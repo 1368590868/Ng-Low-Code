@@ -1,4 +1,5 @@
 using DataEditorPortal.Data.Contexts;
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
@@ -42,6 +43,20 @@ namespace DataEditorPortal
 
             #endregion
 
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder
+                        .WithOrigins("http://localhost:4200", "https://localhost:44315")
+                        .SetIsOriginAllowed(origin => true)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
+            services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
+
             services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -78,6 +93,14 @@ namespace DataEditorPortal
             }
 
             app.UseRouting();
+
+            if (env.IsDevelopment())
+            {
+                app.UseCors();
+            }
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
