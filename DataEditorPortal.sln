@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEditorPortal", "DataEditorPortal\DataEditorPortal.csproj", "{E8F45C30-8872-4763-ADBF-39839391DB7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEditorPortal.Data", "DataEditorPortal.Data\DataEditorPortal.Data.csproj", "{A189ABFB-3AD3-496C-8828-5D9C9623676E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E8F45C30-8872-4763-ADBF-39839391DB7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8F45C30-8872-4763-ADBF-39839391DB7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8F45C30-8872-4763-ADBF-39839391DB7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8F45C30-8872-4763-ADBF-39839391DB7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A189ABFB-3AD3-496C-8828-5D9C9623676E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A189ABFB-3AD3-496C-8828-5D9C9623676E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A189ABFB-3AD3-496C-8828-5D9C9623676E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A189ABFB-3AD3-496C-8828-5D9C9623676E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4A7C8A2C-77BB-4722-B1C7-7FFD649E963F}
+	EndGlobalSection
+EndGlobal
