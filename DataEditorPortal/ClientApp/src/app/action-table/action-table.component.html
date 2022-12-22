@@ -1,0 +1,15 @@
+<p-splitter  styleClass="h-100"  [panelSizes]="[20,80]"  stateKey="split" stateStorage="local" >
+    <ng-template pTemplate>
+        <app-search class="w-100 h-100" ></app-search>
+
+        <div style="position: relative">
+            <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(BatchModule, 'Batch')"
+                style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+        </div>
+    </ng-template>
+    <ng-template pTemplate>
+        <button title="Show Search Panel" class="panelToggle"
+            (click)="togglePanel(BatchModule, 'Batch')"><img src="assets/Images/expand.png" /></button>
+        <!-- <app-batch ></app-batch> -->
+    </ng-template>
+</p-splitter>

@@ -1,0 +1,365 @@
+
+<p-dialog *ngIf="colData" header="Show/Hide Columns"  [style]="{'width': '500px', 'height': '400px'}" [contentStyle]="{'height': '400px'}"
+[(visible)]="showWindow['COLUMNS']" #overlayContainer>
+
+<div>
+
+    <div>Choose the column(s) to display</div>
+    <br>
+
+    <div *ngFor="let c of colData">
+
+        <p-checkbox name="groupname" [binary]="true" [ngModel]="!c.hidden" (onChange)="showColumnsChange(c, $event.checked)" [label]="c.header">
+        </p-checkbox>
+        <br>
+
+    </div>
+
+
+</div>
+
+</p-dialog>
+
+<p-dialog *ngIf="exportData" header="Export To Excel" [style]="{'width': '500px'}" [(visible)]="showWindow['EXPORT']">
+
+    <div>
+      <div style="margin-top: 5px;">
+        File Name
+      </div>
+      <input type="text" style="width: 100%;" styleClass="col-12" pInputText name="ExportName"
+        [(ngModel)]="exportData.ExportName">
+  
+  
+      <div style="margin-top: 5px;">
+        <div>
+          Export Option
+        </div>
+        <div>
+          <div>
+            <p-radioButton label="Export Selected Items Only" name="ExportOption" value="Selection"
+              [(ngModel)]="exportData.ExportOption">
+            </p-radioButton>
+          </div>
+          <div>
+            <p-radioButton name="ExportOption" label="Export Entire Result" value="All"
+              [(ngModel)]="exportData.ExportOption"></p-radioButton>
+          </div>
+        </div>
+      </div>
+  
+  
+      <div style="float: right; margin-top: 10px;">
+        <button class="search-cmd" (click)="exportDataSubmit()">Export</button>
+        <button class="search-cmd" style="margin-left: 10px;" (click)="showWindow = {}">Cancel</button>
+      </div>
+    </div>
+  
+  </p-dialog>
+  
+  
+<p-dialog *ngIf="releaseData" header="Release WOTS Hold" [style]="{'width': '500px'}" 
+[(visible)]="showWindow['RELEASE']" #overlayContainer>
+
+<div *ngIf="validationErrors?.ErrorIssues">
+    <span style="color: red;">
+        <div *ngIf="validationErrors?.ErrorIssues" class="Error"></div>The following Work Orders could not be released due to one of the following reasons:</span>
+    <ul>
+        <li>The Status is not WOTS HOLD</li>
+    </ul>
+    <p>
+        <em>Invalid Issue(s)</em><br>
+        {{validationErrors?.ErrorIssues}}
+    </p>
+    <p>
+        Please unselect those issues and try again. 
+    </p>
+
+    <button class="search-cmd" (click)="showWindow = {}">Ok</button>
+</div>
+
+<div *ngIf="!validationErrors?.ErrorIssues">
+    <div style="font-weight: bold;">These Order Numbers will be set to WOTS FIXED</div>
+    <div >Selected Issue(s) - {{releaseData.checkedItems?.length}} Total</div>
+    <span style="color: #336699">{{releaseData.checkedItemsList}}</span>
+    <div style="color: red" *ngIf="validationErrors?.Selected">
+        <div *ngIf="validationErrors?.Selected" class="Error" [title]="validationErrors?.Selected"></div>No Order Number(s) were selected. 
+    </div>
+    <div style="float: right; margin-top: 10px;">
+        <button class="search-cmd" (click)="releaseHoldSubmit()">Submit</button>
+        <button class="search-cmd" style="margin-left: 10px;"  (click)="showWindow = {}">Cancel</button>
+    </div>
+
+</div>
+</p-dialog>
+
+
+
+<p-dialog *ngIf="exceptionData" header="Edit WOTS Exception {{exceptionData.FNDOCID}}" [style]="{'width': '700px'}" 
+[(visible)]="showWindow['EXCEPTION']" #overlayContainer>
+
+<div class="h-100 p-2">
+  <div class="row mb-1">
+    <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.Project}">
+      <div *ngIf="validationErrors?.Project" class="Error" [title]="validationErrors?.Project"></div>
+      FileNET DOC ID
+    </label>
+    <div class="col-9">
+      <span style="color: #336699">{{exceptionData.FNDOCID}}</span>
+    </div>
+  </div>
+
+  <div class="row mb-1">
+    <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.OrderNumber}">
+      <div *ngIf="validationErrors?.OrderNumber" class="Error" [title]="validationErrors?.OrderNumber"></div>
+      Work Order Number<span class="dialog-require"></span>
+    </label>  
+    <div class="col-9">
+      <input type="text" style="width: 100%;" styleClass="col-12" pInputText [(ngModel)]="exceptionData.OrderNumber">
+    </div>
+  </div>
+
+  
+  
+  <div class="row mb-1" *ngIf="exceptionData.WorkType == 'GAS'">
+    <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.FunctionalLocation}">
+      <div *ngIf="validationErrors?.FunctionalLocation" class="Error" [title]="validationErrors?.FunctionalLocation"></div>
+      Functional Location<span class="dialog-require"></span>
+    </label>
+    <div class="col-9">
+      <input type="text" style="width: 100%;" styleClass="col-12" pInputText [(ngModel)]="exceptionData.FunctionalLocation">
+    </div>
+  </div>
+
+  <div class="row mb-1" *ngIf="exceptionData.WorkType == 'ELECTRIC'">
+    <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.Category}">
+      <div *ngIf="validationErrors?.Category" class="Error" [title]="validationErrors?.Category"></div>
+      Category<span class="dialog-require"></span>
+    </label>
+    <div class="col-9">
+      <p-dropdown styleClass="col-12" [options]="exceptionData.LK_Category"
+        [(ngModel)]="exceptionData.Category" [optionLabel]="'Label'" [optionValue]="'Value'" [filter]="true"
+        filterBy="Label" [showClear]="true" [virtualScroll]="true" [appendTo]="overlayContainer" itemSize="30">
+      </p-dropdown>
+    </div>
+  </div>
+
+  
+  <div class="row mb-1">
+    <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.Batch}">
+      <div *ngIf="validationErrors?.Batch" class="Error" [title]="validationErrors?.Batch"></div>
+      Batch ID<span class="dialog-require"></span>
+    </label>  
+    <div class="col-9">
+      <p-inputNumber style="width: 100%;" [useGrouping]="false" styleClass="col-12" [minFractionDigits]="0" [maxFractionDigits]="0" [(ngModel)]="exceptionData.Batch"
+      mode="decimal"></p-inputNumber>      
+    </div>
+  </div>
+
+  <div class="row mb-1"  *ngIf="exceptionData.WorkType == 'ELECTRIC'">
+    <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.DocumentType}">
+      <div *ngIf="validationErrors?.DocumentType" class="Error" [title]="validationErrors?.DocumentType"></div>
+      Document Type
+    </label>
+    <div class="col-9">
+      <span style="color: #336699">{{exceptionData.DocumentType}}</span>
+    </div>
+  </div>
+
+  <div class="row mb-1"  *ngIf="exceptionData.WorkType == 'GAS'">
+    <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.DocumentType}">
+      <div *ngIf="validationErrors?.DocumentType" class="Error" [title]="validationErrors?.DocumentType"></div>
+      Document Type
+    </label>
+    <div class="col-9">
+      <div class="col-9">
+        <span style="color: #336699">{{exceptionData.DocumentType}}</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row mb-1"  *ngIf="exceptionData.WorkType == 'GAS'">
+    <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.OfficeCode}">
+      <div *ngIf="validationErrors?.OfficeCode" class="Error" [title]="validationErrors?.OfficeCode"></div>
+      Office Code
+    </label>
+    <div class="col-9">
+      <span style="color: #336699">{{exceptionData.OfficeCode}}</span>
+    </div>
+  </div>
+
+
+  
+  <div class="row mb-1" >
+    <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.WOTSStatus}">
+      <div *ngIf="validationErrors?.WOTSStatus" class="Error" [title]="validationErrors?.WOTSStatus"></div>
+      WOTS Status<span class="dialog-require"></span>
+    </label>
+    <div class="col-9">
+      <p-dropdown styleClass="col-12" [options]="exceptionData.LK_WOTSStatus"
+        [(ngModel)]="exceptionData.WOTSStatus" [optionLabel]="'Label'" [optionValue]="'Value'" [filter]="true"
+        filterBy="Label" [showClear]="true" [virtualScroll]="true" [appendTo]="overlayContainer" itemSize="30">
+      </p-dropdown>
+    </div>
+  </div>
+
+  <div class="row mb-1">
+    <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.Project}">
+      <div *ngIf="validationErrors?.Project" class="Error" [title]="validationErrors?.Project"></div>
+      Comments
+    </label>
+    <div class="col-9">
+      <span style="color: #336699">{{exceptionData.Comments}}</span>
+    </div>
+  </div>
+
+  <div class="row mb-1">
+
+    <div style="float: right;">
+      <button class="search-cmd" (click)="editExceptionSubmit()">Save</button>
+      <button class="search-cmd" style="margin-left: 10px;" (click)="showWindow = {}">Cancel</button>
+    </div>
+
+  </div>
+</div>
+</p-dialog>
+  <div class="w-100 h-100 d-flex flex-column">
+    <h5 class="page-title">Staging Area Search Results
+      <p-progressBar mode="indeterminate" [hidden]="!isRunning" title="Searching... Please Wait..."></p-progressBar>
+        </h5>
+    <div *ngIf="workorders && totalRecords == 0" style="font-weight: bold; color: red">
+      <div class="Error"></div>No Search Results Found
+    </div>
+    <div class="table-toolbar" style="margin-bottom: 5px;">
+      <button id="refreshgridID" (click)="refreshData()" class="table-button">
+        <img title="Refresh" src="assets/Images/table-icons/refresh.png" class="sizeIcon" /> Refresh
+      </button>
+      <button (click)="initCheckState(true)" class="table-button">
+        <img title="Select All" src="assets/Images/table-icons/selectall.png" class="sizeIcon" /> Select All
+      </button>
+      <button (click)="initCheckState(false)" class="table-button">
+        <img title="Unselect All" src="assets/Images/table-icons/unselectall.png" class="sizeIcon" /> Unselect All
+      </button>
+  
+      <span style="color:black" class="layercontrolBar"><strong>{{checkedCount}} row(s) selected</strong></span>
+  
+    
+      <button *ngIf="user.Permissions.FILENETWO_RELEASE_HOLD" (click)="releaseHoldInit()" class="table-button">
+        Release Hold
+      </button>
+  
+      <button (click)="exportDataInit()" class="table-button">
+        Export To Excel
+      </button>
+  
+    </div>
+  
+    <div class="flex-fill overflow-hidden">
+      <!-- <div class="flex-fill overflow-hidden" style="position: relative;"> -->
+      <!-- <div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; overflow: hidden;"> -->
+      <p-table #table [value]="workorders" sortMode="multiple" [loading]="isLoading" [scrollable]="true"
+      scrollHeight="flex" [columns]="selectedColumns" [resizableColumns]="true" columnResizeMode="expand"
+      [reorderableColumns]="true" selectionMode="single" [(selection)]="selectedItem" [paginator]="true"
+      [rows]="100" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [rowsPerPageOptions]="[100,200,500,1000]" [lazy]="true" (onLazyLoad)="onLazyLoad($event)"
+      stateStorage="local" stateKey="FN-state" [totalRecords]="totalRecords"
+      styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines Site">
+        <ng-template pTemplate="colgroup" let-columns>
+          <colgroup>
+            <col style="width:100px">
+  
+            <ng-container *ngFor="let col of columns">
+              <col [style.width]="col.width" >
+          </ng-container>
+
+          </colgroup>
+        </ng-template>
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th pResizableColumn></th>
+            <ng-container *ngFor="let col of columns" >
+
+              <th pReorderableColumn pResizableColumn  [pSortableColumn]="col.field">
+
+                  <span>{{col.header}}</span>
+                  <p-sortIcon [field]="col.field"></p-sortIcon>
+                  <p-columnFilter [type]="col.filterType" [field]="col.field" display="menu"
+                      style="float:right;" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+              </th>
+          </ng-container>
+          </tr>
+        </ng-template>
+  
+        <ng-template pTemplate="body" let-data let-columns="columns">
+          <tr [pSelectableRow]="data">
+            <td class="p-table-td">
+              <input class="row-cmd row-chkbox" [checked]="checkedState[data.UI_ID]" (change)="toggleCheckState(data)"
+                type="checkbox" />
+  
+              <button class='row-cmd' title="View Details" (click)="openDetail(data)">
+                <img src="assets/Images/row-icons/info.png" />
+              </button>
+
+              <button *ngIf="user.Permissions.FILENETWO_EDIT_EXCEPTIONS && data.WOTS_STATUS == 'WOTS EXCEPTION'" class='row-cmd' title="Update Exception" (click)="editExceptionInit(data)">
+                <img src="assets/Images/row-icons/wotsexception.png" />
+              </button>
+              
+            </td>
+  
+           
+            <ng-container *ngFor="let col of columns">
+              <td [title]="data[col.field]" >
+                  <span *ngIf="!col.template">{{data[col.field]}}</span>
+              </td>
+          </ng-container>
+
+          </tr>
+        </ng-template>
+  
+        
+        <ng-template pTemplate="paginatorleft">
+          <button class='page-cmd' title="Show / Hide Columns" (click)="showColumnsInit()">
+              <img src="assets/Images/columns.png" />
+          </button>
+      </ng-template>
+      <ng-template pTemplate="paginatorright">
+          <button class='page-cmd' title="Reset Table" (click)="resetColumns()">
+              <img src="assets/Images/reset.png" />
+          </button>
+      </ng-template>
+      </p-table>
+  
+  
+    </div>
+  
+  
+  
+  </div>
+  
+  
+  
+  <p-dialog *ngIf="woDetail" header="Details for {{woDetail?.FNDOCID}}" [style]="{'width': '600px'}"
+      [contentStyle]="{'height': '400px'}" [(visible)]="showWindow['DETAIL']">
+  
+  
+  
+      <span class="DetailHeading">
+       
+          Staging Area Work Order Information
+      </span>
+  
+      <table class="detailView" style="width: 100%">
+        <tbody>
+            <tr class="detailViewTitle">
+                <td style="width: 160px;">Field</td>
+                <td>Value</td>
+            </tr>
+            <tr *ngFor="let row of woDetail.Details">
+                <td class="detailViewField">{{row.Field}}</td>
+                <td class="detailViewValue">{{row.Value}}</td>
+            </tr>
+        </tbody>
+    </table>
+  
+  </p-dialog>
+  

@@ -1,18 +1,55 @@
-a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+.navbar {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
-html {
-  font-size: 14px;
+.Title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #009ADA;
+  padding: .5rem 1rem;
 }
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
+
+.link-active {
+  font-weight: bold;
+}
+
+.toolspanelIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.menuPanel {
+  width: 100%;
+  background-color: #009ada;
+  display: flex;
+}
+
+  .menuPanel .menuBtn {
+    display: inline-block;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    border-radius: 0;
+    vertical-align: middle;
   }
-}
 
-.box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
-}
+    .menuPanel .menuBtn img {
+      max-height: 32px;
+      margin: 2px;
+    }
+
+    .menuPanel .menuBtn:hover {
+      background-color: gray;
+    }
+
+    .menuPanel .menuBtn.active {
+      background-color: #ddd;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
+      .menuPanel .menuBtn.active span {
+        vertical-align: middle;
+        margin-left: 3px;
+      }

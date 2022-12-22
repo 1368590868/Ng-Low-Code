@@ -1,14 +1,375 @@
-<h1>Hello, world!</h1>
-<p>Welcome to your new single-page application, built with:</p>
-<ul>
-  <li><a href='https://get.asp.net/'>ASP.NET Core</a> and <a href='https://msdn.microsoft.com/en-us/library/67ef8sbd.aspx'>C#</a> for cross-platform server-side code</li>
-  <li><a href='https://angular.io/'>Angular</a> and <a href='http://www.typescriptlang.org/'>TypeScript</a> for client-side code</li>
-  <li><a href='http://getbootstrap.com/'>Bootstrap</a> for layout and styling</li>
-</ul>
-<p>To help you get started, we've also set up:</p>
-<ul>
-  <li><strong>Client-side navigation</strong>. For example, click <em>Counter</em> then <em>Back</em> to return here.</li>
-  <li><strong>Angular CLI integration</strong>. In development mode, there's no need to run <code>ng serve</code>. It runs in the background automatically, so your client-side resources are dynamically built on demand and the page refreshes when you modify any file.</li>
-  <li><strong>Efficient production builds</strong>. In production mode, development-time features are disabled, and your <code>dotnet publish</code> configuration automatically invokes <code>ng build</code> to produce minified, ahead-of-time compiled JavaScript files.</li>
-</ul>
-<p>The <code>ClientApp</code> subdirectory is a standard Angular CLI application. If you open a command prompt in that directory, you can run any <code>ng</code> command (e.g., <code>ng test</code>), or use <code>npm</code> to install extra packages into it.</p>
+<div *ngIf="appDataService.currentTool=='NONE'" class="Startup mx-auto">
+    <div style="width:70%; float: left;">
+        <div style="width:100%; height: 100%; padding-right: 20px;">
+            <span class="Heading2">Welcome!</span>
+            <span>
+
+                The Work Order Tracking System (WOTS) was originally created for CenterPoint Energy (CNP) GIS employees to track the work order flow, but now it is widely used by GIS, Work Order Management (WOM), Operation, Engineering, Compliance, and Leadership to track Gas, Electric, Major Underground and Landbase requests, work orders and data corrections submitted for digitizing into GIS. Requests are primarily submitted by internal company employees as work orders to digitize. CNP and Contract personnel use the application for data entry, QC,  problem resolution, work assignment, progress tracking and reporting.
+                
+                <p>To learn how to use the site, download the <a href="assets/UserGuide.pdf" target="_blank" class="aButton">WOTS User Guide</a>.</p>
+                <div>
+                <p>
+
+                <b>Supported internet browsers for WOTS are Microsoft Edge and Google Chrome. Do not use Internet Explorer to access this site.</b>
+                
+                </p>
+                <img src="assets/Images/ie.png" style="width: 75px;" title="Microsoft Edge Browser"/>
+                <img src="assets/Images/chrome.png" title="Google Chrome Browser"/>
+                </div>
+            </span>
+            <!-- 
+            <span class="Heading2" style="margin-top: 20px;">
+                What's New?
+            </span>
+            <div>
+                <ul>
+                    <li>
+                        Added new Review Module - The module allows users to review problem and issue reports.
+                    </li>
+                    <li>
+                        Added QC Section to Report Module
+                    </li>
+                    <li>
+                        Over 30 bug fixes to existing application. To see the list of resolved issues, see the
+                        Release Notes on the <button  class="search-cmd" >About Page</button>.
+                    </li>
+                </ul>
+            </div> -->
+            <span style="margin-top:64px; bottom: 0px; font-size: 10px;">
+                {{appDataService.siteVersion}}
+            </span>
+        </div>
+    </div>
+    <div
+        style="font-size: 14px; background-color: #FFF; opacity: 60%; margin: -20px; height: 500px; padding: 20px; width: 30%; float: right; ">
+        <span class="Heading2">Quick Links</span>
+        <span *ngIf="user.Permissions.DC_SUBMIT_NEW" class="Links" (click)="openQuickLink('NEWDATACORRECTION')">Submit
+            New Data Correction</span>
+        <span *ngIf="user.Permissions.LANDBASE_SUBMIT_NEW" class="Links" (click)="openQuickLink('NEWLANDBASE')">Submit
+            New Landbase Work</span>
+        <span *ngIf="user.Permissions.ELECTRIC_SUBMIT_NEW" class="Links" (click)="openQuickLink('NEWELECTRIC')">Receive Electric Work Order</span>
+        <span *ngIf="user.Permissions.UNDERGROUND_SUBMIT_NEW" class="Links" (click)="openQuickLink('NEWUNDERGROUND')">Receive Underground Work Order</span>
+        <span class="Heading2" style="margin-top: 20px;">Need Help?</span>
+        <div style="font-size: 12px;">
+            For general questions, you can send a message to
+            gissupportdesktop@centerpoint.com<br />
+            <p>
+                Visit <button class="aButton" style="font-size: 12px;" [routerLinkActive]="['link-active']"
+                    [routerLink]="['/contact']">Contact Page</button> for contacts on specific subject matters
+            </p>
+        </div>
+    </div>
+    <app-data-correction-dialogs></app-data-correction-dialogs>
+    <app-land-base-dialogs></app-land-base-dialogs>
+    <app-electric-dialogs></app-electric-dialogs>
+    <app-underground-dialogs></app-underground-dialogs>
+</div>
+
+
+
+<div *ngIf="appDataService.currentTool=='About'">
+    <div style="margin: 15px">
+        <h3>About WOTS</h3>
+
+        <p>
+            The Work Order Tracking System (WOTS) was originally created for CenterPoint Energy (CNP) GIS employees to track the work order flow, but now it is widely used by GIS, Work Order Management (WOM), Operation, Engineering, Compliance, and Leadership to track Gas, Electric, Major Underground and Landbase requests, work orders and data corrections submitted for digitizing into GIS. Requests are primarily submitted by internal company employees as work orders to digitize. CNP and Contract personnel use the application for data entry, QC,  problem resolution, work assignment, progress tracking and reporting. 
+        </p>
+
+        <div>
+            <p>
+
+            <b>Supported internet browsers for WOTS are Microsoft Edge and Google Chrome. Do not use Internet Explorer to access this site.</b>
+            
+            </p>
+            <img src="assets/Images/ie.png" style="width: 75px;" title="Microsoft Edge Browser"/>
+            <img src="assets/Images/chrome.png" title="Google Chrome Browser"/>
+            </div>
+    </div>
+</div>
+
+<div *ngIf="appDataService.currentTool=='Contact'">
+
+
+    <div style="margin: 15px">
+        <h3>Contact</h3>
+
+        <p>
+             
+            For technical support, website issues, user access<br />
+            <strong>GIS Support Desk </strong> <a
+                href="mailto:gissupportdesk@centerpointenergy.com">gissupportdesk@centerpointenergy.com</a><br />
+        </p>
+        <p>
+            For electric and landbase workorder, data correction and facilities related support<br />
+            <strong>Deepa Hukeri </strong> <a
+                href="mailto:deepalaxmi.hukeri@centerpointenergy.com">deepalaxmi.hukeri@centerpointenergy.com</a><br />
+        </p>
+        <p>
+            For gas and landbase workorder, data correction and facilities related support<br />
+            <strong>Christoper Huff </strong> <a
+                href="mailto:Christoper.Huff@centerpointenergy.com">Christoper.Huff@centerpointenergy.com</a><br />
+            
+                <strong>Belinda Walker </strong> <a
+                href="mailto:Belinda.Walker@centerpointenergy.com">Belinda.Walker@centerpointenergy.com</a><br />
+</p>
+    </div>
+</div>
+
+<div *ngIf="appDataService.currentTool=='Landbase'" class="h-100">
+    <p-splitter #landbaseModule styleClass="h-100"  [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['LB']" class="w-100 h-100" [NavigationView]="false"
+                [SearchView]="'Detail'" [DualSearchView]="true" *ngIf="appDataService.currentSearchView != 'Multiple'"
+                style="width:100%" [SearchConfig]="'Landbase'"></app-search>
+            <app-search [hidden]="searchPanelCollapsed['LB']" class="w-100 h-100" [NavigationView]="false"
+                [SearchView]="'Multiple'" [DualSearchView]="true" *ngIf="appDataService.currentSearchView == 'Multiple'"
+                style="width:100%" [SearchConfig]="'Landbase'"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(landbaseModule, 'LB')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['LB']"
+                style="height: 30px;" (click)="togglePanel(landbaseModule, 'LB')"><img
+                    src="assets/Images/expand.png" /></button>
+            <app-land-base class="w-100 h-100" *ngIf="appDataService.currentTool=='Landbase'"></app-land-base>
+        </ng-template>
+    </p-splitter>
+</div>
+
+<div *ngIf="appDataService.currentTool=='Gas'" class="h-100">
+    <p-splitter #gasModule styleClass="h-100" [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['GAS']" class="w-100 h-100" [NavigationView]="false"
+                [SearchView]="'Detail'" [DualSearchView]="true" *ngIf="appDataService.currentSearchView != 'Multiple'"
+                style="width:100%" [SearchConfig]="'Gas'"></app-search>
+            <app-search [hidden]="searchPanelCollapsed['GAS']" class="w-100 h-100" [NavigationView]="false"
+                [SearchView]="'Multiple'" [DualSearchView]="true" *ngIf="appDataService.currentSearchView == 'Multiple'"
+                style="width:100%" [SearchConfig]="'Gas'"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(gasModule, 'GAS')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['GAS']"
+                (click)="togglePanel(gasModule, 'GAS')"><img src="assets/Images/expand.png" /></button>
+            <app-gas class="w-100 h-100" *ngIf="appDataService.currentTool=='Gas'"></app-gas>
+        </ng-template>
+    </p-splitter>
+
+</div>
+
+
+<div *ngIf="appDataService.currentTool=='Electric'" class="h-100">
+    <p-splitter #electricModule styleClass="h-100" [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['ELECTRIC']" class="w-100 h-100" [NavigationView]="false"
+                [SearchView]="'Detail'" [DualSearchView]="true" *ngIf="appDataService.currentSearchView != 'Multiple'"
+                style="width:100%" [SearchConfig]="'Electric'"></app-search>
+            <app-search [hidden]="searchPanelCollapsed['ELECTRIC']" class="w-100 h-100" [NavigationView]="false"
+                [SearchView]="'Multiple'" [DualSearchView]="true" *ngIf="appDataService.currentSearchView == 'Multiple'"
+                style="width:100%" [SearchConfig]="'Electric'"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(electricModule, 'ELECTRIC')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['ELECTRIC']"
+                (click)="togglePanel(electricModule, 'ELECTRIC')"><img src="assets/Images/expand.png" /></button>
+            <app-electric class="w-100 h-100" *ngIf="appDataService.currentTool=='Electric'"></app-electric>
+        </ng-template>
+    </p-splitter>
+
+</div>
+
+<div *ngIf="appDataService.currentTool=='Underground'" class="h-100">
+    <p-splitter #undergroundModule styleClass="h-100" [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['UNDERGROUND']" class="w-100 h-100" [NavigationView]="false"
+                [SearchView]="'Detail'" [DualSearchView]="true" *ngIf="appDataService.currentSearchView != 'Multiple'"
+                style="width:100%" [SearchConfig]="'Underground'"></app-search>
+            <app-search [hidden]="searchPanelCollapsed['UNDERGROUND']" class="w-100 h-100" [NavigationView]="false"
+                [SearchView]="'Multiple'" [DualSearchView]="true" *ngIf="appDataService.currentSearchView == 'Multiple'"
+                style="width:100%" [SearchConfig]="'Underground'"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(undergroundModule, 'UNDERGROUND')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['UNDERGROUND']"
+                (click)="togglePanel(undergroundModule, 'UNDERGROUND')"><img src="assets/Images/expand.png" /></button>
+            <app-underground class="w-100 h-100" *ngIf="appDataService.currentTool=='Underground'"></app-underground>
+        </ng-template>
+    </p-splitter>
+
+</div>
+
+
+<div *ngIf="appDataService.currentTool=='DC'" class="h-100">
+    <p-splitter #DCModule styleClass="h-100"  [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['DC']" [SearchView]="'Multiple'" [NavigationView]="false"
+                class="w-100 h-100" [SearchConfig]="'DataCorrection'" style="width:100%"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(DCModule, 'DC')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['DC']"
+                (click)="togglePanel(DCModule, 'DC')"><img src="assets/Images/expand.png" /></button>
+            <app-data-correction class="w-100 h-100"></app-data-correction>
+        </ng-template>
+    </p-splitter>
+</div>
+
+<div *ngIf="appDataService.currentTool=='User'" class="h-100">
+    <p-splitter #UModule styleClass="h-100"  [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['U']" class="w-100 h-100" [NavigationView]="false"
+                [SearchView]="'Multiple'" [SearchConfig]="'User'"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(UModule, 'U')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['U']"
+                (click)="togglePanel(UModule, 'U')"><img src="assets/Images/expand.png" /></button>
+
+            <app-user-manager class="w-100 h-100"></app-user-manager>
+        </ng-template>
+    </p-splitter>
+</div>
+
+<div *ngIf="appDataService.currentTool=='Batch'" class="h-100">
+    <p-splitter #BatchModule styleClass="h-100" [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['Batch']" [SearchView]="'Multiple'" [NavigationView]="false"
+                class="w-100 h-100" [SearchConfig]="'Batch'" style="width:100%"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(BatchModule, 'Batch')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['Batch']"
+                (click)="togglePanel(BatchModule, 'Batch')"><img src="assets/Images/expand.png" /></button>
+            <app-batch class="w-100 h-100"></app-batch>
+        </ng-template>
+    </p-splitter>
+
+</div>
+
+<div *ngIf="appDataService.currentTool=='Reviews'" class="h-100">
+    <p-splitter #RevModule styleClass="h-100" [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['REV']" class="w-100 h-100" [NavigationView]="true"
+                [SearchView]="'Navigate'" style="width:100%" [SearchConfig]="'Review'"></app-search>
+
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(RevModule, 'REV')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['REV']"
+                (click)="togglePanel(RevModule, 'REV')"><img src="assets/Images/expand.png" /></button>
+
+            <app-review class="w-100 h-100"></app-review>
+        </ng-template>
+    </p-splitter>
+</div>
+
+<div *ngIf="appDataService.currentTool=='Reports'" class="h-100">
+    <p-splitter #RepModule styleClass="h-100" [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['REP']" class="w-100 h-100" [NavigationView]="true"
+                [SearchView]="'Navigate'" style="width:100%" [SearchConfig]="'Report'"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(RepModule, 'REP')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['REP']"
+                (click)="togglePanel(RepModule, 'REP')"><img src="assets/Images/expand.png" /></button>
+
+            <app-report class="w-100 h-100"></app-report>
+        </ng-template>
+    </p-splitter>
+</div>
+
+
+<div *ngIf="appDataService.currentTool=='Projects'" class="h-100">
+    <p-splitter #ProjectsModule styleClass="h-100" [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['Projects']" [SearchView]="'Multiple'" [NavigationView]="false"
+                class="w-100 h-100" [SearchConfig]="'Project'" style="width:100%"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(ProjectsModule, 'Projects')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['Projects']"
+                (click)="togglePanel(ProjectsModule, 'Projects')"><img src="assets/Images/expand.png" /></button>
+            <app-project class="w-100 h-100"></app-project>
+        </ng-template>
+    </p-splitter>
+</div>
+
+
+<div *ngIf="appDataService.currentTool=='DCGroupContact'" class="h-100">
+    <p-splitter #DCGroupContactModule styleClass="h-100" [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['DCGroupContact']" [SearchView]="'Multiple'" [NavigationView]="false"
+                class="w-100 h-100" [SearchConfig]="'DCGroupContact'" style="width:100%"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(DCGroupContactModule, 'DCGroupContact')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['DCGroupContact']"
+                (click)="togglePanel(DCGroupContactModule, 'DCGroupContact')"><img src="assets/Images/expand.png" /></button>
+            <app-dcgroup-contact class="w-100 h-100"></app-dcgroup-contact>
+        </ng-template>
+    </p-splitter>
+</div>
+
+
+
+<div *ngIf="appDataService.currentTool=='FileNetWO'" class="h-100">
+    <p-splitter #FileNetWOModule styleClass="h-100"  [panelSizes]="[20,80]">
+        <ng-template pTemplate>
+            <app-search [hidden]="searchPanelCollapsed['FileNetWO']" [SearchView]="'Multiple'" [NavigationView]="false"
+                class="w-100 h-100" [SearchConfig]="'FileNetWO'" style="width:100%"></app-search>
+
+            <div style="position: relative">
+                <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(FileNetWOModule, 'FileNetWO')"
+                    style="position: absolute; right: 0"><img src="assets/Images/collapse.png" /></button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <button title="Show Search Panel" class="panelToggle" *ngIf="searchPanelCollapsed['FileNetWO']"
+                (click)="togglePanel(FileNetWOModule, 'FileNetWO')"><img src="assets/Images/expand.png" /></button>
+            <app-filenetwo class="w-100 h-100"></app-filenetwo>
+        </ng-template>
+    </p-splitter>
+</div>

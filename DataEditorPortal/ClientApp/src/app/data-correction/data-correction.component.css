@@ -1,0 +1,59 @@
+
+:host::ng-deep .p-datatable-scrollable-wrapper {
+	/* fix pagination not show */
+	overflow: hidden;
+  }
+  
+  :host::ng-deep .pi-sort-alt {
+	display: none;
+  }
+
+/*Status Label Styles*/
+.S_DCA 
+{ 
+	color: green;  
+
+}
+.S_DCASSIGN {
+	color: blue; 
+}
+.S_DCB {
+	color: magenta; 
+}
+.S_DCCNFA {
+	color: red
+}
+.S_DCEX {
+	color: #000000
+}
+.S_DCNPF {
+	color: #000000
+}
+.S_DCNPQ {
+	color: #000000
+}
+.S_DCQCZ {
+	color: red; 
+}
+.S_DCTRZ {
+	color: #000000
+}
+.S_DCZ {
+	color: red; 
+}
+
+
+.responseRow:hover
+{
+	background-color: yellow;
+}
+
+
+.DetailHeading 
+{
+	color: #336699; 
+	font-weight: bold; 
+	display: block;
+	margin-top: 10px;
+}
+

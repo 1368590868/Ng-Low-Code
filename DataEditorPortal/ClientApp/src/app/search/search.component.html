@@ -1,0 +1,153 @@
+<div class="h-100 p-2" style="background-color: #ddd">
+    <p-progressBar mode="indeterminate" [hidden]="!isRunning" title="Loading UI...Please Wait..."></p-progressBar>
+
+    <div *ngIf="appDataService.currentSearchView == 'Navigation'" style="overflow-y: auto; height: 100%;">
+        <div>{{SearchConfig}} List</div>
+        <p-tree [filter]="true" (onNodeSelect)="selectNavItem()" filterMode="strict" [value]="navParams"
+            selectionMode="single" [(selection)]="navItem">
+            <ng-template let-node pTemplate="report">
+                <div class="nodeItem">{{node.label}}</div>
+                <div class="nodeDescription">{{node.Description}}</div>
+            </ng-template>
+            <ng-template let-node pTemplate="search">
+                <div class="nodeItem">{{node.label}}</div>
+                <div class="nodeDescription">{{node.Description}}</div>
+            </ng-template>
+            <ng-template let-node pTemplate="Section">
+                <div class="nodeHeader">{{node.label}}</div>
+                <div *ngIf="node.Description" class="nodeDescription">{{node.Description}}</div>
+            </ng-template>
+        </p-tree>
+
+    </div>
+    
+    <div *ngIf="appDataService.currentSearchView != 'Navigation'" style="display: flex; flex-direction: column;  height: 100%; overflow-y: auto;
+    overflow-x: hidden;">
+        <div style="margin-bottom: 10px; font-weight: bold; color: #336699;"
+            *ngIf="this.appDataService.currentNavigationItem?.label">
+            <span *ngIf="this.appDataService.currentNavigationItem?.grouplabel">{{this.appDataService.currentNavigationItem?.grouplabel}}<img style="margin-top: -4px; " src="assets/Images/sep.png" /></span>{{this.appDataService.currentNavigationItem?.label}} Report<br>
+            <span style="font-size: 12px; font-style: italic; display: block; font-weight: normal" *ngIf="this.appDataService.currentNavigationItem?.Description">{{this.appDataService.currentNavigationItem?.Description}}</span>
+        </div>
+        
+        <div *ngIf="DualSearchView" style="margin-bottom: 10px;">
+            Search Mode:
+            <div style="margin-right: 10px;display: inline; font-size: 16px; font-weight: bold;"
+                *ngIf="appDataService.currentSearchView=='Detail'">Quick</div>
+            <div style="margin-right: 10px;display: inline; font-size: 16px;" class="linkButton"
+                *ngIf="appDataService.currentSearchView !='Detail'" (click)="changeView('Detail')">Quick</div>
+
+            <div style="display: inline; font-size: 16px; font-weight: bold;"
+                *ngIf="appDataService.currentSearchView=='Multiple'">List</div>
+            <div style=" display: inline; font-size: 16px;" *ngIf="appDataService.currentSearchView !='Multiple'"
+                class="linkButton" (click)="changeView('Multiple')">List</div>
+        </div>
+        <div *ngIf="!DualSearchView" style="margin-bottom: 10px;">
+            Search Inputs
+
+        </div>
+        <div *ngIf="appDataService.currentSearchView == 'Multiple' && saveSearchData" class="row mb-1">
+            <label class="col-4 search-label" style="color: #336699">Saved Searches</label>
+            <div class="col-8" #overlayContainer2>
+                <p-dropdown styleClass="col-12" [options]="saveSearchData.LK_SearchNames"
+                [(ngModel)]="saveSearchData.SelectedItem" [optionLabel]="'NAME'" (keydown.enter)="selectSearch()"
+                [appendTo]="overlayContainer2" [filter]="true"
+                [filterBy]="'NAME'" (onChange)="selectSearch()" [virtualScroll]="true" itemSize="30">
+                 </p-dropdown>
+            </div>
+            <hr style="height: 2px; width: 92%;
+            margin-top: 5px;
+            margin-bottom: 0px;
+            margin-left: 12px;">
+        </div>
+        <div *ngFor="let param of searchParams" class="row mb-1">
+            <label class="col-4 search-label">{{param.Label}}<div *ngIf="param?.HelpTip" class="HelpTip" title="{{param.HelpTip}}"></div>
+            </label>
+            <div class="col-8" #overlayContainer>
+                <p-dropdown *ngIf="param.Type == 'pDropDown'" styleClass="col-12" [options]="param.Options"
+                    [(ngModel)]="param.SelectedValue" [optionLabel]="param.OptionLabel" (keydown.enter)="searchSubmit()"
+                    [optionValue]="param.OptionValue" [appendTo]="overlayContainer" [filter]="true"
+                    [filterBy]="param.OptionLabel" (onChange)="checkCascade(param)" [virtualScroll]="true" itemSize="30">
+                </p-dropdown>
+
+                <p-multiSelect (onChange)="getSelectedItems(param)" styleClass="col-12"
+                    *ngIf="param.Type=='pMultiSelect'" [options]="param.Options" [(ngModel)]="param.SelectedValueList"
+                    [optionLabel]="param.OptionLabel" [optionValue]="param.OptionValue" [appendTo]="overlayContainer"
+                    (onChange)="checkCascade(param)" [filter]="true" [filterBy]="param.OptionLabel" [virtualScroll]="true" itemSize="30">
+                    ></p-multiSelect>
+
+                <textarea *ngIf="param.Type=='pOrderNumber'" pInputTextarea rows="5" style="width: 100%;" [(ngModel)]="param.SelectedValue"></textarea>
+                
+                <input *ngIf="param.Type == 'pInputText'" type="text" style="width: 100%;" styleClass="col-12"
+                    [appendTo]="overlayContainer" pInputText [(ngModel)]="param.SelectedValue" (keydown.enter)="searchSubmit()">
+
+                <p-calendar *ngIf="param.Type == 'pCalendar'" styleClass="col-12" [(ngModel)]="param.SelectedValue"
+                    dateFormat="mm/dd/yy" dataType="string" [appendTo]="overlayContainer" (keydown.enter)="searchSubmit()"></p-calendar>
+                <p-calendar *ngIf="param.Type == 'MonthYear'" styleClass="col-12" [(ngModel)]="param.SelectedValue" (keydown.enter)="searchSubmit()"
+                    view="month" dateFormat="mm/yy" dataType="string" [appendTo]="overlayContainer"></p-calendar>
+
+                    <p-checkbox *ngIf="param.Type2 == 'Toggle'"  [label]="param.Label2" value="Y" [(ngModel)]="param.ToggleValue"
+                        [binary]="true" [inputId]="param.Name">
+                    </p-checkbox>
+    
+            </div>
+
+        </div>
+
+
+        <div style="align-self: end;">
+            
+  
+            <button *ngIf="appDataService.currentSearchView == 'Multiple'" class='row-cmd' title="Save Current Search" (click)="saveSearchInit()">
+                <img style="margin-top: -10px;" src="assets/Images/addsearch.png" />
+            </button>
+
+            <button class="search-cmd" (click)="searchSubmit()">Search</button>
+            <button class="search-cmd" style="margin-left: 10px;" (click)="clearSearch()"
+                title="Clear Search Parameters">Clear</button>
+
+            <button class="search-cmd" style="margin-left: 10px;" title="Back to {{SearchConfig}} List"
+                (click)="openNavigation()" *ngIf="this.NavigationView">Back to List</button>
+        </div>
+       
+        <p-dialog *ngIf="showSavedSearch && saveSearchDataAdd" #overlayContainer header="Save Search Inputs" [style]="{'width': '500px'}" [(visible)]="showSavedSearch">
+           
+            <div >
+                <label class="DialogHeading">New Search Name</label>
+                <input type="text" style="width: 100%;" styleClass="col-12"
+                [appendTo]="overlayContainer" pInputText [(ngModel)]="saveSearchDataAdd.Name">
+
+                <label class="DialogHeading">Replace Existing Saved Search</label>
+                <p-dropdown styleClass="col-12" [options]="saveSearchData.LK_SearchNames"
+                [(ngModel)]="saveSearchDataAdd.ID" [optionLabel]="'NAME'" 
+                [appendTo]="overlayContainer" [optionValue]="'ID'" [filter]="true"
+                [filterBy]="'NAME'" [virtualScroll]="true" itemSize="30">
+                </p-dropdown>
+
+                <div style="margin-top: 10px;">
+                <button class="search-cmd" (click)="saveSearchSubmit()">Save</button>
+                <button class="search-cmd" style="margin-left: 10px;" 
+                    title="Close" (click)="showSavedSearch = false">Cancel</button>
+                </div>
+            </div>
+        
+        </p-dialog>
+        
+
+        <div *ngIf="appDataService.currentSearchResult?.length > 0" style="overflow-y: auto; margin-top: 5px;">
+            <span style="font-weight: bold;">Multiple Matches Found</span>
+            <br>
+            <span style="font-style: italic">Select one to view</span>
+            <br>
+            <div *ngFor="let data of appDataService.currentSearchResult">
+                <div class='linkButton' (click)="searchLink(data.Index)" style="display: inline">{{data.Label}}</div>
+                <!--<div [title]="data.StatusDescription" class="StatusMarker {{data.Status}}">{{data.Status}}</div>-->
+            </div>
+        </div>
+        <div *ngIf="appDataService.currentSearchNoMatch">
+            <span style="font-weight: bold; font-style: italic">No Matches Found</span>
+            <div *ngIf="appDataService.currentModule != 'LANDBASE'" style="font-size: 14px; font-style: italic; ">
+            Try <div class="linkButton" style="display: inline-block" (click)="searchStaging()">Search Staging Area</div>
+            </div>    
+        </div>
+    </div>
+</div>

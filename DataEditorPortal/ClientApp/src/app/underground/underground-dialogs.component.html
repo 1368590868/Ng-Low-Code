@@ -1,0 +1,581 @@
+<p-confirmPopup></p-confirmPopup>
+
+
+<ng-template #attachmentSection let-data="data">
+    <table class="table-view">
+        <tr>
+            <th>File Name</th>
+            <th>Attached By</th>
+            <th>Date Attached</th>
+            <th>Order Status</th>
+            <th></th>
+        </tr>
+        <tr *ngFor="let att of data.Attachments">
+            <td   *ngIf="att.STATUS != 'Removed'" style="text-align: left;"><a class="wraplongtext links" 
+                (click)="attachmentDownload(att)">{{att.FILE_NAME}}</a>
+
+                <button (click)="attachmentDownload(att)" class='row-cmd' title="Download">
+                    <img src="assets/Images/row-icons/download.png" />
+                </button>
+            </td>
+            <td style="text-align: left;" *ngIf="att.STATUS == 'Removed'">
+                <span class="wraplongtext" style="text-decoration: line-through;">{{att.FILE_NAME}}</span>              
+            </td>
+
+            <td>
+                {{att.CREATEDBY}}
+            </td>
+            <td>
+                {{att.CREATEDDATE}}
+            </td>
+            <td>
+                {{att.ORDERSTATUSDESC}}
+            </td>
+            <td style="text-align: right;" *ngIf="canEdit(data)">
+                <button *ngIf="att.STATUS != 'Removed'" class='row-cmd' title="Remove {{att.FILE_NAME}}" (click)="attachmentDelete($event, att, data)">
+                    <img src="assets/Images/row-icons/delete.png" />
+                </button>
+                <button *ngIf="att.STATUS == 'Removed'" class='row-cmd' title="Retore {{att.FILE_NAME}}" (click)="attachmentRestore($event, att, data)">
+                    <img src="assets/Images/row-icons/restore.png" />
+                </button>
+            </td>
+        </tr>
+    </table>
+    <div *ngIf="canEdit(data)">
+        <label>Upload New Attachment(s)</label>
+        <p-fileUpload #AttachmentsRef name="attachments" multiple="multiple" [auto]="true" mode="basic"
+            chooseLabel="Browse" url="{{undergroundService._apiUrl}}Underground/AddAttachment"
+            accept=".dwg,.dxf,.dgn,.pdf,.ppt,.docx,.doc,.xlsx,.xls,image/*" (onBeforeUpload)="attachmentSubmit($event)"
+            (onError)="onFileUploadError($event,AttachmentsRef)"
+            (onUpload)="onFileUploadSuccess($event,AttachmentsRef, data)">
+        </p-fileUpload>
+    </div>
+</ng-template>
+
+<p-dialog *ngIf="undergroundData && showWindow['EDIT']" #overlayContainer header="Edit Work Order {{undergroundData?.OrderNumber}}"
+    [style]="{'width': '980px'}" [(visible)]="showWindow['EDIT']">
+
+    <div class="h-100 p-2">
+
+
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.WorkOrderState}">
+                <div *ngIf="validationErrors?.WorkOrderState" class="Error" [title]="validationErrors?.WorkOrderState"></div>Order
+                State<span class="dialog-require"></span>
+            </label>
+            <div class="col-10">
+                <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="undergroundData.LK_WorkOrderState"
+                    name="OrderType" [(ngModel)]="undergroundData.WorkOrderStateNew" [optionLabel]="'Label'" [optionValue]="'Value'">
+                </p-dropdown>
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.OrderType}">
+                <div *ngIf="validationErrors?.OrderType" class="Error" [title]="validationErrors?.OrderType"></div>Order
+                Type<span class="dialog-require"></span>
+            </label>
+            <div class="col-10">
+                <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="undergroundData.LK_OrderType"
+                    name="OrderType" [(ngModel)]="undergroundData.OrderType" [optionLabel]="'Label'" [optionValue]="'Value'">
+                </p-dropdown>
+            </div>
+        </div>
+
+
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.ProblemDescription}">
+                <div *ngIf="validationErrors?.ProblemDescription" class="Error"
+                    [title]="validationErrors?.ProblemDescription"></div>Problem Description
+            </label>
+            <div class="col-10">
+                <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="undergroundData.LK_ProblemDescription"
+                    [(ngModel)]="undergroundData.ProblemDescription" [optionLabel]="'Label'" [optionValue]="'Value'">
+                </p-dropdown>
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.ProblemRemark}">
+                <div *ngIf="validationErrors?.ProblemRemark" class="Error" [title]="validationErrors?.ProblemRemark">
+                </div>Problem Remarks
+            </label>
+            <div class="col-10">
+                <textarea pInputTextarea rows="3" style="width: 100%;" [(ngModel)]="undergroundData.ProblemRemark"></textarea>
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.ServiceArea}">
+                <div *ngIf="validationErrors?.ServiceArea" class="Error" [title]="validationErrors?.ServiceArea"></div>
+                Service Area<span class="dialog-require"></span>
+            </label>
+            <div class="col-10">
+                <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="undergroundData.LK_ServiceArea"
+                    name="ServiceArea" [(ngModel)]="undergroundData.ServiceArea" [optionLabel]="'Label'" [optionValue]="'Value'"
+                    (onChange)="defaultServiceAreaInput()">
+                </p-dropdown>
+            </div>
+        </div>
+
+
+
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.BatchNumber}">
+                <div *ngIf="validationErrors?.BatchNumber" class="Error" [title]="validationErrors?.BatchNumber"></div>
+                Batch Number
+            </label>
+            <div class="col-10">
+
+                <input type="text" style="width: 100%;" styleClass="col-12" pInputText [(ngModel)]="undergroundData.BatchNumber"
+                    (blur)="validateBatchNumber()">
+            </div>
+        </div>
+
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.DesignArea}">
+                <div *ngIf="validationErrors?.DesignArea" class="Error" [title]="validationErrors?.DesignArea"></div>Designated Area
+            </label>
+            <div class="col-10">
+                <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="undergroundData.LK_DesignArea"
+                    name="DesignArea" [(ngModel)]="undergroundData.DesignArea" [optionLabel]="'Label'" [optionValue]="'Value'">
+                </p-dropdown>
+            </div>
+        </div>
+
+
+        <div class="row mb-1">
+            <label class="col-2">Need Date</label>
+            <div class="col-10">
+                <p-calendar styleClass="col-12" [(ngModel)]="undergroundData.NeedDate" dateFormat="mm/dd/yy"
+                    dataType="string" [appendTo]="overlayContainer"></p-calendar>
+            </div>
+        </div>
+
+
+
+
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.Project}">
+                <div *ngIf="validationErrors?.Project" class="Error" [title]="validationErrors?.Project"></div>
+                Project
+            </label>
+            <div class="col-10">
+                <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="undergroundData.LK_Project"
+                    name="Project" [(ngModel)]="undergroundData.Project" [optionLabel]="'Label'" [optionValue]="'Value'">
+                </p-dropdown>
+            </div>
+        </div>
+
+
+        <div class="row mb-1">
+            <label class="col-2">Estimated Project Completion Date</label>
+            <div class="col-10">
+                <p-calendar styleClass="col-12" [(ngModel)]="undergroundData.EstCompletionDate" dateFormat="mm/dd/yy"
+                    dataType="string" [appendTo]="overlayContainer"></p-calendar>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.City}">
+                <div *ngIf="validationErrors?.City" class="Error" [title]="validationErrors?.City"></div>
+                City
+            </label>
+            <div class="col-10">
+
+                <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="undergroundData.LK_City" name="City"
+                    [(ngModel)]="undergroundData.City" [optionLabel]="'Label'" [optionValue]="'Value'">
+                </p-dropdown>
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.ReferenceWO}">
+                <div *ngIf="validationErrors?.ReferenceWO" class="Error" [title]="validationErrors?.ReferenceWO"></div>
+                Related WO#
+            </label>
+            <div class="col-10">
+                <input type="text" style="width: 100%;" styleClass="col-12" pInputText
+                    [(ngModel)]="undergroundData.ReferenceWO">
+            </div>
+        </div>
+
+
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.Vendor}">
+                <div *ngIf="validationErrors?.Vendor" class="Error" [title]="validationErrors?.Vendor"></div>
+                Vendor
+            </label>
+            <div class="col-10">
+                <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="undergroundData.LK_Vendor"
+                    [(ngModel)]="undergroundData.Vendor" [optionLabel]="'Label'" [optionValue]="'Value'">
+                </p-dropdown>
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.VendorComment}">
+                <div *ngIf="validationErrors?.VendorComment" class="Error" [title]="validationErrors?.VendorComment">
+                </div>Vendor Comments
+            </label>
+            <div class="col-10">
+                <textarea pInputTextarea rows="3" style="width: 100%;" [(ngModel)]="undergroundData.VendorComment"></textarea>
+            </div>
+        </div>
+
+
+
+        <div style="float: right;">
+            <button class="search-cmd" [disabled]="isSubmitting" (click)="editSubmit()">Submit</button>
+            <button class="search-cmd" style="margin-left: 10px;" (click)="showWindow = {}">Cancel</button>
+        </div>
+        <br>
+        <p-progressBar class="ToolRunning" mode="indeterminate" [hidden]="!isSubmitting" title="Running..."></p-progressBar>
+
+    </div>
+
+</p-dialog>
+
+<p-dialog *ngIf="receiveData" header="Receive Work Order" [style]="{'width': '900px', 'height': '600px'}"
+    [(visible)]="showWindow['RECEIVE']" #overlayContainer>
+
+    <div style="overflow-x:hidden">
+
+        <div class="row mb-1">
+            <div class="col-4">
+                <label [ngClass]="{'ErrorMsg' : validationErrors?.OrderNumber}">
+                    <div *ngIf="validationErrors?.OrderNumber" class="Error" [title]="validationErrors?.OrderNumber">
+                    </div>
+                    Work Order Number<span class="dialog-require"></span>
+                </label>
+                <div styleClass="col-12">
+                    <input type="text" style="width: 100%;" pInputText [(ngModel)]="receiveData.OrderNumber">
+                </div>
+            </div>
+            <div class="col-4">
+                <label [ngClass]="{'ErrorMsg' : validationErrors?.WorkOrderState}">
+                    <div *ngIf="validationErrors?.WorkOrderState" class="Error"
+                        [title]="validationErrors?.WorkOrderState"></div>
+                    Work Order State
+                </label>
+                <div styleClass="col-12">
+                    <p-dropdown styleClass="col-12" [appendTo]="overlayContainer"
+                        [options]="receiveData.LK_WorkOrderState" [(ngModel)]="receiveData.WorkOrderState"
+                        [optionLabel]="'Label'" [optionValue]="'Value'">
+                    </p-dropdown>
+                </div>
+            </div>
+            <div class="col-4">
+                <label [ngClass]="{'ErrorMsg' : validationErrors?.BatchNumber}">
+                    <div *ngIf="validationErrors?.BatchNumber" class="Error" [title]="validationErrors?.BatchNumber">
+                    </div>
+                    Batch Number
+                </label>
+                <div styleClass="col-12">
+                    <input type="text" style="width: 100%;" pInputText [(ngModel)]="receiveData.BatchNumber">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <div class="col-4">
+                <label [ngClass]="{'ErrorMsg' : validationErrors?.OrderType}">
+                    <div *ngIf="validationErrors?.OrderType" class="Error" [title]="validationErrors?.OrderType"></div>
+                    Order Type
+                </label>
+                <div styleClass="col-12">
+                    <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="receiveData.LK_OrderType"
+                        [(ngModel)]="receiveData.OrderType" [optionLabel]="'Label'" [optionValue]="'Value'">
+                    </p-dropdown>
+                </div>
+            </div>
+            <div class="col-4">
+                <label [ngClass]="{'ErrorMsg' : validationErrors?.ServiceArea}">
+                    <div *ngIf="validationErrors?.ServiceArea" class="Error" [title]="validationErrors?.ServiceArea">
+                    </div>
+                    Service Area
+                </label>
+                <div styleClass="col-12">
+                    <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="receiveData.LK_ServiceArea"
+                        [(ngModel)]="receiveData.ServiceArea" (onChange)="receiveDefaultServiceAreaInput()"
+                        [optionLabel]="'Label'" [optionValue]="'Value'">
+                    </p-dropdown>
+                </div>
+            </div>
+            <div class="col-4">
+                <label [ngClass]="{'ErrorMsg' : validationErrors?.DesignArea}">
+                    <div *ngIf="validationErrors?.DesignArea" class="Error" [title]="validationErrors?.DesignArea"></div>
+                    Designated Area
+                </label>
+                <div styleClass="col-12">
+                    <p-dropdown styleClass="col-12" [appendTo]="overlayContainer" [options]="receiveData.LK_DesignArea"
+                     [(ngModel)]="receiveData.DesignArea" [optionLabel]="'Label'" [optionValue]="'Value'">
+                    </p-dropdown>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-1">
+
+            <div class="col-4">
+                <label [ngClass]="{'ErrorMsg' : validationErrors?.ReferenceOrder}">
+                    <div *ngIf="validationErrors?.ReferenceOrder" class="Error" [title]="validationErrors?.ReferenceOrder"></div>
+                    Reference Order
+                </label>
+                <div styleClass="col-12">
+                    <input type="text" style="width: 100%;" pInputText [(ngModel)]="receiveData.ReferenceOrder">
+                </div>
+            </div>
+            <div class="col-8">
+                <label class="col-12">Attach File(s)<div class="HelpTip" title="Acceptable file types include .zip, .dwg, .dgn, .tif, .pdf, .doc, .docx, .bmp & .jpg "></div></label>
+                <br>
+                <div class="col-12">
+                    <p-fileUpload #AttachmentsRef name="attachments" multiple="multiple" [auto]="true" mode="basic"
+                        chooseLabel="Browse" url="{{undergroundService._apiUrl}}Underground/AddTempAttachment"
+                        accept=".dwg,.dxf,.dgn,.pdf,.ppt,.docx,.doc,.xlsx,.xls,image/*"
+                        (onError)="onFileUploadError($event,AttachmentsRef)"
+                        (onUpload)="receiveAddNewFileUploadSuccess($event,AttachmentsRef)">
+                    </p-fileUpload>
+                    <div *ngFor="let f of receiveData.NewAttachments">
+                        <a class="wraplongtext links" (click)="tempAttachmentDownload(f)">{{f.FileName}}</a>
+                        <button class='row-cmd' title="Remove {{f.FileName}}" (click)="addNewRemoveAttachment(f.FileID)"
+                            style="margin-top: -6px;">
+                            <img src="assets/Images/row-icons/delete.png" />
+                        </button>
+    
+                    </div>
+                </div>    
+            </div>
+        </div>
+   
+
+    <div class="row mb-1"  >
+        <div style="float: right; margin-top: 10px;">
+        <button class="search-cmd" [disabled]="isSubmitting" (click)="receiveSubmit()">Add</button>
+        <button class="search-cmd" style="margin-left: 10px;" (click)="activateWindow('')">Close</button>
+    </div>
+
+    <br>
+    <p-progressBar class="ToolRunning" mode="indeterminate" [hidden]="!isSubmitting" title="Running..."></p-progressBar>
+
+    </div>
+    <div class="row mb-1" *ngIf="receiveData.SubmittedItems?.length != 0">
+        <label style="color: #336699; font-weight: bold; font-size: 14px;">Submitted Workorder(s)</label>
+        <table style="width:97%; margin-left: 12px;"  class="dTable">
+            <tr class="detailViewTitle" style="height: 16px">
+                <td>Order Number</td>
+                <td>Order State</td>
+                <td>Order Type</td>
+                <td>Service Area</td>
+                <td>Designated Area</td>
+                <td>Reference</td>
+                <td>Batch</td>
+            </tr>
+            <tbody  *ngFor="let f of receiveData.SubmittedItems" style="border-bottom: 1px solid black;">
+            <tr style="height: 16px">
+                <td>{{f.OrderNumber}}</td>
+                <td>{{f.WorkOrderState}}</td>
+                <td>{{f.OrderType}}</td>
+                <td>{{f.ServiceArea}}</td>
+                <td>{{f.DesignArea}}</td>
+                <td>{{f.ReferenceOrder}}</td>                
+                <td>{{f.BatchNumber}}</td>                
+            </tr>
+            <tr style="height: 16px">
+                <td colspan="6">
+                    <div *ngFor="let a of f.Attachments" style="padding-left: 10px;">
+                        <a class="wraplongtext links"
+                        (click)="attachmentDownload(a)">{{a.FILE_NAME}}</a>
+                        </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</p-dialog>
+
+
+<p-dialog *ngIf="attachmentData" header="Attachment(s) for {{attachmentData.OrderNumber}}"
+    [style]="{'width': '500px', 'height': '250px'}" [contentStyle]="{'height': '400px'}"
+    [(visible)]="showWindow['ATTACHMENT']">
+
+    <span *ngIf="attachmentData.Attachments && attachmentData.Attachments.length == 0">(No Attachments
+        Found)</span>
+
+    <ng-container *ngTemplateOutlet="attachmentSection; context: {data: attachmentData}"></ng-container>
+</p-dialog>
+
+
+<p-dialog *ngIf="detailData" header="Details for {{detailData?.OrderNumber}}" [style]="{'width': '600px'}"
+    [contentStyle]="{'height': '400px'}" [(visible)]="showWindow['DETAIL']">
+
+
+
+    <span class="DetailHeading">
+
+        <button class='row-cmd' [hidden]="!detailData.sectionVisible.Details"
+            (click)="detailData.sectionVisible.Details = false"><img
+                src="assets/Images/button-icons/collapse.png"></button>
+        <button class='row-cmd' [hidden]="detailData.sectionVisible.Details"
+            (click)="detailData.sectionVisible.Details = true"><img
+                src="assets/Images/button-icons/expand.png"></button>
+        Issue Information
+    </span>
+
+    <table [hidden]="!detailData.sectionVisible.Details" class="detailView" style="width: 100%">
+        <tbody>
+            <tr class="detailViewTitle">
+                <td style="width: 160px;">Field</td>
+                <td>Value</td>
+            </tr>
+            <tr *ngFor="let row of detailData.Details">
+                <td class="detailViewField">{{row.Field}}</td>
+                <td class="detailViewValue">{{row.Value}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <span class="DetailHeading">
+        <button class='row-cmd' [hidden]="!detailData.sectionVisible.Attachments"
+            (click)="detailData.sectionVisible.Attachments = false "><img
+                src="assets/Images/button-icons/collapse.png"></button>
+        <button class='row-cmd' [hidden]="detailData.sectionVisible.Attachments"
+            (click)="detailData.sectionVisible.Attachments = true"><img
+                src="assets/Images/button-icons/expand.png"></button>
+        Attachments
+        <!-- #endregion -->
+    </span>
+    <span [hidden]="!detailData.sectionVisible.Attachments" *ngIf="detailData.Attachments.length == 0">(No Records
+        Found)</span>
+
+    <table [hidden]="!detailData.sectionVisible.Attachments" class="table-view">
+        <tr *ngIf="detailData.Attachments.length != 0">
+            <th>File Name</th>
+            <th>Attached By</th>
+            <th>Date Attached</th>
+            <th>Order Status</th>
+            <th></th>
+        </tr><tr *ngFor="let att of detailData.Attachments">
+            <td style="text-align: left;"><a class="wraplongtext links"
+                    (click)="attachmentDownload(att)">{{att.FILE_NAME}}</a></td>
+            <td>
+                {{att.CREATEDBY}}
+            </td>
+            <td>
+                {{att.CREATEDDATE}}
+            </td>
+            <td>
+                {{att.ORDERSTATUSDESC}}
+            </td>
+            <td style="text-align: right;">
+                <button  (click)="attachmentDownload(att)" class='row-cmd' title="Download">
+                    <img src="assets/Images/row-icons/download.png" />
+                </button>
+            </td>
+        </tr>
+    </table>
+
+
+    <span class="DetailHeading">
+        <button class='row-cmd' [hidden]="!detailData.sectionVisible.Comments"
+            (click)="detailData.sectionVisible.Comments = false "><img
+                src="assets/Images/button-icons/collapse.png"></button>
+        <button class='row-cmd' [hidden]="detailData.sectionVisible.Comments"
+            (click)="detailData.sectionVisible.Comments = true"><img
+                src="assets/Images/button-icons/expand.png"></button>
+        Comments
+    </span>
+
+    <span [hidden]="!detailData.sectionVisible.Comments" *ngIf="detailData.Comments.length == 0">(No Records
+        Found)</span>
+
+    <table [hidden]="!detailData.sectionVisible.Comments"  class="table-view">
+        <tr *ngIf="detailData.Comments.length != 0">
+            <th>Comments</th>
+            <th>Date</th>
+            <th>By</th>
+            <th>Vendor</th>
+            <th>Order Status</th>
+        </tr>
+        <tr *ngFor="let r of detailData.Comments">
+            <td>
+                {{r.COMMENTS}}
+            </td>
+            <td>
+                {{r.CREATEDDATE}}
+            </td>
+            <td>
+                {{r.CREATEDBYNAME}}
+            </td>
+            <td>
+                {{r.VENDOR}}
+            </td>
+            <td>
+                {{r.STATUSDESCRIPTION}}
+            </td>           
+        </tr>
+    </table>
+
+
+    <span class="DetailHeading">
+        <button class='row-cmd' [hidden]="!detailData.sectionVisible.Transactions"
+            (click)="detailData.sectionVisible.Transactions = false "><img
+                src="assets/Images/button-icons/collapse.png"></button>
+        <button class='row-cmd' [hidden]="detailData.sectionVisible.Transactions"
+            (click)="detailData.sectionVisible.Transactions = true"><img
+                src="assets/Images/button-icons/expand.png"></button>
+        Transactions
+        <!-- #endregion -->
+    </span>
+    <span [hidden]="!detailData.sectionVisible.Transactions" *ngIf="detailData.Transactions.length == 0">(No Records
+        Found)</span>
+
+    <table [hidden]="!detailData.sectionVisible.Transactions" class="table-view">
+        <tbody *ngFor="let t of detailData.Transactions">
+            <tr>
+                <td>
+                    {{t.DATEOFTRANSACTION}}
+                </td>
+                <td>
+                    {{t.TRANSACTIONLABEL}}
+                </td>
+                <td>
+                    {{t.NAME}}
+                </td>
+                <td>
+                    {{t.VENDOR}}
+                </td>
+                <td>
+                    {{t.DESCRIPTION}}
+                </td>
+            </tr>
+            <tr *ngIf="t.Fields[0].Field">
+                <td></td>
+                <td colspan="3" style="text-align: left; font-size: 10px;">
+                    <div *ngFor="let f of t.Fields">
+                        <ng-container *ngIf="f.To != f.From">
+                            [{{f.Field}}] From <span style="color: purple">{{f.From || '(empty)'}}</span> To
+                            <span style="color: purple">{{f.To || '(empty)'}}</span>
+                        </ng-container>
+                        <ng-container *ngIf="f.To == f.From">
+                            [{{f.Field}}] = <span style="color: purple">{{f.From || '(empty)'}}</span>
+                        </ng-container>                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+</p-dialog>

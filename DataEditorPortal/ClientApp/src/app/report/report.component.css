@@ -1,0 +1,27 @@
+
+:host::ng-deep .p-datatable-scrollable-wrapper {
+    /* fix pagination not show */
+    overflow: hidden;
+  }
+  
+  :host::ng-deep .pi-sort-alt {
+    display: none;
+  }
+
+
+  :host::ng-deep .Links {
+		white-space: nowrap;
+		color: #009ADA;
+		font-size: 12px;		
+	}
+
+	:host::ng-deep .Links:hover {
+		color: #336699;
+	}
+
+  .SummaryRow 
+  {
+    background: #e6e7e7 !important;
+    font-weight: bold;
+
+  }

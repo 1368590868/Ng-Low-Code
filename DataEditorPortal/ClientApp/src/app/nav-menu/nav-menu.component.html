@@ -1,44 +1,191 @@
-<header>
-  <nav
-    class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
-  >
-    <div class="container">
-      <a class="navbar-brand" [routerLink]="['/']">DataEditorPortal</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target=".navbar-collapse"
-        aria-label="Toggle navigation"
-        [attr.aria-expanded]="isExpanded"
-        (click)="toggle()"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div
-        class="navbar-collapse collapse d-sm-inline-flex justify-content-end"
-        [ngClass]="{ show: isExpanded }"
-      >
-        <ul class="navbar-nav flex-grow">
-          <li
-            class="nav-item"
-            [routerLinkActive]="['link-active']"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']"
-              >Counter</a
-            >
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']"
-              >Fetch data</a
-            >
-          </li>
-        </ul>
-      </div>
+<div class="navbar">
+  <div class="container-fluid">
+    <div style="display: flex; align-items: center;">
+      <a> <img src="assets/Images/cnp.png" style="height: 40px; margin: 5px" /> </a>
+      <div class="Title">GIS Work Order Tracking System (WOTS)</div>
+
+      <a class="nav-link text-dark" [routerLinkActive]="['link-active']" [routerLinkActiveOptions]="{ exact: true }"
+        [routerLink]="['/']">Home</a>
+      <a class="nav-link text-dark" [routerLinkActive]="['link-active']" [routerLink]="['/about']">About</a>
+      <a class="nav-link text-dark" [routerLinkActive]="['link-active']" [routerLink]="['/contact']">Contact</a>
+      <span style="color: red;" [title]="siteInfo?.WebHeaderDescription">{{siteInfo?.WebHeaderMessage}}</span>
     </div>
-  </nav>
-</header>
+    <div style="text-align: right;">
+      {{userService.USER?.DisplayName}}<div title="Edit Your Profile" class="profileButton"  (click)="openUserProfile()"></div>
+      <span style="font-size: 10px; display: block">{{userService.USER?.Username}}, {{userService.USER?.Vendor || "Vendor N/A"}}</span>
+    </div>
+  </div>
+
+  <div class="container-fluid g-0">
+    <div class="menuPanel">
+      <div class="menuBtn" title="Landbase Work Orders" >
+        <img *ngIf="appDataService.currentTool !='Landbase'" src="assets/Images/icon1.png"
+          (click)="appDataService.activateTool('Landbase')" class="toolspanelIcon" />
+        <div class="menuBtn active"  *ngIf="appDataService.currentTool=='Landbase'">
+          <img src="assets/Images/icon1_1.png" class="toolspanelIcon" />
+          <span>Landbase</span>
+        </div>
+      </div>
+
+      <div class="menuBtn" title="Gas Facility Work Orders"  >
+        <img *ngIf="appDataService.currentTool !='Gas'" src="assets/Images/icon2.png"
+          (click)="appDataService.activateTool('Gas')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Gas'">
+          <img src="assets/Images/icon2_1.png" class="toolspanelIcon" />
+          <span>Gas Facility</span>
+        </div>
+      </div>
+
+      <div class="menuBtn" title="Electric Facilities Work Orders" >
+        <img *ngIf="appDataService.currentTool !='Electric'" src="assets/Images/icon3.png"
+          (click)="appDataService.activateTool('Electric')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Electric'">
+          <img src="assets/Images/icon3_1.png" class="toolspanelIcon" />
+          <span>Electric Facility</span>
+        </div>
+      </div>
+
+      <div class="menuBtn" title="Major Underground Work Orders"  >
+        <img *ngIf="appDataService.currentTool !='Underground'" src="assets/Images/icon4.png"
+          (click)="appDataService.activateTool('Underground')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Underground'">
+          <img src="assets/Images/icon4_1.png" class="toolspanelIcon" />
+          <span>Major Underground</span>
+        </div>
+      </div>
+
+      <div class="menuBtn" title="Data Corrections"  >
+        <img *ngIf="appDataService.currentTool !='DC'" src="assets/Images/icon5.png"
+          (click)="appDataService.activateTool('DC')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='DC'">
+          <img src="assets/Images/icon5_1.png" class="toolspanelIcon" />
+          <span>Data Corrections</span>
+        </div>
+      </div>
+
+      <div class="menuBtn" title="Batch Processing"  >
+        <img *ngIf="appDataService.currentTool !='Batch'" src="assets/Images/icon6.png"
+          (click)="appDataService.activateTool('Batch')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Batch'">
+          <img src="assets/Images/icon6_1.png" class="toolspanelIcon" />
+          <span>Batch Processing</span>
+        </div>
+      </div>
+
+      <div class="menuBtn" title="Reviews" >
+        <img *ngIf="appDataService.currentTool !='Reviews'" src="assets/Images/icon9.png"
+          (click)="appDataService.activateTool('Reviews')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Reviews'">
+          <img src="assets/Images/icon9_1.png" class="toolspanelIcon" />
+          <span>Reviews</span>
+        </div>
+      </div>
+
+      <div class="menuBtn" title="Reports"  >
+        <img *ngIf="appDataService.currentTool !='Reports'" src="assets/Images/icon7.png"
+          (click)="appDataService.activateTool('Reports')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Reports'">
+          <img src="assets/Images/icon7_1.png" class="toolspanelIcon" />
+          <span>Reports</span>
+        </div>
+      </div>
+
+      <div class="menuBtn" title="Projects" >
+        <img *ngIf="appDataService.currentTool !='Projects'" src="assets/Images/project.png"
+          (click)="appDataService.activateTool('Projects')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Projects'">
+          <img src="assets/Images/project_1.png" class="toolspanelIcon" />
+          <span>Projects</span>
+        </div>
+      </div>
+
+      
+      <div class="menuBtn" title="Data Correction Group Contacts"  >
+        <img *ngIf="appDataService.currentTool !='DCGroupContact'" src="assets/Images/groupcontact.png"
+          (click)="appDataService.activateTool('DCGroupContact')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='DCGroupContact'">
+          <img src="assets/Images/groupcontact_1.png" class="toolspanelIcon" />
+          <span>Group Contacts</span>
+        </div>
+      </div>
+      
+      <div class="menuBtn" title="Staging Area Work Orders"  >
+        <img *ngIf="appDataService.currentTool !='FileNetWO'" src="assets/Images/filenetwo.png"
+          (click)="appDataService.activateTool('FileNetWO')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='FileNetWO'">
+          <img src="assets/Images/filenetwo_1.png" class="toolspanelIcon" />
+          <span>Staging Area Work Orders</span>
+        </div>
+      </div>
+
+
+      <div class="menuBtn" title="Manage Users"   >
+        <img *ngIf="appDataService.currentTool !='User'" src="assets/Images/user.png"
+          (click)="appDataService.activateTool('User')" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool=='User'">
+          <img src="assets/Images/user_1.png" class="toolspanelIcon" />
+          <span>Manage Users</span>
+        </div>
+      </div>
+
+      <!--
+        <div class="menuBtn btn btn-default tooltip" title="Gas Facilities Work Orders"
+          ng-click="ActivateTool('SyncStatus')" ng-show="panelFlag[shareData.panel.sync]"
+          ng-class="{ active: currentTool == 'SyncStatus' }">
+          <img ng-if="currentTool!='SyncStatus'" src="assets/Images/icon2.png" class="toolspanelIcon" /> <img
+            ng-if="currentTool=='SyncStatus'" src="assets/Images/icon2_1.png" class="toolspanelIcon" />
+          <span ng-show="currentTool == 'SyncStatus'">Gas Facilities Work Orders</span>
+        </div>
+
+        <div class="menuBtn btn btn-default tooltip" title="Electric Facilities Work Orders"
+          ng-click="ActivateTool('Sort')" ng-show="panelFlag[shareData.panel.sortTab]"
+          ng-class="{ active: currentTool == 'Sort' }">
+          <img ng-if="currentTool!='Sort'" src="assets/Images/icon3.png" class="toolspanelIcon" />
+          <img ng-if="currentTool=='Sort'" src="assets/Images/icon3_1.png" class="toolspanelIcon" />
+          <span ng-show="currentTool == 'Sort'">Electric Facilities Work Orders</span>
+        </div>
+
+        <div class="menuBtn btn btn-default tooltip" title="Major Underground Work Orders"
+          ng-click="ActivateTool('PullSheet')" ng-show="panelFlag['PullSheet']"
+          ng-class="{ active: currentTool == 'PullSheet' }">
+          <img ng-if="currentTool!='PullSheet'" src="assets/Images/icon4.png" class="toolspanelIcon" /> <img
+            ng-if="currentTool=='PullSheet'" src="assets/Images/icon4_1.png" class="toolspanelIcon" />
+          <span ng-show="currentTool == 'PullSheet'">Major Underground Work Orders</span>
+        </div>
+        <div class="menuBtn btn btn-default tooltip" title="Data Corrections" ng-click="ActivateTool('search')"
+          ng-class="{ active: currentTool == 'search' }">
+          <img ng-if="currentTool!='search'" src="assets/Images/icon5.png" class="toolspanelIcon" />
+          <img ng-if="currentTool=='search'" src="assets/Images/icon5_1.png" class="toolspanelIcon" />
+          <span ng-show="currentTool == 'search'">Data Corrections</span>
+        </div>
+
+        <div class="menuBtn btn btn-default tooltip" title="Batch Processing" ng-click="ActivateTool('Track')"
+          ng-class="{ active: currentTool == 'Track' }">
+          <img ng-if="currentTool!='Track'" src="assets/Images/icon6.png" class="toolspanelIcon" style="padding: 2px" />
+          <img ng-if="currentTool=='Track'" src="assets/Images/icon6_1.png" class="toolspanelIcon"
+            style="padding: 2px" />
+          <span ng-show="currentTool == 'Track'">Batch Processing</span>
+        </div>
+
+        <div class="menuBtn btn btn-default tooltip" title="Reports" ng-click="ActivateTool('MATProcess')"
+          ng-show="panelFlag['StatAnalysis']" ng-class="{ active: currentTool == 'MATProcess' }">
+          <img ng-if="currentTool!='MATProcess'" src="assets/Images/icon7.png" class="toolspanelIcon"
+            style="padding: 2px" /> <img ng-if="currentTool=='MATProcess'" src="assets/Images/icon7_1.png"
+            class="toolspanelIcon" style="padding: 2px" />
+          <span ng-show="currentTool == 'MATProcess'">Reports</span>
+        </div>
+
+        <div class="menuBtn btn btn-default tooltip" title="Reviews" ng-click="ActivateTool('MAOPBasisReview')"
+          ng-show="panelFlag['StatAnalysis']" ng-class="{ active: currentTool == 'MAOPBasisReview' }">
+          <img ng-if="currentTool!='MAOPBasisReview'" src="assets/Images/icon9.png" class="toolspanelIcon"
+            style="padding: 2px" /> <img ng-if="currentTool=='MAOPBasisReview'" src="assets/Images/icon9_1.png"
+            class="toolspanelIcon" style="padding: 2px" />
+          <span ng-show="currentTool == 'MAOPBasisReview'">Reviews</span>
+        </div>
+        <button class="headerButton" id="addNewRecordID" ng-click="SubmitNewDataCorrection('')">
+          Submit New Data Correction
+        </button> -->
+    </div>
+  </div>
+</div>
+<app-user-manager-dialogs></app-user-manager-dialogs>
