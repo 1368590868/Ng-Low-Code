@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEditorPortal", "DataEditorPortal\DataEditorPortal.csproj", "{E8F45C30-8872-4763-ADBF-39839391DB7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataEditorPortal.Web", "DataEditorPortal\DataEditorPortal.Web.csproj", "{E8F45C30-8872-4763-ADBF-39839391DB7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEditorPortal.Data", "DataEditorPortal.Data\DataEditorPortal.Data.csproj", "{A189ABFB-3AD3-496C-8828-5D9C9623676E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataEditorPortal.Data", "DataEditorPortal.Data\DataEditorPortal.Data.csproj", "{A189ABFB-3AD3-496C-8828-5D9C9623676E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
