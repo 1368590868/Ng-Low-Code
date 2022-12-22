@@ -1,11 +1,5 @@
 ﻿using DataEditorPortal.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataEditorPortal.Data.Contexts
 {
@@ -13,6 +7,13 @@ namespace DataEditorPortal.Data.Contexts
     {
         public DepDbContextSqlServer(DbContextOptions<DepDbContext> options) : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<DEP_USER>().ToTable("DEP_USERS", "DEP");
         }
     }
 }

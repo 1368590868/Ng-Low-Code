@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,18 +22,25 @@ namespace DataEditorPortal
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Dependency Injection
+            #region Dependency Injection
+
             services.AddTransient<DepDbContextSqlServer>();
             services.AddScoped<DbContextOptions<DepDbContext>>(sp =>
             {
                 return new DbContextOptionsBuilder<DepDbContext>()
-                    .UseSqlServer(Configuration.GetConnectionString("Default"), b => b.CommandTimeout(300))
+                    .UseSqlServer(Configuration.GetConnectionString("Default"), b =>
+                    {
+                        b.CommandTimeout(300);
+                        b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "DEP");
+                    })
                     .Options;
             });
             services.AddTransient<DepDbContext>(sp =>
             {
                 return sp.GetService<DepDbContextSqlServer>();
             });
+
+            #endregion
 
             services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
