@@ -32,7 +32,7 @@ namespace DataEditorPortal.Web
                     .UseSqlServer(Configuration.GetConnectionString("Default"), b =>
                     {
                         b.CommandTimeout(300);
-                        b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "DEP");
+                        b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "dep");
                     })
                     .Options;
             });

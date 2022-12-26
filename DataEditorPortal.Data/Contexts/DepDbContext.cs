@@ -1,11 +1,5 @@
 ﻿using DataEditorPortal.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataEditorPortal.Data.Contexts
 {
@@ -15,6 +9,10 @@ namespace DataEditorPortal.Data.Contexts
         {
         }
 
-        public virtual DbSet<DEP_USER> DEP_USERS { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserPermission> UserPermissions { get; set; }
+        public virtual DbSet<SiteRole> SiteRoles { get; set; }
+        public virtual DbSet<SitePermission> SitePermissions { get; set; }
+        public virtual DbSet<SitePermissionRole> SitePermissionRoles { get; set; }
     }
 }

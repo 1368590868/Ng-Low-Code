@@ -1,5 +1,4 @@
-﻿using DataEditorPortal.Data.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace DataEditorPortal.Data.Contexts
 {
@@ -13,7 +12,7 @@ namespace DataEditorPortal.Data.Contexts
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<DEP_USER>().ToTable("DEP_USERS", "DEP");
+            modelBuilder.HasDefaultSchema("dep");
         }
     }
 }
