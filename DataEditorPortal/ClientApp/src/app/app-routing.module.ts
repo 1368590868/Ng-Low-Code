@@ -25,7 +25,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'no-permission', component: NoPermissionComponent },
   { path: ':action', pathMatch: 'full', component: HomeComponent, data: { currentTool: 'NONE' }, canActivate: [AuthGuard] },
-  { path: ':action/:id', component: HomeComponent, data: { currentTool: 'NONE' }, canActivate: [AuthGuard] }            // { path: 'data-correction', component: DataCorrectionComponent },
+  { path: ':action/:id', component: HomeComponent, data: { currentTool: 'NONE' }, canActivate: [AuthGuard] } 
 ]
 
 @NgModule({

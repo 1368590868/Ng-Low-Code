@@ -1,6 +1,6 @@
-<p-splitter  styleClass="h-100"  [panelSizes]="[20,80]"  stateKey="split" stateStorage="local" >
+<p-splitter styleClass="h-100" [panelSizes]="[20,80]" stateKey="split" stateStorage="local">
     <ng-template pTemplate>
-        <app-search class="w-100 h-100" ></app-search>
+        <app-search class="w-100 h-100"></app-search>
 
         <div style="position: relative">
             <button title="Hide Search Panel" class="panelToggle" (click)="togglePanel(BatchModule, 'Batch')"
@@ -8,8 +8,40 @@
         </div>
     </ng-template>
     <ng-template pTemplate>
-        <button title="Show Search Panel" class="panelToggle"
-            (click)="togglePanel(BatchModule, 'Batch')"><img src="assets/Images/expand.png" /></button>
-        <!-- <app-batch ></app-batch> -->
+        <!-- <button title="Show Search Panel" class="panelToggle"
+            (click)="togglePanel(BatchModule, 'Batch')"><img src="assets/Images/expand.png" /></button> -->
+        <!-- <app-batch style="width:100%;"></app-batch> -->
+        <p-table [columns]="cols" [value]="cars" (onLazyLoad)="onLazyLoad($event)" [paginator]="true" [rows]="10"
+            [scrollable]="true" scrollHeight="flex" [lazy]="true">
+            <ng-template pTemplate="caption">
+                List of Cars
+            </ng-template>
+            <ng-template pTemplate="colgroup" let-columns>
+                <colgroup>
+                    <col style="width:150px">
+
+                    <col *ngFor="let col of columns" [style.width]="col.width">
+
+                </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th *ngFor="let col of columns">
+                        {{col.header}}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-columns="columns">
+                <tr>
+                    <td *ngFor="let col of columns">
+                        {{rowData[col.field]}}
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="summary">
+                There are {{cars?.length}} cars
+            </ng-template>
+        </p-table>
     </ng-template>
 </p-splitter>

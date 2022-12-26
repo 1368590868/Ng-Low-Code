@@ -75,8 +75,7 @@
   </div>
 
   <div class="flex-fill overflow-hidden">
-    <!-- <div class="flex-fill overflow-hidden" style="position: relative;"> -->
-    <!-- <div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; overflow: hidden;"> -->
+    
     <p-table [value]="batches" sortMode="multiple" [loading]="isLoading" [scrollable]="true" scrollHeight="flex"
       [columns]="cols" [resizableColumns]="true" columnResizeMode="expand" [reorderableColumns]="true"
       selectionMode="single" [(selection)]="selectedItem" dataKey="BATCH" [paginator]="true" [rows]="100"
