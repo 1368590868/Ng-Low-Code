@@ -22,16 +22,13 @@ namespace DataEditorPortal.Web.Services
 
         private readonly DepDbContext _depDbContext;
         private readonly IDbSqlBuilder _dbSqlBuilder;
-        private readonly IServiceProvider _serviceProvider;
 
         public UniversalGridService(
             DepDbContext depDbContext,
-            IDbSqlBuilder dbSqlBuilder,
-            IServiceProvider serviceProvider)
+            IDbSqlBuilder dbSqlBuilder)
         {
             _depDbContext = depDbContext;
             _dbSqlBuilder = dbSqlBuilder;
-            _serviceProvider = serviceProvider;
         }
 
         public List<GridColConfig> GetGridColumnsConfig(string name)
@@ -54,21 +51,20 @@ namespace DataEditorPortal.Web.Services
             var queryText = _dbSqlBuilder.GenerateSqlText(dataSourceConfig);
 
             // convert search criteria to where clause
-            var searchBy = _dbSqlBuilder.GenerateWhereClause(param.Filters);
+            // var searchBy = _dbSqlBuilder.GenerateWhereClause(param.Filters);
 
             // convert grid filter to where clause
-            var filterBy = _dbSqlBuilder.GenerateWhereClause(param.Filters);
+            // var filterBy = _dbSqlBuilder.GenerateWhereClause(param.Filters);
 
             // generate Id filter
 
-            queryText = _dbSqlBuilder.UseWhereCondition(queryText, new[] { searchBy, filterBy });
+            queryText = _dbSqlBuilder.UseFilters(queryText, param.Filters);
 
             // generate order by clause
-            var sortBy = _dbSqlBuilder.GenerateOrderClause(param.Sorts);
             if (param.Sorts.Any())
             {
                 // replace the order by clause by input Sorts in queryText
-                queryText = _dbSqlBuilder.UseOrderBy(queryText, sortBy);
+                queryText = _dbSqlBuilder.UseOrderBy(queryText, param.Sorts);
             }
 
             // use pagination

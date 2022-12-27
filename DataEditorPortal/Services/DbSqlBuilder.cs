@@ -1,18 +1,19 @@
 ﻿using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DataEditorPortal.Web.Services
 {
     public interface IDbSqlBuilder
     {
-        string GenerateWhereClause(List<FilterParam> filterParams);
+        // string GenerateWhereClause(List<FilterParam> filterParams);
         string GenerateOrderClause(List<SortParam> sortParams);
         string GenerateSqlText(DataSourceConfig config);
         string UsePagination(string query, int startIndex, int indexCount);
-        string UseOrderBy(string query, string orderByClause);
-        string UseWhereCondition(string query, string[] whereCause);
+        string UseOrderBy(string query, List<SortParam> sortParams);
         string UseCount(string query);
+        string UseFilters(string query, List<FilterParam> filterParams);
     }
 
     public class DbSqlServerBuilder : IDbSqlBuilder
@@ -115,7 +116,7 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
-            return $" ({string.Join(" AND ", filters)}) ";
+            return string.Join(" AND ", filters);
         }
 
         public string GenerateOrderClause(List<SortParam> sortParams)
@@ -135,11 +136,11 @@ namespace DataEditorPortal.Web.Services
 
                     if (item.order == 1)
                     {
-                        orders.Add(field + " ASC ");
+                        orders.Add($"[{field}] ASC ");
                     }
                     else
                     {
-                        orders.Add(field + " DESC ");
+                        orders.Add($"[{field}] DESC ");
                     }
                 }
             }
@@ -162,13 +163,13 @@ namespace DataEditorPortal.Web.Services
             }
             else
             {
-                var columns = config.Columns.Count > 0 ? string.Join(",", $"[{config.Columns}]") : "*";
+                var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
 
                 var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
 
                 var orderBy = config.SortBy.Count > 0 ? GenerateOrderClause(config.SortBy) : $"[{config.IdColumn}] ASC";
 
-                var queryText = $@"SELECT {columns} FROM {config.TableName} WHERE {where} AND ##WHERE## ORDER BY {orderBy}";
+                var queryText = $@"SELECT {columns} FROM dep.{config.TableName} WHERE {where} ##FILTERS## ORDER BY {orderBy}";
 
                 return queryText;
             }
@@ -181,33 +182,33 @@ namespace DataEditorPortal.Web.Services
             if (index <= 0) throw new Exception("The input query doesn't contains order by clause");
 
             var orderby = query.Substring(index);
-            var queryWithoutOrderBy = query.Substring(0, index + 1);
+            var queryWithoutOrderBy = query.Substring(0, index);
 
             var queryText = $@"
                 WITH OrderedOrders AS
                 (
-                    SELECT
-                        ROW_NUMBER() OVER({orderby}) AS RowNumber, A.*
+                    SELECT ROW_NUMBER() OVER({orderby}) AS RowNumber, A.*
                     FROM (
                         {queryWithoutOrderBy}
                     ) A
                 ) 
-                SELECT RowNumber, *
-                FROM OrderedOrders
+                SELECT * FROM OrderedOrders
                 WHERE RowNumber > {startIndex} AND RowNumber < {startIndex + indexCount};
             ";
 
             return queryText;
         }
 
-        public string UseOrderBy(string query, string orderByClause)
+        public string UseOrderBy(string query, List<SortParam> sortParams)
         {
+            var orderByClause = GenerateOrderClause(sortParams);
+
             // replace the order by clause by input Sorts in queryText
             var index = query.IndexOf("ORDER BY", StringComparison.InvariantCultureIgnoreCase);
 
             if (index > 0)
             {
-                var queryWithoutOrderBy = query.Substring(0, index + 1);
+                var queryWithoutOrderBy = query.Substring(0, index);
                 return $"{queryWithoutOrderBy} ORDER BY {orderByClause}";
             }
             else
@@ -216,14 +217,26 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public string UseWhereCondition(string query, string[] whereCause)
+        public string UseFilters(string query, List<FilterParam> filterParams)
         {
-            return query.Replace("##WHERE##", string.Join(" AND ", whereCause));
+            var where = GenerateWhereClause(filterParams);
+
+            return where.Any()
+                ? query.Replace("##FILTERS##", $" AND ({string.Join(" AND ", where)}) ")
+                : query.Replace("##FILTERS##", "");
         }
 
         public string UseCount(string query)
         {
-            return $"SELECT COUNT(*) FROM ({query}) A";
+            var queryWithoutOrderBy = query;
+
+            var index = query.IndexOf("ORDER BY", StringComparison.InvariantCultureIgnoreCase);
+            if (index > 0)
+            {
+                queryWithoutOrderBy = query.Substring(0, index);
+            }
+
+            return $"SELECT COUNT(*) FROM ({queryWithoutOrderBy}) A";
         }
     }
 }

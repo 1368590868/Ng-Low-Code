@@ -1,13 +1,14 @@
 using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace DataEditorPortal.Web
 {
@@ -26,20 +27,40 @@ namespace DataEditorPortal.Web
             #region Dependency Injection
 
             services.AddTransient<DepDbContextSqlServer>();
-            services.AddScoped<DbContextOptions<DepDbContext>>(sp =>
+            services.AddScoped(sp =>
             {
-                return new DbContextOptionsBuilder<DepDbContext>()
+                var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
+                if (databaseProvider == "SqlConnection")
+                    return new DbContextOptionsBuilder<DepDbContext>()
                     .UseSqlServer(Configuration.GetConnectionString("Default"), b =>
                     {
                         b.CommandTimeout(300);
                         b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "dep");
                     })
                     .Options;
+                else
+                    throw new NotImplementedException();
             });
             services.AddTransient<DepDbContext>(sp =>
             {
-                return sp.GetService<DepDbContextSqlServer>();
+                var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
+                if (databaseProvider == "SqlConnection")
+                    return sp.GetService<DepDbContextSqlServer>();
+                else
+                    throw new NotImplementedException();
             });
+
+            services.AddScoped<DbSqlServerBuilder>();
+            services.AddScoped<IDbSqlBuilder>(sp =>
+            {
+                var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
+                if (databaseProvider == "SqlConnection")
+                    return sp.GetService<DbSqlServerBuilder>();
+                else
+                    throw new NotImplementedException();
+            });
+
+            services.AddScoped<IUniversalGridService, UniversalGridService>();
 
             #endregion
 
@@ -118,7 +139,7 @@ namespace DataEditorPortal.Web
 
                 if (env.IsDevelopment())
                 {
-                    spa.UseAngularCliServer(npmScript: "start");
+                    // spa.UseAngularCliServer(npmScript: "start");
                 }
             });
         }

@@ -12,9 +12,9 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
         public string DetailsQuery { get; set; }
 
-        public List<GridColConfig> Columns { get; set; }
+        public List<GridColConfig> Columns { get; set; } = new List<GridColConfig>();
 
-        public List<SearchConfig> SearchConfig { get; set; }
+        public List<SearchConfig> SearchConfig { get; set; } = new List<SearchConfig>();
     }
 
     public class SearchConfig
@@ -62,9 +62,9 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
     {
         public string TableName { get; set; }
         public string IdColumn { get; set; }
-        public List<string> Columns { get; set; }
-        public List<SortParam> SortBy { get; set; }
-        public List<FilterParam> Filters { get; set; }
+        public List<string> Columns { get; set; } = new List<string>();
+        public List<SortParam> SortBy { get; set; } = new List<SortParam>();
+        public List<FilterParam> Filters { get; set; } = new List<FilterParam>();
 
         public string QueryText { get; set; }
     }
