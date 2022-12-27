@@ -2,9 +2,6 @@
 
 namespace DataEditorPortal.Web.Models.UniversalGrid
 {
-    public class GridParam
-    {
-    }
 
     public class GridParam
     {
@@ -31,11 +28,13 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string matchMode { get; set; }
         public string Operator { get; set; }
         public object value { get; set; }
+        public string dBFieldExpression { get; set; }
     }
 
     public class SortParam
     {
         public string field { get; set; }
         public int order { get; set; }
+        public string dBFieldExpression { get; set; }
     }
 }

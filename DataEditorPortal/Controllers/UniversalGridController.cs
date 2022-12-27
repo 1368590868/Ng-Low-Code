@@ -25,64 +25,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{name}/config/columns")]
         public IActionResult GridColumns(string name)
         {
-            var columns = new List<GridColConfig>() {
-                new GridColConfig()
-                {
-                    field = "UserId",
-                    header = "CNP ID",
-                    width = "130px",
-                    filterType = "text"
-                },
-                new GridColConfig()
-                {
-                    field = "Name",
-                    header = "Name",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Email",
-                    header = "Email",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Phone",
-                    header = "Phone",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "AutoEmail",
-                    header = "Auto Email",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Vendor",
-                    header = "Vendor",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Employer",
-                    header = "Employer",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Division",
-                    header = "Division",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Comments",
-                    header = "Comments",
-                    width = "250px",
-                    filterType = "text"
-                }
-            };
+            var columns = _universalGridService.GetGridColumnsConfig(name);
             return new JsonResult(columns);
         }
 
@@ -90,65 +33,8 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{name}/config/search")]
         public IActionResult GridSearch(string name)
         {
-            var columns = new List<GridColConfig>() {
-                new GridColConfig()
-                {
-                    field = "UserId",
-                    header = "CNP ID",
-                    width = "130px",
-                    filterType = "text"
-                },
-                new GridColConfig()
-                {
-                    field = "Name",
-                    header = "Name",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Email",
-                    header = "Email",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Phone",
-                    header = "Phone",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "AutoEmail",
-                    header = "Auto Email",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Vendor",
-                    header = "Vendor",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Employer",
-                    header = "Employer",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Division",
-                    header = "Division",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Comments",
-                    header = "Comments",
-                    width = "250px",
-                    filterType = "text"
-                }
-            };
-            return new JsonResult(columns);
+            var config = _universalGridService.GetGridSearchConfig(name);
+            return new JsonResult(config);
         }
 
         [HttpGet]
@@ -216,72 +102,12 @@ namespace DataEditorPortal.Web.Controllers
             return new JsonResult(columns);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("{name}/data")]
         public IActionResult FetchData(string name, GridParam gridParam)
         {
-            var columns = new List<GridColConfig>() {
-                new GridColConfig()
-                {
-                    field = "UserId",
-                    header = "CNP ID",
-                    width = "130px",
-                    filterType = "text"
-                },
-                new GridColConfig()
-                {
-                    field = "Name",
-                    header = "Name",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Email",
-                    header = "Email",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Phone",
-                    header = "Phone",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "AutoEmail",
-                    header = "Auto Email",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Vendor",
-                    header = "Vendor",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Employer",
-                    header = "Employer",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Division",
-                    header = "Division",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Comments",
-                    header = "Comments",
-                    width = "250px",
-                    filterType = "text"
-                }
-            };
-
-            // _universalGridService.
-
-            return new JsonResult(columns);
+            var data = _universalGridService.GetGridData(name, gridParam);
+            return new JsonResult(data);
         }
 
         [HttpGet]
