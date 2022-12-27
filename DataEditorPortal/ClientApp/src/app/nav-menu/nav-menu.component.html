@@ -18,115 +18,20 @@
 
   <div class="container-fluid g-0">
     <div class="menuPanel">
-      <div class="menuBtn" title="Landbase Work Orders" >
-        <img *ngIf="appDataService.currentTool !='Landbase'" src="assets/Images/icon1.png"
-          (click)="appDataService.activateTool('Landbase')" class="toolspanelIcon" />
-        <div class="menuBtn active"  *ngIf="appDataService.currentTool=='Landbase'">
-          <img src="assets/Images/icon1_1.png" class="toolspanelIcon" />
-          <span>Landbase</span>
-        </div>
-      </div>
-
-      <div class="menuBtn" title="Gas Facility Work Orders"  >
-        <img *ngIf="appDataService.currentTool !='Gas'" src="assets/Images/icon2.png"
-          (click)="appDataService.activateTool('Gas')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Gas'">
-          <img src="assets/Images/icon2_1.png" class="toolspanelIcon" />
-          <span>Gas Facility</span>
-        </div>
-      </div>
-
-      <div class="menuBtn" title="Electric Facilities Work Orders" >
-        <img *ngIf="appDataService.currentTool !='Electric'" src="assets/Images/icon3.png"
-          (click)="appDataService.activateTool('Electric')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Electric'">
-          <img src="assets/Images/icon3_1.png" class="toolspanelIcon" />
-          <span>Electric Facility</span>
-        </div>
-      </div>
-
-      <div class="menuBtn" title="Major Underground Work Orders"  >
-        <img *ngIf="appDataService.currentTool !='Underground'" src="assets/Images/icon4.png"
-          (click)="appDataService.activateTool('Underground')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Underground'">
-          <img src="assets/Images/icon4_1.png" class="toolspanelIcon" />
-          <span>Major Underground</span>
-        </div>
-      </div>
-
-      <div class="menuBtn" title="Data Corrections"  >
-        <img *ngIf="appDataService.currentTool !='DC'" src="assets/Images/icon5.png"
-          (click)="appDataService.activateTool('DC')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='DC'">
-          <img src="assets/Images/icon5_1.png" class="toolspanelIcon" />
-          <span>Data Corrections</span>
-        </div>
-      </div>
-
-      <div class="menuBtn" title="Batch Processing"  >
-        <img *ngIf="appDataService.currentTool !='Batch'" src="assets/Images/icon6.png"
-          (click)="appDataService.activateTool('Batch')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Batch'">
-          <img src="assets/Images/icon6_1.png" class="toolspanelIcon" />
-          <span>Batch Processing</span>
-        </div>
-      </div>
-
-      <div class="menuBtn" title="Reviews" >
-        <img *ngIf="appDataService.currentTool !='Reviews'" src="assets/Images/icon9.png"
-          (click)="appDataService.activateTool('Reviews')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Reviews'">
-          <img src="assets/Images/icon9_1.png" class="toolspanelIcon" />
-          <span>Reviews</span>
-        </div>
-      </div>
-
-      <div class="menuBtn" title="Reports"  >
-        <img *ngIf="appDataService.currentTool !='Reports'" src="assets/Images/icon7.png"
-          (click)="appDataService.activateTool('Reports')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Reports'">
-          <img src="assets/Images/icon7_1.png" class="toolspanelIcon" />
-          <span>Reports</span>
-        </div>
-      </div>
-
-      <div class="menuBtn" title="Projects" >
-        <img *ngIf="appDataService.currentTool !='Projects'" src="assets/Images/project.png"
-          (click)="appDataService.activateTool('Projects')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='Projects'">
-          <img src="assets/Images/project_1.png" class="toolspanelIcon" />
-          <span>Projects</span>
-        </div>
-      </div>
-
       
-      <div class="menuBtn" title="Data Correction Group Contacts"  >
-        <img *ngIf="appDataService.currentTool !='DCGroupContact'" src="assets/Images/groupcontact.png"
-          (click)="appDataService.activateTool('DCGroupContact')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='DCGroupContact'">
-          <img src="assets/Images/groupcontact_1.png" class="toolspanelIcon" />
-          <span>Group Contacts</span>
-        </div>
-      </div>
-      
-      <div class="menuBtn" title="Staging Area Work Orders"  >
-        <img *ngIf="appDataService.currentTool !='FileNetWO'" src="assets/Images/filenetwo.png"
-          (click)="appDataService.activateTool('FileNetWO')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='FileNetWO'">
-          <img src="assets/Images/filenetwo_1.png" class="toolspanelIcon" />
-          <span>Staging Area Work Orders</span>
+
+
+      <div class="menuBtn" [title]="menu.title" *ngFor="let menu of menuConfig.data"   >
+        <img *ngIf="appDataService.currentTool != menu.name" [src]="menu.img"
+          (click)="appDataService.activateTool(menu.name)" class="toolspanelIcon" />
+        <div class="menuBtn active" *ngIf="appDataService.currentTool==menu.name">
+          <img [src]="menu.activeImg" class="toolspanelIcon" />
+          <span>{{menu.name}}</span>
         </div>
       </div>
 
-
-      <div class="menuBtn" title="Manage Users"   >
-        <img *ngIf="appDataService.currentTool !='User'" src="assets/Images/user.png"
-          (click)="appDataService.activateTool('User')" class="toolspanelIcon" />
-        <div class="menuBtn active" *ngIf="appDataService.currentTool=='User'">
-          <img src="assets/Images/user_1.png" class="toolspanelIcon" />
-          <span>Manage Users</span>
-        </div>
-      </div>
+     
+    
 
       <!--
         <div class="menuBtn btn btn-default tooltip" title="Gas Facilities Work Orders"

@@ -6,18 +6,25 @@ import { NotificationService } from '../services/notification.service';
 import { UIService } from '../services/UI.service';
 import { UserManagerDialogs } from '../user-manager/user-manager-dialogs.component';
 import { environment } from '../../environments/environment';
+import { Observable, of } from 'rxjs';
+
+import { MenuConfigProps } from './nav-menu.type';
+
 
 @Component({
   selector: 'app-nav-menu',
   templateUrl: './nav-menu.component.html',
   styleUrls: ['./nav-menu.component.css']
 })
-export class NavMenuComponent  {
+export class NavMenuComponent implements OnInit  {
   isExpanded = false;
   @ViewChild(UserManagerDialogs) userManagerDialog; 
 
   user: any; 
   siteInfo: any; 
+
+  menuConfig:MenuConfigProps 
+
   constructor(
     private uiService: UIService,
     public appDataService: AppDataService,
@@ -45,6 +52,28 @@ export class NavMenuComponent  {
     }, error => console.error(error));
 
   }
+
+  ngOnInit() { 
+    this.uiService.getMenuConfig().pipe(
+      catchError(this.handleError('getMenuConfig', {}))
+    )
+      .subscribe((res: MenuConfigProps) => {
+        console.log(res)
+        this.menuConfig = res
+    })
+}
+  
+private handleError<T>(operation = 'operation', result ?: T) {
+  return (error: any): Observable<T> => {
+
+    // TODO: send the error to remote logging infrastructure
+    console.error(error, operation); // log to console instead
+
+    // Let the app keep running by returning an empty result.
+    return of(result as T);
+  };
+}
+
 
 
   public openUserProfile()

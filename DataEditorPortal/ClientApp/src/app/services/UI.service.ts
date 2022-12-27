@@ -18,6 +18,11 @@ export class UIService {
     this._apiUrl = apiUrl;
   }
 
+  // get UI config
+  getMenuConfig() {
+    return this.http.get('../../assets/menu.json')
+  }
+
   getSiteVersion() {
     return this.http.get<any>(this._apiUrl + 'SiteUI/GetSiteVersion');
   }
