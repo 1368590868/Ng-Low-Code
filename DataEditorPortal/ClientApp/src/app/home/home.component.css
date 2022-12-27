@@ -1,0 +1,42 @@
+:host::ng-deep .p-splitter-panel {
+	overflow: hidden;
+}
+
+.Startup {
+	background: url('../../assets/Images/bigbg.jpg') no-repeat center center fixed ;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;	
+	margin: 20px; 
+	padding: 20px; 
+	width: 850px; 
+	height: 500px;
+}
+.Startup span
+{
+	display: block; 
+}
+
+	.Startup .Links {
+		white-space: pre-wrap;
+		color: #009ADA;
+		font-size: 12px;
+		margin-bottom: 5px;
+	}
+
+	.Startup .Links:hover {
+		color: #336699;
+	}
+
+.Startup .Heading2 
+{
+	font-weight: bold; 
+	font-size: 18px;
+}
+
+.Startup .Heading 
+{
+	font-weight: bold; 
+	font-size: 24px;
+}

@@ -1,0 +1,11 @@
+{
+  "/api": {
+    "target": "https://10.10.120.246:44311/api/",
+    "secure": false,
+    "pathRewrite": {
+      "^/api": ""
+    },
+    "changeOrigin": true,
+    "loglevel": "debug"
+  }
+}

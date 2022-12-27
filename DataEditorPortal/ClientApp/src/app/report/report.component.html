@@ -1,0 +1,138 @@
+<p-dialog *ngIf="exportData" header="Export To Excel" [style]="{'width': '500px'}" 
+  [(visible)]="showWindow['EXPORT']">
+
+  <div>
+    <div style="margin-top: 5px;">
+      File Name
+    </div>
+    <input type="text" style="width: 100%;" styleClass="col-12" pInputText name="ExportName"
+      [(ngModel)]="exportData.ExportName">
+
+    <div *ngIf="reportType != 'Summary'">
+    <div style="margin-top: 5px;">
+      <div>
+        Export Option
+      </div>
+      <div>
+        <div>
+          <p-radioButton label="Export Selected Items Only" name="ExportOption" value="Selection"
+            [(ngModel)]="exportData.ExportOption">
+          </p-radioButton>
+        </div>
+        <div>
+          <p-radioButton name="ExportOption" label="Export Entire Result" value="All"
+            [(ngModel)]="exportData.ExportOption"></p-radioButton>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div style="float: right; margin-top: 10px;">
+      <button class="search-cmd" [disabled]="isSubmitting" (click)="exportDataSubmit()">Export</button>
+      <button class="search-cmd" style="margin-left: 10px;" (click)="showWindow = {}">Cancel</button>
+  </div>  
+  <br>
+  <p-progressBar class="ToolRunning" mode="indeterminate" [hidden]="!isSubmitting" title="Running..."></p-progressBar>
+ 
+</div>
+
+</p-dialog>
+
+
+<div class="w-100 h-100 d-flex flex-column">
+  
+    <h5 class="page-title"><span *ngIf="this.appDataService.currentNavigationItem?.grouplabel">{{this.appDataService.currentNavigationItem?.grouplabel}}<img style="margin-top: -4px; " src="assets/Images/sep.png" /></span>{{this.appDataService.currentNavigationItem?.label}} Report 
+    <p-progressBar mode="indeterminate" [hidden]="!isRunning" title="Searching... Please Wait..."></p-progressBar>
+          
+  </h5>
+  <div *ngIf="records && totalRecords == 0" style="font-weight: bold; color: red"><div class="Error" ></div>No Search Results Found</div>
+  
+  <div class="table-toolbar" style="margin-bottom: 5px;">
+    <button id="refreshgridID" (click)="refreshData()" class="table-button">
+      <img title="Refresh" src="assets/Images/table-icons/refresh.png" class="sizeIcon" /> Refresh
+    </button>
+    <div style="display:inline"  *ngIf="reportType != 'Summary'">
+    <button (click)="initCheckState(true)" class="table-button">
+      <img title="Select All" src="assets/Images/table-icons/selectall.png" class="sizeIcon" /> Select All
+    </button>
+    <button (click)="initCheckState(false)" class="table-button">
+      <img title="Unselect All" src="assets/Images/table-icons/unselectall.png" class="sizeIcon" /> Unselect All
+    </button>
+
+    <span style="color:black" class="layercontrolBar"><strong>{{checkedCount}} row(s) selected</strong></span>
+  </div>
+    <button (click)="exportDataInit()" class="table-button">
+      Export To Excel
+    </button>
+
+  </div>
+
+  <div class="flex-fill overflow-hidden">
+    <!-- <div class="flex-fill overflow-hidden" style="position: relative;"> -->
+    <!-- <div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; overflow: hidden;"> -->
+    <p-table [value]="records" sortMode="multiple" [loading]="isLoading" [scrollable]="true" scrollHeight="flex"
+      [columns]="cols" [resizableColumns]="true" columnResizeMode="expand" [reorderableColumns]="true"
+      selectionMode="single" [(selection)]="selectedRow" [paginator]="true" [rows]="100"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [rowsPerPageOptions]="[100,200,500,1000]"  [lazy]="true" (onLazyLoad)="onLazyLoad($event)"
+      [totalRecords]="totalRecords" styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines Site">
+      <ng-template pTemplate="colgroup" let-columns>
+        <colgroup>
+          <col  *ngIf="reportType != 'Summary'" style="width:70px">
+
+          <col *ngFor="let col of columns" [style.width]="col.width">
+
+        </colgroup>
+      </ng-template>
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th  *ngIf="reportType != 'Summary'" pResizableColumn></th>
+
+          <th *ngFor="let col of columns" pReorderableColumn pResizableColumn [pSortableColumn]="col.field">
+
+            <span>{{col.header}}</span>
+            <p-sortIcon [field]="col.field"></p-sortIcon>
+            <p-columnFilter [type]="col.filterType" [field]="col.field" display="menu" style="float:right;"
+              [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </th>
+
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-data let-columns="columns">
+        <tr [pSelectableRow]="data" [ngClass]="{'SummaryRow' : data?.IS_AGGREGATE}">
+
+          <td class="p-table-td" *ngIf="reportType != 'Summary'">
+            <input *ngIf="!data?.IS_AGGREGATE" class="row-cmd row-chkbox" [checked]="checkedState[data.UI_ID]" (change)="toggleCheckState(data)"
+              type="checkbox" />
+
+              <a *ngIf="appDataService.currentNavigationItem.Module && data?.ORDERNUMBER && data?.WORKORDERSTATE" class='row-cmd' title="Open Details In a New Window" href="{{appDataService.currentNavigationItem.Module}}/Search?OrderNumber={{data.ORDERNUMBER}} {{data.WORKORDERSTATE}}" target="_blank"><img src="assets/Images/row-icons/open.png" /></a>                       
+
+          </td>
+          <td *ngFor="let col of columns" [title]="data[col.field]" [style.text-align]="col.filterType =='numeric' ? 'right' : 'left'">
+            <span *ngIf="!col.template && col.field != 'ATTACHMENTS'">{{data[col.field]}}</span> 
+            <div *ngIf="col.field == 'ATTACHMENTS'">
+              <span style="display: block;" title="{{att[0]}} - {{att[1]}}" *ngFor="let att of data[col.field]" (click)="openAttachment(att)" class="Links">
+                 {{att[0]}} - {{att[1]}}
+              </span>              
+            </div>          
+          </td>
+
+        </tr>
+      </ng-template>
+
+      <!--
+        <ng-template pTemplate="paginatorleft">
+          <p-button type="button" icon="pi pi-plus" styleClass="p-button-text"></p-button>
+        </ng-template>
+        <ng-template pTemplate="paginatorright">
+          <p-button type="button" icon="pi pi-cloud" styleClass="p-button-text"></p-button>
+        </ng-template>
+      -->
+    </p-table>
+
+
+  </div>
+
+
+</div>

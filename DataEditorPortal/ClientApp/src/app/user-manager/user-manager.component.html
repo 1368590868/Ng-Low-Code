@@ -1,0 +1,99 @@
+<p-confirmPopup></p-confirmPopup>
+
+<div class="w-100 h-100 d-flex flex-column" *ngIf="appDataService.currentSearchView == 'Multiple'">
+  <h5 class="page-title">User Search Results</h5>
+  <div class="table-toolbar" style="margin-bottom: 5px;">
+    <button id="refreshgridID" (click)="refreshData()" class="table-button">
+      <img title="Refresh" src="assets/Images/table-icons/refresh.png" class="sizeIcon" /> Refresh
+    </button>
+    <button (click)="initCheckState(true)" class="table-button">
+      <img title="Select All" src="assets/Images/table-icons/selectall.png" class="sizeIcon" /> Select All
+    </button>
+    <button (click)="initCheckState(false)" class="table-button">
+      <img title="Unselect All" src="assets/Images/table-icons/unselectall.png" class="sizeIcon" /> Unselect All
+    </button>
+
+    <span style="color:black" class="layercontrolBar"><strong>{{checkedCount}} row(s) selected</strong></span>
+
+    <button (click)="openNewUser()" type="button" class="table-button">
+      New User
+    </button>
+
+    <button (click)="openManageRoles()" type="button" class="table-button">
+      Open Roles Manager
+    </button>
+
+
+    <button *ngIf="user.Permissions.USER_DELETE" (click)="openDelete()" type="button"
+      class="table-button table-button-delete" style="float:right;">
+      Delete
+    </button>
+
+  </div>
+
+  <div class="flex-fill overflow-hidden">
+    <!-- <div class="flex-fill overflow-hidden" style="position: relative;"> -->
+    <!-- <div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; overflow: hidden;"> -->
+    <p-table [value]="userrecords" sortMode="multiple" [loading]="isLoading" [scrollable]="true" scrollHeight="flex"
+      [columns]="cols" [resizableColumns]="true" columnResizeMode="expand" [reorderableColumns]="true"
+      selectionMode="single" [(selection)]="selectedItem" dataKey="UserID" [paginator]="true" [rows]="100"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [rowsPerPageOptions]="[100,200,500,1000]"  [lazy]="true" (onLazyLoad)="onLazyLoad($event)"
+      [totalRecords]="totalRecords" styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines Site">
+      <ng-template pTemplate="colgroup" let-columns>
+        <colgroup>
+          <col style="width:150px">
+
+          <col *ngFor="let col of columns" [style.width]="col.width">
+
+        </colgroup>
+      </ng-template>
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th pResizableColumn></th>
+
+          <th *ngFor="let col of columns" pReorderableColumn pResizableColumn [pSortableColumn]="col.field">
+
+            <span>{{col.header}}</span>
+            <p-sortIcon [field]="col.field"></p-sortIcon>
+            <p-columnFilter [type]="col.filterType" [field]="col.field" display="menu" style="float:right;"
+              [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </th>
+
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-data let-columns="columns">
+        <tr [pSelectableRow]="data">
+          <td class="p-table-td">
+            <input class="row-cmd row-chkbox" [checked]="checkedState[data.UserID]" (change)="toggleCheckState(data)"
+              type="checkbox" />
+
+              <!--
+            <button class='row-cmd' title="View Details" (click)="openDetail(data)">
+              <img src="assets/Images/row-icons/info.png" />
+            </button>
+            -->
+            <button class='row-cmd' title="Edit" (click)="openEdit(data)">
+              <img src="assets/Images/row-icons/edit.png" />
+            </button>
+
+          </td>
+
+          <td *ngFor="let col of columns" [title]="data[col.field]">
+            <span *ngIf="!col.template">{{data[col.field]}}</span>
+          </td>
+
+        </tr>
+      </ng-template>
+
+
+    </p-table>
+
+
+  </div>
+
+
+</div>
+
+<app-user-manager-dialogs (refreshGrid)="refreshData()"></app-user-manager-dialogs>

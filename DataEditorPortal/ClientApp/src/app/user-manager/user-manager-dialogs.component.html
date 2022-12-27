@@ -1,0 +1,317 @@
+<p-confirmPopup></p-confirmPopup>
+
+
+<p-dialog *ngIf="userData" [position]="userData.Mode == 'Profile' ? 'topright' : 'center'"
+    header="{{userData.Mode == 'Add' ? 'Add New' : 'Edit'}} User {{userData?.UserID}}" [style]="{'width': '570px'}" [(visible)]="showWindow['EDIT']"
+    #overlayContainer>
+    <div class="h-100 p-2">
+        <div *ngIf="userData.Mode == 'Add'" class="row mb-1">
+            <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.UserID}">
+                <div *ngIf="validationErrors?.UserID" class="Error" [title]="validationErrors?.UserID"></div>
+                CNP ID<span class="dialog-require"></span>
+            </label>
+            <div class="col-9">
+
+                <input type="text" (blur)="validateUser()" style="width: 100%;" styleClass="col-12" pInputText
+                    [(ngModel)]="userData.UserID">
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.DisplayName}">
+                <div *ngIf="validationErrors?.DisplayName" class="Error" [title]="validationErrors?.DisplayName"></div>
+                Display Name<span class="dialog-require"></span>
+            </label>
+            <div class="col-9">
+
+                <input type="text" style="width: 100%;" styleClass="col-12" pInputText
+                    [(ngModel)]="userData.DisplayName">
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.Email}">
+                <div *ngIf="validationErrors?.Email" class="Error" [title]="validationErrors?.Email"></div>
+                Email<span class="dialog-require"></span>
+            </label>
+            <div class="col-9">
+
+                <input type="text" style="width: 100%;" styleClass="col-12" pInputText [(ngModel)]="userData.Email">
+            </div>
+        </div>
+
+
+        <div class="row mb-1">
+            <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.Phone}">
+                <div *ngIf="validationErrors?.Phone" class="Error" [title]="validationErrors?.Phone"></div>
+                Phone
+            </label>
+            <div class="col-9">
+                <p-inputMask mask="(999) 999-9999" style="width: 100%;" [(ngModel)]="userData.Phone" styleClass="col-12"
+                    placeholder="(999) 999-9999"></p-inputMask>
+            </div>
+        </div>
+
+
+        <div *ngIf="userService.USER?.Permissions.USER_ADMIN">
+
+            <div class="row mb-1">
+                <label class="col-3">
+                    Vendor
+                </label>
+                <div class="col-9">
+
+                    <p-dropdown styleClass="col-12" [options]="userData.LK_Vendor" [(ngModel)]="userData.Vendor"
+                        [optionLabel]="'Label'" [optionValue]="'Value'" [filter]="true" filterBy="Label"
+                        [showClear]="true" [virtualScroll]="true" [appendTo]="overlayContainer" itemSize="30">
+                    </p-dropdown>
+
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <label class="col-3">
+                    Employer
+                </label>
+                <div class="col-9">
+
+                    <p-dropdown styleClass="col-12" [options]="userData.LK_Employer" [(ngModel)]="userData.Employer"
+                        [optionLabel]="'Label'" [optionValue]="'Value'" [filter]="true" filterBy="Label"
+                        [showClear]="true" [virtualScroll]="true" [appendTo]="overlayContainer" itemSize="30">
+                    </p-dropdown>
+
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.Division}">
+                    <div *ngIf="validationErrors?.Division" class="Error" [title]="validationErrors?.Division">
+                    </div>Division(s)
+                </label>
+                <div class="col-9">
+                    <p-checkbox style="margin-right: 15px" name="groupname" value="GAS" [(ngModel)]="userData.Division"
+                        label="Gas">
+                    </p-checkbox>
+
+                    <p-checkbox style="margin-right: 15px" name="groupname" value="ELECTRIC"
+                        [(ngModel)]="userData.Division" label="Electric">
+                    </p-checkbox>
+                    <p-checkbox style="margin-right: 15px" name="groupname" value="LANDBASE"
+                        [(ngModel)]="userData.Division" label="Landbase">
+                    </p-checkbox>
+
+                    <p-checkbox style="margin-right: 15px" name="groupname" value="UNDERGROUND"
+                        [(ngModel)]="userData.Division" label="Underground">
+                    </p-checkbox>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+
+                <div class="p-field-checkbox" class="col-12">
+                    <p-checkbox name="Notify" [(ngModel)]="userData.Notify" [binary]="true" inputId="Notify">
+                    </p-checkbox>
+                    <label for="Notify" style="margin-left: 10px;">Receive Email Notifications</label>
+                </div>
+
+            </div>
+            <span *ngIf="userData.Mode == 'Profile'" style="font-style: italic; font-size: 10px">Changing Roles/Permissions will cause the page to reload for the changes to take effect.<br></span>
+            <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.Roles}">                
+                Role(s) <div class="linkButton" style="display:inline" (click)="editRole()"> Edit</div><div *ngIf="validationErrors?.Roles" class="Error" [title]="validationErrors?.Roles"></div>
+            </label>
+
+            <div class="row mb-1">
+                <div class="col-9">
+
+                    <div *ngFor="let g of userData.Groups">
+                        <span class="RoleLabel" [title]="g.Description">{{g.Name}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <label class="col-3" [ngClass]="{'ErrorMsg' : validationErrors?.Permissions}">                
+                Other Permission(s) <div class="linkButton" style="display:inline" (click)="editPermission()"> Edit</div><div *ngIf="validationErrors?.Permissions" class="Error" [title]="validationErrors?.Permissions"></div>
+            </label>
+
+            <div class="row mb-1">
+                <div class="col-9">
+
+                    <div *ngFor="let g of userData.Roles">
+                        <span class="RoleLabel" [title]="g.Description">{{g.Name}}</span>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div style="float: right;">
+            <button class="search-cmd" (click)="editSubmit()">Save</button>
+            <button class="search-cmd" style="margin-left: 10px;"
+                (click)="showWindow = {}">Cancel</button>
+        </div>
+
+    </div>
+</p-dialog>
+
+
+<p-dialog *ngIf="roleData" header="Manage Roles" [style]="{'width': '500px'}"
+    [(visible)]="showWindow['MANAGEROLES']" #overlayContainer>
+    <div class="h-100 p-2">
+
+        <div class="row mb-1">
+            <label class="col-2">
+                Roles
+            </label>
+            <div class="col-10">
+
+                <p-dropdown styleClass="col-12" [options]="roleData.LK_Roles" [(ngModel)]="roleData.SelectedRole"
+                    [filter]="true" filterBy="Label" [optionLabel]="'Label'"  (onChange)="ManageRoleRetrieve()"
+                  [virtualScroll]="true" [appendTo]="overlayContainer" itemSize="30">
+                </p-dropdown>
+
+            </div>
+        </div>
+
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.RoleName}">
+                <div *ngIf="validationErrors?.RoleName" class="Error" [title]="validationErrors?.RoleName"></div>
+                Name<span class="dialog-require"></span>
+            </label>
+            <div class="col-10">
+
+                <input type="text" style="width: 100%;" styleClass="col-12" pInputText
+                    [(ngModel)]="roleData.RoleName">
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <label class="col-2" [ngClass]="{'ErrorMsg' : validationErrors?.RoleDescription}">
+                <div *ngIf="validationErrors?.RoleDescription" class="Error" [title]="validationErrors?.RoleDescription"></div>
+                Description
+            </label>
+            <div class="col-10">
+
+                <input type="text" style="width: 100%;" styleClass="col-12" pInputText
+                    [(ngModel)]="roleData.RoleDescription">
+            </div>
+        </div>
+
+        <p-accordion [multiple]="true">
+            <p-accordionTab  *ngFor="let g of roleData.Permissions" [header]="g.CATEGORY" [selected]="false"  >
+                <table style="width: 100%">
+                    <tr style="border-bottom: 1px solid #aaa;"  *ngFor="let p of g.Data">
+                        <td style="vertical-align: top;">
+                            <p-checkbox name="{{p.PERMISSIONNAME}}" [binary]="true" [(ngModel)]="p.Selected" inputId="{{p.PERMISSIONNAME}}">
+                            </p-checkbox>
+                        </td>
+                        <td style="vertical-align: top;">
+                            <label for="{{p.PERMISSIONNAME}}" [title]="p.PERMISSIONDESCRIPTION">{{p.PERMISSIONNAME}}</label>
+                        </td>
+                        <td>
+                            <span>
+                                {{p.PERMISSIONDESCRIPTION}}
+                            </span>
+                        </td>
+                    </tr>
+                </table>        
+            </p-accordionTab>
+        </p-accordion>
+        <div style="float: right;">
+            <button class="search-cmd" (click)="manageRoleSubmit()">Save</button>
+            <button class="search-cmd" style="margin-left: 10px;"
+                (click)="showWindow['MANAGEROLES'] = false">Cancel</button>
+        </div>
+
+    </div>
+</p-dialog>
+
+
+<p-dialog *ngIf="userData" header="Edit Roles" [style]="{'width': '400px'}" [(visible)]="showWindow['ROLES']"
+    #overlayContainer>
+    <div class="h-100 p-2">
+        <div *ngFor="let g of userData.LK_Roles">
+            <div *ngIf="g.Value3">
+                <p-checkbox name="{{g.Value}}" [binary]="true" [(ngModel)]="g.Selected" inputId="{{g.Value}}">
+                </p-checkbox>
+
+                <label for="{{g.Value}}" [title]="g.Label">{{g.Value}}</label>
+
+
+            </div>
+        </div>
+
+        <div style="float: right;">
+            <button class="search-cmd" (click)="saveRoles()">Save</button>
+            <button class="search-cmd" style="margin-left: 10px;" (click)="showWindow['ROLES'] = false">Cancel</button>
+        </div>
+
+    </div>
+</p-dialog>
+
+<p-dialog *ngIf="userData" header="Edit Permissions" [style]="{'width': '600px'}"
+    [(visible)]="showWindow['PERMISSIONS']" #overlayContainer>
+    <div class="h-100 p-2">
+
+        <p-accordion [multiple]="false" >
+            <p-accordionTab  *ngFor="let g of userData.Permissions" [header]="g.CATEGORY" [selected]="false"  >
+                <table style="width: 100%">
+                    <tr style="border-bottom: 1px solid #aaa;"  *ngFor="let p of g.Data">
+                        <td style="vertical-align: top;">
+                            <p-checkbox name="{{p.PERMISSIONNAME}}" [binary]="true" [(ngModel)]="p.Selected" inputId="{{p.PERMISSIONNAME}}">
+                            </p-checkbox>
+                        </td>
+                        <td style="vertical-align: top;">
+                            <label for="{{p.PERMISSIONNAME}}" [title]="p.PERMISSIONDESCRIPTION">{{p.PERMISSIONNAME}}</label>
+                        </td>
+                        <td>
+                            <span>
+                                {{p.PERMISSIONDESCRIPTION}}
+                            </span>
+                        </td>
+                    </tr>
+                </table>        
+            </p-accordionTab>
+        </p-accordion>
+     
+
+        <div style="float: right;">
+            <button class="search-cmd" (click)="savePermissions()">Save</button>
+            <button class="search-cmd" style="margin-left: 10px;"
+                (click)="showWindow['PERMISSIONS'] = false">Cancel</button>
+        </div>
+
+    </div>
+</p-dialog>
+
+
+<p-dialog *ngIf="userData" header="Edit Permissions" [style]="{'width': '600px'}"
+    [(visible)]="showWindow['PERMISSIONS2']" #overlayContainer>
+    <div class="h-100 p-2">
+        <table>
+
+            <tr style="border-bottom: 1px solid #aaa;" *ngFor="let g of userData.LK_Permissions">
+                <td style="vertical-align: top;">
+                    <p-checkbox name="{{g.Value}}" [binary]="true" [(ngModel)]="g.Selected" inputId="{{g.Value}}">
+                    </p-checkbox>
+                </td>
+                <td style="vertical-align: top;">
+                    <label for="{{g.Value}}" [title]="g.Label">{{g.Value}}</label>
+                </td>
+                <td>
+                    <span>
+                        {{g.Label}}
+                    </span>
+                </td>
+            </tr>
+        </table>
+
+        <div style="float: right;">
+            <button class="search-cmd" (click)="savePermissions()">Save</button>
+            <button class="search-cmd" style="margin-left: 10px;"
+                (click)="showWindow['PERMISSIONS'] = false">Cancel</button>
+        </div>
+
+    </div>
+</p-dialog>
