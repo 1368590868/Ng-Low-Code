@@ -1,9 +1,0 @@
-
-:host::ng-deep .p-datatable-scrollable-wrapper {
-    /* fix pagination not show */
-    overflow: hidden;
-  }
-  
-  :host::ng-deep .pi-sort-alt {
-    display: none;
-  }
