@@ -1,0 +1,27 @@
+.header {
+  height: 60px;
+  box-shadow: 0 1px 10px #0000001f, 0 4px 5px #00000024, 0 2px 4px -1px #0003;
+
+  .title-text {
+    font-size: 20px;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+  }
+  .page-link {
+    width: 200px;
+    a {
+      width: calc(100% / 3);
+    }
+  }
+
+  .edit-img {
+    width: 12px;
+    height: 12px;
+  }
+
+  .username {
+    font-size: 0.7rem;
+    margin-top: 0.5rem;
+    margin-right: 1rem;
+  }
+}

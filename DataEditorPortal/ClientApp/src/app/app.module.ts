@@ -9,6 +9,7 @@ import { AppComponent } from './app.component';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { MenubarModule } from 'primeng/menubar';
 
 import { HeaderComponent } from './header/header.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -19,7 +20,8 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
     BrowserAnimationsModule,
     ButtonModule,
     AppRoutingModule,
-    ToastModule
+    ToastModule,
+    MenubarModule
   ],
   providers: [MessageService],
   bootstrap: [AppComponent]
