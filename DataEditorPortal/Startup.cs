@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace DataEditorPortal.Web
@@ -87,13 +88,16 @@ namespace DataEditorPortal.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetService<DepDbContext>();
                 dbContext.Database.Migrate();
             }
+
+            // Enable Log files
+            loggerFactory.AddFile(Configuration.GetSection("Logging"));
 
             if (env.IsDevelopment())
             {

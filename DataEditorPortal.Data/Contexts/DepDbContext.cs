@@ -52,7 +52,20 @@ namespace DataEditorPortal.Data.Contexts
                         new { field = "Comments", header = "Comments", width = "250px", filterType = "text" }
                     }),
 
-                    SearchConfig = JsonConvert.SerializeObject(new object[] { }),
+                    SearchConfig = JsonConvert.SerializeObject(new object[] {
+                        new {
+                            Name= "Username",
+                            Label= "CNP ID",
+                            // WhereClause= "upper(USERID) like upper('%{0}%')",
+                            Type= "pInputText"
+                        },
+                        new {
+                            Name= "NAME",
+                            Label= "Name",
+                            // WhereClause= "upper(NAME) like upper('%{0}%')",
+                            Type= "pInputText"
+                        }
+                    }),
 
                     CreatedBy = Guid.Empty,
                     CreatedDate = new DateTime(2022, 12, 26)
