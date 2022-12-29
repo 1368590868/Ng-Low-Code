@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace DataEditorPortal.Web.Models.UniversalGrid
 {
@@ -9,7 +10,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string Description { get; set; }
         public string WorkType { get; set; }
 
-        //public List<SearchConfig> Searches { get; set; }
+        public JObject Searches { get; set; }
         public List<FilterParam> Filters { get; set; } = new List<FilterParam>();
         public List<SortParam> Sorts { get; set; } = new List<SortParam>();
 
