@@ -3,6 +3,7 @@ using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -119,10 +120,10 @@ namespace DataEditorPortal.Web
 
             app.UseRouting();
 
-            if (env.IsDevelopment())
-            {
-                app.UseCors();
-            }
+            // if (env.IsDevelopment())
+            // {
+            app.UseCors();
+            // }
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -143,7 +144,7 @@ namespace DataEditorPortal.Web
 
                 if (env.IsDevelopment())
                 {
-                    // spa.UseAngularCliServer(npmScript: "start");
+                    spa.UseAngularCliServer(npmScript: "start");
                 }
             });
         }
