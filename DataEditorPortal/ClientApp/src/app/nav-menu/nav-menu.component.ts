@@ -11,85 +11,73 @@ export class NavMenuComponent {
   constructor() {
     this.items = [
       {
-        label: 'File',
+        label: 'Gas',
         icon: 'pi pi-fw pi-file',
         items: [
           {
-            label: 'New',
-            icon: 'pi pi-fw pi-plus',
-            items: [
-              {
-                label: 'Bookmark',
-                icon: 'pi pi-fw pi-bookmark'
-              },
-              {
-                label: 'Video',
-                icon: 'pi pi-fw pi-video'
-              }
-            ]
+            label: 'Gas Facility',
+            icon: 'pi pi-fw pi-plus'
           },
           {
-            label: 'Delete',
+            label: 'Gas setting',
             icon: 'pi pi-fw pi-trash'
-          },
-          {
-            separator: true
           }
         ]
       },
       {
-        label: 'Edit',
+        label: 'Electric',
         icon: 'pi pi-fw pi-pencil',
         items: [
           {
-            label: 'Left',
+            label: 'Electric Facility',
             icon: 'pi pi-fw pi-align-left'
           },
           {
-            label: 'Right',
+            label: 'Electric Facility Right',
             icon: 'pi pi-fw pi-align-right'
           },
           {
-            label: 'Center',
+            label: 'Electric Facility Center',
             icon: 'pi pi-fw pi-align-center'
           },
           {
-            label: 'Justify',
+            label: 'Electric Facility Justify',
             icon: 'pi pi-fw pi-align-justify'
           }
         ]
       },
       {
-        label: 'Users',
+        label: 'Major',
         icon: 'pi pi-fw pi-user',
         items: [
           {
-            label: 'New',
+            label: 'Major Underground New',
             icon: 'pi pi-fw pi-user-plus'
           },
           {
-            label: 'Delete',
+            label: 'Major Underground Delete',
             icon: 'pi pi-fw pi-user-minus'
           }
         ]
       },
       {
-        label: 'Events',
+        label: 'Data',
         icon: 'pi pi-fw pi-calendar',
         items: [
           {
-            label: 'Edit',
+            label: 'Data Corrections',
             icon: 'pi pi-fw pi-pencil'
           },
           {
-            label: 'Archieve',
+            label: 'Data Corrections Archieve',
             icon: 'pi pi-fw pi-calendar-times'
           }
         ]
       },
       {
-        label: 'Quit',
-        icon: 'pi pi-fw pi-power-off'
+        label: 'Batch Processing',
+        icon: 'pi pi-fw pi-power-off',
+        routerLink: '/action/batch'
       }
     ];
   }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
+import { ThemeService } from './theme.service';
 
 @Component({
   selector: 'app-root',
@@ -10,24 +11,26 @@ import { PrimeNGConfig } from 'primeng/api';
 export class AppComponent implements OnInit {
   title = 'data-editor-portal';
   bgColor = 'bg-primary';
+  inputValue = '#3F51B5';
 
   constructor(
     private messageService: MessageService,
-    private primengConfig: PrimeNGConfig
+    private primengConfig: PrimeNGConfig,
+    private themeService: ThemeService
   ) {}
   ngOnInit(): void {
     this.primengConfig.ripple = true;
+
+    // init the theme style
+    this.themeService.changePrimaryColor(this.themeService.primaryColor);
+  }
+
+  onSearch() {
+    this.handleClick();
   }
 
   handleClick() {
-    this.bgColor = 'bg-blue-500';
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Service Message',
-      detail: 'Via MessageService'
-    });
-    setTimeout(() => {
-      this.bgColor = 'bg-pink-500';
-    }, 1000);
+    this.themeService.changePrimaryColor(this.inputValue);
+    console.log(1);
   }
 }

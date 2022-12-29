@@ -3,4 +3,7 @@
   ::ng-deep .p-menubar {
     padding: 0.25rem;
   }
+  ::ng-deep .p-submenu-list {
+    z-index: 999;
+  }
 }
