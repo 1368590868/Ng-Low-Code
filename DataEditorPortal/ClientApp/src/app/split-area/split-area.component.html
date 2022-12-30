@@ -1,15 +1,11 @@
-<p-splitter
-  [style]="{ height: '100%' }"
-  [panelSizes]="[20, 80]"
-  stateKey="split"
-  stateStorage="local">
+<p-splitter [panelSizes]="[20, 80]" stateKey="split" stateStorage="local">
   <ng-template pTemplate>
-    <div class="w-full" style="height: calc(100vh - 8rem)">
+    <div class="w-full">
       <app-search></app-search>
     </div>
   </ng-template>
   <ng-template pTemplate>
-    <div class="w-full" style="height: calc(100vh - 8rem)">
+    <div class="w-full">
       <app-table></app-table>
     </div>
   </ng-template>

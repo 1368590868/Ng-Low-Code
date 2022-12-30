@@ -1,5 +1,10 @@
 .nav-menu {
   box-shadow: 2px 0 4px -1px #0003, 4px 0 5px #00000024, 1px 0 10px #0000001f;
+  position: sticky;
+  top: 4.29rem;
+  z-index: 9999;
+  background: #fff;
+
   ::ng-deep .p-menubar {
     padding: 0.25rem;
   }
