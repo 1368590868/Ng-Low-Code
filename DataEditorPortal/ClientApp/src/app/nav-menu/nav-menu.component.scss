@@ -1,14 +1,28 @@
 .nav-menu {
+  --menuitem-text-color: #515c66;
+
   box-shadow: 2px 0 4px -1px #0003, 4px 0 5px #00000024, 1px 0 10px #0000001f;
   position: sticky;
-  top: 4.29rem;
-  z-index: 9999;
+  top: 4rem;
+  z-index: 9998;
   background: #fff;
 
   ::ng-deep .p-menubar {
-    padding: 0.25rem;
-  }
-  ::ng-deep .p-submenu-list {
-    z-index: 999;
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+    .p-menuitem-link {
+      border-radius: 0;
+      padding-top: 0.875rem;
+      .p-menuitem-text,
+      .p-submenu-icon {
+        color: var(--menuitem-text-color);
+        font-size: 0.875rem;
+      }
+    }
+    .p-submenu-list {
+      z-index: 999;
+      border-radius: var(--border-radius);
+      margin-top: 0.125rem;
+    }
   }
 }

@@ -1,34 +1,24 @@
-<header class="header flex flex-nowarp justify-content-between bg-primary">
+<header class="header flex flex-nowarp justify-content-between">
   <div class="flex justify-content-center align-items-center">
-    <img
-      class="logo"
-      src="assets/Images/cnp.png"
-      style="height: 4.29rem; padding-left: 0.357rem; width: 20rem" />
-
-    <div class="page-link flex justify-content-center align-items-center ml-6">
-      <span class="cursor-pointer" [routerLink]="['/']">Home</span>
-      <span class="cursor-pointer" [routerLink]="['/about']">About</span>
-      <span class="cursor-pointer" [routerLink]="['/contact']">Contact</span>
+    <div class="logo-wrapper flex justify-content-center align-items-center">
+      <img
+        class="logo"
+        src="assets/Images/cnp.png"
+        style="filter: brightness(8)" />
     </div>
+    <p-menubar [model]="items" class="page-link"></p-menubar>
   </div>
-  <!-- <div class="username flex flex-column">
-    <div>username<img src="assets/Images/edit.png" class="edit-img" /></div>
-    <p>description</p>
-  </div> -->
-  <div class="flex justify-content-center align-items-center w-2">
-    <p-button
-      icon="pi pi-search"
-      class="p-button-rounded p-button-text"></p-button>
-    <p-button
-      icon="pi pi-bell"
-      class="p-button-rounded p-button-text"></p-button>
-    <p-button
-      icon="pi pi-table"
-      class="p-button-rounded p-button-text"></p-button>
-    <p-avatar
-      image="https://www.primefaces.org/ultima-ng/assets/demo/images/avatar/amyelsner.png"
-      styleClass="mr-2"
-      class="ml-2"
-      shape="circle"></p-avatar>
+  <div class="menu-end flex justify-content-center align-items-center">
+    <p-button icon="pi pi-search" styleClass="p-button-rounded mr-2"></p-button>
+    <p-button styleClass="mr-1">
+      <p-avatar
+        image="https://www.primefaces.org/ultima-ng/assets/demo/images/avatar/amyelsner.png"
+        styleClass="flex mr-2"
+        shape="circle"></p-avatar>
+      <span class="flex flex-column align-items-start">
+        <strong>Administrator</strong>
+        <small>Vendor:NA</small>
+      </span>
+    </p-button>
   </div>
 </header>
