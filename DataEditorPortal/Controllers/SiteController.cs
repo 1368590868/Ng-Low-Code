@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace DataEditorPortal.Web.Controllers
@@ -52,6 +53,45 @@ namespace DataEditorPortal.Web.Controllers
                 version,
                 date
             });
+        }
+
+        [HttpPost]
+        [Route("menus")]
+        public IActionResult GetMenus()
+        {
+            var menus = _depDbContext.SiteMenus.ToList();
+
+            var root = menus
+                .Where(x => x.ParentId == null)
+                .OrderBy(x => x.Order)
+                .ThenBy(x => x.Name)
+                .Select(x =>
+                {
+                    var items = menus
+                            .Where(m => m.ParentId == x.Id)
+                            .OrderBy(x => x.Order)
+                            .ThenBy(x => x.Name)
+                            .Select(m => new
+                            {
+                                id = m.Id,
+                                name = m.Name,
+                                lable = m.Lable,
+                                icon = m.Icon,
+                                title = m.Description
+                            });
+
+                    return new
+                    {
+                        id = x.Id,
+                        name = x.Name,
+                        lable = x.Lable,
+                        icon = x.Icon,
+                        title = x.Description,
+                        items = items.Any() ? items : null
+                    };
+                });
+
+            return new JsonResult(root);
         }
     }
 }

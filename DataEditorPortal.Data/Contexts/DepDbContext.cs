@@ -18,6 +18,8 @@ namespace DataEditorPortal.Data.Contexts
         public virtual DbSet<SitePermission> SitePermissions { get; set; }
         public virtual DbSet<SitePermissionRole> SitePermissionRoles { get; set; }
 
+        public virtual DbSet<SiteMenu> SiteMenus { get; set; }
+
         public virtual DbSet<UniversalGridConfiguration> UniversalGridConfigurations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,8 +31,6 @@ namespace DataEditorPortal.Data.Contexts
                 {
                     Id = Guid.Parse("071f5419-85b8-11ed-a86f-0242ac130004"),
                     Name = "UserManagement",
-                    Description = "User Management",
-                    Icon = "",
 
                     DataSourceConfig = JsonConvert.SerializeObject(new
                     {
@@ -69,6 +69,16 @@ namespace DataEditorPortal.Data.Contexts
 
                     CreatedBy = Guid.Empty,
                     CreatedDate = new DateTime(2022, 12, 26)
+                }
+            );
+            modelBuilder.Entity<SiteMenu>().HasData(
+                new SiteMenu()
+                {
+                    Id = new Guid("4E22E18E-492E-4786-8170-FB8F0C9D3A62"),
+                    Name = "UserManagement",
+                    Lable = "User Management",
+                    Icon = "pi pi-fw pi-user",
+                    Type = "PortalItem"
                 }
             );
         }

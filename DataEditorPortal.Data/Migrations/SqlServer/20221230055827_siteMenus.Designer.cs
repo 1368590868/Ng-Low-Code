@@ -4,14 +4,16 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20221230055827_siteMenus")]
+    partial class siteMenus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,9 +32,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Icon")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Lable")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -58,8 +57,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         {
                             Id = new Guid("4e22e18e-492e-4786-8170-fb8f0c9d3a62"),
                             Icon = "pi pi-fw pi-user",
-                            Lable = "User Management",
-                            Name = "UserManagement",
+                            Name = "User Management",
                             Order = 0,
                             Type = "PortalItem"
                         });
@@ -150,7 +148,13 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("DataSourceConfig")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DetailDialogConfig")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Icon")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -174,6 +178,8 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
                             CreatedDate = new DateTime(2022, 12, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DataSourceConfig = "{\"TableName\":\"Users\",\"IdColumn\":\"Id\",\"Columns\":[\"Id\",\"Username\",\"Name\",\"Email\",\"Phone\",\"AutoEmail\",\"Vendor\",\"Employer\",\"Division\",\"Comments\"],\"SortBy\":[{\"field\":\"Name\",\"order\":1}]}",
+                            Description = "User Management",
+                            Icon = "",
                             Name = "UserManagement",
                             SearchConfig = "[{\"Name\":\"Username\",\"Label\":\"CNP ID\",\"Type\":\"pInputText\"},{\"Name\":\"NAME\",\"Label\":\"Name\",\"Type\":\"pInputText\"}]",
                             UseCustomDetailDialog = false
