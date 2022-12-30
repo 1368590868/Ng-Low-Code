@@ -1,4 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Table } from 'primeng/table';
+import { PrimeNGConfig } from 'primeng/api';
+import { GridTableService } from '../grid-table.service';
+
+export interface Country {
+  name?: string;
+  code?: string;
+}
+
+export interface Representative {
+  name?: string;
+  image?: string;
+}
+
+export interface Customer {
+  id?: number;
+  name?: number;
+  country?: Country;
+  company?: string;
+  date?: string;
+  status?: string;
+  representative?: Representative;
+}
 
 @Component({
   selector: 'app-table',
@@ -6,32 +29,99 @@ import { Component } from '@angular/core';
   styleUrls: ['./table.component.scss']
 })
 export class TableComponent {
-  cols: any[];
-  cars: any[];
-  constructor() {
-    this.cols = [
-      { field: 'vin', header: 'Vin' },
-      { field: 'year', header: 'Year' },
-      { field: 'brand', header: 'Brand' },
-      { field: 'color', header: 'Color' }
+  searchText = '';
+  nameFilter = '';
+  countryFilter = '';
+  activity: any;
+
+  customers: Customer[];
+
+  selectedCustomers: Customer[];
+
+  representatives: Representative[];
+
+  statuses: any[];
+
+  loading = true;
+  @ViewChild('dt') table: any;
+
+  constructor(
+    private gridTableService: GridTableService,
+    private primengConfig: PrimeNGConfig
+  ) {
+    this.activity = '';
+    this.customers = [];
+    this.selectedCustomers = [];
+    this.representatives = [
+      { name: 'Amy Elsner', image: 'amyelsner.png' },
+      { name: 'Anna Fali', image: 'annafali.png' },
+      { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
+      { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
+      { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
+      { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
+      { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
+      { name: 'Onyama Limba', image: 'onyamalimba.png' },
+      { name: 'Stephen Shaw', image: 'stephenshaw.png' },
+      { name: 'Xuxue Feng', image: 'xuxuefeng.png' }
     ];
-    this.cars = [
-      { vin: 'r3278r2', year: 2010, brand: 'Audi', color: 'Black' },
-      { vin: 'jhto2g2', year: 2015, brand: 'BMW', color: 'White' },
-      { vin: 'h453w54', year: 2012, brand: 'Honda', color: 'Blue' },
-      { vin: 'g43gwwg', year: 1998, brand: 'Renault', color: 'White' },
-      { vin: 'gf45wg5', year: 2011, brand: 'VW', color: 'Red' },
-      { vin: 'bhv5y5w', year: 2015, brand: 'Jaguar', color: 'Blue' },
-      { vin: 'ybw5fsd', year: 2012, brand: 'Ford', color: 'Yellow' },
-      { vin: '45665e5', year: 2011, brand: 'Mercedes', color: 'Brown' },
-      { vin: 'he6sb5v', year: 2015, brand: 'Ford', color: 'Black' },
-      { vin: 'av5svnb', year: 2016, brand: 'Mercedes', color: 'Red' },
-      { vin: 'jsja3ia', year: 2015, brand: 'Volvo', color: 'White' },
-      { vin: 'hsd77sa', year: 2016, brand: 'Honda', color: 'Yellow' }
+
+    this.statuses = [
+      { label: 'Unqualified', value: 'unqualified' },
+      { label: 'Qualified', value: 'qualified' },
+      { label: 'New', value: 'new' },
+      { label: 'Negotiation', value: 'negotiation' },
+      { label: 'Renewal', value: 'renewal' },
+      { label: 'Proposal', value: 'proposal' }
     ];
+    this.primengConfig.ripple = true;
   }
 
-  onLazyLoad(event: any) {
-    console.log(event, 'event');
+  ngOnInit() {
+    this.gridTableService.getCustomersLarge().then(customers => {
+      this.customers = customers;
+      this.loading = false;
+    });
+  }
+
+  onActivityChange(event: { target: { value: any } }) {
+    const value = event.target.value;
+    if (value && value.trim().length) {
+      const activity = parseInt(value);
+
+      if (!isNaN(activity)) {
+        this.table.filter(activity, 'activity', 'gte');
+      }
+    }
+  }
+
+  onDateSelect(value: {
+    getMonth: () => number;
+    getDate: () => any;
+    getFullYear: () => string;
+  }) {
+    this.table.filter(this.formatDate(value), 'date', 'equals');
+  }
+
+  formatDate(date: {
+    getMonth: () => any;
+    getDate: () => any;
+    getFullYear: () => string;
+  }) {
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+
+    if (month < 10) {
+      month = '0' + month;
+    }
+
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    return date.getFullYear() + '-' + month + '-' + day;
+  }
+
+  onRepresentativeChange(event: { value: any }) {
+    this.table.filter(event.value, 'representative', 'in');
   }
 }
