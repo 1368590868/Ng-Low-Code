@@ -1,0 +1,29 @@
+.Startup {
+  background: url('../../assets/Images/bigbg.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  width: 61rem;
+  height: 35.71rem;
+  span {
+    display: block;
+  }
+  .Links {
+    white-space: pre-wrap;
+    color: #009ada;
+    font-size: 0.857rem;
+    margin-bottom: 0.35rem;
+  }
+  .Links:hover {
+    color: #336699;
+  }
+  .Heading2 {
+    font-weight: bold;
+    font-size: 1.286rem;
+  }
+  .Heading {
+    font-weight: bold;
+    font-size: 1.72rem;
+  }
+}

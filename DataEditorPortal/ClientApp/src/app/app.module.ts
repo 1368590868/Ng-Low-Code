@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -10,18 +11,43 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
+import { AvatarModule } from 'primeng/avatar';
+import { SplitterModule } from 'primeng/splitter';
+import { DropdownModule } from 'primeng/dropdown';
+import { TableModule } from 'primeng/table';
 
 import { HeaderComponent } from './header/header.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
+import { AboutComponent } from './about/about.component';
+import { ContactComponent } from './contact/contact.component';
+import { HomeComponent } from './home/home.component';
+import { SplitAreaComponent } from './split-area/split-area.component';
+import { SearchComponent } from './search/search.component';
+import { TableComponent } from './table/table.component';
 @NgModule({
-  declarations: [AppComponent, HeaderComponent, NavMenuComponent],
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    NavMenuComponent,
+    AboutComponent,
+    ContactComponent,
+    HomeComponent,
+    SplitAreaComponent,
+    SearchComponent,
+    TableComponent
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    FormsModule,
     ButtonModule,
     AppRoutingModule,
     ToastModule,
-    MenubarModule
+    MenubarModule,
+    AvatarModule,
+    SplitterModule,
+    DropdownModule,
+    TableModule
   ],
   providers: [MessageService],
   bootstrap: [AppComponent]
