@@ -19,8 +19,8 @@
         styleClass="flex mr-2"
         shape="circle"></p-avatar>
       <span class="flex flex-column align-items-start">
-        <strong>Administrator</strong>
-        <small>Vendor:NA</small>
+        <strong>{{ USER.displayName }}</strong>
+        <small>Vendor:{{ USER.vendor || 'Vendor N/A' }}</small>
       </span>
     </p-button>
   </div>
