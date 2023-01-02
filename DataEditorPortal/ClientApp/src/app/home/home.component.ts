@@ -14,9 +14,5 @@ export class HomeComponent implements OnInit {
     this.configData.getSiteVersion().subscribe((data: any) => {
       this.siteVersion = `Site Version ${data.version}, Release Date ${data.date}`;
     });
-
-    this.configData.getLoggedInUser().subscribe(data => {
-      console.log(data);
-    });
   }
 }

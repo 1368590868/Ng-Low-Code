@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Table } from 'primeng/table';
 import { PrimeNGConfig } from 'primeng/api';
 import { GridTableService } from '../grid-table.service';
+import { ConfigDataService } from '../config-data.service';
+import { catchError } from 'rxjs';
 
 export interface Country {
   name?: string;
@@ -21,6 +22,7 @@ export interface Customer {
   date?: string;
   status?: string;
   representative?: Representative;
+  data?: Customer[];
 }
 
 @Component({
@@ -28,13 +30,13 @@ export interface Customer {
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss']
 })
-export class TableComponent {
+export class TableComponent implements OnInit {
   searchText = '';
   nameFilter = '';
   countryFilter = '';
   activity: any;
 
-  customers: Customer[];
+  customers: any;
 
   selectedCustomers: Customer[];
 
@@ -43,12 +45,20 @@ export class TableComponent {
   statuses: any[];
 
   loading = true;
+
   @ViewChild('dt') table: any;
+
+  cols: any[];
+
+  totalRecords: any;
 
   constructor(
     private gridTableService: GridTableService,
-    private primengConfig: PrimeNGConfig
+    private primengConfig: PrimeNGConfig,
+    private configData: ConfigDataService
   ) {
+    this.totalRecords = 0;
+    this.cols = [];
     this.activity = '';
     this.customers = [];
     this.selectedCustomers = [];
@@ -77,18 +87,72 @@ export class TableComponent {
   }
 
   ngOnInit() {
-    this.gridTableService.getCustomersLarge().then(customers => {
-      this.customers = customers;
-      this.loading = false;
+    this.configData.getTableColumns().subscribe((res: never[]) => {
+      this.cols = res;
     });
   }
 
-  onActivityChange(event: { target: { value: any } }) {
-    const value = event.target.value;
+  loadTableLazy(event: any) {
+    //simulate remote connection with a timeout
+    console.log('event', event);
+    const fetchParam = {
+      Filters: [],
+      Sorts: [],
+      Searches: [],
+      startIndex: 0,
+      indexCount: 100
+    };
+
+    // event filters value != null
+    const obj = event.filters;
+    for (const prop in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+        // do stuff
+        const fieldProp = obj[prop];
+        for (let i = 0; i < fieldProp.length; i++) {
+          if (fieldProp[i].value != null) {
+            fieldProp[i].field = prop;
+            fetchParam.Filters.push(fieldProp[i] as never);
+          }
+        }
+      }
+    }
+
+    fetchParam.startIndex = event.first ?? 0;
+    fetchParam.indexCount = event.rows ?? 100;
+
+    // Please replace the current api
+    // this.gridTableService
+    //   .getTableData(JSON.stringify(fetchParam))
+    //   .pipe(
+    //     catchError(err =>
+    //       this.configData.notifyErrorInPipe(err, { data: [], total: 0 })
+    //     )
+    //   )
+    //   .subscribe(res => {
+    //     this.customers = (res as any).data;
+    //     this.loading = false;
+    //     this.totalRecords = (res as any).total;
+    //   });
+
+    // Please remove local JSON API , this is testing purpose
+    this.gridTableService.getCustomersLarge().then(customers => {
+      this.customers = customers['data'];
+      this.loading = false;
+      this.totalRecords = customers['total'];
+    });
+  }
+
+  onActivityChange(val: string) {
+    const value = val;
     if (value && value.trim().length) {
       const activity = parseInt(value);
 
       if (!isNaN(activity)) {
+        console.log('activity', activity);
+        console.log(this.table);
+        console.log(this.customers);
+
         this.table.filter(activity, 'activity', 'gte');
       }
     }
@@ -123,5 +187,6 @@ export class TableComponent {
 
   onRepresentativeChange(event: { value: any }) {
     this.table.filter(event.value, 'representative', 'in');
+    console.log(event.value);
   }
 }
