@@ -32,17 +32,10 @@ export interface Customer {
 })
 export class TableComponent implements OnInit {
   searchText = '';
-  nameFilter = '';
-  countryFilter = '';
-  activity: any;
 
   customers: any;
 
   selectedCustomers: Customer[];
-
-  representatives: Representative[];
-
-  statuses: any[];
 
   loading = true;
 
@@ -59,30 +52,8 @@ export class TableComponent implements OnInit {
   ) {
     this.totalRecords = 0;
     this.cols = [];
-    this.activity = '';
     this.customers = [];
     this.selectedCustomers = [];
-    this.representatives = [
-      { name: 'Amy Elsner', image: 'amyelsner.png' },
-      { name: 'Anna Fali', image: 'annafali.png' },
-      { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-      { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-      { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-      { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-      { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-      { name: 'Onyama Limba', image: 'onyamalimba.png' },
-      { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-      { name: 'Xuxue Feng', image: 'xuxuefeng.png' }
-    ];
-
-    this.statuses = [
-      { label: 'Unqualified', value: 'unqualified' },
-      { label: 'Qualified', value: 'qualified' },
-      { label: 'New', value: 'new' },
-      { label: 'Negotiation', value: 'negotiation' },
-      { label: 'Renewal', value: 'renewal' },
-      { label: 'Proposal', value: 'proposal' }
-    ];
     this.primengConfig.ripple = true;
   }
 
@@ -141,52 +112,5 @@ export class TableComponent implements OnInit {
       this.loading = false;
       this.totalRecords = customers['total'];
     });
-  }
-
-  onActivityChange(val: string) {
-    const value = val;
-    if (value && value.trim().length) {
-      const activity = parseInt(value);
-
-      if (!isNaN(activity)) {
-        console.log('activity', activity);
-        console.log(this.table);
-        console.log(this.customers);
-
-        this.table.filter(activity, 'activity', 'gte');
-      }
-    }
-  }
-
-  onDateSelect(value: {
-    getMonth: () => number;
-    getDate: () => any;
-    getFullYear: () => string;
-  }) {
-    this.table.filter(this.formatDate(value), 'date', 'equals');
-  }
-
-  formatDate(date: {
-    getMonth: () => any;
-    getDate: () => any;
-    getFullYear: () => string;
-  }) {
-    let month = date.getMonth() + 1;
-    let day = date.getDate();
-
-    if (month < 10) {
-      month = '0' + month;
-    }
-
-    if (day < 10) {
-      day = '0' + day;
-    }
-
-    return date.getFullYear() + '-' + month + '-' + day;
-  }
-
-  onRepresentativeChange(event: { value: any }) {
-    this.table.filter(event.value, 'representative', 'in');
-    console.log(event.value);
   }
 }
