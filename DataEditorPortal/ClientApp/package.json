@@ -8,6 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
+    "prepare": "cd .. && cd.. && husky install DataEditorPortal/ClientApp/.husky",
     "pre-commit": "lint-staged --no-stash"
   },
   "private": true,
