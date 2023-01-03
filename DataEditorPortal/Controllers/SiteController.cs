@@ -75,7 +75,7 @@ namespace DataEditorPortal.Web.Controllers
                             {
                                 id = m.Id,
                                 name = m.Name,
-                                lable = m.Lable,
+                                label = m.Lable,
                                 icon = m.Icon,
                                 title = m.Description
                             });
@@ -84,7 +84,7 @@ namespace DataEditorPortal.Web.Controllers
                     {
                         id = x.Id,
                         name = x.Name,
-                        lable = x.Lable,
+                        label = x.Lable,
                         icon = x.Icon,
                         title = x.Description,
                         items = items.Any() ? items : null
