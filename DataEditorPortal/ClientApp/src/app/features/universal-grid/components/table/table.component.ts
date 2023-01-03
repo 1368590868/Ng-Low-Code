@@ -14,17 +14,6 @@ export interface Representative {
   image?: string;
 }
 
-export interface Customer {
-  id?: number;
-  name?: number;
-  country?: Country;
-  company?: string;
-  date?: string;
-  status?: string;
-  representative?: Representative;
-  data?: Customer[];
-}
-
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
@@ -33,9 +22,9 @@ export interface Customer {
 export class TableComponent implements OnInit {
   searchText = '';
 
-  customers: any;
+  records: any;
 
-  selectedCustomers: Customer[];
+  selectedRecords: any[];
 
   loading = true;
 
@@ -52,8 +41,8 @@ export class TableComponent implements OnInit {
   ) {
     this.totalRecords = 0;
     this.cols = [];
-    this.customers = [];
-    this.selectedCustomers = [];
+    this.records = [];
+    this.selectedRecords = [];
     this.primengConfig.ripple = true;
   }
 
@@ -69,7 +58,7 @@ export class TableComponent implements OnInit {
     const fetchParam = {
       Filters: [],
       Sorts: [],
-      Searches: [],
+      // Searches: [],
       startIndex: 0,
       indexCount: 100
     };
@@ -92,25 +81,17 @@ export class TableComponent implements OnInit {
     fetchParam.startIndex = event.first ?? 0;
     fetchParam.indexCount = event.rows ?? 100;
 
-    // Please replace the current api
     this.gridTableService
-      .getTableData(JSON.stringify(fetchParam))
+      .getTableData(fetchParam)
       .pipe(
         catchError(err =>
           this.notifyService.notifyErrorInPipe(err, { data: [], total: 0 })
         )
       )
       .subscribe(res => {
-        this.customers = (res as any).data;
+        this.records = (res as any).data;
         this.loading = false;
         this.totalRecords = (res as any).total;
       });
-
-    // Please remove local JSON API , this is testing purpose
-    // this.gridTableService.getCustomersLarge().then(customers => {
-    //   this.customers = customers['data'];
-    //   this.loading = false;
-    //   this.totalRecords = customers['total'];
-    // });
   }
 }
