@@ -5,6 +5,4 @@ import { Component } from '@angular/core';
   templateUrl: './split-area.component.html',
   styleUrls: ['./split-area.component.scss']
 })
-export class SplitAreaComponent {
-
-}
+export class SplitAreaComponent {}
