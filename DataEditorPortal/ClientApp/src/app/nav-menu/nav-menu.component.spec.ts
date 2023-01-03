@@ -16,7 +16,7 @@ describe('NavMenuComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create1', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
