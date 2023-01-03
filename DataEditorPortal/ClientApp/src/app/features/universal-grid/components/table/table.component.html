@@ -8,13 +8,13 @@
     [resizableColumns]="true"
     columnResizeMode="expand"
     [reorderableColumns]="true"
-    selectionMode="single"
+    selectionMode="multiple"
     [lazy]="true"
     (onLazyLoad)="loadTableLazy($event)"
     [value]="records"
     [(selection)]="selectedRecords"
     dataKey="Id"
-    styleClass="p-datatable-records "
+    styleClass="p-datatable-records"
     [rowHover]="true"
     [rows]="10"
     [showCurrentPageReport]="true"
@@ -24,25 +24,37 @@
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries  "
     [totalRecords]="totalRecords"
     scrollHeight="600px"
-    [filterDelay]="0">
+    [filterDelay]="0"
+    stateStorage="session"
+    stateKey="statedemo-session">
     <ng-template pTemplate="caption">
-      <div class="table-header">
-        Top button
-        <span class="p-input-icon-left">
-          <i class="pi pi-search"></i>
-          <input
-            [(ngModel)]="searchText"
-            pInputText
-            type="text"
-            (input)="dt.filterGlobal(searchText, 'contains')"
-            placeholder="Global Search" />
-        </span>
+      <h3 class="mb-4">User Management</h3>
+      <div class="table-header flex align-items-center">
+        <p-button label="Add New" icon="pi pi-plus" class="mr-2"></p-button>
+        <p-button
+          label="Export To Excel"
+          icon="pi pi-file-excel"
+          styleClass="p-button-outlined mr-2"></p-button>
+        <p-button
+          label="Remove"
+          icon="pi pi-file-excel mr-2"
+          styleClass="p-button-outlined p-button-danger"></p-button>
+        <div class="flex-grow-1">
+          <strong *ngIf="selectedRecords.length > 0"
+            >{{ selectedRecords.length }} row(s) selected</strong
+          >
+        </div>
+        <p-button
+          icon="pi pi-refresh"
+          styleClass="p-button-rounded p-button-outlined p-button-lg"></p-button>
       </div>
     </ng-template>
 
     <ng-template pTemplate="header" let-columns>
       <tr>
-        <th pResizableColumn></th>
+        <th style="width: 4rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
         <th
           *ngFor="let col of columns"
           pReorderableColumn
@@ -63,7 +75,9 @@
     <ng-template pTemplate="body" let-data let-columns="columns">
       <tr [pSelectableRow]="data">
         <td class="p-table-td">
-          <p-tableCheckbox [value]="data"></p-tableCheckbox>
+          <p-tableCheckbox
+            [value]="data"
+            (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
         </td>
 
         <td *ngFor="let col of columns" [title]="data[col.field]">

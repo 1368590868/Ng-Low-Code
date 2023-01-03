@@ -78,6 +78,10 @@ export class TableComponent implements OnInit {
       }
     }
 
+    if (event.multiSortMeta && event.multiSortMeta.length > 0) {
+      fetchParam.Sorts = event.multiSortMeta;
+    }
+
     fetchParam.startIndex = event.first ?? 0;
     fetchParam.indexCount = event.rows ?? 100;
 
@@ -93,5 +97,9 @@ export class TableComponent implements OnInit {
         this.loading = false;
         this.totalRecords = (res as any).total;
       });
+  }
+
+  onRowCheckBoxClick(event: any) {
+    event.stopPropagation();
   }
 }
