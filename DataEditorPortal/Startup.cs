@@ -66,18 +66,18 @@ namespace DataEditorPortal.Web
 
             #endregion
 
-            services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(builder =>
-                {
-                    builder
-                        .WithOrigins("http://localhost:4200", "https://localhost:44315")
-                        .SetIsOriginAllowed(origin => true)
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
-            });
+            //services.AddCors(options =>
+            //{
+            //    options.AddDefaultPolicy(builder =>
+            //    {
+            //        builder
+            //            .WithOrigins("http://localhost:4200", "https://localhost:44315")
+            //            .SetIsOriginAllowed(origin => true)
+            //            .AllowAnyHeader()
+            //            .AllowAnyMethod()
+            //            .AllowCredentials();
+            //    });
+            //});
             services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
 
             services.AddControllersWithViews();
@@ -122,7 +122,7 @@ namespace DataEditorPortal.Web
 
             // if (env.IsDevelopment())
             // {
-            app.UseCors();
+            // app.UseCors();
             // }
 
             app.UseAuthentication();
