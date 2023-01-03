@@ -23,7 +23,9 @@ if (environment.production) {
 } else {
   providers.push({
     provide: 'API_URL',
-    useValue: 'https://10.10.120.246:5735/api/',
+    useFactory: () => {
+      return `${environment.apiHost}api/`;
+    },
     deps: []
   });
 }

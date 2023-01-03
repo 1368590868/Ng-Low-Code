@@ -1,0 +1,17 @@
+<p-splitter
+  [panelSizes]="[20, 80]"
+  stateKey="split"
+  stateStorage="local"
+  [panelStyle]="{ minWidth: '300px' }"
+  styleClass="split-area">
+  <ng-template pTemplate>
+    <div class="w-full">
+      <app-search></app-search>
+    </div>
+  </ng-template>
+  <ng-template pTemplate>
+    <div class="table-area w-full">
+      <app-table></app-table>
+    </div>
+  </ng-template>
+</p-splitter>

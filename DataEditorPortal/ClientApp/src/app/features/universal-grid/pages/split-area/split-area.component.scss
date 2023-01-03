@@ -1,0 +1,10 @@
+::ng-deep {
+  .split-area.p-splitter {
+    height: calc(100% - 7rem);
+    border-bottom: none;
+  }
+  .table-area {
+    padding: 1.5rem;
+    background: var(--surface-ground);
+  }
+}
