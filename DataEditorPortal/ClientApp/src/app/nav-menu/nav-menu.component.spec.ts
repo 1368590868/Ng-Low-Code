@@ -8,16 +8,15 @@ describe('NavMenuComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NavMenuComponent ]
-    })
-    .compileComponents();
+      declarations: [NavMenuComponent]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(NavMenuComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create1', () => {
     expect(component).toBeTruthy();
   });
 });
