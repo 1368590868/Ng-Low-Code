@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Customer } from './table/table.component';
 
 @Injectable({
   providedIn: 'root'
@@ -21,13 +20,16 @@ export class GridTableService {
       });
   }
 
+  getTableColumns(): any {
+    return this.http.get(
+      `${this._apiUrl}UniversalGrid/UserManagement/config/columns`
+    );
+  }
+
   getTableData(tableParams: any) {
     return this.http.post<{ data: any[]; total: number }>(
       `${this._apiUrl}UniversalGrid/UserManagement/data`,
-      tableParams,
-      {
-        withCredentials: true
-      }
+      tableParams
     );
   }
 }

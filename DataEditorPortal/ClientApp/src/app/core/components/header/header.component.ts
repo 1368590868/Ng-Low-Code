@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { ConfigDataService } from '../config-data.service';
+import { ConfigDataService } from '../../services/config-data.service';
 
 export interface AppUser {
   identityName: string;

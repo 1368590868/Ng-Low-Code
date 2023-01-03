@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PrimeNGConfig } from 'primeng/api';
-import { GridTableService } from '../grid-table.service';
-import { ConfigDataService } from '../config-data.service';
+import { GridTableService } from '../../services/grid-table.service';
 import { catchError } from 'rxjs';
+import { NotifyService } from '../../../../app.module';
 
 export interface Country {
   name?: string;
@@ -46,9 +46,9 @@ export class TableComponent implements OnInit {
   totalRecords: any;
 
   constructor(
+    private notifyService: NotifyService,
     private gridTableService: GridTableService,
-    private primengConfig: PrimeNGConfig,
-    private configData: ConfigDataService
+    private primengConfig: PrimeNGConfig
   ) {
     this.totalRecords = 0;
     this.cols = [];
@@ -58,7 +58,7 @@ export class TableComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.configData.getTableColumns().subscribe((res: never[]) => {
+    this.gridTableService.getTableColumns().subscribe((res: never[]) => {
       this.cols = res;
     });
   }
@@ -93,24 +93,24 @@ export class TableComponent implements OnInit {
     fetchParam.indexCount = event.rows ?? 100;
 
     // Please replace the current api
-    // this.gridTableService
-    //   .getTableData(JSON.stringify(fetchParam))
-    //   .pipe(
-    //     catchError(err =>
-    //       this.configData.notifyErrorInPipe(err, { data: [], total: 0 })
-    //     )
-    //   )
-    //   .subscribe(res => {
-    //     this.customers = (res as any).data;
-    //     this.loading = false;
-    //     this.totalRecords = (res as any).total;
-    //   });
+    this.gridTableService
+      .getTableData(JSON.stringify(fetchParam))
+      .pipe(
+        catchError(err =>
+          this.notifyService.notifyErrorInPipe(err, { data: [], total: 0 })
+        )
+      )
+      .subscribe(res => {
+        this.customers = (res as any).data;
+        this.loading = false;
+        this.totalRecords = (res as any).total;
+      });
 
     // Please remove local JSON API , this is testing purpose
-    this.gridTableService.getCustomersLarge().then(customers => {
-      this.customers = customers['data'];
-      this.loading = false;
-      this.totalRecords = customers['total'];
-    });
+    // this.gridTableService.getCustomersLarge().then(customers => {
+    //   this.customers = customers['data'];
+    //   this.loading = false;
+    //   this.totalRecords = customers['total'];
+    // });
   }
 }

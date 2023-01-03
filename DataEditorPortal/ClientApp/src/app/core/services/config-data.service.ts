@@ -18,36 +18,19 @@ export class ConfigDataService {
   }
 
   getSiteVersion() {
-    return this.http.get(this._apiUrl + 'site/version', {
-      withCredentials: true
-    });
+    return this.http.get(this._apiUrl + 'site/version');
   }
 
   getSiteEnvironment() {
-    return this.http.get(`${this._apiUrl}site/environment`, {
-      withCredentials: true
-    });
+    return this.http.get(`${this._apiUrl}site/environment`);
   }
 
   getLoggedInUser() {
-    return this.http.get(`${this._apiUrl}User/GetLoggedInUser`, {
-      withCredentials: true
-    });
+    return this.http.get(`${this._apiUrl}User/GetLoggedInUser`);
   }
 
   getSiteMenus() {
-    return this.http.post(`${this._apiUrl}site/menus`, null, {
-      withCredentials: true
-    });
-  }
-
-  getTableColumns(): any {
-    return this.http.get(
-      `${this._apiUrl}UniversalGrid/UserManagement/config/columns`,
-      {
-        withCredentials: true
-      }
-    );
+    return this.http.post(`${this._apiUrl}site/menus`, null);
   }
 
   // notifyService

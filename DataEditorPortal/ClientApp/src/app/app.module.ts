@@ -2,8 +2,8 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
-
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { WinAuthInterceptor } from './core/interceptor/win-auth.interceptor';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
@@ -13,25 +13,16 @@ import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { AvatarModule } from 'primeng/avatar';
-import { SplitterModule } from 'primeng/splitter';
-import { DropdownModule } from 'primeng/dropdown';
-import { TableModule } from 'primeng/table';
-import { CalendarModule } from 'primeng/calendar';
-import { SliderModule } from 'primeng/slider';
 import { DialogModule } from 'primeng/dialog';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { ContextMenuModule } from 'primeng/contextmenu';
-import { InputTextModule } from 'primeng/inputtext';
-import { ProgressBarModule } from 'primeng/progressbar';
 
-import { HeaderComponent } from './header/header.component';
-import { NavMenuComponent } from './nav-menu/nav-menu.component';
-import { AboutComponent } from './about/about.component';
-import { ContactComponent } from './contact/contact.component';
-import { HomeComponent } from './home/home.component';
-import { SplitAreaComponent } from './split-area/split-area.component';
-import { SearchComponent } from './search/search.component';
-import { TableComponent } from './table/table.component';
+import { HeaderComponent } from './core/components/header/header.component';
+import { NavMenuComponent } from './core/components/nav-menu/nav-menu.component';
+import { AboutComponent } from './core/components/about/about.component';
+import { ContactComponent } from './core/components/contact/contact.component';
+import { HomeComponent } from './core/components/home/home.component';
+
+export { NotifyService } from './core/utils/notify.service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -39,33 +30,28 @@ import { TableComponent } from './table/table.component';
     NavMenuComponent,
     AboutComponent,
     ContactComponent,
-    HomeComponent,
-    SplitAreaComponent,
-    SearchComponent,
-    TableComponent
+    HomeComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
-    ButtonModule,
     AppRoutingModule,
+    ButtonModule,
     ToastModule,
     MenubarModule,
     AvatarModule,
-    SplitterModule,
-    DropdownModule,
-    TableModule,
-    CalendarModule,
-    SliderModule,
-    DialogModule,
-    MultiSelectModule,
-    ContextMenuModule,
-    InputTextModule,
-    ProgressBarModule
+    DialogModule
   ],
-  providers: [MessageService],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: WinAuthInterceptor,
+      multi: true
+    },
+    MessageService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
