@@ -1,14 +1,18 @@
-.card {
-  background-color: var(--surface-card);
+.p-card {
+  // background-color: var(--surface-card);
+  // overflow: hidden;
+  // margin-bottom: 2rem;
+  // box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
+  // border-radius: var(--border-radius);
+  position: relative;
   overflow: hidden;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
-  border-radius: var(--border-radius);
-  // min-height: calc(100vh - 10.5rem);
+
+  min-height: 100%;
   .data-table {
     ::ng-deep {
       .p-datatable {
         padding: 1rem 1rem 0 1rem;
+        position: static;
       }
       .p-datatable-wrapper {
         overflow-x: auto;

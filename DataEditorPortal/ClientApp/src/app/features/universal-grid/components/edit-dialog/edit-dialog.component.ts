@@ -17,7 +17,7 @@ export class EditDialogComponent implements OnInit {
   isLoading = false;
 
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    console.log('Not Implemented');
   }
 
   showDialog() {

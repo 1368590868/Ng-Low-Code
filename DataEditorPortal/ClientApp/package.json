@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "prepare": "cd .. && cd.. && husky install DataEditorPortal/ClientApp/.husky",
+    "prepare": "cd .. && cd .. && husky install DataEditorPortal/ClientApp/.husky",
     "pre-commit": "lint-staged --no-stash"
   },
   "private": true,
@@ -26,7 +26,9 @@
     "primeng": "^14.2.3",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.12.0"
+    "zone.js": "~0.12.0",
+    "@ngx-formly/core": "^6.0.0",
+    "@ngx-formly/primeng": "^6.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.0.4",
@@ -37,6 +39,7 @@
     "@angular-eslint/template-parser": "15.1.0",
     "@angular/cli": "~15.0.4",
     "@angular/compiler-cli": "^15.0.0",
+    "@ngx-formly/schematics": "^6.0.4",
     "@types/jasmine": "~4.3.0",
     "@typescript-eslint/eslint-plugin": "5.44.0",
     "@typescript-eslint/parser": "5.44.0",

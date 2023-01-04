@@ -1,97 +1,102 @@
 import { Component } from '@angular/core';
-import { SelectItem } from 'primeng/api';
-import { SelectItemGroup } from 'primeng/api';
+import { FormGroup } from '@angular/forms';
+import { FormlyFieldConfig } from '@ngx-formly/core';
 
-interface City {
-  name: string;
-  code: string;
-}
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent {
-  cities: City[];
-
-  selectedCity1: City;
-
-  selectedCity2: City;
-
-  selectedCity3: string;
-
-  selectedCountry: any;
-
-  countries: any[];
-
-  groupedCities: SelectItemGroup[];
-
-  items: SelectItem[];
-  item: any;
-
-  constructor() {
-    this.selectedCity1 = { name: 'Rome', code: 'RM' };
-    this.selectedCity2 = { name: 'Rome', code: 'RM' };
-    this.selectedCity3 = 'Rome';
-    this.selectedCountry = 'DE';
-
-    this.items = [];
-    for (let i = 0; i < 10000; i++) {
-      this.items.push({ label: 'Item ' + i, value: 'Item ' + i });
-    }
-
-    this.cities = [
-      { name: 'New York', code: 'NY' },
-      { name: 'Rome', code: 'RM' },
-      { name: 'London', code: 'LDN' },
-      { name: 'Istanbul', code: 'IST' },
-      { name: 'Paris', code: 'PRS' }
-    ];
-
-    this.groupedCities = [
-      {
-        label: 'Germany',
-        value: 'de',
-        items: [
-          { label: 'Berlin', value: 'Berlin' },
-          { label: 'Frankfurt', value: 'Frankfurt' },
-          { label: 'Hamburg', value: 'Hamburg' },
-          { label: 'Munich', value: 'Munich' }
-        ]
-      },
-      {
-        label: 'USA',
-        value: 'us',
-        items: [
-          { label: 'Chicago', value: 'Chicago' },
-          { label: 'Los Angeles', value: 'Los Angeles' },
-          { label: 'New York', value: 'New York' },
-          { label: 'San Francisco', value: 'San Francisco' }
-        ]
-      },
-      {
-        label: 'Japan',
-        value: 'jp',
-        items: [
-          { label: 'Kyoto', value: 'Kyoto' },
-          { label: 'Osaka', value: 'Osaka' },
-          { label: 'Tokyo', value: 'Tokyo' },
-          { label: 'Yokohama', value: 'Yokohama' }
+  form = new FormGroup({});
+  model = { email: 'email@gmail.com' };
+  fields: FormlyFieldConfig[] = [
+    {
+      key: 'email',
+      type: 'input',
+      props: {
+        label: 'Email address',
+        placeholder: 'Enter email',
+        required: true
+      }
+    },
+    {
+      key: 'select',
+      type: 'select',
+      props: {
+        label: 'Select 1',
+        placeholder: 'Please select',
+        required: true,
+        options: [
+          { value: 1, label: 'Option 1' },
+          { value: 2, label: 'Option 2' },
+          { value: 3, label: 'Option 3' },
+          { value: 4, label: 'Option 4', disabled: true }
         ]
       }
-    ];
+    },
+    {
+      key: 'Checkbox',
+      type: 'checkbox',
+      props: {
+        label: 'Accept terms',
+        description: 'In order to proceed, please accept terms',
+        pattern: 'true',
+        required: true
+      },
+      validation: {
+        messages: {
+          pattern: 'Please accept the terms'
+        }
+      }
+    },
+    {
+      key: 'Datepicker',
+      type: 'datepicker',
+      props: {
+        label: 'Datepicker',
+        placeholder: 'Placeholder',
+        description: 'Description',
+        dateFormat: 'yy/mm/dd',
+        hourFormat: '24',
+        numberOfMonths: 1,
+        selectionMode: 'single',
+        required: true,
+        readonlyInput: false,
+        showTime: false,
+        showButtonBar: true,
+        showIcon: false,
+        showOtherMonths: true,
+        selectOtherMonths: false,
+        monthNavigator: false,
+        yearNavigator: false,
+        yearRange: '2020:2030',
+        inline: false,
+        appendTo: 'body'
+      }
+    },
+    {
+      key: 'MultipleSelect',
+      type: 'multiSelect',
+      props: {
+        label: 'MultipleSelect',
+        placeholder: 'Placeholder',
+        description: 'Description'
+      }
+    },
+    {
+      key: 'Textarea',
+      type: 'textarea',
+      props: {
+        label: 'Textarea',
+        placeholder: 'Placeholder',
+        description: 'Description',
+        required: true
+      }
+    }
+  ];
 
-    this.countries = [
-      { name: 'Australia', code: 'AU' },
-      { name: 'Brazil', code: 'BR' },
-      { name: 'China', code: 'CN' },
-      { name: 'Egypt', code: 'EG' },
-      { name: 'France', code: 'FR' },
-      { name: 'Germany', code: 'DE' },
-      { name: 'India', code: 'IN' },
-      { name: 'Japan', code: 'JP' },
-      { name: 'Spain', code: 'ES' },
-      { name: 'United States', code: 'US' }
-    ];
+  onSubmit(model: any) {
+    console.log(model);
   }
 }

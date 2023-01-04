@@ -3,6 +3,12 @@
     height: calc(100% - 7rem);
     border-bottom: none;
   }
+  .search-area {
+    padding: 1.5rem;
+    background: var(--surface-ground);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
   .table-area {
     padding: 1.5rem;
     background: var(--surface-ground);
