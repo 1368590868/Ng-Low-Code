@@ -22,13 +22,15 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { EditDialogComponent } from './components/edit-dialog/edit-dialog.component';
 
 @NgModule({
   declarations: [
     UniversalGridComponent,
     SplitAreaComponent,
     SearchComponent,
-    TableComponent
+    TableComponent,
+    EditDialogComponent
   ],
   imports: [
     CommonModule,
