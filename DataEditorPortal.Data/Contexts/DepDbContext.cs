@@ -54,21 +54,88 @@ namespace DataEditorPortal.Data.Contexts
 
                     SearchConfig = JsonConvert.SerializeObject(new object[] {
                         new {
-                            Name= "Username",
-                            Label= "CNP ID",
-                            // WhereClause= "upper(USERID) like upper('%{0}%')",
-                            Type= "pInputText"
+                            key = "username",
+                            type = "input",
+                            props = new {
+                                label = "CNP ID",
+                                placeholder = "CNP ID"
+                            },
+                            searchRule = new
+                            {
+                                field = "Username",
+                                matchMode = "contains"
+                            }
                         },
                         new {
-                            Name= "NAME",
-                            Label= "Name",
-                            // WhereClause= "upper(NAME) like upper('%{0}%')",
-                            Type= "pInputText"
+                            key = "name",
+                            type = "input",
+                            props = new {
+                                label = "Name",
+                                placeholder = "Name"
+                            },
+                            searchRule = new
+                            {
+                                field = "Name",
+                                matchMode = "contains"
+                            }
+                        },
+                        new {
+                            key = "roles",
+                            type = "select",
+                            props = new {
+                                label = "Roles",
+                                placeholder = "Please select",
+                                options = new object[] {
+                                    new { value = 1, label = "Option 1" },
+                                    new { value = 2, label = "Option 2" },
+                                    new { value = 3, label = "Option 3" },
+                                    new { value = 4, label = "Option 4" }
+                                }
+                            },
+                            searchRule = new
+                            {
+                                whereClause = "Id in (select UserId from USERID_PERMISSION where PERMISSION_GRANT_ID = '{0}')"
+                            }
+                        },
+                        new {
+                            key = "vendor",
+                            type = "select",
+                            props = new {
+                                label = "Vendor",
+                                placeholder = "Please select",
+                                options = new object[] {
+                                    new { value = 1, label = "Option 1" },
+                                    new { value = 2, label = "Option 2" },
+                                    new { value = 3, label = "Option 3" },
+                                    new { value = 4, label = "Option 4" }
+                                }
+                            },
+                            searchRule = new
+                            {
+                                field = "Vendor",
+                                matchMode = "contains"
+                            }
+                        },
+                        new {
+                            key = "employer",
+                            type = "select",
+                            props = new {
+                                label = "Employer",
+                                placeholder = "Please select",
+                                options = new object[] {
+                                    new { value = 1, label = "Option 1" },
+                                    new { value = 2, label = "Option 2" },
+                                    new { value = 3, label = "Option 3" },
+                                    new { value = 4, label = "Option 4" }
+                                }
+                            },
+                            searchRule = new
+                            {
+                                field = "Employer",
+                                matchMode = "contains"
+                            }
                         }
-                    }),
-
-                    CreatedBy = Guid.Empty,
-                    CreatedDate = new DateTime(2022, 12, 26)
+                    })
                 }
             );
             modelBuilder.Entity<SiteMenu>().HasData(
