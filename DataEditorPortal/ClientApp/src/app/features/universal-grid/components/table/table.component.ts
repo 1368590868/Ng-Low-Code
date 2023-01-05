@@ -1,55 +1,75 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { PrimeNGConfig } from 'primeng/api';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
-import { catchError } from 'rxjs';
+import { catchError, skip, Subject, takeUntil, tap } from 'rxjs';
 import { NotifyService } from '../../../../app.module';
-
-export interface Country {
-  name?: string;
-  code?: string;
-}
-
-export interface Representative {
-  name?: string;
-  image?: string;
-}
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss']
 })
-export class TableComponent implements OnInit {
-  searchText = '';
+export class TableComponent implements OnInit, OnDestroy {
+  destroy$ = new Subject();
 
-  records: any;
+  records: any = [];
+  totalRecords: any = 0;
+  selectedRecords: any[] = [];
 
-  selectedRecords: any[];
+  searchModel: any;
 
   loading = true;
-
   @ViewChild('dt') table: any;
 
-  cols: any[];
-
-  totalRecords: any;
+  cols: any[] = [];
 
   constructor(
+    private route: ActivatedRoute,
     private notifyService: NotifyService,
-    private gridTableService: GridTableService,
-    private primengConfig: PrimeNGConfig
-  ) {
-    this.totalRecords = 0;
-    this.cols = [];
-    this.records = [];
-    this.selectedRecords = [];
-    this.primengConfig.ripple = true;
-  }
+    private gridTableService: GridTableService
+  ) {}
 
   ngOnInit() {
-    this.gridTableService.getTableColumns().subscribe((res: never[]) => {
-      this.cols = res;
-    });
+    // subscribe route change to update currentPortalItem and then get grid column and data
+    this.route.params
+      .pipe(
+        tap(param => {
+          if (param && param['name']) {
+            // reset
+            this.reset();
+            // get grid column
+            this.gridTableService
+              .getTableColumns()
+              .subscribe((res: never[]) => {
+                this.cols = res;
+              });
+          }
+        }),
+        skip(1),
+        tap(param => {
+          if (param && param['name']) {
+            // get grid data, skip the first notification, as the data will be load by table lazyLoading
+            this.fetchData();
+          }
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe();
+
+    // subscribe search click to do searching
+    this.gridTableService.searchClicked$
+      .pipe(
+        tap(model => {
+          this.searchModel = model;
+          this.fetchData();
+        })
+      )
+      .subscribe();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next(null);
+    this.destroy$.complete();
   }
 
   loadTableLazy(event: any) {
@@ -85,6 +105,16 @@ export class TableComponent implements OnInit {
     fetchParam.startIndex = event.first ?? 0;
     fetchParam.indexCount = event.rows ?? 100;
 
+    this.fetchData(fetchParam);
+  }
+
+  fetchData(fetchParam?: any) {
+    if (!fetchParam) {
+      fetchParam = {
+        startIndex: 0,
+        indexCount: 100
+      };
+    }
     this.gridTableService
       .getTableData(fetchParam)
       .pipe(
@@ -101,5 +131,12 @@ export class TableComponent implements OnInit {
 
   onRowCheckBoxClick(event: any) {
     event.stopPropagation();
+  }
+
+  reset() {
+    this.totalRecords = 0;
+    this.cols = [];
+    this.records = [];
+    this.selectedRecords = [];
   }
 }

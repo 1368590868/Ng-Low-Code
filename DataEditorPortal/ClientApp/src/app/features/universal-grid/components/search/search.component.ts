@@ -1,16 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig } from '@ngx-formly/core';
+import { Subject, takeUntil } from 'rxjs';
+import { GridTableService } from '../../services/grid-table.service';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent {
+export class SearchComponent implements OnInit, OnDestroy {
+  destroy$ = new Subject();
+
   form = new FormGroup({});
-  model = { email: 'email@gmail.com' };
-  fields: FormlyFieldConfig[] = [
+  model = {};
+  fields1: FormlyFieldConfig[] = [
     {
       key: 'email',
       type: 'input',
@@ -95,8 +100,31 @@ export class SearchComponent {
       }
     }
   ];
+  fields!: FormlyFieldConfig[];
+
+  constructor(
+    private route: ActivatedRoute,
+    private gridTableService: GridTableService
+  ) {}
+
+  ngOnInit(): void {
+    // subscribe route change to get search config
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((param: any) => {
+      if (param && param.name) {
+        // get search config
+        console.log('get search config');
+        this.fields = this.fields1;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(null);
+    this.destroy$.complete();
+  }
 
   onSubmit(model: any) {
     console.log(model);
+    this.gridTableService.searchClicked$.next(model);
   }
 }

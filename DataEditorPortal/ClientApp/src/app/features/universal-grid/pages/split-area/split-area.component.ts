@@ -1,5 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { trigger, style, animate, transition } from '@angular/animations';
+import { ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+import { GridTableService } from '../../services/grid-table.service';
 
 @Component({
   selector: 'app-split-area',
@@ -15,13 +18,20 @@ import { trigger, style, animate, transition } from '@angular/animations';
     ])
   ]
 })
-export class SplitAreaComponent implements OnInit {
+export class SplitAreaComponent implements OnInit, OnDestroy {
   @ViewChild('splitter') splitterRef: any;
 
   showPanel = true;
   panelSizesPrev = [20, 80];
   stateKey = 'universial-grid-splitter';
   stateStorage = 'session';
+
+  destroy$ = new Subject();
+
+  constructor(
+    private route: ActivatedRoute,
+    private gridTableService: GridTableService
+  ) {}
 
   ngOnInit() {
     const storage = this.getStorage();
@@ -37,6 +47,18 @@ export class SplitAreaComponent implements OnInit {
         this.showPanel = false;
       }
     }
+
+    // subscribe route change to update currentPortalItem
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((param: any) => {
+      if (param && param.name) {
+        this.gridTableService.currentPortalItem = param.name;
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next(null);
+    this.destroy$.complete();
   }
 
   onToggle() {
