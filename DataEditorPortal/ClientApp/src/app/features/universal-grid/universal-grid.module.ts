@@ -17,6 +17,7 @@ import { TableComponent } from './components/table/table.component';
 import { EditDialogComponent } from './components/edit-dialog/edit-dialog.component';
 
 // primeNG components
+import { AnimateModule } from 'primeng/animate';
 import { ToastModule } from 'primeng/toast';
 import { MenubarModule } from 'primeng/menubar';
 import { AvatarModule } from 'primeng/avatar';
@@ -30,6 +31,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { SplitButtonModule } from 'primeng/splitbutton';
 
 @NgModule({
   declarations: [
@@ -52,6 +54,8 @@ import { ProgressBarModule } from 'primeng/progressbar';
     FormlyDatepickerModule,
     FormlyMultiSelectModule,
     UniversalGridRoutingModule,
+    // primeNg
+    AnimateModule,
     ToastModule,
     MenubarModule,
     AvatarModule,
@@ -64,7 +68,8 @@ import { ProgressBarModule } from 'primeng/progressbar';
     MultiSelectModule,
     ContextMenuModule,
     InputTextModule,
-    ProgressBarModule
+    ProgressBarModule,
+    SplitButtonModule
   ]
 })
 export class UniversalGridModule {}

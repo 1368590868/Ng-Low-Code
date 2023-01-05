@@ -10,6 +10,10 @@ html {
   margin: 0;
 }
 
+:root {
+  --transition-duration: 0.2s;
+}
+
 body {
   height: 100%;
   font-weight: 400;
