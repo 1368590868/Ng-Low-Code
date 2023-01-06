@@ -8,9 +8,12 @@
       [form]="form"
       [fields]="fields"
       [model]="model"
+      [options]="options"
       class="p-fluid"></formly-form>
     <div class="flex justify-content-end">
-      <p-button styleClass="p-button-outlined mr-2"> Clear </p-button>
+      <p-button styleClass="p-button-outlined mr-2" (click)="onClear()">
+        Clear
+      </p-button>
       <p-button type="submit">Submit</p-button>
     </div>
   </form>

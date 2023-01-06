@@ -4,7 +4,7 @@
     "type": "input",
     "props": {
       "label": "CNP ID",
-      "placeholder": "CNP ID",
+      "placeholder": "",
       "required": true
     }
   },
@@ -13,7 +13,7 @@
     "type": "input",
     "props": {
       "label": "Name",
-      "placeholder": "Name",
+      "placeholder": "",
       "required": true
     }
   },
@@ -60,6 +60,61 @@
         { "value": 3, "label": "Option 3" },
         { "value": 4, "label": "Option 4", "disabled": true }
       ]
+    }
+  },
+  {
+    "key": "Checkbox",
+    "type": "checkbox",
+    "props": {
+      "label": "Accept terms",
+      "description": "In order to proceed, please accept terms",
+      "pattern": "true",
+      "required": true
+    },
+    "validation": { "messages": { "pattern": "Please accept the terms" } }
+  },
+  {
+    "key": "Datepicker",
+    "type": "datepicker",
+    "props": {
+      "label": "Datepicker",
+      "placeholder": "Placeholder",
+      "description": "Description",
+      "dateFormat": "yy/mm/dd",
+      "hourFormat": "24",
+      "numberOfMonths": 1,
+      "selectionMode": "single",
+      "required": true,
+      "readonlyInput": false,
+      "showTime": false,
+      "showButtonBar": true,
+      "showIcon": false,
+      "showOtherMonths": true,
+      "selectOtherMonths": false,
+      "monthNavigator": false,
+      "yearNavigator": false,
+      "yearRange": "2020:2030",
+      "inline": false,
+      "appendTo": "body"
+    }
+  },
+  {
+    "key": "MultipleSelect",
+    "type": "multiSelect",
+    "props": {
+      "label": "MultipleSelect",
+      "placeholder": "Placeholder",
+      "description": "Description"
+    }
+  },
+  {
+    "key": "Textarea",
+    "type": "textarea",
+    "props": {
+      "label": "Textarea",
+      "placeholder": "Placeholder",
+      "description": "Description",
+      "required": true
     }
   }
 ]

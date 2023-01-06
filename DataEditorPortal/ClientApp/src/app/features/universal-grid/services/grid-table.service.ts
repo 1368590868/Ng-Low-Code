@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { share, Subject, tap } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -25,5 +25,12 @@ export class GridTableService {
       `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data`,
       tableParams
     );
+  }
+
+  getSearchConfig(): any {
+    return this.http.get(
+      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/search`
+    );
+    // return this.http.get<any>('assets/customers-large.json');
   }
 }

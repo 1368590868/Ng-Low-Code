@@ -26,7 +26,7 @@
     [totalRecords]="totalRecords"
     [filterDelay]="0"
     stateStorage="session"
-    stateKey="statedemo-session">
+    [stateKey]="stateKey">
     <ng-template pTemplate="caption">
       <h3 class="mb-4">User Management</h3>
       <div class="table-header flex align-items-center">
@@ -55,7 +55,8 @@
         </div>
         <p-button
           icon="pi pi-refresh"
-          styleClass="p-button-rounded p-button-outlined p-button-lg"></p-button>
+          styleClass="p-button-rounded p-button-outlined p-button-lg"
+          (click)="onRefresh()"></p-button>
       </div>
     </ng-template>
 
@@ -75,6 +76,7 @@
             [type]="col.filterType"
             [field]="col.field"
             display="menu"
+            [hideOnClear]="true"
             [showOperator]="false"
             [showAddButton]="false"></p-columnFilter>
         </th>

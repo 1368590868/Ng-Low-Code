@@ -19,8 +19,8 @@
     </div>
   </ng-template>
   <ng-template pTemplate>
-    <div @fadeInOut class="table-area w-full">
-      <app-table></app-table>
+    <div class="table-area w-full">
+      <app-table *ngIf="currentPortalItem"></app-table>
     </div>
   </ng-template>
 </p-splitter>

@@ -17,11 +17,13 @@ export class TableComponent implements OnInit, OnDestroy {
   selectedRecords: any[] = [];
 
   searchModel: any;
+  lazyLoadParam: any;
 
   loading = true;
   @ViewChild('dt') table: any;
 
   cols: any[] = [];
+  stateKey!: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -30,31 +32,13 @@ export class TableComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // subscribe route change to update currentPortalItem and then get grid column and data
-    this.route.params
-      .pipe(
-        tap(param => {
-          if (param && param['name']) {
-            // reset
-            this.reset();
-            // get grid column
-            this.gridTableService
-              .getTableColumns()
-              .subscribe((res: never[]) => {
-                this.cols = res;
-              });
-          }
-        }),
-        skip(1),
-        tap(param => {
-          if (param && param['name']) {
-            // get grid data, skip the first notification, as the data will be load by table lazyLoading
-            this.fetchData();
-          }
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe();
+    this.reset();
+    this.stateKey = `universal-grid-state-${this.gridTableService.currentPortalItem}`;
+
+    // get grid column
+    this.gridTableService.getTableColumns().subscribe((res: never[]) => {
+      this.cols = res;
+    });
 
     // subscribe search click to do searching
     this.gridTableService.searchClicked$
@@ -62,7 +46,8 @@ export class TableComponent implements OnInit, OnDestroy {
         tap(model => {
           this.searchModel = model;
           this.fetchData();
-        })
+        }),
+        takeUntil(this.destroy$)
       )
       .subscribe();
   }
@@ -73,67 +58,99 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   loadTableLazy(event: any) {
-    //simulate remote connection with a timeout
-    console.log('event', event);
-    const fetchParam = {
-      Filters: [],
-      Sorts: [],
-      // Searches: [],
-      startIndex: 0,
-      indexCount: 100
-    };
-
-    // event filters value != null
-    const obj = event.filters;
-    for (const prop in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-        // do stuff
-        const fieldProp = obj[prop];
-        for (let i = 0; i < fieldProp.length; i++) {
-          if (fieldProp[i].value != null) {
-            fieldProp[i].field = prop;
-            fetchParam.Filters.push(fieldProp[i] as never);
-          }
-        }
-      }
-    }
-
-    if (event.multiSortMeta && event.multiSortMeta.length > 0) {
-      fetchParam.Sorts = event.multiSortMeta;
-    }
-
-    fetchParam.startIndex = event.first ?? 0;
-    fetchParam.indexCount = event.rows ?? 100;
-
-    this.fetchData(fetchParam);
+    this.lazyLoadParam = event;
+    this.fetchData();
   }
 
-  fetchData(fetchParam?: any) {
-    if (!fetchParam) {
-      fetchParam = {
-        startIndex: 0,
-        indexCount: 100
-      };
-    }
+  fetchData() {
+    this.loading = true;
+    const fetchParam = this.getFetchParam();
     this.gridTableService
       .getTableData(fetchParam)
       .pipe(
-        catchError(err =>
-          this.notifyService.notifyErrorInPipe(err, { data: [], total: 0 })
-        )
+        catchError(err => {
+          this.loading = false;
+          return this.notifyService.notifyErrorInPipe(err, {
+            data: [],
+            total: 0
+          });
+        })
       )
-      .subscribe(res => {
-        this.records = (res as any).data;
+      .subscribe((res: any) => {
         this.loading = false;
-        this.totalRecords = (res as any).total;
+
+        if (res.errormessage) {
+          this.notifyService.notifyError('Operation faild', res.errormessage);
+        } else {
+          const data = (res as any).data;
+          const data1 = [
+            ...data,
+            ...data,
+            ...data,
+            ...data,
+            ...data,
+            ...data,
+            ...data,
+            ...data
+          ];
+          this.records = data1;
+          this.totalRecords = 100; //(res as any).total;
+        }
       });
+  }
+
+  getFetchParam() {
+    const fetchParam = {
+      filters: [],
+      sorts: [],
+      searches: this.searchModel,
+      startIndex: 0,
+      indexCount: 50
+    };
+
+    if (this.lazyLoadParam) {
+      // set filters from table lazyload event
+      const obj = this.lazyLoadParam.filters;
+      for (const prop in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+          // do stuff
+          const fieldProp = obj[prop];
+          for (let i = 0; i < fieldProp.length; i++) {
+            if (fieldProp[i].value != null) {
+              fieldProp[i].field = prop;
+              fetchParam.filters.push(fieldProp[i] as never);
+            }
+          }
+        }
+      }
+
+      // set sorts from table lazyload event
+      if (
+        this.lazyLoadParam.multiSortMeta &&
+        this.lazyLoadParam.multiSortMeta.length > 0
+      ) {
+        fetchParam.sorts = this.lazyLoadParam.multiSortMeta;
+      }
+
+      // set pagination
+      fetchParam.startIndex = this.lazyLoadParam.first ?? 0;
+      fetchParam.indexCount = this.lazyLoadParam.rows ?? 50;
+    }
+
+    return fetchParam;
   }
 
   onRowCheckBoxClick(event: any) {
     event.stopPropagation();
   }
 
+  onRefresh() {
+    this.table.reset();
+  }
+
   reset() {
+    this.searchModel = {};
+    this.lazyLoadParam = null;
     this.totalRecords = 0;
     this.cols = [];
     this.records = [];
