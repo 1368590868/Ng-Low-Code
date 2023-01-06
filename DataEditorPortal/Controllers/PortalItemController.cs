@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System.Linq;
+using System.Text.Json;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -36,7 +36,7 @@ namespace DataEditorPortal.Web.Controllers
             var item = _depDbContext.UniversalGridConfigurations.Where(x => x.Name == name).FirstOrDefault();
             if (item == null) throw new System.Exception($"Portal Item with name:{name} deosn't exists");
 
-            item.SearchConfig = JsonConvert.SerializeObject(model);
+            item.SearchConfig = JsonSerializer.Serialize(model);
             _depDbContext.SaveChanges();
 
             return new JsonResult(model);

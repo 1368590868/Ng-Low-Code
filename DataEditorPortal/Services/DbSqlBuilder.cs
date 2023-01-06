@@ -8,12 +8,13 @@ namespace DataEditorPortal.Web.Services
     public interface IDbSqlBuilder
     {
         // string GenerateWhereClause(List<FilterParam> filterParams);
-        string GenerateOrderClause(List<SortParam> sortParams);
+        //string GenerateOrderClause(List<SortParam> sortParams);
         string GenerateSqlText(DataSourceConfig config);
         string UsePagination(string query, int startIndex, int indexCount);
         string UseOrderBy(string query, List<SortParam> sortParams);
         string UseCount(string query);
         string UseFilters(string query, List<FilterParam> filterParams);
+        string UseSearches(string query, List<SearchParam> filterParams);
     }
 
     public class DbSqlServerBuilder : IDbSqlBuilder
@@ -23,7 +24,7 @@ namespace DataEditorPortal.Web.Services
 
         }
 
-        public string GenerateWhereClause(List<FilterParam> filterParams)
+        private string GenerateWhereClause(List<FilterParam> filterParams)
         {
             List<string> filters = new List<string>();
 
@@ -31,95 +32,106 @@ namespace DataEditorPortal.Web.Services
             {
                 if (!string.IsNullOrEmpty(item.value.ToString()))
                 {
-                    string field = item.field;
-                    if (item.dBFieldExpression != null)
-                    {
-                        field = item.dBFieldExpression;
-                    }
-
-                    //For date conversions
-                    string date = "";
-                    string value = item.value.ToString().ToUpper();
-                    switch (item.matchMode)
-                    {
-                        case "startsWith":
-                            filters.Add($"[{field}] like '{value}%'");
-                            break;
-
-                        case "contains":
-                            filters.Add($"[{field}] like '%{value}%'");
-                            break;
-
-                        case "notContains":
-                            filters.Add($"[{field}] not like '%{value}%'");
-                            break;
-
-                        case "endsWith":
-                            filters.Add($"[{field}] like '%{value}'");
-                            break;
-
-                        case "equals":
-                            filters.Add($"[{field}] = '{value}'");
-                            break;
-
-                        case "notEquals":
-                            filters.Add($"[{field}] <> '{value}'");
-                            break;
-
-                        case "dateIs":
-                            //Get Date
-                            date = DateTime.Parse(value).ToShortDateString();
-                            filters.Add($"{field} = TO_DATE('{date}','mm/dd/yyyy')");
-                            break;
-
-                        case "dateIsNot":
-                            //Get Date
-                            date = DateTime.Parse(value).ToShortDateString();
-                            filters.Add($"{field} <> TO_DATE('{date}','mm/dd/yyyy')");
-                            break;
-
-                        case "dateBefore":
-                            //Get Date
-                            date = DateTime.Parse(value).ToShortDateString();
-                            filters.Add($"{field} < TO_DATE('{date}','mm/dd/yyyy')");
-                            break;
-
-                        case "dateAfter":
-                            //Get Date
-                            date = DateTime.Parse(value).ToShortDateString();
-                            filters.Add($"{field} > TO_DATE('{date}','mm/dd/yyyy')");
-                            break;
-
-                        case "gt":
-                            //Get Date
-                            filters.Add($"{field} > {value}");
-                            break;
-
-                        case "lt":
-                            //Get Date
-                            filters.Add($"{field} < {value}");
-                            break;
-
-
-                        case "gte":
-                            //Get Date
-                            filters.Add($"{field} >= {value}");
-                            break;
-
-                        case "lte":
-                            //Get Date
-                            filters.Add($"{field} <= {value}");
-                            break;
-                        default:
-                            break;
-                    }
+                    var criteriaStr = GenerateCriteriaClause(item);
+                    if (!string.IsNullOrEmpty(criteriaStr))
+                        filters.Add(criteriaStr);
                 }
             }
 
             return string.Join(" AND ", filters);
         }
 
-        public string GenerateOrderClause(List<SortParam> sortParams)
+        private string GenerateCriteriaClause(FilterParam item)
+        {
+            string result = string.Empty;
+
+            string field = item.field;
+            if (item.dBFieldExpression != null)
+            {
+                field = item.dBFieldExpression;
+            }
+
+            //For date conversions
+            string date = "";
+            string value = item.value.ToString().ToUpper();
+            switch (item.matchMode)
+            {
+                case "startsWith":
+                    result = $"[{field}] like '{value}%'";
+                    break;
+
+                case "contains":
+                    result = $"[{field}] like '%{value}%'";
+                    break;
+
+                case "notContains":
+                    result = $"[{field}] not like '%{value}%'";
+                    break;
+
+                case "endsWith":
+                    result = $"[{field}] like '%{value}'";
+                    break;
+
+                case "equals":
+                    result = $"[{field}] = '{value}'";
+                    break;
+
+                case "notEquals":
+                    result = $"[{field}] <> '{value}'";
+                    break;
+
+                case "dateIs":
+                    //Get Date
+                    date = DateTime.Parse(value).ToShortDateString();
+                    result = $"{field} = TO_DATE('{date}','mm/dd/yyyy')";
+                    break;
+
+                case "dateIsNot":
+                    //Get Date
+                    date = DateTime.Parse(value).ToShortDateString();
+                    result = $"{field} <> TO_DATE('{date}','mm/dd/yyyy')";
+                    break;
+
+                case "dateBefore":
+                    //Get Date
+                    date = DateTime.Parse(value).ToShortDateString();
+                    result = $"{field} < TO_DATE('{date}','mm/dd/yyyy')";
+                    break;
+
+                case "dateAfter":
+                    //Get Date
+                    date = DateTime.Parse(value).ToShortDateString();
+                    result = $"{field} > TO_DATE('{date}','mm/dd/yyyy')";
+                    break;
+
+                case "gt":
+                    //Get Date
+                    result = $"{field} > {value}";
+                    break;
+
+                case "lt":
+                    //Get Date
+                    result = $"{field} < {value}";
+                    break;
+
+
+                case "gte":
+                    //Get Date
+                    result = $"{field} >= {value}";
+                    break;
+
+                case "lte":
+                    //Get Date
+                    result = $"{field} <= {value}";
+                    break;
+                default:
+                    break;
+            }
+
+            return result;
+        }
+
+        private string GenerateOrderClause(List<SortParam> sortParams)
         {
             List<string> orders = new List<string>();
             if (sortParams.Count > 0)
@@ -169,7 +181,7 @@ namespace DataEditorPortal.Web.Services
 
                 var orderBy = config.SortBy.Count > 0 ? GenerateOrderClause(config.SortBy) : $"[{config.IdColumn}] ASC";
 
-                var queryText = $@"SELECT {columns} FROM dep.{config.TableName} WHERE {where} ##FILTERS## ORDER BY {orderBy}";
+                var queryText = $@"SELECT {columns} FROM dep.{config.TableName} WHERE {where} ##SEARCHES## ##FILTERS## ORDER BY {orderBy}";
 
                 return queryText;
             }
@@ -224,6 +236,32 @@ namespace DataEditorPortal.Web.Services
             return where.Any()
                 ? query.Replace("##FILTERS##", $" AND ({string.Join(" AND ", where)}) ")
                 : query.Replace("##FILTERS##", "");
+        }
+
+        public string UseSearches(string query, List<SearchParam> filterParams)
+        {
+            List<string> filters = new List<string>();
+
+            foreach (var item in filterParams)
+            {
+                if (!string.IsNullOrEmpty(item.value.ToString()))
+                {
+                    if (string.IsNullOrEmpty(item.whereClause))
+                    {
+                        var criteriaStr = GenerateCriteriaClause(item);
+                        if (!string.IsNullOrEmpty(criteriaStr))
+                            filters.Add(criteriaStr);
+                    }
+                    else
+                    {
+                        filters.Add(string.Format(item.whereClause, item.value.ToString()));
+                    }
+                }
+            }
+
+            return filters.Any()
+                ? query.Replace("##SEARCHES##", $" AND ({string.Join(" AND ", filters)}) ")
+                : query.Replace("##SEARCHES##", "");
         }
 
         public string UseCount(string query)

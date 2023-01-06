@@ -1,8 +1,8 @@
 ﻿using DataEditorPortal.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace DataEditorPortal.Data.Contexts
 {
@@ -32,7 +32,7 @@ namespace DataEditorPortal.Data.Contexts
                     Id = Guid.Parse("071f5419-85b8-11ed-a86f-0242ac130004"),
                     Name = "UserManagement",
 
-                    DataSourceConfig = JsonConvert.SerializeObject(new
+                    DataSourceConfig = JsonSerializer.Serialize(new
                     {
                         TableName = "Users",
                         IdColumn = "Id",
@@ -40,7 +40,7 @@ namespace DataEditorPortal.Data.Contexts
                         SortBy = new List<object>() { new { field = "Name", order = 1 } }
                     }),
 
-                    ColumnsConfig = JsonConvert.SerializeObject(new object[] {
+                    ColumnsConfig = JsonSerializer.Serialize(new object[] {
                         new { field = "Username", header = "CNP ID", width = "130px", filterType = "text" },
                         new { field = "Name", header = "Name", width = "250px", filterType = "text" },
                         new { field = "Email", header = "Email", width = "250px", filterType = "text" },
@@ -52,7 +52,7 @@ namespace DataEditorPortal.Data.Contexts
                         new { field = "Comments", header = "Comments", width = "250px", filterType = "text" }
                     }),
 
-                    SearchConfig = JsonConvert.SerializeObject(new object[] {
+                    SearchConfig = JsonSerializer.Serialize(new object[] {
                         new {
                             key = "username",
                             type = "input",

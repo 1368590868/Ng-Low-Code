@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DataEditorPortal.Web.Models.UniversalGrid
 {
@@ -22,24 +20,23 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
     public class SearchConfig
     {
         // basic info
-        public string Key { get; set; }
-        public string Type { get; set; }
-        public JObject Props { get; set; }
+        public string key { get; set; }
+        public string type { get; set; }
+        public object props { get; set; }
 
         // advance field dependence
-        public string DependOnFields { get; set; }
+        public string dependOnFields { get; set; }
 
         // search rule
-        [JsonIgnore]
-        public SearchFiledFilterRule SearchRule { get; set; }
+        public SearchFieldFilterRule searchRule { get; set; }
     }
 
-    public class SearchFiledFilterRule
+    public class SearchFieldFilterRule
     {
-        public string FieldType { get; set; } // Database, SearchField
-        public string Field { get; set; }
-        public string MatchMode { get; set; }
-        public string WhereClause { get; set; }
+        public string dBFieldExpression { get; set; } // Database, SearchField
+        public string field { get; set; }
+        public string matchMode { get; set; }
+        public string whereClause { get; set; }
     }
 
     public class GridColConfig

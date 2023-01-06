@@ -1,10 +1,10 @@
 ﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -38,7 +38,7 @@ namespace DataEditorPortal.Web.Services
 
             if (string.IsNullOrEmpty(config.ColumnsConfig)) config.ColumnsConfig = "[]";
 
-            return JsonConvert.DeserializeObject<List<GridColConfig>>(config.ColumnsConfig);
+            return JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
         }
 
         public GridData GetGridData(string name, GridParam param)
@@ -47,11 +47,38 @@ namespace DataEditorPortal.Web.Services
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
-            var dataSourceConfig = JsonConvert.DeserializeObject<DataSourceConfig>(config.DataSourceConfig);
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
             var queryText = _dbSqlBuilder.GenerateSqlText(dataSourceConfig);
 
             // convert search criteria to where clause
             // var searchBy = _dbSqlBuilder.GenerateWhereClause(param.Filters);
+            var searchConfig = JsonSerializer.Deserialize<List<SearchConfig>>(config.SearchConfig);
+            if (param.Searches != null)
+            {
+                var rules = param.Searches
+                    .Where(x => x.Value != null)
+                    .Select(x =>
+                    {
+                        SearchParam param = null;
+
+                        var fieldConfig = searchConfig.FirstOrDefault(s => s.key == x.Key);
+                        if (fieldConfig != null && fieldConfig.searchRule != null)
+                        {
+                            param = new SearchParam
+                            {
+                                field = fieldConfig.searchRule.field,
+                                matchMode = fieldConfig.searchRule.matchMode,
+                                dBFieldExpression = fieldConfig.searchRule.dBFieldExpression,
+                                value = x.Value,
+                                whereClause = fieldConfig.searchRule.whereClause
+                            };
+                        }
+                        return param;
+                    })
+                    .ToList();
+
+                queryText = _dbSqlBuilder.UseSearches(queryText, rules);
+            }
 
             // convert grid filter to where clause
             // var filterBy = _dbSqlBuilder.GenerateWhereClause(param.Filters);
@@ -123,7 +150,11 @@ namespace DataEditorPortal.Web.Services
 
             if (string.IsNullOrEmpty(config.SearchConfig)) config.SearchConfig = "[]";
 
-            return JsonConvert.DeserializeObject<List<SearchConfig>>(config.SearchConfig);
+            var result = JsonSerializer.Deserialize<List<SearchConfig>>(config.SearchConfig);
+
+            result.ForEach(x => x.searchRule = null);
+
+            return result;
         }
     }
 }
