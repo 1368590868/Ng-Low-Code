@@ -1,97 +1,60 @@
-import { Component } from '@angular/core';
-import { SelectItem } from 'primeng/api';
-import { SelectItemGroup } from 'primeng/api';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import {
+  FormlyFieldConfig,
+  FormlyFieldProps,
+  FormlyFormOptions
+} from '@ngx-formly/core';
+import { Subject, takeUntil } from 'rxjs';
+import { GridTableService } from '../../services/grid-table.service';
 
-interface City {
-  name: string;
-  code: string;
-}
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent {
-  cities: City[];
+export class SearchComponent implements OnInit, OnDestroy {
+  destroy$ = new Subject();
 
-  selectedCity1: City;
+  form = new FormGroup({});
+  options: FormlyFormOptions = {};
+  model = {};
+  fields!: FormlyFieldConfig[];
 
-  selectedCity2: City;
+  constructor(
+    private route: ActivatedRoute,
+    private gridTableService: GridTableService
+  ) {}
 
-  selectedCity3: string;
-
-  selectedCountry: any;
-
-  countries: any[];
-
-  groupedCities: SelectItemGroup[];
-
-  items: SelectItem[];
-  item: any;
-
-  constructor() {
-    this.selectedCity1 = { name: 'Rome', code: 'RM' };
-    this.selectedCity2 = { name: 'Rome', code: 'RM' };
-    this.selectedCity3 = 'Rome';
-    this.selectedCountry = 'DE';
-
-    this.items = [];
-    for (let i = 0; i < 10000; i++) {
-      this.items.push({ label: 'Item ' + i, value: 'Item ' + i });
-    }
-
-    this.cities = [
-      { name: 'New York', code: 'NY' },
-      { name: 'Rome', code: 'RM' },
-      { name: 'London', code: 'LDN' },
-      { name: 'Istanbul', code: 'IST' },
-      { name: 'Paris', code: 'PRS' }
-    ];
-
-    this.groupedCities = [
-      {
-        label: 'Germany',
-        value: 'de',
-        items: [
-          { label: 'Berlin', value: 'Berlin' },
-          { label: 'Frankfurt', value: 'Frankfurt' },
-          { label: 'Hamburg', value: 'Hamburg' },
-          { label: 'Munich', value: 'Munich' }
-        ]
-      },
-      {
-        label: 'USA',
-        value: 'us',
-        items: [
-          { label: 'Chicago', value: 'Chicago' },
-          { label: 'Los Angeles', value: 'Los Angeles' },
-          { label: 'New York', value: 'New York' },
-          { label: 'San Francisco', value: 'San Francisco' }
-        ]
-      },
-      {
-        label: 'Japan',
-        value: 'jp',
-        items: [
-          { label: 'Kyoto', value: 'Kyoto' },
-          { label: 'Osaka', value: 'Osaka' },
-          { label: 'Tokyo', value: 'Tokyo' },
-          { label: 'Yokohama', value: 'Yokohama' }
-        ]
+  ngOnInit(): void {
+    // subscribe route change to get search config
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((param: any) => {
+      if (param && param.name) {
+        // get search config
+        this.gridTableService.getSearchConfig().subscribe((result: any) => {
+          // this.options.resetModel?.();
+          this.model = {};
+          this.fields = result;
+        });
       }
-    ];
+    });
+  }
 
-    this.countries = [
-      { name: 'Australia', code: 'AU' },
-      { name: 'Brazil', code: 'BR' },
-      { name: 'China', code: 'CN' },
-      { name: 'Egypt', code: 'EG' },
-      { name: 'France', code: 'FR' },
-      { name: 'Germany', code: 'DE' },
-      { name: 'India', code: 'IN' },
-      { name: 'Japan', code: 'JP' },
-      { name: 'Spain', code: 'ES' },
-      { name: 'United States', code: 'US' }
-    ];
+  ngOnDestroy(): void {
+    this.destroy$.next(null);
+    this.destroy$.complete();
+  }
+
+  onSubmit(model: any) {
+    console.log(model);
+    if (this.form.valid) {
+      this.gridTableService.searchClicked$.next(model);
+    }
+  }
+
+  onClear() {
+    this.options.resetModel?.();
+    this.gridTableService.searchClicked$.next(this.model);
   }
 }

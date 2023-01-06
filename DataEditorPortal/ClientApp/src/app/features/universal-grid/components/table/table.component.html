@@ -1,10 +1,12 @@
-<div class="card">
+<div class="p-card">
   <p-table
     #dt
     class="data-table"
+    styleClass="p-datatable-striped"
     [columns]="cols"
     sortMode="multiple"
     [scrollable]="true"
+    scrollHeight="flex"
     [resizableColumns]="true"
     columnResizeMode="expand"
     [reorderableColumns]="true"
@@ -14,31 +16,38 @@
     [value]="records"
     [(selection)]="selectedRecords"
     dataKey="Id"
-    styleClass="p-datatable-records"
     [rowHover]="true"
-    [rows]="10"
+    [rows]="50"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 25, 50]"
     [loading]="loading"
     [paginator]="true"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries  "
     [totalRecords]="totalRecords"
-    scrollHeight="600px"
     [filterDelay]="0"
     stateStorage="session"
-    stateKey="statedemo-session">
+    [stateKey]="stateKey">
     <ng-template pTemplate="caption">
       <h3 class="mb-4">User Management</h3>
       <div class="table-header flex align-items-center">
-        <p-button label="Add New" icon="pi pi-plus" class="mr-2"></p-button>
+        <app-edit-dialog
+          label="Add New"
+          icon="pi pi-plus"
+          class="mr-2"></app-edit-dialog>
         <p-button
           label="Export To Excel"
           icon="pi pi-file-excel"
           styleClass="p-button-outlined mr-2"></p-button>
         <p-button
+          *ngIf="selectedRecords.length > 0"
           label="Remove"
-          icon="pi pi-file-excel mr-2"
-          styleClass="p-button-outlined p-button-danger"></p-button>
+          icon="pi pi-trash"
+          styleClass="p-button-outlined p-button-danger mr-2"></p-button>
+
+        <!-- <p-splitButton
+          label="Custom Actions"
+          [model]="this.items"
+          styleClass="p-button-outlined mr-2"></p-splitButton> -->
         <div class="flex-grow-1">
           <strong *ngIf="selectedRecords.length > 0"
             >{{ selectedRecords.length }} row(s) selected</strong
@@ -46,7 +55,8 @@
         </div>
         <p-button
           icon="pi pi-refresh"
-          styleClass="p-button-rounded p-button-outlined p-button-lg"></p-button>
+          styleClass="p-button-rounded p-button-outlined p-button-lg"
+          (click)="onRefresh()"></p-button>
       </div>
     </ng-template>
 
@@ -66,6 +76,7 @@
             [type]="col.filterType"
             [field]="col.field"
             display="menu"
+            [hideOnClear]="true"
             [showOperator]="false"
             [showAddButton]="false"></p-columnFilter>
         </th>

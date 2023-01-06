@@ -1,17 +1,26 @@
 <p-splitter
   [panelSizes]="[20, 80]"
-  stateKey="split"
-  stateStorage="local"
-  [panelStyle]="{ minWidth: '300px' }"
-  styleClass="split-area">
+  [panelStyle]="{ minWidth: '1rem' }"
+  styleClass="split-area border-none"
+  [class.hide-panel]="!showPanel"
+  [stateKey]="stateKey"
+  [stateStorage]="stateStorage"
+  #splitter>
   <ng-template pTemplate>
-    <div class="w-full">
-      <app-search></app-search>
+    <div class="search-area w-full">
+      <p-button
+        icon="pi pi-arrow-left"
+        class="justify-content-end expand-btn"
+        styleClass="p-button-rounded p-button-text p-button-lg"
+        [style]="{ width: '2rem', height: '2rem' }"
+        (click)="onToggle()">
+      </p-button>
+      <app-search @fadeInOut *ngIf="showPanel"></app-search>
     </div>
   </ng-template>
   <ng-template pTemplate>
     <div class="table-area w-full">
-      <app-table></app-table>
+      <app-table *ngIf="currentPortalItem"></app-table>
     </div>
   </ng-template>
 </p-splitter>
