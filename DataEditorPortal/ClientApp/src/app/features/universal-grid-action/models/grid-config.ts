@@ -1,14 +1,25 @@
 import { Type } from '@angular/core';
 import { GridActionDirective } from '../directives/grid-action.directive';
 
-export interface GridConfig {
+export interface GridActionWrapperOption {
+  label?: string;
+  icon?: string;
+  header?: string;
+  okText?: string;
+  cancelText?: string;
+}
+
+export interface GridActionOption {
   name: string;
-  caption: string;
-  actions: GridActionConfig[];
+  wrapper?: GridActionWrapperOption;
+  props?: {
+    [propName: string]: any;
+  };
 }
 
 export interface GridActionConfig {
   name: string;
+  requireGridRowSelected: boolean;
   component: Type<GridActionDirective>;
   data: any;
 }

@@ -3,6 +3,7 @@ import { GridTableService } from '../../services/grid-table.service';
 import { catchError, skip, Subject, takeUntil, tap } from 'rxjs';
 import { NotifyService } from '../../../../app.module';
 import { ActivatedRoute } from '@angular/router';
+import { GridActionOption } from 'src/app/features/universal-grid-action/universal-grid-action.module';
 
 @Component({
   selector: 'app-table',
@@ -21,7 +22,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   loading = true;
   @ViewChild('dt') table: any;
-  actions: string[] = [];
+  actions: GridActionOption[] = [];
 
   cols: any[] = [];
   stateKey!: string;
@@ -42,7 +43,16 @@ export class TableComponent implements OnInit, OnDestroy {
     });
 
     // get grid config
-    this.actions = ['addEdit', 'addEdit', 'addEdit'];
+    this.actions = [
+      {
+        name: 'addEdit',
+        wrapper: {
+          label: 'Add two'
+        }
+      },
+      { name: 'addEdit1' },
+      { name: 'addEdit' }
+    ];
 
     // subscribe search click to do searching
     this.gridTableService.searchClicked$

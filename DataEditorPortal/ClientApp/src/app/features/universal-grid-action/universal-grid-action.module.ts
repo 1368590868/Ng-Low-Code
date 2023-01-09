@@ -30,14 +30,16 @@ import { ButtonModule } from 'primeng/button';
 
 import { GridActionDirective } from './directives/grid-action.directive';
 import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
-import { EditDialogComponent } from './components/edit-dialog/edit-dialog.component';
+import { EditRecordActionComponent } from './components/edit-record-action/edit-record-action.component';
 import { ActionWrapperComponent } from './components/action-wrapper/action-wrapper.component';
+
+export * from './models/grid-config';
 
 @NgModule({
   declarations: [
     UniversalGridActionDirective,
     GridActionDirective,
-    EditDialogComponent,
+    EditRecordActionComponent,
     ActionWrapperComponent
   ],
   imports: [
@@ -78,7 +80,12 @@ import { ActionWrapperComponent } from './components/action-wrapper/action-wrapp
       useValue: [
         {
           name: 'addEdit',
-          component: EditDialogComponent
+          requireGridRowSelected: true,
+          component: EditRecordActionComponent
+        },
+        {
+          name: 'addEdit1',
+          component: EditRecordActionComponent
         }
       ]
     }

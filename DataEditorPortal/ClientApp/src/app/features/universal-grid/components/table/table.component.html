@@ -34,6 +34,7 @@
           <ng-template
             appUniversalGridAction
             [actions]="actions"
+            [selectedRecords]="selectedRecords"
             (savedEvent)="onRefresh()"></ng-template>
           <p-button
             label="Export To Excel"

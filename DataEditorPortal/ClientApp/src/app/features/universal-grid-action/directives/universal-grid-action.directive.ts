@@ -5,18 +5,21 @@ import {
   EventEmitter,
   Inject,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
   ViewContainerRef
 } from '@angular/core';
 import { GridActionDirective } from './grid-action.directive';
-import { GridActionConfig } from '../models/grid-config';
+import { GridActionConfig, GridActionOption } from '../models/grid-config';
 import { ActionWrapperComponent } from '../components/action-wrapper/action-wrapper.component';
 
 @Directive({
   selector: '[appUniversalGridAction]'
 })
-export class UniversalGridActionDirective implements DoCheck {
-  @Input() actions: string[] = [];
+export class UniversalGridActionDirective implements DoCheck, OnChanges {
+  @Input() actions: GridActionOption[] = [];
+  @Input() selectedRecords: any[] = [];
 
   @Output() savedEvent = new EventEmitter<void>();
 
@@ -26,6 +29,13 @@ export class UniversalGridActionDirective implements DoCheck {
     private viewContainerRef: ViewContainerRef,
     @Inject('GRID_ACTION_CONFIG') private config: GridActionConfig[]
   ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('selectedRecords' in changes) {
+      // selectedRecords changed, reloaded actions.
+      this.actionLoaded = false;
+    }
+  }
 
   ngDoCheck(): void {
     if (!this.actionLoaded) {
@@ -44,22 +54,37 @@ export class UniversalGridActionDirective implements DoCheck {
 
       this.actions.forEach(x => {
         const actionCfg = this.config.find(action => {
-          return action.name === x;
+          return action.name === x.name;
         });
 
-        if (actionCfg) {
+        if (
+          actionCfg &&
+          (!actionCfg.requireGridRowSelected || this.selectedRecords.length > 0)
+        ) {
           const wrapperRef =
             this.viewContainerRef.createComponent<ActionWrapperComponent>(
               ActionWrapperComponent
             );
 
           // assign wrapper data;
-          wrapperRef.instance.label = 'Edit';
+          if (x.wrapper) {
+            if (wrapperRef instanceof ComponentRef) {
+              Object.assign(wrapperRef.instance, x.wrapper);
+            }
+          }
 
           const actionRef =
             wrapperRef.instance.viewContainerRef.createComponent<GridActionDirective>(
               actionCfg.component
             );
+
+          // assign wrapper data;
+          if (x.props) {
+            if (actionRef instanceof ComponentRef) {
+              Object.assign(actionRef.instance, x.props);
+            }
+          }
+          actionRef.instance.selectedRecords = this.selectedRecords;
 
           // bind action events
           actionRef.instance.savedEvent.asObservable().subscribe(() => {
