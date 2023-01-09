@@ -7,6 +7,8 @@ export interface GridActionWrapperOption {
   header?: string;
   okText?: string;
   cancelText?: string;
+  class?: string;
+  buttonStyleClass?: string;
 }
 
 export interface GridActionOption {

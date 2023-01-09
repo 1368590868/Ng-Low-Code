@@ -13,9 +13,10 @@ import { GridActionDirective } from '../../directives/grid-action.directive';
   styleUrls: ['./action-wrapper.component.scss']
 })
 export class ActionWrapperComponent {
+  @Input() class = 'mr-2';
   @Input() label = 'Add New';
   @Input() icon = 'pi pi-plus';
-  @Input() buttonStyleClass = 'mr-2';
+  @Input() buttonStyleClass = '';
   @Input() header = 'Add / Edit';
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';

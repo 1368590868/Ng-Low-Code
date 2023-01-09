@@ -90,19 +90,34 @@
             (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
         </td>
         <td style="width: auto !important; max-width: none !important">
-          <div class="flex">
-            <a
-              pRipple
-              class="flex hover:surface-300 border-circle p-1 transition-colors transition-duration-200"
-              ><i class="text-lg pi pi-info-circle"></i
-            ></a>
-            <a
-              pRipple
-              class="flex hover:surface-300 border-circle p-1 ml-1 transition-colors transition-duration-200"
-              ><i
-                class="text-lg pi pi-file-edit"
-                style="transform: translateX(0.125rem)"></i
-            ></a>
+          <div class="row-actions flex">
+            <ng-template
+              class="flex"
+              appUniversalGridAction
+              [actions]="[
+                {
+                  name: 'addEdit1',
+                  wrapper: {
+                    label: '',
+                    icon: 'pi pi-info-circle',
+                    class: 'flex',
+                    buttonStyleClass:
+                      'p-button-lg p-button-rounded p-button-text'
+                  }
+                },
+                {
+                  name: 'addEdit1',
+                  wrapper: {
+                    label: '',
+                    icon: 'pi pi-file-edit',
+                    class: 'flex ml-1',
+                    buttonStyleClass:
+                      'p-button-lg p-button-rounded p-button-text'
+                  }
+                }
+              ]"
+              [selectedRecords]="[data]"
+              (savedEvent)="onRefresh()"></ng-template>
           </div>
         </td>
 

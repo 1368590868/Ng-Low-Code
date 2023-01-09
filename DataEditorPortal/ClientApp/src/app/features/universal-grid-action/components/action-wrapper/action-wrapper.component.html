@@ -2,13 +2,15 @@
   (click)="showDialog()"
   [icon]="icon"
   [label]="label"
-  [class]="buttonStyleClass"></p-button>
+  [class]="class"
+  [styleClass]="buttonStyleClass"></p-button>
 <p-dialog
   [header]="header"
   [(visible)]="visible"
   (onShow)="onShow()"
   (onHide)="onHide()"
-  [style]="{ width: '31.25rem' }">
+  [style]="{ width: '31.25rem' }"
+  appendTo="body">
   <div #container></div>
   <ng-template pTemplate="footer">
     <p-button

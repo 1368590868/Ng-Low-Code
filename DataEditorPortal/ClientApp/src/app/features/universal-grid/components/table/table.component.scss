@@ -25,6 +25,14 @@
       .p-datatable-loading-overlay {
         z-index: 12;
       }
+
+      .row-actions {
+        .p-button.p-button-icon-only.p-button-rounded {
+          height: 1.625rem;
+          width: 1.625rem;
+          padding: 0.30375rem 0.4375rem;
+        }
+      }
     }
   }
 }
