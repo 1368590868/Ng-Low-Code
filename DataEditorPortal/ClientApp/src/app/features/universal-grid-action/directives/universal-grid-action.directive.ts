@@ -66,6 +66,13 @@ export class UniversalGridActionDirective implements DoCheck, OnChanges {
               ActionWrapperComponent
             );
 
+          // assign wrapper config;
+          if (actionCfg.wrapper) {
+            if (wrapperRef instanceof ComponentRef) {
+              Object.assign(wrapperRef.instance, actionCfg.wrapper);
+            }
+          }
+
           // assign wrapper data;
           if (x.wrapper) {
             if (wrapperRef instanceof ComponentRef) {
@@ -78,7 +85,7 @@ export class UniversalGridActionDirective implements DoCheck, OnChanges {
               actionCfg.component
             );
 
-          // assign wrapper data;
+          // assign action data;
           if (x.props) {
             if (actionRef instanceof ComponentRef) {
               Object.assign(actionRef.instance, x.props);

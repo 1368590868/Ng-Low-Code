@@ -9,11 +9,13 @@
   [(visible)]="visible"
   (onShow)="onShow()"
   (onHide)="onHide()"
-  [style]="{ width: '31.25rem' }"
+  [style]="dialogStyle"
+  contentStyleClass="border-top-1 surface-border pt-3"
   appendTo="body">
   <div #container></div>
   <ng-template pTemplate="footer">
     <p-button
+      *ngIf="cancelText"
       icon="pi pi-times"
       (click)="onCancel()"
       [label]="cancelText"

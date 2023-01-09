@@ -20,6 +20,7 @@ export class ActionWrapperComponent {
   @Input() header = 'Add / Edit';
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
+  @Input() dialogStyle = { width: '31.25rem' };
 
   @ViewChild('container', { read: ViewContainerRef, static: true })
   viewContainerRef!: ViewContainerRef;

@@ -9,6 +9,7 @@ export interface GridActionWrapperOption {
   cancelText?: string;
   class?: string;
   buttonStyleClass?: string;
+  dialogStyle?: string;
 }
 
 export interface GridActionOption {
@@ -23,5 +24,5 @@ export interface GridActionConfig {
   name: string;
   requireGridRowSelected: boolean;
   component: Type<GridActionDirective>;
-  data: any;
+  wrapper?: GridActionWrapperOption;
 }

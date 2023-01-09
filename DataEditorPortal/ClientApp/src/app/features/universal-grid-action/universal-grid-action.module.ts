@@ -32,6 +32,7 @@ import { GridActionDirective } from './directives/grid-action.directive';
 import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
 import { EditRecordActionComponent } from './components/edit-record-action/edit-record-action.component';
 import { ActionWrapperComponent } from './components/action-wrapper/action-wrapper.component';
+import { ViewRecordActionComponent } from './components/view-record-action/view-record-action.component';
 
 export * from './models/grid-config';
 
@@ -40,7 +41,8 @@ export * from './models/grid-config';
     UniversalGridActionDirective,
     GridActionDirective,
     EditRecordActionComponent,
-    ActionWrapperComponent
+    ActionWrapperComponent,
+    ViewRecordActionComponent
   ],
   imports: [
     CommonModule,
@@ -84,8 +86,19 @@ export * from './models/grid-config';
           component: EditRecordActionComponent
         },
         {
-          name: 'addEdit1',
+          name: 'edit-record',
+          requireGridRowSelected: true,
           component: EditRecordActionComponent
+        },
+        {
+          name: 'view-record',
+          requireGridRowSelected: true,
+          component: ViewRecordActionComponent,
+          wrapper: {
+            header: 'View Info',
+            cancelText: '',
+            dialogStyle: { width: '40rem' }
+          }
         }
       ]
     }
