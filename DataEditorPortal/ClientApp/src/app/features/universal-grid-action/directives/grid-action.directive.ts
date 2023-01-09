@@ -1,4 +1,16 @@
-import { Directive, Input } from '@angular/core';
+import { Directive, EventEmitter, Input, Output } from '@angular/core';
+
+export interface OnGridActionSave {
+  onSave: () => void;
+}
+
+export interface OnGridActionCancel {
+  onCancel: () => void;
+}
+
+export interface OnGridActionDialogShow {
+  onDialogShow: () => void;
+}
 
 @Directive({
   selector: '[appGridAction]'
@@ -10,6 +22,6 @@ export class GridActionDirective {
   @Input() header = 'Add / Edit';
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
-
-  // constructor() {}
+  @Output() savedEvent = new EventEmitter<void>();
+  @Output() errorEvent = new EventEmitter<void>();
 }

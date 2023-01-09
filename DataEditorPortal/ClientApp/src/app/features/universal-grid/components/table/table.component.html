@@ -31,7 +31,10 @@
       <h3 class="mb-4">User Management</h3>
       <div class="table-header flex align-items-center">
         <div class="flex flex-wrap mr-2">
-          <ng-template appUniversalGridAction [actions]="actions"></ng-template>
+          <ng-template
+            appUniversalGridAction
+            [actions]="actions"
+            (savedEvent)="onRefresh()"></ng-template>
           <p-button
             label="Export To Excel"
             icon="pi pi-file-excel"

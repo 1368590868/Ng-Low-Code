@@ -31,12 +31,14 @@ import { ButtonModule } from 'primeng/button';
 import { GridActionDirective } from './directives/grid-action.directive';
 import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
 import { EditDialogComponent } from './components/edit-dialog/edit-dialog.component';
+import { ActionWrapperComponent } from './components/action-wrapper/action-wrapper.component';
 
 @NgModule({
   declarations: [
     UniversalGridActionDirective,
     GridActionDirective,
-    EditDialogComponent
+    EditDialogComponent,
+    ActionWrapperComponent
   ],
   imports: [
     CommonModule,

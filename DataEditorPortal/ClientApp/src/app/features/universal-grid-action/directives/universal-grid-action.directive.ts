@@ -2,12 +2,15 @@ import {
   ComponentRef,
   Directive,
   DoCheck,
+  EventEmitter,
   Inject,
   Input,
+  Output,
   ViewContainerRef
 } from '@angular/core';
 import { GridActionDirective } from './grid-action.directive';
 import { GridActionConfig } from '../models/grid-config';
+import { ActionWrapperComponent } from '../components/action-wrapper/action-wrapper.component';
 
 @Directive({
   selector: '[appUniversalGridAction]'
@@ -15,8 +18,10 @@ import { GridActionConfig } from '../models/grid-config';
 export class UniversalGridActionDirective implements DoCheck {
   @Input() actions: string[] = [];
 
+  @Output() savedEvent = new EventEmitter<void>();
+
   actionLoaded = false;
-  actionRefs: ComponentRef<GridActionDirective>[] = [];
+
   constructor(
     private viewContainerRef: ViewContainerRef,
     @Inject('GRID_ACTION_CONFIG') private config: GridActionConfig[]
@@ -43,11 +48,30 @@ export class UniversalGridActionDirective implements DoCheck {
         });
 
         if (actionCfg) {
+          const wrapperRef =
+            this.viewContainerRef.createComponent<ActionWrapperComponent>(
+              ActionWrapperComponent
+            );
+
+          // assign wrapper data;
+          wrapperRef.instance.label = 'Edit';
+
           const actionRef =
-            this.viewContainerRef.createComponent<GridActionDirective>(
+            wrapperRef.instance.viewContainerRef.createComponent<GridActionDirective>(
               actionCfg.component
             );
-          this.actionRefs.push(actionRef);
+
+          // bind action events
+          actionRef.instance.savedEvent.asObservable().subscribe(() => {
+            wrapperRef.instance.visible = false;
+            this.savedEvent.emit();
+          });
+          actionRef.instance.errorEvent.asObservable().subscribe(() => {
+            wrapperRef.instance.isLoading = false;
+          });
+
+          // set actionRef to wrapper, for it to invoke
+          wrapperRef.instance.componentRef = actionRef;
         }
       });
 
