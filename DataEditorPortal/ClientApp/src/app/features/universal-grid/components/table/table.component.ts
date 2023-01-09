@@ -21,6 +21,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   loading = true;
   @ViewChild('dt') table: any;
+  actions: string[] = [];
 
   cols: any[] = [];
   stateKey!: string;
@@ -39,6 +40,9 @@ export class TableComponent implements OnInit, OnDestroy {
     this.gridTableService.getTableColumns().subscribe((res: never[]) => {
       this.cols = res;
     });
+
+    // get grid config
+    this.actions = ['addEdit', 'addEdit', 'addEdit'];
 
     // subscribe search click to do searching
     this.gridTableService.searchClicked$

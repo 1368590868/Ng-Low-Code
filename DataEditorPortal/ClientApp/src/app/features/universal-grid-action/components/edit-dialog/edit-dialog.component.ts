@@ -1,18 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { GridActionDirective } from '../../directives/grid-action.directive';
 
 @Component({
   selector: 'app-edit-dialog',
   templateUrl: './edit-dialog.component.html',
   styleUrls: ['./edit-dialog.component.scss']
 })
-export class EditDialogComponent implements OnInit {
-  @Input() label = 'Add New';
-  @Input() icon = 'pi pi-plus';
-
-  @Input() header = 'Add / Edit';
-  @Input() okText = 'Ok';
-  @Input() cancelText = 'Cancel';
-
+export class EditDialogComponent extends GridActionDirective implements OnInit {
   visible = false;
   isLoading = false;
 

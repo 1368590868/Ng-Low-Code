@@ -9,13 +9,6 @@ import { FormlyPrimeNGModule } from '@ngx-formly/primeng';
 import { FormlyDatepickerModule } from '../ngx-formly/datepicker';
 import { FormlyMultiSelectModule } from '../ngx-formly/multiselect';
 
-import { UniversalGridRoutingModule } from './universal-grid-routing.module';
-import { UniversalGridComponent } from './universal-grid.component';
-import { SplitAreaComponent } from './pages/split-area/split-area.component';
-import { SearchComponent } from './components/search/search.component';
-import { TableComponent } from './components/table/table.component';
-import { UniversalGridActionModule } from '../universal-grid-action/universal-grid-action.module';
-
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
 import { ToastModule } from 'primeng/toast';
@@ -35,12 +28,15 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 
+import { GridActionDirective } from './directives/grid-action.directive';
+import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
+import { EditDialogComponent } from './components/edit-dialog/edit-dialog.component';
+
 @NgModule({
   declarations: [
-    UniversalGridComponent,
-    SplitAreaComponent,
-    SearchComponent,
-    TableComponent
+    UniversalGridActionDirective,
+    GridActionDirective,
+    EditDialogComponent
   ],
   imports: [
     CommonModule,
@@ -54,8 +50,6 @@ import { ButtonModule } from 'primeng/button';
     FormlyPrimeNGModule,
     FormlyDatepickerModule,
     FormlyMultiSelectModule,
-    UniversalGridRoutingModule,
-    UniversalGridActionModule,
     // primeNg
     AnimateModule,
     ToastModule,
@@ -74,6 +68,18 @@ import { ButtonModule } from 'primeng/button';
     SplitButtonModule,
     RippleModule,
     ButtonModule
+  ],
+  exports: [UniversalGridActionDirective],
+  providers: [
+    {
+      provide: 'GRID_ACTION_CONFIG',
+      useValue: [
+        {
+          name: 'addEdit',
+          component: EditDialogComponent
+        }
+      ]
+    }
   ]
 })
-export class UniversalGridModule {}
+export class UniversalGridActionModule {}
