@@ -6,6 +6,7 @@ import {
   Inject,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
   SimpleChanges,
   ViewContainerRef
@@ -13,22 +14,42 @@ import {
 import { GridActionDirective } from './grid-action.directive';
 import { GridActionConfig, GridActionOption } from '../models/grid-config';
 import { ActionWrapperComponent } from '../components/action-wrapper/action-wrapper.component';
+import { ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+import { UniversalGridService } from '../services/universal-grid.service';
 
 @Directive({
   selector: '[appUniversalGridAction]'
 })
-export class UniversalGridActionDirective implements DoCheck, OnChanges {
+export class UniversalGridActionDirective
+  implements DoCheck, OnChanges, OnDestroy
+{
   @Input() actions: GridActionOption[] = [];
   @Input() selectedRecords: any[] = [];
 
   @Output() savedEvent = new EventEmitter<void>();
 
   actionLoaded = false;
+  destroy$ = new Subject();
 
   constructor(
+    private route: ActivatedRoute,
     private viewContainerRef: ViewContainerRef,
+    private gridService: UniversalGridService,
     @Inject('GRID_ACTION_CONFIG') private config: GridActionConfig[]
-  ) {}
+  ) {
+    // subscribe route change to update currentPortalItem
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((param: any) => {
+      if (param && param.name) {
+        this.gridService.currentPortalItem = param.name;
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next(null);
+    this.destroy$.complete();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('selectedRecords' in changes) {
