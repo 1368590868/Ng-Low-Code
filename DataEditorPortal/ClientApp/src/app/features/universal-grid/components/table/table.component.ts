@@ -25,6 +25,7 @@ export class TableComponent implements OnInit, OnDestroy {
   actions: GridActionOption[] = [];
 
   cols: any[] = [];
+  dataKey = 'Id';
   stateKey!: string;
 
   constructor(
@@ -107,7 +108,12 @@ export class TableComponent implements OnInit, OnDestroy {
             ...data,
             ...data
           ];
-          this.records = data1;
+          console.log(data1);
+          const data2 = data1.map((x, index) => {
+            return { ...x, Id: Math.random() };
+          });
+          console.log(data2);
+          this.records = data;
           this.totalRecords = 100; //(res as any).total;
         }
       });

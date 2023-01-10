@@ -33,6 +33,14 @@ export class UniversalGridService {
   }
 
   getDetailConfig(): any {
-    return this.http.get<any>('assets/customers-large.json');
+    return this.http.get(
+      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`
+    );
+  }
+
+  getDetailData(id: string): any {
+    return this.http.get(
+      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/${id}`
+    );
   }
 }

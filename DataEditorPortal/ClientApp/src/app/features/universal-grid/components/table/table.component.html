@@ -15,7 +15,7 @@
     (onLazyLoad)="loadTableLazy($event)"
     [value]="records"
     [(selection)]="selectedRecords"
-    dataKey="Id"
+    [dataKey]="dataKey"
     [rowHover]="true"
     [rows]="50"
     [showCurrentPageReport]="true"
@@ -60,10 +60,10 @@
 
     <ng-template pTemplate="header" let-columns>
       <tr>
-        <th style="width: auto !important">
+        <th style="width: 2.75rem !important; max-width: 2.75rem !important">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
-        <th style="width: auto !important; max-width: none !important"></th>
+        <th style="width: 5rem !important; max-width: 5rem !important"></th>
         <th
           *ngFor="let col of columns"
           pReorderableColumn
@@ -84,12 +84,12 @@
 
     <ng-template pTemplate="body" let-data let-columns="columns">
       <tr [pSelectableRow]="data">
-        <td style="width: auto !important">
+        <td style="width: 2.75rem !important; max-width: 2.75rem !important">
           <p-tableCheckbox
             [value]="data"
             (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
         </td>
-        <td style="width: auto !important; max-width: none !important">
+        <td style="width: 5rem !important; max-width: 5rem !important">
           <div class="row-actions flex">
             <ng-template
               class="flex"
@@ -116,6 +116,7 @@
                   }
                 }
               ]"
+              [recordKey]="dataKey"
               [selectedRecords]="[data]"
               (savedEvent)="onRefresh()"></ng-template>
           </div>

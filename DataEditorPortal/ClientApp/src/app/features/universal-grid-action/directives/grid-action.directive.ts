@@ -17,6 +17,7 @@ export interface OnGridActionDialogShow {
 })
 export class GridActionDirective {
   @Input() selectedRecords: any = [];
+  @Input() recordKey = 'Id';
 
   @Output() savedEvent = new EventEmitter<void>();
   @Output() errorEvent = new EventEmitter<void>();

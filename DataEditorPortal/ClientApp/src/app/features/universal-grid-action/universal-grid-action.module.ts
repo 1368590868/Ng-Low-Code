@@ -27,6 +27,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
+import { SkeletonModule } from 'primeng/skeleton';
 
 import { GridActionDirective } from './directives/grid-action.directive';
 import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
@@ -73,7 +74,8 @@ export * from './models/grid-config';
     ProgressBarModule,
     SplitButtonModule,
     RippleModule,
-    ButtonModule
+    ButtonModule,
+    SkeletonModule
   ],
   exports: [UniversalGridActionDirective],
   providers: [
@@ -88,7 +90,10 @@ export * from './models/grid-config';
         {
           name: 'edit-record',
           requireGridRowSelected: true,
-          component: EditRecordActionComponent
+          component: EditRecordActionComponent,
+          wrapper: {
+            dialogStyle: { width: '40rem' }
+          }
         },
         {
           name: 'view-record',

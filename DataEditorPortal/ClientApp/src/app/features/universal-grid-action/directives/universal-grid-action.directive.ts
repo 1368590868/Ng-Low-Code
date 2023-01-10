@@ -26,6 +26,7 @@ export class UniversalGridActionDirective
 {
   @Input() actions: GridActionOption[] = [];
   @Input() selectedRecords: any[] = [];
+  @Input() recordKey = 'Id';
 
   @Output() savedEvent = new EventEmitter<void>();
 
@@ -113,6 +114,7 @@ export class UniversalGridActionDirective
             }
           }
           actionRef.instance.selectedRecords = this.selectedRecords;
+          actionRef.instance.recordKey = this.recordKey;
 
           // bind action events
           actionRef.instance.savedEvent.asObservable().subscribe(() => {
