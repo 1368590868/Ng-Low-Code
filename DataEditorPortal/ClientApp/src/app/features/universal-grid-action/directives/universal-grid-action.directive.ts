@@ -124,6 +124,10 @@ export class UniversalGridActionDirective
           actionRef.instance.errorEvent.asObservable().subscribe(() => {
             wrapperRef.instance.isLoading = false;
           });
+          actionRef.instance.loadedEvent.asObservable().subscribe(() => {
+            wrapperRef.instance.isLoading = false;
+            wrapperRef.instance.buttonDisabled = false;
+          });
 
           // set actionRef to wrapper, for it to invoke
           wrapperRef.instance.componentRef = actionRef;

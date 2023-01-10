@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { tap } from 'rxjs';
@@ -19,6 +19,8 @@ export class EditRecordActionComponent
   extends GridActionDirective
   implements OnGridActionSave, OnGridActionCancel, OnGridActionDialogShow
 {
+  @Input() isAddForm = false;
+
   form = new FormGroup({});
   options: FormlyFormOptions = {};
   model = {};
@@ -31,25 +33,28 @@ export class EditRecordActionComponent
   }
 
   onDialogShow(): void {
-    const dataKey = this.selectedRecords[0][this.recordKey];
-
     this.gridService
       .getDetailConfig()
       .pipe(
         tap((result: any) => {
           this.fields = result;
+          this.loadedEvent.emit();
         })
       )
       .subscribe();
 
-    this.gridService
-      .getDetailData(dataKey)
-      .pipe(
-        tap((result: any) => {
-          this.model = result;
-        })
-      )
-      .subscribe();
+    if (!this.isAddForm) {
+      const dataKey = this.selectedRecords[0][this.recordKey];
+
+      this.gridService
+        .getDetailData(dataKey)
+        .pipe(
+          tap((result: any) => {
+            this.model = result;
+          })
+        )
+        .subscribe();
+    }
   }
 
   onFormSubmit(model: any) {

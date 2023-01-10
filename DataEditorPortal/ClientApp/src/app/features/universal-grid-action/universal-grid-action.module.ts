@@ -85,16 +85,23 @@ export * from './models/grid-config';
       provide: 'GRID_ACTION_CONFIG',
       useValue: [
         {
-          name: 'addEdit',
-          requireGridRowSelected: true,
-          component: EditRecordActionComponent
+          name: 'add-record',
+          component: EditRecordActionComponent,
+          wrapper: {
+            dialogStyle: { width: '40rem' },
+            okText: 'Add'
+          },
+          props: {
+            isAddForm: true
+          }
         },
         {
           name: 'edit-record',
           requireGridRowSelected: true,
           component: EditRecordActionComponent,
           wrapper: {
-            dialogStyle: { width: '40rem' }
+            dialogStyle: { width: '40rem' },
+            okText: 'Update'
           }
         },
         {

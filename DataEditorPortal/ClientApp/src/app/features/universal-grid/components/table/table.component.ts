@@ -46,9 +46,10 @@ export class TableComponent implements OnInit, OnDestroy {
     // get grid config
     this.actions = [
       {
-        name: 'addEdit',
+        name: 'add-record',
         wrapper: {
-          label: 'Add two'
+          label: 'Add New',
+          icon: 'pi pi-plus'
         }
       },
 

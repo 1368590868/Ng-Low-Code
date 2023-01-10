@@ -19,12 +19,13 @@
       icon="pi pi-times"
       (click)="onCancel()"
       [label]="cancelText"
+      [disabled]="buttonDisabled"
       styleClass="p-button-text"></p-button>
     <p-button
       icon="pi pi-check"
       (click)="onOk()"
       [label]="okText"
-      styleClass="p-button-text"
+      [disabled]="buttonDisabled"
       [loading]="isLoading"></p-button>
   </ng-template>
 </p-dialog>

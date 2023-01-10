@@ -28,6 +28,7 @@ export class ActionWrapperComponent {
   public componentRef!: ComponentRef<GridActionDirective>;
   visible = false;
   isLoading = false;
+  buttonDisabled = true;
 
   showDialog() {
     this.isLoading = false;
@@ -35,8 +36,11 @@ export class ActionWrapperComponent {
   }
 
   onShow() {
-    if (this.hasEventHandler('onDialogShow'))
+    if (this.hasEventHandler('onDialogShow')) {
       (this.componentRef.instance as any).onDialogShow();
+    } else {
+      this.buttonDisabled = false;
+    }
   }
 
   onHide() {
