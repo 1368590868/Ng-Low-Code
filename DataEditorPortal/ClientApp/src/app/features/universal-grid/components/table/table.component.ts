@@ -51,8 +51,17 @@ export class TableComponent implements OnInit, OnDestroy {
           label: 'Add two'
         }
       },
+
       { name: 'addEdit1' },
-      { name: 'addEdit' }
+      { name: 'addEdit' },
+      {
+        name: 'export-excel',
+        wrapper: {
+          label: 'Export To Excel',
+          icon: 'pi pi-file-excel',
+          buttonStyleClass: 'p-button-outlined mr-2 mb-1'
+        }
+      }
     ];
 
     // subscribe search click to do searching

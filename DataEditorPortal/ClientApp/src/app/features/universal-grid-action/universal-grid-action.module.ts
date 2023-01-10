@@ -34,6 +34,7 @@ import { UniversalGridActionDirective } from './directives/universal-grid-action
 import { EditRecordActionComponent } from './components/edit-record-action/edit-record-action.component';
 import { ActionWrapperComponent } from './components/action-wrapper/action-wrapper.component';
 import { ViewRecordActionComponent } from './components/view-record-action/view-record-action.component';
+import { ExportExcelActionComponent } from './components/export-excel-action/export-excel-action.component';
 
 export * from './models/grid-config';
 
@@ -43,7 +44,8 @@ export * from './models/grid-config';
     GridActionDirective,
     EditRecordActionComponent,
     ActionWrapperComponent,
-    ViewRecordActionComponent
+    ViewRecordActionComponent,
+    ExportExcelActionComponent
   ],
   imports: [
     CommonModule,
@@ -103,6 +105,17 @@ export * from './models/grid-config';
             header: 'View Info',
             cancelText: '',
             dialogStyle: { width: '40rem' }
+          }
+        },
+        {
+          name: 'export-excel',
+          requireGridRowSelected: true,
+          component: ExportExcelActionComponent,
+          wrapper: {
+            header: 'Export to Excel',
+            dialogStyle: { width: '40rem' },
+            cancelText: 'Cancel',
+            okText: 'Export'
           }
         }
       ]

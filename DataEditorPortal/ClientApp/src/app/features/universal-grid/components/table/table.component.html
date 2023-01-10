@@ -36,10 +36,7 @@
             [actions]="actions"
             [selectedRecords]="selectedRecords"
             (savedEvent)="onRefresh()"></ng-template>
-          <p-button
-            label="Export To Excel"
-            icon="pi pi-file-excel"
-            styleClass="p-button-outlined mr-2 mb-1"></p-button>
+
           <p-button
             *ngIf="selectedRecords.length > 0"
             label="Remove"
