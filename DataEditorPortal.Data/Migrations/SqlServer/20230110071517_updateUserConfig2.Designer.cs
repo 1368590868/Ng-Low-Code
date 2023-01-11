@@ -4,14 +4,16 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20230110071517_updateUserConfig2")]
+    partial class updateUserConfig2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,7 +34,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("Icon")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Label")
+                    b.Property<string>("Lable")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -58,7 +60,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         {
                             Id = new Guid("4e22e18e-492e-4786-8170-fb8f0c9d3a62"),
                             Icon = "pi pi-fw pi-user",
-                            Label = "User Management",
+                            Lable = "User Management",
                             Name = "UserManagement",
                             Order = 0,
                             Type = "PortalItem"

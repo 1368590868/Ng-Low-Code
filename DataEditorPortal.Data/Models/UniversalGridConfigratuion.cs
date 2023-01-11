@@ -15,8 +15,7 @@ namespace DataEditorPortal.Data.Models
 
         public string SearchConfig { get; set; }
 
-        public bool UseCustomDetailDialog { get; set; }
-        public string DetailDialogConfig { get; set; }
+        public string DetailConfig { get; set; }
 
         public Guid CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

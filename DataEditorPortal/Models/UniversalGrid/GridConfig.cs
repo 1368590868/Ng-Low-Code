@@ -6,27 +6,22 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
     {
         public string Name { get; set; }
 
+        public string Caption { get; set; }
         public string Description { get; set; }
-
-        public string ListQuery { get; set; }
-
-        public string DetailsQuery { get; set; }
-
-        public List<GridColConfig> Columns { get; set; } = new List<GridColConfig>();
-
-        public List<SearchConfig> SearchConfig { get; set; } = new List<SearchConfig>();
+        public string DataKey { get; set; }
     }
 
-    public class SearchConfig
+    public class FormFieldConfig
     {
-        // basic info
         public string key { get; set; }
         public string type { get; set; }
         public object props { get; set; }
 
         // advance field dependence
         public string dependOnFields { get; set; }
-
+    }
+    public class SearchFieldConfig : FormFieldConfig
+    {
         // search rule
         public SearchFieldFilterRule searchRule { get; set; }
     }
@@ -60,6 +55,15 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public List<string> Columns { get; set; } = new List<string>();
         public List<SortParam> SortBy { get; set; } = new List<SortParam>();
         public List<FilterParam> Filters { get; set; } = new List<FilterParam>();
+
+        public string QueryText { get; set; }
+    }
+
+    public class DetailConfig
+    {
+        public bool UseCustomAction { get; set; }
+        public string CustomActionName { get; set; }
+        public List<FormFieldConfig> FormConfig { get; set; }
 
         public string QueryText { get; set; }
     }

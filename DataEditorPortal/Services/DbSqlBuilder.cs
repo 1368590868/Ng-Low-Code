@@ -9,12 +9,14 @@ namespace DataEditorPortal.Web.Services
     {
         // string GenerateWhereClause(List<FilterParam> filterParams);
         //string GenerateOrderClause(List<SortParam> sortParams);
-        string GenerateSqlText(DataSourceConfig config);
+        string GenerateSqlTextForList(DataSourceConfig config);
         string UsePagination(string query, int startIndex, int indexCount);
         string UseOrderBy(string query, List<SortParam> sortParams);
         string UseCount(string query);
         string UseFilters(string query, List<FilterParam> filterParams);
         string UseSearches(string query, List<SearchParam> filterParams);
+
+        string GenerateSqlTextForDetail(DataSourceConfig config);
     }
 
     public class DbSqlServerBuilder : IDbSqlBuilder
@@ -166,7 +168,7 @@ namespace DataEditorPortal.Web.Services
             return orderby;
         }
 
-        public string GenerateSqlText(DataSourceConfig config)
+        public string GenerateSqlTextForList(DataSourceConfig config)
         {
             if (config.QueryText != null)
             {
@@ -275,6 +277,25 @@ namespace DataEditorPortal.Web.Services
             }
 
             return $"SELECT COUNT(*) FROM ({queryWithoutOrderBy}) A";
+        }
+
+        public string GenerateSqlTextForDetail(DataSourceConfig config)
+        {
+            if (config.QueryText != null)
+            {
+                // advanced datasource, ingore other setting.
+                return config.QueryText;
+            }
+            else
+            {
+                var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
+
+                var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
+
+                var queryText = $@"SELECT {columns} FROM dep.{config.TableName} WHERE {where}";
+
+                return queryText;
+            }
         }
     }
 }

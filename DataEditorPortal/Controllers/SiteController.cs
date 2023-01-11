@@ -75,7 +75,7 @@ namespace DataEditorPortal.Web.Controllers
                             {
                                 id = m.Id,
                                 name = m.Name,
-                                label = m.Lable,
+                                label = m.Label,
                                 icon = m.Icon,
                                 title = m.Description,
                                 routerLink = new string[] { $"/portal-item/{m.Name.ToLower()}" }
@@ -85,7 +85,7 @@ namespace DataEditorPortal.Web.Controllers
                     {
                         id = x.Id,
                         name = x.Name,
-                        label = x.Lable,
+                        label = x.Label,
                         icon = x.Icon,
                         title = x.Description,
                         items = items.Any() ? items : null,

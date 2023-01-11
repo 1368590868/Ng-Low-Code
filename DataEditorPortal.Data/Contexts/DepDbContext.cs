@@ -135,6 +135,65 @@ namespace DataEditorPortal.Data.Contexts
                                 matchMode = "contains"
                             }
                         }
+                    }),
+
+                    DetailConfig = JsonSerializer.Serialize(new
+                    {
+                        UseCustomAction = false,
+                        FormConfig = new object[] {
+                            new {
+                                key = "Username",
+                                type = "input",
+                                props = new {
+                                    label = "CNP ID",
+                                    placeholder = "CNP ID",
+                                    required= true
+                                }
+                            },
+                            new {
+                                key = "Name",
+                                type = "input",
+                                props = new {
+                                    label = "Name",
+                                    placeholder = "Name",
+                                    required= true
+                                }
+                            },
+                            new {
+                                key = "Email",
+                                type = "input",
+                                props = new {
+                                    label = "Email",
+                                    placeholder = "Email",
+                                    required= true
+                                }
+                            },
+                            new {
+                                key = "Phone",
+                                type = "input",
+                                props = new {
+                                    label = "Phone",
+                                    placeholder = "Phone",
+                                    required= true
+                                }
+                            },
+                            new {
+                                key = "Vendor",
+                                type = "input",
+                                props = new {
+                                    label = "Vendor",
+                                    placeholder = "Vendor"
+                                }
+                            },
+                            new {
+                                key = "Employer",
+                                type = "input",
+                                props = new {
+                                    label = "Employer",
+                                    placeholder = "Employer"
+                                }
+                            }
+                        }
                     })
                 }
             );
@@ -143,7 +202,7 @@ namespace DataEditorPortal.Data.Contexts
                 {
                     Id = new Guid("4E22E18E-492E-4786-8170-FB8F0C9D3A62"),
                     Name = "UserManagement",
-                    Lable = "User Management",
+                    Label = "User Management",
                     Icon = "pi pi-fw pi-user",
                     Type = "PortalItem"
                 }
