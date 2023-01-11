@@ -60,7 +60,7 @@ export class TableComponent implements OnInit, OnDestroy {
         wrapper: {
           label: 'Export To Excel',
           icon: 'pi pi-file-excel',
-          buttonStyleClass: 'p-button-outlined mr-2 mb-1'
+          buttonStyleClass: 'p-button-outlined'
         }
       },
       {
