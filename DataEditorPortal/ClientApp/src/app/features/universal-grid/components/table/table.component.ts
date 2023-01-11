@@ -62,6 +62,14 @@ export class TableComponent implements OnInit, OnDestroy {
           icon: 'pi pi-file-excel',
           buttonStyleClass: 'p-button-outlined mr-2 mb-1'
         }
+      },
+      {
+        name: 'remove-record',
+        wrapper: {
+          label: 'Remove',
+          icon: 'pi pi-trash',
+          buttonStyleClass: 'p-button-outlined p-button-danger'
+        }
       }
     ];
 

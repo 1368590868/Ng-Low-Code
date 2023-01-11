@@ -35,6 +35,7 @@ import { EditRecordActionComponent } from './components/edit-record-action/edit-
 import { ActionWrapperComponent } from './components/action-wrapper/action-wrapper.component';
 import { ViewRecordActionComponent } from './components/view-record-action/view-record-action.component';
 import { ExportExcelActionComponent } from './components/export-excel-action/export-excel-action.component';
+import { RemoveActionComponent } from './components/remove-action/remove-action.component';
 
 export * from './models/grid-config';
 
@@ -45,7 +46,8 @@ export * from './models/grid-config';
     EditRecordActionComponent,
     ActionWrapperComponent,
     ViewRecordActionComponent,
-    ExportExcelActionComponent
+    ExportExcelActionComponent,
+    RemoveActionComponent
   ],
   imports: [
     CommonModule,
@@ -120,9 +122,19 @@ export * from './models/grid-config';
           component: ExportExcelActionComponent,
           wrapper: {
             header: 'Export to Excel',
-            dialogStyle: { width: '40rem' },
             cancelText: 'Cancel',
             okText: 'Export'
+          }
+        },
+        {
+          name: 'remove-record',
+          requireGridRowSelected: true,
+          component: RemoveActionComponent,
+          wrapper: {
+            header: 'Delete Confirmation',
+            dialogStyle: { width: '40rem' },
+            cancelText: 'No',
+            okText: 'Yes'
           }
         }
       ]
