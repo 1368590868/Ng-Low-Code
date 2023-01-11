@@ -36,6 +36,8 @@ import { ActionWrapperComponent } from './components/action-wrapper/action-wrapp
 import { ViewRecordActionComponent } from './components/view-record-action/view-record-action.component';
 import { ExportExcelActionComponent } from './components/export-excel-action/export-excel-action.component';
 import { RemoveActionComponent } from './components/remove-action/remove-action.component';
+import { UserManagerActionComponent } from './components/user-manager-action/user-manager-action.component';
+import { PanelWrapperComponent } from './components/user-manager-action/panel-warpper.component';
 
 export * from './models/grid-config';
 
@@ -47,7 +49,9 @@ export * from './models/grid-config';
     ActionWrapperComponent,
     ViewRecordActionComponent,
     ExportExcelActionComponent,
-    RemoveActionComponent
+    RemoveActionComponent,
+    UserManagerActionComponent,
+    PanelWrapperComponent
   ],
   imports: [
     CommonModule,
@@ -56,7 +60,8 @@ export * from './models/grid-config';
     FormlyModule.forRoot({
       validationMessages: [
         { name: 'required', message: 'This field is required' }
-      ]
+      ],
+      wrappers: [{ name: 'panel', component: PanelWrapperComponent }]
     }),
     FormlyPrimeNGModule,
     FormlyDatepickerModule,
@@ -132,6 +137,17 @@ export * from './models/grid-config';
           component: RemoveActionComponent,
           wrapper: {
             header: 'Delete Confirmation',
+            dialogStyle: { width: '40rem' },
+            cancelText: 'No',
+            okText: 'Yes'
+          }
+        },
+        {
+          name: 'user-manager',
+          requireGridRowSelected: false,
+          component: UserManagerActionComponent,
+          wrapper: {
+            header: 'user-manager',
             dialogStyle: { width: '40rem' },
             cancelText: 'No',
             okText: 'Yes'

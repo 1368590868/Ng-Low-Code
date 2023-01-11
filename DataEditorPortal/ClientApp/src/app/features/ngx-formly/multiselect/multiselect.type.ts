@@ -6,8 +6,9 @@ import {
 } from '@ngx-formly/core';
 import { FormlyFieldProps } from '@ngx-formly/primeng/form-field';
 
-type MultiSelectProps = FormlyFieldProps;
-
+interface MultiSelectProps extends FormlyFieldProps {
+  appendTo?: string;
+}
 export interface FormlyMultiSelectFieldConfig
   extends FormlyFieldConfig<MultiSelectProps> {
   type: 'multiSelect' | Type<FormlyFieldMultiSelectComponent>;
@@ -26,7 +27,8 @@ export interface FormlyMultiSelectFieldConfig
       [virtualScroll]="true"
       [virtualScrollItemSize]="30"
       [showToggleAll]="false"
-      [filter]="true">
+      [filter]="true"
+      [appendTo]="props.appendTo">
     </p-multiSelect>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush

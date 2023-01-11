@@ -84,6 +84,13 @@ export class TableComponent implements OnInit, OnDestroy {
           icon: 'pi pi-trash',
           buttonStyleClass: 'p-button-outlined p-button-danger'
         }
+      },
+      {
+        name: 'user-manager',
+        wrapper: {
+          label: 'User Manager',
+          icon: 'pi pi-plus'
+        }
       }
     ];
 
