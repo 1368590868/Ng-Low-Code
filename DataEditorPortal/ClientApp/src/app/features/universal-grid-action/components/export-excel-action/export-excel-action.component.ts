@@ -1,7 +1,11 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { catchError } from 'rxjs';
+import { NotifyService } from 'src/app/core/utils/notify.service';
 import { GridActionDirective } from '../../directives/grid-action.directive';
+import { ExportActionService } from '../../export-services//export-action.service';
+import { ExportForm } from '../../models/export';
 
 @Component({
   selector: 'app-export-excel-action',
@@ -16,7 +20,7 @@ export class ExportExcelActionComponent extends GridActionDirective {
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [
     {
-      key: 'Input',
+      key: 'fileName',
       type: 'input',
       props: {
         label: 'File Name',
@@ -26,7 +30,7 @@ export class ExportExcelActionComponent extends GridActionDirective {
       }
     },
     {
-      key: 'Radio',
+      key: 'exportOption',
       type: 'radio',
       defaultValue: 'Selection',
       props: {
@@ -42,12 +46,29 @@ export class ExportExcelActionComponent extends GridActionDirective {
     }
   ];
 
-  onFormSubmit(model: any) {
+  constructor(
+    private exportActionService: ExportActionService,
+    private notifyService: NotifyService
+  ) {
+    super();
+  }
+
+  onFormSubmit(model: ExportForm) {
     if (this.form.valid) {
-      console.log(model);
-      setTimeout(() => {
-        this.savedEvent.emit();
-      }, 1000);
+      this.exportActionService
+        .exportFile(model)
+        .pipe(
+          catchError(err => {
+            this.errorEvent.emit();
+            return this.notifyService.notifyErrorInPipe(err, false);
+          })
+        )
+        .subscribe(res => {
+          if (res) {
+            this.notifyService.notifySuccess('Success', 'Export Success');
+            this.savedEvent.emit();
+          }
+        });
     } else {
       this.errorEvent.emit();
     }
