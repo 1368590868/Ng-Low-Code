@@ -18,7 +18,6 @@ export interface GridFilterParam extends FilterMetadata {
 
 export interface GridResult {
   total: number;
-  errormessage: string;
   data: GridData[];
 }
 

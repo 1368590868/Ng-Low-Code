@@ -1,6 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Observable, of } from 'rxjs';
+import { ApiResponse } from '../models/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -43,11 +45,17 @@ export class NotifyService {
     });
   }
 
-  notifyErrorInPipe<T>(
-    err: any,
-    returnData?: { data: []; total: 0 } | any
-  ): Observable<T> {
+  notifyErrorInPipe<T>(err: HttpErrorResponse, returnData: T): Observable<T> {
     this.notifyError(err.name || err.statusText, err.message || err.error);
-    return of(returnData);
+    return of<T>(returnData);
+  }
+
+  processErrorInPipe<T>(res: ApiResponse<T>): void {
+    if (res.isError && res.responseException?.exceptionMessage) {
+      this.notifyError(
+        'Operation failed',
+        res.responseException?.exceptionMessage
+      );
+    }
   }
 }

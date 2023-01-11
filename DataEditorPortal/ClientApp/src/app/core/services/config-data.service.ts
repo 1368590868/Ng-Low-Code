@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
+import { map, Observable, of } from 'rxjs';
+import { ApiResponse } from '../models/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +25,9 @@ export class ConfigDataService {
     return this.http.get(`${this._apiUrl}User/GetLoggedInUser`);
   }
 
-  getSiteMenus() {
-    return this.http.post(`${this._apiUrl}site/menus`, null);
+  getSiteMenus(): Observable<any> {
+    return this.http
+      .post<ApiResponse<any>>(`${this._apiUrl}site/menus`, null)
+      .pipe(map(res => res.result));
   }
 }

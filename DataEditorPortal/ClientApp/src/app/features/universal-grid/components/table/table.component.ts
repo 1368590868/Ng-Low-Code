@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
-import { catchError, Subject, takeUntil, tap } from 'rxjs';
+import { finalize, Subject, takeUntil, tap } from 'rxjs';
 import { NotifyService } from '../../../../app.module';
 import { ActivatedRoute } from '@angular/router';
 import { GridActionOption } from 'src/app/features/universal-grid-action/universal-grid-action.module';
@@ -9,7 +9,6 @@ import {
   GridConfig,
   GridParam,
   GridData,
-  GridResult,
   SearchParam
 } from '../../models/grid-types';
 import { Table } from 'primeng/table';
@@ -116,24 +115,15 @@ export class TableComponent implements OnInit, OnDestroy {
     this.gridTableService
       .getTableData(fetchParam)
       .pipe(
-        catchError(err => {
-          this.loading = false;
-          return this.notifyService.notifyErrorInPipe<GridResult>(err, {
-            data: [],
-            total: 0
-          });
-        })
-      )
-      .subscribe(res => {
-        this.loading = false;
-
-        if (res.errormessage) {
-          this.notifyService.notifyError('Operation faild', res.errormessage);
-        } else {
+        tap(res => {
           this.records = res.data;
           this.totalRecords = res.total;
-        }
-      });
+        }),
+        finalize(() => {
+          this.loading = false;
+        })
+      )
+      .subscribe();
   }
 
   getFetchParam() {
