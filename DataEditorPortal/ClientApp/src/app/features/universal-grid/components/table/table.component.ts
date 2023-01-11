@@ -1,9 +1,18 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
-import { catchError, skip, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, Subject, takeUntil, tap } from 'rxjs';
 import { NotifyService } from '../../../../app.module';
 import { ActivatedRoute } from '@angular/router';
 import { GridActionOption } from 'src/app/features/universal-grid-action/universal-grid-action.module';
+import {
+  GridColumn,
+  GridConfig,
+  GridParam,
+  GridData,
+  GridResult,
+  SearchParam
+} from '../../models/grid-types';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-table',
@@ -13,20 +22,21 @@ import { GridActionOption } from 'src/app/features/universal-grid-action/univers
 export class TableComponent implements OnInit, OnDestroy {
   destroy$ = new Subject();
 
-  records: any = [];
-  totalRecords: any = 0;
-  selectedRecords: any[] = [];
+  records: GridData[] = [];
+  totalRecords = 0;
+  selectedRecords: GridData[] = [];
 
-  searchModel: any;
+  searchModel?: SearchParam;
   lazyLoadParam: any;
 
   loading = true;
-  @ViewChild('dt') table: any;
+  @ViewChild('dt') table!: Table;
   actions: GridActionOption[] = [];
 
-  cols: any[] = [];
-  dataKey = 'Id';
+  cols: GridColumn[] = [];
   stateKey!: string;
+
+  tableConfig: GridConfig = { dataKey: 'Id' };
 
   constructor(
     private route: ActivatedRoute,
@@ -38,8 +48,13 @@ export class TableComponent implements OnInit, OnDestroy {
     this.reset();
     this.stateKey = `universal-grid-state-${this.gridTableService.currentPortalItem}`;
 
+    // get grid config
+    this.gridTableService.getTableConfig().subscribe(result => {
+      this.tableConfig = result;
+    });
+
     // get grid column
-    this.gridTableService.getTableColumns().subscribe((res: never[]) => {
+    this.gridTableService.getTableColumns().subscribe(res => {
       this.cols = res;
     });
 
@@ -103,42 +118,26 @@ export class TableComponent implements OnInit, OnDestroy {
       .pipe(
         catchError(err => {
           this.loading = false;
-          return this.notifyService.notifyErrorInPipe(err, {
+          return this.notifyService.notifyErrorInPipe<GridResult>(err, {
             data: [],
             total: 0
           });
         })
       )
-      .subscribe((res: any) => {
+      .subscribe(res => {
         this.loading = false;
 
         if (res.errormessage) {
           this.notifyService.notifyError('Operation faild', res.errormessage);
         } else {
-          const data = (res as any).data;
-          const data1 = [
-            ...data,
-            ...data,
-            ...data,
-            ...data,
-            ...data,
-            ...data,
-            ...data,
-            ...data
-          ];
-          console.log(data1);
-          const data2 = data1.map((x, index) => {
-            return { ...x, Id: Math.random() };
-          });
-          console.log(data2);
-          this.records = data;
-          this.totalRecords = 100; //(res as any).total;
+          this.records = res.data;
+          this.totalRecords = res.total;
         }
       });
   }
 
   getFetchParam() {
-    const fetchParam = {
+    const fetchParam: GridParam = {
       filters: [],
       sorts: [],
       searches: this.searchModel,
@@ -156,7 +155,7 @@ export class TableComponent implements OnInit, OnDestroy {
           for (let i = 0; i < fieldProp.length; i++) {
             if (fieldProp[i].value != null) {
               fieldProp[i].field = prop;
-              fetchParam.filters.push(fieldProp[i] as never);
+              fetchParam.filters.push(fieldProp[i]);
             }
           }
         }
@@ -178,7 +177,7 @@ export class TableComponent implements OnInit, OnDestroy {
     return fetchParam;
   }
 
-  onRowCheckBoxClick(event: any) {
+  onRowCheckBoxClick(event: MouseEvent) {
     event.stopPropagation();
   }
 

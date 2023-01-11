@@ -15,7 +15,7 @@
     (onLazyLoad)="loadTableLazy($event)"
     [value]="records"
     [(selection)]="selectedRecords"
-    [dataKey]="dataKey"
+    [dataKey]="tableConfig.dataKey"
     [rowHover]="true"
     [rows]="50"
     [showCurrentPageReport]="true"
@@ -107,7 +107,7 @@
                   }
                 }
               ]"
-              [recordKey]="dataKey"
+              [recordKey]="tableConfig.dataKey"
               [selectedRecords]="[data]"
               (savedEvent)="onRefresh()"></ng-template>
           </div>
