@@ -31,6 +31,7 @@ export class ViewRecordActionComponent
         return { name: key, value: this.selectedRecords[0][key] };
       });
       this.viewData = key;
+      this.loadedEvent.emit();
     }
   }
 }
