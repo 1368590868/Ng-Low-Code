@@ -192,6 +192,14 @@ namespace DataEditorPortal.Data.Contexts
                                     label = "Employer",
                                     placeholder = "Employer"
                                 }
+                            },
+                            new {
+                                key = "AutoEmail",
+                                type = "checkbox",
+                                props = new {
+                                    label = "Auto Email",
+                                    required= true
+                                }
                             }
                         }
                     })

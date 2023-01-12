@@ -4,14 +4,16 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20230112022811_userEditFrom")]
+    partial class userEditFrom
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,7 +173,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DataSourceConfig = "{\"TableName\":\"Users\",\"IdColumn\":\"Id\",\"Columns\":[\"Id\",\"Username\",\"Name\",\"Email\",\"Phone\",\"AutoEmail\",\"Vendor\",\"Employer\",\"Division\",\"Comments\"],\"SortBy\":[{\"field\":\"Name\",\"order\":1}]}",
-                            DetailConfig = "{\"UseCustomAction\":false,\"FormConfig\":[{\"key\":\"Username\",\"type\":\"input\",\"props\":{\"label\":\"CNP ID\",\"placeholder\":\"CNP ID\",\"required\":true}},{\"key\":\"Name\",\"type\":\"input\",\"props\":{\"label\":\"Name\",\"placeholder\":\"Name\",\"required\":true}},{\"key\":\"Email\",\"type\":\"input\",\"props\":{\"label\":\"Email\",\"placeholder\":\"Email\",\"required\":true}},{\"key\":\"Phone\",\"type\":\"input\",\"props\":{\"label\":\"Phone\",\"placeholder\":\"Phone\",\"required\":true}},{\"key\":\"Vendor\",\"type\":\"input\",\"props\":{\"label\":\"Vendor\",\"placeholder\":\"Vendor\"}},{\"key\":\"Employer\",\"type\":\"input\",\"props\":{\"label\":\"Employer\",\"placeholder\":\"Employer\"}},{\"key\":\"AutoEmail\",\"type\":\"checkbox\",\"props\":{\"label\":\"Auto Email\",\"required\":true}}]}",
+                            DetailConfig = "{\"UseCustomAction\":false,\"FormConfig\":[{\"key\":\"Username\",\"type\":\"input\",\"props\":{\"label\":\"CNP ID\",\"placeholder\":\"CNP ID\",\"required\":true}},{\"key\":\"Name\",\"type\":\"input\",\"props\":{\"label\":\"Name\",\"placeholder\":\"Name\",\"required\":true}},{\"key\":\"Email\",\"type\":\"input\",\"props\":{\"label\":\"Email\",\"placeholder\":\"Email\",\"required\":true}},{\"key\":\"Phone\",\"type\":\"input\",\"props\":{\"label\":\"Phone\",\"placeholder\":\"Phone\",\"required\":true}},{\"key\":\"Vendor\",\"type\":\"input\",\"props\":{\"label\":\"Vendor\",\"placeholder\":\"Vendor\"}},{\"key\":\"Employer\",\"type\":\"input\",\"props\":{\"label\":\"Employer\",\"placeholder\":\"Employer\"}},{\"key\":\"AutoEmail\",\"type\":\"checkbox\",\"props\":{\"label\":\"Auto Email\"}}]}",
                             Name = "UserManagement",
                             SearchConfig = "[{\"key\":\"username\",\"type\":\"input\",\"props\":{\"label\":\"CNP ID\",\"placeholder\":\"CNP ID\"},\"searchRule\":{\"field\":\"Username\",\"matchMode\":\"contains\"}},{\"key\":\"name\",\"type\":\"input\",\"props\":{\"label\":\"Name\",\"placeholder\":\"Name\"},\"searchRule\":{\"field\":\"Name\",\"matchMode\":\"contains\"}},{\"key\":\"roles\",\"type\":\"select\",\"props\":{\"label\":\"Roles\",\"placeholder\":\"Please select\",\"options\":[{\"value\":1,\"label\":\"Option 1\"},{\"value\":2,\"label\":\"Option 2\"},{\"value\":3,\"label\":\"Option 3\"},{\"value\":4,\"label\":\"Option 4\"}]},\"searchRule\":{\"whereClause\":\"Id in (select UserId from USERID_PERMISSION where PERMISSION_GRANT_ID = \\u0027{0}\\u0027)\"}},{\"key\":\"vendor\",\"type\":\"select\",\"props\":{\"label\":\"Vendor\",\"placeholder\":\"Please select\",\"options\":[{\"value\":1,\"label\":\"Option 1\"},{\"value\":2,\"label\":\"Option 2\"},{\"value\":3,\"label\":\"Option 3\"},{\"value\":4,\"label\":\"Option 4\"}]},\"searchRule\":{\"field\":\"Vendor\",\"matchMode\":\"contains\"}},{\"key\":\"employer\",\"type\":\"select\",\"props\":{\"label\":\"Employer\",\"placeholder\":\"Please select\",\"options\":[{\"value\":1,\"label\":\"Option 1\"},{\"value\":2,\"label\":\"Option 2\"},{\"value\":3,\"label\":\"Option 3\"},{\"value\":4,\"label\":\"Option 4\"}]},\"searchRule\":{\"field\":\"Employer\",\"matchMode\":\"contains\"}}]"
                         });

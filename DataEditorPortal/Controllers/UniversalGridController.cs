@@ -63,21 +63,21 @@ namespace DataEditorPortal.Web.Controllers
             return _universalGridService.GetGridDataDetail(name, id);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("{name}/data/create")]
-        public bool AddData(string name, Dictionary<string, object> model)
+        public bool AddData(string name, [FromBody] Dictionary<string, object> model)
         {
             return _universalGridService.AddGridData(name, model);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("{name}/data/{id}/update")]
-        public bool UpdateDate(string name, string id, Dictionary<string, object> model)
+        public bool UpdateDate(string name, string id, [FromBody] Dictionary<string, object> model)
         {
             return _universalGridService.UpdateGridData(name, id, model);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("{name}/data/export")]
         public IActionResult ExportData(string name, GridParam gridParam)
         {

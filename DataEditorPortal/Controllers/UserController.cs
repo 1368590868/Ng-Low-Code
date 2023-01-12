@@ -1,4 +1,5 @@
-﻿using DataEditorPortal.Data.Contexts;
+﻿using AutoWrapper.Wrappers;
+using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -110,7 +111,7 @@ namespace DataEditorPortal.Web.Controllers
             var dep_user = _depDbContext.Users.FirstOrDefault(u => u.Id == userId);
             if (dep_user == null)
             {
-                return NotFound();
+                throw new ApiException("Not Found", 404);
             }
 
             dep_user.Username = model.Username;

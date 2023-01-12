@@ -1,6 +1,8 @@
 ﻿using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,13 +31,16 @@ namespace DataEditorPortal.Web.Services
 
         private readonly DepDbContext _depDbContext;
         private readonly IDbSqlBuilder _dbSqlBuilder;
+        private readonly ILogger<UniversalGridService> _logger;
 
         public UniversalGridService(
             DepDbContext depDbContext,
-            IDbSqlBuilder dbSqlBuilder)
+            IDbSqlBuilder dbSqlBuilder,
+            ILogger<UniversalGridService> logger)
         {
             _depDbContext = depDbContext;
             _dbSqlBuilder = dbSqlBuilder;
+            _logger = logger;
         }
 
         #region Grid cofnig, columns config, search config and list data
@@ -282,13 +287,16 @@ namespace DataEditorPortal.Web.Services
                 throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }
 
-            var dataSource = new DataSourceConfig()
+            var columns = detailConfig.FormConfig
+                .Select(x => x.key)
+                .Where(x => model.Keys.Contains(x) && model[x] != null).ToList();
+
+            var queryText = _dbSqlBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
             {
                 TableName = dataSourceConfig.TableName,
-                Columns = detailConfig.FormConfig.Select(x => x.key).ToList(),
+                Columns = columns,
                 QueryText = detailConfig.QueryForInsert
-            };
-            var queryText = _dbSqlBuilder.GenerateSqlTextForInsert(dataSource);
+            });
 
             using (var con = _depDbContext.Database.GetDbConnection())
             {
@@ -300,21 +308,21 @@ namespace DataEditorPortal.Web.Services
                 {
                     cmd.CommandText = queryText;
 
-                    foreach (var column in dataSource.Columns)
+                    foreach (var column in columns)
                     {
-                        if (model.Keys.Contains(column) && model[column] != null)
-                        {
-                            var value = model[column].ToString();
-                            cmd.Parameters.Add(new { column, value });
-                        }
+                        var value = model[column].ToString();
+                        var param = cmd.CreateParameter();
+                        param.ParameterName = column;
+                        param.Value = value;
+                        cmd.Parameters.Add(param);
                     }
 
                     cmd.ExecuteNonQuery();
                 }
                 catch (Exception ex)
                 {
-                    // output.errormessage = "An Error in the query has occurred: " + ex.Message;
-                    return false;
+                    _logger.LogError(ex.Message, ex);
+                    throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
 
@@ -336,7 +344,11 @@ namespace DataEditorPortal.Web.Services
                 throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }
 
-            var dataSource = new DataSourceConfig()
+            var columns = detailConfig.FormConfig
+                .Select(x => x.key)
+                .Where(x => model.Keys.Contains(x) && model[x] != null).ToList();
+
+            var queryText = _dbSqlBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
             {
                 TableName = dataSourceConfig.TableName,
                 Columns = detailConfig.FormConfig.Select(x => x.key).ToList(),
@@ -345,8 +357,7 @@ namespace DataEditorPortal.Web.Services
                     new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "equals", value = id }
                 },
                 QueryText = detailConfig.QueryForUpdate
-            };
-            var queryText = _dbSqlBuilder.GenerateSqlTextForUpdate(dataSource);
+            });
 
             using (var con = _depDbContext.Database.GetDbConnection())
             {
@@ -358,21 +369,21 @@ namespace DataEditorPortal.Web.Services
                 {
                     cmd.CommandText = queryText;
 
-                    foreach (var column in dataSource.Columns)
+                    foreach (var column in columns)
                     {
-                        if (model.Keys.Contains(column) && model[column] != null)
-                        {
-                            var value = model[column].ToString();
-                            cmd.Parameters.Add(new { column, value });
-                        }
+                        var value = model[column].ToString();
+                        var param = cmd.CreateParameter();
+                        param.ParameterName = column;
+                        param.Value = value;
+                        cmd.Parameters.Add(param);
                     }
 
                     cmd.ExecuteNonQuery();
                 }
                 catch (Exception ex)
                 {
-                    // output.errormessage = "An Error in the query has occurred: " + ex.Message;
-                    return false;
+                    _logger.LogError(ex.Message, ex);
+                    throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
 

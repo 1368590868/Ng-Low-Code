@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DataEditorPortal.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataEditorPortal.Data.Contexts
 {
@@ -13,6 +14,11 @@ namespace DataEditorPortal.Data.Contexts
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.HasDefaultSchema("dep");
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            });
         }
     }
 }

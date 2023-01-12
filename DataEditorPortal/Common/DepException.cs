@@ -4,9 +4,9 @@ namespace DataEditorPortal.Web.Common
 {
     public class DepException : ApiException
     {
-        public DepException(string msg) : base(msg)
+        public DepException(string msg, string title = "Error")
+            : base(new { exceptionTitle = title, exceptionMessage = msg }, 500)
         {
-            StatusCode = 200;
         }
     }
 }
