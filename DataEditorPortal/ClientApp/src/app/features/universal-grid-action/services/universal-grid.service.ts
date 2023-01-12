@@ -37,7 +37,7 @@ export class UniversalGridService {
   }
 
   addGridData(data: EditFormData): Observable<ApiResponse<boolean>> {
-    return this.http.post<ApiResponse<boolean>>(
+    return this.http.put<ApiResponse<boolean>>(
       `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/create`,
       data
     );
@@ -50,6 +50,13 @@ export class UniversalGridService {
     return this.http.post<ApiResponse<boolean>>(
       `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/${id}/update`,
       data
+    );
+  }
+
+  deleteGridData(ids: string[]): Observable<ApiResponse<boolean>> {
+    return this.http.post<ApiResponse<boolean>>(
+      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/batch-delete`,
+      { ids }
     );
   }
 }

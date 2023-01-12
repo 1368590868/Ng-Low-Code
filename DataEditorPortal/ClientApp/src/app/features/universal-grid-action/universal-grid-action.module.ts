@@ -141,7 +141,6 @@ export * from './models/grid-config';
           component: RemoveActionComponent,
           wrapper: {
             header: 'Delete Confirmation',
-            dialogStyle: { width: '40rem' },
             cancelText: 'No',
             okText: 'Yes'
           }

@@ -176,6 +176,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   onRefresh() {
+    this.selectedRecords = [];
     this.table.reset();
   }
 

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NotifyService } from 'src/app/core/utils/notify.service';
 import { GridActionDirective } from '../../directives/grid-action.directive';
-import { RemoveActionService } from '../../services/remove-services/remove-action.service';
+import { UniversalGridService } from '../../services/universal-grid.service';
 
 @Component({
   selector: 'app-remove-action',
@@ -10,17 +10,20 @@ import { RemoveActionService } from '../../services/remove-services/remove-actio
 })
 export class RemoveActionComponent extends GridActionDirective {
   constructor(
-    private removeActionService: RemoveActionService,
+    private gridService: UniversalGridService,
     private notifyService: NotifyService
   ) {
     super();
   }
   onSave(): void {
-    this.removeActionService
-      .removeTableData(this.selectedRecords)
+    this.gridService
+      .deleteGridData(this.selectedRecords.map((x: any) => x[this.recordKey]))
       .subscribe(res => {
         if (!res.isError && res.result) {
-          this.notifyService.notifySuccess('Success', 'Remove Success');
+          this.notifyService.notifySuccess(
+            'Success',
+            'Remove Successfully Completed.'
+          );
           this.savedEvent.emit();
         } else {
           this.errorEvent.emit();
