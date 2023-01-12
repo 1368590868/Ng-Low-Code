@@ -38,6 +38,7 @@ import { ExportExcelActionComponent } from './components/export-excel-action/exp
 import { RemoveActionComponent } from './components/remove-action/remove-action.component';
 import { UserManagerActionComponent } from './components/user-manager-action/user-manager-action.component';
 import { PanelWrapperComponent } from './components/user-manager-action/panel-warpper.component';
+import { FormlySelectModule } from '../ngx-formly/select/select.module';
 
 export * from './models/grid-config';
 
@@ -66,6 +67,7 @@ export * from './models/grid-config';
     FormlyPrimeNGModule,
     FormlyDatepickerModule,
     FormlyMultiSelectModule,
+    FormlySelectModule,
     // primeNg
     AnimateModule,
     ToastModule,

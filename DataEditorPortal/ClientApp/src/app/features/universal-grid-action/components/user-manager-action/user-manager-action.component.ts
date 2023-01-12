@@ -57,10 +57,11 @@ export class UserManagerActionComponent extends GridActionDirective {
         {
           className: 'w-6 pl-2',
           key: 'town3',
-          type: 'input',
+          type: 'inputMask',
           props: {
             required: true,
             type: 'text',
+            mask: '(999) 999-9999',
             label: 'Phone',
             placeholder: 'Phone'
           }
@@ -94,13 +95,14 @@ export class UserManagerActionComponent extends GridActionDirective {
                 value: 4,
                 label: 'Option 4'
               }
-            ]
+            ],
+            appendTo: 'body'
           }
         },
         {
           className: 'w-6 ml-2',
           key: 'employer',
-          type: 'multiSelect',
+          type: 'select',
           props: {
             label: 'Employer',
             placeholder: 'Please select',

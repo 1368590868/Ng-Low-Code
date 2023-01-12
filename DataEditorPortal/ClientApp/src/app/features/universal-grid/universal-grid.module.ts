@@ -8,6 +8,7 @@ import { FormlyModule } from '@ngx-formly/core';
 import { FormlyPrimeNGModule } from '@ngx-formly/primeng';
 import { FormlyDatepickerModule } from '../ngx-formly/datepicker';
 import { FormlyMultiSelectModule } from '../ngx-formly/multiselect';
+import { FormlyInputMaskModule } from '../ngx-formly/inputMask';
 
 import { UniversalGridRoutingModule } from './universal-grid-routing.module';
 import { UniversalGridComponent } from './universal-grid.component';
@@ -54,6 +55,7 @@ import { ButtonModule } from 'primeng/button';
     FormlyPrimeNGModule,
     FormlyDatepickerModule,
     FormlyMultiSelectModule,
+    FormlyInputMaskModule,
     UniversalGridRoutingModule,
     UniversalGridActionModule,
     // primeNg
