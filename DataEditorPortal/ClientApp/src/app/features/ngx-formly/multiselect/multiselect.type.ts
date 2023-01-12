@@ -8,6 +8,8 @@ import { FormlyFieldProps } from '@ngx-formly/primeng/form-field';
 
 interface MultiSelectProps extends FormlyFieldProps {
   appendTo?: string;
+  virtualScroll: boolean;
+  virtualScrollItemSize: number;
 }
 export interface FormlyMultiSelectFieldConfig
   extends FormlyFieldConfig<MultiSelectProps> {
@@ -24,8 +26,8 @@ export interface FormlyMultiSelectFieldConfig
       [formlyAttributes]="field"
       [showClear]="!props.required"
       (onChange)="props.change && props.change(field, $event)"
-      [virtualScroll]="true"
-      [virtualScrollItemSize]="30"
+      [virtualScroll]="props.virtualScroll"
+      [virtualScrollItemSize]="props.virtualScrollItemSize"
       [showToggleAll]="false"
       [filter]="true"
       [appendTo]="props.appendTo">
