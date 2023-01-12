@@ -1,10 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { catchError } from 'rxjs';
 import { NotifyService } from 'src/app/core/utils/notify.service';
 import { GridActionDirective } from '../../directives/grid-action.directive';
-import { ExportActionService } from '../../export-services//export-action.service';
+import { ExportActionService } from '../../services/export-services/export-action.service';
 import { ExportForm } from '../../models/export';
 
 @Component({
@@ -55,20 +54,14 @@ export class ExportExcelActionComponent extends GridActionDirective {
 
   onFormSubmit(model: ExportForm) {
     if (this.form.valid) {
-      this.exportActionService
-        .exportFile(model)
-        .pipe(
-          catchError(err => {
-            this.errorEvent.emit();
-            return this.notifyService.notifyErrorInPipe(err, false);
-          })
-        )
-        .subscribe(res => {
-          if (res) {
-            this.notifyService.notifySuccess('Success', 'Export Success');
-            this.savedEvent.emit();
-          }
-        });
+      this.exportActionService.exportFile(model).subscribe(res => {
+        if (!res.isError && res.result) {
+          this.notifyService.notifySuccess('Success', 'Export Success');
+          this.savedEvent.emit();
+        } else {
+          this.errorEvent.emit();
+        }
+      });
     } else {
       this.errorEvent.emit();
     }

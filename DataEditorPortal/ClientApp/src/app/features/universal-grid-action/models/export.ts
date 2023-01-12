@@ -1,4 +1,6 @@
 export interface Export {
+  isError?: boolean;
+  result?: string;
   name?: string;
 }
 

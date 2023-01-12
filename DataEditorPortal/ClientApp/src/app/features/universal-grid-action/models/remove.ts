@@ -1,4 +1,4 @@
 export interface RemoveData {
-  error?: string;
+  isError?: string;
   result?: string;
 }
