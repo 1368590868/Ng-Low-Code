@@ -1,4 +1,5 @@
-﻿using DataEditorPortal.Web.Models.UniversalGrid;
+﻿using AutoWrapper.Filters;
+using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -100,70 +101,12 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("{name}/data/export")]
-        public IActionResult ExportData(string name, GridParam gridParam)
+        [AutoWrapIgnore]
+        public IActionResult ExportData(string name, [FromBody] ExportParam exportParam)
         {
-            var columns = new List<GridColConfig>() {
-                new GridColConfig()
-                {
-                    field = "UserId",
-                    header = "CNP ID",
-                    width = "130px",
-                    filterType = "text"
-                },
-                new GridColConfig()
-                {
-                    field = "Name",
-                    header = "Name",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Email",
-                    header = "Email",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Phone",
-                    header = "Phone",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "AutoEmail",
-                    header = "Auto Email",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Vendor",
-                    header = "Vendor",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Employer",
-                    header = "Employer",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Division",
-                    header = "Division",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Comments",
-                    header = "Comments",
-                    width = "250px",
-                    filterType = "text"
-                }
-            };
+            var fs = _universalGridService.ExportExcel(name, exportParam);
 
-            // _universalGridService.
-
-            return new JsonResult(columns);
+            return File(fs, "application/ms-excel", exportParam.FileName);
         }
     }
 }

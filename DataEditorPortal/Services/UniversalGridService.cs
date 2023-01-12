@@ -1,10 +1,12 @@
 ﻿using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 
@@ -14,14 +16,13 @@ namespace DataEditorPortal.Web.Services
     {
         GridConfig GetGridConfig(string name);
         List<GridColConfig> GetGridColumnsConfig(string name);
-
         List<SearchFieldConfig> GetGridSearchConfig(string name);
         List<FormFieldConfig> GetGridDetailConfig(string name);
 
         GridData GetGridData(string name, GridParam param);
+        MemoryStream ExportExcel(string name, ExportParam param);
 
         Dictionary<string, string> GetGridDataDetail(string name, string id);
-
         bool UpdateGridData(string name, string id, Dictionary<string, object> model);
         bool AddGridData(string name, Dictionary<string, object> model);
         bool DeleteGridData(string name, string[] ids);
@@ -190,6 +191,88 @@ namespace DataEditorPortal.Web.Services
             result.ForEach(x => x.searchRule = null);
 
             return result;
+        }
+
+        public MemoryStream ExportExcel(string name, ExportParam param)
+        {
+            var columns = GetGridColumnsConfig(name);
+
+            var result = GetGridData(name, param);
+
+            List<DataParam> sheetData = new List<DataParam>();
+
+            var sheet = new SheetParam() { Name = "Data", ID = 1, ColumnParams = new List<ColumnOptions>() };
+
+            #region add header
+            var colIndex = 0;
+            foreach (var item in columns)
+            {
+                colIndex++;
+                DataParam header = new DataParam()
+                {
+                    C2 = colIndex,
+                    R2 = 1,
+                    Text = item.header,
+                    Type = "String",
+                    FormatCell = new FormatOptions() { WrapText = true, BackGroundColor = "cccccc" }
+                };
+                sheet.ColumnParams.Add(new ColumnOptions() { Index2 = colIndex, Width = 20 });
+                sheetData.Add(header);
+            }
+            #endregion
+
+            #region add data
+            var rowIndex = 1;
+            foreach (var row in result.Data)
+            {
+                colIndex = 0;
+                rowIndex++;
+                foreach (var item in columns)
+                {
+                    try
+                    {
+                        colIndex++;
+                        DataParam data = new DataParam()
+                        {
+                            C2 = colIndex,
+                            R2 = rowIndex,
+                            Text = row[item.field],
+                            Type = item.filterType
+                        };
+                        sheetData.Add(data);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.Message, ex);
+                    }
+                }
+            }
+            #endregion
+
+            sheet.FilterParam = new List<AutoFilterOptions>
+            {
+                new AutoFilterOptions()
+                {
+                    FromRow = 1,
+                    ToRow = rowIndex,
+                    FromColumn = 1,
+                    ToColumn = sheet.ColumnParams.Count
+                }
+            };
+
+            string outputFile = Path.Combine("C:\\Temp", System.Guid.NewGuid().ToString() + ".xlsx");
+            var exp = new Exporters();
+            exp.Addsheet(sheet, sheetData, outputFile);
+
+            var fs = new MemoryStream();
+            var f = System.IO.File.OpenRead(outputFile);
+            f.CopyTo(fs);
+            fs.Seek(0, SeekOrigin.Begin);
+            f.Close();
+            f.Dispose();
+
+            System.IO.File.Delete(outputFile);
+            return fs;
         }
 
         #endregion

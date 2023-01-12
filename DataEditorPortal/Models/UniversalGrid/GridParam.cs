@@ -5,9 +5,9 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class GridParam
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string WorkType { get; set; }
+        //public string Name { get; set; }
+        //public string Description { get; set; }
+        //public string WorkType { get; set; }
 
         public Dictionary<string, object> Searches { get; set; } = new Dictionary<string, object>();
         public List<FilterParam> Filters { get; set; } = new List<FilterParam>();
@@ -16,10 +16,16 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public int StartIndex { get; set; }
         public int IndexCount { get; set; }
 
-        public string AppendFilter { get; set; }
+        //public string AppendFilter { get; set; }
 
         //public List<GridColConfig> GridColumns { get; set; } = new List<GridColConfig>();
         //public List<string> SelectedIDs { get; set; }
+    }
+
+    public class ExportParam : GridParam
+    {
+        public string FileName { get; set; }
+        public List<string> SelectedIDs { get; set; }
     }
 
     public class FilterParam
