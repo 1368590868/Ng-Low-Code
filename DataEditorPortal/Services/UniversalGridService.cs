@@ -24,6 +24,7 @@ namespace DataEditorPortal.Web.Services
 
         bool UpdateGridData(string name, string id, Dictionary<string, object> model);
         bool AddGridData(string name, Dictionary<string, object> model);
+        bool DeleteGridData(string name, string[] ids);
     }
 
     public class UniversalGridService : IUniversalGridService
@@ -389,6 +390,53 @@ namespace DataEditorPortal.Web.Services
 
             return true;
         }
+
+        public bool DeleteGridData(string name, string[] ids)
+        {
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+
+            // get detail config
+            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+            if (detailConfig.UseCustomAction)
+            {
+                throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
+
+            var queryText = _dbSqlBuilder.GenerateSqlTextForDelete(new DataSourceConfig()
+            {
+                TableName = dataSourceConfig.TableName,
+                Filters = new List<FilterParam>()
+                {
+                    new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "in", value = $"'{string.Join("','", ids)}'" }
+                },
+                QueryText = detailConfig.QueryForDelete
+            });
+
+            using (var con = _depDbContext.Database.GetDbConnection())
+            {
+                con.Open();
+                var cmd = con.CreateCommand();
+                cmd.Connection = con;
+
+                try
+                {
+                    cmd.CommandText = queryText;
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, ex);
+                    throw new DepException("An Error in the query has occurred: " + ex.Message);
+                }
+            }
+
+            return true;
+        }
+
         #endregion
     }
 }

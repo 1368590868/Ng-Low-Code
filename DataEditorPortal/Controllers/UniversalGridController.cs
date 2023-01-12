@@ -3,6 +3,8 @@ using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -63,7 +65,7 @@ namespace DataEditorPortal.Web.Controllers
             return _universalGridService.GetGridDataDetail(name, id);
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("{name}/data/create")]
         public bool AddData(string name, [FromBody] Dictionary<string, object> model)
         {
@@ -75,6 +77,25 @@ namespace DataEditorPortal.Web.Controllers
         public bool UpdateDate(string name, string id, [FromBody] Dictionary<string, object> model)
         {
             return _universalGridService.UpdateGridData(name, id, model);
+        }
+
+        [HttpDelete]
+        [Route("{name}/data/{id}/delete")]
+        public bool DeleteDate(string name, string id)
+        {
+            return _universalGridService.DeleteGridData(name, new string[] { id });
+        }
+
+        [HttpPost]
+        [Route("{name}/data/batch-delete")]
+        public bool BatchDeleteDate(string name, [FromBody] JsonDocument model)
+        {
+            var ids = model.RootElement
+                .GetProperty("ids")
+                .EnumerateArray()
+                .Select(x => x.GetString())
+                .ToArray();
+            return _universalGridService.DeleteGridData(name, ids);
         }
 
         [HttpPost]

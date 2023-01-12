@@ -18,6 +18,7 @@ namespace DataEditorPortal.Web.Services
         string GenerateSqlTextForDetail(DataSourceConfig config);
         string GenerateSqlTextForInsert(DataSourceConfig config);
         string GenerateSqlTextForUpdate(DataSourceConfig config);
+        string GenerateSqlTextForDelete(DataSourceConfig config);
     }
 
     public class DbSqlServerBuilder : IDbSqlBuilder
@@ -127,6 +128,11 @@ namespace DataEditorPortal.Web.Services
                     //Get Date
                     result = $"{field} <= {value}";
                     break;
+
+                case "in":
+                    result = $"{field} IN ({value})";
+                    break;
+
                 default:
                     break;
             }
@@ -337,6 +343,25 @@ namespace DataEditorPortal.Web.Services
                 var where = string.Join(" AND ", GenerateWhereClause(config.Filters));
 
                 var queryText = $@"UPDATE dep.{config.TableName} SET {sets} WHERE {where}";
+
+                return queryText;
+            }
+        }
+
+        public string GenerateSqlTextForDelete(DataSourceConfig config)
+        {
+            if (config.QueryText != null)
+            {
+                // advanced datasource, ingore other setting.
+                return config.QueryText;
+            }
+            else
+            {
+                if (config.Filters.Count <= 0) throw new Exception("Filters can not be empty during generating delete script.");
+
+                var where = string.Join(" AND ", GenerateWhereClause(config.Filters));
+
+                var queryText = $@"DELETE FROM dep.{config.TableName} WHERE {where}";
 
                 return queryText;
             }
