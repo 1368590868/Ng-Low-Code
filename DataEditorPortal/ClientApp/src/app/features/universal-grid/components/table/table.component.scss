@@ -6,7 +6,7 @@
   .data-table {
     ::ng-deep {
       .p-datatable {
-        padding: 0rem 1rem 0 1rem;
+        padding: 0rem 0.75rem 0 0.75rem;
       }
       .p-datatable-wrapper {
         overflow-x: auto;
@@ -24,6 +24,14 @@
       }
       .p-datatable-loading-overlay {
         z-index: 12;
+      }
+
+      .row-actions {
+        .p-button.p-button-icon-only.p-button-rounded {
+          height: 1.625rem;
+          width: 1.625rem;
+          padding: 0.30375rem 0.4375rem;
+        }
       }
     }
   }

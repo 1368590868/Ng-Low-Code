@@ -1,12 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import {
-  FormlyFieldConfig,
-  FormlyFieldProps,
-  FormlyFormOptions
-} from '@ngx-formly/core';
+import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
+import { SearchParam } from '../../models/grid-types';
 import { GridTableService } from '../../services/grid-table.service';
 
 @Component({
@@ -29,10 +26,10 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // subscribe route change to get search config
-    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((param: any) => {
-      if (param && param.name) {
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(param => {
+      if (param && param['name']) {
         // get search config
-        this.gridTableService.getSearchConfig().subscribe((result: any) => {
+        this.gridTableService.getSearchConfig().subscribe(result => {
           // this.options.resetModel?.();
           this.model = {};
           this.fields = result;
@@ -46,7 +43,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSubmit(model: any) {
+  onSubmit(model: SearchParam) {
     console.log(model);
     if (this.form.valid) {
       this.gridTableService.searchClicked$.next(model);

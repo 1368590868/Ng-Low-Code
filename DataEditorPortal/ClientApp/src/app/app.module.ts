@@ -4,6 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { WinAuthInterceptor } from './core/interceptor/win-auth.interceptor';
+import { HttpErrorInterceptor } from './core/interceptor/http-error.interceptor';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
@@ -48,6 +49,11 @@ export { NotifyService } from './core/utils/notify.service';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: WinAuthInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorInterceptor,
       multi: true
     },
     MessageService

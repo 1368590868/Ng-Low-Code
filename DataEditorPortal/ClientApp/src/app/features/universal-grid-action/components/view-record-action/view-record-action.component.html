@@ -1,0 +1,14 @@
+<p-table [value]="viewData" [rowHover]="true" styleClass="p-datatable-striped">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-viewData>
+    <tr>
+      <td>{{ viewData.name }}</td>
+      <td>{{ viewData.value }}</td>
+    </tr>
+  </ng-template>
+</p-table>

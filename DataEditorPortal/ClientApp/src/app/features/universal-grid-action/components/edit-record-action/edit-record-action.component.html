@@ -1,0 +1,17 @@
+<form [formGroup]="form" #editForm="ngForm" (ngSubmit)="onFormSubmit(model)">
+  <formly-form
+    [form]="form"
+    [fields]="fields"
+    [model]="model"
+    [options]="options"
+    class="p-fluid"></formly-form>
+  <div
+    *ngIf="!fields || fields.length <= 0"
+    class="flex flex-wrap"
+    style="margin: 0 -0.5rem">
+    <p *ngFor="let e of [].constructor(5)" class="w-6 px-2 mb-3">
+      <p-skeleton width="5rem" styleClass="mb-1"></p-skeleton>
+      <p-skeleton height="2.83rem"></p-skeleton>
+    </p>
+  </div>
+</form>

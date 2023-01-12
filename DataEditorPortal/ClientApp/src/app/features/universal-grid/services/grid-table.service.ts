@@ -1,36 +1,63 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { map, Observable, Subject } from 'rxjs';
+import { ApiResponse } from 'src/app/core/models/api-response';
+import { NotifyService } from 'src/app/core/utils/notify.service';
+import {
+  GridColumn,
+  GridConfig,
+  GridParam,
+  GridResult,
+  GridSearchConfig,
+  SearchParam
+} from '../models/grid-types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GridTableService {
-  public searchClicked$ = new Subject<any>();
+  public searchClicked$ = new Subject<SearchParam>();
   public currentPortalItem = '';
 
   public _apiUrl: string;
-  constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
+  constructor(
+    private http: HttpClient,
+    private notifyService: NotifyService,
+    @Inject('API_URL') apiUrl: string
+  ) {
     this._apiUrl = apiUrl;
   }
 
-  getTableColumns(): any {
-    return this.http.get(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/columns`
-    );
+  getTableConfig(): Observable<GridConfig> {
+    return this.http
+      .get<ApiResponse<GridConfig>>(
+        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/grid-config`
+      )
+      .pipe(map(res => res.result || { dataKey: 'Id' }));
   }
 
-  getTableData(tableParams: any) {
-    return this.http.post<{ data: any[]; total: number }>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data`,
-      tableParams
-    );
+  getTableColumns(): Observable<GridColumn[]> {
+    return this.http
+      .get<ApiResponse<GridColumn[]>>(
+        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/columns`
+      )
+      .pipe(map(res => res.result || []));
   }
 
-  getSearchConfig(): any {
-    return this.http.get(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/search`
-    );
-    // return this.http.get<any>('assets/customers-large.json');
+  getTableData(tableParams: GridParam): Observable<GridResult> {
+    return this.http
+      .post<ApiResponse<GridResult>>(
+        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data`,
+        tableParams
+      )
+      .pipe(map(res => res.result || { data: [], total: 0 }));
+  }
+
+  getSearchConfig(): Observable<GridSearchConfig[]> {
+    return this.http
+      .get<ApiResponse<GridSearchConfig[]>>(
+        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/search`
+      )
+      .pipe(map(res => res.result || []));
   }
 }

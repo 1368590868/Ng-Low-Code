@@ -1,8 +1,18 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
-import { catchError, skip, Subject, takeUntil, tap } from 'rxjs';
+import { finalize, Subject, takeUntil, tap } from 'rxjs';
 import { NotifyService } from '../../../../app.module';
 import { ActivatedRoute } from '@angular/router';
+import { GridActionOption } from 'src/app/features/universal-grid-action/universal-grid-action.module';
+import {
+  GridColumn,
+  GridConfig,
+  GridParam,
+  GridData,
+  SearchParam
+} from '../../models/grid-types';
+import { Table } from 'primeng/table';
+import { TableState } from 'primeng/api';
 
 @Component({
   selector: 'app-table',
@@ -12,18 +22,22 @@ import { ActivatedRoute } from '@angular/router';
 export class TableComponent implements OnInit, OnDestroy {
   destroy$ = new Subject();
 
-  records: any = [];
-  totalRecords: any = 0;
-  selectedRecords: any[] = [];
+  records: GridData[] = [];
+  totalRecords = 0;
+  selectedRecords: GridData[] = [];
 
-  searchModel: any;
+  searchModel?: SearchParam;
   lazyLoadParam: any;
+  fetchDataParam?: GridParam;
 
   loading = true;
-  @ViewChild('dt') table: any;
+  @ViewChild('dt') table!: Table;
+  actions: GridActionOption[] = [];
 
-  cols: any[] = [];
+  cols: GridColumn[] = [];
   stateKey!: string;
+
+  tableConfig: GridConfig = { dataKey: 'Id' };
 
   constructor(
     private route: ActivatedRoute,
@@ -35,10 +49,49 @@ export class TableComponent implements OnInit, OnDestroy {
     this.reset();
     this.stateKey = `universal-grid-state-${this.gridTableService.currentPortalItem}`;
 
+    // get grid config
+    this.gridTableService.getTableConfig().subscribe(result => {
+      this.tableConfig = result;
+    });
+
     // get grid column
-    this.gridTableService.getTableColumns().subscribe((res: never[]) => {
+    this.gridTableService.getTableColumns().subscribe(res => {
       this.cols = res;
     });
+
+    // get grid config
+    this.actions = [
+      {
+        name: 'add-record',
+        wrapper: {
+          label: 'Add New',
+          icon: 'pi pi-plus'
+        }
+      },
+      {
+        name: 'export-excel',
+        wrapper: {
+          label: 'Export To Excel',
+          icon: 'pi pi-file-excel',
+          buttonStyleClass: 'p-button-outlined'
+        }
+      },
+      {
+        name: 'remove-record',
+        wrapper: {
+          label: 'Remove',
+          icon: 'pi pi-trash',
+          buttonStyleClass: 'p-button-outlined p-button-danger'
+        }
+      },
+      {
+        name: 'user-manager',
+        wrapper: {
+          label: 'User Manager',
+          icon: 'pi pi-plus'
+        }
+      }
+    ];
 
     // subscribe search click to do searching
     this.gridTableService.searchClicked$
@@ -64,43 +117,23 @@ export class TableComponent implements OnInit, OnDestroy {
 
   fetchData() {
     this.loading = true;
-    const fetchParam = this.getFetchParam();
+    this.fetchDataParam = this.getFetchParam();
     this.gridTableService
-      .getTableData(fetchParam)
+      .getTableData(this.fetchDataParam)
       .pipe(
-        catchError(err => {
+        tap(res => {
+          this.records = res.data;
+          this.totalRecords = res.total;
+        }),
+        finalize(() => {
           this.loading = false;
-          return this.notifyService.notifyErrorInPipe(err, {
-            data: [],
-            total: 0
-          });
         })
       )
-      .subscribe((res: any) => {
-        this.loading = false;
-
-        if (res.errormessage) {
-          this.notifyService.notifyError('Operation faild', res.errormessage);
-        } else {
-          const data = (res as any).data;
-          const data1 = [
-            ...data,
-            ...data,
-            ...data,
-            ...data,
-            ...data,
-            ...data,
-            ...data,
-            ...data
-          ];
-          this.records = data1;
-          this.totalRecords = 100; //(res as any).total;
-        }
-      });
+      .subscribe();
   }
 
   getFetchParam() {
-    const fetchParam = {
+    const fetchParam: GridParam = {
       filters: [],
       sorts: [],
       searches: this.searchModel,
@@ -118,7 +151,7 @@ export class TableComponent implements OnInit, OnDestroy {
           for (let i = 0; i < fieldProp.length; i++) {
             if (fieldProp[i].value != null) {
               fieldProp[i].field = prop;
-              fetchParam.filters.push(fieldProp[i] as never);
+              fetchParam.filters.push(fieldProp[i]);
             }
           }
         }
@@ -140,11 +173,12 @@ export class TableComponent implements OnInit, OnDestroy {
     return fetchParam;
   }
 
-  onRowCheckBoxClick(event: any) {
+  onRowCheckBoxClick(event: MouseEvent) {
     event.stopPropagation();
   }
 
   onRefresh() {
+    this.selectedRecords = [];
     this.table.reset();
   }
 
@@ -155,5 +189,11 @@ export class TableComponent implements OnInit, OnDestroy {
     this.cols = [];
     this.records = [];
     this.selectedRecords = [];
+  }
+
+  onStateSave(state: TableState) {
+    // do not save selection to state.
+    state.selection = undefined;
+    this.table.getStorage().setItem(this.stateKey, JSON.stringify(state));
   }
 }

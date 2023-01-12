@@ -1,0 +1,33 @@
+<p-button
+  (click)="showDialog()"
+  [icon]="icon"
+  [label]="label"
+  [class]="class"
+  [styleClass]="buttonStyleClass"></p-button>
+<p-dialog
+  [header]="header"
+  [(visible)]="visible"
+  (onShow)="onShow()"
+  (onHide)="onHide()"
+  [style]="dialogStyle"
+  [modal]="true"
+  [dismissableMask]="true"
+  contentStyleClass="border-top-1 surface-border pt-3"
+  appendTo="body">
+  <div #container></div>
+  <ng-template pTemplate="footer">
+    <p-button
+      *ngIf="cancelText"
+      icon="pi pi-times"
+      (click)="onCancel()"
+      [label]="cancelText"
+      [disabled]="buttonDisabled"
+      styleClass="p-button-text"></p-button>
+    <p-button
+      icon="pi pi-check"
+      (click)="onOk()"
+      [label]="okText"
+      [disabled]="buttonDisabled"
+      [loading]="isLoading"></p-button>
+  </ng-template>
+</p-dialog>

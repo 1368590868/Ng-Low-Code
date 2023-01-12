@@ -8,13 +8,14 @@ import { FormlyModule } from '@ngx-formly/core';
 import { FormlyPrimeNGModule } from '@ngx-formly/primeng';
 import { FormlyDatepickerModule } from '../ngx-formly/datepicker';
 import { FormlyMultiSelectModule } from '../ngx-formly/multiselect';
+import { FormlyInputMaskModule } from '../ngx-formly/inputMask';
 
 import { UniversalGridRoutingModule } from './universal-grid-routing.module';
 import { UniversalGridComponent } from './universal-grid.component';
 import { SplitAreaComponent } from './pages/split-area/split-area.component';
 import { SearchComponent } from './components/search/search.component';
 import { TableComponent } from './components/table/table.component';
-import { EditDialogComponent } from './components/edit-dialog/edit-dialog.component';
+import { UniversalGridActionModule } from '../universal-grid-action/universal-grid-action.module';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
@@ -32,14 +33,15 @@ import { ContextMenuModule } from 'primeng/contextmenu';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { RippleModule } from 'primeng/ripple';
+import { ButtonModule } from 'primeng/button';
 
 @NgModule({
   declarations: [
     UniversalGridComponent,
     SplitAreaComponent,
     SearchComponent,
-    TableComponent,
-    EditDialogComponent
+    TableComponent
   ],
   imports: [
     CommonModule,
@@ -53,7 +55,9 @@ import { SplitButtonModule } from 'primeng/splitbutton';
     FormlyPrimeNGModule,
     FormlyDatepickerModule,
     FormlyMultiSelectModule,
+    FormlyInputMaskModule,
     UniversalGridRoutingModule,
+    UniversalGridActionModule,
     // primeNg
     AnimateModule,
     ToastModule,
@@ -69,7 +73,9 @@ import { SplitButtonModule } from 'primeng/splitbutton';
     ContextMenuModule,
     InputTextModule,
     ProgressBarModule,
-    SplitButtonModule
+    SplitButtonModule,
+    RippleModule,
+    ButtonModule
   ]
 })
 export class UniversalGridModule {}
