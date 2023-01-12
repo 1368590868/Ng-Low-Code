@@ -16,6 +16,7 @@ export interface OnGridActionDialogShow {
   selector: '[appGridAction]'
 })
 export class GridActionDirective {
+  @Input() fetchDataParam: any;
   @Input() selectedRecords: any = [];
   @Input() recordKey = 'Id';
 

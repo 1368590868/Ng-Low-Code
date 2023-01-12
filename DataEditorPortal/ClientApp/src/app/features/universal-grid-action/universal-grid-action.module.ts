@@ -127,7 +127,6 @@ export * from './models/grid-config';
         },
         {
           name: 'export-excel',
-          requireGridRowSelected: true,
           component: ExportExcelActionComponent,
           wrapper: {
             header: 'Export to Excel',

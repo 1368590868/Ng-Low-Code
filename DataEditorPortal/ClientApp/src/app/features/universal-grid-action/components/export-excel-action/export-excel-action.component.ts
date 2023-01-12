@@ -1,17 +1,24 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { catchError, EMPTY, tap } from 'rxjs';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import { GridActionDirective } from '../../directives/grid-action.directive';
-import { ExportActionService } from '../../services/export-services/export-action.service';
-import { ExportForm } from '../../models/export';
+import {
+  GridActionDirective,
+  OnGridActionDialogShow
+} from '../../directives/grid-action.directive';
+import { ExportForm, ExportParam } from '../../models/export';
+import { UniversalGridService } from '../../services/universal-grid.service';
 
 @Component({
   selector: 'app-export-excel-action',
   templateUrl: './export-excel-action.component.html',
   styleUrls: ['./export-excel-action.component.scss']
 })
-export class ExportExcelActionComponent extends GridActionDirective {
+export class ExportExcelActionComponent
+  extends GridActionDirective
+  implements OnGridActionDialogShow, OnInit
+{
   @ViewChild('exportForm') exportForm!: NgForm;
 
   form = new FormGroup({});
@@ -27,41 +34,80 @@ export class ExportExcelActionComponent extends GridActionDirective {
         description: 'Description',
         required: true
       }
-    },
-    {
-      key: 'exportOption',
-      type: 'radio',
-      defaultValue: 'Selection',
-      props: {
-        label: 'Export Option',
-        description: 'Description',
-        required: true,
-
-        options: [
-          { value: 'Selection', label: 'Export Selected Items Only' },
-          { value: 'All', label: 'Export Entire Result' }
-        ]
-      }
     }
   ];
 
   constructor(
-    private exportActionService: ExportActionService,
+    private gridService: UniversalGridService,
     private notifyService: NotifyService
   ) {
     super();
   }
 
-  onFormSubmit(model: ExportForm) {
-    if (this.form.valid) {
-      this.exportActionService.exportFile(model).subscribe(res => {
-        if (!res.isError && res.result) {
-          this.notifyService.notifySuccess('Success', 'Export Success');
-          this.savedEvent.emit();
-        } else {
-          this.errorEvent.emit();
+  ngOnInit(): void {
+    if (this.selectedRecords && this.selectedRecords.length > 0) {
+      this.fields.push({
+        key: 'exportOption',
+        type: 'radio',
+        defaultValue: 'Selection',
+        props: {
+          label: 'Export Option',
+          description: 'Description',
+          required: true,
+
+          options: [
+            { value: 'Selection', label: 'Export Selected Items Only' },
+            { value: 'All', label: 'Export Entire Result' }
+          ]
         }
       });
+    }
+  }
+
+  onDialogShow() {
+    this.model = {
+      ...this.model,
+      fileName: `Export-${
+        this.gridService.currentPortalItem
+      }-${new Date().toLocaleDateString('en-US')}`
+    };
+    this.loadedEvent.emit();
+  }
+
+  onFormSubmit(model: ExportForm) {
+    if (this.form.valid) {
+      const param = this.fetchDataParam as ExportParam;
+      param.fileName = model.fileName;
+      if (model.exportOption === 'Selection') {
+        const selectedIds: string[] = this.selectedRecords.map((x: any) => {
+          return (x[this.recordKey] as string).replace("'", '');
+        });
+        param.filters.push({
+          field: this.recordKey,
+          matchMode: 'in',
+          value: `'${selectedIds.join(`','`)}'`
+        });
+      }
+
+      this.gridService
+        .exportGridData(param)
+        .pipe(
+          catchError(() => {
+            this.errorEvent.emit();
+            return EMPTY;
+          }),
+          tap(result => {
+            const url = window.URL.createObjectURL(result);
+            const a = document.createElement('a');
+            a.href = url;
+            const fileName = param.fileName + '.xlsx';
+            a.download = fileName;
+            a.click();
+            a.remove();
+            this.savedEvent.emit();
+          })
+        )
+        .subscribe();
     } else {
       this.errorEvent.emit();
     }

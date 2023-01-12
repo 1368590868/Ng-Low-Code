@@ -4,6 +4,7 @@ import { catchError, map, Observable, takeWhile, tap } from 'rxjs';
 import { ApiResponse } from 'src/app/core/models/api-response';
 import { NotifyService } from 'src/app/core/utils/notify.service';
 import { EditFormData, EditFormField } from '../models/edit';
+import { ExportParam } from '../models/export';
 
 @Injectable({
   providedIn: 'root'
@@ -57,6 +58,14 @@ export class UniversalGridService {
     return this.http.post<ApiResponse<boolean>>(
       `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/batch-delete`,
       { ids }
+    );
+  }
+
+  exportGridData(param: ExportParam): Observable<Blob> {
+    return this.http.post(
+      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/export`,
+      param,
+      { responseType: 'blob' }
     );
   }
 }

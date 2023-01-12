@@ -28,6 +28,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   searchModel?: SearchParam;
   lazyLoadParam: any;
+  fetchDataParam?: GridParam;
 
   loading = true;
   @ViewChild('dt') table!: Table;
@@ -116,9 +117,9 @@ export class TableComponent implements OnInit, OnDestroy {
 
   fetchData() {
     this.loading = true;
-    const fetchParam = this.getFetchParam();
+    this.fetchDataParam = this.getFetchParam();
     this.gridTableService
-      .getTableData(fetchParam)
+      .getTableData(this.fetchDataParam)
       .pipe(
         tap(res => {
           this.records = res.data;

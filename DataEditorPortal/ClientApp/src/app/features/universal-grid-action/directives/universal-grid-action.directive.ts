@@ -27,10 +27,12 @@ export class UniversalGridActionDirective
   @Input() actions: GridActionOption[] = [];
   @Input() selectedRecords: any[] = [];
   @Input() recordKey = 'Id';
+  @Input() fetchDataParam: any;
 
   @Output() savedEvent = new EventEmitter<void>();
 
   actionLoaded = false;
+  actionWrapperRefs: ComponentRef<ActionWrapperComponent>[] = [];
   destroy$ = new Subject();
 
   constructor(
@@ -57,6 +59,12 @@ export class UniversalGridActionDirective
       // selectedRecords changed, reloaded actions.
       this.actionLoaded = false;
     }
+    if ('fetchDataParam' in changes) {
+      this.actionWrapperRefs.forEach(wrapper => {
+        wrapper.instance.componentRef.instance.fetchDataParam =
+          this.fetchDataParam;
+      });
+    }
   }
 
   ngDoCheck(): void {
@@ -73,6 +81,7 @@ export class UniversalGridActionDirective
       this.viewContainerRef
     ) {
       this.viewContainerRef.clear();
+      this.actionWrapperRefs = [];
 
       this.actions.forEach(x => {
         const actionCfg = this.config.find(action => {
@@ -118,6 +127,7 @@ export class UniversalGridActionDirective
           }
           actionRef.instance.selectedRecords = this.selectedRecords;
           actionRef.instance.recordKey = this.recordKey;
+          actionRef.instance.fetchDataParam = this.fetchDataParam;
 
           // bind action events
           actionRef.instance.savedEvent.asObservable().subscribe(() => {
@@ -134,6 +144,7 @@ export class UniversalGridActionDirective
 
           // set actionRef to wrapper, for it to invoke
           wrapperRef.instance.componentRef = actionRef;
+          this.actionWrapperRefs.push(wrapperRef);
         }
       });
 

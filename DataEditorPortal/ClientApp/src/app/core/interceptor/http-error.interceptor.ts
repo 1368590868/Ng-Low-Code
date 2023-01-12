@@ -6,7 +6,7 @@ import {
   HttpErrorResponse,
   HttpResponse
 } from '@angular/common/http';
-import { catchError, of } from 'rxjs';
+import { catchError, of, throwError } from 'rxjs';
 import { NotifyService } from '../utils/notify.service';
 
 @Injectable()
@@ -24,11 +24,15 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             error.error?.responseException?.exceptionMessage || error.message
           );
 
-        return of(
-          new HttpResponse({
-            body: JSON.stringify(error.error)
-          })
-        );
+        if (request.responseType === 'json') {
+          return of(
+            new HttpResponse({
+              body: JSON.stringify(error.error)
+            })
+          );
+        } else {
+          return throwError(() => error);
+        }
       })
     );
   }
