@@ -39,6 +39,7 @@ import { RemoveActionComponent } from './components/remove-action/remove-action.
 import { UserManagerActionComponent } from './components/user-manager-action/user-manager-action.component';
 import { PanelWrapperComponent } from './components/user-manager-action/panel-warpper.component';
 import { FormlySelectModule } from '../ngx-formly/select/select.module';
+import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
 
 export * from './models/grid-config';
 
@@ -68,6 +69,7 @@ export * from './models/grid-config';
     FormlyDatepickerModule,
     FormlyMultiSelectModule,
     FormlySelectModule,
+    FormlyCheckBoxModule,
     // primeNg
     AnimateModule,
     ToastModule,

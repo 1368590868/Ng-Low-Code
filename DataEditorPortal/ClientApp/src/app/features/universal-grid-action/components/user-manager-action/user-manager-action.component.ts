@@ -131,55 +131,49 @@ export class UserManagerActionComponent extends GridActionDirective {
     },
     {
       fieldGroupClassName: 'flex flex-warp justify-content-between ',
-      wrappers: ['panel'],
-      props: { label: 'Division' },
       fieldGroup: [
         {
-          key: 'Gas',
+          key: 'Division',
           type: 'checkbox',
-          name: 'Gas',
           props: {
-            label: 'Gas'
-          }
-        },
-        {
-          key: 'ELECTRIC',
-          type: 'checkbox',
-          name: 'Gas',
-
-          props: {
-            label: 'Electric'
-          }
-        },
-        {
-          key: 'LANDBASE',
-          type: 'checkbox',
-          name: 'Gas',
-
-          props: {
-            label: 'Landbase'
-          }
-        },
-        {
-          key: 'UNDERGROUND',
-          type: 'checkbox',
-          name: 'Gas',
-
-          props: {
-            label: 'Underground'
+            label: 'Division(s)',
+            options: [
+              {
+                value: 'Gas',
+                label: 'Gas'
+              },
+              {
+                value: 'ELECTRIC',
+                label: 'Electric'
+              },
+              {
+                value: 'LANDBASE',
+                label: 'Landbase'
+              },
+              {
+                value: 'UNDERGROUND',
+                label: 'Underground'
+              }
+            ]
           }
         }
       ]
     },
     {
-      wrappers: ['panel'],
-      props: { label: 'Receive Email Notifications' },
       fieldGroup: [
         {
-          key: 'Notify',
+          key: 'notify',
           type: 'checkbox',
           props: {
-            label: 'Notify'
+            label: 'Notify',
+            binary: true,
+            required: true,
+            options: [
+              {
+                value: 'Notify',
+                label: 'Notify'
+              }
+            ]
           }
         }
       ]
