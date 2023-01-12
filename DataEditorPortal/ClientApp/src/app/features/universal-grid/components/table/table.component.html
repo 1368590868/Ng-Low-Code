@@ -26,7 +26,8 @@
     [totalRecords]="totalRecords"
     [filterDelay]="0"
     stateStorage="session"
-    [stateKey]="stateKey">
+    [stateKey]="stateKey"
+    (onStateSave)="onStateSave($event)">
     <ng-template pTemplate="caption">
       <h3 class="mb-4">{{ tableConfig.caption }}</h3>
       <div class="table-header flex align-items-center">
@@ -60,9 +61,10 @@
           pReorderableColumn
           pResizableColumn
           [pSortableColumn]="col.field">
-          <span>{{ col.header }}</span>
+          <span style="vertical-align: middle">{{ col.header }}</span>
           <p-sortIcon [field]="col.field"></p-sortIcon>
           <p-columnFilter
+            style="vertical-align: middle"
             [type]="col.filterType"
             [field]="col.field"
             display="menu"

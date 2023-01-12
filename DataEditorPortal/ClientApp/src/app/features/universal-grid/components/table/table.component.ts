@@ -12,6 +12,7 @@ import {
   SearchParam
 } from '../../models/grid-types';
 import { Table } from 'primeng/table';
+import { TableState } from 'primeng/api';
 
 @Component({
   selector: 'app-table',
@@ -187,5 +188,11 @@ export class TableComponent implements OnInit, OnDestroy {
     this.cols = [];
     this.records = [];
     this.selectedRecords = [];
+  }
+
+  onStateSave(state: TableState) {
+    // do not save selection to state.
+    state.selection = undefined;
+    this.table.getStorage().setItem(this.stateKey, JSON.stringify(state));
   }
 }
