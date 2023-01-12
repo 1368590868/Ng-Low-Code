@@ -20,7 +20,7 @@ export interface FormlyCheckBoxFieldConfig
   selector: 'app-formly-field-primeng-checkbox',
   template: `
     <div
-      class="p-field-checkbox"
+      class="p-field-radiobutton"
       *ngFor="
         let option of props.options | formlySelectOptions : field | async
       ">

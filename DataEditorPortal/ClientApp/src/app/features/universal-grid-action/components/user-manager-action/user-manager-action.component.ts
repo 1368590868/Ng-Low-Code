@@ -188,6 +188,7 @@ export class UserManagerActionComponent extends GridActionDirective {
   }
 
   onFormSubmit(model: UserManagerForm) {
+    console.log(model);
     if (this.form.valid) {
       this.userManagerService.saveUserManager(model).subscribe(res => {
         if (!res.isError && res.result) {
