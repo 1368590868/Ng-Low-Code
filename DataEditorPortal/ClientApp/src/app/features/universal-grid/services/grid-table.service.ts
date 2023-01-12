@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { map, Observable, Subject, tap } from 'rxjs';
+import { map, Observable, Subject } from 'rxjs';
 import { ApiResponse } from 'src/app/core/models/api-response';
 import { NotifyService } from 'src/app/core/utils/notify.service';
 import {
@@ -33,10 +33,7 @@ export class GridTableService {
       .get<ApiResponse<GridConfig>>(
         `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/grid-config`
       )
-      .pipe(
-        tap(res => this.notifyService.processErrorInPipe(res)),
-        map(res => res.result || { dataKey: 'Id' })
-      );
+      .pipe(map(res => res.result || { dataKey: 'Id' }));
   }
 
   getTableColumns(): Observable<GridColumn[]> {
@@ -44,10 +41,7 @@ export class GridTableService {
       .get<ApiResponse<GridColumn[]>>(
         `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/columns`
       )
-      .pipe(
-        tap(res => this.notifyService.processErrorInPipe(res)),
-        map(res => res.result || [])
-      );
+      .pipe(map(res => res.result || []));
   }
 
   getTableData(tableParams: GridParam): Observable<GridResult> {
@@ -56,10 +50,7 @@ export class GridTableService {
         `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data`,
         tableParams
       )
-      .pipe(
-        tap(res => this.notifyService.processErrorInPipe(res)),
-        map(res => res.result || { data: [], total: 0 })
-      );
+      .pipe(map(res => res.result || { data: [], total: 0 }));
   }
 
   getSearchConfig(): Observable<GridSearchConfig[]> {
@@ -67,21 +58,6 @@ export class GridTableService {
       .get<ApiResponse<GridSearchConfig[]>>(
         `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/search`
       )
-      .pipe(
-        tap(res => this.notifyService.processErrorInPipe(res)),
-        map(res => res.result || [])
-      );
-  }
-
-  addGridData(): any {
-    return this.http.get<ApiResponse<GridSearchConfig[]>>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/create`
-    );
-  }
-
-  updateGridData(id: string): any {
-    return this.http.get<ApiResponse<GridSearchConfig[]>>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/${id}/update`
-    );
+      .pipe(map(res => res.result || []));
   }
 }

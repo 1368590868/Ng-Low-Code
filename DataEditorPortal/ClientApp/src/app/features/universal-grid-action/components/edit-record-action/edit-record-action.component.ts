@@ -2,12 +2,14 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { tap } from 'rxjs';
+import { NotifyService } from 'src/app/core/utils/notify.service';
 import {
   OnGridActionSave,
   OnGridActionCancel,
   GridActionDirective,
   OnGridActionDialogShow
 } from '../../directives/grid-action.directive';
+import { EditFormData } from '../../models/edit';
 import { UniversalGridService } from '../../services/universal-grid.service';
 
 @Component({
@@ -28,7 +30,10 @@ export class EditRecordActionComponent
 
   @ViewChild('editForm') editForm!: NgForm;
 
-  constructor(private gridService: UniversalGridService) {
+  constructor(
+    private gridService: UniversalGridService,
+    private notifyService: NotifyService
+  ) {
     super();
   }
 
@@ -36,7 +41,7 @@ export class EditRecordActionComponent
     this.gridService
       .getDetailConfig()
       .pipe(
-        tap((result: any) => {
+        tap(result => {
           this.fields = result;
           this.loadedEvent.emit();
         })
@@ -57,12 +62,34 @@ export class EditRecordActionComponent
     }
   }
 
-  onFormSubmit(model: any) {
+  onFormSubmit(model: EditFormData) {
     if (this.form.valid) {
-      console.log(model);
-      setTimeout(() => {
-        this.savedEvent.emit();
-      }, 1000);
+      if (this.isAddForm) {
+        this.gridService.addGridData(model).subscribe(res => {
+          if (!res.isError && res.result) {
+            this.notifyService.notifySuccess(
+              'Success',
+              'Save Successfully Completed.'
+            );
+            this.savedEvent.emit();
+          } else {
+            this.errorEvent.emit();
+          }
+        });
+      } else {
+        const dataKey = this.selectedRecords[0][this.recordKey];
+        this.gridService.updateGridData(dataKey, this.model).subscribe(res => {
+          if (!res.isError && res.result) {
+            this.notifyService.notifySuccess(
+              'Success',
+              'Save Successfully Completed.'
+            );
+            this.savedEvent.emit();
+          } else {
+            this.errorEvent.emit();
+          }
+        });
+      }
     } else {
       this.errorEvent.emit();
     }

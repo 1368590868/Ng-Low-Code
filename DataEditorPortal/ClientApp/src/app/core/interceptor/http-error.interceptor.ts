@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
-  HttpEvent,
   HttpInterceptor,
-  HttpErrorResponse
+  HttpErrorResponse,
+  HttpResponse
 } from '@angular/common/http';
-import { catchError, EMPTY, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { NotifyService } from '../utils/notify.service';
 
 @Injectable()
@@ -18,10 +18,17 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       catchError(error => {
         if (error instanceof HttpErrorResponse)
           this.notifyService.notifyError(
-            error.name || error.statusText,
-            error.message || error.error
+            error.error?.responseException?.exceptionTitle ||
+              error.statusText ||
+              error.name,
+            error.error?.responseException?.exceptionMessage || error.message
           );
-        return EMPTY;
+
+        return of(
+          new HttpResponse({
+            body: JSON.stringify(error.error)
+          })
+        );
       })
     );
   }

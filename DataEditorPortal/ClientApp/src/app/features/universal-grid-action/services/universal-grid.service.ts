@@ -1,5 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
+import { catchError, map, Observable, takeWhile, tap } from 'rxjs';
+import { ApiResponse } from 'src/app/core/models/api-response';
+import { NotifyService } from 'src/app/core/utils/notify.service';
+import { EditFormData, EditFormField } from '../models/edit';
 
 @Injectable({
   providedIn: 'root'
@@ -8,39 +12,44 @@ export class UniversalGridService {
   public currentPortalItem = 'usermanagement';
 
   public _apiUrl: string;
-  constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
+  constructor(
+    private http: HttpClient,
+    private notifyService: NotifyService,
+    @Inject('API_URL') apiUrl: string
+  ) {
     this._apiUrl = apiUrl;
   }
 
-  getTableColumns(): any {
-    return this.http.get(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/columns`
+  getDetailConfig(): Observable<EditFormField[]> {
+    return this.http
+      .get<ApiResponse<EditFormField[]>>(
+        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`
+      )
+      .pipe(map(res => res.result || []));
+  }
+
+  getDetailData(id: string): Observable<EditFormData> {
+    return this.http
+      .get<ApiResponse<EditFormData>>(
+        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/${id}`
+      )
+      .pipe(map(res => res.result || {}));
+  }
+
+  addGridData(data: EditFormData): Observable<ApiResponse<boolean>> {
+    return this.http.post<ApiResponse<boolean>>(
+      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/create`,
+      data
     );
   }
 
-  getTableData(tableParams: any) {
-    return this.http.post<{ data: any[]; total: number }>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data`,
-      tableParams
-    );
-  }
-
-  getSearchConfig(): any {
-    return this.http.get(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/search`
-    );
-    // return this.http.get<any>('assets/customers-large.json');
-  }
-
-  getDetailConfig(): any {
-    return this.http.get(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`
-    );
-  }
-
-  getDetailData(id: string): any {
-    return this.http.get(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/${id}`
+  updateGridData(
+    id: string,
+    data: EditFormData
+  ): Observable<ApiResponse<boolean>> {
+    return this.http.post<ApiResponse<boolean>>(
+      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/${id}/update`,
+      data
     );
   }
 }

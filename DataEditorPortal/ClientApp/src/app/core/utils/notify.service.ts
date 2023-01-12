@@ -49,13 +49,4 @@ export class NotifyService {
     this.notifyError(err.name || err.statusText, err.message || err.error);
     return of<T>(returnData);
   }
-
-  processErrorInPipe<T>(res: ApiResponse<T>): void {
-    if (res.isError && res.responseException?.exceptionMessage) {
-      this.notifyError(
-        'Operation failed',
-        res.responseException?.exceptionMessage
-      );
-    }
-  }
 }
