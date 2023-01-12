@@ -260,19 +260,11 @@ namespace DataEditorPortal.Web.Services
                 }
             };
 
-            string outputFile = Path.Combine("C:\\Temp", System.Guid.NewGuid().ToString() + ".xlsx");
+            var stream = new MemoryStream();
             var exp = new Exporters();
-            exp.Addsheet(sheet, sheetData, outputFile);
-
-            var fs = new MemoryStream();
-            var f = System.IO.File.OpenRead(outputFile);
-            f.CopyTo(fs);
-            fs.Seek(0, SeekOrigin.Begin);
-            f.Close();
-            f.Dispose();
-
-            System.IO.File.Delete(outputFile);
-            return fs;
+            exp.Addsheet(sheet, sheetData, stream);
+            stream.Seek(0, SeekOrigin.Begin);
+            return stream;
         }
 
         #endregion

@@ -120,7 +120,16 @@ namespace DataEditorPortal.Web
                 app.UseSpaStaticFiles();
             }
 
-            app.UseApiResponseAndExceptionWrapper();
+            app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions()
+            {
+                IsApiOnly = false,
+                WrapWhenApiPathStartsWith = "/api",
+                ExcludePaths = new AutoWrapperExcludePath[]
+                {
+                    new AutoWrapperExcludePath("/")
+                }
+            });
+
             app.UseRouting();
 
             // if (env.IsDevelopment())

@@ -50,15 +50,15 @@ namespace DataEditorPortal.ExcelExport
             return index;
         }
 
-        public void Addsheet(SheetParam sheetParam, IList<DataParam> dataParam, string outputFile)
+        public void Addsheet(SheetParam sheetParam, IList<DataParam> dataParam, Stream stream)
         {
 
 
-            FileInfo existingFile = new FileInfo(outputFile);
+            //FileInfo existingFile = new FileInfo(outputFile);
             //_sOutput = new MemoryStream();
 
             //var p = new ExcelPackage(existingFile);
-            using (var p = new ExcelPackage(existingFile))
+            using (var p = new ExcelPackage(stream))
             {
 
                 //A workbook must have at least on cell, so lets add one... 
