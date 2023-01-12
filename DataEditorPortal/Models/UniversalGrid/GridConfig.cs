@@ -15,6 +15,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
     {
         public string key { get; set; }
         public string type { get; set; }
+        public object defaultValue { get; set; }
         public object props { get; set; }
 
         // advance field dependence

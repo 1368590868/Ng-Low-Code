@@ -196,6 +196,7 @@ namespace DataEditorPortal.Data.Contexts
                             new {
                                 key = "AutoEmail",
                                 type = "checkbox",
+                                defaultValue = true,
                                 props = new {
                                     label = "Auto Email",
                                     required= true
