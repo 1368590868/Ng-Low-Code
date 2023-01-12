@@ -28,6 +28,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
+import { AccordionModule } from 'primeng/accordion';
 
 import { GridActionDirective } from './directives/grid-action.directive';
 import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
@@ -40,6 +41,8 @@ import { UserManagerActionComponent } from './components/user-manager-action/use
 import { PanelWrapperComponent } from './components/user-manager-action/panel-warpper.component';
 import { FormlySelectModule } from '../ngx-formly/select/select.module';
 import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ManagerRoleComponent } from './components/user-manager-action/manager-role/manager-role.component';
 
 export * from './models/grid-config';
 
@@ -53,7 +56,8 @@ export * from './models/grid-config';
     ExportExcelActionComponent,
     RemoveActionComponent,
     UserManagerActionComponent,
-    PanelWrapperComponent
+    PanelWrapperComponent,
+    ManagerRoleComponent
   ],
   imports: [
     CommonModule,
@@ -88,7 +92,9 @@ export * from './models/grid-config';
     SplitButtonModule,
     RippleModule,
     ButtonModule,
-    SkeletonModule
+    SkeletonModule,
+    AccordionModule,
+    CheckboxModule
   ],
   exports: [UniversalGridActionDirective],
   providers: [
@@ -150,6 +156,17 @@ export * from './models/grid-config';
           component: UserManagerActionComponent,
           wrapper: {
             header: 'user-manager',
+            dialogStyle: { width: '40rem' },
+            cancelText: 'No',
+            okText: 'Yes'
+          }
+        },
+        {
+          name: 'add-role',
+          requireGridRowSelected: false,
+          component: ManagerRoleComponent,
+          wrapper: {
+            header: 'Add Role Confirmation',
             dialogStyle: { width: '40rem' },
             cancelText: 'No',
             okText: 'Yes'
