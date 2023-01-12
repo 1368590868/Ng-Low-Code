@@ -66,9 +66,6 @@ export class TableComponent implements OnInit, OnDestroy {
           icon: 'pi pi-plus'
         }
       },
-
-      { name: 'addEdit1' },
-      { name: 'addEdit' },
       {
         name: 'export-excel',
         wrapper: {

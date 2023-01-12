@@ -101,5 +101,6 @@ export class EditRecordActionComponent
 
   onCancel(): void {
     this.options.resetModel?.();
+    this.fields = [];
   }
 }

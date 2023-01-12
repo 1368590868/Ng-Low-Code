@@ -94,8 +94,6 @@ export class UniversalGridActionDirective
               Object.assign(wrapperRef.instance, actionCfg.wrapper);
             }
           }
-
-          // assign wrapper data;
           if (x.wrapper) {
             if (wrapperRef instanceof ComponentRef) {
               Object.assign(wrapperRef.instance, x.wrapper);
@@ -108,6 +106,11 @@ export class UniversalGridActionDirective
             );
 
           // assign action data;
+          if (actionCfg.props) {
+            if (actionRef instanceof ComponentRef) {
+              Object.assign(actionRef.instance, actionCfg.props);
+            }
+          }
           if (x.props) {
             if (actionRef instanceof ComponentRef) {
               Object.assign(actionRef.instance, x.props);
