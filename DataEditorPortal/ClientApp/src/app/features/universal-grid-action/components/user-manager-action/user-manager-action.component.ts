@@ -134,7 +134,7 @@ export class UserManagerActionComponent extends GridActionDirective {
       fieldGroup: [
         {
           key: 'Division',
-          type: 'checkbox',
+          type: 'checkboxList',
           props: {
             label: 'Division(s)',
             options: [

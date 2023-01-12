@@ -19,7 +19,7 @@ import { FormlyFieldCheckBoxComponent } from './checkbox.type';
     FormlyModule.forChild({
       types: [
         {
-          name: 'checkbox',
+          name: 'checkboxList',
           component: FormlyFieldCheckBoxComponent,
           wrappers: ['form-field']
         }

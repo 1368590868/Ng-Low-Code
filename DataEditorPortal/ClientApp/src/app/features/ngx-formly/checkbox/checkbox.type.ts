@@ -13,7 +13,7 @@ interface CheckboxProps extends FormlyFieldProps {
 
 export interface FormlyCheckBoxFieldConfig
   extends FormlyFieldConfig<CheckboxProps> {
-  type: 'checkbox' | Type<FormlyFieldCheckBoxComponent>;
+  type: 'checkboxList' | Type<FormlyFieldCheckBoxComponent>;
 }
 
 @Component({
