@@ -1,7 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { NotifyService } from 'src/app/core/utils/notify.service';
 import { GridActionDirective } from '../../directives/grid-action.directive';
+import { UserManagerForm } from '../../models/user-manager';
+import { UserManagerService } from '../../services/user-manager-services/user-manager.service';
 
 @Component({
   selector: 'app-user-manager-action',
@@ -11,7 +14,7 @@ import { GridActionDirective } from '../../directives/grid-action.directive';
 export class UserManagerActionComponent extends GridActionDirective {
   @ViewChild('editForm') editForm!: NgForm;
   form = new FormGroup({});
-  model: any = {};
+  model: UserManagerForm = {};
   options: FormlyFormOptions = {};
 
   fields: FormlyFieldConfig[] = [
@@ -25,7 +28,8 @@ export class UserManagerActionComponent extends GridActionDirective {
           props: {
             required: true,
             type: 'text',
-            label: 'CNP ID'
+            label: 'CNP ID',
+            placeholder: 'CNP ID'
           }
         },
         {
@@ -35,7 +39,8 @@ export class UserManagerActionComponent extends GridActionDirective {
           props: {
             required: true,
             type: 'text',
-            label: 'Town'
+            label: 'Town',
+            placeholder: 'Town'
           }
         },
         {
@@ -45,7 +50,8 @@ export class UserManagerActionComponent extends GridActionDirective {
           props: {
             required: true,
             type: 'text',
-            label: 'Email'
+            label: 'Email',
+            placeholder: 'Email'
           }
         },
         {
@@ -55,7 +61,8 @@ export class UserManagerActionComponent extends GridActionDirective {
           props: {
             required: true,
             type: 'text',
-            label: 'Phone'
+            label: 'Phone',
+            placeholder: 'Phone'
           }
         }
       ]
@@ -65,7 +72,7 @@ export class UserManagerActionComponent extends GridActionDirective {
       fieldGroup: [
         {
           className: 'w-6 ',
-          key: 'employer',
+          key: 'vendor',
           type: 'select',
           props: {
             label: 'Vendor',
@@ -163,7 +170,6 @@ export class UserManagerActionComponent extends GridActionDirective {
       ]
     },
     {
-      key: 'Notify',
       wrappers: ['panel'],
       props: { label: 'Receive Email Notifications' },
       fieldGroup: [
@@ -178,12 +184,23 @@ export class UserManagerActionComponent extends GridActionDirective {
     }
   ];
 
-  onFormSubmit(model: any) {
+  constructor(
+    private userManagerService: UserManagerService,
+    private notifyService: NotifyService
+  ) {
+    super();
+  }
+
+  onFormSubmit(model: UserManagerForm) {
     if (this.form.valid) {
-      console.log(model);
-      setTimeout(() => {
-        this.savedEvent.emit();
-      }, 1000);
+      this.userManagerService.saveUserManager(model).subscribe(res => {
+        if (!res.isError && res.result) {
+          this.notifyService.notifySuccess('Success', 'Save Success');
+          this.savedEvent.emit();
+        } else {
+          this.errorEvent.emit();
+        }
+      });
     } else {
       this.errorEvent.emit();
     }
