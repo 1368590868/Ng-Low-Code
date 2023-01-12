@@ -66,5 +66,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public List<FormFieldConfig> FormConfig { get; set; }
 
         public string QueryText { get; set; }
+        public string QueryForInsert { get; set; }
+        public string QueryForUpdate { get; set; }
     }
 }

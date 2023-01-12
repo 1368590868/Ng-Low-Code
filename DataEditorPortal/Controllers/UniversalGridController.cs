@@ -23,128 +23,58 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{name}/grid-config")]
-        public IActionResult GridConfig(string name)
+        public GridConfig GridConfig(string name)
         {
-            var config = _universalGridService.GetGridConfig(name);
-            return new JsonResult(config);
+            return _universalGridService.GetGridConfig(name);
         }
 
         [HttpGet]
         [Route("{name}/config/columns")]
-        public IActionResult GridColumns(string name)
+        public List<GridColConfig> GridColumns(string name)
         {
-            var columns = _universalGridService.GetGridColumnsConfig(name);
-            return new JsonResult(columns);
+            return _universalGridService.GetGridColumnsConfig(name);
         }
 
         [HttpGet]
         [Route("{name}/config/search")]
-        public IActionResult GridSearch(string name)
+        public List<SearchFieldConfig> GridSearch(string name)
         {
-            var config = _universalGridService.GetGridSearchConfig(name);
-
-            return new JsonResult(config);
+            return _universalGridService.GetGridSearchConfig(name);
         }
 
         [HttpGet]
         [Route("{name}/config/detail")]
-        public IActionResult GridDetail(string name)
+        public List<FormFieldConfig> GridDetail(string name)
         {
-            var config = _universalGridService.GetGridDetailConfig(name);
-            return new JsonResult(config);
+            return _universalGridService.GetGridDetailConfig(name);
         }
 
         [HttpPost]
         [Route("{name}/data")]
-        public IActionResult FetchData(string name, GridParam gridParam)
+        public GridData FetchData(string name, GridParam gridParam)
         {
-            var data = _universalGridService.GetGridData(name, gridParam);
-            return new JsonResult(data);
+            return _universalGridService.GetGridData(name, gridParam);
         }
 
         [HttpGet]
         [Route("{name}/data/{id}")]
-        public IActionResult FetchDataDetail(string name, string id)
+        public Dictionary<string, string> FetchDataDetail(string name, string id)
         {
-            var data = _universalGridService.GetGridDataDetail(name, id);
-            return new JsonResult(data);
+            return _universalGridService.GetGridDataDetail(name, id);
         }
 
         [HttpGet]
         [Route("{name}/data/create")]
-        public IActionResult AddData(string name, GridParam gridParam)
+        public bool AddData(string name, Dictionary<string, object> model)
         {
-            var columns = new List<GridColConfig>() {
-                new GridColConfig()
-                {
-                    field = "UserId",
-                    header = "CNP ID",
-                    width = "130px",
-                    filterType = "text"
-                },
-                new GridColConfig()
-                {
-                    field = "Name",
-                    header = "Name",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Email",
-                    header = "Email",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Phone",
-                    header = "Phone",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "AutoEmail",
-                    header = "Auto Email",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Vendor",
-                    header = "Vendor",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Employer",
-                    header = "Employer",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Division",
-                    header = "Division",
-                    width = "250px",
-                    filterType = "text"
-                },new GridColConfig()
-                {
-                    field = "Comments",
-                    header = "Comments",
-                    width = "250px",
-                    filterType = "text"
-                }
-            };
-
-            // _universalGridService.
-
-            return new JsonResult(columns);
+            return _universalGridService.AddGridData(name, model);
         }
 
         [HttpGet]
         [Route("{name}/data/{id}/update")]
-        public IActionResult UpdateDate(string name, GridParam gridParam)
+        public bool UpdateDate(string name, string id, Dictionary<string, object> model)
         {
-
-
-            return new JsonResult(null);
+            return _universalGridService.UpdateGridData(name, id, model);
         }
 
         [HttpGet]

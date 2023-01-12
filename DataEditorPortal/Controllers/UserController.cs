@@ -4,6 +4,7 @@ using DataEditorPortal.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
@@ -104,7 +105,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("update/{userId}")]
-        public IActionResult Update(Guid userId, [FromBody] User model)
+        public Guid Update(Guid userId, [FromBody] User model)
         {
             var dep_user = _depDbContext.Users.FirstOrDefault(u => u.Id == userId);
             if (dep_user == null)
@@ -124,12 +125,12 @@ namespace DataEditorPortal.Web.Controllers
             _depDbContext.Users.Add(dep_user);
             _depDbContext.SaveChanges();
 
-            return new JsonResult(dep_user.Id);
+            return dep_user.Id;
         }
 
         [HttpGet]
         [Route("{userId}/permissions")]
-        public IActionResult Permissions(Guid userId)
+        public List<AppRolePermission> Permissions(Guid userId)
         {
             var userPermissions = from up in _depDbContext.UserPermissions
                                   where up.UserId == userId
@@ -147,12 +148,12 @@ namespace DataEditorPortal.Web.Controllers
                             Selected = up != null
                         };
 
-            return new JsonResult(query.ToList());
+            return query.ToList();
         }
 
         [HttpPost]
         [Route("{userId}/permissions")]
-        public IActionResult UpdatePermissions(Guid userId, [FromBody] UserPermissions model)
+        public bool UpdatePermissions(Guid userId, [FromBody] UserPermissions model)
         {
             var username = AppUser.ParseUsername(User.Identity.Name).Username;
             var currentUserId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
@@ -180,12 +181,12 @@ namespace DataEditorPortal.Web.Controllers
             }
             _depDbContext.SaveChanges();
 
-            return new JsonResult(true);
+            return true;
         }
 
         [HttpGet]
         [Route("{userId}/roles")]
-        public IActionResult UserRoles(Guid userId)
+        public dynamic UserRoles(Guid userId)
         {
             var userPermissions = from up in _depDbContext.UserPermissions
                                   where up.UserId == userId
@@ -202,12 +203,12 @@ namespace DataEditorPortal.Web.Controllers
                             Selected = up != null
                         };
 
-            return new JsonResult(query.ToList());
+            return query.ToList();
         }
 
         [HttpPost]
         [Route("{userId}/roles")]
-        public IActionResult UpdateUserRoles(Guid userId, [FromBody] UserPermissions model)
+        public bool UpdateUserRoles(Guid userId, [FromBody] UserPermissions model)
         {
             var username = AppUser.ParseUsername(User.Identity.Name).Username;
             var currentUserId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
@@ -235,7 +236,7 @@ namespace DataEditorPortal.Web.Controllers
             }
             _depDbContext.SaveChanges();
 
-            return new JsonResult(true);
+            return true;
         }
     }
 }

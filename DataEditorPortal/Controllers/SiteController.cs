@@ -26,38 +26,38 @@ namespace DataEditorPortal.Web.Controllers
         [HttpGet]
         [Route("environment")]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-        public IActionResult GetEnvironment()
+        public dynamic GetEnvironment()
         {
             var section = _config.GetSection("SiteEvnironment");
             if (section == null) return null;
 
-            return new JsonResult(new
+            return new
             {
                 WebHeaderMessage = section.GetValue<string>("WebHeaderMessage"),
                 WebHeaderDescription = section.GetValue<string>("WebHeaderDescription")
-            });
+            };
         }
 
         [HttpGet]
         [Route("version")]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-        public IActionResult GetSiteVersion()
+        public dynamic GetSiteVersion()
         {
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             var filePath = Assembly.GetExecutingAssembly().Location;
             var date = new FileInfo(filePath).LastWriteTime.ToShortDateString();
 
-            return new JsonResult(new
+            return new
             {
                 version,
                 date
-            });
+            };
         }
 
         [HttpPost]
         [Route("menus")]
-        public IActionResult GetMenus()
+        public dynamic GetMenus()
         {
             var menus = _depDbContext.SiteMenus.ToList();
 
@@ -93,7 +93,7 @@ namespace DataEditorPortal.Web.Controllers
                     };
                 });
 
-            return new JsonResult(root);
+            return root;
         }
     }
 }

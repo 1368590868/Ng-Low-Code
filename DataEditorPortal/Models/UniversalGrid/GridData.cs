@@ -6,6 +6,5 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
     {
         public List<Dictionary<string, string>> Data { get; set; } = new List<Dictionary<string, string>>();
         public int Total { get; set; }
-        public string errormessage { get; set; }
     }
 }

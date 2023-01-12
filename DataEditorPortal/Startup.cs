@@ -1,3 +1,4 @@
+using AutoWrapper;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authentication.Negotiate;
@@ -81,6 +82,7 @@ namespace DataEditorPortal.Web
             services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
 
             services.AddControllersWithViews();
+
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -118,6 +120,7 @@ namespace DataEditorPortal.Web
                 app.UseSpaStaticFiles();
             }
 
+            app.UseApiResponseAndExceptionWrapper();
             app.UseRouting();
 
             // if (env.IsDevelopment())

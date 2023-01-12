@@ -19,6 +19,9 @@ namespace DataEditorPortal.Web.Services
         GridData GetGridData(string name, GridParam param);
 
         Dictionary<string, string> GetGridDataDetail(string name, string id);
+
+        bool UpdateGridData(string name, string id, Dictionary<string, object> model);
+        bool AddGridData(string name, Dictionary<string, object> model);
     }
 
     public class UniversalGridService : IUniversalGridService
@@ -162,8 +165,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    output.errormessage = "An Error in the query has occurred: " + ex.Message;
-                    return output;
+                    throw new Exception("An Error in the query has occurred: " + ex.Message);
                 }
             }
 
@@ -265,6 +267,117 @@ namespace DataEditorPortal.Web.Services
             return result.FormConfig;
         }
 
+        public bool AddGridData(string name, Dictionary<string, object> model)
+        {
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+
+            // get detail config
+            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+            if (detailConfig.UseCustomAction)
+            {
+                throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
+
+            var dataSource = new DataSourceConfig()
+            {
+                TableName = dataSourceConfig.TableName,
+                Columns = detailConfig.FormConfig.Select(x => x.key).ToList(),
+                QueryText = detailConfig.QueryForInsert
+            };
+            var queryText = _dbSqlBuilder.GenerateSqlTextForInsert(dataSource);
+
+            using (var con = _depDbContext.Database.GetDbConnection())
+            {
+                con.Open();
+                var cmd = con.CreateCommand();
+                cmd.Connection = con;
+
+                try
+                {
+                    cmd.CommandText = queryText;
+
+                    foreach (var column in dataSource.Columns)
+                    {
+                        if (model.Keys.Contains(column) && model[column] != null)
+                        {
+                            var value = model[column].ToString();
+                            cmd.Parameters.Add(new { column, value });
+                        }
+                    }
+
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    // output.errormessage = "An Error in the query has occurred: " + ex.Message;
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public bool UpdateGridData(string name, string id, Dictionary<string, object> model)
+        {
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+
+            // get detail config
+            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+            if (detailConfig.UseCustomAction)
+            {
+                throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
+
+            var dataSource = new DataSourceConfig()
+            {
+                TableName = dataSourceConfig.TableName,
+                Columns = detailConfig.FormConfig.Select(x => x.key).ToList(),
+                Filters = new List<FilterParam>()
+                {
+                    new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "equals", value = id }
+                },
+                QueryText = detailConfig.QueryForUpdate
+            };
+            var queryText = _dbSqlBuilder.GenerateSqlTextForUpdate(dataSource);
+
+            using (var con = _depDbContext.Database.GetDbConnection())
+            {
+                con.Open();
+                var cmd = con.CreateCommand();
+                cmd.Connection = con;
+
+                try
+                {
+                    cmd.CommandText = queryText;
+
+                    foreach (var column in dataSource.Columns)
+                    {
+                        if (model.Keys.Contains(column) && model[column] != null)
+                        {
+                            var value = model[column].ToString();
+                            cmd.Parameters.Add(new { column, value });
+                        }
+                    }
+
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    // output.errormessage = "An Error in the query has occurred: " + ex.Message;
+                    return false;
+                }
+            }
+
+            return true;
+        }
         #endregion
     }
 }

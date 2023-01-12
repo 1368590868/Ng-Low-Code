@@ -7,8 +7,7 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IDbSqlBuilder
     {
-        // string GenerateWhereClause(List<FilterParam> filterParams);
-        //string GenerateOrderClause(List<SortParam> sortParams);
+
         string GenerateSqlTextForList(DataSourceConfig config);
         string UsePagination(string query, int startIndex, int indexCount);
         string UseOrderBy(string query, List<SortParam> sortParams);
@@ -17,6 +16,8 @@ namespace DataEditorPortal.Web.Services
         string UseSearches(string query, List<SearchParam> filterParams);
 
         string GenerateSqlTextForDetail(DataSourceConfig config);
+        string GenerateSqlTextForInsert(DataSourceConfig config);
+        string GenerateSqlTextForUpdate(DataSourceConfig config);
     }
 
     public class DbSqlServerBuilder : IDbSqlBuilder
@@ -293,6 +294,49 @@ namespace DataEditorPortal.Web.Services
                 var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
 
                 var queryText = $@"SELECT {columns} FROM dep.{config.TableName} WHERE {where}";
+
+                return queryText;
+            }
+        }
+
+        public string GenerateSqlTextForInsert(DataSourceConfig config)
+        {
+            if (config.QueryText != null)
+            {
+                // advanced datasource, ingore other setting.
+                return config.QueryText;
+            }
+            else
+            {
+                if (config.Columns.Count <= 0) throw new Exception("Columns can not be empty during generating insert script.");
+
+                var columns = string.Join(",", config.Columns.Select(x => $"[{x}]"));
+
+                var param = string.Join(",", config.Columns.Select(x => $"@{x}"));
+
+                var queryText = $@"INSERT INTO dep.{config.TableName} ({columns}) VALUES ({param})";
+
+                return queryText;
+            }
+        }
+
+        public string GenerateSqlTextForUpdate(DataSourceConfig config)
+        {
+            if (config.QueryText != null)
+            {
+                // advanced datasource, ingore other setting.
+                return config.QueryText;
+            }
+            else
+            {
+                if (config.Columns.Count <= 0) throw new Exception("Columns can not be empty during generating update script.");
+                if (config.Filters.Count <= 0) throw new Exception("Filters can not be empty during generating update script.");
+
+                var sets = string.Join(",", config.Columns.Select(x => $"[{x}] = @{x}"));
+
+                var where = string.Join(" AND ", GenerateWhereClause(config.Filters));
+
+                var queryText = $@"UPDATE dep.{config.TableName} SET {sets} WHERE {where}";
 
                 return queryText;
             }
