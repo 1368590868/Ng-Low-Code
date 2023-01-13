@@ -5,7 +5,6 @@ import { NotifyService } from 'src/app/core/utils/notify.service';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UserManagerForm } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager-services/user-manager.service';
-import { GridActionOption } from '../../universal-grid-action.module';
 
 @Component({
   selector: 'app-user-manager-action',
@@ -181,22 +180,12 @@ export class UserManagerActionComponent extends GridActionDirective {
       ]
     }
   ];
-  actions: GridActionOption[] = [];
 
   constructor(
     private userManagerService: UserManagerService,
     private notifyService: NotifyService
   ) {
     super();
-    this.actions = [
-      {
-        name: 'add-role',
-        wrapper: {
-          label: 'Role dialog',
-          icon: 'pi pi-plus'
-        }
-      }
-    ];
   }
 
   openRoleVisible(): void {

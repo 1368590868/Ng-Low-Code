@@ -2,8 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import { GridActionDirective } from '../../../directives/grid-action.directive';
-import { UserManagerForm } from '../../../models/user-manager';
+import { GridActionDirective } from '../../directives/grid-action.directive';
+import { UserManagerForm } from '../../models/user-manager';
 
 @Component({
   selector: 'app-manager-role',

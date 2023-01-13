@@ -10,19 +10,10 @@
     </button>
   </formly-form>
 </form>
-
-<p-accordion [multiple]="true">
-  <p-accordionTab header="CATEGORY 1">
+<label class="line-height-3"> Check Role </label>
+<p-accordion [multiple]="false">
+  <p-accordionTab header="CATEGORY 1" [selected]="true">
     <p-table [value]="permissions">
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 4rem">
-            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-          </th>
-          <th style="min-width: 14rem">Role name</th>
-          <th style="min-width: 14rem">Role desc</th>
-        </tr>
-      </ng-template>
       <ng-template pTemplate="body" let-permission>
         <tr>
           <td>
@@ -42,15 +33,6 @@
   <p-accordionTab header="CATEGORY 2"> Content 2 </p-accordionTab>
   <p-accordionTab header="CATEGORY 3">
     <p-table [value]="permissions">
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 4rem">
-            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-          </th>
-          <th style="min-width: 14rem">Role name</th>
-          <th style="min-width: 14rem">Role desc</th>
-        </tr>
-      </ng-template>
       <ng-template pTemplate="body" let-permission>
         <tr>
           <td>

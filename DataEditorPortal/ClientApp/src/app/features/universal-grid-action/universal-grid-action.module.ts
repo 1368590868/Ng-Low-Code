@@ -42,7 +42,7 @@ import { PanelWrapperComponent } from './components/user-manager-action/panel-wa
 import { FormlySelectModule } from '../ngx-formly/select/select.module';
 import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
 import { CheckboxModule } from 'primeng/checkbox';
-import { ManagerRoleComponent } from './components/user-manager-action/manager-role/manager-role.component';
+import { ManagerRoleComponent } from './components/manager-role/manager-role.component';
 
 export * from './models/grid-config';
 
@@ -155,7 +155,7 @@ export * from './models/grid-config';
           requireGridRowSelected: false,
           component: UserManagerActionComponent,
           wrapper: {
-            header: 'user-manager',
+            header: 'User Manager',
             dialogStyle: { width: '40rem' },
             cancelText: 'No',
             okText: 'Yes'
@@ -166,7 +166,7 @@ export * from './models/grid-config';
           requireGridRowSelected: false,
           component: ManagerRoleComponent,
           wrapper: {
-            header: 'Add Role Confirmation',
+            header: 'Manage Roles',
             dialogStyle: { width: '40rem' },
             cancelText: 'No',
             okText: 'Yes'

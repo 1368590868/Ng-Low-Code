@@ -90,6 +90,13 @@ export class TableComponent implements OnInit, OnDestroy {
           label: 'User Manager',
           icon: 'pi pi-plus'
         }
+      },
+      {
+        name: 'add-role',
+        wrapper: {
+          label: 'Manage Roles',
+          icon: 'pi pi-plus'
+        }
       }
     ];
 
