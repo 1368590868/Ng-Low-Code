@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -83,16 +84,17 @@ namespace DataEditorPortal.Web.Services
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
 
+            #region compose the query text
+
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
             var queryText = _dbSqlBuilder.GenerateSqlTextForList(dataSourceConfig);
 
             // convert search criteria to where clause
-            // var searchBy = _dbSqlBuilder.GenerateWhereClause(param.Filters);
             var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
             if (param.Searches != null)
             {
-                var rules = param.Searches
+                var searchRules = param.Searches
                     .Where(x => x.Value != null)
                     .Select(x =>
                     {
@@ -114,14 +116,10 @@ namespace DataEditorPortal.Web.Services
                     })
                     .ToList();
 
-                queryText = _dbSqlBuilder.UseSearches(queryText, rules);
+                queryText = _dbSqlBuilder.UseSearches(queryText, searchRules);
             }
 
             // convert grid filter to where clause
-            // var filterBy = _dbSqlBuilder.GenerateWhereClause(param.Filters);
-
-            // generate Id filter
-
             queryText = _dbSqlBuilder.UseFilters(queryText, param.Filters);
 
             // generate order by clause
@@ -135,6 +133,8 @@ namespace DataEditorPortal.Web.Services
             var pagedQueryText = _dbSqlBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount);
             // generate sql to calculate count
             var totalQueryText = _dbSqlBuilder.UseCount(queryText);
+
+            #endregion
 
             // run sql query text
             var output = new GridData();
@@ -159,12 +159,15 @@ namespace DataEditorPortal.Web.Services
                             fieldnames[i] = dr.GetName(i);
                         }
 
+                        var schema = dr.GetSchemaTable();
+
                         while (dr.Read())
                         {
                             var row = new Dictionary<string, string>();
                             for (int i = 0; i < fields; i++)
                             {
-                                row[fieldnames[i]] = dr[i].ToString();
+                                var typename = dr.GetFieldType(i);
+                                row[fieldnames[i]] = _dbSqlBuilder.FormatValue(dr[i], schema.Rows[i]);
                             }
                             output.Data.Add(row);
                         }
@@ -316,12 +319,14 @@ namespace DataEditorPortal.Web.Services
                             fieldnames[i] = dr.GetName(i);
                         }
 
+                        var schema = dr.GetSchemaTable();
+
                         while (dr.Read())
                         {
                             result = new Dictionary<string, string>();
                             for (int i = 0; i < fields; i++)
                             {
-                                result[fieldnames[i]] = dr[i].ToString();
+                                result[fieldnames[i]] = _dbSqlBuilder.FormatValue(dr[i], schema.Rows[i]);
                             }
                         }
                     }
@@ -486,7 +491,7 @@ namespace DataEditorPortal.Web.Services
                 TableName = dataSourceConfig.TableName,
                 Filters = new List<FilterParam>()
                 {
-                    new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "in", value = $"'{string.Join("','", ids)}'" }
+                    new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "in", value = ids }
                 },
                 QueryText = detailConfig.QueryForDelete
             });

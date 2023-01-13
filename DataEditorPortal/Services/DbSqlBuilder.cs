@@ -1,7 +1,9 @@
 ﻿using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Text.Json;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -19,6 +21,8 @@ namespace DataEditorPortal.Web.Services
         string GenerateSqlTextForInsert(DataSourceConfig config);
         string GenerateSqlTextForUpdate(DataSourceConfig config);
         string GenerateSqlTextForDelete(DataSourceConfig config);
+
+        string FormatValue(object value, DataRow schema);
     }
 
     public class DbSqlServerBuilder : IDbSqlBuilder
@@ -55,86 +59,113 @@ namespace DataEditorPortal.Web.Services
                 field = item.dBFieldExpression;
             }
 
-            //For date conversions
-            string date = "";
-            string value = item.value.ToString().ToUpper();
-            switch (item.matchMode)
+            var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(item.value));
+
+            if (jsonElement.ValueKind == JsonValueKind.True || jsonElement.ValueKind == JsonValueKind.False)
             {
-                case "startsWith":
-                    result = $"[{field}] like '{value}%'";
-                    break;
+                var value = jsonElement.GetBoolean();
+                result = $"[{field}] = {(value ? 1 : 0)}";
+            }
+            else if (jsonElement.ValueKind == JsonValueKind.Number)
+            {
+                var value = jsonElement.GetDecimal();
+                switch (item.matchMode)
+                {
+                    case "gt":
+                        result = $"[{field}] > {value}";
+                        break;
 
-                case "contains":
-                    result = $"[{field}] like '%{value}%'";
-                    break;
-
-                case "notContains":
-                    result = $"[{field}] not like '%{value}%'";
-                    break;
-
-                case "endsWith":
-                    result = $"[{field}] like '%{value}'";
-                    break;
-
-                case "equals":
-                    result = $"[{field}] = '{value}'";
-                    break;
-
-                case "notEquals":
-                    result = $"[{field}] <> '{value}'";
-                    break;
-
-                case "dateIs":
-                    //Get Date
-                    date = DateTime.Parse(value).ToShortDateString();
-                    result = $"{field} = TO_DATE('{date}','mm/dd/yyyy')";
-                    break;
-
-                case "dateIsNot":
-                    //Get Date
-                    date = DateTime.Parse(value).ToShortDateString();
-                    result = $"{field} <> TO_DATE('{date}','mm/dd/yyyy')";
-                    break;
-
-                case "dateBefore":
-                    //Get Date
-                    date = DateTime.Parse(value).ToShortDateString();
-                    result = $"{field} < TO_DATE('{date}','mm/dd/yyyy')";
-                    break;
-
-                case "dateAfter":
-                    //Get Date
-                    date = DateTime.Parse(value).ToShortDateString();
-                    result = $"{field} > TO_DATE('{date}','mm/dd/yyyy')";
-                    break;
-
-                case "gt":
-                    //Get Date
-                    result = $"{field} > {value}";
-                    break;
-
-                case "lt":
-                    //Get Date
-                    result = $"{field} < {value}";
-                    break;
+                    case "lt":
+                        result = $"[{field}] < {value}";
+                        break;
 
 
-                case "gte":
-                    //Get Date
-                    result = $"{field} >= {value}";
-                    break;
+                    case "gte":
+                        result = $"[{field}] >= {value}";
+                        break;
 
-                case "lte":
-                    //Get Date
-                    result = $"{field} <= {value}";
-                    break;
+                    case "lte":
+                        result = $"[{field}] <= {value}";
+                        break;
 
-                case "in":
-                    result = $"{field} IN ({value})";
-                    break;
+                    case "equals":
+                        result = $"[{field}] = {value}";
+                        break;
 
-                default:
-                    break;
+                    case "notEquals":
+                        result = $"[{field}] <> {value}";
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            else if (jsonElement.ValueKind == JsonValueKind.Array)
+            {
+                if (jsonElement.GetArrayLength() > 0 && item.matchMode == "in")
+                {
+                    var inStr = "";
+                    jsonElement.EnumerateArray().ToList().ForEach(value =>
+                    {
+                        if (value.ValueKind == JsonValueKind.Number)
+                        {
+                            inStr += $",'{value.GetDecimal()}'";
+                        }
+                        else
+                        {
+                            inStr += $",'{value.GetString()}'";
+                        }
+                    });
+                    result = $"[{field}] IN ({inStr.Substring(1)})";
+                }
+            }
+            else if (jsonElement.ValueKind == JsonValueKind.String)
+            {
+                var value = jsonElement.GetString().Replace("'", "''");
+                switch (item.matchMode)
+                {
+                    case "startsWith":
+                        result = $"[{field}] like '{value}%'";
+                        break;
+
+                    case "contains":
+                        result = $"[{field}] like '%{value}%'";
+                        break;
+
+                    case "notContains":
+                        result = $"[{field}] not like '%{value}%'";
+                        break;
+
+                    case "endsWith":
+                        result = $"[{field}] like '%{value}'";
+                        break;
+
+                    case "equals":
+                        result = $"[{field}] = '{value}'";
+                        break;
+
+                    case "notEquals":
+                        result = $"[{field}] <> '{value}'";
+                        break;
+
+                    case "dateIs":
+                        result = $"[{field}] = '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                        break;
+
+                    case "dateIsNot":
+                        result = $"[{field}] <> '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                        break;
+
+                    case "dateBefore":
+                        result = $"[{field}] < '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                        break;
+
+                    case "dateAfter":
+                        result = $"[{field}] > '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                        break;
+                    default:
+                        break;
+                }
             }
 
             return result;
@@ -365,6 +396,18 @@ namespace DataEditorPortal.Web.Services
 
                 return queryText;
             }
+        }
+
+        public string FormatValue(object value, DataRow schema)
+        {
+            var sqlDbType = (SqlDbType)schema["ProviderType"];
+            if (sqlDbType == SqlDbType.Date) return Convert.ToDateTime(value).ToString("d");
+            if (sqlDbType == SqlDbType.DateTime || sqlDbType == SqlDbType.DateTime2 || sqlDbType == SqlDbType.SmallDateTime)
+                return Convert.ToDateTime(value).ToString();
+            if (sqlDbType == SqlDbType.Float || sqlDbType == SqlDbType.Decimal || sqlDbType == SqlDbType.Money)
+                return Convert.ToDecimal(value).ToString("N2");
+            else
+                return value.ToString();
         }
     }
 }
