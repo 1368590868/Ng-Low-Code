@@ -18,19 +18,19 @@ export class ViewRecordActionComponent
   implements OnGridActionDialogShow
 {
   viewData: ViewColumn[];
+  loading = true;
 
   constructor() {
     super();
     this.viewData = [];
   }
   onDialogShow(): void {
-    console.log('On dialog show');
-    console.log(this.selectedRecords[0]);
     if (this.selectedRecords[0] !== undefined) {
       const key = Object.keys(this.selectedRecords[0]).map(key => {
         return { name: key, value: this.selectedRecords[0][key] };
       });
       this.viewData = key;
+      this.loading = false;
       this.loadedEvent.emit();
     }
   }

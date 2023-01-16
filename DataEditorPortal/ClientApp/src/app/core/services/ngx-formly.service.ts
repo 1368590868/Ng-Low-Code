@@ -15,7 +15,7 @@ export class NgxFormlyService {
   getLookup(id: string, data?: any): Observable<any[]> {
     return this.http
       .post<ApiResponse<any[]>>(
-        `${this._apiUrl}lookup/options/${id}`,
+        `${this._apiUrl}lookup/${id}/options`,
         data || {}
       )
       .pipe(map(res => res.result || []));
