@@ -10,3 +10,25 @@ export interface Permisstion {
   name?: string;
   desc?: string;
 }
+
+export interface RoleList {
+  id?: string;
+  roleName?: string;
+  roleDescription?: string;
+  label?: string;
+  value?: string;
+}
+
+export interface RolePermissions {
+  id?: string;
+  selected?: boolean;
+  permissionName?: string;
+  permissionDescription?: string;
+  category?: string;
+}
+
+export interface ManageRoleForm {
+  roleName?: string;
+  roleDescription?: string;
+  permissions?: RolePermissions[];
+}

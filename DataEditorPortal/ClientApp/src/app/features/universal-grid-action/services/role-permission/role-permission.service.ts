@@ -2,7 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiResponse } from 'src/app/core/models/api-response';
-import { Role, Permisstion } from '../../models/role-permisstion';
+import {
+  Role,
+  Permisstion,
+  RoleList,
+  RolePermissions
+} from '../../models/role-permisstion';
 
 @Injectable({
   providedIn: 'root'
@@ -42,5 +47,19 @@ export class RolePermissionService {
       `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`,
       permissions
     );
+  }
+
+  getRoleList() {
+    return this.http
+      .get<ApiResponse<RoleList[]>>(`${this._apiUrl}role/list`)
+      .pipe(map(res => res.result || []));
+  }
+
+  getRolePermissions(roleId: string) {
+    return this.http
+      .get<ApiResponse<RolePermissions[]>>(
+        `${this._apiUrl}role/${roleId}/permissions`
+      )
+      .pipe(map(res => res.result || []));
   }
 }
