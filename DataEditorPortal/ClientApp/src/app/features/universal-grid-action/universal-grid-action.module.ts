@@ -42,7 +42,7 @@ import { PanelWrapperComponent } from './components/user-manager-action/panel-wa
 import { FormlySelectModule } from '../ngx-formly/select/select.module';
 import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
 import { CheckboxModule } from 'primeng/checkbox';
-import { ManagerRoleComponent } from './components/manager-role/manager-role.component';
+import { ManagerRoleComponent } from './components/manager-role-action/manager-role.component-action';
 
 export * from './models/grid-config';
 
