@@ -1,9 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { tap } from 'rxjs';
 import { NotifyService } from 'src/app/core/utils/notify.service';
 import { GridActionDirective } from '../../directives/grid-action.directive';
+import { Permisstion } from '../../models/role-permisstion';
 import { UserManagerForm } from '../../models/user-manager';
+import { RolePermissionService } from '../../services/role-permission/role-permission.service';
 import { UserManagerService } from '../../services/user-manager-services/user-manager.service';
 
 @Component({
@@ -16,7 +19,30 @@ export class UserManagerActionComponent extends GridActionDirective {
   form = new FormGroup({});
   model: UserManagerForm = {};
   options: FormlyFormOptions = {};
+
   roleVisible = false;
+  permissionVisible = false;
+  isLoading = false;
+  isPermissionLoading = false;
+  permisstionSelect = [];
+  rolesArr = [
+    { key: '', checked: true, label: 'Admin', value: 'Admin' },
+    { key: '', checked: false, label: 'User', value: 'User' },
+    { key: '', checked: false, label: 'Guest', value: 'Guest' }
+  ];
+
+  permissions: Permisstion[] = [
+    {
+      id: 1,
+      name: 'Permission 1',
+      desc: 'Description 1'
+    },
+    {
+      id: 2,
+      name: 'Permission 2',
+      desc: 'Description 2 '
+    }
+  ];
 
   fields: FormlyFieldConfig[] = [
     {
@@ -183,13 +209,10 @@ export class UserManagerActionComponent extends GridActionDirective {
 
   constructor(
     private userManagerService: UserManagerService,
+    private rolePermisstionService: RolePermissionService,
     private notifyService: NotifyService
   ) {
     super();
-  }
-
-  openRoleVisible(): void {
-    this.roleVisible = !this.roleVisible;
   }
 
   onFormSubmit(model: UserManagerForm) {
@@ -213,5 +236,62 @@ export class UserManagerActionComponent extends GridActionDirective {
 
   onCancel(): void {
     this.options.resetModel?.();
+  }
+  /**
+   * Role dialog functions
+   */
+  onRoleShow(): void {
+    this.rolePermisstionService
+      .getRoles()
+      .pipe(
+        tap(result => {
+          this.rolesArr = result;
+        })
+      )
+      .subscribe();
+  }
+  onRoleHide(): void {
+    console.log('hide');
+  }
+
+  onRoleCancel(): void {
+    this.roleVisible = false;
+  }
+
+  onRoleOk(): void {
+    this.isLoading = true;
+    this.rolePermisstionService.saveRoles(this.rolesArr).subscribe(res => {
+      if (res.isError) {
+        this.notifyService.notifySuccess('Success', 'Save Success');
+        this.roleVisible = false;
+      }
+      this.isLoading = false;
+    });
+  }
+
+  /**
+   * permission dialog functions
+   */
+  onPermisstionShow(): void {
+    this.rolePermisstionService.getPermissions().subscribe(res => {
+      this.permissions = res;
+    });
+  }
+  onPermissionCancel(): void {
+    this.permissionVisible = false;
+  }
+
+  onPermisstionOk(): void {
+    this.isPermissionLoading = true;
+    console.log(this.permisstionSelect);
+    this.rolePermisstionService
+      .savePermissions(this.permisstionSelect)
+      .subscribe(res => {
+        if (res.isError) {
+          this.notifyService.notifySuccess('Success', 'Save Success');
+          this.permissionVisible = false;
+        }
+        this.isPermissionLoading = false;
+      });
   }
 }
