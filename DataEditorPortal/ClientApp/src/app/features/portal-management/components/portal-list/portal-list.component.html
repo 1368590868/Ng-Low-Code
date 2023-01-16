@@ -1,0 +1,65 @@
+<div class="layout-content p-2 flex">
+  <p-card styleClass="h-full">
+    <p-treeTable [value]="data" styleClass="p-datatable-striped">
+      <ng-template pTemplate="caption">
+        <div class="flex align-items-center mb-2">
+          <h3 class="">Portal Management</h3>
+          <p-button
+            icon="pi pi-plus"
+            class="ml-auto"
+            styleClass="p-button-outlined"
+            label="New Portal Item"
+            (click)="addRootItem()"></p-button>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 18%">Name</th>
+          <th style="width: 18%">label</th>
+          <th style="width: 12%">Type</th>
+          <th>Description</th>
+          <th style="width: 10rem">Status</th>
+          <th style="width: 5rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+        <tr [ttRow]="rowNode">
+          <td style="width: 18%">
+            <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+            {{ rowData.name }}
+          </td>
+          <td style="width: 18%">{{ rowData.label }}</td>
+          <td style="width: 12%">{{ rowData.type }}</td>
+          <td>{{ rowData.description }}</td>
+          <td style="width: 10rem">
+            <p-tag
+              *ngIf="rowData.status === 0"
+              icon="pi pi-file-edit"
+              severity="info"
+              value="Draft"></p-tag>
+            <p-tag
+              *ngIf="rowData.status === 1"
+              icon="pi pi-check"
+              severity="success"
+              value="Published"></p-tag>
+          </td>
+          <td style="width: 5rem">
+            <p-menu
+              #menu
+              [popup]="true"
+              [model]="getMenuList(rowData)"
+              appendTo="body"
+              [style]="{ width: 'auto' }"></p-menu>
+            <button
+              type="button"
+              pButton
+              icon="pi pi-ellipsis-v"
+              class="p-button-rounded p-button-text"
+              (click)="menu.toggle($event)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-treeTable>
+  </p-card>
+</div>
+<app-add-portal-dialog #addDialog></app-add-portal-dialog>

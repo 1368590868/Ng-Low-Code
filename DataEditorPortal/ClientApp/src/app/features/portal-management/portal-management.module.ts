@@ -9,23 +9,14 @@ import { FormlyPrimeNGModule } from '@ngx-formly/primeng';
 import { FormlyDatepickerModule } from '../ngx-formly/datepicker';
 import { FormlyMultiSelectModule } from '../ngx-formly/multiselect';
 import { FormlyInputMaskModule } from '../ngx-formly/inputMask';
-
-import { UniversalGridRoutingModule } from './universal-grid-routing.module';
-import { SplitAreaComponent } from './pages/split-area/split-area.component';
-import { SearchComponent } from './components/search/search.component';
-import { TableComponent } from './components/table/table.component';
-import { UniversalGridActionModule } from '../universal-grid-action/universal-grid-action.module';
+import { FormlySelectModule } from '../ngx-formly/select';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
 import { ToastModule } from 'primeng/toast';
-import { MenubarModule } from 'primeng/menubar';
-import { AvatarModule } from 'primeng/avatar';
-import { SplitterModule } from 'primeng/splitter';
 import { DropdownModule } from 'primeng/dropdown';
 import { TableModule } from 'primeng/table';
 import { CalendarModule } from 'primeng/calendar';
-import { SliderModule } from 'primeng/slider';
 import { DialogModule } from 'primeng/dialog';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ContextMenuModule } from 'primeng/contextmenu';
@@ -34,11 +25,24 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { TreeTableModule } from 'primeng/treetable';
+import { TagModule } from 'primeng/tag';
+import { MenuModule } from 'primeng/menu';
+import { SkeletonModule } from 'primeng/skeleton';
+import { KeyFilterModule } from 'primeng/keyfilter';
+
+import { PortalManagementRoutingModule } from './portal-management-routing.module';
+import {
+  PortalListComponent,
+  AddPortalDialogComponent
+} from './components/portal-list';
 
 @NgModule({
-  declarations: [SplitAreaComponent, SearchComponent, TableComponent],
+  declarations: [PortalListComponent, AddPortalDialogComponent],
   imports: [
     CommonModule,
+    PortalManagementRoutingModule,
     FormsModule,
     ReactiveFormsModule,
     FormlyModule.forRoot({
@@ -50,18 +54,13 @@ import { ButtonModule } from 'primeng/button';
     FormlyDatepickerModule,
     FormlyMultiSelectModule,
     FormlyInputMaskModule,
-    UniversalGridRoutingModule,
-    UniversalGridActionModule,
+    FormlySelectModule,
     // primeNg
     AnimateModule,
     ToastModule,
-    MenubarModule,
-    AvatarModule,
-    SplitterModule,
     DropdownModule,
     TableModule,
     CalendarModule,
-    SliderModule,
     DialogModule,
     MultiSelectModule,
     ContextMenuModule,
@@ -69,7 +68,13 @@ import { ButtonModule } from 'primeng/button';
     ProgressBarModule,
     SplitButtonModule,
     RippleModule,
-    ButtonModule
+    ButtonModule,
+    CardModule,
+    TreeTableModule,
+    TagModule,
+    MenuModule,
+    SkeletonModule,
+    KeyFilterModule
   ]
 })
-export class UniversalGridModule {}
+export class PortalManagementModule {}

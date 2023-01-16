@@ -1,0 +1,17 @@
+@media screen and (min-width: 1729px) {
+  .layout-content {
+    width: 1504px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    min-height: calc(100% - 7rem);
+  }
+}
+
+:host {
+  ::ng-deep {
+    .p-button.p-button-icon-only.p-button-rounded {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+}
