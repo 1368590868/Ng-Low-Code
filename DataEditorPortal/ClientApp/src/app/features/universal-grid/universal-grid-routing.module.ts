@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UniversalGridComponent } from './universal-grid.component';
+import { SplitAreaComponent } from './pages/split-area/split-area.component';
 
-const routes: Routes = [{ path: '', component: UniversalGridComponent }];
+const routes: Routes = [{ path: '', component: SplitAreaComponent }];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

@@ -1,4 +1,8 @@
-<p-table [value]="viewData" [rowHover]="true" styleClass="p-datatable-striped">
+<p-table
+  *ngIf="!loading; else elseBlock"
+  [value]="viewData"
+  [rowHover]="true"
+  styleClass="p-datatable-striped">
   <ng-template pTemplate="header">
     <tr>
       <th>Name</th>
@@ -12,3 +16,13 @@
     </tr>
   </ng-template>
 </p-table>
+<ng-template #elseBlock>
+  <div class="flex flex-wrap" *ngFor="let e of [].constructor(6)">
+    <p class="w-4 px-2 my-2 py-1">
+      <p-skeleton></p-skeleton>
+    </p>
+    <p class="w-8 px-2 my-2 py-1">
+      <p-skeleton></p-skeleton>
+    </p>
+  </div>
+</ng-template>

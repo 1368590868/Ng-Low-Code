@@ -79,13 +79,13 @@ export class ExportExcelActionComponent
       const param = this.fetchDataParam as ExportParam;
       param.fileName = model.fileName;
       if (model.exportOption === 'Selection') {
-        const selectedIds: string[] = this.selectedRecords.map((x: any) => {
-          return (x[this.recordKey] as string).replace("'", '');
+        const selectedIds = this.selectedRecords.map((x: any) => {
+          return x[this.recordKey];
         });
         param.filters.push({
           field: this.recordKey,
           matchMode: 'in',
-          value: `'${selectedIds.join(`','`)}'`
+          value: selectedIds
         });
       }
 

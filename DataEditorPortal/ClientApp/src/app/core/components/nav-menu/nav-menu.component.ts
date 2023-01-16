@@ -14,8 +14,31 @@ export class NavMenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.configData.getSiteMenus().subscribe((res: any) => {
+    this.configData.getSiteMenus().subscribe((res: any[]) => {
+      res.forEach(m => {
+        this.setMenu(m);
+      });
       this.items = res;
     });
+  }
+
+  setMenu(menu: any) {
+    if (menu && menu.description) {
+      menu.tooltipOptions = {
+        tooltipPosition: 'bottom',
+        showDelay: 500,
+        tooltipLabel: menu.description
+      };
+    }
+    if (menu.type === 'Portal Item') {
+      menu.routerLink = `/portal-item/${menu.name.toLowerCase()}`;
+    } else if (menu.type === 'External') {
+      menu.url = menu.link;
+    } else menu.routerLink = menu.link;
+
+    menu.items &&
+      menu.items.forEach((i: any) => {
+        this.setMenu(i);
+      });
   }
 }

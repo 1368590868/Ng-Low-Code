@@ -14,6 +14,13 @@ const routes: Routes = [
       import('./features/universal-grid/universal-grid.module').then(
         m => m.UniversalGridModule
       )
+  },
+  {
+    path: 'portal-management',
+    loadChildren: () =>
+      import('./features/portal-management/portal-management.module').then(
+        m => m.PortalManagementModule
+      )
   }
 ];
 
