@@ -333,8 +333,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    // output.errormessage = "An Error in the query has occurred: " + ex.Message;
-                    return result;
+                    throw new Exception("An Error in the query has occurred: " + ex.Message);
                 }
             }
 

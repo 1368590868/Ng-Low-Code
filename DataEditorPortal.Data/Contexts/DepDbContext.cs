@@ -19,6 +19,7 @@ namespace DataEditorPortal.Data.Contexts
         public virtual DbSet<SitePermissionRole> SitePermissionRoles { get; set; }
 
         public virtual DbSet<SiteMenu> SiteMenus { get; set; }
+        public virtual DbSet<Lookup> Lookups { get; set; }
 
         public virtual DbSet<UniversalGridConfiguration> UniversalGridConfigurations { get; set; }
 

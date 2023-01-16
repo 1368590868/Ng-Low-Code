@@ -4,14 +4,16 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20230113064125_addLookup")]
+    partial class addLookup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,7 +31,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("QueryText")
+                    b.Property<string>("QueryScripts")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

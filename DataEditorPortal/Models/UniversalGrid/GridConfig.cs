@@ -17,10 +17,8 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string type { get; set; }
         public object defaultValue { get; set; }
         public object props { get; set; }
-
-        // advance field dependence
-        public string dependOnFields { get; set; }
     }
+
     public class SearchFieldConfig : FormFieldConfig
     {
         // search rule

@@ -26,10 +26,10 @@ namespace DataEditorPortal.Web.Controllers
         [Route("list")]
         public List<SiteRole> List()
         {
-            return _depDbContext.SiteRoles.ToList();
+            return _depDbContext.SiteRoles.OrderBy(x => x.RoleName).ToList();
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("create")]
         public Guid Create([FromBody] AppRole role)
         {
@@ -65,7 +65,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPost]
-        [Route("update/{roleId}")]
+        [Route("{roleId}/update")]
         public Guid Update(Guid roleId, [FromBody] AppRole role)
         {
             var username = AppUser.ParseUsername(User.Identity.Name).Username;
@@ -110,6 +110,7 @@ namespace DataEditorPortal.Web.Controllers
             var query = from sp in _depDbContext.SitePermissions
                         join p in sitePermissions on sp.Id equals p.SitePermissionId into rps
                         from rp in rps.DefaultIfEmpty()
+                        orderby sp.Category, sp.PermissionName
                         select new AppRolePermission()
                         {
                             Id = sp.Id,
