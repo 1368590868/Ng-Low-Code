@@ -12,8 +12,11 @@
 </form>
 <label class="line-height-3"> Permissions </label>
 <p-accordion [multiple]="false">
-  <p-accordionTab header="CATEGORY 1" [selected]="true">
-    <p-table [value]="permissions" [(selection)]="permissionSelect">
+  <p-accordionTab
+    *ngFor="let item of groupPermissions; let i = index"
+    [header]="this.permissions[i][0].category"
+    [selected]="true">
+    <p-table [value]="permissions[i]" [(selection)]="permissionSelect[i]">
       <ng-template pTemplate="body" let-permission>
         <tr>
           <td>
@@ -21,10 +24,10 @@
           </td>
 
           <td>
-            <span> {{ permission.permissionName }} </span>
+            <span> {{ permission?.permissionName }} </span>
           </td>
           <td>
-            <span> {{ permission.permissionDescription }}</span>
+            <span> {{ permission?.permissionDescription }}</span>
           </td>
         </tr>
       </ng-template>

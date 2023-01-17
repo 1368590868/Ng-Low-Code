@@ -34,12 +34,25 @@ export class ManagerRoleComponent
   roleList: RoleList[] = [];
 
   permissions: any[] = [];
+  groupPermissions: any[] = [];
   constructor(
     private notifyService: NotifyService,
     private rolePermissionService: RolePermissionService
   ) {
     super();
-    this.permissions = [];
+  }
+
+  groupBy(objectArray: any[]) {
+    const map = new Map();
+    objectArray.forEach((item, _, arr) => {
+      if (!map.has(item.category)) {
+        map.set(
+          item.category,
+          arr.filter(a => a.category == item.category)
+        );
+      }
+    });
+    return Array.from(map).map(item => [...item[1]]);
   }
 
   onDialogShow(): void {
@@ -146,24 +159,35 @@ export class ManagerRoleComponent
 
   getRolePermissionsList(roleId = '', isNew = false) {
     this.rolePermissionService.getRolePermissions(roleId).subscribe(res => {
-      this.permissions = res;
+      this.groupPermissions = this.groupBy(res);
+      this.groupPermissions.map((item, i) => {
+        this.permissions[i] = item;
+      });
+
       if (isNew) {
         this.permissions.map(res => {
-          res.selected = false;
+          res.map((item: any) => {
+            item.selected = false;
+          });
         });
       }
-      this.permissionSelect = this.permissions.filter(res => res.selected);
+      this.permissions.map((res, i) => {
+        this.permissionSelect[i] = res.filter((item: any) => {
+          return item.selected;
+        });
+      });
     });
   }
 
   onFormSubmit(model: ManageRoleForm) {
+    this.permissionSelect = this.permissionSelect.flat(3);
     if (this.form.valid) {
       const apiName =
         this.model.roleId!.split(',')[1] === 'new'
           ? 'createRole'
           : 'updateRole';
 
-      this.permissions.map(res => {
+      this.permissionSelect.map(res => {
         res.selected = true;
       });
       this.rolePermissionService[apiName]({
