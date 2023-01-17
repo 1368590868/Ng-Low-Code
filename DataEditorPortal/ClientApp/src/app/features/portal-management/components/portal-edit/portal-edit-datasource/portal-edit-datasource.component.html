@@ -1,0 +1,129 @@
+<p-card styleClass="px-3 py-2">
+  <ng-template pTemplate="title">Data Source </ng-template>
+  <ng-template pTemplate="subtitle">
+    Setup data source for this portal item.
+  </ng-template>
+  <p-divider styleClass="mt-0"></p-divider>
+  <div class="w-6 pt-3">
+    <div class="flex align-items-center">
+      <div class="flex flex-column mb-3 mr-4">
+        <label for="tableName" class="mb-1">Database Table *</label>
+        <div class="flex align-items-center">
+          <p-dropdown
+            inputId="tableName"
+            [(ngModel)]="datasourceConfig.tableName"
+            [options]="dbTables"
+            (onChange)="onTableNameChange($event)"
+            [style]="{ minWidth: '20rem' }"
+            placeholder="Select a Database Table"></p-dropdown>
+          <i
+            class="pi pi-question-circle ml-3 text-lg"
+            pTooltip="Select one table from database"></i>
+        </div>
+      </div>
+      <div class="flex flex-column mb-3">
+        <label for="idColumn" class="mb-1">Id Column *</label>
+        <div class="flex align-items-center">
+          <p-dropdown
+            inputId="idColumn"
+            [(ngModel)]="datasourceConfig.idColumn"
+            [options]="dbTableColumns"
+            (onChange)="onTableNameChange($event)"
+            [style]="{ minWidth: '20rem' }"
+            placeholder="Select Id Column"></p-dropdown>
+          <i
+            class="pi pi-question-circle ml-3 text-lg"
+            pTooltip="Id Column will be used as the key in the grid"></i>
+        </div>
+      </div>
+    </div>
+    <p-divider>Filters</p-divider>
+    <div class="flex flex-column mb-3">
+      <!-- <label class="mb-1">Filters</label> -->
+      <p-orderList [value]="datasourceConfig.filters" [stripedRows]="true">
+        <ng-template let-filter pTemplate="item">
+          <div class="flex align-items-center">
+            <div class="mr-3">
+              <p-dropdown
+                [(ngModel)]="filter.field"
+                [options]="dbTableColumns"
+                appendTo="body"
+                placeholder="Select Id Column"></p-dropdown>
+            </div>
+            <div class="mr-3">
+              <p-dropdown
+                [(ngModel)]="filter.match"
+                [options]="dbTableColumns"
+                appendTo="body"
+                placeholder="Match Mode"></p-dropdown>
+            </div>
+            <div class="mr-3">
+              <input pInputText placeholder="Enter a value" />
+            </div>
+          </div>
+        </ng-template>
+      </p-orderList>
+      <p-button
+        label="Add"
+        icon="pi pi-plus"
+        class="mt-2"
+        styleClass="p-button-text"></p-button>
+    </div>
+    <p-divider>Sort By</p-divider>
+    <div class="flex flex-column mb-3">
+      <!-- <label class="mb-1">Sort By</label> -->
+      <p-orderList
+        [value]="datasourceConfig.sortBy"
+        [stripedRows]="true"
+        [dragdrop]="true">
+        <ng-template let-sortBy pTemplate="item">
+          <div class="flex align-items-center">
+            <div class="mr-3">
+              <p-dropdown
+                [(ngModel)]="sortBy.field"
+                [options]="dbTableColumns"
+                appendTo="body"
+                placeholder="Select Id Column"></p-dropdown>
+            </div>
+            <div class="mr-3">
+              <p-dropdown
+                [(ngModel)]="sortBy.order"
+                [options]="dbOrderOptions"
+                appendTo="body"
+                placeholder="Order"></p-dropdown>
+            </div>
+          </div>
+        </ng-template>
+      </p-orderList>
+      <p-button
+        label="Add"
+        icon="pi pi-plus"
+        class="mt-2"
+        styleClass="p-button-text"></p-button>
+    </div>
+  </div>
+  <p-divider styleClass="mb-0"></p-divider>
+  <ng-template pTemplate="footer">
+    <div class="flex align-items-center">
+      <p-button
+        label="Back"
+        icon="pi pi-angle-left"
+        [disabled]="isSaving"
+        styleClass="p-button-outlined"
+        (click)="onBack()"></p-button>
+      <p-button
+        label="Save Draft & Exit"
+        icon="pi pi-save"
+        class="ml-auto"
+        [disabled]="isSaving"
+        styleClass="p-button-outlined"></p-button>
+      <p-button
+        label="Save & Next"
+        icon="pi pi-angle-right"
+        iconPos="right"
+        [style]="{ 'margin-left': '.5em' }"
+        (click)="onSaveAndNext()"
+        [loading]="isSaving"></p-button>
+    </div>
+  </ng-template>
+</p-card>

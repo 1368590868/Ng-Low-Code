@@ -31,15 +31,33 @@ import { TagModule } from 'primeng/tag';
 import { MenuModule } from 'primeng/menu';
 import { SkeletonModule } from 'primeng/skeleton';
 import { KeyFilterModule } from 'primeng/keyfilter';
+import { StepsModule } from 'primeng/steps';
+import { OrderListModule } from 'primeng/orderlist';
+import { PickListModule } from 'primeng/picklist';
+import { TooltipModule } from 'primeng/tooltip';
+import { DividerModule } from 'primeng/divider';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import {
   PortalListComponent,
   AddPortalDialogComponent
 } from './components/portal-list';
+import {
+  PortalEditComponent,
+  PortalEditBasicComponent,
+  PortalEditDatasourceComponent,
+  PortalEditColumnsComponent
+} from './components/portal-edit';
 
 @NgModule({
-  declarations: [PortalListComponent, AddPortalDialogComponent],
+  declarations: [
+    PortalListComponent,
+    AddPortalDialogComponent,
+    PortalEditComponent,
+    PortalEditBasicComponent,
+    PortalEditDatasourceComponent,
+    PortalEditColumnsComponent
+  ],
   imports: [
     CommonModule,
     PortalManagementRoutingModule,
@@ -74,7 +92,12 @@ import {
     TagModule,
     MenuModule,
     SkeletonModule,
-    KeyFilterModule
+    KeyFilterModule,
+    StepsModule,
+    OrderListModule,
+    PickListModule,
+    TooltipModule,
+    DividerModule
   ]
 })
 export class PortalManagementModule {}

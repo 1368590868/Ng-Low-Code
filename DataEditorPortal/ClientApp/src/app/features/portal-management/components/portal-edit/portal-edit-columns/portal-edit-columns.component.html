@@ -1,0 +1,116 @@
+<p-card styleClass="px-3 py-2">
+  <ng-template pTemplate="title"> Grid Columns </ng-template>
+  <ng-template pTemplate="subtitle">
+    Select the columns that you want to show in grid.
+  </ng-template>
+  <p-divider styleClass="mt-0"></p-divider>
+  <div class="w-full pt-3">
+    <p-pickList
+      [source]="sourceColumns"
+      [target]="targetColumns"
+      sourceHeader="Available Columns"
+      targetHeader="Selected Columns"
+      [dragdrop]="true"
+      [responsive]="true"
+      [sourceStyle]="{ height: '300px' }"
+      [targetStyle]="{ height: '300px' }"
+      filterBy="name"
+      [showSourceControls]="false"
+      [showTargetControls]="false"
+      [stripedRows]="true"
+      (onMoveToTarget)="onMoveToTarget($event)"
+      (onMoveToSource)="onMoveToSource($event)"
+      (onMoveAllToTarget)="onMoveToTarget($event)"
+      (onMoveAllToSource)="onMoveToSource($event)"
+      sourceFilterPlaceholder="Search by name"
+      targetFilterPlaceholder="Search by name">
+      <ng-template let-column pTemplate="item">
+        <div *ngIf="!column.selected" class="">[{{ column.name }}]</div>
+        <div *ngIf="column.selected" class="flex align-items-center">
+          <div class="w-10rem">[{{ column.name }}]</div>
+          <div class="w-20rem" *ngIf="column.header">
+            Header:
+            <p-tag>{{ column.header }}</p-tag>
+          </div>
+          <div class="w-6rem">
+            <p-tag severity="success">Filterable</p-tag>
+          </div>
+          <div class="w-6rem">
+            <p-tag severity="success">Sortable</p-tag>
+          </div>
+          <button
+            type="button"
+            pButton
+            icon="pi pi-cog"
+            class="p-button-rounded p-button-text ml-auto text-lg"
+            (click)="onConfigColumn(column)"></button>
+        </div>
+      </ng-template>
+    </p-pickList>
+  </div>
+  <p-divider styleClass="mb-0"></p-divider>
+  <ng-template pTemplate="footer">
+    <div class="flex align-items-center">
+      <p-button
+        label="Back"
+        icon="pi pi-angle-left"
+        [disabled]="isSaving"
+        styleClass="p-button-outlined"
+        (click)="onBack()"></p-button>
+      <p-button
+        label="Save Draft & Exit"
+        icon="pi pi-save"
+        class="ml-auto"
+        [disabled]="isSaving"
+        styleClass="p-button-outlined"></p-button>
+      <p-button
+        label="Save & Next"
+        icon="pi pi-angle-right"
+        iconPos="right"
+        [style]="{ 'margin-left': '.5em' }"
+        (click)="onSaveAndNext()"
+        [loading]="isSaving"></p-button>
+    </div>
+  </ng-template>
+</p-card>
+
+<p-dialog
+  #configDialog
+  [header]="header"
+  [(visible)]="visible"
+  (onShow)="onShow()"
+  (onHide)="onHide()"
+  [style]="dialogStyle"
+  [modal]="true"
+  [dismissableMask]="true"
+  contentStyleClass="border-top-1 surface-border pt-3"
+  appendTo="body">
+  <div class="dialog-content">
+    <form
+      [formGroup]="form"
+      #editForm="ngForm"
+      (ngSubmit)="onFormSubmit(model)">
+      <formly-form
+        [form]="form"
+        [fields]="fields"
+        [model]="model"
+        [options]="options"
+        class="p-fluid"></formly-form>
+    </form>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button
+      *ngIf="cancelText"
+      icon="pi pi-times"
+      (click)="onCancel()"
+      [label]="cancelText"
+      [disabled]="buttonDisabled"
+      styleClass="p-button-text"></p-button>
+    <p-button
+      icon="pi pi-check"
+      (click)="onOk()"
+      [label]="okText"
+      [disabled]="buttonDisabled"
+      [loading]="isLoading"></p-button>
+  </ng-template>
+</p-dialog>
