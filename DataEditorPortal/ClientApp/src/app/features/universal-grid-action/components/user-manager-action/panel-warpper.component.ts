@@ -4,12 +4,9 @@ import { FieldWrapper } from '@ngx-formly/core';
 @Component({
   selector: 'app-formly-wrapper-panel',
   template: `
-    <div class="card">
-      <h3 class="card-header">{{ to.label }}</h3>
-      <div class="card-body">
-        <ng-container #fieldComponent></ng-container>
-      </div>
-    </div>
+    <p-divider align="left" type="dashed">
+      <b>{{ to.label }}</b>
+    </p-divider>
   `
 })
 export class PanelWrapperComponent extends FieldWrapper {

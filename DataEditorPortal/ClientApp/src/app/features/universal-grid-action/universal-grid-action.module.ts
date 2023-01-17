@@ -29,6 +29,7 @@ import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { AccordionModule } from 'primeng/accordion';
+import { DividerModule } from 'primeng/divider';
 
 import { GridActionDirective } from './directives/grid-action.directive';
 import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
@@ -94,7 +95,8 @@ export * from './models/grid-config';
     ButtonModule,
     SkeletonModule,
     AccordionModule,
-    CheckboxModule
+    CheckboxModule,
+    DividerModule
   ],
   exports: [UniversalGridActionDirective],
   providers: [

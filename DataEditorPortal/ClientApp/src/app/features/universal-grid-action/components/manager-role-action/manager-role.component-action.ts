@@ -60,7 +60,7 @@ export class ManagerRoleComponent
           fieldGroupClassName: 'flex flex-wrap justify-content-between',
           fieldGroup: [
             {
-              className: 'w-full',
+              className: 'w-full pb-0',
               key: 'roleId',
               type: 'select',
               defaultValue: res[0].id,
@@ -99,10 +99,15 @@ export class ManagerRoleComponent
               }
             },
             {
+              wrappers: ['panel'],
+              className: 'w-full',
+              templateOptions: { label: 'Input Text' }
+            },
+
+            {
               className: 'w-full',
               key: 'roleName',
               type: 'input',
-              // defaultValue: this.roleName,
               props: {
                 required: true,
                 type: 'text',
