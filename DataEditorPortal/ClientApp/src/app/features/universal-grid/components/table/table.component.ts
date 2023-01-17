@@ -89,6 +89,9 @@ export class TableComponent implements OnInit, OnDestroy {
         wrapper: {
           label: 'User Manager',
           icon: 'pi pi-plus'
+        },
+        props: {
+          isAddForm: true
         }
       },
       {
