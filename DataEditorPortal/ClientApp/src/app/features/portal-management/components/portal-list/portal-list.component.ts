@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 
 @Component({
@@ -8,8 +9,29 @@ import { MenuItem } from 'primeng/api';
 })
 export class PortalListComponent implements OnInit {
   data!: any[];
+  addNewMenuModels: any[] = [
+    {
+      label: 'Create Folder',
+      icon: 'pi pi-fw pi-folder',
+      command: () => {
+        this.addDialog.showDialog();
+      }
+    },
+    {
+      label: 'Create Portal Item',
+      icon: 'pi pi-fw pi-desktop',
+      command: () => {
+        this.router.navigate([`../add`], {
+          relativeTo: this.activatedRoute
+        });
+      }
+    }
+  ];
 
   @ViewChild('addDialog') addDialog: any;
+  @ViewChild('newButton') newButton: any;
+
+  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.data = [
@@ -73,6 +95,17 @@ export class PortalListComponent implements OnInit {
         label: 'New',
         icon: 'pi pi-fw pi-plus',
         command: () => {
+          // new portal item
+          this.router.navigate([`../add`], {
+            relativeTo: this.activatedRoute
+          });
+        }
+      });
+      items.push({
+        label: 'Edit',
+        icon: 'pi pi-fw pi-pencil',
+        command: () => {
+          // edit folder
           this.addDialog.showDialog();
         }
       });
@@ -81,7 +114,10 @@ export class PortalListComponent implements OnInit {
         label: 'Edit',
         icon: 'pi pi-fw pi-pencil',
         command: () => {
-          this.addDialog.showDialog();
+          // edit portal item
+          this.router.navigate([`../edit/${row.id}`], {
+            relativeTo: this.activatedRoute
+          });
         }
       });
     }
@@ -91,9 +127,5 @@ export class PortalListComponent implements OnInit {
       items.push({ label: 'Publish', icon: 'pi pi-fw pi-minus-circle' });
     }
     return items;
-  }
-
-  addRootItem() {
-    this.addDialog.showDialog();
   }
 }

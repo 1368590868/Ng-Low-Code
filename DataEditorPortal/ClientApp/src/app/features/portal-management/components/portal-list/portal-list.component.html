@@ -4,12 +4,18 @@
       <ng-template pTemplate="caption">
         <div class="flex align-items-center mb-2">
           <h3 class="">Portal Management</h3>
+          <p-menu
+            #addNewMenu
+            [popup]="true"
+            [model]="addNewMenuModels"
+            appendTo="body"
+            [style]="{ width: 'auto' }"></p-menu>
           <p-button
             icon="pi pi-plus"
             class="ml-auto"
             styleClass="p-button-outlined"
-            label="New Portal Item"
-            (click)="addRootItem()"></p-button>
+            label="New"
+            (click)="addNewMenu.toggle($event)"></p-button>
         </div>
       </ng-template>
       <ng-template pTemplate="header">

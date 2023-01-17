@@ -30,53 +30,12 @@ export class AddPortalDialogComponent {
   model = {};
   fields: FormlyFieldConfig[] = [
     {
-      key: 'type',
-      type: 'select',
-      className: 'w-full',
-      defaultValue: 'Portal Item',
-      props: {
-        label: 'Type',
-        required: true,
-        showClear: false,
-        placeholder: 'Please Select',
-        options: [
-          {
-            label: 'Portal Item',
-            value: 'Portal Item'
-          },
-          {
-            label: 'External',
-            value: 'External'
-          },
-          {
-            label: 'System',
-            value: 'System'
-          }
-        ]
-      }
-    },
-    {
       key: 'name',
       type: 'input',
       className: 'w-full',
       props: {
-        label: 'Portal Name',
+        label: 'Folder Name',
         placeholder: 'Portal Name'
-      }
-    },
-    {
-      key: 'parent',
-      type: 'select',
-      className: 'w-full',
-      props: {
-        label: 'Parent Folder',
-        placeholder: 'Please Select',
-        options: [
-          {
-            label: 'Portal Item',
-            value: 'Portal Item'
-          }
-        ]
       }
     },
     {
@@ -95,7 +54,6 @@ export class AddPortalDialogComponent {
         placeholder: 'Icon'
       }
     },
-
     {
       key: 'description',
       type: 'textarea',
