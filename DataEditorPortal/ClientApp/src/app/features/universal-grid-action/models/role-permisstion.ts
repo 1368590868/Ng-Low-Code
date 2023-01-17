@@ -15,8 +15,6 @@ export interface RoleList {
   id?: string;
   roleName?: string;
   roleDescription?: string;
-  label?: string;
-  value?: string;
 }
 
 export interface RolePermissions {
@@ -28,7 +26,13 @@ export interface RolePermissions {
 }
 
 export interface ManageRoleForm {
+  roleId?: string;
   roleName?: string;
+  oldRoleName?: string;
   roleDescription?: string;
   permissions?: RolePermissions[];
+}
+
+export interface updateRole {
+  roleId?: string;
 }

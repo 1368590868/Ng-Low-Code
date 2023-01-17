@@ -6,7 +6,11 @@ import {
   GridActionDirective,
   OnGridActionDialogShow
 } from '../../directives/grid-action.directive';
-import { ManageRoleForm, RolePermissions } from '../../models/role-permisstion';
+import {
+  ManageRoleForm,
+  RoleList,
+  RolePermissions
+} from '../../models/role-permisstion';
 import { RolePermissionService } from '../../services/role-permission/role-permission.service';
 
 @Component({
@@ -24,8 +28,10 @@ export class ManagerRoleComponent
   options: FormlyFormOptions = {};
   // Role form config
   roleFields: FormlyFieldConfig[] = [];
-  permisstionSelect: RolePermissions[] = [];
+  permissionSelect: RolePermissions[] = [];
   roleId = '';
+  roleName = '';
+  roleList: RoleList[] = [];
 
   permissions: any[] = [];
   constructor(
@@ -37,22 +43,50 @@ export class ManagerRoleComponent
   }
 
   onDialogShow(): void {
-    console.log('show dialog');
     this.rolePermissionService.getRoleList().subscribe(res => {
       this.roleId = res[0].id || '';
+      this.roleName = res[0].roleName || '';
+      this.initData(res);
+      this.roleList = [
+        ...res,
+        {
+          id: res[0].id + ',new',
+          roleName: 'Add New Role',
+          roleDescription: 'Add new role'
+        }
+      ];
       this.roleFields = [
         {
           fieldGroupClassName: 'flex flex-wrap justify-content-between',
           fieldGroup: [
             {
               className: 'w-full',
-              key: 'roleName',
+              key: 'roleId',
               type: 'select',
               defaultValue: res[0].id,
               props: {
                 change: () => {
-                  this.roleId = this.model.roleName || '';
-                  this.getRolePermissionsList(this.roleId);
+                  this.roleId = this.model.roleId || '';
+                  const isNew = this.roleId.split(',')[1];
+
+                  if (isNew === 'new') {
+                    this.roleId = this.roleId.split(',')[0];
+                  }
+                  this.getRolePermissionsList(this.roleId, isNew === 'new');
+
+                  let roleDesc = '';
+                  this.roleList.map(res => {
+                    if (this.roleId == res.id) {
+                      this.roleName = res.roleName || '';
+                      roleDesc = res.roleDescription || '';
+                    }
+                  });
+                  this.form.setValue({
+                    roleId:
+                      isNew === 'new' ? `${this.roleId},new` : this.roleId,
+                    roleName: isNew === 'new' ? '' : this.roleName,
+                    roleDescription: isNew === 'new' ? '' : roleDesc
+                  });
                 },
 
                 required: true,
@@ -60,14 +94,15 @@ export class ManagerRoleComponent
                 placeholder: 'Roles',
                 valueProp: 'id',
                 labelProp: 'roleName',
-                options: res,
+                options: this.roleList,
                 appendTo: 'body'
               }
             },
             {
               className: 'w-full',
-              key: 'name',
+              key: 'roleName',
               type: 'input',
+              // defaultValue: this.roleName,
               props: {
                 required: true,
                 type: 'text',
@@ -77,7 +112,7 @@ export class ManagerRoleComponent
             },
             {
               className: 'w-full',
-              key: 'Description',
+              key: 'roleDescription',
               type: 'textarea',
               props: {
                 required: true,
@@ -94,20 +129,49 @@ export class ManagerRoleComponent
     });
   }
 
-  getRolePermissionsList(roleId = '') {
+  initData(data: RoleList[]) {
+    setTimeout(() => {
+      this.form.setValue({
+        roleId: data[0].id,
+        roleName: data[0].roleName,
+        roleDescription: data[0].roleDescription
+      });
+    }, 500);
+  }
+
+  getRolePermissionsList(roleId = '', isNew = false) {
     this.rolePermissionService.getRolePermissions(roleId).subscribe(res => {
       this.permissions = res;
-      this.permisstionSelect = this.permissions.filter(res => res.selected);
+      if (isNew) {
+        this.permissions.map(res => {
+          res.selected = false;
+        });
+      }
+      this.permissionSelect = this.permissions.filter(res => res.selected);
     });
   }
 
   onFormSubmit(model: ManageRoleForm) {
-    console.log({ ...model, permissions: this.permisstionSelect });
     if (this.form.valid) {
-      setTimeout(() => {
-        this.notifyService.notifySuccess('Success', 'Save Success');
-        this.savedEvent.emit();
-      }, 1000);
+      const apiName =
+        this.model.roleId!.split(',')[1] === 'new'
+          ? 'createRole'
+          : 'updateRole';
+
+      this.permissions.map(res => {
+        res.selected = true;
+      });
+      this.rolePermissionService[apiName]({
+        ...model,
+        permissions: this.permissionSelect
+      }).subscribe(res => {
+        if (!res.isError) {
+          this.notifyService.notifySuccess('Success', 'Save Success');
+          this.savedEvent.emit();
+        } else {
+          this.errorEvent.emit();
+        }
+      });
     } else {
       this.errorEvent.emit();
     }

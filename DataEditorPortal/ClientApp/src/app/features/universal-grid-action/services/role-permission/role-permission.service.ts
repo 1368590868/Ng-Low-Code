@@ -6,7 +6,9 @@ import {
   Role,
   Permisstion,
   RoleList,
-  RolePermissions
+  RolePermissions,
+  updateRole,
+  ManageRoleForm
 } from '../../models/role-permisstion';
 
 @Injectable({
@@ -61,5 +63,19 @@ export class RolePermissionService {
         `${this._apiUrl}role/${roleId}/permissions`
       )
       .pipe(map(res => res.result || []));
+  }
+
+  updateRole(data: ManageRoleForm) {
+    return this.http.post<ApiResponse<updateRole[]>>(
+      `${this._apiUrl}role/${data.roleId}/update`,
+      data
+    );
+  }
+
+  createRole(data: ManageRoleForm) {
+    return this.http.put<ApiResponse<updateRole[]>>(
+      `${this._apiUrl}role/create`,
+      data
+    );
   }
 }
