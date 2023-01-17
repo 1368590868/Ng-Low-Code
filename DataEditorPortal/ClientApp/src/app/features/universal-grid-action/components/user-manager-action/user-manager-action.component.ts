@@ -66,8 +66,8 @@ export class UserManagerActionComponent extends GridActionDirective {
           props: {
             required: true,
             type: 'text',
-            label: 'Town',
-            placeholder: 'Town'
+            label: ' Display Name',
+            placeholder: 'Display Name'
           }
         },
         {
@@ -157,9 +157,11 @@ export class UserManagerActionComponent extends GridActionDirective {
       ]
     },
     {
-      fieldGroupClassName: 'flex flex-warp justify-content-between ',
+      fieldGroupClassName: 'flex flex-warp justify-content-between w-full ',
       fieldGroup: [
         {
+          className: 'w-full',
+
           key: 'Division',
           type: 'checkboxList',
           props: {
