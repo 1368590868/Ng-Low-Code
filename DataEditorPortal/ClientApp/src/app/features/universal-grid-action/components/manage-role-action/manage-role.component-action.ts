@@ -15,8 +15,8 @@ import { RolePermissionService } from '../../services/role-permission/role-permi
 
 @Component({
   selector: 'app-manager-role',
-  templateUrl: './manager-role-action.component.html',
-  styleUrls: ['./manager-role-action.component.scss']
+  templateUrl: './manage-role-action.component.html',
+  styleUrls: ['./manage-role-action.component.scss']
 })
 export class ManagerRoleComponent
   extends GridActionDirective

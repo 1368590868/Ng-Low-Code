@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ManagerRoleComponent } from './manager-role.component-action';
+import { ManagerRoleComponent } from './manage-role.component-action';
 
 describe('ManagerRoleComponent', () => {
   let component: ManagerRoleComponent;
