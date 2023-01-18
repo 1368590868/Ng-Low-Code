@@ -39,7 +39,6 @@ import { ViewRecordActionComponent } from './components/view-record-action/view-
 import { ExportExcelActionComponent } from './components/export-excel-action/export-excel-action.component';
 import { RemoveActionComponent } from './components/remove-action/remove-action.component';
 import { UserManagerActionComponent } from './components/user-manager-action/user-manager-action.component';
-import { PanelWrapperComponent } from './components/user-manager-action/panel-warpper.component';
 import { FormlySelectModule } from '../ngx-formly/select/select.module';
 import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -61,7 +60,6 @@ export * from './models/grid-config';
     ExportExcelActionComponent,
     RemoveActionComponent,
     UserManagerActionComponent,
-    PanelWrapperComponent,
     ManagerRoleComponent,
     UserRoleActionComponent,
     UserPermissionComponent

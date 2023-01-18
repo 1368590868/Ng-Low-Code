@@ -2,7 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiResponse } from 'src/app/core/models/api-response';
-import { ManageRoleForm, updateRole } from '../../models/user-manager';
+import {
+  ManageRoleForm,
+  updateRole,
+  UserPemissions
+} from '../../models/user-manager';
 import {
   UserManagerForm,
   UserManagerResponse
@@ -38,9 +42,15 @@ export class UserManagerService {
   }
 
   updateUser(data: ManageRoleForm) {
-    return this.http.post<ApiResponse<updateRole[]>>(
+    return this.http.put<ApiResponse<updateRole[]>>(
       `${this._apiUrl}user/update/${data.id}`,
       { ...data, division: JSON.stringify(data.division) }
     );
+  }
+
+  getUserPermissions(id: string) {
+    return this.http
+      .get<ApiResponse<UserPemissions>>(`${this._apiUrl}user/${id}/permissions`)
+      .pipe(map(res => res.result));
   }
 }

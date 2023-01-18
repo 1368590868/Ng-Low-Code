@@ -214,6 +214,42 @@ export class UserManagerActionComponent
           }
         }
       ]
+    },
+    {
+      wrappers: ['divider'],
+      props: {
+        label: 'Role'
+      }
+    },
+    {
+      wrappers: ['tag'],
+      props: {
+        forArray: [
+          { label: '1' },
+          { label: '2' },
+          { label: '1' },
+          { label: '2' },
+          { label: '1' }
+        ]
+      }
+    },
+    {
+      wrappers: ['divider'],
+      props: {
+        label: 'Permissions'
+      }
+    },
+    {
+      wrappers: ['tag'],
+      props: {
+        forArray: [
+          { label: '1' },
+          { label: '2' },
+          { label: '1' },
+          { label: '2' },
+          { label: '1' }
+        ]
+      }
     }
   ];
 

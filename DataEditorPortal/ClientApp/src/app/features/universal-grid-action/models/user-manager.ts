@@ -27,3 +27,11 @@ export interface ManageRoleForm {
 export interface updateRole {
   roleId?: string;
 }
+
+export interface UserPemissions {
+  id?: string;
+  selected?: boolean;
+  permissionName?: string;
+  permissionDescription?: string;
+  category?: string;
+}
