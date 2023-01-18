@@ -43,8 +43,11 @@ import { PanelWrapperComponent } from './components/user-manager-action/panel-wa
 import { FormlySelectModule } from '../ngx-formly/select/select.module';
 import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
 import { CheckboxModule } from 'primeng/checkbox';
-import { ManagerRoleComponent } from './components/manager-role-action/manager-role.component-action';
+import { ManagerRoleComponent } from './components/manage-role-action/manage-role.component-action';
 import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
+import { FormlyTagWrapperModule } from '../ngx-formly/tag';
+import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
+import { UserPermissionComponent } from './components/user-permission/user-permission.component';
 
 export * from './models/grid-config';
 
@@ -59,7 +62,9 @@ export * from './models/grid-config';
     RemoveActionComponent,
     UserManagerActionComponent,
     PanelWrapperComponent,
-    ManagerRoleComponent
+    ManagerRoleComponent,
+    UserRoleActionComponent,
+    UserPermissionComponent
   ],
   imports: [
     CommonModule,
@@ -76,6 +81,7 @@ export * from './models/grid-config';
     FormlySelectModule,
     FormlyCheckBoxModule,
     FormlyDividerWrapperModule,
+    FormlyTagWrapperModule,
     // primeNg
     AnimateModule,
     ToastModule,
@@ -171,6 +177,27 @@ export * from './models/grid-config';
           wrapper: {
             header: 'Manage Roles',
             dialogStyle: { width: '40rem' },
+            cancelText: 'No',
+            okText: 'Yes'
+          }
+        },
+        {
+          name: 'edit-role',
+          requireGridRowSelected: true,
+          component: UserRoleActionComponent,
+          wrapper: {
+            header: 'Edit Roles',
+            cancelText: 'No',
+            okText: 'Yes'
+          }
+        },
+        {
+          name: 'edit-permission',
+          requireGridRowSelected: true,
+          component: UserPermissionComponent,
+          wrapper: {
+            dialogStyle: { width: '40rem' },
+            header: 'Edit Permission',
             cancelText: 'No',
             okText: 'Yes'
           }
