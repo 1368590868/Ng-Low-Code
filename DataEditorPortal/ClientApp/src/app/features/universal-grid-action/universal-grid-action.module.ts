@@ -44,6 +44,7 @@ import { FormlySelectModule } from '../ngx-formly/select/select.module';
 import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ManagerRoleComponent } from './components/manager-role-action/manager-role.component-action';
+import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
 
 export * from './models/grid-config';
 
@@ -67,14 +68,14 @@ export * from './models/grid-config';
     FormlyModule.forRoot({
       validationMessages: [
         { name: 'required', message: 'This field is required' }
-      ],
-      wrappers: [{ name: 'panel', component: PanelWrapperComponent }]
+      ]
     }),
     FormlyPrimeNGModule,
     FormlyDatepickerModule,
     FormlyMultiSelectModule,
     FormlySelectModule,
     FormlyCheckBoxModule,
+    FormlyDividerWrapperModule,
     // primeNg
     AnimateModule,
     ToastModule,

@@ -80,9 +80,11 @@ export class ManagerRoleComponent
           }
         },
         {
-          wrappers: ['panel'],
+          wrappers: ['divider'],
           className: 'w-full',
-          templateOptions: { label: 'Role Details' }
+          props: {
+            label: 'Role Details'
+          }
         },
 
         {
