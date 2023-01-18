@@ -4,70 +4,107 @@
     Customize the Add / Edit / View Form or select custom Form.
   </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
-  <div class="w-full pt-3 pb-3 flex">
-    <p-pickList
-      #pickList
-      class="flex-grow-1 mr-3"
-      [source]="sourceColumns"
-      [target]="targetColumns"
-      sourceHeader="Available Fields"
-      targetHeader="Selected Fields"
-      [dragdrop]="true"
-      [responsive]="true"
-      [sourceStyle]="{ height: '400px' }"
-      [targetStyle]="{ height: '400px' }"
-      filterBy="name"
-      [showSourceControls]="false"
-      [showTargetControls]="false"
-      [stripedRows]="true"
-      (onMoveToTarget)="onMoveToTarget($event)"
-      (onMoveToSource)="onMoveToSource($event)"
-      (onMoveAllToTarget)="onMoveToTarget($event)"
-      (onMoveAllToSource)="onMoveToSource($event)"
-      (onTargetSelect)="onTargetSelect($event)"
-      sourceFilterPlaceholder="Search by name"
-      targetFilterPlaceholder="Search by name">
-      <ng-template let-column pTemplate="item">
-        <div *ngIf="!column.selected" class="">[{{ column.name }}]</div>
-        <div *ngIf="column.selected" class="flex align-items-center">
-          <div class="w-10rem">[{{ column.name }}]</div>
-          <div class="w-20rem" *ngIf="column.props && column.props.label">
-            Label:
-            <p-tag>{{ column.props.label }}</p-tag>
-          </div>
-          <div class="w-10rem" *ngIf="column.type">
-            <p-tag severity="success">{{
-              getControlTypeName(column.type)
-            }}</p-tag>
-          </div>
-          <div class="w-6rem" *ngIf="column.props && column.props.required">
-            <p-tag severity="success">Required</p-tag>
+  <div class="w-full pt-1 pb-1">
+    <div class="flex align-items-center pb-1">
+      <div class="flex align-items-center mr-4">
+        <p-inputSwitch class="mr-2 h-1rem"></p-inputSwitch>
+        Allow Delete
+      </div>
+      <div class="flex align-items-center mr-4">
+        <p-inputSwitch class="mr-2 h-1rem"></p-inputSwitch> Allow Add New
+      </div>
+      <div class="flex align-items-center mr-4">
+        <p-inputSwitch class="mr-2 h-1rem" [(ngModel)]="allowEdit">
+        </p-inputSwitch>
+        Allow Edit
+      </div>
+      <div *ngIf="allowEdit" class="flex align-items-center">
+        <p-inputSwitch
+          class="mr-2 h-1rem"
+          [(ngModel)]="useCustomForm"></p-inputSwitch>
+        Use Custom Form
+      </div>
+    </div>
+    <p-divider></p-divider>
+    <div *ngIf="allowEdit">
+      <div class="flex flex-column" *ngIf="useCustomForm">
+        <label class="line-height-3">Select Custom Form</label>
+        <p-dropdown styleClass="w-15rem"></p-dropdown>
+      </div>
+      <div class="flex" *ngIf="!useCustomForm">
+        <p-pickList
+          #pickList
+          class="flex-grow-1 mr-3"
+          [source]="sourceColumns"
+          [target]="targetColumns"
+          sourceHeader="Available Fields"
+          targetHeader="Selected Fields"
+          [dragdrop]="true"
+          [responsive]="true"
+          [sourceStyle]="{ height: '400px' }"
+          [targetStyle]="{ height: '400px' }"
+          filterBy="name"
+          [showSourceControls]="false"
+          [showTargetControls]="false"
+          [stripedRows]="true"
+          (onMoveToTarget)="onMoveToTarget($event)"
+          (onMoveToSource)="onMoveToSource($event)"
+          (onMoveAllToTarget)="onMoveToTarget($event)"
+          (onMoveAllToSource)="onMoveToSource($event)"
+          (onTargetSelect)="onTargetSelect($event)"
+          sourceFilterPlaceholder="Search by name"
+          targetFilterPlaceholder="Search by name">
+          <ng-template let-column pTemplate="item">
+            <div *ngIf="!column.selected" class="">[{{ column.name }}]</div>
+            <div *ngIf="column.selected" class="flex align-items-center">
+              <div class="w-10rem">[{{ column.name }}]</div>
+              <div class="w-20rem" *ngIf="column.props && column.props.label">
+                Label:
+                <p-tag>{{ column.props.label }}</p-tag>
+              </div>
+              <div class="w-10rem" *ngIf="column.type">
+                <p-tag severity="success">{{
+                  getControlTypeName(column.type)
+                }}</p-tag>
+              </div>
+              <div class="w-6rem" *ngIf="column.props && column.props.required">
+                <p-tag severity="success">Required</p-tag>
+              </div>
+            </div>
+          </ng-template>
+        </p-pickList>
+        <div class="config-form">
+          <div class="title">Configuration Form</div>
+          <div class="body">
+            <form
+              *ngIf="this.model && this.model.name; else emptyMessage"
+              [formGroup]="form"
+              #configForm="ngForm">
+              <formly-form
+                [form]="form"
+                [fields]="fields"
+                [model]="model"
+                [options]="options"
+                class="p-fluid"></formly-form>
+              <div
+                *ngIf="
+                  'select,checkboxList,radio,multiSelect'.indexOf(model.type) >=
+                  0
+                ">
+                <p-divider>Options</p-divider>
+                <p-button styleClass="p-button-text"
+                  >Configure Options</p-button
+                >
+              </div>
+            </form>
+            <ng-template #emptyMessage>
+              <div class="pt-4">
+                Please select one row in <b>Selected Fields</b> panel to
+                configure.
+              </div>
+            </ng-template>
           </div>
         </div>
-      </ng-template>
-    </p-pickList>
-    <div class="config-form">
-      <div class="title">Configuration Form</div>
-      <div class="body">
-        <form
-          *ngIf="this.model && this.model.name; else emptyMessage"
-          [formGroup]="form"
-          #configForm="ngForm">
-          <formly-form
-            [form]="form"
-            [fields]="fields"
-            [model]="model"
-            [options]="options"
-            class="p-fluid"></formly-form>
-          <p-button styleClass="p-button-text" *ngIf="model.type === 'select'"
-            >Configure Options</p-button
-          >
-        </form>
-        <ng-template #emptyMessage>
-          <div class="pt-4">
-            Please select one row in <b>Selected Fields</b> panel to configure.
-          </div>
-        </ng-template>
       </div>
     </div>
   </div>

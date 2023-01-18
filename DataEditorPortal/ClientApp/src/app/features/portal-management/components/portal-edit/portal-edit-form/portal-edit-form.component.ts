@@ -1,9 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PrimeNGConfig } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
+import { distinctUntilChanged, tap } from 'rxjs';
 
 @Component({
   selector: 'app-portal-edit-form',
@@ -50,7 +51,7 @@ export class PortalEditFormComponent {
             value: 'checkboxList'
           },
           {
-            label: 'Date',
+            label: 'Date Picker',
             value: 'datepicker'
           },
           {
@@ -74,18 +75,38 @@ export class PortalEditFormComponent {
             value: 'textarea'
           }
         ]
+      },
+      hooks: {
+        onInit: field => {
+          field.formControl?.valueChanges
+            .pipe(
+              distinctUntilChanged(),
+              tap(value => {
+                const dField = field.parent?.get?.('defaultValue');
+                if (dField != null) {
+                  dField.hide = true;
+                  if (dField.props)
+                    dField.props['hideLabel'] = value === 'checkbox';
+                  this.changeDetectorRef.detectChanges();
+                  if (
+                    'input,datepicker,checkbox,textarea'.indexOf(value) >= 0
+                  ) {
+                    dField.type = value;
+                    dField.hide = false;
+                  }
+                }
+              })
+            )
+            .subscribe();
+        }
       }
     },
     {
       key: 'defaultValue',
       type: 'input',
       props: {
-        lable: 'Default Value',
+        label: 'Default Value',
         placeholder: 'Default Value'
-      },
-      expressions: {
-        type: `model.type`,
-        hide: `model.type === 'datepicker'`
       }
     },
     {
@@ -112,12 +133,26 @@ export class PortalEditFormComponent {
             label: 'Placeholder',
             placeholder: 'Placeholder'
           }
+        },
+        {
+          key: 'required',
+          type: 'checkbox',
+          defaultValue: true,
+          props: {
+            label: 'Required'
+          }
         }
       ]
     }
   ];
 
+  useCustomForm = false;
+  allowEdit = true;
+  allowAdd = true;
+  allowDelete = true;
+
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private primeNGConfig: PrimeNGConfig,
     private router: Router,
     private activatedRoute: ActivatedRoute
@@ -134,7 +169,8 @@ export class PortalEditFormComponent {
       item.type = 'input';
       item.props = {
         label: item.name,
-        placeholder: item.name
+        placeholder: item.name,
+        required: true
       };
     });
   }
