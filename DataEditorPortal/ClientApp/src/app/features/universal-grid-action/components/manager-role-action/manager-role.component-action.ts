@@ -27,11 +27,92 @@ export class ManagerRoleComponent
   model: ManageRoleForm = {};
   options: FormlyFormOptions = {};
   // Role form config
-  roleFields: FormlyFieldConfig[] = [];
+  roleList: RoleList[] = [];
+  roleFields: FormlyFieldConfig[] = [
+    {
+      fieldGroupClassName: 'flex flex-wrap justify-content-between',
+      fieldGroup: [
+        {
+          className: 'w-full pb-0',
+          key: 'roleId',
+          type: 'select',
+
+          props: {
+            change: () => {
+              this.roleId = this.model.roleId || '';
+              const isNew = this.roleId.split(',')[1];
+
+              if (isNew === 'new') {
+                this.roleId = this.roleId.split(',')[0];
+              }
+              this.getRolePermissionsList(this.roleId, isNew === 'new');
+
+              let roleDesc = '';
+              this.roleList.map(res => {
+                if (this.roleId == res.id) {
+                  this.roleName = res.roleName || '';
+                  roleDesc = res.roleDescription || '';
+                }
+              });
+              this.form.setValue({
+                roleId: isNew === 'new' ? `${this.roleId},new` : this.roleId,
+                roleName: isNew === 'new' ? '' : this.roleName,
+                roleDescription: isNew === 'new' ? '' : roleDesc
+              });
+            },
+
+            required: true,
+            label: 'Roles',
+            placeholder: 'Roles',
+            valueProp: 'id',
+            labelProp: 'roleName',
+            options: this.roleList,
+            appendTo: 'body'
+          },
+          hooks: {
+            onInit: (field: FormlyFieldConfig) => {
+              this.rolePermissionService.getRoleList().subscribe(res => {
+                if (field.props) {
+                  field.props.options = res;
+                }
+              });
+            }
+          }
+        },
+        {
+          wrappers: ['panel'],
+          className: 'w-full',
+          templateOptions: { label: 'Role Details' }
+        },
+
+        {
+          className: 'w-full',
+          key: 'roleName',
+          type: 'input',
+          props: {
+            required: true,
+            type: 'text',
+            label: 'Name',
+            placeholder: 'Name'
+          }
+        },
+        {
+          className: 'w-full',
+          key: 'roleDescription',
+          type: 'textarea',
+          props: {
+            required: true,
+            type: 'text',
+            label: 'Description',
+            placeholder: 'Description'
+          }
+        }
+      ]
+    }
+  ];
   permissionSelect: RolePermissions[] = [];
   roleId = '';
   roleName = '';
-  roleList: RoleList[] = [];
 
   permissions: any[] = [];
   groupPermissions: any[] = [];
@@ -66,80 +147,6 @@ export class ManagerRoleComponent
           id: res[0].id + ',new',
           roleName: 'Add New Role',
           roleDescription: 'Add new role'
-        }
-      ];
-      this.roleFields = [
-        {
-          fieldGroupClassName: 'flex flex-wrap justify-content-between',
-          fieldGroup: [
-            {
-              className: 'w-full pb-0',
-              key: 'roleId',
-              type: 'select',
-              defaultValue: res[0].id,
-              props: {
-                change: () => {
-                  this.roleId = this.model.roleId || '';
-                  const isNew = this.roleId.split(',')[1];
-
-                  if (isNew === 'new') {
-                    this.roleId = this.roleId.split(',')[0];
-                  }
-                  this.getRolePermissionsList(this.roleId, isNew === 'new');
-
-                  let roleDesc = '';
-                  this.roleList.map(res => {
-                    if (this.roleId == res.id) {
-                      this.roleName = res.roleName || '';
-                      roleDesc = res.roleDescription || '';
-                    }
-                  });
-                  this.form.setValue({
-                    roleId:
-                      isNew === 'new' ? `${this.roleId},new` : this.roleId,
-                    roleName: isNew === 'new' ? '' : this.roleName,
-                    roleDescription: isNew === 'new' ? '' : roleDesc
-                  });
-                },
-
-                required: true,
-                label: 'Roles',
-                placeholder: 'Roles',
-                valueProp: 'id',
-                labelProp: 'roleName',
-                options: this.roleList,
-                appendTo: 'body'
-              }
-            },
-            {
-              wrappers: ['panel'],
-              className: 'w-full',
-              templateOptions: { label: 'Input Text' }
-            },
-
-            {
-              className: 'w-full',
-              key: 'roleName',
-              type: 'input',
-              props: {
-                required: true,
-                type: 'text',
-                label: 'Name',
-                placeholder: 'Name'
-              }
-            },
-            {
-              className: 'w-full',
-              key: 'roleDescription',
-              type: 'textarea',
-              props: {
-                required: true,
-                type: 'text',
-                label: 'Description',
-                placeholder: 'Description'
-              }
-            }
-          ]
         }
       ];
       this.getRolePermissionsList(this.roleId);

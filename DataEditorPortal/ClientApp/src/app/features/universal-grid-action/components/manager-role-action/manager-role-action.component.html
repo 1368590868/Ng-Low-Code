@@ -15,7 +15,7 @@
   <p-accordionTab
     *ngFor="let item of groupPermissions; let i = index"
     [header]="this.permissions[i][0].category"
-    [selected]="true">
+    [selected]="i === 0">
     <p-table [value]="permissions[i]" [(selection)]="permissionSelect[i]">
       <ng-template pTemplate="body" let-permission>
         <tr>
