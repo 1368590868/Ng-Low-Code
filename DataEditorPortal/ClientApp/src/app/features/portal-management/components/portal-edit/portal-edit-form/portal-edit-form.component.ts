@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
@@ -6,11 +6,11 @@ import { PrimeNGConfig } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
 
 @Component({
-  selector: 'app-portal-edit-search',
-  templateUrl: './portal-edit-search.component.html',
-  styleUrls: ['./portal-edit-search.component.scss']
+  selector: 'app-portal-edit-form',
+  templateUrl: './portal-edit-form.component.html',
+  styleUrls: ['./portal-edit-form.component.scss']
 })
-export class PortalEditSearchComponent implements OnInit {
+export class PortalEditFormComponent {
   isSaving = false;
 
   sourceColumns: any[] = [
@@ -43,45 +43,49 @@ export class PortalEditSearchComponent implements OnInit {
         options: [
           {
             label: 'Checkbox',
-            value: 'checkbox',
-            filterType: 'boolean'
+            value: 'checkbox'
           },
           {
             label: 'Checkbox List',
-            value: 'checkboxList',
-            filterType: 'array'
+            value: 'checkboxList'
           },
           {
             label: 'Date',
-            value: 'datepicker',
-            filterType: 'date'
+            value: 'datepicker'
           },
           {
             label: 'Dropdown',
-            value: 'select',
-            filterType: 'text'
+            value: 'select'
           },
           {
             label: 'Multiple Dropdown',
-            value: 'multiSelect',
-            filterType: 'array'
+            value: 'multiSelect'
           },
           {
             label: 'Radio List',
-            value: 'radio',
-            filterType: 'text'
+            value: 'radio'
           },
           {
             label: 'Textbox',
-            value: 'input',
-            filterType: 'text'
+            value: 'input'
           },
           {
             label: 'Textarea',
-            value: 'textarea',
-            filterType: 'text'
+            value: 'textarea'
           }
         ]
+      }
+    },
+    {
+      key: 'defaultValue',
+      type: 'input',
+      props: {
+        lable: 'Default Value',
+        placeholder: 'Default Value'
+      },
+      expressions: {
+        type: `model.type`,
+        hide: `model.type === 'datepicker'`
       }
     },
     {
@@ -176,24 +180,5 @@ export class PortalEditSearchComponent implements OnInit {
       x => x.value === type
     );
     return option?.label;
-  }
-
-  getControlFilterType(type: string) {
-    const option = (this.fields[0].props?.options as any[]).find(
-      x => x.value === type
-    );
-    return option?.filterType;
-  }
-
-  getFilterMatchModeOptions(type: string) {
-    const filterType = this.getControlFilterType(type);
-    if (filterType === 'array')
-      return [{ label: 'In selected values', value: 'in' }];
-    if (filterType === 'boolean') return [{ label: 'Equals', value: 'equals' }];
-    return (this.primeNGConfig.filterMatchModeOptions as any)[filterType]?.map(
-      (key: any) => {
-        return { label: this.primeNGConfig.getTranslation(key), value: key };
-      }
-    );
   }
 }

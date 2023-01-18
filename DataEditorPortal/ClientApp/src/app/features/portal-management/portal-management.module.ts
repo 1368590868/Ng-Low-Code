@@ -10,7 +10,8 @@ import { FormlyDatepickerModule } from '../ngx-formly/datepicker';
 import { FormlyMultiSelectModule } from '../ngx-formly/multiselect';
 import { FormlyInputMaskModule } from '../ngx-formly/inputMask';
 import { FormlySelectModule } from '../ngx-formly/select';
-import { DividerWrapperModule } from '../ngx-formly/divider';
+import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
+import { FormlyCheckBoxModule } from '../ngx-formly/checkbox';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
@@ -48,7 +49,8 @@ import {
   PortalEditBasicComponent,
   PortalEditDatasourceComponent,
   PortalEditColumnsComponent,
-  PortalEditSearchComponent
+  PortalEditSearchComponent,
+  PortalEditFormComponent
 } from './components/portal-edit';
 
 @NgModule({
@@ -59,7 +61,8 @@ import {
     PortalEditBasicComponent,
     PortalEditDatasourceComponent,
     PortalEditColumnsComponent,
-    PortalEditSearchComponent
+    PortalEditSearchComponent,
+    PortalEditFormComponent
   ],
   imports: [
     CommonModule,
@@ -76,7 +79,8 @@ import {
     FormlyMultiSelectModule,
     FormlyInputMaskModule,
     FormlySelectModule,
-    DividerWrapperModule,
+    FormlyDividerWrapperModule,
+    FormlyCheckBoxModule,
 
     // primeNg
     AnimateModule,

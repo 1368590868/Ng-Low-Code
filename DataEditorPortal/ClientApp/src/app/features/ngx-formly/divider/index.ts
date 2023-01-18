@@ -1,1 +1,1 @@
-export { DividerWrapperModule } from './divider.module';
+export { FormlyDividerWrapperModule } from './divider.module';

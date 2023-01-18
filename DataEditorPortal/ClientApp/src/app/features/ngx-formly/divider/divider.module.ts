@@ -23,4 +23,4 @@ import { DividerWrapperComponent } from './divider.type';
     })
   ]
 })
-export class DividerWrapperModule {}
+export class FormlyDividerWrapperModule {}

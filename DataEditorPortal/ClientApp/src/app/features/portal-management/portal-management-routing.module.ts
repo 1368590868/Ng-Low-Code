@@ -6,7 +6,8 @@ import {
   PortalEditBasicComponent,
   PortalEditDatasourceComponent,
   PortalEditColumnsComponent,
-  PortalEditSearchComponent
+  PortalEditSearchComponent,
+  PortalEditFormComponent
 } from './components/portal-edit';
 
 const routes: Routes = [
@@ -19,7 +20,8 @@ const routes: Routes = [
       { path: 'basic', component: PortalEditBasicComponent },
       { path: 'datasource', component: PortalEditDatasourceComponent },
       { path: 'columns', component: PortalEditColumnsComponent },
-      { path: 'search', component: PortalEditSearchComponent }
+      { path: 'search', component: PortalEditSearchComponent },
+      { path: 'form', component: PortalEditFormComponent }
     ]
   }
 ];
