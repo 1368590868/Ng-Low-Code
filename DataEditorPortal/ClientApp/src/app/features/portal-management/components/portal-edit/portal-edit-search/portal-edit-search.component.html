@@ -14,8 +14,8 @@
       targetHeader="Selected Fields"
       [dragdrop]="true"
       [responsive]="true"
-      [sourceStyle]="{ height: '300px' }"
-      [targetStyle]="{ height: '300px' }"
+      [sourceStyle]="{ height: '400px' }"
+      [targetStyle]="{ height: '400px' }"
       filterBy="name"
       [showSourceControls]="false"
       [showTargetControls]="false"
@@ -59,6 +59,21 @@
             [model]="model"
             [options]="options"
             class="p-fluid"></formly-form>
+          <p-button styleClass="p-button-text" *ngIf="model.type === 'select'"
+            >Configure Options</p-button
+          >
+          <p-divider>Search Rule</p-divider>
+          <div class="flex align-items-center">
+            <p-dropdown
+              class="mr-2 flex-grow-1"
+              styleClass="w-full"
+              [options]="getFilterMatchModeOptions(model.type)"></p-dropdown>
+            <p-button
+              class="ml-auto"
+              title="Advanced Configuration"
+              styleClass="p-button-text p-button-rounded"
+              icon="pi pi-ellipsis-v"></p-button>
+          </div>
         </form>
         <ng-template #emptyMessage>
           <div class="pt-4">

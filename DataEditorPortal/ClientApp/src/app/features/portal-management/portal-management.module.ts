@@ -10,6 +10,7 @@ import { FormlyDatepickerModule } from '../ngx-formly/datepicker';
 import { FormlyMultiSelectModule } from '../ngx-formly/multiselect';
 import { FormlyInputMaskModule } from '../ngx-formly/inputMask';
 import { FormlySelectModule } from '../ngx-formly/select';
+import { DividerWrapperModule } from '../ngx-formly/divider';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
@@ -75,6 +76,8 @@ import {
     FormlyMultiSelectModule,
     FormlyInputMaskModule,
     FormlySelectModule,
+    DividerWrapperModule,
+
     // primeNg
     AnimateModule,
     ToastModule,

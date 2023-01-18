@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { PrimeNGConfig } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
 
 @Component({
@@ -42,37 +43,51 @@ export class PortalEditSearchComponent implements OnInit {
         options: [
           {
             label: 'Checkbox',
-            value: 'checkbox'
+            value: 'checkbox',
+            filterType: 'boolean'
           },
           {
             label: 'Checkbox List',
-            value: 'checkboxList'
+            value: 'checkboxList',
+            filterType: 'array'
           },
           {
             label: 'Date',
-            value: 'datepicker'
+            value: 'datepicker',
+            filterType: 'date'
           },
           {
             label: 'Dropdown',
-            value: 'select'
+            value: 'select',
+            filterType: 'text'
           },
           {
             label: 'Multiple Dropdown',
-            value: 'multiSelect'
+            value: 'multiSelect',
+            filterType: 'array'
           },
           {
             label: 'Radio List',
-            value: 'radio'
+            value: 'radio',
+            filterType: 'text'
           },
           {
             label: 'Textbox',
-            value: 'input'
+            value: 'input',
+            filterType: 'text'
           },
           {
             label: 'Textarea',
-            value: 'textarea'
+            value: 'textarea',
+            filterType: 'text'
           }
         ]
+      }
+    },
+    {
+      wrappers: ['divider'],
+      props: {
+        label: 'Properties'
       }
     },
     {
@@ -98,7 +113,11 @@ export class PortalEditSearchComponent implements OnInit {
     }
   ];
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private primeNGConfig: PrimeNGConfig,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
     console.log('test');
@@ -157,5 +176,24 @@ export class PortalEditSearchComponent implements OnInit {
       x => x.value === type
     );
     return option?.label;
+  }
+
+  getControlFilterType(type: string) {
+    const option = (this.fields[0].props?.options as any[]).find(
+      x => x.value === type
+    );
+    return option?.filterType;
+  }
+
+  getFilterMatchModeOptions(type: string) {
+    const filterType = this.getControlFilterType(type);
+    if (filterType === 'array')
+      return [{ label: 'In selected values', value: 'in' }];
+    if (filterType === 'boolean') return [{ label: 'Equals', value: 'equals' }];
+    return (this.primeNGConfig.filterMatchModeOptions as any)[filterType]?.map(
+      (key: any) => {
+        return { label: this.primeNGConfig.getTranslation(key), value: key };
+      }
+    );
   }
 }
