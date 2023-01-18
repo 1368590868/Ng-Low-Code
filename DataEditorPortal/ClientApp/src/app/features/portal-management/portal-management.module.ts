@@ -46,7 +46,8 @@ import {
   PortalEditComponent,
   PortalEditBasicComponent,
   PortalEditDatasourceComponent,
-  PortalEditColumnsComponent
+  PortalEditColumnsComponent,
+  PortalEditSearchComponent
 } from './components/portal-edit';
 
 @NgModule({
@@ -56,7 +57,8 @@ import {
     PortalEditComponent,
     PortalEditBasicComponent,
     PortalEditDatasourceComponent,
-    PortalEditColumnsComponent
+    PortalEditColumnsComponent,
+    PortalEditSearchComponent
   ],
   imports: [
     CommonModule,

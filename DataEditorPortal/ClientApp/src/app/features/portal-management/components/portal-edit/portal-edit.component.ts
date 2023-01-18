@@ -33,6 +33,10 @@ export class PortalEditComponent implements OnInit {
       {
         label: 'Add / Edit / View',
         routerLink: 'form'
+      },
+      {
+        label: 'Custom Actions',
+        routerLink: 'actions'
       }
     ];
 

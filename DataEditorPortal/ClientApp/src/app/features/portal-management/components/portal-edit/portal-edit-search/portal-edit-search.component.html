@@ -1,7 +1,7 @@
 <p-card styleClass="px-3 py-2">
-  <ng-template pTemplate="title"> Grid Columns </ng-template>
+  <ng-template pTemplate="title"> Search Configuration </ng-template>
   <ng-template pTemplate="subtitle">
-    Select the fields that you want to display in grid.
+    Select the fields that you want to used in search panel.
   </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
   <div class="w-full pt-3 pb-3 flex">
@@ -31,17 +31,17 @@
         <div *ngIf="!column.selected" class="">[{{ column.name }}]</div>
         <div *ngIf="column.selected" class="flex align-items-center">
           <div class="w-10rem">[{{ column.name }}]</div>
-          <div class="w-20rem" *ngIf="column.header">
-            Header:
-            <p-tag>{{ column.header }}</p-tag>
+          <div class="w-20rem" *ngIf="column.props && column.props.label">
+            Label:
+            <p-tag>{{ column.props.label }}</p-tag>
           </div>
-          <div
-            class="w-6rem"
-            *ngIf="column.filterType && column.filterType !== 'none'">
-            <p-tag severity="success">Filterable</p-tag>
+          <div class="w-10rem" *ngIf="column.type">
+            <p-tag severity="success">{{
+              getControlTypeName(column.type)
+            }}</p-tag>
           </div>
-          <div class="w-6rem" *ngIf="column.sortable">
-            <p-tag severity="success">Sortable</p-tag>
+          <div class="w-6rem" *ngIf="column.props && column.props.required">
+            <p-tag severity="success">Required</p-tag>
           </div>
         </div>
       </ng-template>

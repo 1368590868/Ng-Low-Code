@@ -5,11 +5,11 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PickList } from 'primeng/picklist';
 
 @Component({
-  selector: 'app-portal-edit-columns',
-  templateUrl: './portal-edit-columns.component.html',
-  styleUrls: ['./portal-edit-columns.component.scss']
+  selector: 'app-portal-edit-search',
+  templateUrl: './portal-edit-search.component.html',
+  styleUrls: ['./portal-edit-search.component.scss']
 })
-export class PortalEditColumnsComponent implements OnInit {
+export class PortalEditSearchComponent implements OnInit {
   isSaving = false;
 
   sourceColumns: any[] = [
@@ -31,64 +31,70 @@ export class PortalEditColumnsComponent implements OnInit {
   model: any = {};
   fields: FormlyFieldConfig[] = [
     {
-      key: 'header',
-      type: 'input',
-      props: {
-        label: 'Column Header',
-        required: true,
-        placeholder: 'Column Header'
-      }
-    },
-    {
-      key: 'width',
-      defaultValue: '10rem',
-      type: 'input',
-      props: {
-        label: 'Column Width',
-        required: true,
-        placeholder: 'Enter numeric value in rem or percentage'
-      }
-    },
-    {
-      key: 'filterType',
+      key: 'type',
       type: 'select',
-      defaultValue: 'text',
+      defaultValue: 'input',
       props: {
-        label: 'Filter Type',
+        label: 'Control Type',
         placeholder: 'Please Select',
-        required: true,
         showClear: false,
+        required: true,
         options: [
           {
-            label: 'None',
-            value: 'none'
+            label: 'Checkbox',
+            value: 'checkbox'
           },
           {
-            label: 'Text',
-            value: 'text'
-          },
-          {
-            label: 'Numeric',
-            value: 'numeric'
-          },
-          {
-            label: 'Boolean',
-            value: 'boolean'
+            label: 'Checkbox List',
+            value: 'checkboxList'
           },
           {
             label: 'Date',
-            value: 'date'
+            value: 'datepicker'
+          },
+          {
+            label: 'Dropdown',
+            value: 'select'
+          },
+          {
+            label: 'Multiple Dropdown',
+            value: 'multiSelect'
+          },
+          {
+            label: 'Radio List',
+            value: 'radio'
+          },
+          {
+            label: 'Textbox',
+            value: 'input'
+          },
+          {
+            label: 'Textarea',
+            value: 'textarea'
           }
         ]
       }
     },
     {
-      key: 'sortable',
-      type: 'checkbox',
-      defaultValue: true,
-      props: {
-        label: 'Sortable'
-      }
+      key: 'props',
+      fieldGroup: [
+        {
+          key: 'label',
+          type: 'input',
+          props: {
+            label: 'Label',
+            placeholder: 'Control label'
+          }
+        },
+        {
+          key: 'placeholder',
+          type: 'input',
+          props: {
+            label: 'Placeholder',
+            placeholder: 'Placeholder'
+          }
+        }
+      ]
     }
   ];
 
@@ -102,10 +108,11 @@ export class PortalEditColumnsComponent implements OnInit {
     event.items.forEach((item: any) => {
       item.selected = true;
       item.key = item.name;
-      item.header = item.name;
-      item.width = '10rem';
-      item.filterType = 'text'; // set by column type
-      item.sortable = true;
+      item.type = 'input';
+      item.props = {
+        label: item.name,
+        placeholder: item.name
+      };
     });
   }
 
@@ -113,10 +120,8 @@ export class PortalEditColumnsComponent implements OnInit {
     event.items.forEach((item: any) => {
       item.selected = false;
       item.key = undefined;
-      item.header = undefined;
-      item.width = undefined;
-      item.filterType = undefined;
-      item.sortable = undefined;
+      item.type = undefined;
+      item.props = undefined;
     });
     if (event.items.find((x: any) => x.name === this.model.name)) {
       this.model = {};
@@ -145,5 +150,12 @@ export class PortalEditColumnsComponent implements OnInit {
     this.router.navigate(['../datasource'], {
       relativeTo: this.activatedRoute
     });
+  }
+
+  getControlTypeName(type: string) {
+    const option = (this.fields[0].props?.options as any[]).find(
+      x => x.value === type
+    );
+    return option?.label;
   }
 }
