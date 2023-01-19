@@ -5,7 +5,7 @@ import {
   OnGridActionDialogShow
 } from '../../directives/grid-action.directive';
 import { RoleList } from '../../models/user-manager';
-import { UserManagerService } from '../../services/user-manager-services/user-manager.service';
+import { UserManagerService } from '../../services/user-manager.service';
 
 @Component({
   selector: 'app-user-role-action',

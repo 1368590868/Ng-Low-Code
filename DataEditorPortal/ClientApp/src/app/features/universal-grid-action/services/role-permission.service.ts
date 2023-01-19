@@ -9,7 +9,7 @@ import {
   RolePermissions,
   updateRole,
   ManageRoleForm
-} from '../../models/role-permisstion';
+} from '../models/role-permisstion';
 
 @Injectable({
   providedIn: 'root'

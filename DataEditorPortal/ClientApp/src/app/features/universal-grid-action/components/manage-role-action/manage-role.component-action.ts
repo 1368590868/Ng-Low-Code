@@ -11,7 +11,7 @@ import {
   RoleList,
   RolePermissions
 } from '../../models/role-permisstion';
-import { RolePermissionService } from '../../services/role-permission/role-permission.service';
+import { RolePermissionService } from '../../services/role-permission.service';
 
 @Component({
   selector: 'app-manager-role',

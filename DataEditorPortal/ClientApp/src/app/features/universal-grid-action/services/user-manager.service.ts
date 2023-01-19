@@ -9,7 +9,7 @@ import {
   UserPemissions,
   UserManagerForm,
   UserManagerResponse
-} from '../../models/user-manager';
+} from '../models/user-manager';
 
 @Injectable({
   providedIn: 'root'
