@@ -46,7 +46,7 @@ import { ManagerRoleComponent } from './components/manage-role-action/manage-rol
 import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
 import { FormlyTagWrapperModule } from '../ngx-formly/tag';
 import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
-import { UserPermissionComponent } from './components/user-permission/user-permission.component';
+import { UserPermissionComponent } from './components/user-permission-action/user-permission-action.component';
 
 export * from './models/grid-config';
 

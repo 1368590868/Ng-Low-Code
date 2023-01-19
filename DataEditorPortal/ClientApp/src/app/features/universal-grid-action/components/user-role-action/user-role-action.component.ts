@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NotifyService } from 'src/app/core/utils/notify.service';
 import {
   GridActionDirective,
   OnGridActionDialogShow
@@ -17,7 +18,10 @@ export class UserRoleActionComponent
 {
   rolesArr: RoleList[] = [];
 
-  constructor(private userManagerService: UserManagerService) {
+  constructor(
+    private userManagerService: UserManagerService,
+    private notifyService: NotifyService
+  ) {
     super();
   }
 
@@ -27,6 +31,22 @@ export class UserRoleActionComponent
       .subscribe(res => {
         this.rolesArr = res;
         this.loadedEvent.emit();
+      });
+  }
+
+  onSave(): void {
+    this.userManagerService
+      .saveUserRole(this.rolesArr, this.selectedRecords[0][this.recordKey])
+      .subscribe(res => {
+        if (!res.isError) {
+          this.notifyService.notifySuccess(
+            'Success',
+            'Save Successfully Completed.'
+          );
+          this.savedEvent.emit();
+        } else {
+          this.errorEvent.emit();
+        }
       });
   }
 }

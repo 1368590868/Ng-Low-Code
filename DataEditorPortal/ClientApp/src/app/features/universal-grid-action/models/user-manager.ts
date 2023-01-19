@@ -24,7 +24,7 @@ export interface ManageRoleForm {
   phone?: string;
 }
 
-export interface updateRole {
+export interface UpdateRole {
   roleId?: string;
 }
 
@@ -36,7 +36,7 @@ export interface UserPemissions {
   category?: string;
 }
 
-export interface UserRole extends UserPemissions {
+export interface UserData extends UserPemissions {
   label?: string;
   roleName?: string;
   selected?: boolean;

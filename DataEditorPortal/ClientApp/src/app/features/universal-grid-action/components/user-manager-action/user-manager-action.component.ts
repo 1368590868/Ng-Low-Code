@@ -237,6 +237,20 @@ export class UserManagerActionComponent
       },
       expressions: {
         hide: () => this.isAddForm
+      },
+      hooks: {
+        onInit: field => {
+          if (!this.isAddForm) {
+            this.userManagerService
+              .getUserPermissions(this.selectedRecords[0][this.recordKey])
+              .subscribe(res => {
+                field.props!['forArray'] = res.filter(item => {
+                  item.label = item.permissionName;
+                  return item.selected;
+                });
+              });
+          }
+        }
       }
     }
   ];
@@ -261,13 +275,11 @@ export class UserManagerActionComponent
             vendor: res.vendor,
             employer: res.employer,
             autoEmail: res.autoEmail,
-            division: JSON.parse(res.division)
+            division: res.division !== 'NONE' ? JSON.parse(res.division) : []
           });
-          this.loadedEvent.emit();
         });
-    } else {
-      this.loadedEvent.emit();
     }
+    this.loadedEvent.emit();
   }
 
   onFormSubmit(model: ManageRoleForm) {
@@ -283,7 +295,10 @@ export class UserManagerActionComponent
             }
       ).subscribe(res => {
         if (!res.isError && res.result) {
-          this.notifyService.notifySuccess('Success', 'Save Success');
+          this.notifyService.notifySuccess(
+            'Success',
+            'Save Successfully Completed.'
+          );
           this.savedEvent.emit();
         } else {
           this.errorEvent.emit();
