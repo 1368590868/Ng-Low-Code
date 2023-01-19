@@ -1,6 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { tap } from 'rxjs';
+import { NotifyService } from 'src/app/app.module';
+import { PortalItem, PortalItemData } from '../../models/portal-item';
+import { PortalItemService } from '../../services/portal-item.service';
+import { AddPortalDialogComponent } from './add-portal-dialog/add-portal-dialog.component';
 
 @Component({
   selector: 'app-portal-list',
@@ -8,12 +13,14 @@ import { MenuItem } from 'primeng/api';
   styleUrls: ['./portal-list.component.scss']
 })
 export class PortalListComponent implements OnInit {
-  data!: any[];
-  addNewMenuModels: any[] = [
+  data!: PortalItem[];
+  addNewMenuModels: MenuItem[] = [
     {
       label: 'Create Folder',
       icon: 'pi pi-fw pi-folder',
       command: () => {
+        this.addDialog.header = 'Create Folder';
+        this.addDialog.okText = 'Create Folder';
         this.addDialog.showDialog();
       }
     },
@@ -28,71 +35,35 @@ export class PortalListComponent implements OnInit {
     }
   ];
 
-  @ViewChild('addDialog') addDialog: any;
-  @ViewChild('newButton') newButton: any;
+  @ViewChild('addDialog') addDialog!: AddPortalDialogComponent;
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private portalItemService: PortalItemService,
+    private notifyService: NotifyService
+  ) {}
 
   ngOnInit(): void {
-    this.data = [
-      {
-        data: {
-          id: 'b4b490ea-9df3-4f7a-8806-936ca7f87b8f',
-          name: 'PortalManagement',
-          label: 'Portal Management',
-          icon: 'pi pi-desktop',
-          description: null,
-          type: 'System',
-          link: '/portal-management/list'
-        },
-        children: []
-      },
-      {
-        data: {
-          id: '4e22e18e-492e-4786-8170-fb8f0c9d3a62',
-          name: 'UserManagement',
-          label: 'User Management',
-          icon: 'pi pi-fw pi-user',
-          description: '1',
-          type: 'Portal Item',
-          link: null,
-          status: 0
-        },
-        children: null
-      },
-      {
-        data: {
-          id: '4e22e18e-492e-4786-8170-fb8f0c9d3a63',
-          name: 'UserManagement1',
-          label: 'User Management 1',
-          icon: 'pi pi-fw pi-user',
-          description: '2',
-          type: 'Folder',
-          link: null,
-          status: 1
-        },
-        children: [
-          {
-            data: {
-              id: '4e22e18e-492e-4786-8170-fb8f0c9d3a64',
-              name: 'UserManagement1',
-              label: 'Portal Item 2',
-              icon: 'pi pi-fw pi-user',
-              description: '3',
-              type: 'Portal Item',
-              link: null
-            }
-          }
-        ]
-      }
-    ];
+    this.getPortalList();
   }
 
-  getMenuList(row: any) {
+  getMenuList(row: PortalItemData) {
     const items: MenuItem[] = [];
-    if (row.type === 'Folder') {
+    if (row['type'] === 'Portal Item') {
       items.push({
-        label: 'New',
+        label: 'Edit Portal Item',
+        icon: 'pi pi-fw pi-pencil',
+        command: () => {
+          // edit portal item
+          this.router.navigate([`../edit/${row['id']}`], {
+            relativeTo: this.activatedRoute
+          });
+        }
+      });
+    } else {
+      items.push({
+        label: 'New Portal Item',
         icon: 'pi pi-fw pi-plus',
         command: () => {
           // new portal item
@@ -102,30 +73,67 @@ export class PortalListComponent implements OnInit {
         }
       });
       items.push({
-        label: 'Edit',
+        label: 'Edit Folder',
         icon: 'pi pi-fw pi-pencil',
         command: () => {
           // edit folder
+          this.addDialog.header = 'Update Folder details';
+          this.addDialog.okText = 'Update Folder';
+          this.addDialog.model = { ...row };
           this.addDialog.showDialog();
         }
       });
+    }
+    if (row['status'] === 1) {
+      items.push({
+        label: 'Unpublish',
+        icon: 'pi pi-fw pi-minus-circle',
+        command: () => this.unpublish(row)
+      });
     } else {
       items.push({
-        label: 'Edit',
-        icon: 'pi pi-fw pi-pencil',
-        command: () => {
-          // edit portal item
-          this.router.navigate([`../edit/${row.id}`], {
-            relativeTo: this.activatedRoute
-          });
-        }
+        label: 'Publish',
+        icon: 'pi pi-fw pi-check-circle',
+        command: () => this.publish(row)
       });
     }
-    if (row.status === 1) {
-      items.push({ label: 'Unpublish', icon: 'pi pi-fw pi-check-circle' });
-    } else {
-      items.push({ label: 'Publish', icon: 'pi pi-fw pi-minus-circle' });
-    }
     return items;
+  }
+
+  getPortalList() {
+    this.portalItemService
+      .getPortalList()
+      .pipe(
+        tap(res => {
+          this.data = res;
+        })
+      )
+      .subscribe();
+  }
+
+  publish(row: PortalItemData) {
+    this.portalItemService
+      .publish(row['id'])
+      .pipe(
+        tap(res => {
+          if (res && !res.isError) {
+            row['status'] = 1;
+          }
+        })
+      )
+      .subscribe();
+  }
+
+  unpublish(row: PortalItemData) {
+    this.portalItemService
+      .unpublish(row['id'])
+      .pipe(
+        tap(res => {
+          if (res && !res.isError) {
+            row['status'] = 2;
+          }
+        })
+      )
+      .subscribe();
   }
 }

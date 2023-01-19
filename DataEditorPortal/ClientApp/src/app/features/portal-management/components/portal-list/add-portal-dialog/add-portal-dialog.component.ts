@@ -1,6 +1,14 @@
-import { Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild
+} from '@angular/core';
+import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { NotifyService } from 'src/app/app.module';
+import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
   selector: 'app-add-portal-dialog',
@@ -8,18 +16,14 @@ import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
   styleUrls: ['./add-portal-dialog.component.scss']
 })
 export class AddPortalDialogComponent {
-  @Input() class = 'mr-2';
-  @Input() label = 'Add New';
-  @Input() icon = 'pi pi-plus';
-  @Input() buttonStyleClass = '';
   @Input() header = 'Add / Edit';
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
   @Input() dialogStyle = { width: '40rem' };
-  @Input() isAddForm = false;
 
-  @ViewChild('container', { read: ViewContainerRef, static: true })
-  viewContainerRef!: ViewContainerRef;
+  @Output() saved = new EventEmitter<string>();
+
+  @ViewChild('editForm') editForm!: NgForm;
 
   visible = false;
   isLoading = false;
@@ -35,7 +39,8 @@ export class AddPortalDialogComponent {
       className: 'w-full',
       props: {
         label: 'Folder Name',
-        placeholder: 'Portal Name'
+        placeholder: 'Portal Name',
+        required: true
       }
     },
     {
@@ -43,15 +48,17 @@ export class AddPortalDialogComponent {
       type: 'input',
       props: {
         label: 'Menu Label',
-        placeholder: 'Menu Label'
+        placeholder: 'Menu Label',
+        required: true
       }
     },
     {
-      key: 'Icon',
+      key: 'icon',
       type: 'input',
       props: {
         label: 'Icon',
-        placeholder: 'Icon'
+        placeholder: 'Icon',
+        required: true
       }
     },
     {
@@ -65,29 +72,57 @@ export class AddPortalDialogComponent {
     }
   ];
 
+  constructor(
+    private portalItemService: PortalItemService,
+    private notifyService: NotifyService
+  ) {}
+
   showDialog() {
     this.isLoading = false;
     this.visible = true;
-  }
-
-  onShow() {
     this.buttonDisabled = false;
   }
 
-  onHide() {
-    console.log('onHide');
-  }
   onCancel() {
     this.visible = false;
   }
 
   onOk() {
-    this.isLoading = true;
-
-    this.visible = false;
+    this.editForm.onSubmit(new Event('submit'));
   }
 
-  onFormSubmit(model: any) {
-    console.log(model);
+  onFormSubmit(model: { [name: string]: unknown }) {
+    if (this.form.valid) {
+      this.isLoading = true;
+      if (model['id']) {
+        this.portalItemService
+          .updateRootFolder(model['id'] as string, model)
+          .subscribe(res => {
+            if (!res.isError && res.result) {
+              this.notifyService.notifySuccess(
+                'Success',
+                'Save Successfully Completed.'
+              );
+              this.visible = false;
+              this.saved.emit(res.result);
+            } else {
+              this.isLoading = false;
+            }
+          });
+      } else {
+        this.portalItemService.createRootFolder(model).subscribe(res => {
+          if (!res.isError && res.result) {
+            this.notifyService.notifySuccess(
+              'Success',
+              'Save Successfully Completed.'
+            );
+            this.visible = false;
+            this.saved.emit(res.result);
+          } else {
+            this.isLoading = false;
+          }
+        });
+      }
+    }
   }
 }
