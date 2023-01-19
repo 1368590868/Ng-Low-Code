@@ -59,7 +59,7 @@ namespace DataEditorPortal.Web.Controllers
             {
                 var siteRoles = from up in _depDbContext.UserPermissions
                                 join sr in _depDbContext.SiteRoles on up.PermissionGrantId equals sr.Id
-                                where up.UserId == dep_user.Id
+                                where up.UserId == dep_user.Id && up.GrantType == "GROUP"
                                 select new
                                 {
                                     PermissionName = sr.RoleName,
@@ -68,13 +68,13 @@ namespace DataEditorPortal.Web.Controllers
 
                 var sitePermissions = from up in _depDbContext.UserPermissions
                                       join sp in _depDbContext.SitePermissions on up.PermissionGrantId equals sp.Id
-                                      where up.UserId == dep_user.Id
+                                      where up.UserId == dep_user.Id && up.GrantType == "ITEM"
                                       select new
                                       {
                                           PermissionName = sp.PermissionName,
                                           Description = sp.PermissionDescription
                                       };
-                var permissions = siteRoles.Union(sitePermissions).ToList();
+                var permissions = siteRoles.Union(sitePermissions).Distinct().ToList();
                 foreach (var p in permissions)
                 {
                     user.Permissions[p.PermissionName] = true;
@@ -82,6 +82,19 @@ namespace DataEditorPortal.Web.Controllers
             }
 
             return user;
+        }
+
+        [HttpGet]
+        [Route("detail/{userId}")]
+        public dynamic GetUserDetail(Guid userId)
+        {
+            var dep_user = _depDbContext.Users.Where(x => x.Id == userId).FirstOrDefault();
+            if (dep_user == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            return dep_user;
         }
 
         [HttpPost]
@@ -104,7 +117,7 @@ namespace DataEditorPortal.Web.Controllers
             return dep_user.Id;
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("update/{userId}")]
         public Guid Update(Guid userId, [FromBody] User model)
         {
@@ -123,7 +136,6 @@ namespace DataEditorPortal.Web.Controllers
             dep_user.Email = model.Email;
             dep_user.Phone = model.Phone;
 
-            _depDbContext.Users.Add(dep_user);
             _depDbContext.SaveChanges();
 
             return dep_user.Id;
@@ -134,7 +146,7 @@ namespace DataEditorPortal.Web.Controllers
         public List<AppRolePermission> Permissions(Guid userId)
         {
             var userPermissions = from up in _depDbContext.UserPermissions
-                                  where up.UserId == userId
+                                  where up.UserId == userId && up.GrantType == "ITEM"
                                   select up;
 
             var query = from sp in _depDbContext.SitePermissions
@@ -160,10 +172,10 @@ namespace DataEditorPortal.Web.Controllers
             var currentUserId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
 
             _depDbContext.UserPermissions
-                .Where(r => r.UserId == userId)
-                .Where(r => r.GrantType == "ITEM")
+                .Where(p => p.UserId == userId)
+                .Where(p => p.GrantType == "ITEM")
                 .ToList()
-                .ForEach(r => _depDbContext.UserPermissions.Remove(r));
+                .ForEach(p => _depDbContext.UserPermissions.Remove(p));
 
             foreach (var p in model.Permissions)
             {
@@ -171,7 +183,7 @@ namespace DataEditorPortal.Web.Controllers
                 {
                     var permission = new UserPermission()
                     {
-                        GrantType = "",
+                        GrantType = "ITEM",
                         UserId = userId,
                         PermissionGrantId = p.Id,
                         CreatedBy = currentUserId,
@@ -190,7 +202,7 @@ namespace DataEditorPortal.Web.Controllers
         public dynamic UserRoles(Guid userId)
         {
             var userPermissions = from up in _depDbContext.UserPermissions
-                                  where up.UserId == userId
+                                  where up.UserId == userId && up.GrantType == "GROUP"
                                   select up;
 
             var query = from sr in _depDbContext.SiteRoles
@@ -215,20 +227,20 @@ namespace DataEditorPortal.Web.Controllers
             var currentUserId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
 
             _depDbContext.UserPermissions
-                .Where(r => r.UserId == userId)
-                .Where(r => r.GrantType == "GROUP")
+                .Where(p => p.UserId == userId)
+                .Where(p => p.GrantType == "GROUP")
                 .ToList()
-                .ForEach(r => _depDbContext.UserPermissions.Remove(r));
+                .ForEach(p => _depDbContext.UserPermissions.Remove(p));
 
-            foreach (var p in model.Permissions)
+            foreach (var r in model.Permissions)
             {
-                if (p.Selected)
+                if (r.Selected)
                 {
                     var permission = new UserPermission()
                     {
                         GrantType = "GROUP",
                         UserId = userId,
-                        PermissionGrantId = p.Id,
+                        PermissionGrantId = r.Id,
                         CreatedBy = currentUserId,
                         CreatedDate = DateTime.UtcNow
                     };

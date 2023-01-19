@@ -400,6 +400,8 @@ namespace DataEditorPortal.Web.Services
 
         public string FormatValue(object value, DataRow schema)
         {
+            if (value == System.DBNull.Value) return string.Empty;
+
             var sqlDbType = (SqlDbType)schema["ProviderType"];
             if (sqlDbType == SqlDbType.Date) return Convert.ToDateTime(value).ToString("d");
             if (sqlDbType == SqlDbType.DateTime || sqlDbType == SqlDbType.DateTime2 || sqlDbType == SqlDbType.SmallDateTime)
