@@ -21,13 +21,15 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             error.error?.responseException?.exceptionTitle ||
               error.statusText ||
               error.name,
-            error.error?.responseException?.exceptionMessage || error.message
+            error.error?.responseException?.exceptionMessage?.title ||
+              error.error?.responseException?.exceptionMessage ||
+              error.message
           );
 
         if (request.responseType === 'json') {
           return of(
             new HttpResponse({
-              body: JSON.stringify(error.error)
+              body: error.error
             })
           );
         } else {

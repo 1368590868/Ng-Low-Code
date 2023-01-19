@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, NgForm } from '@angular/forms';
+import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { of, switchMap } from 'rxjs';
+import { of, finalize, tap } from 'rxjs';
+import { PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
@@ -13,10 +14,14 @@ import { PortalItemService } from '../../../services/portal-item.service';
 export class PortalEditBasicComponent implements OnInit {
   @ViewChild('editForm') editForm!: NgForm;
 
+  isLoading = true;
   isSaving = false;
+  isSavingAndNext = false;
+  isSavingAndExit = false;
+
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  model: { [name: string]: unknown } = {};
+  model!: PortalItemData;
   fields: FormlyFieldConfig[] = [
     {
       key: 'name',
@@ -26,10 +31,37 @@ export class PortalEditBasicComponent implements OnInit {
         label: 'Portal Name',
         placeholder: 'Portal Name',
         required: true
+      },
+      modelOptions: {
+        updateOn: 'blur'
+      },
+      validators: {
+        doNotAllowSpecial: {
+          expression: (c: AbstractControl) => {
+            return /^[a-zA-Z]\w+/.test(c.value);
+          },
+          message: 'Only number and letter are allowed.'
+        }
+      },
+      asyncValidators: {
+        exist: {
+          expression: (c: AbstractControl) => {
+            return new Promise((resolve, reject) => {
+              this.portalItemService
+                .nameExists(c.value, this.portalItemService.currentPortalItemId)
+                .subscribe(res =>
+                  !res.isError ? resolve(!res.result) : reject(res.message)
+                );
+            });
+          },
+          message: () => {
+            return 'The Portal Name has already been exist.';
+          }
+        }
       }
     },
     {
-      key: 'parent',
+      key: 'parentId',
       type: 'select',
       className: 'w-full',
       props: {
@@ -56,7 +88,11 @@ export class PortalEditBasicComponent implements OnInit {
               });
 
               field.props.options = options;
-              this.model = { ...this.model, parent: '<root>' };
+
+              // reset the dropdown value, if the options come after the model value, dropdown may has no options selected
+              if (!this.model['parentId'])
+                this.model = { ...this.model, parentId: '<root>' };
+              else this.model = { ...this.model };
             }
           });
         }
@@ -72,7 +108,7 @@ export class PortalEditBasicComponent implements OnInit {
       }
     },
     {
-      key: 'Icon',
+      key: 'icon',
       type: 'input',
       props: {
         label: 'Icon',
@@ -98,28 +134,79 @@ export class PortalEditBasicComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.portalItemService.currentPortalItemId);
     // load basic information
-    setTimeout(() => {
-      this.isSaving = false;
-    }, 1000);
+    if (this.portalItemService.currentPortalItemId) {
+      this.portalItemService
+        .getPortalDetails(this.portalItemService.currentPortalItemId)
+        .subscribe(res => {
+          if (!res['parentId']) res['parentId'] = '<root>';
+          this.model = res;
+
+          // enable buttons after data loaded.
+          this.isLoading = false;
+        });
+    }
   }
 
-  onFormSubmit(model: { [name: string]: unknown }) {
+  onFormSubmit(model: PortalItemData) {
     if (this.form.valid) {
       // save & next
+      const data = { ...model };
+      if (data['parentId'] === '<root>') data['parentId'] = null;
+
       this.isSaving = true;
-      setTimeout(() => {
-        this.router.navigate(['../datasource'], {
-          relativeTo: this.activatedRoute
-        });
-      }, 1000);
+      if (this.portalItemService.currentPortalItemId) {
+        this.portalItemService
+          .updatePortalDetails(this.portalItemService.currentPortalItemId, data)
+          .pipe(
+            tap(res => {
+              if (res && !res.isError) {
+                this.saveSucess();
+              }
+
+              this.isSaving = false;
+              this.isSavingAndExit = false;
+              this.isSavingAndNext = false;
+            })
+          )
+          .subscribe();
+      } else {
+        this.portalItemService
+          .createPortalDetails(data)
+          .pipe(
+            tap(res => {
+              if (res && !res.isError) {
+                this.saveSucess();
+              }
+              this.isSaving = false;
+              this.isSavingAndExit = false;
+              this.isSavingAndNext = false;
+            })
+          )
+          .subscribe();
+      }
     }
   }
 
   onSaveAndNext() {
+    this.isSavingAndNext = true;
     this.editForm.onSubmit(new Event('submit'));
   }
+
+  onSaveAndExit() {
+    this.isSavingAndExit = true;
+    this.editForm.onSubmit(new Event('submit'));
+  }
+
+  saveSucess() {
+    let next: unknown[] = [];
+    if (this.isSavingAndNext) next = ['../datasource'];
+    if (this.isSavingAndExit) next = ['/portal-management/list'];
+    this.router.navigate(next, {
+      relativeTo: this.activatedRoute
+    });
+  }
+
   onBack() {
     this.router.navigate(['/portal-management/list'], {
       relativeTo: this.activatedRoute

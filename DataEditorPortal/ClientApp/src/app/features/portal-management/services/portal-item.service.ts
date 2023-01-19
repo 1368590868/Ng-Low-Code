@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable, Subject } from 'rxjs';
 import { NotifyService } from 'src/app/app.module';
@@ -11,7 +11,7 @@ import { PortalItem, PortalItemData } from '../models/portal-item';
 export class PortalItemService {
   public _apiUrl: string;
 
-  public currentPortalItemId!: string;
+  public currentPortalItemId?: string;
 
   constructor(
     private http: HttpClient,
@@ -55,6 +55,44 @@ export class PortalItemService {
     return this.http.put<ApiResponse<string>>(
       `${this._apiUrl}portal-item/${id}/unpublish`,
       null
+    );
+  }
+
+  nameExists(name: string, id?: string): Observable<ApiResponse<boolean>> {
+    let params = new HttpParams().set('name', name);
+    if (id) params = params.set('id', id);
+    return this.http.get<ApiResponse<boolean>>(
+      `${this._apiUrl}portal-item/name-exists`,
+      {
+        params
+      }
+    );
+  }
+
+  getPortalDetails(id: string): Observable<PortalItemData> {
+    return this.http
+      .get<ApiResponse<PortalItemData>>(
+        `${this._apiUrl}portal-item/${id}/details`
+      )
+      .pipe(map(x => x.result || {}));
+  }
+
+  createPortalDetails(
+    data: PortalItemData
+  ): Observable<ApiResponse<PortalItemData>> {
+    return this.http.post<ApiResponse<PortalItemData>>(
+      `${this._apiUrl}portal-item/create`,
+      data
+    );
+  }
+
+  updatePortalDetails(
+    id: string,
+    data: PortalItemData
+  ): Observable<ApiResponse<PortalItemData>> {
+    return this.http.put<ApiResponse<PortalItemData>>(
+      `${this._apiUrl}portal-item/${id}/update`,
+      data
     );
   }
 }

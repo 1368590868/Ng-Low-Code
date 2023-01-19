@@ -32,22 +32,25 @@
       <p-button
         label="Back"
         icon="pi pi-angle-left"
-        [disabled]="isSaving"
+        [disabled]="isLoading || isSaving"
         styleClass="p-button-outlined"
-        (click)="onBack()"></p-button>
+        (onClick)="onBack()"></p-button>
       <p-button
         label="Save Draft & Exit"
         icon="pi pi-save"
         class="ml-auto"
-        [disabled]="isSaving"
-        styleClass="p-button-outlined"></p-button>
+        [disabled]="isLoading || isSaving"
+        styleClass="p-button-outlined"
+        (onClick)="onSaveAndExit()"
+        [loading]="isSaving && isSavingAndExit"></p-button>
       <p-button
         label="Save & Next"
         icon="pi pi-angle-right"
         iconPos="right"
         [style]="{ 'margin-left': '.5em' }"
-        (click)="onSaveAndNext()"
-        [loading]="isSaving"></p-button>
+        [disabled]="isLoading || isSaving"
+        (onClick)="onSaveAndNext()"
+        [loading]="isSaving && isSavingAndNext"></p-button>
     </div>
   </ng-template>
 </p-card>
