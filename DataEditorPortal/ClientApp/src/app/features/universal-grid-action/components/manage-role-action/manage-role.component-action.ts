@@ -157,13 +157,11 @@ export class ManagerRoleComponent
   }
 
   initData(data: RoleList[]) {
-    setTimeout(() => {
-      this.form.setValue({
-        roleId: data[0].id,
-        roleName: data[0].roleName,
-        roleDescription: data[0].roleDescription
-      });
-    }, 500);
+    this.form.setValue({
+      roleId: data[0].id,
+      roleName: data[0].roleName,
+      roleDescription: data[0].roleDescription
+    });
   }
 
   getRolePermissionsList(roleId = '', isNew = false) {
@@ -189,16 +187,15 @@ export class ManagerRoleComponent
   }
 
   onFormSubmit(model: ManageRoleForm) {
-    this.permissionSelect = this.permissionSelect.flat(3);
+    this.permissionSelect = this.permissionSelect.flat(3).map(res => {
+      res.selected = true;
+      return res;
+    });
     if (this.form.valid) {
       const apiName =
         this.model.roleId!.split(',')[1] === 'new'
           ? 'createRole'
           : 'updateRole';
-
-      this.permissionSelect.map(res => {
-        res.selected = true;
-      });
       this.rolePermissionService[apiName]({
         ...model,
         permissions: this.permissionSelect
