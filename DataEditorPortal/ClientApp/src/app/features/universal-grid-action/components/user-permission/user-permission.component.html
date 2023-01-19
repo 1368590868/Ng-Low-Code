@@ -1,25 +1,9 @@
 <p-accordion [multiple]="false">
-  <p-accordionTab header="CATEGORY 1" [selected]="true">
-    <p-table [value]="permissions" [(selection)]="permisstionSelect">
-      <ng-template pTemplate="body" let-permission>
-        <tr>
-          <td>
-            <p-tableCheckbox [value]="permission.key"></p-tableCheckbox>
-          </td>
-
-          <td>
-            <span> {{ permission.key }} </span>
-          </td>
-          <td>
-            <span> {{ permission.desc }} </span>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </p-accordionTab>
-  <p-accordionTab header="CATEGORY 2"> Content 2 </p-accordionTab>
-  <p-accordionTab header="CATEGORY 3">
-    <p-table [value]="permissions">
+  <p-accordionTab
+    *ngFor="let item of groupPermissions; let i = index"
+    [header]="item[0].category"
+    [selected]="i === 0">
+    <p-table [value]="permissions[i]" [(selection)]="permissionSelect[i]">
       <ng-template pTemplate="body" let-permission>
         <tr>
           <td>
@@ -27,13 +11,13 @@
           </td>
 
           <td>
-            <span> PERMISSIONDESCRIPTION </span>
+            <span> {{ permission.permissionName }} </span>
           </td>
           <td>
-            <span> {{ permission.desc }} </span>
+            <span> {{ permission.permissionDescription }} </span>
           </td>
         </tr>
       </ng-template>
-    </p-table></p-accordionTab
-  >
+    </p-table>
+  </p-accordionTab>
 </p-accordion>

@@ -4,8 +4,8 @@ import {
   GridActionDirective,
   OnGridActionDialogShow
 } from '../../directives/grid-action.directive';
-import { Permisstion } from '../../models/role-permisstion';
-import { RolePermissionService } from '../../services/role-permission/role-permission.service';
+import { UserPemissions } from '../../models/user-manager';
+import { UserManagerService } from '../../services/user-manager-services/user-manager.service';
 
 @Component({
   selector: 'app-user-permission',
@@ -16,46 +16,63 @@ export class UserPermissionComponent
   extends GridActionDirective
   implements OnGridActionDialogShow
 {
-  isPermissionLoading = false;
-  permisstionSelect = [];
-  permissions: Permisstion[] = [
-    {
-      id: 1,
-      name: 'Permission 1',
-      desc: 'Description 1'
-    },
-    {
-      id: 2,
-      name: 'Permission 2',
-      desc: 'Description 2 '
-    }
-  ];
+  groupPermissions: any[] = [];
+  permissionSelect: UserPemissions[] = [];
+  permissions: any[] = [];
   constructor(
-    private rolePermisstionService: RolePermissionService,
+    private userManagerService: UserManagerService,
     private notifyService: NotifyService
   ) {
     super();
   }
 
-  onDialogShow(): void {
-    this.rolePermisstionService.getPermissions().subscribe(res => {
-      this.permissions = res;
+  getPermissionsList(id = '') {
+    this.userManagerService.getUserPermissions(id).subscribe(res => {
+      this.groupPermissions = this.groupBy(res);
+      this.groupPermissions.map((item, i) => {
+        this.permissions[i] = item;
+      });
+      this.permissions.map((res, i) => {
+        this.permissionSelect[i] = res.filter((item: any) => {
+          return item.selected;
+        });
+      });
       this.loadedEvent.emit();
     });
   }
 
+  // format data
+  groupBy(objectArray: any[]) {
+    const map = new Map();
+    objectArray.forEach((item, _, arr) => {
+      if (!map.has(item.category)) {
+        map.set(
+          item.category,
+          arr.filter(a => a.category == item.category)
+        );
+      }
+    });
+    return Array.from(map).map(item => [...item[1]]);
+  }
+
+  // dialog function
+
+  onDialogShow(): void {
+    // this.rolePermisstionService.getPermissions().subscribe(res => {
+    //   this.permissions = res;
+    // });
+    this.getPermissionsList(this.selectedRecords[0][this.recordKey]);
+  }
+
   onSave(): void {
-    this.isPermissionLoading = true;
-    this.rolePermisstionService
-      .savePermissions(this.permisstionSelect)
-      .subscribe(res => {
-        if (res.isError) {
-          this.notifyService.notifySuccess('Success', 'Save Success');
-          this.savedEvent.emit();
-        } else {
-          this.errorEvent.emit();
-        }
-      });
+    this.permissionSelect = this.permissionSelect.flat(3).map(res => {
+      {
+        res.selected = true;
+        return res;
+      }
+    });
+
+    console.log(this.permissionSelect);
   }
 
   onCancel(): void {

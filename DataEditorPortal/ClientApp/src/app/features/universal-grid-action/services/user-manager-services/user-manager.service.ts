@@ -5,7 +5,8 @@ import { ApiResponse } from 'src/app/core/models/api-response';
 import {
   ManageRoleForm,
   updateRole,
-  UserPemissions
+  UserPemissions,
+  UserRole
 } from '../../models/user-manager';
 import {
   UserManagerForm,
@@ -29,7 +30,7 @@ export class UserManagerService {
   }
 
   createUser(data: ManageRoleForm) {
-    return this.http.put<ApiResponse<updateRole[]>>(
+    return this.http.post<ApiResponse<updateRole[]>>(
       `${this._apiUrl}user/create`,
       { ...data, division: JSON.stringify(data.division) }
     );
@@ -50,7 +51,14 @@ export class UserManagerService {
 
   getUserPermissions(id: string) {
     return this.http
-      .get<ApiResponse<UserPemissions>>(`${this._apiUrl}user/${id}/permissions`)
-      .pipe(map(res => res.result));
+      .get<ApiResponse<UserPemissions[]>>(
+        `${this._apiUrl}user/${id}/permissions`
+      )
+      .pipe(map(res => res.result || []));
+  }
+  getUserRole(id: string) {
+    return this.http
+      .get<ApiResponse<UserRole[]>>(`${this._apiUrl}user/${id}/roles`)
+      .pipe(map(res => res.result || []));
   }
 }

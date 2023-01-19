@@ -1,8 +1,8 @@
 <div class="p-2" *ngFor="let role of rolesArr">
   <p-checkbox
     [binary]="true"
-    name="{{ role.value }}"
-    value="{{ role.value }}"
-    label="{{ role.key }}"
-    [(ngModel)]="role.checked"></p-checkbox>
+    name="{{ role.id }}"
+    value="{{ role.id }}"
+    label="{{ role.roleName }}"
+    [(ngModel)]="role.selected"></p-checkbox>
 </div>

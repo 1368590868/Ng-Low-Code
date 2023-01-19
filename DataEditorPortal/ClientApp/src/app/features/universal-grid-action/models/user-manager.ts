@@ -35,3 +35,16 @@ export interface UserPemissions {
   permissionDescription?: string;
   category?: string;
 }
+
+export interface UserRole extends UserPemissions {
+  label?: string;
+  roleName?: string;
+  selected?: boolean;
+}
+
+export interface RoleList {
+  id?: string;
+  roleDescription?: string;
+  roleName?: string;
+  selected?: boolean;
+}
