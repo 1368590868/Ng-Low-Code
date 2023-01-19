@@ -201,7 +201,10 @@ export class ManagerRoleComponent
         permissions: this.permissionSelect
       }).subscribe(res => {
         if (!res.isError) {
-          this.notifyService.notifySuccess('Success', 'Save Success');
+          this.notifyService.notifySuccess(
+            'Success',
+            'Save Successfully Completed.'
+          );
           this.savedEvent.emit();
         } else {
           this.errorEvent.emit();
