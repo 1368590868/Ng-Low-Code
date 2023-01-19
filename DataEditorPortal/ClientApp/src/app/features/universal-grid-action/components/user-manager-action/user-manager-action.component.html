@@ -1,4 +1,8 @@
-<form [formGroup]="form" (ngSubmit)="onFormSubmit(model)" #editForm="ngForm">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onFormSubmit(model)"
+  #editForm="ngForm"
+  class="user-form">
   <formly-form
     [model]="model"
     [fields]="fields"
