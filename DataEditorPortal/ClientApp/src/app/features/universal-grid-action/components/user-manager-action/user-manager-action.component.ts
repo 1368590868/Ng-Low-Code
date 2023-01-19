@@ -1,9 +1,15 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { tap } from 'rxjs';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import { GridActionDirective } from '../../directives/grid-action.directive';
-import { UserManagerForm } from '../../models/user-manager';
+import {
+  GridActionDirective,
+  OnGridActionDialogShow
+} from '../../directives/grid-action.directive';
+import { Permisstion } from '../../models/role-permisstion';
+import { ManageRoleForm, UserManagerForm } from '../../models/user-manager';
+import { RolePermissionService } from '../../services/role-permission/role-permission.service';
 import { UserManagerService } from '../../services/user-manager-services/user-manager.service';
 
 @Component({
@@ -11,11 +17,40 @@ import { UserManagerService } from '../../services/user-manager-services/user-ma
   templateUrl: './user-manager-action.component.html',
   styleUrls: ['./user-manager-action.component.scss']
 })
-export class UserManagerActionComponent extends GridActionDirective {
+export class UserManagerActionComponent
+  extends GridActionDirective
+  implements OnGridActionDialogShow
+{
   @ViewChild('editForm') editForm!: NgForm;
+  @Input() isAddForm = false;
+
   form = new FormGroup({});
-  model: UserManagerForm = {};
+  model: ManageRoleForm = {};
   options: FormlyFormOptions = {};
+
+  roleVisible = false;
+  permissionVisible = false;
+  isLoading = false;
+  isPermissionLoading = false;
+  permisstionSelect = [];
+  rolesArr = [
+    { key: '', checked: true, label: 'Admin', value: 'Admin' },
+    { key: '', checked: false, label: 'User', value: 'User' },
+    { key: '', checked: false, label: 'Guest', value: 'Guest' }
+  ];
+
+  permissions: Permisstion[] = [
+    {
+      id: 1,
+      name: 'Permission 1',
+      desc: 'Description 1'
+    },
+    {
+      id: 2,
+      name: 'Permission 2',
+      desc: 'Description 2 '
+    }
+  ];
 
   fields: FormlyFieldConfig[] = [
     {
@@ -23,7 +58,7 @@ export class UserManagerActionComponent extends GridActionDirective {
       fieldGroup: [
         {
           className: 'w-6',
-          key: 'firstName',
+          key: 'username',
           type: 'input',
           props: {
             required: true,
@@ -34,18 +69,18 @@ export class UserManagerActionComponent extends GridActionDirective {
         },
         {
           className: 'w-6 pl-2',
-          key: 'town1',
+          key: 'name',
           type: 'input',
           props: {
             required: true,
             type: 'text',
-            label: 'Town',
-            placeholder: 'Town'
+            label: 'Name',
+            placeholder: 'Name'
           }
         },
         {
           className: 'w-6',
-          key: 'town2',
+          key: 'email',
           type: 'input',
           props: {
             required: true,
@@ -56,7 +91,7 @@ export class UserManagerActionComponent extends GridActionDirective {
         },
         {
           className: 'w-6 pl-2',
-          key: 'town3',
+          key: 'phone',
           type: 'inputMask',
           props: {
             required: true,
@@ -80,19 +115,19 @@ export class UserManagerActionComponent extends GridActionDirective {
             placeholder: 'Please select',
             options: [
               {
-                value: 1,
+                value: '1',
                 label: 'Option 1'
               },
               {
-                value: 2,
+                value: '2',
                 label: 'Option 2'
               },
               {
-                value: 3,
+                value: '3',
                 label: 'Option 3'
               },
               {
-                value: 4,
+                value: '4',
                 label: 'Option 4'
               }
             ],
@@ -108,19 +143,19 @@ export class UserManagerActionComponent extends GridActionDirective {
             placeholder: 'Please select',
             options: [
               {
-                value: 1,
+                value: '1',
                 label: 'Option 1'
               },
               {
-                value: 2,
+                value: '2',
                 label: 'Option 2'
               },
               {
-                value: 3,
+                value: '3',
                 label: 'Option 3'
               },
               {
-                value: 4,
+                value: '4',
                 label: 'Option 4'
               }
             ],
@@ -130,10 +165,12 @@ export class UserManagerActionComponent extends GridActionDirective {
       ]
     },
     {
-      fieldGroupClassName: 'flex flex-warp justify-content-between ',
+      fieldGroupClassName: 'flex flex-warp justify-content-between w-full ',
       fieldGroup: [
         {
-          key: 'Division',
+          className: 'w-full',
+
+          key: 'division',
           type: 'checkboxList',
           props: {
             label: 'Division(s)',
@@ -162,7 +199,7 @@ export class UserManagerActionComponent extends GridActionDirective {
     {
       fieldGroup: [
         {
-          key: 'notify',
+          key: 'autoEmail',
           type: 'checkbox',
           props: {
             label: 'Notify',
@@ -177,20 +214,83 @@ export class UserManagerActionComponent extends GridActionDirective {
           }
         }
       ]
+    },
+    {
+      wrappers: ['divider'],
+      props: {
+        label: 'Role'
+      }
+    },
+    {
+      wrappers: ['tag'],
+      props: {
+        forArray: [
+          { label: '1' },
+          { label: '2' },
+          { label: '1' },
+          { label: '2' },
+          { label: '1' }
+        ]
+      }
+    },
+    {
+      wrappers: ['divider'],
+      props: {
+        label: 'Permissions'
+      }
+    },
+    {
+      wrappers: ['tag'],
+      props: {
+        forArray: [
+          { label: '1' },
+          { label: '2' },
+          { label: '1' },
+          { label: '2' },
+          { label: '1' }
+        ]
+      }
     }
   ];
 
   constructor(
     private userManagerService: UserManagerService,
+    private rolePermisstionService: RolePermissionService,
     private notifyService: NotifyService
   ) {
     super();
   }
 
-  onFormSubmit(model: UserManagerForm) {
-    console.log(model);
+  onDialogShow(): void {
+    if (!this.isAddForm) {
+      this.userManagerService
+        .getUserDetail(this.selectedRecords[0][this.recordKey])
+        .subscribe(res => {
+          this.form.setValue({
+            name: res.name,
+            username: res.username,
+            email: res.email,
+            phone: res.phone,
+            vendor: res.vendor,
+            employer: res.employer,
+            autoEmail: res.autoEmail,
+            division: JSON.parse(res.division)
+          });
+          this.loadedEvent.emit();
+        });
+    } else {
+      this.loadedEvent.emit();
+    }
+  }
+
+  onFormSubmit(model: ManageRoleForm) {
     if (this.form.valid) {
-      this.userManagerService.saveUserManager(model).subscribe(res => {
+      const apiName = this.isAddForm ? 'createUser' : 'updateUser';
+
+      this.userManagerService[apiName]({
+        ...model,
+        id: this.selectedRecords[0][this.recordKey]
+      }).subscribe(res => {
         if (!res.isError && res.result) {
           this.notifyService.notifySuccess('Success', 'Save Success');
           this.savedEvent.emit();
@@ -209,5 +309,62 @@ export class UserManagerActionComponent extends GridActionDirective {
 
   onCancel(): void {
     this.options.resetModel?.();
+  }
+  /**
+   * Role dialog functions
+   */
+  onRoleShow(): void {
+    this.rolePermisstionService
+      .getRoles()
+      .pipe(
+        tap(result => {
+          this.rolesArr = result;
+        })
+      )
+      .subscribe();
+  }
+  onRoleHide(): void {
+    console.log('hide');
+  }
+
+  onRoleCancel(): void {
+    this.roleVisible = false;
+  }
+
+  onRoleOk(): void {
+    this.isLoading = true;
+    this.rolePermisstionService.saveRoles(this.rolesArr).subscribe(res => {
+      if (res.isError) {
+        this.notifyService.notifySuccess('Success', 'Save Success');
+        this.roleVisible = false;
+      }
+      this.isLoading = false;
+    });
+  }
+
+  /**
+   * permission dialog functions
+   */
+  onPermisstionShow(): void {
+    this.rolePermisstionService.getPermissions().subscribe(res => {
+      this.permissions = res;
+    });
+  }
+  onPermissionCancel(): void {
+    this.permissionVisible = false;
+  }
+
+  onPermisstionOk(): void {
+    this.isPermissionLoading = true;
+    console.log(this.permisstionSelect);
+    this.rolePermisstionService
+      .savePermissions(this.permisstionSelect)
+      .subscribe(res => {
+        if (res.isError) {
+          this.notifyService.notifySuccess('Success', 'Save Success');
+          this.permissionVisible = false;
+        }
+        this.isPermissionLoading = false;
+      });
   }
 }

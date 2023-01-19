@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { finalize, Subject, takeUntil, tap } from 'rxjs';
-import { NotifyService } from '../../../../app.module';
 import { ActivatedRoute } from '@angular/router';
 import { GridActionOption } from 'src/app/features/universal-grid-action/universal-grid-action.module';
 import {
@@ -13,6 +12,7 @@ import {
 } from '../../models/grid-types';
 import { Table } from 'primeng/table';
 import { TableState } from 'primeng/api';
+import { NotifyService } from 'src/app/app.module';
 
 @Component({
   selector: 'app-table',
@@ -88,6 +88,30 @@ export class TableComponent implements OnInit, OnDestroy {
         name: 'user-manager',
         wrapper: {
           label: 'User Manager',
+          icon: 'pi pi-plus'
+        },
+        props: {
+          isAddForm: true
+        }
+      },
+      {
+        name: 'add-role',
+        wrapper: {
+          label: 'Manage Roles',
+          icon: 'pi pi-plus'
+        }
+      },
+      {
+        name: 'edit-role',
+        wrapper: {
+          label: 'Edit Roles',
+          icon: 'pi pi-plus'
+        }
+      },
+      {
+        name: 'edit-permission',
+        wrapper: {
+          label: 'Edit Permission',
           icon: 'pi pi-plus'
         }
       }

@@ -46,5 +46,4 @@ export interface GridSearchConfig {
   key: string;
   type: string;
   props: { [name: string]: string };
-  dependOnFields?: string;
 }

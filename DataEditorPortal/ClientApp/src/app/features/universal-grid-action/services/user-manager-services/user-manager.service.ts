@@ -1,6 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
+import { ApiResponse } from 'src/app/core/models/api-response';
+import {
+  ManageRoleForm,
+  updateRole,
+  UserPemissions
+} from '../../models/user-manager';
 import {
   UserManagerForm,
   UserManagerResponse
@@ -20,5 +26,31 @@ export class UserManagerService {
       `${this._apiUrl}UniversalGrid/usermanagement/config/columns`,
       formData
     );
+  }
+
+  createUser(data: ManageRoleForm) {
+    return this.http.put<ApiResponse<updateRole[]>>(
+      `${this._apiUrl}user/create`,
+      { ...data, division: JSON.stringify(data.division) }
+    );
+  }
+
+  getUserDetail(id: string): Observable<ManageRoleForm> {
+    return this.http
+      .get<ApiResponse<ManageRoleForm>>(`${this._apiUrl}user/detail/${id}`)
+      .pipe(map(res => res.result || {}));
+  }
+
+  updateUser(data: ManageRoleForm) {
+    return this.http.put<ApiResponse<updateRole[]>>(
+      `${this._apiUrl}user/update/${data.id}`,
+      { ...data, division: JSON.stringify(data.division) }
+    );
+  }
+
+  getUserPermissions(id: string) {
+    return this.http
+      .get<ApiResponse<UserPemissions>>(`${this._apiUrl}user/${id}/permissions`)
+      .pipe(map(res => res.result));
   }
 }

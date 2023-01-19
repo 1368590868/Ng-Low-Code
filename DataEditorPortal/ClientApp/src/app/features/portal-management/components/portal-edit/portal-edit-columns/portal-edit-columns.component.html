@@ -1,0 +1,95 @@
+<p-card styleClass="px-3 py-2">
+  <ng-template pTemplate="title"> Grid Columns </ng-template>
+  <ng-template pTemplate="subtitle">
+    Select the fields that you want to display in grid.
+  </ng-template>
+  <p-divider styleClass="mt-0"></p-divider>
+  <div class="w-full pt-3 pb-3 flex">
+    <p-pickList
+      #pickList
+      class="flex-grow-1 mr-3"
+      [source]="sourceColumns"
+      [target]="targetColumns"
+      sourceHeader="Available Fields"
+      targetHeader="Selected Fields"
+      [dragdrop]="true"
+      [responsive]="true"
+      [sourceStyle]="{ height: '300px' }"
+      [targetStyle]="{ height: '300px' }"
+      filterBy="name"
+      [showSourceControls]="false"
+      [showTargetControls]="false"
+      [stripedRows]="true"
+      (onMoveToTarget)="onMoveToTarget($event)"
+      (onMoveToSource)="onMoveToSource($event)"
+      (onMoveAllToTarget)="onMoveToTarget($event)"
+      (onMoveAllToSource)="onMoveToSource($event)"
+      (onTargetSelect)="onTargetSelect($event)"
+      sourceFilterPlaceholder="Search by name"
+      targetFilterPlaceholder="Search by name">
+      <ng-template let-column pTemplate="item">
+        <div *ngIf="!column.selected" class="">[{{ column.name }}]</div>
+        <div *ngIf="column.selected" class="flex align-items-center">
+          <div class="w-10rem">[{{ column.name }}]</div>
+          <div class="w-20rem" *ngIf="column.header">
+            Header:
+            <p-tag>{{ column.header }}</p-tag>
+          </div>
+          <div
+            class="w-6rem"
+            *ngIf="column.filterType && column.filterType !== 'none'">
+            <p-tag severity="success">Filterable</p-tag>
+          </div>
+          <div class="w-6rem" *ngIf="column.sortable">
+            <p-tag severity="success">Sortable</p-tag>
+          </div>
+        </div>
+      </ng-template>
+    </p-pickList>
+    <div class="config-form">
+      <div class="title">Configuration Form</div>
+      <div class="body">
+        <form
+          *ngIf="this.model && this.model.name; else emptyMessage"
+          [formGroup]="form"
+          #configForm="ngForm">
+          <formly-form
+            [form]="form"
+            [fields]="fields"
+            [model]="model"
+            [options]="options"
+            class="p-fluid"></formly-form>
+        </form>
+        <ng-template #emptyMessage>
+          <div class="pt-4">
+            Please select one row in <b>Selected Fields</b> panel to configure.
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+  <p-divider styleClass="mb-0"></p-divider>
+  <ng-template pTemplate="footer">
+    <div class="flex align-items-center">
+      <p-button
+        label="Back"
+        icon="pi pi-angle-left"
+        [disabled]="isSaving"
+        styleClass="p-button-outlined"
+        (click)="onBack()"></p-button>
+      <p-button
+        label="Save Draft & Exit"
+        icon="pi pi-save"
+        class="ml-auto"
+        [disabled]="isSaving"
+        styleClass="p-button-outlined"></p-button>
+      <p-button
+        label="Save & Next"
+        icon="pi pi-angle-right"
+        iconPos="right"
+        [style]="{ 'margin-left': '.5em' }"
+        (click)="onSaveAndNext()"
+        [loading]="isSaving"></p-button>
+    </div>
+  </ng-template>
+</p-card>

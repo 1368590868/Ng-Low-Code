@@ -10,3 +10,93 @@
     </button>
   </formly-form>
 </form>
+<!-- Edit Roles -->
+<p-dialog
+  appendTo="body"
+  header="Edit Roles"
+  (onShow)="onRoleShow()"
+  (onHide)="onRoleHide()"
+  [style]="{ width: '400px' }"
+  [(visible)]="roleVisible">
+  <div class="p-2" *ngFor="let role of rolesArr">
+    <p-checkbox
+      [binary]="true"
+      name="{{ role.value }}"
+      value="{{ role.value }}"
+      label="{{ role.key }}"
+      [(ngModel)]="role.checked"></p-checkbox>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      icon="pi pi-times"
+      (click)="onRoleCancel()"
+      label="Cancel"
+      styleClass="p-button-text"></p-button>
+    <p-button
+      icon="pi pi-check"
+      (click)="onRoleOk()"
+      label="Save"
+      [loading]="isLoading"></p-button>
+  </ng-template>
+</p-dialog>
+<!-- Edit Permission -->
+<p-dialog
+  appendTo="body"
+  header="Edit Permission"
+  (onShow)="onPermisstionShow()"
+  [style]="{ width: '40rem' }"
+  [(visible)]="permissionVisible">
+  <p-accordion [multiple]="false">
+    <p-accordionTab header="CATEGORY 1" [selected]="true">
+      <p-table [value]="permissions" [(selection)]="permisstionSelect">
+        <ng-template pTemplate="body" let-permission>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="permission.key"></p-tableCheckbox>
+            </td>
+
+            <td>
+              <span> {{ permission.key }} </span>
+            </td>
+            <td>
+              <span> {{ permission.desc }} </span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-accordionTab>
+    <p-accordionTab header="CATEGORY 2"> Content 2 </p-accordionTab>
+    <p-accordionTab header="CATEGORY 3">
+      <p-table [value]="permissions">
+        <ng-template pTemplate="body" let-permission>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="permission"></p-tableCheckbox>
+            </td>
+
+            <td>
+              <span> PERMISSIONDESCRIPTION </span>
+            </td>
+            <td>
+              <span> {{ permission.desc }} </span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table></p-accordionTab
+    >
+  </p-accordion>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      icon="pi pi-times"
+      (click)="onPermissionCancel()"
+      label="Cancel"
+      styleClass="p-button-text"></p-button>
+    <p-button
+      icon="pi pi-check"
+      (click)="onPermisstionOk()"
+      label="Save"
+      [loading]="isPermissionLoading"></p-button>
+  </ng-template>
+</p-dialog>

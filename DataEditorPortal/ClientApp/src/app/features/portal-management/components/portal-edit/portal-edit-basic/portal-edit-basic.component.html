@@ -1,0 +1,47 @@
+<p-card styleClass="px-3 py-2">
+  <ng-template pTemplate="title"> Basic Infomation </ng-template>
+  <ng-template pTemplate="subtitle">
+    Basic Infomation for portal item
+  </ng-template>
+  <p-divider styleClass="mt-0"></p-divider>
+  <div class="w-6 pt-3">
+    <form
+      [formGroup]="form"
+      #editForm="ngForm"
+      (ngSubmit)="onFormSubmit(model)">
+      <formly-form
+        [form]="form"
+        [fields]="fields"
+        [model]="model"
+        [options]="options"
+        class="p-fluid"></formly-form>
+      <div
+        *ngIf="!fields || fields.length <= 0"
+        class="flex flex-wrap"
+        style="margin: 0 -0.5rem">
+        <p *ngFor="let e of [].constructor(5)" class="w-6 px-2 mb-3">
+          <p-skeleton width="5rem" styleClass="mb-1"></p-skeleton>
+          <p-skeleton height="2.83rem"></p-skeleton>
+        </p>
+      </div>
+    </form>
+  </div>
+  <p-divider styleClass="mb-0"></p-divider>
+  <ng-template pTemplate="footer">
+    <div class="flex align-items-center">
+      <p-button
+        label="Save Draft & Exit"
+        icon="pi pi-save"
+        class="ml-auto"
+        [disabled]="isSaving"
+        styleClass="p-button-outlined"></p-button>
+      <p-button
+        label="Save & Next"
+        icon="pi pi-angle-right"
+        iconPos="right"
+        [style]="{ 'margin-left': '.5em' }"
+        (click)="onSaveAndNext()"
+        [loading]="isSaving"></p-button>
+    </div>
+  </ng-template>
+</p-card>

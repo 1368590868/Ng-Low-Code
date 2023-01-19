@@ -46,6 +46,15 @@ body {
   background-color: var(--primary-color);
 }
 
+@media screen and (min-width: 1729px) {
+  .layout-content {
+    width: 1504px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    min-height: calc(100% - 7rem);
+  }
+}
+
 /* ngx formly style */
 formly-form {
   .p-field {

@@ -26,7 +26,7 @@ export interface FormlySelectFieldConfig
       [formlyAttributes]="field"
       [showClear]="!props.required"
       (onChange)="props.change && props.change(field, $event)"
-      [appendTo]="props.appendTo">
+      [appendTo]="props.appendTo || 'body'">
     </p-dropdown>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush

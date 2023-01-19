@@ -1,0 +1,36 @@
+<form [formGroup]="form" (ngSubmit)="onFormSubmit(model)" #editForm="ngForm">
+  <formly-form
+    [model]="model"
+    [fields]="roleFields"
+    [options]="options"
+    [form]="form"
+    class="p-fluid">
+    <button type="submit" class="btn btn-primary submit-button border">
+      Submit
+    </button>
+  </formly-form>
+</form>
+<label class="line-height-3"> Permissions </label>
+<p-accordion [multiple]="false">
+  <p-accordionTab
+    *ngFor="let item of groupPermissions; let i = index"
+    [header]="this.permissions[i][0].category"
+    [selected]="i === 0">
+    <p-table [value]="permissions[i]" [(selection)]="permissionSelect[i]">
+      <ng-template pTemplate="body" let-permission>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="permission"></p-tableCheckbox>
+          </td>
+
+          <td>
+            <span> {{ permission?.permissionName }} </span>
+          </td>
+          <td>
+            <span> {{ permission?.permissionDescription }}</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-accordionTab>
+</p-accordion>

@@ -28,6 +28,8 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
+import { AccordionModule } from 'primeng/accordion';
+import { DividerModule } from 'primeng/divider';
 
 import { GridActionDirective } from './directives/grid-action.directive';
 import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
@@ -37,9 +39,14 @@ import { ViewRecordActionComponent } from './components/view-record-action/view-
 import { ExportExcelActionComponent } from './components/export-excel-action/export-excel-action.component';
 import { RemoveActionComponent } from './components/remove-action/remove-action.component';
 import { UserManagerActionComponent } from './components/user-manager-action/user-manager-action.component';
-import { PanelWrapperComponent } from './components/user-manager-action/panel-warpper.component';
 import { FormlySelectModule } from '../ngx-formly/select/select.module';
 import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ManagerRoleComponent } from './components/manage-role-action/manage-role.component-action';
+import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
+import { FormlyTagWrapperModule } from '../ngx-formly/tag';
+import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
+import { UserPermissionComponent } from './components/user-permission/user-permission.component';
 
 export * from './models/grid-config';
 
@@ -53,7 +60,9 @@ export * from './models/grid-config';
     ExportExcelActionComponent,
     RemoveActionComponent,
     UserManagerActionComponent,
-    PanelWrapperComponent
+    ManagerRoleComponent,
+    UserRoleActionComponent,
+    UserPermissionComponent
   ],
   imports: [
     CommonModule,
@@ -62,14 +71,15 @@ export * from './models/grid-config';
     FormlyModule.forRoot({
       validationMessages: [
         { name: 'required', message: 'This field is required' }
-      ],
-      wrappers: [{ name: 'panel', component: PanelWrapperComponent }]
+      ]
     }),
     FormlyPrimeNGModule,
     FormlyDatepickerModule,
     FormlyMultiSelectModule,
     FormlySelectModule,
     FormlyCheckBoxModule,
+    FormlyDividerWrapperModule,
+    FormlyTagWrapperModule,
     // primeNg
     AnimateModule,
     ToastModule,
@@ -88,7 +98,10 @@ export * from './models/grid-config';
     SplitButtonModule,
     RippleModule,
     ButtonModule,
-    SkeletonModule
+    SkeletonModule,
+    AccordionModule,
+    CheckboxModule,
+    DividerModule
   ],
   exports: [UniversalGridActionDirective],
   providers: [
@@ -149,8 +162,40 @@ export * from './models/grid-config';
           requireGridRowSelected: false,
           component: UserManagerActionComponent,
           wrapper: {
-            header: 'user-manager',
+            header: 'User Manager',
             dialogStyle: { width: '40rem' },
+            cancelText: 'No',
+            okText: 'Yes'
+          }
+        },
+        {
+          name: 'add-role',
+          requireGridRowSelected: false,
+          component: ManagerRoleComponent,
+          wrapper: {
+            header: 'Manage Roles',
+            dialogStyle: { width: '40rem' },
+            cancelText: 'No',
+            okText: 'Yes'
+          }
+        },
+        {
+          name: 'edit-role',
+          requireGridRowSelected: true,
+          component: UserRoleActionComponent,
+          wrapper: {
+            header: 'Edit Roles',
+            cancelText: 'No',
+            okText: 'Yes'
+          }
+        },
+        {
+          name: 'edit-permission',
+          requireGridRowSelected: true,
+          component: UserPermissionComponent,
+          wrapper: {
+            dialogStyle: { width: '40rem' },
+            header: 'Edit Permission',
             cancelText: 'No',
             okText: 'Yes'
           }

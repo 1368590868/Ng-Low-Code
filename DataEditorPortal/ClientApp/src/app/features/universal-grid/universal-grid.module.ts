@@ -11,7 +11,6 @@ import { FormlyMultiSelectModule } from '../ngx-formly/multiselect';
 import { FormlyInputMaskModule } from '../ngx-formly/inputMask';
 
 import { UniversalGridRoutingModule } from './universal-grid-routing.module';
-import { UniversalGridComponent } from './universal-grid.component';
 import { SplitAreaComponent } from './pages/split-area/split-area.component';
 import { SearchComponent } from './components/search/search.component';
 import { TableComponent } from './components/table/table.component';
@@ -37,12 +36,7 @@ import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 
 @NgModule({
-  declarations: [
-    UniversalGridComponent,
-    SplitAreaComponent,
-    SearchComponent,
-    TableComponent
-  ],
+  declarations: [SplitAreaComponent, SearchComponent, TableComponent],
   imports: [
     CommonModule,
     FormsModule,
