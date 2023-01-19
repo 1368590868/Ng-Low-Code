@@ -42,34 +42,21 @@
           [dragdrop]="true"
           [responsive]="true"
           [sourceStyle]="{ height: '400px' }"
-          [targetStyle]="{ height: '400px' }"
+          [targetStyle]="{ height: '461px' }"
           filterBy="name"
+          sourceFilterPlaceholder="Search by name"
+          [showTargetFilter]="false"
           [showSourceControls]="false"
           [showTargetControls]="false"
-          [stripedRows]="true"
           (onMoveToTarget)="onMoveToTarget($event)"
           (onMoveToSource)="onMoveToSource($event)"
           (onMoveAllToTarget)="onMoveToTarget($event)"
           (onMoveAllToSource)="onMoveToSource($event)"
-          (onTargetSelect)="onTargetSelect($event)"
-          sourceFilterPlaceholder="Search by name"
-          targetFilterPlaceholder="Search by name">
+          (onTargetSelect)="onTargetSelect($event)">
           <ng-template let-column pTemplate="item">
             <div *ngIf="!column.selected" class="">[{{ column.name }}]</div>
-            <div *ngIf="column.selected" class="flex align-items-center">
-              <div class="w-10rem">[{{ column.name }}]</div>
-              <div class="w-20rem" *ngIf="column.props && column.props.label">
-                Label:
-                <p-tag>{{ column.props.label }}</p-tag>
-              </div>
-              <div class="w-10rem" *ngIf="column.type">
-                <p-tag severity="success">{{
-                  getControlTypeName(column.type)
-                }}</p-tag>
-              </div>
-              <div class="w-6rem" *ngIf="column.props && column.props.required">
-                <p-tag severity="success">Required</p-tag>
-              </div>
+            <div *ngIf="column.selected">
+              <formly-form [fields]="[column]" class="p-fluid"></formly-form>
             </div>
           </ng-template>
         </p-pickList>

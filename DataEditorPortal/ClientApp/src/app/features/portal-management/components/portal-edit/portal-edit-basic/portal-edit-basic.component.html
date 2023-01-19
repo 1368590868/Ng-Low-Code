@@ -30,6 +30,12 @@
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
       <p-button
+        label="Back"
+        icon="pi pi-angle-left"
+        [disabled]="isSaving"
+        styleClass="p-button-outlined"
+        (click)="onBack()"></p-button>
+      <p-button
         label="Save Draft & Exit"
         icon="pi pi-save"
         class="ml-auto"

@@ -84,10 +84,13 @@ export class PortalEditFormComponent {
               tap(value => {
                 const dField = field.parent?.get?.('defaultValue');
                 if (dField != null) {
-                  dField.hide = true;
                   if (dField.props)
                     dField.props['hideLabel'] = value === 'checkbox';
+
+                  dField.hide = true;
+                  this.model.selected = false;
                   this.changeDetectorRef.detectChanges();
+                  this.model.selected = true;
                   if (
                     'input,datepicker,checkbox,textarea'.indexOf(value) >= 0
                   ) {
@@ -107,6 +110,21 @@ export class PortalEditFormComponent {
       props: {
         label: 'Default Value',
         placeholder: 'Default Value'
+      },
+      hooks: {
+        onInit: field => {
+          field.formControl?.valueChanges
+            .pipe(
+              distinctUntilChanged(),
+              tap(value => {
+                this.model.selected = false;
+                this.changeDetectorRef.detectChanges();
+                this.model.selected = true;
+                this.changeDetectorRef.detectChanges();
+              })
+            )
+            .subscribe();
+        }
       }
     },
     {

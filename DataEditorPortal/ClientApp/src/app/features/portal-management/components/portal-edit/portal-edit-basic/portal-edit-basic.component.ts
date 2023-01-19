@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { of, switchMap } from 'rxjs';
+import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
   selector: 'app-portal-edit-basic',
@@ -14,36 +16,8 @@ export class PortalEditBasicComponent implements OnInit {
   isSaving = false;
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  model = {
-    name: ''
-  };
+  model: { [name: string]: unknown } = {};
   fields: FormlyFieldConfig[] = [
-    {
-      key: 'type',
-      type: 'select',
-      className: 'w-6',
-      defaultValue: 'Portal Item',
-      props: {
-        label: 'Type',
-        required: true,
-        showClear: false,
-        placeholder: 'Please Select',
-        options: [
-          {
-            label: 'Portal Item',
-            value: 'Portal Item'
-          },
-          {
-            label: 'External',
-            value: 'External'
-          },
-          {
-            label: 'System',
-            value: 'System'
-          }
-        ]
-      }
-    },
     {
       key: 'name',
       type: 'input',
@@ -62,13 +36,30 @@ export class PortalEditBasicComponent implements OnInit {
         label: 'Parent Folder',
         placeholder: 'Please Select',
         required: true,
-        showClear: false,
-        options: [
-          {
-            label: 'Portal Item',
-            value: 'Portal Item'
-          }
-        ]
+        showClear: false
+      },
+      hooks: {
+        onInit: field => {
+          this.portalItemService.getPortalList().subscribe(res => {
+            if (field.props) {
+              const options = res
+                .filter(x => x.data?.['type'] === 'Folder')
+                .map(x => {
+                  return {
+                    label: `- ${x.data?.['label']}`,
+                    value: x.data?.['id']
+                  };
+                });
+              options.splice(0, 0, {
+                label: 'Root',
+                value: '<root>'
+              });
+
+              field.props.options = options;
+              this.model = { ...this.model, parent: '<root>' };
+            }
+          });
+        }
       }
     },
     {
@@ -100,16 +91,21 @@ export class PortalEditBasicComponent implements OnInit {
     }
   ];
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private portalItemService: PortalItemService
+  ) {}
 
   ngOnInit(): void {
+    console.log(this.portalItemService.currentPortalItemId);
     // load basic information
     setTimeout(() => {
       this.isSaving = false;
     }, 1000);
   }
 
-  onFormSubmit(model: any) {
+  onFormSubmit(model: { [name: string]: unknown }) {
     if (this.form.valid) {
       // save & next
       this.isSaving = true;
@@ -123,5 +119,10 @@ export class PortalEditBasicComponent implements OnInit {
 
   onSaveAndNext() {
     this.editForm.onSubmit(new Event('submit'));
+  }
+  onBack() {
+    this.router.navigate(['/portal-management/list'], {
+      relativeTo: this.activatedRoute
+    });
   }
 }

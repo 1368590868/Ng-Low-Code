@@ -11,6 +11,8 @@ import { PortalItem, PortalItemData } from '../models/portal-item';
 export class PortalItemService {
   public _apiUrl: string;
 
+  public currentPortalItemId!: string;
+
   constructor(
     private http: HttpClient,
     private notifyService: NotifyService,
