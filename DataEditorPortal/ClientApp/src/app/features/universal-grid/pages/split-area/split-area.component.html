@@ -13,7 +13,7 @@
         class="justify-content-end expand-btn"
         styleClass="p-button-rounded p-button-text p-button-lg"
         [style]="{ width: '2rem', height: '2rem' }"
-        (click)="onToggle()">
+        (onClick)="onToggle()">
       </p-button>
       <app-search @fadeInOut *ngIf="showPanel"></app-search>
     </div>
