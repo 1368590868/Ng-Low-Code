@@ -1,23 +1,24 @@
 ﻿using DataEditorPortal.Data.Common;
 using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
-namespace DataEditorPortal.Data.Models
+namespace DataEditorPortal.Web.Models.PortalItem
 {
-    public class SiteMenu
+    public class PortalItem
     {
-        [Key]
+        public PortalItemData Data { get; set; }
+        public List<PortalItem> Children { get; set; }
+    }
+
+    public class PortalItemData
+    {
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Label { get; set; }
-        public string Description { get; set; }
         public string Icon { get; set; }
+        public string Description { get; set; }
         public string Type { get; set; }
-        public string Link { get; set; }
         public int Order { get; set; }
         public PortalItemStatus Status { get; set; }
-
-        public SiteMenu Parent { get; set; }
-        public Guid? ParentId { get; set; }
     }
 }

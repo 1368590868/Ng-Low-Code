@@ -13,10 +13,10 @@ namespace DataEditorPortal.Web.Controllers
     [Route("api/[controller]")]
     public class RoleController : ControllerBase
     {
-        private readonly ILogger<UserController> _logger;
+        private readonly ILogger<RoleController> _logger;
         private readonly DepDbContext _depDbContext;
 
-        public RoleController(ILogger<UserController> logger, DepDbContext depDbContext)
+        public RoleController(ILogger<RoleController> logger, DepDbContext depDbContext)
         {
             _logger = logger;
             _depDbContext = depDbContext;

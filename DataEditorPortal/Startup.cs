@@ -81,6 +81,8 @@ namespace DataEditorPortal.Web
             //});
             services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
 
+            services.AddAutoMapper(typeof(Startup));
+
             services.AddControllersWithViews();
 
             // In production, the Angular files will be served from this directory

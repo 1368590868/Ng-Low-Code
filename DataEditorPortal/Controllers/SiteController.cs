@@ -12,11 +12,11 @@ namespace DataEditorPortal.Web.Controllers
     [Route("api/[controller]")]
     public class SiteController : ControllerBase
     {
-        private readonly ILogger<UserController> _logger;
+        private readonly ILogger<SiteController> _logger;
         private readonly DepDbContext _depDbContext;
         private readonly IConfiguration _config;
 
-        public SiteController(ILogger<UserController> logger, DepDbContext depDbContext, IConfiguration config)
+        public SiteController(ILogger<SiteController> logger, DepDbContext depDbContext, IConfiguration config)
         {
             _logger = logger;
             _depDbContext = depDbContext;

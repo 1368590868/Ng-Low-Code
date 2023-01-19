@@ -17,11 +17,11 @@ namespace DataEditorPortal.Web.Controllers
     [Route("api/[controller]")]
     public class LookupController : ControllerBase
     {
-        private readonly ILogger<UserController> _logger;
+        private readonly ILogger<LookupController> _logger;
         private readonly DepDbContext _depDbContext;
         private readonly IConfiguration _config;
 
-        public LookupController(ILogger<UserController> logger, DepDbContext depDbContext, IConfiguration config)
+        public LookupController(ILogger<LookupController> logger, DepDbContext depDbContext, IConfiguration config)
         {
             _logger = logger;
             _depDbContext = depDbContext;

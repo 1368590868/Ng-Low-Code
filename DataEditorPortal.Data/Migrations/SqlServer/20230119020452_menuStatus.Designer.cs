@@ -4,14 +4,16 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20230119020452_menuStatus")]
+    partial class menuStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,8 +66,8 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
@@ -84,7 +86,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                             Label = "User Management",
                             Name = "UserManagement",
                             Order = 0,
-                            Status = 0,
                             Type = "PortalItem"
                         },
                         new
@@ -95,7 +96,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                             Link = "/portal-management/list",
                             Name = "PortalManagement",
                             Order = 0,
-                            Status = 0,
                             Type = ""
                         });
                 });
