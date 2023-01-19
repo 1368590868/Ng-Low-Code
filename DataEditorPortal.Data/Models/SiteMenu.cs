@@ -12,6 +12,7 @@ namespace DataEditorPortal.Data.Models
         public string Description { get; set; }
         public string Icon { get; set; }
         public string Type { get; set; }
+        public string Link { get; set; }
         public int Order { get; set; }
 
         public SiteMenu Parent { get; set; }

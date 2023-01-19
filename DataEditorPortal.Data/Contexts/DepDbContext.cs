@@ -27,6 +27,10 @@ namespace DataEditorPortal.Data.Contexts
         {
             base.OnModelCreating(modelBuilder);
 
+            #region Initial data
+
+            #region user management
+
             modelBuilder.Entity<UniversalGridConfiguration>().HasData(
                 new UniversalGridConfiguration()
                 {
@@ -217,6 +221,26 @@ namespace DataEditorPortal.Data.Contexts
                     Type = "PortalItem"
                 }
             );
+
+            #endregion
+
+            #region portal manament
+
+            modelBuilder.Entity<SiteMenu>().HasData(
+                new SiteMenu()
+                {
+                    Id = new Guid("B4B490EA-9DF3-4F7A-8806-936CA7F87B8F"),
+                    Name = "PortalManagement",
+                    Label = "Portal Management",
+                    Icon = "pi pi-desktop",
+                    Type = "",
+                    Link = "/portal-management/list"
+                }
+            );
+
+            #endregion
+
+            #endregion
         }
     }
 }

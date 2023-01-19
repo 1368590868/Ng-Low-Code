@@ -77,8 +77,9 @@ namespace DataEditorPortal.Web.Controllers
                                 name = m.Name,
                                 label = m.Label,
                                 icon = m.Icon,
-                                title = m.Description,
-                                routerLink = new string[] { $"/portal-item/{m.Name.ToLower()}" }
+                                description = m.Description,
+                                type = m.Type,
+                                link = m.Link
                             });
 
                     return new
@@ -87,9 +88,10 @@ namespace DataEditorPortal.Web.Controllers
                         name = x.Name,
                         label = x.Label,
                         icon = x.Icon,
-                        title = x.Description,
+                        description = x.Description,
                         items = items.Any() ? items : null,
-                        routerLink = items.Any() ? null : new string[] { $"/portal-item/{x.Name.ToLower()}" },
+                        type = x.Type,
+                        link = x.Link
                     };
                 });
 
