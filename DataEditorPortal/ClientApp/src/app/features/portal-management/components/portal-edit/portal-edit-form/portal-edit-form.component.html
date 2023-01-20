@@ -7,21 +7,18 @@
   <div class="w-full pt-1 pb-1">
     <div class="flex align-items-center pb-1">
       <div class="flex align-items-center mr-4">
-        <p-inputSwitch class="mr-2 h-1rem"></p-inputSwitch>
+        <p-inputSwitch class="mr-2"></p-inputSwitch>
         Allow Delete
       </div>
       <div class="flex align-items-center mr-4">
-        <p-inputSwitch class="mr-2 h-1rem"></p-inputSwitch> Allow Add New
+        <p-inputSwitch class="mr-2"></p-inputSwitch> Allow Add New
       </div>
       <div class="flex align-items-center mr-4">
-        <p-inputSwitch class="mr-2 h-1rem" [(ngModel)]="allowEdit">
-        </p-inputSwitch>
+        <p-inputSwitch class="mr-2" [(ngModel)]="allowEdit"> </p-inputSwitch>
         Allow Edit
       </div>
       <div *ngIf="allowEdit" class="flex align-items-center">
-        <p-inputSwitch
-          class="mr-2 h-1rem"
-          [(ngModel)]="useCustomForm"></p-inputSwitch>
+        <p-inputSwitch class="mr-2" [(ngModel)]="useCustomForm"></p-inputSwitch>
         Use Custom Form
       </div>
     </div>
