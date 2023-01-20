@@ -1,5 +1,5 @@
-<div class="layout-content p-2 flex">
-  <p-card styleClass="h-full">
+<div class="layout-content p-2 flex flex-column">
+  <div class="p-card flex-grow-1">
     <p-treeTable [value]="data" styleClass="p-datatable-striped" dataKey="id">
       <ng-template pTemplate="caption">
         <div class="flex align-items-center mb-2">
@@ -71,7 +71,7 @@
         </tr>
       </ng-template>
     </p-treeTable>
-  </p-card>
+  </div>
 </div>
 <app-add-portal-dialog
   #addDialog

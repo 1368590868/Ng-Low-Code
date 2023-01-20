@@ -105,6 +105,7 @@ export class PortalListComponent implements OnInit {
       .getPortalList()
       .pipe(
         tap(res => {
+          res.forEach(x => (x.expanded = true));
           this.data = res;
         })
       )

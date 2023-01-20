@@ -10,9 +10,8 @@
     <div class="search-area w-full">
       <p-button
         icon="pi pi-arrow-left"
-        class="justify-content-end expand-btn"
-        styleClass="p-button-rounded p-button-text p-button-lg"
-        [style]="{ width: '2rem', height: '2rem' }"
+        class="expand-btn"
+        styleClass="p-button-rounded p-button-text"
         (onClick)="onToggle()">
       </p-button>
       <app-search @fadeInOut *ngIf="showPanel"></app-search>
