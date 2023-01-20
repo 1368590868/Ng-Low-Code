@@ -97,6 +97,7 @@ export class PortalEditFormComponent {
                     dField.type = value;
                     dField.hide = false;
                   }
+                  this.changeDetectorRef.detectChanges();
                 }
               })
             )

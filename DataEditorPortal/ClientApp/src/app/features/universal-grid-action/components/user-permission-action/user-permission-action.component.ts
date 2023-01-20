@@ -1,9 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import {
-  GridActionDirective,
-  OnGridActionDialogShow
-} from '../../directives/grid-action.directive';
+import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UserPemissions } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';
 
@@ -14,7 +11,7 @@ import { UserManagerService } from '../../services/user-manager.service';
 })
 export class UserPermissionComponent
   extends GridActionDirective
-  implements OnGridActionDialogShow
+  implements OnInit
 {
   groupPermissions: any[] = [];
   permissionSelect: UserPemissions[] = [];
@@ -57,7 +54,7 @@ export class UserPermissionComponent
 
   // dialog function
 
-  onDialogShow(): void {
+  ngOnInit(): void {
     this.getPermissionsList(this.selectedRecords[0][this.recordKey]);
   }
 

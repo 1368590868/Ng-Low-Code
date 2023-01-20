@@ -1,9 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import {
-  GridActionDirective,
-  OnGridActionDialogShow
-} from '../../directives/grid-action.directive';
+import { GridActionDirective } from '../../directives/grid-action.directive';
 import { RoleList } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';
 
@@ -14,7 +11,7 @@ import { UserManagerService } from '../../services/user-manager.service';
 })
 export class UserRoleActionComponent
   extends GridActionDirective
-  implements OnGridActionDialogShow
+  implements OnInit
 {
   rolesArr: RoleList[] = [];
 
@@ -25,7 +22,7 @@ export class UserRoleActionComponent
     super();
   }
 
-  onDialogShow(): void {
+  ngOnInit(): void {
     this.userManagerService
       .getUserRole(this.selectedRecords[0][this.recordKey])
       .subscribe(res => {

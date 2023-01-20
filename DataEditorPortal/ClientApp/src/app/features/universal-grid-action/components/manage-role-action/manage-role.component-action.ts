@@ -1,11 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import {
-  GridActionDirective,
-  OnGridActionDialogShow
-} from '../../directives/grid-action.directive';
+import { GridActionDirective } from '../../directives/grid-action.directive';
 import {
   ManageRoleForm,
   RoleList,
@@ -20,7 +17,7 @@ import { RolePermissionService } from '../../services/role-permission.service';
 })
 export class ManagerRoleComponent
   extends GridActionDirective
-  implements OnGridActionDialogShow
+  implements OnInit
 {
   @ViewChild('editForm') editForm!: NgForm;
   form = new FormGroup({});
@@ -138,7 +135,7 @@ export class ManagerRoleComponent
     return Array.from(map).map(item => [...item[1]]);
   }
 
-  onDialogShow(): void {
+  ngOnInit(): void {
     this.rolePermissionService.getRoleList().subscribe(res => {
       this.roleId = res[0].id || '';
       this.roleName = res[0].roleName || '';

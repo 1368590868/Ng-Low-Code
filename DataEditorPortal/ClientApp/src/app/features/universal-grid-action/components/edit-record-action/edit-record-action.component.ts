@@ -1,14 +1,9 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { tap } from 'rxjs';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import {
-  OnGridActionSave,
-  OnGridActionCancel,
-  GridActionDirective,
-  OnGridActionDialogShow
-} from '../../directives/grid-action.directive';
+import { GridActionDirective } from '../../directives/grid-action.directive';
 import { EditFormData } from '../../models/edit';
 import { UniversalGridService } from '../../services/universal-grid.service';
 
@@ -19,7 +14,7 @@ import { UniversalGridService } from '../../services/universal-grid.service';
 })
 export class EditRecordActionComponent
   extends GridActionDirective
-  implements OnGridActionSave, OnGridActionCancel, OnGridActionDialogShow
+  implements OnInit
 {
   @Input() isAddForm = false;
 
@@ -37,7 +32,7 @@ export class EditRecordActionComponent
     super();
   }
 
-  onDialogShow(): void {
+  ngOnInit(): void {
     this.gridService
       .getDetailConfig()
       .pipe(

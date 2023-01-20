@@ -15,6 +15,7 @@ export class RemoveActionComponent extends GridActionDirective {
   ) {
     super();
   }
+
   onSave(): void {
     this.gridService
       .deleteGridData(this.selectedRecords.map((x: any) => x[this.recordKey]))
@@ -29,9 +30,5 @@ export class RemoveActionComponent extends GridActionDirective {
           this.errorEvent.emit();
         }
       });
-  }
-
-  onCancel(): void {
-    console.log('cancel');
   }
 }

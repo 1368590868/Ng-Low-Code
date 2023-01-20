@@ -61,8 +61,7 @@ export class UniversalGridActionDirective
     }
     if ('fetchDataParam' in changes) {
       this.actionWrapperRefs.forEach(wrapper => {
-        wrapper.instance.componentRef.instance.fetchDataParam =
-          this.fetchDataParam;
+        wrapper.instance.fetchDataParam = this.fetchDataParam;
       });
     }
   }
@@ -97,53 +96,30 @@ export class UniversalGridActionDirective
               ActionWrapperComponent
             );
 
+          const tableParams = {
+            selectedRecords: this.selectedRecords,
+            recordKey: this.recordKey,
+            fetchDataParam: this.fetchDataParam
+          };
           // assign wrapper config;
-          if (actionCfg.wrapper) {
-            if (wrapperRef instanceof ComponentRef) {
-              Object.assign(wrapperRef.instance, actionCfg.wrapper);
-            }
-          }
-          if (x.wrapper) {
-            if (wrapperRef instanceof ComponentRef) {
-              Object.assign(wrapperRef.instance, x.wrapper);
-            }
+          const wrapperProps = {};
+          if (actionCfg.wrapper) Object.assign(wrapperProps, actionCfg.wrapper);
+          if (x.wrapper) Object.assign(wrapperProps, x.wrapper);
+          Object.assign(wrapperProps, tableParams);
+          if (wrapperRef instanceof ComponentRef) {
+            Object.assign(wrapperRef.instance, wrapperProps);
           }
 
-          const actionRef =
-            wrapperRef.instance.viewContainerRef.createComponent<GridActionDirective>(
-              actionCfg.component
-            );
+          // assign action config;
+          const config = { ...actionCfg };
+          if (!config.props) config.props = {};
+          if (x.props) Object.assign(config.props, x.props);
+          Object.assign(config.props, tableParams);
+          wrapperRef.instance.actionConfig = config;
 
-          // assign action data;
-          if (actionCfg.props) {
-            if (actionRef instanceof ComponentRef) {
-              Object.assign(actionRef.instance, actionCfg.props);
-            }
-          }
-          if (x.props) {
-            if (actionRef instanceof ComponentRef) {
-              Object.assign(actionRef.instance, x.props);
-            }
-          }
-          actionRef.instance.selectedRecords = this.selectedRecords;
-          actionRef.instance.recordKey = this.recordKey;
-          actionRef.instance.fetchDataParam = this.fetchDataParam;
-
-          // bind action events
-          actionRef.instance.savedEvent.asObservable().subscribe(() => {
-            wrapperRef.instance.visible = false;
+          wrapperRef.instance.savedEvent.subscribe(() => {
             this.savedEvent.emit();
           });
-          actionRef.instance.errorEvent.asObservable().subscribe(() => {
-            wrapperRef.instance.isLoading = false;
-          });
-          actionRef.instance.loadedEvent.asObservable().subscribe(() => {
-            wrapperRef.instance.isLoading = false;
-            wrapperRef.instance.buttonDisabled = false;
-          });
-
-          // set actionRef to wrapper, for it to invoke
-          wrapperRef.instance.componentRef = actionRef;
           this.actionWrapperRefs.push(wrapperRef);
         }
       });

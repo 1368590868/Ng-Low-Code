@@ -1,11 +1,8 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import {
-  GridActionDirective,
-  OnGridActionDialogShow
-} from '../../directives/grid-action.directive';
+import { GridActionDirective } from '../../directives/grid-action.directive';
 import { ManageRoleForm } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';
 
@@ -16,7 +13,7 @@ import { UserManagerService } from '../../services/user-manager.service';
 })
 export class UserManagerActionComponent
   extends GridActionDirective
-  implements OnGridActionDialogShow
+  implements OnInit
 {
   @ViewChild('editForm') editForm!: NgForm;
   @Input() isAddForm = false;
@@ -262,7 +259,7 @@ export class UserManagerActionComponent
     super();
   }
 
-  onDialogShow(): void {
+  ngOnInit(): void {
     if (!this.isAddForm) {
       this.userManagerService
         .getUserDetail(this.selectedRecords[0][this.recordKey])

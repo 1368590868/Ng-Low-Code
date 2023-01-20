@@ -3,10 +3,7 @@ import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { catchError, EMPTY, tap } from 'rxjs';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import {
-  GridActionDirective,
-  OnGridActionDialogShow
-} from '../../directives/grid-action.directive';
+import { GridActionDirective } from '../../directives/grid-action.directive';
 import { ExportForm, ExportParam } from '../../models/export';
 import { UniversalGridService } from '../../services/universal-grid.service';
 
@@ -17,7 +14,7 @@ import { UniversalGridService } from '../../services/universal-grid.service';
 })
 export class ExportExcelActionComponent
   extends GridActionDirective
-  implements OnGridActionDialogShow, OnInit
+  implements OnInit
 {
   @ViewChild('exportForm') exportForm!: NgForm;
 
@@ -62,16 +59,13 @@ export class ExportExcelActionComponent
         }
       });
     }
-  }
 
-  onDialogShow() {
     this.model = {
       ...this.model,
       fileName: `Export-${
         this.gridService.currentPortalItem
       }-${new Date().toLocaleDateString('en-US')}`
     };
-    this.loadedEvent.emit();
   }
 
   onFormSubmit(model: ExportForm) {
