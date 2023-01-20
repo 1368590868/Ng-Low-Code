@@ -1,9 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PrimeNGConfig } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
+import { distinctUntilChanged, tap } from 'rxjs';
 
 @Component({
   selector: 'app-portal-edit-search',
@@ -82,6 +83,21 @@ export class PortalEditSearchComponent implements OnInit {
             filterType: 'text'
           }
         ]
+      },
+      hooks: {
+        onInit: field => {
+          field.formControl?.valueChanges
+            .pipe(
+              distinctUntilChanged(),
+              tap(value => {
+                this.model.selected = false;
+                this.changeDetectorRef.detectChanges();
+                this.model.selected = true;
+                this.changeDetectorRef.detectChanges();
+              })
+            )
+            .subscribe();
+        }
       }
     },
     {
@@ -116,7 +132,8 @@ export class PortalEditSearchComponent implements OnInit {
   constructor(
     private primeNGConfig: PrimeNGConfig,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -171,13 +188,6 @@ export class PortalEditSearchComponent implements OnInit {
     });
   }
 
-  getControlTypeName(type: string) {
-    const option = (this.fields[0].props?.options as any[]).find(
-      x => x.value === type
-    );
-    return option?.label;
-  }
-
   getControlFilterType(type: string) {
     const option = (this.fields[0].props?.options as any[]).find(
       x => x.value === type
@@ -195,5 +205,9 @@ export class PortalEditSearchComponent implements OnInit {
         return { label: this.primeNGConfig.getTranslation(key), value: key };
       }
     );
+  }
+
+  cloneColumn(column: any) {
+    return [JSON.parse(JSON.stringify(column))];
   }
 }

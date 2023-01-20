@@ -55,6 +55,12 @@ body {
   }
 }
 
+.p-card {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
 /* ngx formly style */
 formly-form {
   .p-field {

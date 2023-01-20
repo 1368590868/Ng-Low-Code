@@ -21,7 +21,7 @@ export class PortalEditBasicComponent implements OnInit {
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  model!: PortalItemData;
+  model: PortalItemData = {};
   fields: FormlyFieldConfig[] = [
     {
       key: 'name',
@@ -90,7 +90,7 @@ export class PortalEditBasicComponent implements OnInit {
               field.props.options = options;
 
               // reset the dropdown value, if the options come after the model value, dropdown may has no options selected
-              if (!this.model['parentId'])
+              if (this.model && !this.model['parentId'])
                 this.model = { ...this.model, parentId: '<root>' };
               else this.model = { ...this.model };
             }

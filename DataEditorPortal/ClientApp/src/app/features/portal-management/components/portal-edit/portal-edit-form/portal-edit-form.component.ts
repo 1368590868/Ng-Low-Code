@@ -230,10 +230,7 @@ export class PortalEditFormComponent {
     });
   }
 
-  getControlTypeName(type: string) {
-    const option = (this.fields[0].props?.options as any[]).find(
-      x => x.value === type
-    );
-    return option?.label;
+  cloneColumn(column: any) {
+    return [JSON.parse(JSON.stringify(column))];
   }
 }

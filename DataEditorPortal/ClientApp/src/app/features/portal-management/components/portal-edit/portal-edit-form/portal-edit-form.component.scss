@@ -1,41 +1,28 @@
 .config-form {
-  border: 1px solid #e0e0e0;
+  flex-direction: column;
   width: 26rem;
-  border-radius: 4px;
 
-  .title {
-    color: rgba(0, 0, 0, 0.87);
-    border-bottom: 1px solid #e0e0e0;
-    padding: 0.75rem;
-    font-weight: 500;
-    margin-bottom: 0.75rem;
-  }
-  .body {
+  .p-picklist-list {
     padding: 0.75rem;
   }
 }
 
-:host {
-  ::ng-deep {
-    .p-picklist-source-wrapper {
-      max-width: 20rem;
-    }
-    .p-picklist-target-wrapper {
-      .p-picklist-target {
-        padding-top: 1rem;
-      }
-      .p-picklist-item {
-        padding-top: 0;
-        padding-bottom: 0;
-        position: relative;
+:host ::ng-deep {
+  .p-picklist-source-wrapper {
+    max-width: 20rem;
+  }
+  .p-picklist-target-wrapper {
+    .p-picklist-item {
+      padding-top: 1;
+      padding-bottom: 0;
+      position: relative;
 
-        &::before {
-          content: ' ';
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          z-index: 2;
-        }
+      &::before {
+        content: ' ';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
       }
     }
   }

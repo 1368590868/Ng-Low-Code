@@ -1,10 +1,10 @@
-<p-card styleClass="px-3 py-2">
+<p-card styleClass="">
   <ng-template pTemplate="title"> Search Configuration </ng-template>
   <ng-template pTemplate="subtitle">
     Select the fields that you want to used in search panel.
   </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
-  <div class="w-full pt-3 pb-3 flex">
+  <div class="w-full pt-2 flex">
     <p-pickList
       #pickList
       class="flex-grow-1 mr-3"
@@ -15,8 +15,10 @@
       [dragdrop]="true"
       [responsive]="true"
       [sourceStyle]="{ height: '400px' }"
-      [targetStyle]="{ height: '400px' }"
+      [targetStyle]="{ height: '475px' }"
+      sourceFilterPlaceholder="Search by name"
       filterBy="name"
+      [showTargetFilter]="false"
       [showSourceControls]="false"
       [showTargetControls]="false"
       [stripedRows]="true"
@@ -24,31 +26,19 @@
       (onMoveToSource)="onMoveToSource($event)"
       (onMoveAllToTarget)="onMoveToTarget($event)"
       (onMoveAllToSource)="onMoveToSource($event)"
-      (onTargetSelect)="onTargetSelect($event)"
-      sourceFilterPlaceholder="Search by name"
-      targetFilterPlaceholder="Search by name">
+      (onTargetSelect)="onTargetSelect($event)">
       <ng-template let-column pTemplate="item">
         <div *ngIf="!column.selected" class="">[{{ column.name }}]</div>
-        <div *ngIf="column.selected" class="flex align-items-center">
-          <div class="w-10rem">[{{ column.name }}]</div>
-          <div class="w-20rem" *ngIf="column.props && column.props.label">
-            Label:
-            <p-tag>{{ column.props.label }}</p-tag>
-          </div>
-          <div class="w-10rem" *ngIf="column.type">
-            <p-tag severity="success">{{
-              getControlTypeName(column.type)
-            }}</p-tag>
-          </div>
-          <div class="w-6rem" *ngIf="column.props && column.props.required">
-            <p-tag severity="success">Required</p-tag>
-          </div>
+        <div *ngIf="column.selected">
+          <formly-form
+            [fields]="cloneColumn(column)"
+            class="p-fluid"></formly-form>
         </div>
       </ng-template>
     </p-pickList>
-    <div class="config-form">
-      <div class="title">Configuration Form</div>
-      <div class="body">
+    <div class="config-form p-picklist">
+      <div class="p-picklist-header">Configuration Form</div>
+      <div class="p-picklist-list flex-grow-1">
         <form
           *ngIf="this.model && this.model.name; else emptyMessage"
           [formGroup]="form"
@@ -83,7 +73,6 @@
       </div>
     </div>
   </div>
-  <p-divider styleClass="mb-0"></p-divider>
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
       <p-button

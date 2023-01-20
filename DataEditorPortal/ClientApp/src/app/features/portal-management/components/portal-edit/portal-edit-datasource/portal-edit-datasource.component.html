@@ -1,4 +1,4 @@
-<p-card styleClass="px-3 py-2">
+<p-card styleClass="">
   <ng-template pTemplate="title">Data Source </ng-template>
   <ng-template pTemplate="subtitle">
     Setup data source for this portal item.
@@ -6,7 +6,7 @@
   <p-divider styleClass="mt-0"></p-divider>
   <div class="w-6 pt-3">
     <div class="flex align-items-center">
-      <div class="flex flex-column mb-3 mr-4">
+      <div class="flex flex-column mb-2 mr-4">
         <label for="tableName" class="mb-1">Database Table *</label>
         <div class="flex align-items-center">
           <p-dropdown
@@ -21,7 +21,7 @@
             pTooltip="Select one table from database"></i>
         </div>
       </div>
-      <div class="flex flex-column mb-3">
+      <div class="flex flex-column mb-2">
         <label for="idColumn" class="mb-1">Id Column *</label>
         <div class="flex align-items-center">
           <p-dropdown
@@ -37,8 +37,8 @@
         </div>
       </div>
     </div>
-    <p-divider>Filters</p-divider>
-    <div class="flex flex-column mb-3">
+    <p-divider styleClass="mb-0">Filters</p-divider>
+    <div class="flex flex-column mb-2">
       <!-- <label class="mb-1">Filters</label> -->
       <p-orderList [value]="datasourceConfig.filters" [stripedRows]="true">
         <ng-template let-filter pTemplate="item">
@@ -66,11 +66,11 @@
       <p-button
         label="Add"
         icon="pi pi-plus"
-        class="mt-2"
-        styleClass="p-button-text"></p-button>
+        class="mt-1"
+        styleClass="p-button-text p-button-sm"></p-button>
     </div>
-    <p-divider>Sort By</p-divider>
-    <div class="flex flex-column mb-3">
+    <p-divider styleClass="mb-0">Sort By</p-divider>
+    <div class="flex flex-column mb-2">
       <!-- <label class="mb-1">Sort By</label> -->
       <p-orderList
         [value]="datasourceConfig.sortBy"
@@ -98,11 +98,10 @@
       <p-button
         label="Add"
         icon="pi pi-plus"
-        class="mt-2"
-        styleClass="p-button-text"></p-button>
+        class="mt-1"
+        styleClass="p-button-text p-button-sm"></p-button>
     </div>
   </div>
-  <p-divider styleClass="mb-0"></p-divider>
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
       <p-button

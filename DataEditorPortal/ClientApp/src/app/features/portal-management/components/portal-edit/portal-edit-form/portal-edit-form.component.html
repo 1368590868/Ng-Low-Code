@@ -1,4 +1,4 @@
-<p-card styleClass="px-3 py-2">
+<p-card styleClass="">
   <ng-template pTemplate="title"> Add / Edit / View Configuration </ng-template>
   <ng-template pTemplate="subtitle">
     Customize the Add / Edit / View Form or select custom Form.
@@ -42,7 +42,7 @@
           [dragdrop]="true"
           [responsive]="true"
           [sourceStyle]="{ height: '400px' }"
-          [targetStyle]="{ height: '461px' }"
+          [targetStyle]="{ height: '475px' }"
           filterBy="name"
           sourceFilterPlaceholder="Search by name"
           [showTargetFilter]="false"
@@ -56,13 +56,15 @@
           <ng-template let-column pTemplate="item">
             <div *ngIf="!column.selected" class="">[{{ column.name }}]</div>
             <div *ngIf="column.selected">
-              <formly-form [fields]="[column]" class="p-fluid"></formly-form>
+              <formly-form
+                [fields]="cloneColumn(column)"
+                class="p-fluid"></formly-form>
             </div>
           </ng-template>
         </p-pickList>
-        <div class="config-form">
-          <div class="title">Configuration Form</div>
-          <div class="body">
+        <div class="config-form p-picklist">
+          <div class="p-picklist-header">Configuration Form</div>
+          <div class="p-picklist-list flex-grow-1">
             <form
               *ngIf="this.model && this.model.name; else emptyMessage"
               [formGroup]="form"
@@ -95,7 +97,7 @@
       </div>
     </div>
   </div>
-  <p-divider styleClass="mb-0"></p-divider>
+
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
       <p-button
