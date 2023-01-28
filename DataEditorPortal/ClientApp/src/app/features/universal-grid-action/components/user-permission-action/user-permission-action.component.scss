@@ -1,0 +1,7 @@
+.table-last-border {
+  ::ng-deep {
+    .p-datatable .p-datatable-tbody > tr:last-child > td {
+      border: none;
+    }
+  }
+}
