@@ -21,6 +21,7 @@ import { NavMenuComponent } from './core/components/nav-menu/nav-menu.component'
 import { AboutComponent } from './core/components/about/about.component';
 import { ContactComponent } from './core/components/contact/contact.component';
 import { HomeComponent } from './core/components/home/home.component';
+import { TileComponent } from './core/components/tile/tile.component';
 
 export { NotifyService } from './core/utils/notify.service';
 
@@ -31,7 +32,8 @@ export { NotifyService } from './core/utils/notify.service';
     NavMenuComponent,
     AboutComponent,
     ContactComponent,
-    HomeComponent
+    HomeComponent,
+    TileComponent
   ],
   imports: [
     BrowserModule,
