@@ -4,14 +4,14 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 
 import { TagWrapperComponent } from './tag.type';
-import { TagModule } from 'primeng/tag';
+import { ChipModule } from 'primeng/chip';
 
 @NgModule({
   declarations: [TagWrapperComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    TagModule,
+    ChipModule,
 
     FormlyModule.forChild({
       wrappers: [

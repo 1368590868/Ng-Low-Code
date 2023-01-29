@@ -15,13 +15,12 @@ interface TagProps extends FormlyFieldProps {
     <div
       class="flex flex-wrap justify-content-start"
       style="margin-top:'-1.5rem'">
-      <p-tag
+      <p-chip
         [style]="{ 'min-width': '5rem' }"
-        class="p-tag-rounded"
         styleClass="mr-2"
         *ngFor="let item of props.forArray"
         [styleClass]="item.styleClass || 'mr-2 mt-3'"
-        [value]="item.label"></p-tag>
+        [label]="item.label"></p-chip>
     </div>
   `
 })

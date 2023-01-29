@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { switchMap, of } from 'rxjs';
+import { PortalItemService } from '../../services/portal-item.service';
 
 @Component({
   selector: 'app-portal-edit',
@@ -10,9 +12,27 @@ import { MenuItem } from 'primeng/api';
 export class PortalEditComponent implements OnInit {
   items!: MenuItem[];
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private portalItemService: PortalItemService
+  ) {}
 
   ngOnInit() {
+    this.activatedRoute.paramMap
+      .pipe(
+        switchMap((params: ParamMap) => {
+          return of(params.get('id') || '');
+        })
+      )
+      .subscribe(val => {
+        this.portalItemService.currentPortalItemId = val;
+        this.router.navigate(['basic'], {
+          relativeTo: this.activatedRoute,
+          replaceUrl: true
+        });
+      });
+
     this.items = [
       {
         label: 'Basic',
@@ -33,13 +53,7 @@ export class PortalEditComponent implements OnInit {
       {
         label: 'Add / Edit / View',
         routerLink: 'form'
-      },
-      {
-        label: 'Custom Actions',
-        routerLink: 'actions'
       }
     ];
-
-    // this.router.navigate(['basic'], { relativeTo: this.activatedRoute });
   }
 }

@@ -1,16 +1,10 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { tap } from 'rxjs';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import {
-  GridActionDirective,
-  OnGridActionDialogShow
-} from '../../directives/grid-action.directive';
-import { Permisstion } from '../../models/role-permisstion';
-import { ManageRoleForm, UserManagerForm } from '../../models/user-manager';
-import { RolePermissionService } from '../../services/role-permission/role-permission.service';
-import { UserManagerService } from '../../services/user-manager-services/user-manager.service';
+import { GridActionDirective } from '../../directives/grid-action.directive';
+import { ManageRoleForm } from '../../models/user-manager';
+import { UserManagerService } from '../../services/user-manager.service';
 
 @Component({
   selector: 'app-user-manager-action',
@@ -19,7 +13,7 @@ import { UserManagerService } from '../../services/user-manager-services/user-ma
 })
 export class UserManagerActionComponent
   extends GridActionDirective
-  implements OnGridActionDialogShow
+  implements OnInit
 {
   @ViewChild('editForm') editForm!: NgForm;
   @Input() isAddForm = false;
@@ -27,31 +21,6 @@ export class UserManagerActionComponent
   form = new FormGroup({});
   model: ManageRoleForm = {};
   options: FormlyFormOptions = {};
-
-  roleVisible = false;
-  permissionVisible = false;
-  isLoading = false;
-  isPermissionLoading = false;
-  permisstionSelect = [];
-  rolesArr = [
-    { key: '', checked: true, label: 'Admin', value: 'Admin' },
-    { key: '', checked: false, label: 'User', value: 'User' },
-    { key: '', checked: false, label: 'Guest', value: 'Guest' }
-  ];
-
-  permissions: Permisstion[] = [
-    {
-      id: 1,
-      name: 'Permission 1',
-      desc: 'Description 1'
-    },
-    {
-      id: 2,
-      name: 'Permission 2',
-      desc: 'Description 2 '
-    }
-  ];
-
   fields: FormlyFieldConfig[] = [
     {
       fieldGroupClassName: 'flex flex-wrap justify-content-between',
@@ -218,50 +187,79 @@ export class UserManagerActionComponent
     {
       wrappers: ['divider'],
       props: {
-        label: 'Role'
+        label: 'Roles'
+      },
+      expressions: {
+        hide: () => this.isAddForm
       }
     },
     {
       wrappers: ['tag'],
       props: {
-        forArray: [
-          { label: '1' },
-          { label: '2' },
-          { label: '1' },
-          { label: '2' },
-          { label: '1' }
-        ]
+        forArray: []
+      },
+      expressions: {
+        hide: () => {
+          this.isAddForm;
+        }
+      },
+      hooks: {
+        onInit: field => {
+          if (!this.isAddForm) {
+            this.userManagerService
+              .getUserRole(this.selectedRecords[0][this.recordKey])
+              .subscribe(res => {
+                field.props!['forArray'] = res.filter(item => {
+                  item.label = item.roleName;
+                  return item.selected;
+                });
+              });
+          }
+        }
       }
     },
     {
       wrappers: ['divider'],
       props: {
         label: 'Permissions'
+      },
+      expressions: {
+        hide: () => this.isAddForm
       }
     },
     {
       wrappers: ['tag'],
       props: {
-        forArray: [
-          { label: '1' },
-          { label: '2' },
-          { label: '1' },
-          { label: '2' },
-          { label: '1' }
-        ]
+        forArray: []
+      },
+      expressions: {
+        hide: () => this.isAddForm
+      },
+      hooks: {
+        onInit: field => {
+          if (!this.isAddForm) {
+            this.userManagerService
+              .getUserPermissions(this.selectedRecords[0][this.recordKey])
+              .subscribe(res => {
+                field.props!['forArray'] = res.filter(item => {
+                  item.label = item.permissionName;
+                  return item.selected;
+                });
+              });
+          }
+        }
       }
     }
   ];
 
   constructor(
     private userManagerService: UserManagerService,
-    private rolePermisstionService: RolePermissionService,
     private notifyService: NotifyService
   ) {
     super();
   }
 
-  onDialogShow(): void {
+  ngOnInit(): void {
     if (!this.isAddForm) {
       this.userManagerService
         .getUserDetail(this.selectedRecords[0][this.recordKey])
@@ -274,25 +272,30 @@ export class UserManagerActionComponent
             vendor: res.vendor,
             employer: res.employer,
             autoEmail: res.autoEmail,
-            division: JSON.parse(res.division)
+            division: res.division !== 'NONE' ? JSON.parse(res.division) : []
           });
-          this.loadedEvent.emit();
         });
-    } else {
-      this.loadedEvent.emit();
     }
+    this.loadedEvent.emit();
   }
 
   onFormSubmit(model: ManageRoleForm) {
     if (this.form.valid) {
       const apiName = this.isAddForm ? 'createUser' : 'updateUser';
 
-      this.userManagerService[apiName]({
-        ...model,
-        id: this.selectedRecords[0][this.recordKey]
-      }).subscribe(res => {
+      this.userManagerService[apiName](
+        this.isAddForm
+          ? model
+          : {
+              ...model,
+              id: this.selectedRecords[0][this.recordKey]
+            }
+      ).subscribe(res => {
         if (!res.isError && res.result) {
-          this.notifyService.notifySuccess('Success', 'Save Success');
+          this.notifyService.notifySuccess(
+            'Success',
+            'Save Successfully Completed.'
+          );
           this.savedEvent.emit();
         } else {
           this.errorEvent.emit();
@@ -309,62 +312,5 @@ export class UserManagerActionComponent
 
   onCancel(): void {
     this.options.resetModel?.();
-  }
-  /**
-   * Role dialog functions
-   */
-  onRoleShow(): void {
-    this.rolePermisstionService
-      .getRoles()
-      .pipe(
-        tap(result => {
-          this.rolesArr = result;
-        })
-      )
-      .subscribe();
-  }
-  onRoleHide(): void {
-    console.log('hide');
-  }
-
-  onRoleCancel(): void {
-    this.roleVisible = false;
-  }
-
-  onRoleOk(): void {
-    this.isLoading = true;
-    this.rolePermisstionService.saveRoles(this.rolesArr).subscribe(res => {
-      if (res.isError) {
-        this.notifyService.notifySuccess('Success', 'Save Success');
-        this.roleVisible = false;
-      }
-      this.isLoading = false;
-    });
-  }
-
-  /**
-   * permission dialog functions
-   */
-  onPermisstionShow(): void {
-    this.rolePermisstionService.getPermissions().subscribe(res => {
-      this.permissions = res;
-    });
-  }
-  onPermissionCancel(): void {
-    this.permissionVisible = false;
-  }
-
-  onPermisstionOk(): void {
-    this.isPermissionLoading = true;
-    console.log(this.permisstionSelect);
-    this.rolePermisstionService
-      .savePermissions(this.permisstionSelect)
-      .subscribe(res => {
-        if (res.isError) {
-          this.notifyService.notifySuccess('Success', 'Save Success');
-          this.permissionVisible = false;
-        }
-        this.isPermissionLoading = false;
-      });
   }
 }

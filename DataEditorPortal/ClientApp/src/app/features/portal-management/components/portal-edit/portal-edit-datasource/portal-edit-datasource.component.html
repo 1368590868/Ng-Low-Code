@@ -1,4 +1,4 @@
-<p-card styleClass="px-3 py-2">
+<p-card styleClass="">
   <ng-template pTemplate="title">Data Source </ng-template>
   <ng-template pTemplate="subtitle">
     Setup data source for this portal item.
@@ -6,12 +6,12 @@
   <p-divider styleClass="mt-0"></p-divider>
   <div class="w-6 pt-3">
     <div class="flex align-items-center">
-      <div class="flex flex-column mb-3 mr-4">
+      <div class="flex flex-column mb-2 mr-4">
         <label for="tableName" class="mb-1">Database Table *</label>
         <div class="flex align-items-center">
           <p-dropdown
             inputId="tableName"
-            [(ngModel)]="datasourceConfig.tableName"
+            [(ngModel)]="selectedDbTable"
             [options]="dbTables"
             (onChange)="onTableNameChange($event)"
             [style]="{ minWidth: '20rem' }"
@@ -21,15 +21,16 @@
             pTooltip="Select one table from database"></i>
         </div>
       </div>
-      <div class="flex flex-column mb-3">
+      <div class="flex flex-column mb-2">
         <label for="idColumn" class="mb-1">Id Column *</label>
         <div class="flex align-items-center">
           <p-dropdown
             inputId="idColumn"
             [(ngModel)]="datasourceConfig.idColumn"
             [options]="dbTableColumns"
-            (onChange)="onTableNameChange($event)"
             [style]="{ minWidth: '20rem' }"
+            optionLabel="columnName"
+            optionValue="columnName"
             placeholder="Select Id Column"></p-dropdown>
           <i
             class="pi pi-question-circle ml-3 text-lg"
@@ -37,8 +38,8 @@
         </div>
       </div>
     </div>
-    <p-divider>Filters</p-divider>
-    <div class="flex flex-column mb-3">
+    <p-divider styleClass="mb-0">Filters</p-divider>
+    <div class="flex flex-column mb-2">
       <!-- <label class="mb-1">Filters</label> -->
       <p-orderList [value]="datasourceConfig.filters" [stripedRows]="true">
         <ng-template let-filter pTemplate="item">
@@ -47,18 +48,32 @@
               <p-dropdown
                 [(ngModel)]="filter.field"
                 [options]="dbTableColumns"
+                optionLabel="columnName"
+                optionValue="columnName"
+                (onChange)="onFilterColumnChange($event, filter)"
                 appendTo="body"
                 placeholder="Select Id Column"></p-dropdown>
             </div>
             <div class="mr-3">
               <p-dropdown
-                [(ngModel)]="filter.match"
-                [options]="dbTableColumns"
+                [(ngModel)]="filter.matchMode"
+                [options]="filter.matchOptions"
                 appendTo="body"
                 placeholder="Match Mode"></p-dropdown>
             </div>
             <div class="mr-3">
-              <input pInputText placeholder="Enter a value" />
+              <input
+                pInputText
+                placeholder="Enter a value"
+                [class]="filter.errValue ? 'ng-invalid ng-dirty' : ''"
+                (ngModelChange)="onFilterValueChange($event, filter)"
+                [(ngModel)]="filter.value" />
+            </div>
+            <div>
+              <p-button
+                icon="pi pi-trash"
+                styleClass="p-button-rounded p-button-text"
+                (onClick)="onRemoveFilter(filter)"></p-button>
             </div>
           </div>
         </ng-template>
@@ -66,11 +81,12 @@
       <p-button
         label="Add"
         icon="pi pi-plus"
-        class="mt-2"
-        styleClass="p-button-text"></p-button>
+        class="mt-1"
+        styleClass="p-button-text p-button-sm"
+        (onClick)="onAddFilter()"></p-button>
     </div>
-    <p-divider>Sort By</p-divider>
-    <div class="flex flex-column mb-3">
+    <p-divider styleClass="mb-0">Sort By</p-divider>
+    <div class="flex flex-column mb-2">
       <!-- <label class="mb-1">Sort By</label> -->
       <p-orderList
         [value]="datasourceConfig.sortBy"
@@ -82,6 +98,8 @@
               <p-dropdown
                 [(ngModel)]="sortBy.field"
                 [options]="dbTableColumns"
+                optionLabel="columnName"
+                optionValue="columnName"
                 appendTo="body"
                 placeholder="Select Id Column"></p-dropdown>
             </div>
@@ -92,38 +110,47 @@
                 appendTo="body"
                 placeholder="Order"></p-dropdown>
             </div>
+            <div>
+              <p-button
+                icon="pi pi-trash"
+                styleClass="p-button-rounded p-button-text"
+                (onClick)="onRemoveSortColumn(sortBy)"></p-button>
+            </div>
           </div>
         </ng-template>
       </p-orderList>
       <p-button
         label="Add"
         icon="pi pi-plus"
-        class="mt-2"
-        styleClass="p-button-text"></p-button>
+        class="mt-1"
+        styleClass="p-button-text p-button-sm"
+        (onClick)="onAddSortColumn()"></p-button>
     </div>
   </div>
-  <p-divider styleClass="mb-0"></p-divider>
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
       <p-button
         label="Back"
         icon="pi pi-angle-left"
-        [disabled]="isSaving"
+        [disabled]="isLoading || isSaving"
         styleClass="p-button-outlined"
-        (click)="onBack()"></p-button>
+        (onClick)="onBack()"></p-button>
       <p-button
         label="Save Draft & Exit"
         icon="pi pi-save"
         class="ml-auto"
-        [disabled]="isSaving"
-        styleClass="p-button-outlined"></p-button>
+        [disabled]="isLoading || isSaving"
+        styleClass="p-button-outlined"
+        (onClick)="onSaveAndExit()"
+        [loading]="isSaving && isSavingAndExit"></p-button>
       <p-button
         label="Save & Next"
         icon="pi pi-angle-right"
         iconPos="right"
         [style]="{ 'margin-left': '.5em' }"
-        (click)="onSaveAndNext()"
-        [loading]="isSaving"></p-button>
+        [disabled]="isLoading || isSaving"
+        (onClick)="onSaveAndNext()"
+        [loading]="isSaving && isSavingAndNext"></p-button>
     </div>
   </ng-template>
 </p-card>

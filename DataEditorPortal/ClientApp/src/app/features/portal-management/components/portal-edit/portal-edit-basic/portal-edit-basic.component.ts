@@ -1,7 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, NgForm } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { of, finalize, tap } from 'rxjs';
+import { PortalItemData } from '../../../models/portal-item';
+import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
   selector: 'app-portal-edit-basic',
@@ -11,39 +14,15 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 export class PortalEditBasicComponent implements OnInit {
   @ViewChild('editForm') editForm!: NgForm;
 
+  isLoading = true;
   isSaving = false;
+  isSavingAndNext = false;
+  isSavingAndExit = false;
+
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  model = {
-    name: ''
-  };
+  model: PortalItemData = {};
   fields: FormlyFieldConfig[] = [
-    {
-      key: 'type',
-      type: 'select',
-      className: 'w-6',
-      defaultValue: 'Portal Item',
-      props: {
-        label: 'Type',
-        required: true,
-        showClear: false,
-        placeholder: 'Please Select',
-        options: [
-          {
-            label: 'Portal Item',
-            value: 'Portal Item'
-          },
-          {
-            label: 'External',
-            value: 'External'
-          },
-          {
-            label: 'System',
-            value: 'System'
-          }
-        ]
-      }
-    },
     {
       key: 'name',
       type: 'input',
@@ -52,23 +31,71 @@ export class PortalEditBasicComponent implements OnInit {
         label: 'Portal Name',
         placeholder: 'Portal Name',
         required: true
+      },
+      modelOptions: {
+        updateOn: 'blur'
+      },
+      validators: {
+        doNotAllowSpecial: {
+          expression: (c: AbstractControl) => {
+            return /^[a-zA-Z]\w+/.test(c.value);
+          },
+          message: 'Only number and letter are allowed.'
+        }
+      },
+      asyncValidators: {
+        exist: {
+          expression: (c: AbstractControl) => {
+            return new Promise((resolve, reject) => {
+              this.portalItemService
+                .nameExists(c.value, this.portalItemService.currentPortalItemId)
+                .subscribe(res =>
+                  !res.isError ? resolve(!res.result) : reject(res.message)
+                );
+            });
+          },
+          message: () => {
+            return 'The Portal Name has already been exist.';
+          }
+        }
       }
     },
     {
-      key: 'parent',
+      key: 'parentId',
       type: 'select',
       className: 'w-full',
       props: {
         label: 'Parent Folder',
         placeholder: 'Please Select',
         required: true,
-        showClear: false,
-        options: [
-          {
-            label: 'Portal Item',
-            value: 'Portal Item'
-          }
-        ]
+        showClear: false
+      },
+      hooks: {
+        onInit: field => {
+          this.portalItemService.getPortalList().subscribe(res => {
+            if (field.props) {
+              const options = res
+                .filter(x => x.data?.['type'] === 'Folder')
+                .map(x => {
+                  return {
+                    label: `- ${x.data?.['label']}`,
+                    value: x.data?.['id']
+                  };
+                });
+              options.splice(0, 0, {
+                label: 'Root',
+                value: '<root>'
+              });
+
+              field.props.options = options;
+
+              // reset the dropdown value, if the options come after the model value, dropdown may has no options selected
+              if (this.model && !this.model['parentId'])
+                this.model = { ...this.model, parentId: '<root>' };
+              else this.model = { ...this.model };
+            }
+          });
+        }
       }
     },
     {
@@ -81,7 +108,7 @@ export class PortalEditBasicComponent implements OnInit {
       }
     },
     {
-      key: 'Icon',
+      key: 'icon',
       type: 'input',
       props: {
         label: 'Icon',
@@ -100,28 +127,89 @@ export class PortalEditBasicComponent implements OnInit {
     }
   ];
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private portalItemService: PortalItemService
+  ) {}
 
   ngOnInit(): void {
     // load basic information
-    setTimeout(() => {
-      this.isSaving = false;
-    }, 1000);
+    if (this.portalItemService.currentPortalItemId) {
+      this.portalItemService
+        .getPortalDetails(this.portalItemService.currentPortalItemId)
+        .subscribe(res => {
+          if (!res['parentId']) res['parentId'] = '<root>';
+          this.model = res;
+
+          // enable buttons after data loaded.
+          this.isLoading = false;
+        });
+    }
   }
 
-  onFormSubmit(model: any) {
+  onFormSubmit(model: PortalItemData) {
     if (this.form.valid) {
       // save & next
+      const data = { ...model };
+      if (data['parentId'] === '<root>') data['parentId'] = null;
+
       this.isSaving = true;
-      setTimeout(() => {
-        this.router.navigate(['../datasource'], {
-          relativeTo: this.activatedRoute
-        });
-      }, 1000);
+      if (this.portalItemService.currentPortalItemId) {
+        this.portalItemService
+          .updatePortalDetails(this.portalItemService.currentPortalItemId, data)
+          .pipe(
+            tap(res => {
+              if (res && !res.isError) {
+                this.saveSucess();
+              }
+
+              this.isSaving = false;
+              this.isSavingAndExit = false;
+              this.isSavingAndNext = false;
+            })
+          )
+          .subscribe();
+      } else {
+        this.portalItemService
+          .createPortalDetails(data)
+          .pipe(
+            tap(res => {
+              if (res && !res.isError) {
+                this.saveSucess();
+              }
+              this.isSaving = false;
+              this.isSavingAndExit = false;
+              this.isSavingAndNext = false;
+            })
+          )
+          .subscribe();
+      }
     }
   }
 
   onSaveAndNext() {
+    this.isSavingAndNext = true;
     this.editForm.onSubmit(new Event('submit'));
+  }
+
+  onSaveAndExit() {
+    this.isSavingAndExit = true;
+    this.editForm.onSubmit(new Event('submit'));
+  }
+
+  saveSucess() {
+    let next: unknown[] = [];
+    if (this.isSavingAndNext) next = ['../datasource'];
+    if (this.isSavingAndExit) next = ['/portal-management/list'];
+    this.router.navigate(next, {
+      relativeTo: this.activatedRoute
+    });
+  }
+
+  onBack() {
+    this.router.navigate(['/portal-management/list'], {
+      relativeTo: this.activatedRoute
+    });
   }
 }

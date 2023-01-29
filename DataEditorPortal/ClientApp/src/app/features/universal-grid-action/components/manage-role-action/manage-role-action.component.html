@@ -16,7 +16,10 @@
     *ngFor="let item of groupPermissions; let i = index"
     [header]="this.permissions[i][0].category"
     [selected]="i === 0">
-    <p-table [value]="permissions[i]" [(selection)]="permissionSelect[i]">
+    <p-table
+      [value]="permissions[i]"
+      [(selection)]="permissionSelect[i]"
+      class="table-last-border">
       <ng-template pTemplate="body" let-permission>
         <tr>
           <td>

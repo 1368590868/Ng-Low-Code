@@ -1,16 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
+import { AppUser } from '../../models/user';
 import { ConfigDataService } from '../../services/config-data.service';
-
-export interface AppUser {
-  identityName: string;
-  username: string;
-  domain: string;
-  displayName: string;
-  email: string;
-  vendor: string;
-  authenticated: boolean;
-}
+import { UserService } from '../../services/user.service';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -23,17 +15,12 @@ export class HeaderComponent implements OnInit {
     WebHeaderDescription: '',
     WebHeaderMessage: ''
   };
-  public USER: AppUser;
-  constructor(private configData: ConfigDataService) {
-    this.USER = {
-      identityName: '',
-      username: '',
-      domain: '',
-      displayName: '',
-      email: '',
-      vendor: '',
-      authenticated: false
-    };
+  public USER: AppUser = {};
+  constructor(
+    private configData: ConfigDataService,
+    private userService: UserService
+  ) {
+    this.USER = this.userService.USER;
     this.items = [
       {
         label: 'Home',
@@ -53,9 +40,6 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
     this.configData.getSiteEnvironment().subscribe((res: any) => {
       this.headerText = res;
-    });
-    this.configData.getLoggedInUser().subscribe(user => {
-      this.USER = user as AppUser;
     });
   }
 }

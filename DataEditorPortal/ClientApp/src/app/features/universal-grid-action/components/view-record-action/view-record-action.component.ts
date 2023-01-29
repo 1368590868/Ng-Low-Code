@@ -1,8 +1,5 @@
-import { Component } from '@angular/core';
-import {
-  GridActionDirective,
-  OnGridActionDialogShow
-} from '../../directives/grid-action.directive';
+import { Component, OnInit } from '@angular/core';
+import { GridActionDirective } from '../../directives/grid-action.directive';
 
 export interface ViewColumn {
   name?: string;
@@ -15,7 +12,7 @@ export interface ViewColumn {
 })
 export class ViewRecordActionComponent
   extends GridActionDirective
-  implements OnGridActionDialogShow
+  implements OnInit
 {
   viewData: ViewColumn[];
   loading = true;
@@ -24,7 +21,8 @@ export class ViewRecordActionComponent
     super();
     this.viewData = [];
   }
-  onDialogShow(): void {
+
+  ngOnInit(): void {
     if (this.selectedRecords[0] !== undefined) {
       const key = Object.keys(this.selectedRecords[0]).map(key => {
         return { name: key, value: this.selectedRecords[0][key] };

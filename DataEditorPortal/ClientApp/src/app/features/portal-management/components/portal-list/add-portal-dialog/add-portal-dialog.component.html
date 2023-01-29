@@ -1,8 +1,6 @@
 <p-dialog
   [header]="header"
   [(visible)]="visible"
-  (onShow)="onShow()"
-  (onHide)="onHide()"
   [style]="dialogStyle"
   [modal]="true"
   [dismissableMask]="true"
@@ -34,13 +32,13 @@
     <p-button
       *ngIf="cancelText"
       icon="pi pi-times"
-      (click)="onCancel()"
+      (onClick)="onCancel()"
       [label]="cancelText"
       [disabled]="buttonDisabled"
       styleClass="p-button-text"></p-button>
     <p-button
       icon="pi pi-check"
-      (click)="onOk()"
+      (onClick)="onOk()"
       [label]="okText"
       [disabled]="buttonDisabled"
       [loading]="isLoading"></p-button>

@@ -4,13 +4,12 @@ import { map, Observable } from 'rxjs';
 import { ApiResponse } from 'src/app/core/models/api-response';
 import {
   ManageRoleForm,
-  updateRole,
-  UserPemissions
-} from '../../models/user-manager';
-import {
+  UpdateRole,
+  UserData,
+  UserPemissions,
   UserManagerForm,
   UserManagerResponse
-} from '../../models/user-manager';
+} from '../models/user-manager';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +28,7 @@ export class UserManagerService {
   }
 
   createUser(data: ManageRoleForm) {
-    return this.http.put<ApiResponse<updateRole[]>>(
+    return this.http.post<ApiResponse<UpdateRole[]>>(
       `${this._apiUrl}user/create`,
       { ...data, division: JSON.stringify(data.division) }
     );
@@ -42,7 +41,7 @@ export class UserManagerService {
   }
 
   updateUser(data: ManageRoleForm) {
-    return this.http.put<ApiResponse<updateRole[]>>(
+    return this.http.put<ApiResponse<UpdateRole[]>>(
       `${this._apiUrl}user/update/${data.id}`,
       { ...data, division: JSON.stringify(data.division) }
     );
@@ -50,7 +49,26 @@ export class UserManagerService {
 
   getUserPermissions(id: string) {
     return this.http
-      .get<ApiResponse<UserPemissions>>(`${this._apiUrl}user/${id}/permissions`)
-      .pipe(map(res => res.result));
+      .get<ApiResponse<UserData[]>>(`${this._apiUrl}user/${id}/permissions`)
+      .pipe(map(res => res.result || []));
+  }
+  getUserRole(id: string) {
+    return this.http
+      .get<ApiResponse<UserData[]>>(`${this._apiUrl}user/${id}/roles`)
+      .pipe(map(res => res.result || []));
+  }
+
+  saveUserRole(data: UserData[], id: string) {
+    return this.http.post<ApiResponse<string>>(
+      `${this._apiUrl}user/${id}/roles`,
+      { permissions: data }
+    );
+  }
+
+  saveUserPermissions(data: UserPemissions[], id: string) {
+    return this.http.post<ApiResponse<string>>(
+      `${this._apiUrl}user/${id}/permissions`,
+      { permissions: data }
+    );
   }
 }

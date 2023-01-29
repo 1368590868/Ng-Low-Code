@@ -21,11 +21,9 @@ import { TableModule } from 'primeng/table';
 import { CalendarModule } from 'primeng/calendar';
 import { DialogModule } from 'primeng/dialog';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { ContextMenuModule } from 'primeng/contextmenu';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { SplitButtonModule } from 'primeng/splitbutton';
-import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TreeTableModule } from 'primeng/treetable';
@@ -38,6 +36,7 @@ import { OrderListModule } from 'primeng/orderlist';
 import { PickListModule } from 'primeng/picklist';
 import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
+import { InputSwitchModule } from 'primeng/inputswitch';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import {
@@ -90,11 +89,9 @@ import {
     CalendarModule,
     DialogModule,
     MultiSelectModule,
-    ContextMenuModule,
     InputTextModule,
     ProgressBarModule,
     SplitButtonModule,
-    RippleModule,
     ButtonModule,
     CardModule,
     TreeTableModule,
@@ -106,7 +103,8 @@ import {
     OrderListModule,
     PickListModule,
     TooltipModule,
-    DividerModule
+    DividerModule,
+    InputSwitchModule
   ]
 })
 export class PortalManagementModule {}

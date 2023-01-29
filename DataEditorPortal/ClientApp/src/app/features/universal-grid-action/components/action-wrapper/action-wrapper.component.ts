@@ -3,9 +3,12 @@ import {
   Input,
   ViewChild,
   ViewContainerRef,
-  ComponentRef
+  ComponentRef,
+  Output,
+  EventEmitter
 } from '@angular/core';
 import { GridActionDirective } from '../../directives/grid-action.directive';
+import { GridActionConfig } from '../../universal-grid-action.module';
 
 @Component({
   selector: 'app-action-wrapper',
@@ -22,10 +25,15 @@ export class ActionWrapperComponent {
   @Input() cancelText = 'Cancel';
   @Input() dialogStyle = { width: '31.25rem' };
 
+  @Input() actionConfig!: GridActionConfig;
+  @Input() fetchDataParam!: any;
+
+  @Output() savedEvent = new EventEmitter();
+
   @ViewChild('container', { read: ViewContainerRef, static: true })
   viewContainerRef!: ViewContainerRef;
 
-  public componentRef!: ComponentRef<GridActionDirective>;
+  componentRef!: ComponentRef<GridActionDirective>;
   visible = false;
   isLoading = false;
   buttonDisabled = true;
@@ -33,6 +41,7 @@ export class ActionWrapperComponent {
   showDialog() {
     this.isLoading = false;
     this.visible = true;
+    this.renderAction();
   }
 
   onShow() {
@@ -47,6 +56,7 @@ export class ActionWrapperComponent {
     if (this.hasEventHandler('onCancel'))
       (this.componentRef.instance as any).onCancel();
   }
+
   onCancel() {
     this.visible = false;
   }
@@ -65,5 +75,41 @@ export class ActionWrapperComponent {
       event in this.componentRef.instance &&
       typeof (this.componentRef.instance as any)[event] === 'function'
     );
+  }
+
+  renderAction() {
+    this.viewContainerRef.clear();
+
+    const actionRef =
+      this.viewContainerRef.createComponent<GridActionDirective>(
+        this.actionConfig.component
+      );
+
+    // assign action data;
+    if (this.actionConfig.props) {
+      if (actionRef instanceof ComponentRef) {
+        Object.assign(actionRef.instance, this.actionConfig.props);
+      }
+    }
+
+    // actionRef.instance.selectedRecords = this.selectedRecords;
+    // actionRef.instance.recordKey = this.recordKey;
+    actionRef.instance.fetchDataParam = this.fetchDataParam;
+
+    // bind action events
+    actionRef.instance.savedEvent.asObservable().subscribe(() => {
+      this.visible = false;
+      this.savedEvent.emit();
+    });
+    actionRef.instance.errorEvent.asObservable().subscribe(() => {
+      this.isLoading = false;
+    });
+    actionRef.instance.loadedEvent.asObservable().subscribe(() => {
+      this.isLoading = false;
+      this.buttonDisabled = false;
+    });
+
+    // set actionRef to wrapper, for it to invoke
+    this.componentRef = actionRef;
   }
 }

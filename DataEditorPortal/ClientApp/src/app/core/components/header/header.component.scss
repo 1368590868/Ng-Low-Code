@@ -1,6 +1,6 @@
 .header {
-  --topbar-bg: #3f51b5;
-  --topbar-start-bg: #283593;
+  --topbar-bg: var(--primary-color);
+  --topbar-start-bg: var(--primary-600);
   --topbar-menu-button-text-color: #212121;
   --topbar-item-text-color: #ffffff;
   --topbar-item-hover-bg: rgba(255, 255, 255, 0.12);
@@ -25,6 +25,7 @@
   .page-link {
     ::ng-deep .p-menubar {
       border: none;
+      background: transparent;
 
       .p-menuitem-link {
         &:hover {

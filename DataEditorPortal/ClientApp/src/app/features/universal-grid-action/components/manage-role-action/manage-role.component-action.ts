@@ -1,17 +1,14 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { NotifyService } from 'src/app/core/utils/notify.service';
-import {
-  GridActionDirective,
-  OnGridActionDialogShow
-} from '../../directives/grid-action.directive';
+import { GridActionDirective } from '../../directives/grid-action.directive';
 import {
   ManageRoleForm,
   RoleList,
   RolePermissions
 } from '../../models/role-permisstion';
-import { RolePermissionService } from '../../services/role-permission/role-permission.service';
+import { RolePermissionService } from '../../services/role-permission.service';
 
 @Component({
   selector: 'app-manager-role',
@@ -20,7 +17,7 @@ import { RolePermissionService } from '../../services/role-permission/role-permi
 })
 export class ManagerRoleComponent
   extends GridActionDirective
-  implements OnGridActionDialogShow
+  implements OnInit
 {
   @ViewChild('editForm') editForm!: NgForm;
   form = new FormGroup({});
@@ -138,7 +135,7 @@ export class ManagerRoleComponent
     return Array.from(map).map(item => [...item[1]]);
   }
 
-  onDialogShow(): void {
+  ngOnInit(): void {
     this.rolePermissionService.getRoleList().subscribe(res => {
       this.roleId = res[0].id || '';
       this.roleName = res[0].roleName || '';
@@ -201,7 +198,10 @@ export class ManagerRoleComponent
         permissions: this.permissionSelect
       }).subscribe(res => {
         if (!res.isError) {
-          this.notifyService.notifySuccess('Success', 'Save Success');
+          this.notifyService.notifySuccess(
+            'Success',
+            'Save Successfully Completed.'
+          );
           this.savedEvent.emit();
         } else {
           this.errorEvent.emit();

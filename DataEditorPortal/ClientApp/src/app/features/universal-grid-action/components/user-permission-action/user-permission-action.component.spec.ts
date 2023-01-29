@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UserPermissionComponent } from './user-permission.component';
+import { UserPermissionComponent } from './user-permission-action.component';
 
 describe('UserPermissionComponent', () => {
   let component: UserPermissionComponent;
