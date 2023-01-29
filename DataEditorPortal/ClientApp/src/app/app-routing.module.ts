@@ -13,7 +13,6 @@ const routes: Routes = [
   { path: 'about', component: AboutComponent, canActivate: [RouterGuard] },
   { path: 'contact', component: ContactComponent, canActivate: [RouterGuard] },
   { path: 'login', component: LoginComponent },
-  { path: '**', component: ErrorPageComponent },
 
   {
     path: 'portal-item/:name',
@@ -30,7 +29,8 @@ const routes: Routes = [
         m => m.PortalManagementModule
       ),
     canActivate: [RouterGuard]
-  }
+  },
+  { path: '**', component: ErrorPageComponent }
 ];
 
 @NgModule({
