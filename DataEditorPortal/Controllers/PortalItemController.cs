@@ -6,6 +6,7 @@ using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.PortalItem;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -15,6 +16,7 @@ using System.Linq;
 
 namespace DataEditorPortal.Web.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/portal-item")]
     public class PortalItemController : ControllerBase

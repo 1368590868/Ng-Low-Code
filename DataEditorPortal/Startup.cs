@@ -67,18 +67,19 @@ namespace DataEditorPortal.Web
 
             #endregion
 
-            //services.AddCors(options =>
-            //{
-            //    options.AddDefaultPolicy(builder =>
-            //    {
-            //        builder
-            //            .WithOrigins("http://localhost:4200", "https://localhost:44315")
-            //            .SetIsOriginAllowed(origin => true)
-            //            .AllowAnyHeader()
-            //            .AllowAnyMethod()
-            //            .AllowCredentials();
-            //    });
-            //});
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder
+                        .WithOrigins("http://localhost:4200")
+                        .SetIsOriginAllowed(origin => true)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
+
             services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
 
             services.AddAutoMapper(typeof(Startup));
@@ -117,10 +118,7 @@ namespace DataEditorPortal.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            if (!env.IsDevelopment())
-            {
-                app.UseSpaStaticFiles();
-            }
+            app.UseSpaStaticFiles();
 
             app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions()
             {
@@ -134,10 +132,10 @@ namespace DataEditorPortal.Web
 
             app.UseRouting();
 
-            // if (env.IsDevelopment())
-            // {
-            // app.UseCors();
-            // }
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseCors();
+            //}
 
             app.UseAuthentication();
             app.UseAuthorization();
