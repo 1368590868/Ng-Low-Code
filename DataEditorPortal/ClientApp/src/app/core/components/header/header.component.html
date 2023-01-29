@@ -7,11 +7,13 @@
         style="filter: brightness(8)" />
     </div>
     <p-menubar [model]="items" class="page-link"></p-menubar>
-    <span [title]="headerText.WebHeaderDescription">{{
-      headerText.WebHeaderMessage
+    <span [title]="this.userService.headerText.WebHeaderDescription">{{
+      this.userService.headerText.WebHeaderMessage
     }}</span>
   </div>
-  <div class="menu-end flex justify-content-center align-items-center">
+  <div
+    class="menu-end flex justify-content-center align-items-center"
+    *ngIf="this.userService?.isLogin">
     <p-button icon="pi pi-search" styleClass="p-button-rounded mr-2"></p-button>
     <p-button styleClass="mr-1">
       <p-avatar
@@ -19,8 +21,8 @@
         styleClass="flex mr-2"
         shape="circle"></p-avatar>
       <span class="flex flex-column align-items-start">
-        <strong>{{ USER.displayName }}</strong>
-        <small>Vendor:{{ USER.vendor || 'Vendor N/A' }}</small>
+        <strong>{{ this.userService.USER.displayName }}</strong>
+        <small>Vendor:{{ this.userService.USER.vendor || 'Vendor N/A' }}</small>
       </span>
     </p-button>
   </div>

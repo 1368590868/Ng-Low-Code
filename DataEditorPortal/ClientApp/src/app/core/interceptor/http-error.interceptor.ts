@@ -26,6 +26,14 @@ export class HttpErrorInterceptor implements HttpInterceptor {
               error.message
           );
 
+        if (error.status === 401) {
+          return of(
+            new HttpResponse({
+              body: { isError: true }
+            })
+          );
+        }
+
         if (request.responseType === 'json') {
           return of(
             new HttpResponse({
