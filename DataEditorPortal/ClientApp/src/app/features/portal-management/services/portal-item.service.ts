@@ -1,9 +1,15 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { map, Observable, Subject } from 'rxjs';
+import { delay, map, Observable, of, Subject } from 'rxjs';
 import { NotifyService } from 'src/app/app.module';
 import { ApiResponse } from 'src/app/core/models/api-response';
-import { PortalItem, PortalItemData } from '../models/portal-item';
+import {
+  DataSourceConfig,
+  DataSourceTable,
+  DataSourceTableColumn,
+  PortalItem,
+  PortalItemData
+} from '../models/portal-item';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +18,7 @@ export class PortalItemService {
   public _apiUrl: string;
 
   public currentPortalItemId?: string;
+  public currentPortalDataSourceTableColumns?: any;
 
   constructor(
     private http: HttpClient,
@@ -92,6 +99,52 @@ export class PortalItemService {
   ): Observable<ApiResponse<PortalItemData>> {
     return this.http.put<ApiResponse<PortalItemData>>(
       `${this._apiUrl}portal-item/${id}/update`,
+      data
+    );
+  }
+
+  // datasource
+  getDataSourceTables(): Observable<DataSourceTable[]> {
+    return this.http
+      .get<ApiResponse<DataSourceTable[]>>(
+        `${this._apiUrl}portal-item/datasource/tables`
+      )
+      .pipe(map(x => x.result || []));
+  }
+
+  getDataSourceTableColumns(
+    tableSchema: string,
+    tableName: string
+  ): Observable<DataSourceTableColumn[]> {
+    return this.http
+      .get<ApiResponse<DataSourceTableColumn[]>>(
+        `${this._apiUrl}portal-item/datasource/${tableSchema}/${tableName}/columns`
+      )
+      .pipe(map(x => x.result || []));
+  }
+
+  getDataSourceConfig(id: string): Observable<DataSourceConfig> {
+    return this.http
+      .get<ApiResponse<DataSourceConfig>>(
+        `${this._apiUrl}portal-item/${id}/datasource`
+      )
+      .pipe(
+        map(
+          x =>
+            x.result || {
+              tableName: '',
+              tableSchema: '',
+              idColumn: '',
+              filters: [],
+              sortBy: []
+            }
+        )
+      );
+  }
+
+  saveDataSourceConfig(id: string, data: DataSourceConfig) {
+    return this.http.post<ApiResponse<boolean>>(
+      `${this._apiUrl}portal-item/${id}/datasource`,
       data
     );
   }
