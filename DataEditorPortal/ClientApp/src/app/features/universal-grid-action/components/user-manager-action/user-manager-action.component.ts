@@ -194,7 +194,7 @@ export class UserManagerActionComponent
       }
     },
     {
-      wrappers: ['tag'],
+      wrappers: ['chip'],
       props: {
         forArray: []
       },
@@ -228,7 +228,7 @@ export class UserManagerActionComponent
       }
     },
     {
-      wrappers: ['tag'],
+      wrappers: ['chip'],
       props: {
         forArray: []
       },
