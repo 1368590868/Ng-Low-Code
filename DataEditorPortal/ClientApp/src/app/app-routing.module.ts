@@ -13,7 +13,8 @@ const routes: Routes = [
   { path: 'about', component: AboutComponent, canActivate: [RouterGuard] },
   { path: 'contact', component: ContactComponent, canActivate: [RouterGuard] },
   { path: 'login', component: LoginComponent },
-  { path: 'error', component: ErrorPageComponent },
+  { path: '**', component: ErrorPageComponent },
+
   {
     path: 'portal-item/:name',
     loadChildren: () =>
