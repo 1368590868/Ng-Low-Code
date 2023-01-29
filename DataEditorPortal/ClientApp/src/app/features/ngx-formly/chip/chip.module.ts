@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 
-import { TagWrapperComponent } from './tag.type';
 import { ChipModule } from 'primeng/chip';
+import { ChipWrapperComponent } from './chip.type';
 
 @NgModule({
-  declarations: [TagWrapperComponent],
+  declarations: [ChipWrapperComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -16,11 +16,11 @@ import { ChipModule } from 'primeng/chip';
     FormlyModule.forChild({
       wrappers: [
         {
-          name: 'tag',
-          component: TagWrapperComponent
+          name: 'chip',
+          component: ChipWrapperComponent
         }
       ]
     })
   ]
 })
-export class FormlyTagWrapperModule {}
+export class FormlyChipWrapperModule {}

@@ -4,13 +4,13 @@ import {
   FieldWrapper,
   FormlyFieldProps
 } from '@ngx-formly/core';
-interface TagProps extends FormlyFieldProps {
+interface ChipProps extends FormlyFieldProps {
   styleClass?: string;
   forArray?: any[];
   label: string;
 }
 @Component({
-  selector: 'app-formly-wrapper-tag',
+  selector: 'app-formly-wrapper-chip',
   template: `
     <div
       class="flex flex-wrap justify-content-start"
@@ -24,8 +24,8 @@ interface TagProps extends FormlyFieldProps {
     </div>
   `
 })
-export class TagWrapperComponent extends FieldWrapper<
-  FieldTypeConfig<TagProps>
+export class ChipWrapperComponent extends FieldWrapper<
+  FieldTypeConfig<ChipProps>
 > {
   @ViewChild('fieldComponent', { read: ViewContainerRef })
   override fieldComponent!: ViewContainerRef;

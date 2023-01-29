@@ -1,26 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { AppUser } from '../../models/user';
-import { ConfigDataService } from '../../services/config-data.service';
 import { UserService } from '../../services/user.service';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   items!: MenuItem[];
-
-  public headerText = {
-    WebHeaderDescription: '',
-    WebHeaderMessage: ''
-  };
-  public USER: AppUser = {};
-  constructor(
-    private configData: ConfigDataService,
-    private userService: UserService
-  ) {
-    this.USER = this.userService.USER;
+  constructor(public userService: UserService) {
     this.items = [
       {
         label: 'Home',
@@ -35,11 +23,5 @@ export class HeaderComponent implements OnInit {
         routerLink: ['/contact']
       }
     ];
-  }
-
-  ngOnInit(): void {
-    this.configData.getSiteEnvironment().subscribe((res: any) => {
-      this.headerText = res;
-    });
   }
 }

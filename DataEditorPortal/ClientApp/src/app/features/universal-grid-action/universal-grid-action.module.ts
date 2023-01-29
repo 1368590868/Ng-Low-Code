@@ -44,9 +44,9 @@ import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ManagerRoleComponent } from './components/manage-role-action/manage-role.component-action';
 import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
-import { FormlyTagWrapperModule } from '../ngx-formly/tag';
 import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
 import { UserPermissionComponent } from './components/user-permission-action/user-permission-action.component';
+import { FormlyChipWrapperModule } from '../ngx-formly/chip/chip.module';
 
 export * from './models/grid-config';
 
@@ -79,7 +79,7 @@ export * from './models/grid-config';
     FormlySelectModule,
     FormlyCheckBoxModule,
     FormlyDividerWrapperModule,
-    FormlyTagWrapperModule,
+    FormlyChipWrapperModule,
     // primeNg
     AnimateModule,
     ToastModule,

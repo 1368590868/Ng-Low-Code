@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit {
       .login()
       .pipe(
         tap(() => {
-          if (JSON.stringify(this.userService.USER) !== '{}') {
+          if (this.userService.isLogin) {
             this.route.queryParams
               .pipe(
                 tap((qp: any) => {
@@ -52,5 +52,9 @@ export class LoginComponent implements OnInit {
         finalize(() => (this.isLoading = false))
       )
       .subscribe();
+  }
+
+  reload() {
+    location.reload();
   }
 }

@@ -7,7 +7,6 @@ import {
   UrlTree
 } from '@angular/router';
 import { Observable } from 'rxjs';
-import { AppUser } from '../models/user';
 import { UserService } from '../services/user.service';
 
 @Injectable({
@@ -23,19 +22,11 @@ export class RouterGuard implements CanActivate {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    const isLoggedIn = this.isLoggedIn(this.userService.USER);
-    if (!isLoggedIn) {
+    if (!this.userService.isLogin) {
       this.router.navigate(['login'], {
         queryParams: { returnUrl: state.url }
       });
     }
-    return isLoggedIn;
-  }
-
-  isLoggedIn(user: AppUser) {
-    if (JSON.stringify(user) === '{}') {
-      return false;
-    }
-    return true;
+    return this.userService.isLogin;
   }
 }
