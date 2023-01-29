@@ -187,7 +187,7 @@ export class UserManagerActionComponent
     {
       wrappers: ['divider'],
       props: {
-        label: 'Role'
+        label: 'Roles'
       },
       expressions: {
         hide: () => this.isAddForm
