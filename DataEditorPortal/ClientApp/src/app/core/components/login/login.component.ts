@@ -53,4 +53,8 @@ export class LoginComponent implements OnInit {
       )
       .subscribe();
   }
+
+  reload() {
+    location.reload();
+  }
 }
