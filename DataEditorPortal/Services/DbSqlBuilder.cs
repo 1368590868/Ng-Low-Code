@@ -9,20 +9,24 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IDbSqlBuilder
     {
-
-        string GenerateSqlTextForList(DataSourceConfig config);
+        // ultilities
         string UsePagination(string query, int startIndex, int indexCount);
         string UseOrderBy(string query, List<SortParam> sortParams);
         string UseCount(string query);
         string UseFilters(string query, List<FilterParam> filterParams);
         string UseSearches(string query, List<SearchParam> filterParams);
+        string FormatValue(object value, DataRow schema);
 
+        // universal grid
+        string GenerateSqlTextForList(DataSourceConfig config);
         string GenerateSqlTextForDetail(DataSourceConfig config);
         string GenerateSqlTextForInsert(DataSourceConfig config);
         string GenerateSqlTextForUpdate(DataSourceConfig config);
         string GenerateSqlTextForDelete(DataSourceConfig config);
 
-        string FormatValue(object value, DataRow schema);
+        // database
+        string GetSqlTextForDatabaseTables();
+        string GetSqlTextForDatabaseTableSchema(string tableSchema, string tableName);
     }
 
     public class DbSqlServerBuilder : IDbSqlBuilder
@@ -31,6 +35,8 @@ namespace DataEditorPortal.Web.Services
         {
 
         }
+
+        #region Ultilities
 
         private string GenerateWhereClause(List<FilterParam> filterParams)
         {
@@ -206,27 +212,6 @@ namespace DataEditorPortal.Web.Services
             return orderby;
         }
 
-        public string GenerateSqlTextForList(DataSourceConfig config)
-        {
-            if (config.QueryText != null)
-            {
-                // advanced datasource, ingore TableName, Columns, SortBy and Filters setting.
-                return config.QueryText;
-            }
-            else
-            {
-                var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
-
-                var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
-
-                var orderBy = config.SortBy.Count > 0 ? GenerateOrderClause(config.SortBy) : $"[{config.IdColumn}] ASC";
-
-                var queryText = $@"SELECT {columns} FROM dep.{config.TableName} WHERE {where} ##SEARCHES## ##FILTERS## ORDER BY {orderBy}";
-
-                return queryText;
-            }
-        }
-
         public string UsePagination(string query, int startIndex, int indexCount)
         {
             // get order by clause
@@ -317,6 +302,45 @@ namespace DataEditorPortal.Web.Services
             return $"SELECT COUNT(*) FROM ({queryWithoutOrderBy}) A";
         }
 
+        public string FormatValue(object value, DataRow schema)
+        {
+            if (value == System.DBNull.Value) return string.Empty;
+
+            var sqlDbType = (SqlDbType)schema["ProviderType"];
+            if (sqlDbType == SqlDbType.Date) return Convert.ToDateTime(value).ToString("d");
+            if (sqlDbType == SqlDbType.DateTime || sqlDbType == SqlDbType.DateTime2 || sqlDbType == SqlDbType.SmallDateTime)
+                return Convert.ToDateTime(value).ToString();
+            if (sqlDbType == SqlDbType.Float || sqlDbType == SqlDbType.Decimal || sqlDbType == SqlDbType.Money)
+                return Convert.ToDecimal(value).ToString("N2");
+            else
+                return value.ToString();
+        }
+
+        #endregion
+
+        #region Universal Grid
+
+        public string GenerateSqlTextForList(DataSourceConfig config)
+        {
+            if (config.QueryText != null)
+            {
+                // advanced datasource, ingore TableName, Columns, SortBy and Filters setting.
+                return config.QueryText;
+            }
+            else
+            {
+                var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
+
+                var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
+
+                var orderBy = config.SortBy.Count > 0 ? GenerateOrderClause(config.SortBy) : $"[{config.IdColumn}] ASC";
+
+                var queryText = $@"SELECT {columns} FROM dep.{config.TableName} WHERE {where} ##SEARCHES## ##FILTERS## ORDER BY {orderBy}";
+
+                return queryText;
+            }
+        }
+
         public string GenerateSqlTextForDetail(DataSourceConfig config)
         {
             if (config.QueryText != null)
@@ -398,18 +422,28 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public string FormatValue(object value, DataRow schema)
-        {
-            if (value == System.DBNull.Value) return string.Empty;
+        #endregion
 
-            var sqlDbType = (SqlDbType)schema["ProviderType"];
-            if (sqlDbType == SqlDbType.Date) return Convert.ToDateTime(value).ToString("d");
-            if (sqlDbType == SqlDbType.DateTime || sqlDbType == SqlDbType.DateTime2 || sqlDbType == SqlDbType.SmallDateTime)
-                return Convert.ToDateTime(value).ToString();
-            if (sqlDbType == SqlDbType.Float || sqlDbType == SqlDbType.Decimal || sqlDbType == SqlDbType.Money)
-                return Convert.ToDecimal(value).ToString("N2");
-            else
-                return value.ToString();
+        #region Database 
+
+        /// <summary>
+        /// Sql to get all tables from database, the first column should be table name and second column should be table schema.
+        /// </summary>
+        /// <returns></returns>
+        public string GetSqlTextForDatabaseTables()
+        {
+            return $"SELECT TABLE_NAME AS TableName, TABLE_SCHEMA AS TableSchema FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA <> 'dep' AND TABLE_TYPE  = 'BASE TABLE'";
         }
+
+        /// <summary>
+        /// Sql to get table schema from IDataReader
+        /// </summary>
+        /// <returns></returns>
+        public string GetSqlTextForDatabaseTableSchema(string tableSchema, string tableName)
+        {
+            return $"SELECT TOP 1 * FROM {tableSchema}.{tableName}";
+        }
+
+        #endregion
     }
 }

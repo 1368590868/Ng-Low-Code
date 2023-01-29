@@ -2,14 +2,16 @@
 using AutoWrapper.Wrappers;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.PortalItem;
+using DataEditorPortal.Web.Models.UniversalGrid;
+using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -21,17 +23,20 @@ namespace DataEditorPortal.Web.Controllers
         private readonly DepDbContext _depDbContext;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
+        private readonly IPortalItemService _portalItemService;
 
         public PortalItemController(
             ILogger<PortalItemController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
-            IMapper mapper)
+            IMapper mapper,
+            IPortalItemService portalItemService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _config = config;
             _mapper = mapper;
+            _portalItemService = portalItemService;
         }
 
         [HttpGet]
@@ -65,6 +70,8 @@ namespace DataEditorPortal.Web.Controllers
 
             return root;
         }
+
+        #region Folder
 
         [HttpPost]
         [Route("folder/create")]
@@ -133,24 +140,112 @@ namespace DataEditorPortal.Web.Controllers
             return siteMenu.Id;
         }
 
+        #endregion
+
+        #region Portal Item Basic
+
+        [HttpGet]
+        [Route("name-exists")]
+        public bool ExistName([FromQuery] string name, [FromQuery] Guid? id)
+        {
+            return _depDbContext.SiteMenus.Where(x => x.Name == name && x.Id != id).Any();
+        }
+
+        [HttpGet]
+        [Route("{id}/details")]
+        public PortalItemData Details(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            return _mapper.Map<PortalItemData>(siteMenu);
+        }
+
         [HttpPost]
         [Route("create")]
-        public IActionResult Create(string name, [FromBody] object model)
+        public Guid CreatePortalItem([FromBody] PortalItemData model)
         {
-            return null;
+            var username = AppUser.ParseUsername(User.Identity.Name).Username;
+            var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+
+            // create site menu
+            var siteMenu = _mapper.Map<SiteMenu>(model);
+            siteMenu.Status = Data.Common.PortalItemStatus.Draft;
+            siteMenu.Type = "Portal Item";
+
+            _depDbContext.SiteMenus.Add(siteMenu);
+
+            // create universal grid configuration
+            var item = new UniversalGridConfiguration();
+            item.Name = siteMenu.Name;
+            item.CreatedBy = userId;
+            item.CreatedDate = DateTime.UtcNow;
+
+            _depDbContext.UniversalGridConfigurations.Add(item);
+
+            _depDbContext.SaveChanges();
+
+            return siteMenu.Id;
         }
 
         [HttpPut]
-        [Route("{id}/search/update")]
-        public IActionResult UpdateSearch(Guid id, [FromBody] object model)
+        [Route("{id}/update")]
+        public Guid UpdatePortalItem(Guid id, [FromBody] PortalItemData model)
         {
-            var item = _depDbContext.UniversalGridConfigurations.Where(x => x.Name == id.ToString()).FirstOrDefault();
-            if (item == null) throw new System.Exception($"Portal Item with name:{id} deosn't exists");
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type == "Portal Item");
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
 
-            item.SearchConfig = JsonSerializer.Serialize(model);
+            var oldName = siteMenu.Name;
+
+            _mapper.Map(model, siteMenu);
+            siteMenu.Status = Data.Common.PortalItemStatus.Draft;
+            siteMenu.Type = "Portal Item";
+
+            var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == oldName);
+            item.Name = siteMenu.Name;
+
             _depDbContext.SaveChanges();
-
-            return new JsonResult(model);
+            return siteMenu.Id;
         }
+
+        #endregion
+
+        #region Datasource configuration
+
+        [HttpGet]
+        [Route("datasource/tables")]
+        public List<DataSourceTable> GetDataTables()
+        {
+            return _portalItemService.GetDataSourceTables();
+        }
+
+        [HttpGet]
+        [Route("datasource/{schema}/{tableName}/columns")]
+        public List<DataSourceTableColumn> GetDataTables(string schema, string tableName)
+        {
+            return _portalItemService.GetDataSourceTableColumns(schema, tableName);
+        }
+
+        [HttpGet]
+        [Route("{id}/datasource")]
+        public DataSourceConfig GetDataSourceConfig(Guid id)
+        {
+            return _portalItemService.GetDataSourceConfig(id);
+        }
+
+        [HttpPost]
+        [Route("{id}/datasource")]
+        public bool SaveDataSourceConfig(Guid id, DataSourceConfig model)
+        {
+            return _portalItemService.SaveDataSourceConfig(id, model);
+        }
+
+        #endregion
     }
 }

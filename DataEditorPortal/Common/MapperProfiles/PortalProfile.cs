@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models.PortalItem;
+using System.Data.Common;
 
 namespace DataEditorPortal.Web.Common.MapperProfiles
 {
@@ -9,6 +10,7 @@ namespace DataEditorPortal.Web.Common.MapperProfiles
         public PortalProfile()
         {
             CreateMap<SiteMenu, PortalItemData>().ReverseMap();
+            CreateMap<DbColumn, DataSourceTableColumn>();
         }
     }
 }

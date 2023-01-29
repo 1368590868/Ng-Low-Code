@@ -19,6 +19,7 @@ namespace DataEditorPortal.Web.Models.PortalItem
         public string Description { get; set; }
         public string Type { get; set; }
         public int Order { get; set; }
+        public Guid? ParentId { get; set; }
         public PortalItemStatus Status { get; set; }
     }
 }

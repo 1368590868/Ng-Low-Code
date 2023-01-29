@@ -4,7 +4,6 @@ using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -64,6 +63,7 @@ namespace DataEditorPortal.Web
             });
 
             services.AddScoped<IUniversalGridService, UniversalGridService>();
+            services.AddScoped<IPortalItemService, PortalItemService>();
 
             #endregion
 
@@ -158,7 +158,7 @@ namespace DataEditorPortal.Web
 
                 if (env.IsDevelopment())
                 {
-                    spa.UseAngularCliServer(npmScript: "start");
+                    // spa.UseAngularCliServer(npmScript: "start");
                 }
             });
         }
