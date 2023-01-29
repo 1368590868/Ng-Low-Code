@@ -15,6 +15,7 @@ import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { AvatarModule } from 'primeng/avatar';
 import { DialogModule } from 'primeng/dialog';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { HeaderComponent } from './core/components/header/header.component';
 import { NavMenuComponent } from './core/components/nav-menu/nav-menu.component';
@@ -22,6 +23,8 @@ import { AboutComponent } from './core/components/about/about.component';
 import { ContactComponent } from './core/components/contact/contact.component';
 import { HomeComponent } from './core/components/home/home.component';
 import { TileComponent } from './core/components/tile/tile.component';
+import { LoginComponent } from './core/components/login/login.component';
+import { ErrorPageComponent } from './core/components/error-page/error-page.component';
 
 export { NotifyService } from './core/utils/notify.service';
 
@@ -33,7 +36,9 @@ export { NotifyService } from './core/utils/notify.service';
     AboutComponent,
     ContactComponent,
     HomeComponent,
-    TileComponent
+    TileComponent,
+    LoginComponent,
+    ErrorPageComponent
   ],
   imports: [
     BrowserModule,
@@ -45,7 +50,8 @@ export { NotifyService } from './core/utils/notify.service';
     ToastModule,
     MenubarModule,
     AvatarModule,
-    DialogModule
+    DialogModule,
+    ProgressSpinnerModule
   ],
   providers: [
     {
