@@ -132,10 +132,10 @@ namespace DataEditorPortal.Web
 
             app.UseRouting();
 
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseCors();
-            //}
+            if (env.IsDevelopment())
+            {
+                app.UseCors();
+            }
 
             app.UseAuthentication();
             app.UseAuthorization();
