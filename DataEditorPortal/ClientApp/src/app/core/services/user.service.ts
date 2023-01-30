@@ -32,7 +32,7 @@ export class UserService {
   login() {
     return this.getLoggedInUser().pipe(
       tap(user => {
-        if (!user.isError) {
+        if (user.result?.authenticated !== false) {
           this.isLogin = true;
           this.loginAfter();
           if (user.result != undefined) {
