@@ -63,14 +63,17 @@ export class PortalEditDatasourceComponent implements OnInit {
         .getDataSourceConfig(this.portalItemService.currentPortalItemId)
         .pipe(
           tap(res => {
-            res.filters?.forEach(
-              x =>
-                (x.matchOptions = this.getFilterMatchModeOptions(x.filterType))
-            );
-            this.datasourceConfig = res;
-            this.selectedDbTable = `${res.tableSchema}.${res.tableName}`;
-            this.loadTableColumns(res.tableSchema, res.tableName);
-
+            if (res) {
+              res.filters?.forEach(
+                x =>
+                  (x.matchOptions = this.getFilterMatchModeOptions(
+                    x.filterType
+                  ))
+              );
+              this.datasourceConfig = res;
+              this.selectedDbTable = `${res.tableSchema}.${res.tableName}`;
+              this.loadTableColumns(res.tableSchema, res.tableName);
+            }
             this.isLoading = false;
           })
         )
@@ -111,6 +114,8 @@ export class PortalEditDatasourceComponent implements OnInit {
   onTableNameChange(event: any) {
     const item = this.dbTables.find(x => x.value === event.value);
     if (item) {
+      this.datasourceConfig.tableName = item.tableName;
+      this.datasourceConfig.tableSchema = item.tableSchema;
       this.loadTableColumns(item.tableSchema, item.tableName);
 
       // clear the filters and sortBy, as the database table has changed.
@@ -124,6 +129,8 @@ export class PortalEditDatasourceComponent implements OnInit {
       .getDataSourceTableColumns(tableSchema, tableName)
       .pipe(
         tap(res => {
+          this.dbTableColumns = res;
+          this.changeDetectorRef.detectChanges();
           if (
             !this.datasourceConfig.idColumn ||
             !res.find(x => x.columnName === this.datasourceConfig.idColumn)
@@ -131,8 +138,6 @@ export class PortalEditDatasourceComponent implements OnInit {
             this.datasourceConfig.idColumn = res[0].columnName;
             this.changeDetectorRef.detectChanges();
           }
-          this.dbTableColumns = res;
-          this.changeDetectorRef.detectChanges();
         })
       )
       .subscribe();

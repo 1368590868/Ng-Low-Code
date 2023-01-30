@@ -7,6 +7,7 @@ import {
   DataSourceConfig,
   DataSourceTable,
   DataSourceTableColumn,
+  GridColumn,
   PortalItem,
   PortalItemData
 } from '../models/portal-item';
@@ -123,6 +124,16 @@ export class PortalItemService {
       .pipe(map(x => x.result || []));
   }
 
+  getDataSourceTableColumnsByPortalId(
+    id: string
+  ): Observable<DataSourceTableColumn[]> {
+    return this.http
+      .get<ApiResponse<DataSourceTableColumn[]>>(
+        `${this._apiUrl}portal-item/${id}/datasource/columns`
+      )
+      .pipe(map(x => x.result || []));
+  }
+
   getDataSourceConfig(id: string): Observable<DataSourceConfig> {
     return this.http
       .get<ApiResponse<DataSourceConfig>>(
@@ -145,6 +156,21 @@ export class PortalItemService {
   saveDataSourceConfig(id: string, data: DataSourceConfig) {
     return this.http.post<ApiResponse<boolean>>(
       `${this._apiUrl}portal-item/${id}/datasource`,
+      data
+    );
+  }
+
+  getGridColumnsConfig(id: string): Observable<GridColumn[]> {
+    return this.http
+      .get<ApiResponse<GridColumn[]>>(
+        `${this._apiUrl}portal-item/${id}/grid-columns`
+      )
+      .pipe(map(x => x.result || []));
+  }
+
+  saveGridColumnsConfig(id: string, data: GridColumn[]) {
+    return this.http.post<ApiResponse<boolean>>(
+      `${this._apiUrl}portal-item/${id}/grid-columns`,
       data
     );
   }

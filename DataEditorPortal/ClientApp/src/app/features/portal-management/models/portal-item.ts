@@ -43,3 +43,13 @@ export interface DataSourceSortBy {
   field?: string;
   order?: string;
 }
+
+export interface GridColumn {
+  field?: string;
+  header?: string;
+  width?: string;
+  filterType?: string;
+  uiType?: string;
+  order?: number;
+  aggregate?: boolean;
+}
