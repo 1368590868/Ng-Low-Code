@@ -131,13 +131,6 @@ export class PortalEditDatasourceComponent implements OnInit {
         tap(res => {
           this.dbTableColumns = res;
           this.changeDetectorRef.detectChanges();
-          if (
-            !this.datasourceConfig.idColumn ||
-            !res.find(x => x.columnName === this.datasourceConfig.idColumn)
-          ) {
-            this.datasourceConfig.idColumn = res[0].columnName;
-            this.changeDetectorRef.detectChanges();
-          }
         })
       )
       .subscribe();
@@ -263,8 +256,8 @@ export class PortalEditDatasourceComponent implements OnInit {
       const index = newFilter.indexOf(filter);
       newFilter.splice(index, 1, {
         ...filter,
-        matchOptions,
-        matchMode: matchOptions[0].value
+        matchOptions
+        // matchMode: matchOptions[0].value
       });
       this.datasourceConfig.filters = newFilter;
     }

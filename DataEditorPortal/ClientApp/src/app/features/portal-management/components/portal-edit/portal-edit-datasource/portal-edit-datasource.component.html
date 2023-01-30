@@ -14,8 +14,7 @@
             [(ngModel)]="selectedDbTable"
             [options]="dbTables"
             (onChange)="onTableNameChange($event)"
-            [style]="{ minWidth: '20rem' }"
-            placeholder="Select a Database Table"></p-dropdown>
+            [style]="{ minWidth: '20rem' }"></p-dropdown>
           <i
             class="pi pi-question-circle ml-3 text-lg"
             pTooltip="Select one table from database"></i>
@@ -30,8 +29,7 @@
             [options]="dbTableColumns"
             [style]="{ minWidth: '20rem' }"
             optionLabel="columnName"
-            optionValue="columnName"
-            placeholder="Select Id Column"></p-dropdown>
+            optionValue="columnName"></p-dropdown>
           <i
             class="pi pi-question-circle ml-3 text-lg"
             pTooltip="Id Column will be used as the key in the grid"></i>
@@ -51,15 +49,13 @@
                 optionLabel="columnName"
                 optionValue="columnName"
                 (onChange)="onFilterColumnChange($event, filter)"
-                appendTo="body"
-                placeholder="Select Id Column"></p-dropdown>
+                appendTo="body"></p-dropdown>
             </div>
             <div class="mr-3">
               <p-dropdown
                 [(ngModel)]="filter.matchMode"
                 [options]="filter.matchOptions"
-                appendTo="body"
-                placeholder="Match Mode"></p-dropdown>
+                appendTo="body"></p-dropdown>
             </div>
             <div class="mr-3">
               <input
