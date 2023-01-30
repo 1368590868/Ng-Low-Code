@@ -29,7 +29,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         if (error.status === 401) {
           return of(
             new HttpResponse({
-              body: { result: { authenticated: false } }
+              body: { isError: true }
             })
           );
         }

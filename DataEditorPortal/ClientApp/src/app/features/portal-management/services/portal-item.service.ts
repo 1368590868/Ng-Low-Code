@@ -8,6 +8,7 @@ import {
   DataSourceTable,
   DataSourceTableColumn,
   GridColumn,
+  GridSearchField,
   PortalItem,
   PortalItemData
 } from '../models/portal-item';
@@ -171,6 +172,21 @@ export class PortalItemService {
   saveGridColumnsConfig(id: string, data: GridColumn[]) {
     return this.http.post<ApiResponse<boolean>>(
       `${this._apiUrl}portal-item/${id}/grid-columns`,
+      data
+    );
+  }
+
+  getGridSearchConfig(id: string): Observable<GridSearchField[]> {
+    return this.http
+      .get<ApiResponse<GridSearchField[]>>(
+        `${this._apiUrl}portal-item/${id}/grid-search`
+      )
+      .pipe(map(x => x.result || []));
+  }
+
+  saveGridSearchConfig(id: string, data: GridSearchField[]) {
+    return this.http.post<ApiResponse<boolean>>(
+      `${this._apiUrl}portal-item/${id}/grid-search`,
       data
     );
   }

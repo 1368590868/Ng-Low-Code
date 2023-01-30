@@ -31,13 +31,11 @@ export class UserService {
 
   login() {
     return this.getLoggedInUser().pipe(
-      tap(user => {
-        if (user.result?.authenticated !== false) {
+      tap(res => {
+        if (!res.isError && res.result) {
           this.isLogin = true;
           this.loginAfter();
-          if (user.result != undefined) {
-            this.USER = user.result;
-          }
+          this.USER = res.result;
         }
       })
     );

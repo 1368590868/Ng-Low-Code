@@ -139,7 +139,7 @@ export class PortalEditColumnsComponent implements OnInit {
     event.items.forEach((item: any) => {
       item.selected = false;
     });
-    if (event.items.find((x: any) => x.name === this.model.name)) {
+    if (event.items.find((x: any) => x.field === this.model.field)) {
       this.model = {};
     }
   }

@@ -4,7 +4,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PrimeNGConfig } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
-import { distinctUntilChanged, tap } from 'rxjs';
+import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
+import { GridSearchField } from '../../../models/portal-item';
+import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
   selector: 'app-portal-edit-search',
@@ -12,26 +14,100 @@ import { distinctUntilChanged, tap } from 'rxjs';
   styleUrls: ['./portal-edit-search.component.scss']
 })
 export class PortalEditSearchComponent implements OnInit {
+  isLoading = true;
   isSaving = false;
+  isSavingAndNext = false;
+  isSavingAndExit = false;
 
-  sourceColumns: any[] = [
-    {
-      name: 'Name'
-    },
-    {
-      name: 'UserId'
-    },
-    {
-      name: 'Email'
-    }
-  ];
-  targetColumns: any[] = [];
+  sourceColumns: GridSearchField[] = [];
+  targetColumns: GridSearchField[] = [];
   @ViewChild('pickList') pickList!: PickList;
 
+  controls: { label: string; value: string; filterType: string }[] = [
+    {
+      label: 'Checkbox',
+      value: 'checkbox',
+      filterType: 'boolean'
+    },
+    {
+      label: 'Checkbox List',
+      value: 'checkboxList',
+      filterType: 'array'
+    },
+    {
+      label: 'Date',
+      value: 'datepicker',
+      filterType: 'date'
+    },
+    {
+      label: 'Dropdown',
+      value: 'select',
+      filterType: 'text'
+    },
+    {
+      label: 'Multiple Dropdown',
+      value: 'multiSelect',
+      filterType: 'array'
+    },
+    {
+      label: 'Radio List',
+      value: 'radio',
+      filterType: 'text'
+    },
+    {
+      label: 'Textbox',
+      value: 'input',
+      filterType: 'text'
+    },
+    {
+      label: 'Textarea',
+      value: 'textarea',
+      filterType: 'text'
+    },
+    {
+      label: 'Textbox',
+      value: 'input',
+      filterType: 'numeric'
+    }
+  ];
   form = new FormGroup({});
   options: FormlyFormOptions = {};
   model: any = {};
   fields: FormlyFieldConfig[] = [
+    {
+      key: 'filterType',
+      type: 'input',
+      hooks: {
+        onInit: field => {
+          field.formControl?.valueChanges
+            .pipe(
+              distinctUntilChanged(),
+              startWith(field.formControl.value),
+              tap(value => {
+                if (field.parent?.get) {
+                  const typeField = field.parent?.get('type');
+                  if (typeField && typeField.props) {
+                    const result = this.controls.filter(
+                      x => x.filterType === value
+                    );
+
+                    typeField.props.options = result;
+
+                    if (
+                      !result.find(
+                        o => o.value === typeField.formControl?.value
+                      )
+                    )
+                      typeField.formControl?.setValue(result[0].value);
+                  }
+                }
+              })
+            )
+            .subscribe();
+        }
+      },
+      hide: true
+    },
     {
       key: 'type',
       type: 'select',
@@ -40,56 +116,14 @@ export class PortalEditSearchComponent implements OnInit {
         label: 'Control Type',
         placeholder: 'Please Select',
         showClear: false,
-        required: true,
-        options: [
-          {
-            label: 'Checkbox',
-            value: 'checkbox',
-            filterType: 'boolean'
-          },
-          {
-            label: 'Checkbox List',
-            value: 'checkboxList',
-            filterType: 'array'
-          },
-          {
-            label: 'Date',
-            value: 'datepicker',
-            filterType: 'date'
-          },
-          {
-            label: 'Dropdown',
-            value: 'select',
-            filterType: 'text'
-          },
-          {
-            label: 'Multiple Dropdown',
-            value: 'multiSelect',
-            filterType: 'array'
-          },
-          {
-            label: 'Radio List',
-            value: 'radio',
-            filterType: 'text'
-          },
-          {
-            label: 'Textbox',
-            value: 'input',
-            filterType: 'text'
-          },
-          {
-            label: 'Textarea',
-            value: 'textarea',
-            filterType: 'text'
-          }
-        ]
+        required: true
       },
       hooks: {
         onInit: field => {
           field.formControl?.valueChanges
             .pipe(
               distinctUntilChanged(),
-              tap(value => {
+              tap(() => {
                 this.model.selected = false;
                 this.changeDetectorRef.detectChanges();
                 this.model.selected = true;
@@ -133,38 +167,66 @@ export class PortalEditSearchComponent implements OnInit {
     private primeNGConfig: PrimeNGConfig,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private portalItemService: PortalItemService
   ) {}
 
   ngOnInit(): void {
-    console.log('test');
+    if (this.portalItemService.currentPortalItemId) {
+      forkJoin([
+        this.portalItemService.getGridSearchConfig(
+          this.portalItemService.currentPortalItemId
+        ),
+        this.portalItemService.getDataSourceTableColumnsByPortalId(
+          this.portalItemService.currentPortalItemId
+        )
+      ]).subscribe(res => {
+        this.isLoading = false;
+        this.targetColumns = res[0].map<GridSearchField>(x => {
+          return {
+            ...x,
+            selected: true
+          };
+        });
+        this.sourceColumns = res[1]
+          .filter(s => !this.targetColumns.find(t => t.key === s.columnName))
+          .map<GridSearchField>(x => {
+            const result = this.controls.filter(
+              c => c.filterType === x.filterType
+            );
+            return {
+              key: x.columnName,
+              type: result[0].value,
+              props: {
+                label: x.columnName,
+                placeholder: x.columnName
+              },
+              filterType: x.filterType,
+              searchRule: {
+                field: x.columnName
+              }
+            };
+          });
+      });
+    }
   }
 
-  onMoveToTarget(event: any) {
-    event.items.forEach((item: any) => {
+  onMoveToTarget(event: { items: GridSearchField[] }) {
+    event.items.forEach(item => {
       item.selected = true;
-      item.key = item.name;
-      item.type = 'input';
-      item.props = {
-        label: item.name,
-        placeholder: item.name
-      };
     });
   }
 
-  onMoveToSource(event: any) {
-    event.items.forEach((item: any) => {
+  onMoveToSource(event: { items: GridSearchField[] }) {
+    event.items.forEach(item => {
       item.selected = false;
-      item.key = undefined;
-      item.type = undefined;
-      item.props = undefined;
     });
-    if (event.items.find((x: any) => x.name === this.model.name)) {
+    if (event.items.find(x => x.key === this.model.key)) {
       this.model = {};
     }
   }
 
-  onTargetSelect(event: any) {
+  onTargetSelect(event: { items: GridSearchField[] }) {
     if (event.items.length === 1) {
       this.model = event.items[0];
     } else {
@@ -172,14 +234,46 @@ export class PortalEditSearchComponent implements OnInit {
     }
   }
 
-  onSaveAndNext() {
+  saveGridSearchConfig() {
     this.isSaving = true;
-    console.log(this.targetColumns);
-    setTimeout(() => {
-      this.router.navigate(['../form'], {
-        relativeTo: this.activatedRoute
-      });
-    }, 1000);
+    if (this.portalItemService.currentPortalItemId) {
+      this.portalItemService
+        .saveGridSearchConfig(
+          this.portalItemService.currentPortalItemId,
+          this.targetColumns
+        )
+        .pipe(
+          tap(res => {
+            if (res && !res.isError) {
+              this.saveSucess();
+            }
+
+            this.isSaving = false;
+            this.isSavingAndExit = false;
+            this.isSavingAndNext = false;
+          })
+        )
+        .subscribe();
+    }
+  }
+
+  saveSucess() {
+    let next: unknown[] = [];
+    if (this.isSavingAndNext) next = ['../form'];
+    if (this.isSavingAndExit) next = ['/portal-management/list'];
+    this.router.navigate(next, {
+      relativeTo: this.activatedRoute
+    });
+  }
+
+  onSaveAndNext() {
+    this.isSavingAndNext = true;
+    this.saveGridSearchConfig();
+  }
+
+  onSaveAndExit() {
+    this.isSavingAndExit = true;
+    this.saveGridSearchConfig();
   }
 
   onBack() {
@@ -188,15 +282,7 @@ export class PortalEditSearchComponent implements OnInit {
     });
   }
 
-  getControlFilterType(type: string) {
-    const option = (this.fields[0].props?.options as any[]).find(
-      x => x.value === type
-    );
-    return option?.filterType;
-  }
-
-  getFilterMatchModeOptions(type: string) {
-    const filterType = this.getControlFilterType(type);
+  getFilterMatchModeOptions(filterType: string) {
     if (filterType === 'array')
       return [{ label: 'In selected values', value: 'in' }];
     if (filterType === 'boolean') return [{ label: 'Equals', value: 'equals' }];

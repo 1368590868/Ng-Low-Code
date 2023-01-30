@@ -53,3 +53,15 @@ export interface GridColumn {
   order?: number;
   aggregate?: boolean;
 }
+
+export interface GridSearchField {
+  key: string;
+  type: string;
+  props: { [name: string]: string };
+  selected?: boolean;
+  searchRule: {
+    field: string;
+    matchMode?: string;
+  };
+  filterType: string;
+}

@@ -225,7 +225,7 @@ export class PortalEditFormComponent {
   }
 
   onBack() {
-    this.router.navigate(['../columns'], {
+    this.router.navigate(['../search'], {
       relativeTo: this.activatedRoute
     });
   }
