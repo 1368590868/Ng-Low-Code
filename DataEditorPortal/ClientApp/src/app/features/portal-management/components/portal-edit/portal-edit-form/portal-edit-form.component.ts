@@ -269,6 +269,8 @@ export class PortalEditFormComponent implements OnInit {
             };
           });
       });
+
+      this.portalItemService.saveCurrentStep('form');
     }
   }
 
@@ -340,7 +342,6 @@ export class PortalEditFormComponent implements OnInit {
         });
     }
     if (this.isSavingAndExit) {
-      this.portalItemService.saveCurrentStep('form');
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'

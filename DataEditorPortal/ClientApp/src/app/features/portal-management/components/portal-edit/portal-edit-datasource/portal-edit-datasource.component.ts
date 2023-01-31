@@ -65,6 +65,15 @@ export class PortalEditDatasourceComponent implements OnInit {
         // load database tables
         this.portalItemService.getDataSourceTables()
       ]).subscribe(res => {
+        const tables = res[1];
+        // create label and value for dropdown
+        tables.forEach(x => {
+          x.label = `${x.tableSchema}.${x.tableName}`;
+          x.value = `${x.tableSchema}.${x.tableName}`;
+        });
+        this.dbTables = tables;
+        this.changeDetectorRef.detectChanges();
+
         const dsConfig = res[0];
         if (dsConfig && dsConfig.tableName) {
           dsConfig.filters?.forEach(
@@ -73,14 +82,6 @@ export class PortalEditDatasourceComponent implements OnInit {
           this.datasourceConfig = dsConfig;
           this.selectedDbTable = `${dsConfig.tableSchema}.${dsConfig.tableName}`;
         }
-
-        const tables = res[1];
-        // create label and value for dropdown
-        tables.forEach(x => {
-          x.label = `${x.tableSchema}.${x.tableName}`;
-          x.value = `${x.tableSchema}.${x.tableName}`;
-        });
-        this.dbTables = tables;
 
         if (
           !this.selectedDbTable ||
@@ -96,6 +97,8 @@ export class PortalEditDatasourceComponent implements OnInit {
         this.loadTableColumns();
         this.isLoading = false;
       });
+
+      this.portalItemService.saveCurrentStep('datasource');
     }
   }
 
@@ -182,7 +185,6 @@ export class PortalEditDatasourceComponent implements OnInit {
       next = ['../columns'];
     }
     if (this.isSavingAndExit) {
-      this.portalItemService.saveCurrentStep('datasource');
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'

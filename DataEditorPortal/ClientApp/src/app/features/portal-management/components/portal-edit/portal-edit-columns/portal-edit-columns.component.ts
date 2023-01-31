@@ -124,6 +124,8 @@ export class PortalEditColumnsComponent implements OnInit {
             };
           });
       });
+
+      this.portalItemService.saveCurrentStep('columns');
     }
   }
 
@@ -177,7 +179,6 @@ export class PortalEditColumnsComponent implements OnInit {
       next = ['../search'];
     }
     if (this.isSavingAndExit) {
-      this.portalItemService.saveCurrentStep('columns');
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'

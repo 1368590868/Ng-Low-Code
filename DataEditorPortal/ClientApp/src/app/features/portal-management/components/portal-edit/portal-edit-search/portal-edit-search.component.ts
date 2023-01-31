@@ -206,6 +206,8 @@ export class PortalEditSearchComponent implements OnInit {
             };
           });
       });
+
+      this.portalItemService.saveCurrentStep('search');
     }
   }
 
@@ -259,7 +261,6 @@ export class PortalEditSearchComponent implements OnInit {
       next = ['../form'];
     }
     if (this.isSavingAndExit) {
-      this.portalItemService.saveCurrentStep('search');
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'

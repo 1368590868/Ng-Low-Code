@@ -24,6 +24,8 @@ import {
   LoginComponent,
   ErrorPageComponent
 } from './components';
+import { PermissionDirective } from './directive/permission.directive';
+import { CommonModule } from '@angular/common';
 
 export * from './components';
 export { RouterGuard } from './guards/router.guard';
@@ -40,11 +42,11 @@ export { NgxFormlyService } from './services/ngx-formly.service';
     HomeComponent,
     TileComponent,
     LoginComponent,
-    ErrorPageComponent
+    ErrorPageComponent,
+    PermissionDirective
   ],
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
+    CommonModule,
     FormsModule,
     HttpClientModule,
     ButtonModule,
@@ -62,7 +64,8 @@ export { NgxFormlyService } from './services/ngx-formly.service';
     HomeComponent,
     TileComponent,
     LoginComponent,
-    ErrorPageComponent
+    ErrorPageComponent,
+    PermissionDirective
   ],
   providers: [
     {

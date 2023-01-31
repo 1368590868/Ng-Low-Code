@@ -42,7 +42,7 @@ export class PortalItemService {
   saveCurrentStep(step: string) {
     return this.http
       .post<ApiResponse<string>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/current-step/${step}`,
+        `${this._apiUrl}portal-item/${this.currentPortalItemId}/current-step?step=${step}`,
         null
       )
       .subscribe();

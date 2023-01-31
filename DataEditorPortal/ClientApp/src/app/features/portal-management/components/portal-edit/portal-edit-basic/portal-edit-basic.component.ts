@@ -145,6 +145,8 @@ export class PortalEditBasicComponent implements OnInit {
         // enable buttons after data loaded.
         this.isLoading = false;
       });
+
+      this.portalItemService.saveCurrentStep('basic');
     } else {
       this.model = {
         ...this.model,
@@ -212,7 +214,6 @@ export class PortalEditBasicComponent implements OnInit {
       this.portalItemService.saveCurrentStep('datasource');
     }
     if (this.isSavingAndExit) {
-      this.portalItemService.saveCurrentStep('basic');
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'
