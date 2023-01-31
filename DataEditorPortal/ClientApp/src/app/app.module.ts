@@ -25,6 +25,7 @@ import { HomeComponent } from './core/components/home/home.component';
 import { TileComponent } from './core/components/tile/tile.component';
 import { LoginComponent } from './core/components/login/login.component';
 import { ErrorPageComponent } from './core/components/error-page/error-page.component';
+import { PermissionDirective } from './core/directive/permission.directive';
 
 export { NotifyService } from './core/utils/notify.service';
 
@@ -38,7 +39,8 @@ export { NotifyService } from './core/utils/notify.service';
     HomeComponent,
     TileComponent,
     LoginComponent,
-    ErrorPageComponent
+    ErrorPageComponent,
+    PermissionDirective
   ],
   imports: [
     BrowserModule,
@@ -53,6 +55,7 @@ export { NotifyService } from './core/utils/notify.service';
     DialogModule,
     ProgressSpinnerModule
   ],
+  exports: [PermissionDirective],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
