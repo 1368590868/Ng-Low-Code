@@ -28,6 +28,7 @@ export class PortalListComponent implements OnInit {
       label: 'Create Portal Item',
       icon: 'pi pi-fw pi-desktop',
       command: () => {
+        this.portalItemService.currentPortalItemParentFolder = undefined;
         this.router.navigate([`../add`], {
           relativeTo: this.activatedRoute
         });
@@ -67,6 +68,7 @@ export class PortalListComponent implements OnInit {
         icon: 'pi pi-fw pi-plus',
         command: () => {
           // new portal item
+          this.portalItemService.currentPortalItemParentFolder = row['id'];
           this.router.navigate([`../add`], {
             relativeTo: this.activatedRoute
           });

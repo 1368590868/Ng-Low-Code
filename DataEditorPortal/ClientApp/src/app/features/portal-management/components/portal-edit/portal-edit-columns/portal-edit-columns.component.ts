@@ -100,12 +100,8 @@ export class PortalEditColumnsComponent implements OnInit {
   ngOnInit(): void {
     if (this.portalItemService.currentPortalItemId) {
       forkJoin([
-        this.portalItemService.getGridColumnsConfig(
-          this.portalItemService.currentPortalItemId
-        ),
-        this.portalItemService.getDataSourceTableColumnsByPortalId(
-          this.portalItemService.currentPortalItemId
-        )
+        this.portalItemService.getGridColumnsConfig(),
+        this.portalItemService.getDataSourceTableColumnsByPortalId()
       ]).subscribe(res => {
         this.isLoading = false;
         this.targetColumns = res[0].map<GridColumn>(x => {
@@ -158,10 +154,7 @@ export class PortalEditColumnsComponent implements OnInit {
     this.isSaving = true;
     if (this.portalItemService.currentPortalItemId) {
       this.portalItemService
-        .saveGridColumnsConfig(
-          this.portalItemService.currentPortalItemId,
-          this.targetColumns
-        )
+        .saveGridColumnsConfig(this.targetColumns)
         .pipe(
           tap(res => {
             if (res && !res.isError) {
@@ -179,13 +172,17 @@ export class PortalEditColumnsComponent implements OnInit {
 
   saveSucess() {
     let next: unknown[] = [];
-    if (this.isSavingAndNext) next = ['../search'];
+    if (this.isSavingAndNext) {
+      this.portalItemService.saveCurrentStep('search');
+      next = ['../search'];
+    }
     if (this.isSavingAndExit) {
+      this.portalItemService.saveCurrentStep('columns');
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'
       );
-      next = ['/portal-management/list'];
+      next = ['../../../list'];
     }
     this.router.navigate(next, {
       relativeTo: this.activatedRoute

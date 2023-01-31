@@ -176,12 +176,8 @@ export class PortalEditSearchComponent implements OnInit {
   ngOnInit(): void {
     if (this.portalItemService.currentPortalItemId) {
       forkJoin([
-        this.portalItemService.getGridSearchConfig(
-          this.portalItemService.currentPortalItemId
-        ),
-        this.portalItemService.getDataSourceTableColumnsByPortalId(
-          this.portalItemService.currentPortalItemId
-        )
+        this.portalItemService.getGridSearchConfig(),
+        this.portalItemService.getDataSourceTableColumnsByPortalId()
       ]).subscribe(res => {
         this.isLoading = false;
         this.targetColumns = res[0].map<GridSearchField>(x => {
@@ -240,10 +236,7 @@ export class PortalEditSearchComponent implements OnInit {
     this.isSaving = true;
     if (this.portalItemService.currentPortalItemId) {
       this.portalItemService
-        .saveGridSearchConfig(
-          this.portalItemService.currentPortalItemId,
-          this.targetColumns
-        )
+        .saveGridSearchConfig(this.targetColumns)
         .pipe(
           tap(res => {
             if (res && !res.isError) {
@@ -261,13 +254,17 @@ export class PortalEditSearchComponent implements OnInit {
 
   saveSucess() {
     let next: unknown[] = [];
-    if (this.isSavingAndNext) next = ['../form'];
+    if (this.isSavingAndNext) {
+      this.portalItemService.saveCurrentStep('form');
+      next = ['../form'];
+    }
     if (this.isSavingAndExit) {
+      this.portalItemService.saveCurrentStep('search');
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'
       );
-      next = ['/portal-management/list'];
+      next = ['../../../list'];
     }
     this.router.navigate(next, {
       relativeTo: this.activatedRoute

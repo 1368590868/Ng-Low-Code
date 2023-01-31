@@ -238,12 +238,8 @@ export class PortalEditFormComponent implements OnInit {
   ngOnInit(): void {
     if (this.portalItemService.currentPortalItemId) {
       forkJoin([
-        this.portalItemService.getGridFormConfig(
-          this.portalItemService.currentPortalItemId
-        ),
-        this.portalItemService.getDataSourceTableColumnsByPortalId(
-          this.portalItemService.currentPortalItemId
-        )
+        this.portalItemService.getGridFormConfig(),
+        this.portalItemService.getDataSourceTableColumnsByPortalId()
       ]).subscribe(res => {
         this.isLoading = false;
 
@@ -307,7 +303,7 @@ export class PortalEditFormComponent implements OnInit {
 
     if (this.portalItemService.currentPortalItemId) {
       this.portalItemService
-        .saveGridFormConfig(this.portalItemService.currentPortalItemId, data)
+        .saveGridFormConfig(data)
         .pipe(
           tap(res => {
             if (res && !res.isError) {
@@ -324,6 +320,7 @@ export class PortalEditFormComponent implements OnInit {
 
   saveSucess() {
     if (this.isSavingAndNext && this.portalItemService.currentPortalItemId) {
+      this.portalItemService.saveCurrentStep('basic');
       this.portalItemService
         .publish(this.portalItemService.currentPortalItemId)
         .subscribe(res => {
@@ -333,7 +330,7 @@ export class PortalEditFormComponent implements OnInit {
               'Save & Publish Successfully Completed.'
             );
 
-            this.router.navigate(['/portal-management/list'], {
+            this.router.navigate(['../../../list'], {
               relativeTo: this.activatedRoute
             });
           } else {
@@ -343,11 +340,12 @@ export class PortalEditFormComponent implements OnInit {
         });
     }
     if (this.isSavingAndExit) {
+      this.portalItemService.saveCurrentStep('form');
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'
       );
-      this.router.navigate(['/portal-management/list'], {
+      this.router.navigate(['../../../list'], {
         relativeTo: this.activatedRoute
       });
     }

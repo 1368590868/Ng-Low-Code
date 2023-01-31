@@ -138,15 +138,19 @@ export class PortalEditBasicComponent implements OnInit {
   ngOnInit(): void {
     // load basic information
     if (this.portalItemService.currentPortalItemId) {
-      this.portalItemService
-        .getPortalDetails(this.portalItemService.currentPortalItemId)
-        .subscribe(res => {
-          if (!res['parentId']) res['parentId'] = '<root>';
-          this.model = res;
+      this.portalItemService.getPortalDetails().subscribe(res => {
+        if (!res['parentId']) res['parentId'] = '<root>';
+        this.model = res;
 
-          // enable buttons after data loaded.
-          this.isLoading = false;
-        });
+        // enable buttons after data loaded.
+        this.isLoading = false;
+      });
+    } else {
+      this.model = {
+        ...this.model,
+        parentId: this.portalItemService.currentPortalItemParentFolder
+      };
+      this.isLoading = false;
     }
   }
 
@@ -159,11 +163,11 @@ export class PortalEditBasicComponent implements OnInit {
       this.isSaving = true;
       if (this.portalItemService.currentPortalItemId) {
         this.portalItemService
-          .updatePortalDetails(this.portalItemService.currentPortalItemId, data)
+          .updatePortalDetails(data)
           .pipe(
             tap(res => {
               if (res && !res.isError) {
-                this.saveSucess();
+                this.saveSucess(['../datasource']);
               }
 
               this.isSaving = false;
@@ -178,7 +182,10 @@ export class PortalEditBasicComponent implements OnInit {
           .pipe(
             tap(res => {
               if (res && !res.isError) {
-                this.saveSucess();
+                this.portalItemService.currentPortalItemId = res.result;
+                this.saveSucess([
+                  `../../edit/${this.portalItemService.currentPortalItemId}/datasource`
+                ]);
               }
               this.isSaving = false;
               this.isSavingAndExit = false;
@@ -200,15 +207,16 @@ export class PortalEditBasicComponent implements OnInit {
     this.editForm.onSubmit(new Event('submit'));
   }
 
-  saveSucess() {
-    let next: unknown[] = [];
-    if (this.isSavingAndNext) next = ['../datasource'];
+  saveSucess(next: unknown[]) {
+    if (this.isSavingAndNext) {
+      this.portalItemService.saveCurrentStep('datasource');
+    }
     if (this.isSavingAndExit) {
+      this.portalItemService.saveCurrentStep('basic');
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'
       );
-      next = ['/portal-management/list'];
     }
     this.router.navigate(next, {
       relativeTo: this.activatedRoute
@@ -216,7 +224,10 @@ export class PortalEditBasicComponent implements OnInit {
   }
 
   onBack() {
-    this.router.navigate(['/portal-management/list'], {
+    const next = this.portalItemService.currentPortalItemId
+      ? ['../../../list']
+      : ['../../list'];
+    this.router.navigate(next, {
       relativeTo: this.activatedRoute
     });
   }

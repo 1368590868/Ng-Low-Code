@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
-import { tap } from 'rxjs';
+import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/app.module';
 import {
   DataSourceConfig,
@@ -60,56 +60,43 @@ export class PortalEditDatasourceComponent implements OnInit {
   ngOnInit(): void {
     // get protal item datasource config
     if (this.portalItemService.currentPortalItemId) {
-      this.portalItemService
-        .getDataSourceConfig(this.portalItemService.currentPortalItemId)
-        .pipe(
-          tap(res => {
-            if (res) {
-              res.filters?.forEach(
-                x =>
-                  (x.matchOptions = this.getFilterMatchModeOptions(
-                    x.filterType
-                  ))
-              );
-              this.datasourceConfig = res;
-              this.selectedDbTable = `${res.tableSchema}.${res.tableName}`;
-              this.loadTableColumns(res.tableSchema, res.tableName);
-            }
-            this.isLoading = false;
-          })
-        )
-        .subscribe();
-    } else {
-      // redirect to list page is current id does not exist.
-      this.router.navigate(['/portal-management/list'], {
-        relativeTo: this.activatedRoute
+      forkJoin([
+        this.portalItemService.getDataSourceConfig(),
+        // load database tables
+        this.portalItemService.getDataSourceTables()
+      ]).subscribe(res => {
+        const dsConfig = res[0];
+        if (dsConfig && dsConfig.tableName) {
+          dsConfig.filters?.forEach(
+            x => (x.matchOptions = this.getFilterMatchModeOptions(x.filterType))
+          );
+          this.datasourceConfig = dsConfig;
+          this.selectedDbTable = `${dsConfig.tableSchema}.${dsConfig.tableName}`;
+        }
+
+        const tables = res[1];
+        // create label and value for dropdown
+        tables.forEach(x => {
+          x.label = `${x.tableSchema}.${x.tableName}`;
+          x.value = `${x.tableSchema}.${x.tableName}`;
+        });
+        this.dbTables = tables;
+
+        if (
+          !this.selectedDbTable ||
+          !tables.find(x => x.value === this.selectedDbTable)
+        ) {
+          // if no selectedDbTable or the selectedDbTable does not exist in the dropdown options.
+          // select the first by default.
+          this.selectedDbTable = tables[0].value;
+          this.datasourceConfig.tableName = tables[0].tableName;
+          this.datasourceConfig.tableSchema = tables[0].tableSchema;
+        }
+
+        this.loadTableColumns();
+        this.isLoading = false;
       });
     }
-
-    // load database tables
-    this.portalItemService
-      .getDataSourceTables()
-      .pipe(
-        tap(res => {
-          // create label and value for dropdown
-          res.forEach(x => {
-            x.label = `${x.tableSchema}.${x.tableName}`;
-            x.value = `${x.tableSchema}.${x.tableName}`;
-          });
-
-          this.dbTables = res;
-          if (
-            !this.selectedDbTable ||
-            !res.find(x => x.value === this.selectedDbTable)
-          ) {
-            // if no selectedDbTable or the selectedDbTable does not exist in the dropdown options.
-            // select the first by default.
-            this.selectedDbTable = res[0].value;
-            this.loadTableColumns(res[0].tableSchema, res[0].tableName);
-          }
-        })
-      )
-      .subscribe();
   }
 
   onTableNameChange({ value }: { value: string }) {
@@ -117,7 +104,7 @@ export class PortalEditDatasourceComponent implements OnInit {
     if (item) {
       this.datasourceConfig.tableName = item.tableName;
       this.datasourceConfig.tableSchema = item.tableSchema;
-      this.loadTableColumns(item.tableSchema, item.tableName);
+      this.loadTableColumns();
 
       // clear the filters and sortBy, as the database table has changed.
       this.datasourceConfig.filters = [];
@@ -125,7 +112,9 @@ export class PortalEditDatasourceComponent implements OnInit {
     }
   }
 
-  loadTableColumns(tableSchema: string, tableName: string) {
+  loadTableColumns() {
+    if (!this.selectedDbTable) return;
+    const [tableSchema, tableName] = this.selectedDbTable.split('.');
     this.portalItemService
       .getDataSourceTableColumns(tableSchema, tableName)
       .pipe(
@@ -170,7 +159,7 @@ export class PortalEditDatasourceComponent implements OnInit {
       });
 
       this.portalItemService
-        .saveDataSourceConfig(this.portalItemService.currentPortalItemId, data)
+        .saveDataSourceConfig(data)
         .pipe(
           tap(res => {
             if (res && !res.isError) {
@@ -188,13 +177,17 @@ export class PortalEditDatasourceComponent implements OnInit {
 
   saveSucess() {
     let next: unknown[] = [];
-    if (this.isSavingAndNext) next = ['../columns'];
+    if (this.isSavingAndNext) {
+      this.portalItemService.saveCurrentStep('columns');
+      next = ['../columns'];
+    }
     if (this.isSavingAndExit) {
+      this.portalItemService.saveCurrentStep('datasource');
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'
       );
-      next = ['/portal-management/list'];
+      next = ['../../../list'];
     }
     this.router.navigate(next, {
       relativeTo: this.activatedRoute
