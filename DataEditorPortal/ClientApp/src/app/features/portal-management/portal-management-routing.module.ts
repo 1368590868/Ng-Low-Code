@@ -26,13 +26,7 @@ const routes: Routes = [
   {
     path: 'add',
     component: PortalEditComponent,
-    children: [
-      { path: 'basic', component: PortalEditBasicComponent },
-      { path: 'datasource', component: PortalEditDatasourceComponent },
-      { path: 'columns', component: PortalEditColumnsComponent },
-      { path: 'search', component: PortalEditSearchComponent },
-      { path: 'form', component: PortalEditFormComponent }
-    ]
+    children: [{ path: 'basic', component: PortalEditBasicComponent }]
   }
 ];
 
