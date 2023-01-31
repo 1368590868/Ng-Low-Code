@@ -21,6 +21,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class SearchFieldConfig : FormFieldConfig
     {
+        public string filterType { get; set; }
         // search rule
         public SearchFieldFilterRule searchRule { get; set; }
     }
@@ -40,7 +41,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string width { get; set; }
         public string filterType { get; set; }
 
-        public string UIType { get; set; }
+        public bool sortable { get; set; }
 
         public int order { get; set; }
 
@@ -61,9 +62,13 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class DetailConfig
     {
+        public bool AllowAdd { get; set; } = true;
+        public bool AllowDelete { get; set; } = true;
+        public bool AllowEdit { get; set; } = true;
         public bool UseCustomAction { get; set; }
         public string CustomActionName { get; set; }
-        public List<FormFieldConfig> FormConfig { get; set; }
+
+        public List<FormFieldConfig> FormFields { get; set; }
 
         public string QueryText { get; set; }
         public string QueryForInsert { get; set; }

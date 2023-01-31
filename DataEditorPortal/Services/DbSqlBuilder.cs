@@ -335,7 +335,7 @@ namespace DataEditorPortal.Web.Services
 
                 var orderBy = config.SortBy.Count > 0 ? GenerateOrderClause(config.SortBy) : $"[{config.IdColumn}] ASC";
 
-                var queryText = $@"SELECT {columns} FROM dep.{config.TableName} WHERE {where} ##SEARCHES## ##FILTERS## ORDER BY {orderBy}";
+                var queryText = $@"SELECT {columns} FROM {config.TableSchema}.{config.TableName} WHERE {where} ##SEARCHES## ##FILTERS## ORDER BY {orderBy}";
 
                 return queryText;
             }
@@ -354,7 +354,7 @@ namespace DataEditorPortal.Web.Services
 
                 var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
 
-                var queryText = $@"SELECT {columns} FROM dep.{config.TableName} WHERE {where}";
+                var queryText = $@"SELECT {columns} FROM {config.TableSchema}.{config.TableName} WHERE {where}";
 
                 return queryText;
             }
@@ -375,7 +375,7 @@ namespace DataEditorPortal.Web.Services
 
                 var param = string.Join(",", config.Columns.Select(x => $"@{x}"));
 
-                var queryText = $@"INSERT INTO dep.{config.TableName} ({columns}) VALUES ({param})";
+                var queryText = $@"INSERT INTO {config.TableSchema}.{config.TableName} ({columns}) VALUES ({param})";
 
                 return queryText;
             }
@@ -397,7 +397,7 @@ namespace DataEditorPortal.Web.Services
 
                 var where = string.Join(" AND ", GenerateWhereClause(config.Filters));
 
-                var queryText = $@"UPDATE dep.{config.TableName} SET {sets} WHERE {where}";
+                var queryText = $@"UPDATE {config.TableSchema}.{config.TableName} SET {sets} WHERE {where}";
 
                 return queryText;
             }
@@ -416,7 +416,7 @@ namespace DataEditorPortal.Web.Services
 
                 var where = string.Join(" AND ", GenerateWhereClause(config.Filters));
 
-                var queryText = $@"DELETE FROM dep.{config.TableName} WHERE {where}";
+                var queryText = $@"DELETE FROM {config.TableSchema}.{config.TableName} WHERE {where}";
 
                 return queryText;
             }

@@ -19,8 +19,15 @@ namespace DataEditorPortal.Web.Services
     {
         List<DataSourceTable> GetDataSourceTables();
         List<DataSourceTableColumn> GetDataSourceTableColumns(string tableSchema, string tableName);
+        List<DataSourceTableColumn> GetDataSourceTableColumns(Guid id);
         DataSourceConfig GetDataSourceConfig(Guid id);
         bool SaveDataSourceConfig(Guid id, DataSourceConfig model);
+        List<GridColConfig> GetGridColumnsConfig(Guid id);
+        bool SaveGridColumnsConfig(Guid id, List<GridColConfig> model);
+        List<SearchFieldConfig> GetGridSearchConfig(Guid id);
+        bool SaveGridSearchConfig(Guid id, List<SearchFieldConfig> model);
+        DetailConfig GetGridFormConfig(Guid id);
+        bool SaveGridFormConfig(Guid id, DetailConfig model);
     }
 
     public class PortalItemService : IPortalItemService
@@ -110,6 +117,16 @@ namespace DataEditorPortal.Web.Services
             return result;
         }
 
+        public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid id)
+        {
+            var datasourceConfig = GetDataSourceConfig(id);
+            if (datasourceConfig == null)
+                throw new DepException("DataSource Config is empty for Portal Item: " + id);
+
+            return GetDataSourceTableColumns(datasourceConfig.TableSchema, datasourceConfig.TableName);
+        }
+
+
         public DataSourceConfig GetDataSourceConfig(Guid id)
         {
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
@@ -121,7 +138,7 @@ namespace DataEditorPortal.Web.Services
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
-            return JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            return !string.IsNullOrEmpty(config.DataSourceConfig) ? JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig) : new DataSourceConfig();
         }
 
         public bool SaveDataSourceConfig(Guid id, DataSourceConfig model)
@@ -136,6 +153,130 @@ namespace DataEditorPortal.Web.Services
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
             config.DataSourceConfig = JsonSerializer.Serialize(model);
+
+            _depDbContext.SaveChanges();
+
+            return true;
+        }
+
+        public List<GridColConfig> GetGridColumnsConfig(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            if (!string.IsNullOrEmpty(config.ColumnsConfig))
+            {
+                return JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
+            }
+            else
+            {
+                var datasourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+                var columns = GetDataSourceTableColumns(datasourceConfig.TableSchema, datasourceConfig.TableName);
+                return columns.Select(x => new GridColConfig()
+                {
+                    field = x.ColumnName,
+                    header = x.ColumnName,
+                    width = "250px",
+                    filterType = x.FilterType,
+                    sortable = true
+                }).ToList();
+            }
+        }
+
+        public bool SaveGridColumnsConfig(Guid id, List<GridColConfig> model)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            config.ColumnsConfig = JsonSerializer.Serialize(model);
+            _depDbContext.SaveChanges();
+
+            return true;
+        }
+
+        public List<SearchFieldConfig> GetGridSearchConfig(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            if (!string.IsNullOrEmpty(config.SearchConfig))
+            {
+                return JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
+            }
+            else
+            {
+                return new List<SearchFieldConfig>();
+            }
+        }
+
+        public bool SaveGridSearchConfig(Guid id, List<SearchFieldConfig> model)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            config.SearchConfig = JsonSerializer.Serialize(model);
+            _depDbContext.SaveChanges();
+
+            return true;
+        }
+
+        public DetailConfig GetGridFormConfig(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            if (!string.IsNullOrEmpty(config.DetailConfig))
+            {
+                return JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+            }
+            else
+            {
+                return new DetailConfig();
+            }
+        }
+
+        public bool SaveGridFormConfig(Guid id, DetailConfig model)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            config.DetailConfig = JsonSerializer.Serialize(model);
             _depDbContext.SaveChanges();
 
             return true;

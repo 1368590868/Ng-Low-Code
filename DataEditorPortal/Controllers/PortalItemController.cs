@@ -222,16 +222,23 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("datasource/tables")]
-        public List<DataSourceTable> GetDataTables()
+        public List<DataSourceTable> GetDataSourceTables()
         {
             return _portalItemService.GetDataSourceTables();
         }
 
         [HttpGet]
         [Route("datasource/{schema}/{tableName}/columns")]
-        public List<DataSourceTableColumn> GetDataTables(string schema, string tableName)
+        public List<DataSourceTableColumn> GetDataSourceTableColumns(string schema, string tableName)
         {
             return _portalItemService.GetDataSourceTableColumns(schema, tableName);
+        }
+
+        [HttpGet]
+        [Route("{id}/datasource/columns")]
+        public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid id)
+        {
+            return _portalItemService.GetDataSourceTableColumns(id);
         }
 
         [HttpGet]
@@ -246,6 +253,60 @@ namespace DataEditorPortal.Web.Controllers
         public bool SaveDataSourceConfig(Guid id, DataSourceConfig model)
         {
             return _portalItemService.SaveDataSourceConfig(id, model);
+        }
+
+        #endregion
+
+        #region Grid Columns
+
+        [HttpGet]
+        [Route("{id}/grid-columns")]
+        public List<GridColConfig> GetGridColumnsConfig(Guid id)
+        {
+            return _portalItemService.GetGridColumnsConfig(id);
+        }
+
+        [HttpPost]
+        [Route("{id}/grid-columns")]
+        public bool SaveGridColumnsConfig(Guid id, List<GridColConfig> model)
+        {
+            return _portalItemService.SaveGridColumnsConfig(id, model);
+        }
+
+        #endregion
+
+        #region Grid Search
+
+        [HttpGet]
+        [Route("{id}/grid-search")]
+        public List<SearchFieldConfig> GetGridSearchConfig(Guid id)
+        {
+            return _portalItemService.GetGridSearchConfig(id);
+        }
+
+        [HttpPost]
+        [Route("{id}/grid-search")]
+        public bool SaveGridSearchConfig(Guid id, List<SearchFieldConfig> model)
+        {
+            return _portalItemService.SaveGridSearchConfig(id, model);
+        }
+
+        #endregion
+
+        #region Grid Form
+
+        [HttpGet]
+        [Route("{id}/grid-form")]
+        public DetailConfig GetGridFormConfig(Guid id)
+        {
+            return _portalItemService.GetGridFormConfig(id);
+        }
+
+        [HttpPost]
+        [Route("{id}/grid-form")]
+        public bool SaveGridFormConfig(Guid id, DetailConfig model)
+        {
+            return _portalItemService.SaveGridFormConfig(id, model);
         }
 
         #endregion

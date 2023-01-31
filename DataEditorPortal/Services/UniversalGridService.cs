@@ -293,7 +293,7 @@ namespace DataEditorPortal.Web.Services
                 new DataSourceConfig()
                 {
                     TableName = dataSourceConfig.TableName,
-                    Columns = detailConfig.FormConfig.Select(x => x.key).ToList(),
+                    Columns = detailConfig.FormFields.Select(x => x.key).ToList(),
                     Filters = new List<FilterParam>() {
                         new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "equals", value = id }
                     },
@@ -349,7 +349,7 @@ namespace DataEditorPortal.Web.Services
 
             var result = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
 
-            return result.FormConfig;
+            return result.FormFields;
         }
 
         public bool AddGridData(string name, Dictionary<string, object> model)
@@ -367,7 +367,7 @@ namespace DataEditorPortal.Web.Services
                 throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }
 
-            var columns = detailConfig.FormConfig
+            var columns = detailConfig.FormFields
                 .Select(x => x.key)
                 .Where(x => model.Keys.Contains(x) && model[x] != null).ToList();
 
@@ -424,14 +424,14 @@ namespace DataEditorPortal.Web.Services
                 throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }
 
-            var columns = detailConfig.FormConfig
+            var columns = detailConfig.FormFields
                 .Select(x => x.key)
                 .Where(x => model.Keys.Contains(x) && model[x] != null).ToList();
 
             var queryText = _dbSqlBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
             {
                 TableName = dataSourceConfig.TableName,
-                Columns = detailConfig.FormConfig.Select(x => x.key).ToList(),
+                Columns = detailConfig.FormFields.Select(x => x.key).ToList(),
                 Filters = new List<FilterParam>()
                 {
                     new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "equals", value = id }
