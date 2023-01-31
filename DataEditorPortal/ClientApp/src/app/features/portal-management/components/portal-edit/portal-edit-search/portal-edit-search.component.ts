@@ -5,7 +5,7 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PrimeNGConfig } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
 import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
-import { NotifyService } from 'src/app/app.module';
+import { NotifyService } from 'src/app/core';
 import { GridSearchField } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 

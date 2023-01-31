@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { forkJoin, tap } from 'rxjs';
-import { NotifyService } from 'src/app/app.module';
+import { NotifyService } from 'src/app/core';
 import {
   DataSourceConfig,
   DataSourceFilter,

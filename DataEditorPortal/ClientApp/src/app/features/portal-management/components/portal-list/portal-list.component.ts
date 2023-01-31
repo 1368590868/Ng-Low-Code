@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { tap } from 'rxjs';
-import { NotifyService } from 'src/app/app.module';
+import { NotifyService } from 'src/app/core';
 import { PortalItem, PortalItemData } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
 import { AddPortalDialogComponent } from './add-portal-dialog/add-portal-dialog.component';

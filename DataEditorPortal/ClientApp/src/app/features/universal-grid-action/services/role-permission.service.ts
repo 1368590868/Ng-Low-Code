@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { ApiResponse } from 'src/app/core/models/api-response';
+import { ApiResponse } from 'src/app/core';
 import {
   Role,
   Permisstion,

@@ -3,7 +3,7 @@ import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { tap } from 'rxjs';
-import { NotifyService } from 'src/app/app.module';
+import { NotifyService } from 'src/app/core';
 import { PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 

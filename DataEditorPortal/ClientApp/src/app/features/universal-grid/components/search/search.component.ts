@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
-import { NgxFormlyService } from 'src/app/core/services/ngx-formly.service';
+import { NgxFormlyService } from 'src/app/core';
 import { SearchParam } from '../../models/grid-types';
 import { GridTableService } from '../../services/grid-table.service';
 

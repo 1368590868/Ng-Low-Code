@@ -1,19 +1,19 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AboutComponent } from './core/components/about/about.component';
-import { ContactComponent } from './core/components/contact/contact.component';
-import { ErrorPageComponent } from './core/components/error-page/error-page.component';
-import { HomeComponent } from './core/components/home/home.component';
-import { LoginComponent } from './core/components/login/login.component';
-import { TileComponent } from './core/components/tile/tile.component';
-import { RouterGuard } from './core/guards/router.guard';
+import {
+  AboutComponent,
+  ContactComponent,
+  ErrorPageComponent,
+  LoginComponent,
+  RouterGuard,
+  TileComponent
+} from './core';
 
 const routes: Routes = [
   { path: '', component: TileComponent, canActivate: [RouterGuard] },
   { path: 'about', component: AboutComponent, canActivate: [RouterGuard] },
   { path: 'contact', component: ContactComponent, canActivate: [RouterGuard] },
   { path: 'login', component: LoginComponent },
-
   {
     path: 'portal-item/:name',
     loadChildren: () =>

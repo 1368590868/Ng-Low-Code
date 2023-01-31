@@ -1,8 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { delay, map, Observable, of, Subject } from 'rxjs';
-import { NotifyService } from 'src/app/app.module';
-import { ApiResponse } from 'src/app/core/models/api-response';
+import { ApiResponse, NotifyService } from 'src/app/core';
 import {
   DataSourceConfig,
   DataSourceTable,

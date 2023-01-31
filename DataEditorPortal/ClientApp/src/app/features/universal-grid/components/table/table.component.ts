@@ -12,7 +12,7 @@ import {
 } from '../../models/grid-types';
 import { Table } from 'primeng/table';
 import { TableState } from 'primeng/api';
-import { NotifyService } from 'src/app/app.module';
+import { NotifyService } from 'src/app/core';
 
 @Component({
   selector: 'app-table',

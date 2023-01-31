@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { NotifyService } from 'src/app/core/utils/notify.service';
+import { NotifyService } from 'src/app/core';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import {
   ManageRoleForm,
