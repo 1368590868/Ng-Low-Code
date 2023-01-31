@@ -1,10 +1,17 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Inject,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PickList } from 'primeng/picklist';
 import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
 import { NotifyService } from 'src/app/app.module';
+import { GridActionConfig } from 'src/app/features/universal-grid-action/universal-grid-action.module';
 import { GridFormField, GridFormConfig } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 
@@ -211,13 +218,22 @@ export class PortalEditFormComponent implements OnInit {
     }
   ];
 
+  customActions: { label: string | undefined; value: string }[] = [];
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
     private portalItemService: PortalItemService,
-    private notifyService: NotifyService
-  ) {}
+    private notifyService: NotifyService,
+    @Inject('GRID_ACTION_CONFIG') public customActionsConfig: GridActionConfig[]
+  ) {
+    this.customActions = customActionsConfig
+      .filter(x => x.isCustom)
+      .map(x => {
+        return { label: x.label, value: x.name };
+      });
+  }
 
   ngOnInit(): void {
     if (this.portalItemService.currentPortalItemId) {

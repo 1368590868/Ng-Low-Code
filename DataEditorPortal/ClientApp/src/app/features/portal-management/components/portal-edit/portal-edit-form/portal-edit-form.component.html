@@ -28,7 +28,10 @@
     <div *ngIf="formConfig.allowEdit">
       <div class="flex flex-column" *ngIf="formConfig.useCustomForm">
         <label class="line-height-3">Select Custom Form</label>
-        <p-dropdown styleClass="w-15rem"></p-dropdown>
+        <p-dropdown
+          [(ngModel)]="formConfig.customActionName"
+          styleClass="w-15rem"
+          [options]="customActions"></p-dropdown>
       </div>
       <div class="flex" *ngIf="!formConfig.useCustomForm">
         <p-pickList

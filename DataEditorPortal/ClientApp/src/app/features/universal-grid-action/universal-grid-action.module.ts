@@ -48,7 +48,108 @@ import { UserRoleActionComponent } from './components/user-role-action/user-role
 import { UserPermissionComponent } from './components/user-permission-action/user-permission-action.component';
 import { FormlyChipWrapperModule } from '../ngx-formly/chip/chip.module';
 
-export * from './models/grid-config';
+const GRID_ACTION_CONFIG = [
+  {
+    name: 'add-record',
+    component: EditRecordActionComponent,
+    wrapper: {
+      dialogStyle: { width: '40rem' },
+      okText: 'Add'
+    },
+    props: {
+      isAddForm: true
+    }
+  },
+  {
+    name: 'edit-record',
+    requireGridRowSelected: true,
+    component: EditRecordActionComponent,
+    wrapper: {
+      dialogStyle: { width: '40rem' },
+      okText: 'Update'
+    }
+  },
+  {
+    name: 'view-record',
+    requireGridRowSelected: true,
+    component: ViewRecordActionComponent,
+    wrapper: {
+      header: 'View Info',
+      cancelText: '',
+      dialogStyle: { width: '40rem' }
+    }
+  },
+  {
+    name: 'export-excel',
+    component: ExportExcelActionComponent,
+    wrapper: {
+      header: 'Export to Excel',
+      cancelText: 'Cancel',
+      okText: 'Export'
+    }
+  },
+  {
+    name: 'remove-record',
+    requireGridRowSelected: true,
+    component: RemoveActionComponent,
+    wrapper: {
+      header: 'Delete Confirmation',
+      cancelText: 'No',
+      okText: 'Yes'
+    }
+  },
+  {
+    name: 'user-manager',
+    label: 'User Manager',
+    isCustom: true,
+    requireGridRowSelected: false,
+    component: UserManagerActionComponent,
+    wrapper: {
+      header: 'User Manager',
+      dialogStyle: { width: '40rem' },
+      cancelText: 'No',
+      okText: 'Yes'
+    }
+  },
+  {
+    name: 'add-role',
+    label: 'Role Manager',
+    isCustom: true,
+    requireGridRowSelected: false,
+    component: ManagerRoleComponent,
+    wrapper: {
+      header: 'Manage Roles',
+      dialogStyle: { width: '40rem' },
+      cancelText: 'No',
+      okText: 'Yes'
+    }
+  },
+  {
+    name: 'edit-role',
+    label: 'Edit User Roles',
+    isCustom: true,
+    requireGridRowSelected: true,
+    component: UserRoleActionComponent,
+    wrapper: {
+      header: 'Edit Roles',
+      cancelText: 'No',
+      okText: 'Yes'
+    }
+  },
+  {
+    name: 'edit-permission',
+    label: 'Edit User Permissions',
+    isCustom: true,
+    requireGridRowSelected: true,
+    component: UserPermissionComponent,
+    wrapper: {
+      dialogStyle: { width: '40rem' },
+      header: 'Edit Permission',
+      cancelText: 'No',
+      okText: 'Yes'
+    }
+  }
+];
 
 @NgModule({
   declarations: [
@@ -107,101 +208,10 @@ export * from './models/grid-config';
   providers: [
     {
       provide: 'GRID_ACTION_CONFIG',
-      useValue: [
-        {
-          name: 'add-record',
-          component: EditRecordActionComponent,
-          wrapper: {
-            dialogStyle: { width: '40rem' },
-            okText: 'Add'
-          },
-          props: {
-            isAddForm: true
-          }
-        },
-        {
-          name: 'edit-record',
-          requireGridRowSelected: true,
-          component: EditRecordActionComponent,
-          wrapper: {
-            dialogStyle: { width: '40rem' },
-            okText: 'Update'
-          }
-        },
-        {
-          name: 'view-record',
-          requireGridRowSelected: true,
-          component: ViewRecordActionComponent,
-          wrapper: {
-            header: 'View Info',
-            cancelText: '',
-            dialogStyle: { width: '40rem' }
-          }
-        },
-        {
-          name: 'export-excel',
-          component: ExportExcelActionComponent,
-          wrapper: {
-            header: 'Export to Excel',
-            cancelText: 'Cancel',
-            okText: 'Export'
-          }
-        },
-        {
-          name: 'remove-record',
-          requireGridRowSelected: true,
-          component: RemoveActionComponent,
-          wrapper: {
-            header: 'Delete Confirmation',
-            cancelText: 'No',
-            okText: 'Yes'
-          }
-        },
-        {
-          name: 'user-manager',
-          requireGridRowSelected: false,
-          component: UserManagerActionComponent,
-          wrapper: {
-            header: 'User Manager',
-            dialogStyle: { width: '40rem' },
-            cancelText: 'No',
-            okText: 'Yes'
-          }
-        },
-        {
-          name: 'add-role',
-          requireGridRowSelected: false,
-          component: ManagerRoleComponent,
-          wrapper: {
-            header: 'Manage Roles',
-            dialogStyle: { width: '40rem' },
-            cancelText: 'No',
-            okText: 'Yes'
-          }
-        },
-        {
-          name: 'edit-role',
-          requireGridRowSelected: true,
-          component: UserRoleActionComponent,
-          wrapper: {
-            header: 'Edit Roles',
-            cancelText: 'No',
-            okText: 'Yes'
-          }
-        },
-        {
-          name: 'edit-permission',
-          requireGridRowSelected: true,
-          component: UserPermissionComponent,
-          wrapper: {
-            dialogStyle: { width: '40rem' },
-            header: 'Edit Permission',
-            cancelText: 'No',
-            okText: 'Yes'
-          }
-        }
-      ]
+      useValue: GRID_ACTION_CONFIG
     }
   ]
 })
 export class UniversalGridActionModule {}
+
+export * from './models/grid-config';
