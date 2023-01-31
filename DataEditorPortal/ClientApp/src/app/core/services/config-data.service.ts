@@ -30,4 +30,9 @@ export class ConfigDataService {
       .post<ApiResponse<any>>(`${this._apiUrl}site/menus`, null)
       .pipe(map(res => res.result));
   }
+  getHomeMenus(): Observable<any> {
+    return this.http
+      .post<ApiResponse<any>>(`${this._apiUrl}site/menus`, null)
+      .pipe(map(res => res.result));
+  }
 }
