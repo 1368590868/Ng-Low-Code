@@ -1,37 +1,117 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { PrimeNGConfig } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
-import { distinctUntilChanged, tap } from 'rxjs';
+import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
+import { NotifyService } from 'src/app/app.module';
+import { GridFormField, GridFormConfig } from '../../../models/portal-item';
+import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
   selector: 'app-portal-edit-form',
   templateUrl: './portal-edit-form.component.html',
   styleUrls: ['./portal-edit-form.component.scss']
 })
-export class PortalEditFormComponent {
+export class PortalEditFormComponent implements OnInit {
+  isLoading = true;
   isSaving = false;
+  isSavingAndNext = false;
+  isSavingAndExit = false;
 
-  sourceColumns: any[] = [
-    {
-      name: 'Name'
-    },
-    {
-      name: 'UserId'
-    },
-    {
-      name: 'Email'
-    }
-  ];
-  targetColumns: any[] = [];
+  formConfig: GridFormConfig = {
+    allowEdit: true,
+    allowDelete: true
+  };
+  sourceColumns: GridFormField[] = [];
+  targetColumns: GridFormField[] = [];
   @ViewChild('pickList') pickList!: PickList;
 
+  controls: { label: string; value: string; filterType: string }[] = [
+    {
+      label: 'Checkbox',
+      value: 'checkbox',
+      filterType: 'boolean'
+    },
+    {
+      label: 'Checkbox List',
+      value: 'checkboxList',
+      filterType: 'array'
+    },
+    {
+      label: 'Date',
+      value: 'datepicker',
+      filterType: 'date'
+    },
+    {
+      label: 'Dropdown',
+      value: 'select',
+      filterType: 'text'
+    },
+    {
+      label: 'Multiple Dropdown',
+      value: 'multiSelect',
+      filterType: 'array'
+    },
+    {
+      label: 'Radio List',
+      value: 'radio',
+      filterType: 'text'
+    },
+    {
+      label: 'Textbox',
+      value: 'input',
+      filterType: 'text'
+    },
+    {
+      label: 'Textarea',
+      value: 'textarea',
+      filterType: 'text'
+    },
+    {
+      label: 'Textbox',
+      value: 'input',
+      filterType: 'numeric'
+    }
+  ];
   form = new FormGroup({});
   options: FormlyFormOptions = {};
   model: any = {};
   fields: FormlyFieldConfig[] = [
+    {
+      key: 'filterType',
+      type: 'input',
+      hooks: {
+        onInit: field => {
+          field.formControl?.valueChanges
+            .pipe(
+              distinctUntilChanged(),
+              startWith(field.formControl.value),
+              tap(value => {
+                if (field.parent?.get) {
+                  const typeField = field.parent?.get('type');
+                  if (typeField && typeField.props) {
+                    const result = this.controls.filter(
+                      x => x.filterType === value
+                    );
+
+                    typeField.props.options = result;
+
+                    if (
+                      !result.find(
+                        o => o.value === typeField.formControl?.value
+                      )
+                    )
+                      typeField.formControl?.setValue(result[0].value);
+                  }
+                }
+              })
+            )
+            .subscribe();
+        }
+      },
+      hide: true
+    },
     {
       key: 'type',
       type: 'select',
@@ -40,41 +120,7 @@ export class PortalEditFormComponent {
         label: 'Control Type',
         placeholder: 'Please Select',
         showClear: false,
-        required: true,
-        options: [
-          {
-            label: 'Checkbox',
-            value: 'checkbox'
-          },
-          {
-            label: 'Checkbox List',
-            value: 'checkboxList'
-          },
-          {
-            label: 'Date Picker',
-            value: 'datepicker'
-          },
-          {
-            label: 'Dropdown',
-            value: 'select'
-          },
-          {
-            label: 'Multiple Dropdown',
-            value: 'multiSelect'
-          },
-          {
-            label: 'Radio List',
-            value: 'radio'
-          },
-          {
-            label: 'Textbox',
-            value: 'input'
-          },
-          {
-            label: 'Textarea',
-            value: 'textarea'
-          }
-        ]
+        required: true
       },
       hooks: {
         onInit: field => {
@@ -165,63 +211,140 @@ export class PortalEditFormComponent {
     }
   ];
 
-  useCustomForm = false;
-  allowEdit = true;
-  allowAdd = true;
-  allowDelete = true;
-
   constructor(
-    private changeDetectorRef: ChangeDetectorRef,
-    private primeNGConfig: PrimeNGConfig,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private changeDetectorRef: ChangeDetectorRef,
+    private portalItemService: PortalItemService,
+    private notifyService: NotifyService
   ) {}
 
   ngOnInit(): void {
-    console.log('test');
+    if (this.portalItemService.currentPortalItemId) {
+      forkJoin([
+        this.portalItemService.getGridFormConfig(
+          this.portalItemService.currentPortalItemId
+        ),
+        this.portalItemService.getDataSourceTableColumnsByPortalId(
+          this.portalItemService.currentPortalItemId
+        )
+      ]).subscribe(res => {
+        this.isLoading = false;
+
+        this.formConfig = res[0];
+        if (res[0].formFields) {
+          this.targetColumns = res[0].formFields.map<GridFormField>(x => {
+            return {
+              ...x,
+              selected: true
+            };
+          });
+        }
+        this.sourceColumns = res[1]
+          .filter(s => !this.targetColumns.find(t => t.key === s.columnName))
+          .map<GridFormField>(x => {
+            const result = this.controls.filter(
+              c => c.filterType === x.filterType
+            );
+            return {
+              key: x.columnName,
+              type: result[0].value,
+              props: {
+                label: x.columnName,
+                placeholder: x.columnName
+              },
+              filterType: x.filterType
+            };
+          });
+      });
+    }
   }
 
-  onMoveToTarget(event: any) {
-    event.items.forEach((item: any) => {
+  onMoveToTarget({ items }: { items: GridFormField[] }) {
+    items.forEach(item => {
       item.selected = true;
-      item.key = item.name;
-      item.type = 'input';
-      item.props = {
-        label: item.name,
-        placeholder: item.name,
-        required: true
-      };
     });
   }
 
-  onMoveToSource(event: any) {
-    event.items.forEach((item: any) => {
+  onMoveToSource({ items }: { items: GridFormField[] }) {
+    items.forEach(item => {
       item.selected = false;
-      item.key = undefined;
-      item.type = undefined;
-      item.props = undefined;
     });
-    if (event.items.find((x: any) => x.name === this.model.name)) {
+    if (items.find(x => x.key === this.model.key)) {
       this.model = {};
     }
   }
 
-  onTargetSelect(event: any) {
-    if (event.items.length === 1) {
-      this.model = event.items[0];
+  onTargetSelect({ items }: { items: GridFormField[] }) {
+    if (items.length === 1) {
+      this.model = items[0];
     } else {
       this.model = {};
     }
   }
 
-  onSaveAndNext() {
+  saveGridFormConfig() {
     this.isSaving = true;
-    console.log(this.targetColumns);
-    setTimeout(() => {
-      this.router.navigate(['../form'], {
+    const data = JSON.parse(JSON.stringify(this.formConfig)) as GridFormConfig;
+    if (data.allowEdit && !data.useCustomForm)
+      data.formFields = this.targetColumns;
+
+    if (this.portalItemService.currentPortalItemId) {
+      this.portalItemService
+        .saveGridFormConfig(this.portalItemService.currentPortalItemId, data)
+        .pipe(
+          tap(res => {
+            if (res && !res.isError) {
+              this.saveSucess();
+            }
+            this.isSaving = false;
+            this.isSavingAndExit = false;
+            this.isSavingAndNext = false;
+          })
+        )
+        .subscribe();
+    }
+  }
+
+  saveSucess() {
+    if (this.isSavingAndNext && this.portalItemService.currentPortalItemId) {
+      this.portalItemService
+        .publish(this.portalItemService.currentPortalItemId)
+        .subscribe(res => {
+          if (!res.isError) {
+            this.notifyService.notifySuccess(
+              'Success',
+              'Save & Publish Successfully Completed.'
+            );
+
+            this.router.navigate(['/portal-management/list'], {
+              relativeTo: this.activatedRoute
+            });
+          } else {
+            this.isSavingAndNext = false;
+            this.isSaving = false;
+          }
+        });
+    }
+    if (this.isSavingAndExit) {
+      this.notifyService.notifySuccess(
+        'Success',
+        'Save Draft Successfully Completed.'
+      );
+      this.router.navigate(['/portal-management/list'], {
         relativeTo: this.activatedRoute
       });
-    }, 1000);
+    }
+  }
+
+  onSaveAndNext() {
+    this.isSavingAndNext = true;
+    this.saveGridFormConfig();
+  }
+
+  onSaveAndExit() {
+    this.isSavingAndExit = true;
+    this.saveGridFormConfig();
   }
 
   onBack() {
@@ -230,7 +353,7 @@ export class PortalEditFormComponent {
     });
   }
 
-  cloneColumn(column: any) {
+  cloneColumn(column: GridFormField) {
     return [JSON.parse(JSON.stringify(column))];
   }
 }

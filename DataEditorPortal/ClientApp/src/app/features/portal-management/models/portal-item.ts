@@ -52,6 +52,7 @@ export interface GridColumn {
   uiType?: string;
   order?: number;
   aggregate?: boolean;
+  selected?: boolean;
 }
 
 export interface GridSearchField {
@@ -64,4 +65,22 @@ export interface GridSearchField {
     matchMode?: string;
   };
   filterType: string;
+}
+
+export interface GridFormField {
+  key: string;
+  type: string;
+  defaultValue?: any;
+  props: { [name: string]: string };
+  selected?: boolean;
+  filterType: string;
+}
+
+export interface GridFormConfig {
+  allowEdit?: boolean;
+  allowDelete?: boolean;
+  allowExport?: boolean;
+  useCustomForm?: boolean;
+  customFormAction?: string;
+  formFields?: GridFormField[];
 }

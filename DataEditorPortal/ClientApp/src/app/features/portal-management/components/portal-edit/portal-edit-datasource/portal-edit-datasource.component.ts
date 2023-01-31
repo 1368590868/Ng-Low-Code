@@ -1,11 +1,12 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
-import { filter, tap } from 'rxjs';
+import { tap } from 'rxjs';
 import { NotifyService } from 'src/app/app.module';
 import {
   DataSourceConfig,
   DataSourceFilter,
+  DataSourceSortBy,
   DataSourceTable,
   DataSourceTableColumn
 } from '../../../models/portal-item';
@@ -29,18 +30,18 @@ export class PortalEditDatasourceComponent implements OnInit {
     filters: [],
     sortBy: []
   };
-  selectedDbTable: any;
+  selectedDbTable?: string;
 
   dbTables: DataSourceTable[] = [];
   dbTableColumns: DataSourceTableColumn[] = [];
-  dbOrderOptions: any[] = [
+  dbOrderOptions: { label: string; value: string }[] = [
     {
       label: 'ASC',
-      value: 0
+      value: '0'
     },
     {
       label: 'DESC',
-      value: 1
+      value: '1'
     }
   ];
 
@@ -111,8 +112,8 @@ export class PortalEditDatasourceComponent implements OnInit {
       .subscribe();
   }
 
-  onTableNameChange(event: any) {
-    const item = this.dbTables.find(x => x.value === event.value);
+  onTableNameChange({ value }: { value: string }) {
+    const item = this.dbTables.find(x => x.value === value);
     if (item) {
       this.datasourceConfig.tableName = item.tableName;
       this.datasourceConfig.tableSchema = item.tableSchema;
@@ -124,7 +125,7 @@ export class PortalEditDatasourceComponent implements OnInit {
     }
   }
 
-  loadTableColumns(tableSchema: any, tableName: any) {
+  loadTableColumns(tableSchema: string, tableName: string) {
     this.portalItemService
       .getDataSourceTableColumns(tableSchema, tableName)
       .pipe(
@@ -188,7 +189,13 @@ export class PortalEditDatasourceComponent implements OnInit {
   saveSucess() {
     let next: unknown[] = [];
     if (this.isSavingAndNext) next = ['../columns'];
-    if (this.isSavingAndExit) next = ['/portal-management/list'];
+    if (this.isSavingAndExit) {
+      this.notifyService.notifySuccess(
+        'Success',
+        'Save Draft Successfully Completed.'
+      );
+      next = ['/portal-management/list'];
+    }
     this.router.navigate(next, {
       relativeTo: this.activatedRoute
     });
@@ -202,7 +209,7 @@ export class PortalEditDatasourceComponent implements OnInit {
 
   onSaveAndExit() {
     if (!this.validate()) return;
-    this.isSavingAndNext = true;
+    this.isSavingAndExit = true;
     this.saveDatasourceConfig();
   }
 
@@ -247,7 +254,7 @@ export class PortalEditDatasourceComponent implements OnInit {
     this.datasourceConfig.filters = newFilter;
   }
 
-  onFilterColumnChange({ value: value }: any, filter: DataSourceFilter) {
+  onFilterColumnChange({ value }: { value: string }, filter: DataSourceFilter) {
     const column = this.dbTableColumns.find(x => x.columnName === value);
     if (column) {
       const matchOptions = this.getFilterMatchModeOptions(column.filterType);
@@ -279,7 +286,7 @@ export class PortalEditDatasourceComponent implements OnInit {
     this.datasourceConfig.sortBy = newSortBy;
   }
 
-  onRemoveSortColumn(sortByColumn: any) {
+  onRemoveSortColumn(sortByColumn: DataSourceSortBy) {
     const newSortBy = [...this.datasourceConfig.sortBy];
     const index = newSortBy.indexOf(sortByColumn);
     newSortBy.splice(index, 1);

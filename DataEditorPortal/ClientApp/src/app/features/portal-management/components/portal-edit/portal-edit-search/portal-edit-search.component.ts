@@ -5,6 +5,7 @@ import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PrimeNGConfig } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
 import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
+import { NotifyService } from 'src/app/app.module';
 import { GridSearchField } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 
@@ -168,7 +169,8 @@ export class PortalEditSearchComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
-    private portalItemService: PortalItemService
+    private portalItemService: PortalItemService,
+    private notifyService: NotifyService
   ) {}
 
   ngOnInit(): void {
@@ -211,24 +213,24 @@ export class PortalEditSearchComponent implements OnInit {
     }
   }
 
-  onMoveToTarget(event: { items: GridSearchField[] }) {
-    event.items.forEach(item => {
+  onMoveToTarget({ items }: { items: GridSearchField[] }) {
+    items.forEach(item => {
       item.selected = true;
     });
   }
 
-  onMoveToSource(event: { items: GridSearchField[] }) {
-    event.items.forEach(item => {
+  onMoveToSource({ items }: { items: GridSearchField[] }) {
+    items.forEach(item => {
       item.selected = false;
     });
-    if (event.items.find(x => x.key === this.model.key)) {
+    if (items.find(x => x.key === this.model.key)) {
       this.model = {};
     }
   }
 
-  onTargetSelect(event: { items: GridSearchField[] }) {
-    if (event.items.length === 1) {
-      this.model = event.items[0];
+  onTargetSelect({ items }: { items: GridSearchField[] }) {
+    if (items.length === 1) {
+      this.model = items[0];
     } else {
       this.model = {};
     }
@@ -260,7 +262,13 @@ export class PortalEditSearchComponent implements OnInit {
   saveSucess() {
     let next: unknown[] = [];
     if (this.isSavingAndNext) next = ['../form'];
-    if (this.isSavingAndExit) next = ['/portal-management/list'];
+    if (this.isSavingAndExit) {
+      this.notifyService.notifySuccess(
+        'Success',
+        'Save Draft Successfully Completed.'
+      );
+      next = ['/portal-management/list'];
+    }
     this.router.navigate(next, {
       relativeTo: this.activatedRoute
     });

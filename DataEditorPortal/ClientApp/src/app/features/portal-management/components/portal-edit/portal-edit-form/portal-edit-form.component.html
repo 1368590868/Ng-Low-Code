@@ -7,28 +7,30 @@
   <div class="w-full pt-1 pb-1">
     <div class="flex align-items-center pb-1">
       <div class="flex align-items-center mr-4">
-        <p-inputSwitch class="mr-2"></p-inputSwitch>
+        <p-inputSwitch
+          class="mr-2"
+          [(ngModel)]="formConfig.allowDelete"></p-inputSwitch>
         Allow Delete
       </div>
       <div class="flex align-items-center mr-4">
-        <p-inputSwitch class="mr-2"></p-inputSwitch> Allow Add New
+        <p-inputSwitch class="mr-2" [(ngModel)]="formConfig.allowEdit">
+        </p-inputSwitch>
+        Allow Add & Edit
       </div>
-      <div class="flex align-items-center mr-4">
-        <p-inputSwitch class="mr-2" [(ngModel)]="allowEdit"> </p-inputSwitch>
-        Allow Edit
-      </div>
-      <div *ngIf="allowEdit" class="flex align-items-center">
-        <p-inputSwitch class="mr-2" [(ngModel)]="useCustomForm"></p-inputSwitch>
+      <div *ngIf="formConfig.allowEdit" class="flex align-items-center">
+        <p-inputSwitch
+          class="mr-2"
+          [(ngModel)]="formConfig.useCustomForm"></p-inputSwitch>
         Use Custom Form
       </div>
     </div>
     <p-divider></p-divider>
-    <div *ngIf="allowEdit">
-      <div class="flex flex-column" *ngIf="useCustomForm">
+    <div *ngIf="formConfig.allowEdit">
+      <div class="flex flex-column" *ngIf="formConfig.useCustomForm">
         <label class="line-height-3">Select Custom Form</label>
         <p-dropdown styleClass="w-15rem"></p-dropdown>
       </div>
-      <div class="flex" *ngIf="!useCustomForm">
+      <div class="flex" *ngIf="!formConfig.useCustomForm">
         <p-pickList
           #pickList
           class="flex-grow-1 mr-3"
@@ -51,7 +53,7 @@
           (onMoveAllToSource)="onMoveToSource($event)"
           (onTargetSelect)="onTargetSelect($event)">
           <ng-template let-column pTemplate="item">
-            <div *ngIf="!column.selected" class="">[{{ column.name }}]</div>
+            <div *ngIf="!column.selected" class="">[{{ column.key }}]</div>
             <div *ngIf="column.selected">
               <formly-form
                 [fields]="cloneColumn(column)"
@@ -63,7 +65,7 @@
           <div class="p-picklist-header">Configuration Form</div>
           <div class="p-picklist-list flex-grow-1">
             <form
-              *ngIf="this.model && this.model.name; else emptyMessage"
+              *ngIf="this.model && this.model.key; else emptyMessage"
               [formGroup]="form"
               #configForm="ngForm">
               <formly-form
@@ -100,22 +102,26 @@
       <p-button
         label="Back"
         icon="pi pi-angle-left"
-        [disabled]="isSaving"
+        [disabled]="isLoading || isSaving"
         styleClass="p-button-outlined"
-        (click)="onBack()"></p-button>
+        (onClick)="onBack()"></p-button>
       <p-button
         label="Save Draft & Exit"
         icon="pi pi-save"
         class="ml-auto"
-        [disabled]="isSaving"
-        styleClass="p-button-outlined"></p-button>
+        [disabled]="isLoading || isSaving"
+        styleClass="p-button-outlined"
+        (onClick)="onSaveAndExit()"
+        [loading]="isSaving && isSavingAndExit"></p-button>
       <p-button
-        label="Save & Next"
-        icon="pi pi-angle-right"
-        iconPos="right"
+        label="Save & Publish"
+        icon="pi pi-check"
+        iconPos="left"
+        styleClass="p-button-success"
         [style]="{ 'margin-left': '.5em' }"
-        (click)="onSaveAndNext()"
-        [loading]="isSaving"></p-button>
+        [disabled]="isLoading || isSaving"
+        (onClick)="onSaveAndNext()"
+        [loading]="isSaving && isSavingAndNext"></p-button>
     </div>
   </ng-template>
 </p-card>

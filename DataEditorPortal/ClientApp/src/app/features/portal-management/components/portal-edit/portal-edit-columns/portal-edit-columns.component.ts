@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PickList } from 'primeng/picklist';
 import { forkJoin, tap } from 'rxjs';
+import { NotifyService } from 'src/app/app.module';
 import { DataSourceTableColumn, GridColumn } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 
@@ -92,7 +93,8 @@ export class PortalEditColumnsComponent implements OnInit {
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private portalItemService: PortalItemService
+    private portalItemService: PortalItemService,
+    private notifyService: NotifyService
   ) {}
 
   ngOnInit(): void {
@@ -129,24 +131,24 @@ export class PortalEditColumnsComponent implements OnInit {
     }
   }
 
-  onMoveToTarget(event: any) {
-    event.items.forEach((item: any) => {
+  onMoveToTarget({ items }: { items: GridColumn[] }) {
+    items.forEach(item => {
       item.selected = true;
     });
   }
 
-  onMoveToSource(event: any) {
-    event.items.forEach((item: any) => {
+  onMoveToSource({ items }: { items: GridColumn[] }) {
+    items.forEach(item => {
       item.selected = false;
     });
-    if (event.items.find((x: any) => x.field === this.model.field)) {
+    if (items.find(x => x.field === this.model.field)) {
       this.model = {};
     }
   }
 
-  onTargetSelect(event: any) {
-    if (event.items.length === 1) {
-      this.model = event.items[0];
+  onTargetSelect({ items }: { items: GridColumn[] }) {
+    if (items.length === 1) {
+      this.model = items[0];
     } else {
       this.model = {};
     }
@@ -178,7 +180,13 @@ export class PortalEditColumnsComponent implements OnInit {
   saveSucess() {
     let next: unknown[] = [];
     if (this.isSavingAndNext) next = ['../search'];
-    if (this.isSavingAndExit) next = ['/portal-management/list'];
+    if (this.isSavingAndExit) {
+      this.notifyService.notifySuccess(
+        'Success',
+        'Save Draft Successfully Completed.'
+      );
+      next = ['/portal-management/list'];
+    }
     this.router.navigate(next, {
       relativeTo: this.activatedRoute
     });

@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { of, finalize, tap } from 'rxjs';
+import { tap } from 'rxjs';
+import { NotifyService } from 'src/app/app.module';
 import { PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 
@@ -130,7 +131,8 @@ export class PortalEditBasicComponent implements OnInit {
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private portalItemService: PortalItemService
+    private portalItemService: PortalItemService,
+    private notifyService: NotifyService
   ) {}
 
   ngOnInit(): void {
@@ -201,7 +203,13 @@ export class PortalEditBasicComponent implements OnInit {
   saveSucess() {
     let next: unknown[] = [];
     if (this.isSavingAndNext) next = ['../datasource'];
-    if (this.isSavingAndExit) next = ['/portal-management/list'];
+    if (this.isSavingAndExit) {
+      this.notifyService.notifySuccess(
+        'Success',
+        'Save Draft Successfully Completed.'
+      );
+      next = ['/portal-management/list'];
+    }
     this.router.navigate(next, {
       relativeTo: this.activatedRoute
     });
