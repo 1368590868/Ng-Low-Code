@@ -14,7 +14,7 @@ import { UniversalGridRoutingModule } from './universal-grid-routing.module';
 import { SplitAreaComponent } from './pages/split-area/split-area.component';
 import { SearchComponent } from './components/search/search.component';
 import { TableComponent } from './components/table/table.component';
-import { UniversalGridActionModule } from '../universal-grid-action/universal-grid-action.module';
+import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';

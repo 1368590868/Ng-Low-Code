@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { finalize, Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { GridActionOption } from 'src/app/features/universal-grid-action/universal-grid-action.module';
+import { GridActionOption } from 'src/app/features/universal-grid-action';
 import {
   GridColumn,
   GridConfig,
