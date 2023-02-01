@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable, of, Subject, tap } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
+import { SiteMenu } from '../models/menu';
 
 interface HeaderText {
   webHeaderDescription: string;
@@ -45,14 +46,15 @@ export class ConfigDataService {
     return this.http.get(`${this._apiUrl}User/GetLoggedInUser`);
   }
 
-  getSiteMenus(): Observable<any> {
+  getSiteMenus(): Observable<SiteMenu[]> {
     return this.http
-      .post<ApiResponse<any>>(`${this._apiUrl}site/menus`, null)
-      .pipe(map(res => res.result));
+      .post<ApiResponse<SiteMenu[]>>(`${this._apiUrl}site/menus`, null)
+      .pipe(map(res => res.result || []));
   }
-  getHomeMenus(): Observable<any> {
+
+  getHomeMenus(): Observable<SiteMenu[]> {
     return this.http
-      .post<ApiResponse<any>>(`${this._apiUrl}site/menus`, null)
-      .pipe(map(res => res.result));
+      .post<ApiResponse<SiteMenu[]>>(`${this._apiUrl}site/menus`, null)
+      .pipe(map(res => res.result || []));
   }
 }

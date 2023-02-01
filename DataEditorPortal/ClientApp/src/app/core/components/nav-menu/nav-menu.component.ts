@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
+import { SiteMenu } from '../../models/menu';
 import { ConfigDataService } from '../../services/config-data.service';
 import { UserService } from '../../services/user.service';
 
@@ -18,7 +19,7 @@ export class NavMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.configDataService.menuChange$.subscribe(() => {
-      this.configDataService.getSiteMenus().subscribe((res: any[]) => {
+      this.configDataService.getSiteMenus().subscribe(res => {
         res.forEach(m => {
           this.setMenu(m);
         });
@@ -27,7 +28,7 @@ export class NavMenuComponent implements OnInit {
     });
   }
 
-  setMenu(menu: any) {
+  setMenu(menu: SiteMenu) {
     if (menu && menu.description) {
       menu.tooltipOptions = {
         tooltipPosition: 'bottom',
@@ -42,7 +43,7 @@ export class NavMenuComponent implements OnInit {
     } else menu.routerLink = menu.link;
 
     menu.items &&
-      menu.items.forEach((i: any) => {
+      menu.items.forEach(i => {
         this.setMenu(i);
       });
   }

@@ -62,6 +62,18 @@ export class PortalListComponent implements OnInit {
           });
         }
       });
+    } else if (row['type'] === 'System') {
+      items.push({
+        label: 'Edit',
+        icon: 'pi pi-fw pi-pencil',
+        command: () => {
+          // edit folder
+          this.addDialog.header = 'Update details';
+          this.addDialog.okText = 'Update';
+          this.addDialog.model = { ...row };
+          this.addDialog.showDialog();
+        }
+      });
     } else {
       items.push({
         label: 'New Portal Item',
@@ -86,18 +98,21 @@ export class PortalListComponent implements OnInit {
         }
       });
     }
-    if (row['status'] === 1) {
-      items.push({
-        label: 'Unpublish',
-        icon: 'pi pi-fw pi-minus-circle',
-        command: () => this.unpublish(row)
-      });
-    } else if (row['configCompleted'] != false) {
-      items.push({
-        label: 'Publish',
-        icon: 'pi pi-fw pi-check-circle',
-        command: () => this.publish(row)
-      });
+
+    if (row['type'] !== 'System') {
+      if (row['status'] === 1) {
+        items.push({
+          label: 'Unpublish',
+          icon: 'pi pi-fw pi-minus-circle',
+          command: () => this.unpublish(row)
+        });
+      } else if (row['configCompleted'] != false) {
+        items.push({
+          label: 'Publish',
+          icon: 'pi pi-fw pi-check-circle',
+          command: () => this.publish(row)
+        });
+      }
     }
     return items;
   }

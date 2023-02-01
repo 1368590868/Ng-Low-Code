@@ -1,12 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { MenuItem } from 'primeng/api';
 import { tap } from 'rxjs';
+import { SiteMenu } from '../../models/menu';
 import { ConfigDataService } from '../../services/config-data.service';
-
-interface HomeMenu extends MenuItem {
-  name: string;
-  link?: string;
-}
 
 @Component({
   selector: 'app-tile',
@@ -14,17 +9,27 @@ interface HomeMenu extends MenuItem {
   styleUrls: ['./tile.component.scss']
 })
 export class TileComponent implements OnInit {
-  public homeMenus: HomeMenu[] = [];
+  public homeMenus: SiteMenu[] = [];
   constructor(private configDataService: ConfigDataService) {}
   ngOnInit() {
     this.configDataService
       .getHomeMenus()
       .pipe(
         tap(res => {
-          res.map((item: HomeMenu) => {
-            item.url = item.link;
-          });
-          this.homeMenus = res;
+          this.homeMenus = res
+            .map(menu => {
+              return menu.items ? menu.items : menu;
+            })
+            .flat()
+            .map(menu => {
+              return {
+                ...menu,
+                url:
+                  menu.type === 'Portal Item'
+                    ? `/portal-item/${menu.name.toLowerCase()}`
+                    : menu.link
+              };
+            });
         })
       )
       .subscribe();
