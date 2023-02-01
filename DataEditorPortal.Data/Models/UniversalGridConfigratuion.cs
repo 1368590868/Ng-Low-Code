@@ -11,7 +11,7 @@ namespace DataEditorPortal.Data.Models
 
         public string CurrentStep { get; set; }
 
-        public bool ConfigCompleted;
+        public bool ConfigCompleted { get; set; }
 
         public string DataSourceConfig { get; set; }
 

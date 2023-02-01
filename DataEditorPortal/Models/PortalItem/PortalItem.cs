@@ -21,5 +21,6 @@ namespace DataEditorPortal.Web.Models.PortalItem
         public int Order { get; set; }
         public Guid? ParentId { get; set; }
         public PortalItemStatus Status { get; set; }
+        public bool? ConfigCompleted { get; set; }
     }
 }

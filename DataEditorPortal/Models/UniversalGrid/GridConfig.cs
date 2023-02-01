@@ -13,6 +13,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class FormFieldConfig
     {
+        public string filterType { get; set; }
         public string key { get; set; }
         public string type { get; set; }
         public object defaultValue { get; set; }
@@ -21,7 +22,6 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class SearchFieldConfig : FormFieldConfig
     {
-        public string filterType { get; set; }
         // search rule
         public SearchFieldFilterRule searchRule { get; set; }
     }

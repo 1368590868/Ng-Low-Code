@@ -2,6 +2,7 @@
 using AutoWrapper.Wrappers;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.PortalItem;
 using DataEditorPortal.Web.Models.UniversalGrid;
@@ -45,29 +46,45 @@ namespace DataEditorPortal.Web.Controllers
         [Route("list")]
         public IEnumerable<PortalItem> List()
         {
-            var menus = _depDbContext.SiteMenus.ToList();
+            var query = from m in _depDbContext.SiteMenus
+                        join p in _depDbContext.UniversalGridConfigurations on m.Name equals p.Name into mps
+                        from mp in mps.DefaultIfEmpty()
+                        select new
+                        {
+                            menu = m,
+                            configCompleted = mp != null ? mp.ConfigCompleted : (bool?)null
+                        };
+
+            var menus = query.ToList();
 
             var root = menus
-                .Where(x => x.ParentId == null)
-                .OrderBy(x => x.Order)
-                .ThenBy(x => x.Name)
+                .Where(x => x.menu.ParentId == null)
+                .OrderBy(x => x.menu.Order)
+                .ThenBy(x => x.menu.Name)
                 .Select(x =>
                 {
                     var children = menus
-                            .Where(m => m.ParentId == x.Id)
-                            .OrderBy(x => x.Order)
-                            .ThenBy(x => x.Name)
-                            .Select(m => new PortalItem()
+                            .Where(m => m.menu.ParentId == x.menu.Id)
+                            .OrderBy(x => x.menu.Order)
+                            .ThenBy(x => x.menu.Name)
+                            .Select(m =>
                             {
-                                Data = _mapper.Map<PortalItemData>(m)
+                                var item = new PortalItem()
+                                {
+                                    Data = _mapper.Map<PortalItemData>(m.menu)
+                                };
+                                item.Data.ConfigCompleted = m.configCompleted;
+                                return item;
                             })
                             .ToList();
 
-                    return new PortalItem()
+                    var item = new PortalItem()
                     {
-                        Data = _mapper.Map<PortalItemData>(x),
+                        Data = _mapper.Map<PortalItemData>(x.menu),
                         Children = children.Any() ? children : null
                     };
+                    item.Data.ConfigCompleted = x.configCompleted;
+                    return item;
                 });
 
             return root;
@@ -119,6 +136,20 @@ namespace DataEditorPortal.Web.Controllers
             {
                 throw new ApiException("Not Found", 404);
             }
+
+            var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (item != null)
+            {
+                if (!item.ConfigCompleted)
+                {
+                    throw new DepException("You can not publish this Portal Item due to you don't complete all configurations.");
+                }
+                else
+                {
+                    item.CurrentStep = "basic";
+                }
+            }
+
             siteMenu.Status = Data.Common.PortalItemStatus.Published;
 
             _depDbContext.SaveChanges();
@@ -160,8 +191,8 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPost]
-        [Route("{id}/current-step/{step}")]
-        public string SaveCurrentStep(Guid id, string step)
+        [Route("{id}/current-step")]
+        public string SaveCurrentStep(Guid id, [FromQuery] string step)
         {
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)

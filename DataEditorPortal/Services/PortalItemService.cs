@@ -152,7 +152,21 @@ namespace DataEditorPortal.Web.Services
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
+            if (!string.IsNullOrEmpty(config.DataSourceConfig))
+            {
+                var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+                if (dataSourceConfig.TableSchema != model.TableSchema || dataSourceConfig.TableName != model.TableName)
+                {
+                    // data table changed, need  to clear columns, search and form configurations
+                    config.ColumnsConfig = null;
+                    config.SearchConfig = null;
+                    config.DetailConfig = null;
+                    config.ConfigCompleted = false;
+                }
+            }
+
             config.DataSourceConfig = JsonSerializer.Serialize(model);
+            siteMenu.Status = Data.Common.PortalItemStatus.Draft;
 
             _depDbContext.SaveChanges();
 
@@ -201,6 +215,8 @@ namespace DataEditorPortal.Web.Services
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
             config.ColumnsConfig = JsonSerializer.Serialize(model);
+            siteMenu.Status = Data.Common.PortalItemStatus.Draft;
+
             _depDbContext.SaveChanges();
 
             return true;
@@ -239,6 +255,8 @@ namespace DataEditorPortal.Web.Services
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
             config.SearchConfig = JsonSerializer.Serialize(model);
+            siteMenu.Status = Data.Common.PortalItemStatus.Draft;
+
             _depDbContext.SaveChanges();
 
             return true;
@@ -277,6 +295,10 @@ namespace DataEditorPortal.Web.Services
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
             config.DetailConfig = JsonSerializer.Serialize(model);
+            config.ConfigCompleted = true;
+
+            siteMenu.Status = Data.Common.PortalItemStatus.Draft;
+
             _depDbContext.SaveChanges();
 
             return true;

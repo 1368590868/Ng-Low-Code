@@ -61,7 +61,9 @@ namespace DataEditorPortal.Web.Controllers
         [Route("menus")]
         public dynamic GetMenus()
         {
-            var menus = _depDbContext.SiteMenus.ToList();
+            var menus = _depDbContext.SiteMenus
+                .Where(x => x.Status == Data.Common.PortalItemStatus.Published)
+                .ToList();
 
             var root = menus
                 .Where(x => x.ParentId == null)
