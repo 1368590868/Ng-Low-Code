@@ -152,6 +152,17 @@ export class PortalEditColumnsComponent implements OnInit {
     }
   }
 
+  valid() {
+    if (!this.targetColumns || this.targetColumns.length === 0) {
+      this.notifyService.notifyWarning(
+        'Warning',
+        'Please select at least one field as column.'
+      );
+      return false;
+    }
+    return true;
+  }
+
   saveGridColumnsConfig() {
     this.isSaving = true;
     if (this.portalItemService.currentPortalItemId) {
@@ -175,7 +186,6 @@ export class PortalEditColumnsComponent implements OnInit {
   saveSucess() {
     let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      this.portalItemService.saveCurrentStep('search');
       next = ['../search'];
     }
     if (this.isSavingAndExit) {
@@ -191,12 +201,13 @@ export class PortalEditColumnsComponent implements OnInit {
   }
 
   onSaveAndNext() {
-    this.isSaving = true;
+    if (!this.valid()) return;
     this.isSavingAndNext = true;
     this.saveGridColumnsConfig();
   }
 
   onSaveAndExit() {
+    if (!this.valid()) return;
     this.isSavingAndExit = true;
     this.saveGridColumnsConfig();
   }

@@ -45,6 +45,11 @@
           </div>
         </div>
       </ng-template>
+      <ng-template pTemplate="emptymessagetarget">
+        <div class="w-full relative" *ngIf="!isLoading">
+          <app-svg-drag></app-svg-drag>
+        </div>
+      </ng-template>
     </p-pickList>
     <div class="config-form p-picklist">
       <div class="p-picklist-header">Configuration Form</div>

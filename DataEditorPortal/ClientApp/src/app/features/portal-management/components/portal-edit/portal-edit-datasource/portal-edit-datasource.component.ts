@@ -196,7 +196,6 @@ export class PortalEditDatasourceComponent implements OnInit {
   saveSucess() {
     let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      this.portalItemService.saveCurrentStep('columns');
       next = ['../columns'];
     }
     if (this.isSavingAndExit) {

@@ -26,4 +26,13 @@
       }
     }
   }
+
+  .p-picklist-empty-message {
+    app-svg-drag {
+      svg {
+        position: absolute;
+        left: calc(50% - 7.5rem);
+      }
+    }
+  }
 }

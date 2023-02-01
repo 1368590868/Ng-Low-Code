@@ -22,6 +22,7 @@ export class PortalItemService {
   public currentPortalItemId?: string;
   public currentPortalItemParentFolder?: string;
   public currentPortalItemConfigCompleted?: boolean;
+  public currentPortalItemCaption?: string;
 
   constructor(
     private http: HttpClient,

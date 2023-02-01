@@ -234,6 +234,17 @@ export class PortalEditSearchComponent implements OnInit {
     }
   }
 
+  valid() {
+    if (!this.targetColumns || this.targetColumns.length === 0) {
+      this.notifyService.notifyWarning(
+        'Warning',
+        'Please select at least one field.'
+      );
+      return false;
+    }
+    return true;
+  }
+
   saveGridSearchConfig() {
     this.isSaving = true;
     if (this.portalItemService.currentPortalItemId) {
@@ -257,7 +268,6 @@ export class PortalEditSearchComponent implements OnInit {
   saveSucess() {
     let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      this.portalItemService.saveCurrentStep('form');
       next = ['../form'];
     }
     if (this.isSavingAndExit) {
@@ -273,11 +283,13 @@ export class PortalEditSearchComponent implements OnInit {
   }
 
   onSaveAndNext() {
+    if (!this.valid()) return;
     this.isSavingAndNext = true;
     this.saveGridSearchConfig();
   }
 
   onSaveAndExit() {
+    if (!this.valid()) return;
     this.isSavingAndExit = true;
     this.saveGridSearchConfig();
   }

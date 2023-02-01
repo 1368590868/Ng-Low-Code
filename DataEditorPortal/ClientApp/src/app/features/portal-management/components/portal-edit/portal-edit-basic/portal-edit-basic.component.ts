@@ -169,6 +169,7 @@ export class PortalEditBasicComponent implements OnInit {
           .pipe(
             tap(res => {
               if (res && !res.isError) {
+                this.portalItemService.currentPortalItemCaption = data['label'];
                 this.saveSucess();
               }
 
@@ -185,6 +186,7 @@ export class PortalEditBasicComponent implements OnInit {
             tap(res => {
               if (res && !res.isError) {
                 this.portalItemService.currentPortalItemId = res.result;
+                this.portalItemService.currentPortalItemCaption = data['label'];
                 this.saveSucess(res.result);
               }
               this.isSaving = false;
@@ -210,7 +212,6 @@ export class PortalEditBasicComponent implements OnInit {
   saveSucess(id?: string) {
     let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      this.portalItemService.saveCurrentStep('datasource');
       next = id
         ? [
             `../../edit/${this.portalItemService.currentPortalItemId}/datasource`

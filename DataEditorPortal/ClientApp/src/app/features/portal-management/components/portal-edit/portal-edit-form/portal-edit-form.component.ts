@@ -297,10 +297,36 @@ export class PortalEditFormComponent implements OnInit {
     }
   }
 
+  valid() {
+    if (this.formConfig.allowEdit) {
+      if (
+        this.formConfig.useCustomAction &&
+        !this.formConfig.customActionName
+      ) {
+        this.notifyService.notifyWarning(
+          'Warning',
+          'Please select one custom action.'
+        );
+        return false;
+      }
+      if (
+        !this.formConfig.useCustomAction &&
+        (!this.targetColumns || this.targetColumns.length === 0)
+      ) {
+        this.notifyService.notifyWarning(
+          'Warning',
+          'Please select at least one field.'
+        );
+        return false;
+      }
+    }
+    return true;
+  }
+
   saveGridFormConfig() {
     this.isSaving = true;
     const data = JSON.parse(JSON.stringify(this.formConfig)) as GridFormConfig;
-    if (data.allowEdit && !data.useCustomForm)
+    if (data.allowEdit && !data.useCustomAction)
       data.formFields = this.targetColumns;
 
     if (this.portalItemService.currentPortalItemId) {
@@ -353,11 +379,13 @@ export class PortalEditFormComponent implements OnInit {
   }
 
   onSaveAndNext() {
+    if (!this.valid()) return;
     this.isSavingAndNext = true;
     this.saveGridFormConfig();
   }
 
   onSaveAndExit() {
+    if (!this.valid()) return;
     this.isSavingAndExit = true;
     this.saveGridFormConfig();
   }

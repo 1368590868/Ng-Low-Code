@@ -20,13 +20,13 @@
       <div *ngIf="formConfig.allowEdit" class="flex align-items-center">
         <p-inputSwitch
           class="mr-2"
-          [(ngModel)]="formConfig.useCustomForm"></p-inputSwitch>
+          [(ngModel)]="formConfig.useCustomAction"></p-inputSwitch>
         Use Custom Form
       </div>
     </div>
     <p-divider></p-divider>
-    <div *ngIf="formConfig.allowEdit">
-      <div class="flex flex-column" *ngIf="formConfig.useCustomForm">
+    <div *ngIf="formConfig.allowEdit && !isLoading">
+      <div class="flex flex-column" *ngIf="formConfig.useCustomAction">
         <label class="line-height-3">Select Custom Form</label>
         <p-dropdown
           [(ngModel)]="formConfig.customActionName"
@@ -34,7 +34,7 @@
           appendTo="body"
           [options]="customActions"></p-dropdown>
       </div>
-      <div class="flex" *ngIf="!formConfig.useCustomForm">
+      <div class="flex" *ngIf="!formConfig.useCustomAction">
         <p-pickList
           #pickList
           class="flex-grow-1 mr-3"
@@ -62,6 +62,11 @@
               <formly-form
                 [fields]="cloneColumn(column)"
                 class="p-fluid"></formly-form>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="emptymessagetarget">
+            <div class="w-full relative">
+              <app-svg-drag></app-svg-drag>
             </div>
           </ng-template>
         </p-pickList>

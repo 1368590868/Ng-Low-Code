@@ -80,7 +80,7 @@ export interface GridFormConfig {
   allowEdit?: boolean;
   allowDelete?: boolean;
   allowExport?: boolean;
-  useCustomForm?: boolean;
+  useCustomAction?: boolean;
   customActionName?: string;
   formFields?: GridFormField[];
 }

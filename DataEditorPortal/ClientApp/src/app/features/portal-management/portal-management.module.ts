@@ -49,7 +49,8 @@ import {
   PortalEditDatasourceComponent,
   PortalEditColumnsComponent,
   PortalEditSearchComponent,
-  PortalEditFormComponent
+  PortalEditFormComponent,
+  SvgDragComponent
 } from './components/portal-edit';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
 
@@ -62,7 +63,8 @@ import { UniversalGridActionModule } from 'src/app/features/universal-grid-actio
     PortalEditDatasourceComponent,
     PortalEditColumnsComponent,
     PortalEditSearchComponent,
-    PortalEditFormComponent
+    PortalEditFormComponent,
+    SvgDragComponent
   ],
   imports: [
     CommonModule,
