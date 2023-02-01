@@ -6,7 +6,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { FormlySelectModule as FormlyCoreSelectModule } from '@ngx-formly/core/select';
 
 import { FormlyFormFieldModule } from '@ngx-formly/primeng/form-field';
-import { FormlyFieldIconSelectComponent } from './iconSelect.type';
+import { FormlyFieldIconSelectComponent } from './iconselect.type';
 
 @NgModule({
   declarations: [FormlyFieldIconSelectComponent],

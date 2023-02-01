@@ -10,6 +10,7 @@ import { SelectItem } from 'primeng/api';
 
 interface IconSelectProps extends FormlyFieldProps, FormlyFieldSelectProps {
   appendTo?: string;
+  virtualScroll?: boolean;
 }
 
 export interface FormlySelectFieldConfig
@@ -27,6 +28,8 @@ export interface FormlySelectFieldConfig
       [showClear]="true"
       [formControl]="formControl"
       [formlyAttributes]="field"
+      [virtualScroll]="props.virtualScroll ?? true"
+      [virtualScrollItemSize]="38"
       [placeholder]="props.placeholder || ''"
       [appendTo]="props.appendTo || 'body'"
       (onChange)="props.change && props.change(field, $event)">
