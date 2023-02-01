@@ -74,22 +74,27 @@ export class PortalEditDatasourceComponent implements OnInit {
         this.dbTables = tables;
         this.changeDetectorRef.detectChanges();
 
+        // after detect changes, the first table will be selected.
         const dsConfig = res[0];
         if (dsConfig && dsConfig.tableName) {
           dsConfig.filters?.forEach(
             x => (x.matchOptions = this.getFilterMatchModeOptions(x.filterType))
           );
           this.datasourceConfig = dsConfig;
-          this.selectedDbTable = `${dsConfig.tableSchema}.${dsConfig.tableName}`;
-        }
+          const currentSelected = `${dsConfig.tableSchema}.${dsConfig.tableName}`;
 
-        if (
-          !this.selectedDbTable ||
-          !tables.find(x => x.value === this.selectedDbTable)
-        ) {
-          // if no selectedDbTable or the selectedDbTable does not exist in the dropdown options.
-          // select the first by default.
-          this.selectedDbTable = tables[0].value;
+          // check if current selected dbTable exists, if not exist, use the first
+          if (!tables.find(x => x.value === currentSelected)) {
+            // if no selectedDbTable or the selectedDbTable does not exist in the dropdown options.
+            // select the first by default.
+            this.selectedDbTable = tables[0].value;
+            this.datasourceConfig.tableName = tables[0].tableName;
+            this.datasourceConfig.tableSchema = tables[0].tableSchema;
+          } else {
+            this.selectedDbTable = currentSelected;
+          }
+        } else {
+          // if table schema and table name havn't been stored, use the first from tables.
           this.datasourceConfig.tableName = tables[0].tableName;
           this.datasourceConfig.tableSchema = tables[0].tableSchema;
         }

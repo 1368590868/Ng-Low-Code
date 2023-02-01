@@ -36,24 +36,14 @@ export class PortalEditSearchComponent implements OnInit {
       filterType: 'array'
     },
     {
-      label: 'Date',
-      value: 'datepicker',
-      filterType: 'date'
-    },
-    {
-      label: 'Dropdown',
-      value: 'select',
-      filterType: 'text'
-    },
-    {
       label: 'Multiple Dropdown',
       value: 'multiSelect',
       filterType: 'array'
     },
     {
-      label: 'Radio List',
-      value: 'radio',
-      filterType: 'text'
+      label: 'Date',
+      value: 'datepicker',
+      filterType: 'date'
     },
     {
       label: 'Textbox',
@@ -66,7 +56,17 @@ export class PortalEditSearchComponent implements OnInit {
       filterType: 'text'
     },
     {
-      label: 'Textbox',
+      label: 'Dropdown',
+      value: 'select',
+      filterType: 'text'
+    },
+    {
+      label: 'Radio List',
+      value: 'radio',
+      filterType: 'text'
+    },
+    {
+      label: 'Input Number',
       value: 'input',
       filterType: 'numeric'
     }

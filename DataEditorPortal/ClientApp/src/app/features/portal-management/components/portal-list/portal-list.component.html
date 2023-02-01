@@ -55,7 +55,10 @@
                 severity="warning"
                 value="Unpublished"></p-tag>
               <i
-                *ngIf="rowData.configCompleted === false"
+                *ngIf="
+                  rowData.type === 'Portal Item' &&
+                  rowData.configCompleted === false
+                "
                 class="pi pi-exclamation-circle ml-3 text-lg"
                 style="color: var(--yellow-600)"
                 pTooltip="You have't completed all configurations"></i>
