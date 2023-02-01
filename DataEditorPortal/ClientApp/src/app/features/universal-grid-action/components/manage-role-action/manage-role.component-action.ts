@@ -98,7 +98,7 @@ export class ManageRoleActionComponent
         {
           className: 'w-full',
           key: 'roleDescription',
-          type: 'inputNumber',
+          type: 'textarea',
           props: {
             required: true,
             type: 'text',
