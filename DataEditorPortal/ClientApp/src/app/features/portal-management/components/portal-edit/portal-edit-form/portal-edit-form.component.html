@@ -57,7 +57,13 @@
           (onMoveAllToSource)="onMoveToSource($event)"
           (onTargetSelect)="onTargetSelect($event)">
           <ng-template let-column pTemplate="item">
-            <div *ngIf="!column.selected" class="">[{{ column.key }}]</div>
+            <div *ngIf="!column.selected">
+              [{{ column.key }}]<span
+                class="text-red-500"
+                *ngIf="isRequired(column)"
+                >*</span
+              >
+            </div>
             <div *ngIf="column.selected">
               <formly-form
                 [fields]="cloneColumn(column)"

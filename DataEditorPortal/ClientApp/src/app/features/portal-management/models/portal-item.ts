@@ -20,6 +20,9 @@ export interface DataSourceTableColumn {
   filterType: string;
   isKey: boolean;
   isUnique: boolean;
+  isAutoIncrement: boolean;
+  isIdentity: boolean;
+  allowDBNull: boolean;
 }
 
 export interface DataSourceConfig {

@@ -12,7 +12,11 @@ import { PickList } from 'primeng/picklist';
 import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
 import { NotifyService } from 'src/app/core';
 import { GridActionConfig } from 'src/app/features/universal-grid-action';
-import { GridFormField, GridFormConfig } from '../../../models/portal-item';
+import {
+  GridFormField,
+  GridFormConfig,
+  DataSourceTableColumn
+} from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
@@ -30,6 +34,7 @@ export class PortalEditFormComponent implements OnInit {
     allowEdit: true,
     allowDelete: true
   };
+  dbColumns: DataSourceTableColumn[] = [];
   sourceColumns: GridFormField[] = [];
   targetColumns: GridFormField[] = [];
   @ViewChild('pickList') pickList!: PickList;
@@ -255,6 +260,7 @@ export class PortalEditFormComponent implements OnInit {
             };
           });
         }
+        this.dbColumns = res[1];
         this.sourceColumns = res[1]
           .filter(s => !this.targetColumns.find(t => t.key === s.columnName))
           .map<GridFormField>(x => {
@@ -401,5 +407,13 @@ export class PortalEditFormComponent implements OnInit {
 
   cloneColumn(column: GridFormField) {
     return [JSON.parse(JSON.stringify(column))];
+  }
+
+  isRequired(field: GridFormField) {
+    const dbCol = this.dbColumns.find(x => x.columnName == field.key);
+    if (dbCol) {
+      return !dbCol.allowDBNull && !(dbCol.isAutoIncrement || dbCol.isIdentity);
+    }
+    return true;
   }
 }
