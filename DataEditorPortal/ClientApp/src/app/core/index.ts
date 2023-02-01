@@ -1,6 +1,4 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
@@ -32,6 +30,7 @@ export { RouterGuard } from './guards/router.guard';
 export { ApiResponse } from './models/api-response';
 export { NotifyService } from './utils/notify.service';
 export { NgxFormlyService } from './services/ngx-formly.service';
+export { ConfigDataService } from './services/config-data.service';
 
 @NgModule({
   declarations: [

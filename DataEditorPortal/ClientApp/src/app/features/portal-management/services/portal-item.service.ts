@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { delay, map, Observable, of, Subject } from 'rxjs';
-import { ApiResponse, NotifyService } from 'src/app/core';
+import { delay, map, Observable, of, Subject, tap } from 'rxjs';
+import { ApiResponse, ConfigDataService, NotifyService } from 'src/app/core';
 import {
   DataSourceConfig,
   DataSourceTable,
@@ -26,6 +26,7 @@ export class PortalItemService {
   constructor(
     private http: HttpClient,
     private notifyService: NotifyService,
+    private configDataService: ConfigDataService,
     @Inject('API_URL') apiUrl: string
   ) {
     this._apiUrl = apiUrl;
@@ -72,17 +73,29 @@ export class PortalItemService {
   }
 
   publish(id: string): Observable<ApiResponse<string>> {
-    return this.http.put<ApiResponse<string>>(
-      `${this._apiUrl}portal-item/${id}/publish`,
-      null
-    );
+    return this.http
+      .put<ApiResponse<string>>(
+        `${this._apiUrl}portal-item/${id}/publish`,
+        null
+      )
+      .pipe(
+        tap(() => {
+          this.configDataService.menuChange$.next(null);
+        })
+      );
   }
 
   unpublish(id: string): Observable<ApiResponse<string>> {
-    return this.http.put<ApiResponse<string>>(
-      `${this._apiUrl}portal-item/${id}/unpublish`,
-      null
-    );
+    return this.http
+      .put<ApiResponse<string>>(
+        `${this._apiUrl}portal-item/${id}/unpublish`,
+        null
+      )
+      .pipe(
+        tap(() => {
+          this.configDataService.menuChange$.next(null);
+        })
+      );
   }
 
   nameExists(name: string, id?: string): Observable<ApiResponse<boolean>> {
@@ -114,10 +127,16 @@ export class PortalItemService {
   updatePortalDetails(
     data: PortalItemData
   ): Observable<ApiResponse<PortalItemData>> {
-    return this.http.put<ApiResponse<PortalItemData>>(
-      `${this._apiUrl}portal-item/${this.currentPortalItemId}/update`,
-      data
-    );
+    return this.http
+      .put<ApiResponse<PortalItemData>>(
+        `${this._apiUrl}portal-item/${this.currentPortalItemId}/update`,
+        data
+      )
+      .pipe(
+        tap(() => {
+          this.configDataService.menuChange$.next(null);
+        })
+      );
   }
 
   // datasource

@@ -53,7 +53,7 @@ export class PortalListComponent implements OnInit {
     const items: MenuItem[] = [];
     if (row['type'] === 'Portal Item') {
       items.push({
-        label: 'Edit Portal Item',
+        label: row['configCompleted'] ? 'Edit Portal Item' : 'Continue Editing',
         icon: 'pi pi-fw pi-pencil',
         command: () => {
           // edit portal item
@@ -92,7 +92,7 @@ export class PortalListComponent implements OnInit {
         icon: 'pi pi-fw pi-minus-circle',
         command: () => this.unpublish(row)
       });
-    } else {
+    } else if (row['configCompleted'] != false) {
       items.push({
         label: 'Publish',
         icon: 'pi pi-fw pi-check-circle',

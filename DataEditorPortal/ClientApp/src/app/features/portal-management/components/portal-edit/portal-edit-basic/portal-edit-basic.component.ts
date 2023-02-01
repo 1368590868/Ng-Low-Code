@@ -169,7 +169,7 @@ export class PortalEditBasicComponent implements OnInit {
           .pipe(
             tap(res => {
               if (res && !res.isError) {
-                this.saveSucess(['../datasource']);
+                this.saveSucess();
               }
 
               this.isSaving = false;
@@ -185,9 +185,7 @@ export class PortalEditBasicComponent implements OnInit {
             tap(res => {
               if (res && !res.isError) {
                 this.portalItemService.currentPortalItemId = res.result;
-                this.saveSucess([
-                  `../../edit/${this.portalItemService.currentPortalItemId}/datasource`
-                ]);
+                this.saveSucess(res.result);
               }
               this.isSaving = false;
               this.isSavingAndExit = false;
@@ -209,15 +207,22 @@ export class PortalEditBasicComponent implements OnInit {
     this.editForm.onSubmit(new Event('submit'));
   }
 
-  saveSucess(next: unknown[]) {
+  saveSucess(id?: string) {
+    let next: unknown[] = [];
     if (this.isSavingAndNext) {
       this.portalItemService.saveCurrentStep('datasource');
+      next = id
+        ? [
+            `../../edit/${this.portalItemService.currentPortalItemId}/datasource`
+          ]
+        : ['../datasource'];
     }
     if (this.isSavingAndExit) {
       this.notifyService.notifySuccess(
         'Success',
         'Save Draft Successfully Completed.'
       );
+      next = id ? ['../../list'] : ['../../../list'];
     }
     this.router.navigate(next, {
       relativeTo: this.activatedRoute
