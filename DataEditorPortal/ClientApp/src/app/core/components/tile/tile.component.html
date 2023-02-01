@@ -4,10 +4,13 @@
   <div class="w-10 flex align-content-start flex-wrap">
     <div
       class="bg-white ml-5 mt-5 flex flex-column justify-content-evenly align-items-center cursor-pointer hover-shadow"
-      *ngFor="let item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]">
-      <i class="pi pi-discord text-7xl text-primary"></i>
+      *ngFor="let menu of homeMenus"
+      [routerLink]="menu?.url">
+      <i [class]="menu.icon" class="text-7xl text-primary"></i>
       <div class="flex justify-content-center align-items-center">
-        <div class="font-semibold text-xl text-center">router name</div>
+        <div class="font-semibold text-xl text-center">
+          {{ menu?.name }}
+        </div>
       </div>
     </div>
   </div>

@@ -3,6 +3,10 @@ import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PickList } from 'primeng/picklist';
+import { forkJoin, tap } from 'rxjs';
+import { NotifyService } from 'src/app/core';
+import { DataSourceTableColumn, GridColumn } from '../../../models/portal-item';
+import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
   selector: 'app-portal-edit-columns',
@@ -10,20 +14,14 @@ import { PickList } from 'primeng/picklist';
   styleUrls: ['./portal-edit-columns.component.scss']
 })
 export class PortalEditColumnsComponent implements OnInit {
+  isLoading = true;
   isSaving = false;
+  isSavingAndNext = false;
+  isSavingAndExit = false;
 
-  sourceColumns: any[] = [
-    {
-      name: 'Name'
-    },
-    {
-      name: 'UserId'
-    },
-    {
-      name: 'Email'
-    }
-  ];
-  targetColumns: any[] = [];
+  dataSourceTableColumns: DataSourceTableColumn[] = [];
+  sourceColumns: GridColumn[] = [];
+  targetColumns: GridColumn[] = [];
   @ViewChild('pickList') pickList!: PickList;
 
   form = new FormGroup({});
@@ -92,53 +90,115 @@ export class PortalEditColumnsComponent implements OnInit {
     }
   ];
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private portalItemService: PortalItemService,
+    private notifyService: NotifyService
+  ) {}
 
   ngOnInit(): void {
-    console.log('test');
+    if (this.portalItemService.currentPortalItemId) {
+      forkJoin([
+        this.portalItemService.getGridColumnsConfig(),
+        this.portalItemService.getDataSourceTableColumnsByPortalId()
+      ]).subscribe(res => {
+        this.isLoading = false;
+        this.targetColumns = res[0].map<GridColumn>(x => {
+          return {
+            ...x,
+            key: x.field,
+            selected: true
+          };
+        });
+        this.sourceColumns = res[1]
+          .filter(s => !this.targetColumns.find(t => t.field === s.columnName))
+          .map<GridColumn>(x => {
+            return {
+              field: x.columnName,
+              key: x.columnName,
+              filterType: x.filterType,
+              header: x.columnName,
+              width: '10rem',
+              sortable: true
+            };
+          });
+      });
+
+      this.portalItemService.saveCurrentStep('columns');
+    }
   }
 
-  onMoveToTarget(event: any) {
-    event.items.forEach((item: any) => {
+  onMoveToTarget({ items }: { items: GridColumn[] }) {
+    items.forEach(item => {
       item.selected = true;
-      item.key = item.name;
-      item.header = item.name;
-      item.width = '10rem';
-      item.filterType = 'text'; // set by column type
-      item.sortable = true;
     });
   }
 
-  onMoveToSource(event: any) {
-    event.items.forEach((item: any) => {
+  onMoveToSource({ items }: { items: GridColumn[] }) {
+    items.forEach(item => {
       item.selected = false;
-      item.key = undefined;
-      item.header = undefined;
-      item.width = undefined;
-      item.filterType = undefined;
-      item.sortable = undefined;
     });
-    if (event.items.find((x: any) => x.name === this.model.name)) {
+    if (items.find(x => x.field === this.model.field)) {
       this.model = {};
     }
   }
 
-  onTargetSelect(event: any) {
-    if (event.items.length === 1) {
-      this.model = event.items[0];
+  onTargetSelect({ items }: { items: GridColumn[] }) {
+    if (items.length === 1) {
+      this.model = items[0];
     } else {
       this.model = {};
     }
   }
 
+  saveGridColumnsConfig() {
+    this.isSaving = true;
+    if (this.portalItemService.currentPortalItemId) {
+      this.portalItemService
+        .saveGridColumnsConfig(this.targetColumns)
+        .pipe(
+          tap(res => {
+            if (res && !res.isError) {
+              this.saveSucess();
+            }
+
+            this.isSaving = false;
+            this.isSavingAndExit = false;
+            this.isSavingAndNext = false;
+          })
+        )
+        .subscribe();
+    }
+  }
+
+  saveSucess() {
+    let next: unknown[] = [];
+    if (this.isSavingAndNext) {
+      this.portalItemService.saveCurrentStep('search');
+      next = ['../search'];
+    }
+    if (this.isSavingAndExit) {
+      this.notifyService.notifySuccess(
+        'Success',
+        'Save Draft Successfully Completed.'
+      );
+      next = ['../../../list'];
+    }
+    this.router.navigate(next, {
+      relativeTo: this.activatedRoute
+    });
+  }
+
   onSaveAndNext() {
     this.isSaving = true;
-    console.log(this.targetColumns);
-    setTimeout(() => {
-      this.router.navigate(['../search'], {
-        relativeTo: this.activatedRoute
-      });
-    }, 1000);
+    this.isSavingAndNext = true;
+    this.saveGridColumnsConfig();
+  }
+
+  onSaveAndExit() {
+    this.isSavingAndExit = true;
+    this.saveGridColumnsConfig();
   }
 
   onBack() {

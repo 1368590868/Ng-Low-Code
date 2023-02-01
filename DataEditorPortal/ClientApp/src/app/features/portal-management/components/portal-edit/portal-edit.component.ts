@@ -27,10 +27,19 @@ export class PortalEditComponent implements OnInit {
       )
       .subscribe(val => {
         this.portalItemService.currentPortalItemId = val;
-        this.router.navigate(['basic'], {
-          relativeTo: this.activatedRoute,
-          replaceUrl: true
-        });
+        if (this.portalItemService.currentPortalItemId) {
+          this.portalItemService.getCurrentStep().subscribe(res => {
+            this.router.navigate([res], {
+              relativeTo: this.activatedRoute,
+              replaceUrl: true
+            });
+          });
+        } else {
+          this.router.navigate(['basic'], {
+            relativeTo: this.activatedRoute,
+            replaceUrl: true
+          });
+        }
       });
 
     this.items = [

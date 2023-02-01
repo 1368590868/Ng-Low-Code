@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { of, finalize, tap } from 'rxjs';
+import { tap } from 'rxjs';
+import { NotifyService } from 'src/app/core';
 import { PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 
@@ -130,21 +131,28 @@ export class PortalEditBasicComponent implements OnInit {
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private portalItemService: PortalItemService
+    private portalItemService: PortalItemService,
+    private notifyService: NotifyService
   ) {}
 
   ngOnInit(): void {
     // load basic information
     if (this.portalItemService.currentPortalItemId) {
-      this.portalItemService
-        .getPortalDetails(this.portalItemService.currentPortalItemId)
-        .subscribe(res => {
-          if (!res['parentId']) res['parentId'] = '<root>';
-          this.model = res;
+      this.portalItemService.getPortalDetails().subscribe(res => {
+        if (!res['parentId']) res['parentId'] = '<root>';
+        this.model = res;
 
-          // enable buttons after data loaded.
-          this.isLoading = false;
-        });
+        // enable buttons after data loaded.
+        this.isLoading = false;
+      });
+
+      this.portalItemService.saveCurrentStep('basic');
+    } else {
+      this.model = {
+        ...this.model,
+        parentId: this.portalItemService.currentPortalItemParentFolder
+      };
+      this.isLoading = false;
     }
   }
 
@@ -157,7 +165,7 @@ export class PortalEditBasicComponent implements OnInit {
       this.isSaving = true;
       if (this.portalItemService.currentPortalItemId) {
         this.portalItemService
-          .updatePortalDetails(this.portalItemService.currentPortalItemId, data)
+          .updatePortalDetails(data)
           .pipe(
             tap(res => {
               if (res && !res.isError) {
@@ -176,7 +184,8 @@ export class PortalEditBasicComponent implements OnInit {
           .pipe(
             tap(res => {
               if (res && !res.isError) {
-                this.saveSucess();
+                this.portalItemService.currentPortalItemId = res.result;
+                this.saveSucess(res.result);
               }
               this.isSaving = false;
               this.isSavingAndExit = false;
@@ -198,17 +207,33 @@ export class PortalEditBasicComponent implements OnInit {
     this.editForm.onSubmit(new Event('submit'));
   }
 
-  saveSucess() {
+  saveSucess(id?: string) {
     let next: unknown[] = [];
-    if (this.isSavingAndNext) next = ['../datasource'];
-    if (this.isSavingAndExit) next = ['/portal-management/list'];
+    if (this.isSavingAndNext) {
+      this.portalItemService.saveCurrentStep('datasource');
+      next = id
+        ? [
+            `../../edit/${this.portalItemService.currentPortalItemId}/datasource`
+          ]
+        : ['../datasource'];
+    }
+    if (this.isSavingAndExit) {
+      this.notifyService.notifySuccess(
+        'Success',
+        'Save Draft Successfully Completed.'
+      );
+      next = id ? ['../../list'] : ['../../../list'];
+    }
     this.router.navigate(next, {
       relativeTo: this.activatedRoute
     });
   }
 
   onBack() {
-    this.router.navigate(['/portal-management/list'], {
+    const next = this.portalItemService.currentPortalItemId
+      ? ['../../../list']
+      : ['../../list'];
+    this.router.navigate(next, {
       relativeTo: this.activatedRoute
     });
   }

@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { finalize, Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { GridActionOption } from 'src/app/features/universal-grid-action/universal-grid-action.module';
+import { GridActionOption } from 'src/app/features/universal-grid-action';
 import {
   GridColumn,
   GridConfig,
@@ -12,7 +12,7 @@ import {
 } from '../../models/grid-types';
 import { Table } from 'primeng/table';
 import { TableState } from 'primeng/api';
-import { NotifyService } from 'src/app/app.module';
+import { NotifyService } from 'src/app/core';
 
 @Component({
   selector: 'app-table',

@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable, Subject } from 'rxjs';
-import { ApiResponse } from 'src/app/core/models/api-response';
-import { NotifyService } from 'src/app/core/utils/notify.service';
+import { ApiResponse, NotifyService } from 'src/app/core';
 import {
   GridColumn,
   GridConfig,

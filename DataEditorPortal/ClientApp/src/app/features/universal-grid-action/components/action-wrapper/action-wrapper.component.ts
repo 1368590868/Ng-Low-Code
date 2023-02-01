@@ -8,7 +8,7 @@ import {
   EventEmitter
 } from '@angular/core';
 import { GridActionDirective } from '../../directives/grid-action.directive';
-import { GridActionConfig } from '../../universal-grid-action.module';
+import { GridActionConfig } from '../../models/grid-config';
 
 @Component({
   selector: 'app-action-wrapper',

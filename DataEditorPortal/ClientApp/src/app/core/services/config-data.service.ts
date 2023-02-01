@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable, of, Subject } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 
 @Injectable({
@@ -9,6 +9,8 @@ import { ApiResponse } from '../models/api-response';
 export class ConfigDataService {
   public _apiUrl: string;
   public durationMs = 5000;
+  public menuChange$ = new Subject();
+
   constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
   }
@@ -26,6 +28,11 @@ export class ConfigDataService {
   }
 
   getSiteMenus(): Observable<any> {
+    return this.http
+      .post<ApiResponse<any>>(`${this._apiUrl}site/menus`, null)
+      .pipe(map(res => res.result));
+  }
+  getHomeMenus(): Observable<any> {
     return this.http
       .post<ApiResponse<any>>(`${this._apiUrl}site/menus`, null)
       .pipe(map(res => res.result));

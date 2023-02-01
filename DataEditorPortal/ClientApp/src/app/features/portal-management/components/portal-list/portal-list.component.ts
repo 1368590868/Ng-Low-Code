@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { tap } from 'rxjs';
-import { NotifyService } from 'src/app/app.module';
+import { NotifyService } from 'src/app/core';
 import { PortalItem, PortalItemData } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
 import { AddPortalDialogComponent } from './add-portal-dialog/add-portal-dialog.component';
@@ -28,6 +28,7 @@ export class PortalListComponent implements OnInit {
       label: 'Create Portal Item',
       icon: 'pi pi-fw pi-desktop',
       command: () => {
+        this.portalItemService.currentPortalItemParentFolder = undefined;
         this.router.navigate([`../add`], {
           relativeTo: this.activatedRoute
         });
@@ -52,7 +53,7 @@ export class PortalListComponent implements OnInit {
     const items: MenuItem[] = [];
     if (row['type'] === 'Portal Item') {
       items.push({
-        label: 'Edit Portal Item',
+        label: row['configCompleted'] ? 'Edit Portal Item' : 'Continue Editing',
         icon: 'pi pi-fw pi-pencil',
         command: () => {
           // edit portal item
@@ -67,6 +68,7 @@ export class PortalListComponent implements OnInit {
         icon: 'pi pi-fw pi-plus',
         command: () => {
           // new portal item
+          this.portalItemService.currentPortalItemParentFolder = row['id'];
           this.router.navigate([`../add`], {
             relativeTo: this.activatedRoute
           });
@@ -90,7 +92,7 @@ export class PortalListComponent implements OnInit {
         icon: 'pi pi-fw pi-minus-circle',
         command: () => this.unpublish(row)
       });
-    } else {
+    } else if (row['configCompleted'] != false) {
       items.push({
         label: 'Publish',
         icon: 'pi pi-fw pi-check-circle',

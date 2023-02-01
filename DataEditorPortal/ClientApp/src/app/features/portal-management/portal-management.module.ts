@@ -51,6 +51,7 @@ import {
   PortalEditSearchComponent,
   PortalEditFormComponent
 } from './components/portal-edit';
+import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
 
 @NgModule({
   declarations: [
@@ -66,6 +67,7 @@ import {
   imports: [
     CommonModule,
     PortalManagementRoutingModule,
+    UniversalGridActionModule,
     FormsModule,
     ReactiveFormsModule,
     FormlyModule.forRoot({
