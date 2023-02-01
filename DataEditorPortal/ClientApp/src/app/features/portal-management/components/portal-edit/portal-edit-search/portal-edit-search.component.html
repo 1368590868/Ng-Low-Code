@@ -52,7 +52,13 @@
               [model]="model"
               [options]="options"
               class="p-fluid"></formly-form>
-            <p-button styleClass="p-button-text" *ngIf="model.type === 'select'"
+            <p-button
+              styleClass="p-button-text"
+              *ngIf="
+                ['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(
+                  model.type
+                ) >= 0
+              "
               >Configure Options</p-button
             >
           </form>

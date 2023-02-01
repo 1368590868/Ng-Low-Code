@@ -85,8 +85,9 @@
                 class="p-fluid"></formly-form>
               <div
                 *ngIf="
-                  'select,checkboxList,radio,multiSelect'.indexOf(model.type) >=
-                  0
+                  ['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(
+                    model.type
+                  ) >= 0
                 ">
                 <p-divider>Options</p-divider>
                 <p-button styleClass="p-button-text"

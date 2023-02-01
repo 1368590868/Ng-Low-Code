@@ -158,6 +158,9 @@ export class PortalEditSearchComponent implements OnInit {
           props: {
             label: 'Placeholder',
             placeholder: 'Placeholder'
+          },
+          expressions: {
+            hide: `['checkbox', 'radio', 'checkboxList'].indexOf(field.parent.parent.model.type) >= 0`
           }
         }
       ]
@@ -196,8 +199,8 @@ export class PortalEditSearchComponent implements OnInit {
               key: x.columnName,
               type: result[0].value,
               props: {
-                label: x.columnName,
-                placeholder: x.columnName
+                label: x.columnName
+                // placeholder: x.columnName
               },
               filterType: x.filterType,
               searchRule: {
