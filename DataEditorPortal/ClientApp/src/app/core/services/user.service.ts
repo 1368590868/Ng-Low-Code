@@ -14,11 +14,6 @@ export class UserService {
   public isLogin = false;
   public durationMs = 5000;
 
-  public headerText = {
-    WebHeaderDescription: '',
-    WebHeaderMessage: ''
-  };
-
   constructor(
     private http: HttpClient,
     @Inject('API_URL') apiUrl: string,
@@ -40,9 +35,7 @@ export class UserService {
   }
 
   loginAfter() {
-    this.configData.getSiteEnvironment().subscribe((res: any) => {
-      this.headerText = res;
-    });
+    this.configData.getSiteEnvironment().subscribe();
 
     this.configData.menuChange$.next(null);
   }

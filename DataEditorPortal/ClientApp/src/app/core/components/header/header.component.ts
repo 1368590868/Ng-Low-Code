@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MenuItem } from 'primeng/api';
+import { ConfigDataService } from '../../services/config-data.service';
 import { UserService } from '../../services/user.service';
 @Component({
   selector: 'app-header',
@@ -8,7 +9,10 @@ import { UserService } from '../../services/user.service';
 })
 export class HeaderComponent {
   items!: MenuItem[];
-  constructor(public userService: UserService) {
+  constructor(
+    public configDataService: ConfigDataService,
+    public userService: UserService
+  ) {
     this.items = [
       {
         label: 'Home',
