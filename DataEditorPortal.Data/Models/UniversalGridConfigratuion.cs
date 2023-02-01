@@ -9,6 +9,10 @@ namespace DataEditorPortal.Data.Models
         public Guid Id { get; set; }
         public string Name { get; set; }
 
+        public string CurrentStep { get; set; }
+
+        public bool ConfigCompleted;
+
         public string DataSourceConfig { get; set; }
 
         public string ColumnsConfig { get; set; }

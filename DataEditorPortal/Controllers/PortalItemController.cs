@@ -144,6 +144,38 @@ namespace DataEditorPortal.Web.Controllers
 
         #endregion
 
+        [HttpGet]
+        [Route("{id}/current-step")]
+        public string CurrentStep(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+
+            return item.CurrentStep ?? "";
+        }
+
+        [HttpPost]
+        [Route("{id}/current-step/{step}")]
+        public string SaveCurrentStep(Guid id, string step)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            item.CurrentStep = step;
+            _depDbContext.SaveChanges();
+
+            return item.CurrentStep ?? "";
+        }
+
         #region Portal Item Basic
 
         [HttpGet]
