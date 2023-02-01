@@ -69,9 +69,7 @@
               styleClass="w-full"
               appendTo="body"
               [(ngModel)]="model.searchRule.matchMode"
-              [options]="
-                getFilterMatchModeOptions(model.filterType)
-              "></p-dropdown>
+              [options]="filterMatchModeOptions"></p-dropdown>
             <p-button
               class="ml-auto"
               title="Advanced Configuration"

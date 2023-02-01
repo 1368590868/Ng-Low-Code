@@ -166,6 +166,7 @@ export class PortalEditSearchComponent implements OnInit {
       ]
     }
   ];
+  filterMatchModeOptions: any[] = [];
 
   constructor(
     private primeNGConfig: PrimeNGConfig,
@@ -231,7 +232,14 @@ export class PortalEditSearchComponent implements OnInit {
 
   onTargetSelect({ items }: { items: GridSearchField[] }) {
     if (items.length === 1) {
+      const cacheSearchRule = items[0].searchRule.matchMode;
       this.model = items[0];
+      this.filterMatchModeOptions = this.getFilterMatchModeOptions(
+        items[0].filterType
+      );
+      this.changeDetectorRef.detectChanges();
+      items[0].searchRule.matchMode = cacheSearchRule;
+      this.changeDetectorRef.detectChanges();
     } else {
       this.model = {};
     }
