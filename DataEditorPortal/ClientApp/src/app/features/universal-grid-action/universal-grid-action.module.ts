@@ -47,6 +47,7 @@ import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
 import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
 import { UserPermissionActionComponent } from './components/user-permission-action/user-permission-action.component';
 import { FormlyChipWrapperModule } from '../ngx-formly/chip/chip.module';
+import { FormlyInputNumberModule } from '../ngx-formly/inputnumber';
 
 const GRID_ACTION_CONFIG = [
   {
@@ -181,6 +182,7 @@ const GRID_ACTION_CONFIG = [
     FormlyCheckBoxModule,
     FormlyDividerWrapperModule,
     FormlyChipWrapperModule,
+    FormlyInputNumberModule,
     // primeNg
     AnimateModule,
     ToastModule,
