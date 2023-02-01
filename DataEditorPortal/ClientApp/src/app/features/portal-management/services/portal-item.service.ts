@@ -21,7 +21,7 @@ export class PortalItemService {
 
   public currentPortalItemId?: string;
   public currentPortalItemParentFolder?: string;
-  public currentPortalDataSourceTableColumns?: any;
+  public currentPortalItemConfigCompleted?: boolean;
 
   constructor(
     private http: HttpClient,

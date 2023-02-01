@@ -23,6 +23,7 @@ export class PortalEditDatasourceComponent implements OnInit {
   isSavingAndNext = false;
   isSavingAndExit = false;
 
+  orginalConfig?: DataSourceConfig;
   datasourceConfig: DataSourceConfig = {
     tableName: '',
     tableSchema: '',
@@ -81,6 +82,7 @@ export class PortalEditDatasourceComponent implements OnInit {
             x => (x.matchOptions = this.getFilterMatchModeOptions(x.filterType))
           );
           this.datasourceConfig = dsConfig;
+          this.orginalConfig = { ...dsConfig };
           const currentSelected = `${dsConfig.tableSchema}.${dsConfig.tableName}`;
 
           // check if current selected dbTable exists, if not exist, use the first
@@ -171,6 +173,14 @@ export class PortalEditDatasourceComponent implements OnInit {
         .pipe(
           tap(res => {
             if (res && !res.isError) {
+              if (
+                this.orginalConfig &&
+                (this.orginalConfig.tableName != data.tableName ||
+                  this.orginalConfig?.tableSchema != data.tableSchema)
+              ) {
+                // if user changed the tableSchema or tableName, user need to continue config column, search, form
+                this.portalItemService.currentPortalItemConfigCompleted = false;
+              }
               this.saveSucess();
             }
 
