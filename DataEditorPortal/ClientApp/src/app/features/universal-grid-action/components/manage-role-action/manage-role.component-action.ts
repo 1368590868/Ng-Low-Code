@@ -11,11 +11,11 @@ import {
 import { RolePermissionService } from '../../services/role-permission.service';
 
 @Component({
-  selector: 'app-manager-role',
+  selector: 'app-manage-action-role',
   templateUrl: './manage-role-action.component.html',
   styleUrls: ['./manage-role-action.component.scss']
 })
-export class ManagerRoleComponent
+export class ManageRoleActionComponent
   extends GridActionDirective
   implements OnInit
 {
@@ -98,7 +98,7 @@ export class ManagerRoleComponent
         {
           className: 'w-full',
           key: 'roleDescription',
-          type: 'textarea',
+          type: 'inputNumber',
           props: {
             required: true,
             type: 'text',

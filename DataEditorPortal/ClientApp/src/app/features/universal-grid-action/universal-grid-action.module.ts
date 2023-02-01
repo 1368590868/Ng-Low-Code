@@ -42,10 +42,10 @@ import { UserManagerActionComponent } from './components/user-manager-action/use
 import { FormlySelectModule } from '../ngx-formly/select/select.module';
 import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
 import { CheckboxModule } from 'primeng/checkbox';
-import { ManagerRoleComponent } from './components/manage-role-action/manage-role.component-action';
+import { ManageRoleActionComponent } from './components/manage-role-action/manage-role.component-action';
 import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
 import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
-import { UserPermissionComponent } from './components/user-permission-action/user-permission-action.component';
+import { UserPermissionActionComponent } from './components/user-permission-action/user-permission-action.component';
 import { FormlyChipWrapperModule } from '../ngx-formly/chip/chip.module';
 
 const GRID_ACTION_CONFIG = [
@@ -116,7 +116,7 @@ const GRID_ACTION_CONFIG = [
     label: 'Role Manager',
     isCustom: true,
     requireGridRowSelected: false,
-    component: ManagerRoleComponent,
+    component: ManageRoleActionComponent,
     wrapper: {
       header: 'Manage Roles',
       dialogStyle: { width: '40rem' },
@@ -141,7 +141,7 @@ const GRID_ACTION_CONFIG = [
     label: 'Edit User Permissions',
     isCustom: true,
     requireGridRowSelected: true,
-    component: UserPermissionComponent,
+    component: UserPermissionActionComponent,
     wrapper: {
       dialogStyle: { width: '40rem' },
       header: 'Edit Permission',
@@ -161,9 +161,9 @@ const GRID_ACTION_CONFIG = [
     ExportExcelActionComponent,
     RemoveActionComponent,
     UserManagerActionComponent,
-    ManagerRoleComponent,
+    ManageRoleActionComponent,
     UserRoleActionComponent,
-    UserPermissionComponent
+    UserPermissionActionComponent
   ],
   imports: [
     CommonModule,
