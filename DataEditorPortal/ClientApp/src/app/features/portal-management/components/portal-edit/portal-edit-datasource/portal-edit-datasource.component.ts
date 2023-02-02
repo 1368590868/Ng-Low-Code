@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { forkJoin, tap } from 'rxjs';
@@ -11,6 +12,14 @@ import {
   DataSourceTableColumn
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
+
+interface DataSourceFilterControls {
+  formControlField: FormControl;
+  formControlMatchMode: FormControl;
+  formControlValue: FormControl;
+  matchOptions: any[];
+  filterType?: string;
+}
 
 @Component({
   selector: 'app-portal-edit-datasource',
@@ -31,7 +40,6 @@ export class PortalEditDatasourceComponent implements OnInit {
     filters: [],
     sortBy: []
   };
-  selectedDbTable?: string;
 
   dbTables: DataSourceTable[] = [];
   dbTableColumns: DataSourceTableColumn[] = [];
@@ -46,19 +54,34 @@ export class PortalEditDatasourceComponent implements OnInit {
     }
   ];
 
-  errTableName = false;
-  errIdColumn = false;
+  filters: DataSourceFilterControls[] = [];
+
+  formControlDbTable: FormControl = new FormControl();
+  formControlIdColumn: FormControl = new FormControl();
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
-    private changeDetectorRef: ChangeDetectorRef,
     private primeNGConfig: PrimeNGConfig,
     private notifyService: NotifyService
   ) {}
 
   ngOnInit(): void {
+    this.formControlDbTable.valueChanges.subscribe(value => {
+      if (value) {
+        const [tableSchema, tableName] = value.split('.');
+        this.datasourceConfig.tableName = tableName;
+        this.datasourceConfig.tableSchema = tableSchema;
+      } else {
+        this.datasourceConfig.tableName = '';
+        this.datasourceConfig.tableSchema = '';
+      }
+    });
+    this.formControlIdColumn.valueChanges.subscribe(
+      value => (this.datasourceConfig.idColumn = value)
+    );
+
     // get protal item datasource config
     if (this.portalItemService.currentPortalItemId) {
       forkJoin([
@@ -66,43 +89,47 @@ export class PortalEditDatasourceComponent implements OnInit {
         // load database tables
         this.portalItemService.getDataSourceTables()
       ]).subscribe(res => {
-        const tables = res[1];
+        this.isLoading = false;
+        const tables: DataSourceTable[] = res[1];
+        if (tables.length === 0) return;
+
         // create label and value for dropdown
         tables.forEach(x => {
           x.label = `${x.tableSchema}.${x.tableName}`;
           x.value = `${x.tableSchema}.${x.tableName}`;
         });
         this.dbTables = tables;
-        this.changeDetectorRef.detectChanges();
 
-        // after detect changes, the first table will be selected.
         const dsConfig = res[0];
         if (dsConfig && dsConfig.tableName) {
-          dsConfig.filters?.forEach(
-            x => (x.matchOptions = this.getFilterMatchModeOptions(x.filterType))
-          );
           this.datasourceConfig = dsConfig;
           this.orginalConfig = { ...dsConfig };
-          const currentSelected = `${dsConfig.tableSchema}.${dsConfig.tableName}`;
+
+          // set form control
+          const selectedDbTable = `${dsConfig.tableSchema}.${dsConfig.tableName}`;
+          this.formControlDbTable.setValue(selectedDbTable);
 
           // check if current selected dbTable exists, if not exist, use the first
-          if (!tables.find(x => x.value === currentSelected)) {
-            // if no selectedDbTable or the selectedDbTable does not exist in the dropdown options.
-            // select the first by default.
-            this.selectedDbTable = tables[0].value;
-            this.datasourceConfig.tableName = tables[0].tableName;
-            this.datasourceConfig.tableSchema = tables[0].tableSchema;
-          } else {
-            this.selectedDbTable = currentSelected;
+          if (!tables.find(x => x.value === selectedDbTable)) {
+            this.formControlDbTable.setValue(tables[0].value);
           }
+
+          // set filters
+          this.filters = dsConfig.filters.map<DataSourceFilterControls>(x => {
+            return {
+              matchOptions: this.getFilterMatchModeOptions(x.filterType),
+              filterType: x.filterType,
+              formControlField: new FormControl(x.field),
+              formControlMatchMode: new FormControl(x.matchMode),
+              formControlValue: new FormControl(x.value)
+            };
+          });
         } else {
           // if table schema and table name havn't been stored, use the first from tables.
-          this.datasourceConfig.tableName = tables[0].tableName;
-          this.datasourceConfig.tableSchema = tables[0].tableSchema;
+          this.formControlDbTable.setValue(tables[0].value);
         }
 
         this.loadTableColumns();
-        this.isLoading = false;
       });
 
       this.portalItemService.saveCurrentStep('datasource');
@@ -112,49 +139,58 @@ export class PortalEditDatasourceComponent implements OnInit {
   onTableNameChange({ value }: { value: string }) {
     const item = this.dbTables.find(x => x.value === value);
     if (item) {
-      this.datasourceConfig.tableName = item.tableName;
-      this.datasourceConfig.tableSchema = item.tableSchema;
       this.loadTableColumns();
 
       // clear the filters and sortBy, as the database table has changed.
-      this.datasourceConfig.filters = [];
+      this.filters = [];
       this.datasourceConfig.sortBy = [];
     }
   }
 
   loadTableColumns() {
-    if (!this.selectedDbTable) return;
-    const [tableSchema, tableName] = this.selectedDbTable.split('.');
+    const selectedDbTable = this.formControlDbTable.value;
+    if (!selectedDbTable) return;
+    const [tableSchema, tableName] = selectedDbTable.split('.');
     this.portalItemService
       .getDataSourceTableColumns(tableSchema, tableName)
       .pipe(
         tap(res => {
           this.dbTableColumns = res;
-          this.changeDetectorRef.detectChanges();
+          if (
+            !this.datasourceConfig.idColumn ||
+            !res.find(x => x.columnName === this.datasourceConfig.idColumn)
+          ) {
+            this.formControlIdColumn.setValue(res[0].columnName);
+          } else {
+            this.formControlIdColumn.setValue(this.datasourceConfig.idColumn);
+          }
         })
       )
       .subscribe();
   }
 
   validate() {
-    if (!this.datasourceConfig.tableName) {
-      this.errTableName = true;
+    if (!this.formControlDbTable.valid) {
+      this.formControlDbTable.markAsDirty();
+      this.formControlDbTable.updateValueAndValidity();
     }
-    if (!this.datasourceConfig.idColumn) {
-      this.errIdColumn = true;
+    if (!this.formControlIdColumn.valid) {
+      this.formControlIdColumn.markAsDirty();
+      this.formControlIdColumn.updateValueAndValidity();
     }
-    this.datasourceConfig.filters.forEach(x => {
-      if (!x.value) {
-        x.errValue = true;
+
+    const filterValid = this.filters.reduce((r, x) => {
+      if (!x.formControlValue.valid) {
+        x.formControlValue.markAsDirty();
+        x.formControlValue.updateValueAndValidity();
       }
-    });
+      return r && x.formControlValue.valid;
+    }, true);
+
     return (
-      !this.errTableName &&
-      !this.errIdColumn &&
-      !this.datasourceConfig.filters.reduce<boolean>(
-        (r, c) => r || !!c.errValue,
-        false
-      )
+      this.formControlDbTable.valid &&
+      this.formControlIdColumn.valid &&
+      filterValid
     );
   }
 
@@ -164,8 +200,13 @@ export class PortalEditDatasourceComponent implements OnInit {
       const data = JSON.parse(
         JSON.stringify(this.datasourceConfig)
       ) as DataSourceConfig;
-      data.filters?.forEach(x => {
-        (x.matchOptions = undefined), (x.errValue = undefined);
+      data.filters = this.filters.map<DataSourceFilter>(x => {
+        return {
+          field: x.formControlField.value,
+          matchMode: x.formControlMatchMode.value,
+          value: x.formControlValue.value,
+          filterType: x.filterType
+        };
       });
 
       this.portalItemService
@@ -234,13 +275,15 @@ export class PortalEditDatasourceComponent implements OnInit {
     const column = this.dbTableColumns[0];
     const matchOptions = this.getFilterMatchModeOptions(column.filterType);
 
-    const newFilter = [...this.datasourceConfig.filters];
+    const newFilter = [...this.filters];
     newFilter.push({
-      field: this.dbTableColumns[0].columnName,
+      filterType: column.filterType,
       matchOptions,
-      matchMode: matchOptions[0].value
+      formControlField: new FormControl(column.columnName),
+      formControlMatchMode: new FormControl(matchOptions[0].value),
+      formControlValue: new FormControl()
     });
-    this.datasourceConfig.filters = newFilter;
+    this.filters = newFilter;
   }
 
   getFilterMatchModeOptions(filterType?: string) {
@@ -256,31 +299,28 @@ export class PortalEditDatasourceComponent implements OnInit {
     );
   }
 
-  onRemoveFilter(filter: DataSourceFilter) {
-    const newFilter = [...this.datasourceConfig.filters];
+  onRemoveFilter(filter: DataSourceFilterControls) {
+    const newFilter = [...this.filters];
     const index = newFilter.indexOf(filter);
     newFilter.splice(index, 1);
-    this.datasourceConfig.filters = newFilter;
+    this.filters = newFilter;
   }
 
-  onFilterColumnChange({ value }: { value: string }, filter: DataSourceFilter) {
+  onFilterColumnChange(
+    { value }: { value: string },
+    filter: DataSourceFilterControls
+  ) {
     const column = this.dbTableColumns.find(x => x.columnName === value);
     if (column) {
-      const matchOptions = this.getFilterMatchModeOptions(column.filterType);
+      filter.matchOptions = this.getFilterMatchModeOptions(column.filterType);
+      filter.filterType = column.filterType;
+      filter.formControlMatchMode.setValue(filter.matchOptions[0].value);
 
-      const newFilter = [...this.datasourceConfig.filters];
+      const newFilter = [...this.filters];
       const index = newFilter.indexOf(filter);
-      newFilter.splice(index, 1, {
-        ...filter,
-        matchOptions
-        // matchMode: matchOptions[0].value
-      });
-      this.datasourceConfig.filters = newFilter;
+      newFilter.splice(index, 1, filter);
+      this.filters = newFilter;
     }
-  }
-
-  onFilterValueChange(value: string, filter: DataSourceFilter) {
-    filter.errValue = !value;
   }
 
   onAddSortColumn() {

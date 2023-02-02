@@ -36,10 +36,8 @@ export interface DataSourceConfig {
 export interface DataSourceFilter {
   field?: string;
   filterType?: string;
-  matchOptions?: any[];
   matchMode?: string;
   value?: string;
-  errValue?: boolean;
 }
 
 export interface DataSourceSortBy {

@@ -10,10 +10,11 @@
         <label for="tableName" class="mb-1">Database Table *</label>
         <div class="flex align-items-center">
           <p-dropdown
-            inputId="tableName"
-            [(ngModel)]="selectedDbTable"
+            [required]="true"
             [options]="dbTables"
             (onChange)="onTableNameChange($event)"
+            [formControl]="formControlDbTable"
+            placeholder="Please Select"
             [style]="{ minWidth: '20rem' }"></p-dropdown>
           <i
             class="pi pi-question-circle ml-3 text-lg"
@@ -24,9 +25,10 @@
         <label for="idColumn" class="mb-1">Id Column *</label>
         <div class="flex align-items-center">
           <p-dropdown
-            inputId="idColumn"
-            [(ngModel)]="datasourceConfig.idColumn"
+            [required]="true"
+            [formControl]="formControlIdColumn"
             [options]="dbTableColumns"
+            placeholder="Please Select"
             [style]="{ minWidth: '20rem' }"
             optionLabel="columnName"
             optionValue="columnName"></p-dropdown>
@@ -39,12 +41,12 @@
     <p-divider styleClass="mb-0">Filters</p-divider>
     <div class="flex flex-column mb-2">
       <!-- <label class="mb-1">Filters</label> -->
-      <p-orderList [value]="datasourceConfig.filters" [stripedRows]="true">
+      <p-orderList [value]="filters" [stripedRows]="true">
         <ng-template let-filter pTemplate="item">
           <div class="flex align-items-center">
             <div class="mr-3">
               <p-dropdown
-                [(ngModel)]="filter.field"
+                [formControl]="filter.formControlField"
                 [options]="dbTableColumns"
                 optionLabel="columnName"
                 optionValue="columnName"
@@ -53,17 +55,33 @@
             </div>
             <div class="mr-3">
               <p-dropdown
-                [(ngModel)]="filter.matchMode"
+                [formControl]="filter.formControlMatchMode"
                 [options]="filter.matchOptions"
                 appendTo="body"></p-dropdown>
             </div>
-            <div class="mr-3">
+            <div class="mr-3" style="width: 15rem">
               <input
+                *ngIf="filter.filterType === 'text'"
+                [required]="true"
+                [formControl]="filter.formControlValue"
                 pInputText
-                placeholder="Enter a value"
-                [class]="filter.errValue ? 'ng-invalid ng-dirty' : ''"
-                (ngModelChange)="onFilterValueChange($event, filter)"
-                [(ngModel)]="filter.value" />
+                placeholder="Enter a value" />
+              <p-inputNumber
+                *ngIf="filter.filterType === 'numeric'"
+                [required]="true"
+                [formControl]="filter.formControlValue"
+                [showButtons]="true"
+                placeholder="Enter a value"></p-inputNumber>
+              <p-calendar
+                *ngIf="filter.filterType === 'date'"
+                [required]="true"
+                [formControl]="filter.formControlValue"
+                appendTo="body"
+                placeholder="Enter a value"></p-calendar>
+              <p-inputSwitch
+                *ngIf="filter.filterType === 'boolean'"
+                [required]="true"
+                [formControl]="filter.formControlValue"></p-inputSwitch>
             </div>
             <div>
               <p-button
