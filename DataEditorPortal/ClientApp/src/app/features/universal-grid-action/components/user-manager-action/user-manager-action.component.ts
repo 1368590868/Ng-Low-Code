@@ -62,6 +62,7 @@ export class UserManagerActionComponent
           className: 'w-6 pl-2',
           key: 'phone',
           type: 'inputMask',
+          defaultValue: '',
           props: {
             required: true,
             type: 'text',
@@ -78,7 +79,7 @@ export class UserManagerActionComponent
         {
           className: 'w-6 ',
           key: 'vendor',
-          type: 'select',
+          type: 'iconSelect',
           props: {
             label: 'Vendor',
             placeholder: 'Please select',
