@@ -10,7 +10,6 @@ import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { AvatarModule } from 'primeng/avatar';
-import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import {
   HeaderComponent,
@@ -20,17 +19,26 @@ import {
   HomeComponent,
   TileComponent,
   LoginComponent,
-  ErrorPageComponent
+  ErrorPageComponent,
+  OptionDialogComponent
 } from './components';
 import { PermissionDirective } from './directive/permission.directive';
 import { CommonModule } from '@angular/common';
-
+import { InputTextModule } from 'primeng/inputtext';
 export * from './components';
 export { RouterGuard } from './guards/router.guard';
 export { ApiResponse } from './models/api-response';
 export { NotifyService } from './utils/notify.service';
 export { NgxFormlyService } from './services/ngx-formly.service';
 export { ConfigDataService } from './services/config-data.service';
+import { DialogModule } from 'primeng/dialog';
+import { DividerModule } from 'primeng/divider';
+import { OrderListModule } from 'primeng/orderlist';
+import { InputSwitchModule } from 'primeng/inputswitch';
+
+import { ReactiveFormsModule } from '@angular/forms';
+
+import { MonacoEditorModule } from 'ngx-monaco-editor';
 
 @NgModule({
   declarations: [
@@ -39,6 +47,7 @@ export { ConfigDataService } from './services/config-data.service';
     AboutComponent,
     ContactComponent,
     HomeComponent,
+    OptionDialogComponent,
     TileComponent,
     LoginComponent,
     ErrorPageComponent,
@@ -53,7 +62,13 @@ export { ConfigDataService } from './services/config-data.service';
     MenubarModule,
     AvatarModule,
     DialogModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    InputTextModule,
+    DividerModule,
+    OrderListModule,
+    InputSwitchModule,
+    ReactiveFormsModule,
+    MonacoEditorModule.forRoot()
   ],
   exports: [
     HeaderComponent,
@@ -64,7 +79,8 @@ export { ConfigDataService } from './services/config-data.service';
     TileComponent,
     LoginComponent,
     ErrorPageComponent,
-    PermissionDirective
+    PermissionDirective,
+    OptionDialogComponent
   ],
   providers: [
     {
