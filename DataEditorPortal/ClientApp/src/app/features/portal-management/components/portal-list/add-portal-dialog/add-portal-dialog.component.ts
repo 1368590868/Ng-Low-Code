@@ -5,7 +5,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { FormGroup, NgForm } from '@angular/forms';
+import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { NotifyService } from 'src/app/core';
 import { PortalItemService } from '../../../services/portal-item.service';
@@ -31,18 +31,8 @@ export class AddPortalDialogComponent {
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  model = {};
+  model: { [name: string]: any } = {};
   fields: FormlyFieldConfig[] = [
-    {
-      key: 'name',
-      type: 'input',
-      className: 'w-full',
-      props: {
-        label: 'Folder Name',
-        placeholder: 'Portal Name',
-        required: true
-      }
-    },
     {
       key: 'label',
       type: 'input',
@@ -50,14 +40,34 @@ export class AddPortalDialogComponent {
         label: 'Menu Label',
         placeholder: 'Menu Label',
         required: true
+      },
+      modelOptions: {
+        updateOn: 'blur'
+      },
+      asyncValidators: {
+        exist: {
+          expression: (c: AbstractControl) => {
+            return new Promise((resolve, reject) => {
+              this.portalItemService
+                .nameExists(c.value, this.model['id'])
+                .subscribe(res =>
+                  !res.isError ? resolve(!res.result) : reject(res.message)
+                );
+            });
+          },
+          message: () => {
+            return 'The Menu Name has already been exist.';
+          }
+        }
       }
     },
     {
       key: 'icon',
-      type: 'input',
+      type: 'iconSelect',
       props: {
         label: 'Icon',
         placeholder: 'Icon',
+        virtualScroll: false,
         required: true
       }
     },

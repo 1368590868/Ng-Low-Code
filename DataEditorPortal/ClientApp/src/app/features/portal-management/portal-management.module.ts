@@ -12,6 +12,7 @@ import { FormlyInputMaskModule } from '../ngx-formly/inputMask';
 import { FormlySelectModule } from '../ngx-formly/select';
 import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
 import { FormlyCheckBoxModule } from '../ngx-formly/checkbox';
+import { FormlyIconSelectModule } from '../ngx-formly/iconselect';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
@@ -85,6 +86,7 @@ import { UniversalGridActionModule } from 'src/app/features/universal-grid-actio
     FormlySelectModule,
     FormlyDividerWrapperModule,
     FormlyCheckBoxModule,
+    FormlyIconSelectModule,
 
     // primeNg
     AnimateModule,

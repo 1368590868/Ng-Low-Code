@@ -1,4 +1,9 @@
-import { Component, ChangeDetectionStrategy, Type } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  Type,
+  ViewChild
+} from '@angular/core';
 import {
   FieldType,
   FieldTypeConfig,
@@ -7,10 +12,13 @@ import {
 import { FormlyFieldProps } from '@ngx-formly/primeng/form-field';
 import { FormlyFieldSelectProps } from '@ngx-formly/core/select';
 import { SelectItem } from 'primeng/api';
+import { Dropdown } from 'primeng/dropdown';
 
 interface IconSelectProps extends FormlyFieldProps, FormlyFieldSelectProps {
   appendTo?: string;
   virtualScroll?: boolean;
+  resetFilterOnHide?: boolean;
+  virtualScrollItemSize?: number;
 }
 
 export interface FormlySelectFieldConfig
@@ -22,6 +30,7 @@ export interface FormlySelectFieldConfig
   selector: 'app-formly-field-primeng-icon-select',
   template: `
     <p-dropdown
+      #dropdown
       [options]="iconList"
       [filter]="true"
       filterBy="label"
@@ -29,18 +38,20 @@ export interface FormlySelectFieldConfig
       [formControl]="formControl"
       [formlyAttributes]="field"
       [virtualScroll]="props.virtualScroll ?? true"
-      [virtualScrollItemSize]="38"
+      [virtualScrollItemSize]="props.virtualScrollItemSize ?? 38"
       [placeholder]="props.placeholder || ''"
       [appendTo]="props.appendTo || 'body'"
+      (onFilter)="onFilter()"
+      [resetFilterOnHide]="props.resetFilterOnHide || true"
       (onChange)="props.change && props.change(field, $event)">
       <ng-template let-select pTemplate="selectedItem">
-        <div class="flex  align-items-center w-6">
+        <div class="flex  align-items-center">
           <i [class]="select.value"></i>
           <p class="ml-5">{{ select.label }}</p>
         </div>
       </ng-template>
       <ng-template let-icon pTemplate="item">
-        <div class="flex  align-items-center w-6">
+        <div class="flex align-items-center">
           <i [class]="icon.value"></i>
           <p class="ml-5">{{ icon.label }}</p>
         </div>
@@ -316,11 +327,16 @@ export class FormlyFieldIconSelectComponent extends FieldType<
     'pi pi-spinner'
   ];
   public iconList: SelectItem[];
+  @ViewChild('dropdown') dropdown!: Dropdown;
+
   constructor() {
     super();
     this.iconList = this.initIcon.map(icon => ({
-      label: icon,
+      label: icon.replace('pi ', ''),
       value: icon
     }));
+  }
+  onFilter() {
+    this.dropdown.scroller.setContentPosition(null);
   }
 }

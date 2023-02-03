@@ -25,24 +25,15 @@ export class PortalEditBasicComponent implements OnInit {
   model: PortalItemData = {};
   fields: FormlyFieldConfig[] = [
     {
-      key: 'name',
+      key: 'label',
       type: 'input',
-      className: 'w-6',
       props: {
-        label: 'Portal Name',
-        placeholder: 'Portal Name',
+        label: 'Menu Label',
+        placeholder: 'Menu Label',
         required: true
       },
       modelOptions: {
         updateOn: 'blur'
-      },
-      validators: {
-        doNotAllowSpecial: {
-          expression: (c: AbstractControl) => {
-            return /^[a-zA-Z]\w+/.test(c.value);
-          },
-          message: 'Only number and letter are allowed.'
-        }
       },
       asyncValidators: {
         exist: {
@@ -59,6 +50,15 @@ export class PortalEditBasicComponent implements OnInit {
             return 'The Portal Name has already been exist.';
           }
         }
+      }
+    },
+    {
+      key: 'icon',
+      type: 'iconSelect',
+      props: {
+        label: 'Icon',
+        placeholder: 'Icon',
+        required: true
       }
     },
     {
@@ -97,24 +97,6 @@ export class PortalEditBasicComponent implements OnInit {
             }
           });
         }
-      }
-    },
-    {
-      key: 'label',
-      type: 'input',
-      props: {
-        label: 'Menu Label',
-        placeholder: 'Menu Label',
-        required: true
-      }
-    },
-    {
-      key: 'icon',
-      type: 'input',
-      props: {
-        label: 'Icon',
-        placeholder: 'Icon',
-        required: true
       }
     },
     {
