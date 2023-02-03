@@ -99,6 +99,32 @@ export class PortalItemService {
       );
   }
 
+  moveUp(id: string): Observable<ApiResponse<boolean>> {
+    return this.http
+      .post<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/${id}/move-up`,
+        null
+      )
+      .pipe(
+        tap(() => {
+          this.configDataService.menuChange$.next(null);
+        })
+      );
+  }
+
+  moveDown(id: string): Observable<ApiResponse<boolean>> {
+    return this.http
+      .post<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/${id}/move-down`,
+        null
+      )
+      .pipe(
+        tap(() => {
+          this.configDataService.menuChange$.next(null);
+        })
+      );
+  }
+
   nameExists(name: string, id?: string): Observable<ApiResponse<boolean>> {
     let params = new HttpParams().set('name', name);
     if (id) params = params.set('id', id);

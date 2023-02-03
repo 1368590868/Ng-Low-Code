@@ -1,8 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, TreeNode } from 'primeng/api';
+import { ContextMenu } from 'primeng/contextmenu';
+import { Menu } from 'primeng/menu';
 import { tap } from 'rxjs';
-import { NotifyService } from 'src/app/core';
+import { ConfigDataService, NotifyService } from 'src/app/core';
 import { PortalItem, PortalItemData } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
 import { AddPortalDialogComponent } from './add-portal-dialog/add-portal-dialog.component';
@@ -36,20 +38,40 @@ export class PortalListComponent implements OnInit {
     }
   ];
 
+  contextMenuItems: MenuItem[] = [];
+
   @ViewChild('addDialog') addDialog!: AddPortalDialogComponent;
+  @ViewChild('cm') contextMenu!: ContextMenu;
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private configDataService: ConfigDataService
   ) {}
 
   ngOnInit(): void {
     this.getPortalList();
   }
 
-  getMenuList(row: PortalItemData) {
+  onShowMenu(menu: Menu, $event: any, rowNode: TreeNode) {
+    if (!menu.visible) {
+      this.contextMenuItems = this.getMenuList(rowNode);
+    }
+    menu.toggle($event);
+  }
+
+  onContextMenuSelect(event: any) {
+    this.contextMenuItems = this.getMenuList(event.node);
+    setTimeout(() => {
+      this.contextMenu.show(event.originalEvent);
+    }, 0);
+  }
+
+  getMenuList(rowNode: TreeNode) {
+    const row = rowNode.data as PortalItemData;
+    console.log(rowNode);
     const items: MenuItem[] = [];
     if (row['type'] === 'Portal Item') {
       items.push({
@@ -114,6 +136,26 @@ export class PortalListComponent implements OnInit {
         });
       }
     }
+
+    if (row['order'] > 0) {
+      items.push({
+        label: 'Move Up',
+        icon: 'pi pi-fw pi-angle-up',
+        command: () => this.moveUp(row)
+      });
+    }
+
+    const length = rowNode.parent?.children
+      ? rowNode.parent?.children.length - 1
+      : this.data.length - 1;
+    if (row['order'] < length) {
+      items.push({
+        label: 'Move Down',
+        icon: 'pi pi-fw pi-angle-down',
+        command: () => this.moveDown(row)
+      });
+    }
+
     return items;
   }
 
@@ -153,5 +195,36 @@ export class PortalListComponent implements OnInit {
         })
       )
       .subscribe();
+  }
+
+  moveUp(row: PortalItemData) {
+    this.portalItemService
+      .moveUp(row['id'])
+      .pipe(
+        tap(res => {
+          if (res && !res.isError) {
+            this.getPortalList();
+          }
+        })
+      )
+      .subscribe();
+  }
+
+  moveDown(row: PortalItemData) {
+    this.portalItemService
+      .moveDown(row['id'])
+      .pipe(
+        tap(res => {
+          if (res && !res.isError) {
+            this.getPortalList();
+          }
+        })
+      )
+      .subscribe();
+  }
+
+  onDiaglogSaved() {
+    this.getPortalList();
+    this.configDataService.menuChange$.next(null);
   }
 }

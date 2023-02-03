@@ -67,7 +67,7 @@ export class PortalEditSearchComponent implements OnInit {
     },
     {
       label: 'Input Number',
-      value: 'input',
+      value: 'inputNumber',
       filterType: 'numeric'
     }
   ];

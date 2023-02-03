@@ -2,7 +2,10 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { finalize, Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { GridActionOption } from 'src/app/features/universal-grid-action';
+import {
+  GridActionOption,
+  GridActionWrapperOption
+} from 'src/app/features/universal-grid-action';
 import {
   GridColumn,
   GridConfig,
@@ -32,12 +35,13 @@ export class TableComponent implements OnInit, OnDestroy {
 
   loading = true;
   @ViewChild('dt') table!: Table;
-  actions: GridActionOption[] = [];
 
   cols: GridColumn[] = [];
   stateKey!: string;
 
   tableConfig: GridConfig = { dataKey: 'Id' };
+  rowActions: GridActionOption[] = [];
+  tableActions: GridActionOption[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -51,7 +55,13 @@ export class TableComponent implements OnInit, OnDestroy {
 
     // get grid config
     this.gridTableService.getTableConfig().subscribe(result => {
+      // result.customActions = [];
+      // result.customActions?.push('manage-roles');
+      // result.customActions?.push('edit-role');
+      // result.customActions?.push('edit-permission');
       this.tableConfig = result;
+      this.setRowActions();
+      this.setTableActions();
     });
 
     // get grid column
@@ -59,65 +69,6 @@ export class TableComponent implements OnInit, OnDestroy {
       this.cols = res;
     });
 
-    // get grid config
-    this.actions = [
-      {
-        name: 'add-record',
-        wrapper: {
-          label: 'Add New',
-          icon: 'pi pi-plus'
-        }
-      },
-      {
-        name: 'export-excel',
-        wrapper: {
-          label: 'Export To Excel',
-          icon: 'pi pi-file-excel',
-          buttonStyleClass: 'p-button-outlined'
-        }
-      },
-      {
-        name: 'remove-record',
-        wrapper: {
-          label: 'Remove',
-          icon: 'pi pi-trash',
-          buttonStyleClass: 'p-button-outlined p-button-danger'
-        }
-      },
-      {
-        name: 'user-manager',
-        wrapper: {
-          label: 'User Manager',
-          icon: 'pi pi-plus'
-        },
-        props: {
-          isAddForm: true
-        }
-      },
-      {
-        name: 'add-role',
-        wrapper: {
-          label: 'Manage Roles',
-          icon: 'pi pi-plus'
-        }
-      },
-      {
-        name: 'edit-role',
-        wrapper: {
-          label: 'Edit Roles',
-          icon: 'pi pi-plus'
-        }
-      },
-      {
-        name: 'edit-permission',
-        wrapper: {
-          label: 'Edit Permission',
-          icon: 'pi pi-plus'
-        }
-      }
-    ];
-
-    // subscribe search click to do searching
     this.gridTableService.searchClicked$
       .pipe(
         tap(model => {
@@ -132,6 +83,77 @@ export class TableComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next(null);
     this.destroy$.complete();
+  }
+
+  setRowActions() {
+    const actions: GridActionOption[] = [];
+    if (this.tableConfig.allowEdit) {
+      const viewWrapper: GridActionWrapperOption = {
+        label: '',
+        icon: 'pi pi-info-circle',
+        class: 'flex',
+        buttonStyleClass: 'p-button-lg p-button-rounded p-button-text'
+      };
+      if (this.tableConfig.useCustomForm) {
+        if (this.tableConfig.customViewFormName) {
+          actions.push({
+            name: this.tableConfig.customViewFormName,
+            wrapper: viewWrapper
+          });
+        }
+      } else {
+        actions.push({
+          name: 'view-record',
+          wrapper: viewWrapper
+        });
+      }
+
+      const editWrapper: GridActionWrapperOption = {
+        label: '',
+        icon: 'pi pi-file-edit',
+        class: 'flex',
+        buttonStyleClass: 'p-button-lg p-button-rounded p-button-text'
+      };
+      if (this.tableConfig.useCustomForm) {
+        if (this.tableConfig.customEditFormName) {
+          actions.push({
+            name: this.tableConfig.customEditFormName,
+            wrapper: editWrapper
+          });
+        }
+      } else {
+        actions.push({
+          name: 'edit-record',
+          wrapper: editWrapper
+        });
+      }
+    }
+    this.rowActions = [...actions];
+  }
+
+  setTableActions() {
+    const actions: GridActionOption[] = [];
+    if (this.tableConfig.allowEdit) {
+      if (this.tableConfig.useCustomForm) {
+        if (this.tableConfig.customAddFormName) {
+          actions.push({ name: this.tableConfig.customAddFormName });
+        }
+      } else {
+        actions.push({ name: 'add-record' });
+      }
+    }
+    if (this.tableConfig.allowDelete) {
+      actions.push({ name: 'remove-record' });
+    }
+    if (this.tableConfig.allowExport) {
+      actions.push({ name: 'export-excel' });
+    }
+
+    this.tableConfig.customActions?.forEach(x => {
+      actions.push({ name: x });
+    });
+
+    this.tableActions = [...actions];
   }
 
   loadTableLazy(event: any) {

@@ -54,6 +54,8 @@ const GRID_ACTION_CONFIG = [
     name: 'add-record',
     component: EditRecordActionComponent,
     wrapper: {
+      label: 'Add New',
+      icon: 'pi pi-plus',
       dialogStyle: { width: '40rem' },
       okText: 'Add'
     },
@@ -84,6 +86,9 @@ const GRID_ACTION_CONFIG = [
     name: 'export-excel',
     component: ExportExcelActionComponent,
     wrapper: {
+      label: 'Export To Excel',
+      icon: 'pi pi-file-excel',
+      buttonStyleClass: 'p-button-outlined',
       header: 'Export to Excel',
       cancelText: 'Cancel',
       okText: 'Export'
@@ -94,31 +99,53 @@ const GRID_ACTION_CONFIG = [
     requireGridRowSelected: true,
     component: RemoveActionComponent,
     wrapper: {
+      label: 'Remove',
+      icon: 'pi pi-trash',
+      buttonStyleClass: 'p-button-outlined p-button-danger',
       header: 'Delete Confirmation',
       cancelText: 'No',
       okText: 'Yes'
     }
   },
   {
-    name: 'user-manager',
-    label: 'User Manager',
+    name: 'user-manager-add',
+    label: 'Add User',
     isCustom: true,
     requireGridRowSelected: false,
     component: UserManagerActionComponent,
     wrapper: {
-      header: 'User Manager',
+      label: 'New User',
+      icon: 'pi pi-plus',
+      header: 'Create User',
       dialogStyle: { width: '40rem' },
-      cancelText: 'No',
-      okText: 'Yes'
+      okText: 'Create User'
+    },
+    props: {
+      isAddForm: true
     }
   },
   {
-    name: 'add-role',
-    label: 'Role Manager',
+    name: 'user-manager-edit',
+    label: 'Edit User',
+    isCustom: true,
+    requireGridRowSelected: true,
+    component: UserManagerActionComponent,
+    wrapper: {
+      header: 'Edit Manager',
+      dialogStyle: { width: '40rem' },
+      okText: 'Edit User'
+    }
+  },
+  {
+    name: 'manage-roles',
+    label: 'Manage Roles',
     isCustom: true,
     requireGridRowSelected: false,
     component: ManageRoleActionComponent,
     wrapper: {
+      label: 'Manage Roles',
+      icon: 'pi pi-users',
+      buttonStyleClass: 'p-button-outlined',
       header: 'Manage Roles',
       dialogStyle: { width: '40rem' },
       cancelText: 'No',
@@ -129,25 +156,29 @@ const GRID_ACTION_CONFIG = [
     name: 'edit-role',
     label: 'Edit User Roles',
     isCustom: true,
-    requireGridRowSelected: true,
+    requireGridRowSelected: 1,
     component: UserRoleActionComponent,
     wrapper: {
-      header: 'Edit Roles',
-      cancelText: 'No',
-      okText: 'Yes'
+      label: 'Edit User Roles',
+      icon: 'pi pi-user-edit',
+      buttonStyleClass: 'p-button-outlined',
+      header: 'Edit User Roles',
+      okText: 'Update User Roles'
     }
   },
   {
     name: 'edit-permission',
     label: 'Edit User Permissions',
     isCustom: true,
-    requireGridRowSelected: true,
+    requireGridRowSelected: 1,
     component: UserPermissionActionComponent,
     wrapper: {
-      dialogStyle: { width: '40rem' },
-      header: 'Edit Permission',
-      cancelText: 'No',
-      okText: 'Yes'
+      label: 'Edit User Permissions',
+      icon: 'pi pi-list',
+      buttonStyleClass: 'p-button-outlined',
+      header: 'Edit User Permissions',
+      okText: 'Update User Permissions',
+      dialogStyle: { width: '60rem' }
     }
   }
 ];

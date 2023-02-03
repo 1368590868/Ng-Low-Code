@@ -82,7 +82,7 @@ export class PortalEditFormComponent implements OnInit {
     },
     {
       label: 'Input Number',
-      value: 'input',
+      value: 'inputNumber',
       filterType: 'numeric'
     }
   ];
@@ -138,6 +138,7 @@ export class PortalEditFormComponent implements OnInit {
         onInit: field => {
           field.formControl?.valueChanges
             .pipe(
+              startWith(field.formControl.value),
               distinctUntilChanged(),
               tap(value => {
                 const dField = field.parent?.get?.('defaultValue');
@@ -150,7 +151,9 @@ export class PortalEditFormComponent implements OnInit {
                   this.changeDetectorRef.detectChanges();
                   this.model.selected = true;
                   if (
-                    'input,datepicker,checkbox,textarea'.indexOf(value) >= 0
+                    'input,datepicker,checkbox,textarea,inputNumber'.indexOf(
+                      value
+                    ) >= 0
                   ) {
                     dField.type = value;
                     dField.hide = false;
@@ -308,18 +311,18 @@ export class PortalEditFormComponent implements OnInit {
 
   valid() {
     if (this.formConfig.allowEdit) {
+      // if (
+      //   this.formConfig.useCustomForm &&
+      //   !this.formConfig.customEditFormName
+      // ) {
+      //   this.notifyService.notifyWarning(
+      //     'Warning',
+      //     'Please select one custom action.'
+      //   );
+      //   return false;
+      // }
       if (
-        this.formConfig.useCustomAction &&
-        !this.formConfig.customActionName
-      ) {
-        this.notifyService.notifyWarning(
-          'Warning',
-          'Please select one custom action.'
-        );
-        return false;
-      }
-      if (
-        !this.formConfig.useCustomAction &&
+        !this.formConfig.useCustomForm &&
         (!this.targetColumns || this.targetColumns.length === 0)
       ) {
         this.notifyService.notifyWarning(
@@ -335,7 +338,7 @@ export class PortalEditFormComponent implements OnInit {
   saveGridFormConfig() {
     this.isSaving = true;
     const data = JSON.parse(JSON.stringify(this.formConfig)) as GridFormConfig;
-    if (data.allowEdit && !data.useCustomAction)
+    if (data.allowEdit && !data.useCustomForm)
       data.formFields = this.targetColumns;
 
     if (this.portalItemService.currentPortalItemId) {
