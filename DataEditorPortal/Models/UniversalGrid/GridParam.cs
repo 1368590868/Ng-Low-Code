@@ -32,7 +32,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
     {
         public string field { get; set; }
         public string matchMode { get; set; }
-        public string Operator { get; set; }
+        public string filterType { get; set; }
         public object value { get; set; }
         public string dBFieldExpression { get; set; }
     }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models.PortalItem;
+using DataEditorPortal.Web.Models.UniversalGrid;
 using System.Data.Common;
 
 namespace DataEditorPortal.Web.Common.MapperProfiles
@@ -11,6 +12,7 @@ namespace DataEditorPortal.Web.Common.MapperProfiles
         {
             CreateMap<SiteMenu, PortalItemData>().ReverseMap();
             CreateMap<DbColumn, DataSourceTableColumn>();
+            CreateMap<DetailConfig, GridConfig>();
         }
     }
 }

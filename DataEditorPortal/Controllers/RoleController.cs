@@ -51,14 +51,14 @@ namespace DataEditorPortal.Web.Controllers
             {
                 if (p.Selected)
                 {
-                    var permission = new SitePermissionRole()
+                    var permission = new SiteRolePermission()
                     {
                         SiteRoleId = siteRole.Id,
                         SitePermissionId = p.Id,
                         CreatedBy = userId,
                         CreatedDate = DateTime.UtcNow
                     };
-                    _depDbContext.SitePermissionRoles.Add(permission);
+                    _depDbContext.SiteRolePermissions.Add(permission);
                 }
             }
             _depDbContext.SaveChanges();
@@ -77,23 +77,23 @@ namespace DataEditorPortal.Web.Controllers
             siteRole.RoleName = role.RoleName;
             siteRole.RoleDescription = role.RoleDescription;
 
-            _depDbContext.SitePermissionRoles
+            _depDbContext.SiteRolePermissions
                 .Where(r => r.SiteRoleId == roleId)
                 .ToList()
-                .ForEach(r => _depDbContext.SitePermissionRoles.Remove(r));
+                .ForEach(r => _depDbContext.SiteRolePermissions.Remove(r));
 
             foreach (var p in role.Permissions)
             {
                 if (p.Selected)
                 {
-                    var permission = new SitePermissionRole()
+                    var permission = new SiteRolePermission()
                     {
                         SiteRoleId = siteRole.Id,
                         SitePermissionId = p.Id,
                         CreatedBy = userId,
                         CreatedDate = DateTime.UtcNow
                     };
-                    _depDbContext.SitePermissionRoles.Add(permission);
+                    _depDbContext.SiteRolePermissions.Add(permission);
                 }
             }
             _depDbContext.SaveChanges();
@@ -105,7 +105,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{roleId}/permissions")]
         public List<AppRolePermission> PermissionsForRole(Guid roleId)
         {
-            var sitePermissions = from sp in _depDbContext.SitePermissionRoles
+            var sitePermissions = from sp in _depDbContext.SiteRolePermissions
                                   where sp.SiteRoleId == roleId
                                   select sp;
 

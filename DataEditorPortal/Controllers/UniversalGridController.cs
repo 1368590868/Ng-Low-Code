@@ -63,7 +63,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{name}/data/{id}")]
-        public Dictionary<string, string> FetchDataDetail(string name, string id)
+        public Dictionary<string, dynamic> FetchDataDetail(string name, string id)
         {
             return _universalGridService.GetGridDataDetail(name, id);
         }

@@ -9,6 +9,16 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string Caption { get; set; }
         public string Description { get; set; }
         public string DataKey { get; set; }
+
+        public bool AllowExport { get; set; } = true;
+        public bool AllowDelete { get; set; } = true;
+        public bool AllowEdit { get; set; } = true;
+        public bool UseCustomForm { get; set; }
+        public string CustomAddFormName { get; set; }
+        public string CustomEditFormName { get; set; }
+        public string CustomViewFormName { get; set; }
+
+        public List<string> CustomActions { get; set; }
     }
 
     public class FormFieldConfig
@@ -62,11 +72,13 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class DetailConfig
     {
-        public bool AllowAdd { get; set; } = true;
+        public bool AllowExport { get; set; } = true;
         public bool AllowDelete { get; set; } = true;
         public bool AllowEdit { get; set; } = true;
-        public bool UseCustomAction { get; set; }
-        public string CustomActionName { get; set; }
+        public bool UseCustomForm { get; set; }
+        public string CustomAddFormName { get; set; }
+        public string CustomEditFormName { get; set; }
+        public string CustomViewFormName { get; set; }
 
         public List<FormFieldConfig> FormFields { get; set; }
 

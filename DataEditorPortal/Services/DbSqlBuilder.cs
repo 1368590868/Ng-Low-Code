@@ -15,7 +15,7 @@ namespace DataEditorPortal.Web.Services
         string UseCount(string query);
         string UseFilters(string query, List<FilterParam> filterParams);
         string UseSearches(string query, List<SearchParam> filterParams);
-        string FormatValue(object value, DataRow schema);
+        object FormatValue(object value, DataRow schema);
 
         // universal grid
         string GenerateSqlTextForList(DataSourceConfig config);
@@ -302,7 +302,7 @@ namespace DataEditorPortal.Web.Services
             return $"SELECT COUNT(*) FROM ({queryWithoutOrderBy}) A";
         }
 
-        public string FormatValue(object value, DataRow schema)
+        public object FormatValue(object value, DataRow schema)
         {
             if (value == System.DBNull.Value) return string.Empty;
 
@@ -312,6 +312,8 @@ namespace DataEditorPortal.Web.Services
                 return Convert.ToDateTime(value).ToString();
             if (sqlDbType == SqlDbType.Float || sqlDbType == SqlDbType.Decimal || sqlDbType == SqlDbType.Money)
                 return Convert.ToDecimal(value).ToString("N2");
+            if (sqlDbType == SqlDbType.Bit)
+                return Convert.ToBoolean(value);
             else
                 return value.ToString();
         }

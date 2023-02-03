@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DataEditorPortal.Data.Models
 {
-    public class SitePermissionRole
+    public class SiteRolePermission
     {
         [Key]
         public Guid Id { get; set; }

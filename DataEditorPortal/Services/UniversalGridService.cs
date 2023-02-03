@@ -1,4 +1,5 @@
-﻿using DataEditorPortal.Data.Contexts;
+﻿using AutoMapper;
+using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models.UniversalGrid;
@@ -23,7 +24,7 @@ namespace DataEditorPortal.Web.Services
         GridData GetGridData(string name, GridParam param);
         MemoryStream ExportExcel(string name, ExportParam param);
 
-        Dictionary<string, string> GetGridDataDetail(string name, string id);
+        Dictionary<string, dynamic> GetGridDataDetail(string name, string id);
         bool UpdateGridData(string name, string id, Dictionary<string, object> model);
         bool AddGridData(string name, Dictionary<string, object> model);
         bool DeleteGridData(string name, string[] ids);
@@ -35,15 +36,18 @@ namespace DataEditorPortal.Web.Services
         private readonly DepDbContext _depDbContext;
         private readonly IDbSqlBuilder _dbSqlBuilder;
         private readonly ILogger<UniversalGridService> _logger;
+        private readonly IMapper _mapper;
 
         public UniversalGridService(
             DepDbContext depDbContext,
             IDbSqlBuilder dbSqlBuilder,
-            ILogger<UniversalGridService> logger)
+            ILogger<UniversalGridService> logger,
+            IMapper mapper)
         {
             _depDbContext = depDbContext;
             _dbSqlBuilder = dbSqlBuilder;
             _logger = logger;
+            _mapper = mapper;
         }
 
         #region Grid cofnig, columns config, search config and list data
@@ -58,15 +62,20 @@ namespace DataEditorPortal.Web.Services
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-            var queryText = _dbSqlBuilder.GenerateSqlTextForList(dataSourceConfig);
 
-            return new GridConfig()
+            var result = new GridConfig()
             {
                 Name = config.Name,
                 DataKey = dataSourceConfig.IdColumn,
                 Description = item.Description,
                 Caption = item.Label
             };
+
+            // get query text for list data from grid config.
+            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+            _mapper.Map(detailConfig, result);
+
+            return result;
         }
 
         public List<GridColConfig> GetGridColumnsConfig(string name)
@@ -163,7 +172,7 @@ namespace DataEditorPortal.Web.Services
 
                         while (dr.Read())
                         {
-                            var row = new Dictionary<string, string>();
+                            var row = new Dictionary<string, dynamic>();
                             for (int i = 0; i < fields; i++)
                             {
                                 var typename = dr.GetFieldType(i);
@@ -274,7 +283,7 @@ namespace DataEditorPortal.Web.Services
 
         #region Grid detail and config, add, update and remove
 
-        public Dictionary<string, string> GetGridDataDetail(string name, string id)
+        public Dictionary<string, dynamic> GetGridDataDetail(string name, string id)
         {
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
@@ -284,7 +293,7 @@ namespace DataEditorPortal.Web.Services
 
             // get detail config
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            if (detailConfig.UseCustomAction)
+            if (detailConfig.UseCustomForm)
             {
                 throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }
@@ -300,7 +309,7 @@ namespace DataEditorPortal.Web.Services
                     QueryText = detailConfig.QueryText
                 });
 
-            var result = new Dictionary<string, string>();
+            var result = new Dictionary<string, dynamic>();
             using (var con = _depDbContext.Database.GetDbConnection())
             {
                 con.Open();
@@ -323,7 +332,6 @@ namespace DataEditorPortal.Web.Services
 
                         while (dr.Read())
                         {
-                            result = new Dictionary<string, string>();
                             for (int i = 0; i < fields; i++)
                             {
                                 result[fieldnames[i]] = _dbSqlBuilder.FormatValue(dr[i], schema.Rows[i]);
@@ -362,7 +370,7 @@ namespace DataEditorPortal.Web.Services
 
             // get detail config
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            if (detailConfig.UseCustomAction)
+            if (detailConfig.UseCustomForm)
             {
                 throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }
@@ -419,7 +427,7 @@ namespace DataEditorPortal.Web.Services
 
             // get detail config
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            if (detailConfig.UseCustomAction)
+            if (detailConfig.UseCustomForm)
             {
                 throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }
@@ -480,7 +488,7 @@ namespace DataEditorPortal.Web.Services
 
             // get detail config
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            if (detailConfig.UseCustomAction)
+            if (detailConfig.UseCustomForm)
             {
                 throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }

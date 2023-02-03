@@ -14,6 +14,9 @@ namespace DataEditorPortal.Web.Models.PortalItem
         public string ColumnName { get; set; }
         public bool IsUnique { get; set; }
         public bool IsKey { get; set; }
+        public bool IsAutoIncrement { get; set; }
+        public bool IsIdentity { get; set; }
+        public bool AllowDBNull { get; set; }
 
         [JsonIgnore]
         public Type DataType { get; set; }
