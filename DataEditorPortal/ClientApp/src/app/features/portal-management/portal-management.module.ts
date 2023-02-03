@@ -40,6 +40,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { ContextMenuModule } from 'primeng/contextmenu';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import {
@@ -114,7 +115,8 @@ import { UniversalGridActionModule } from 'src/app/features/universal-grid-actio
     TooltipModule,
     DividerModule,
     InputSwitchModule,
-    InputNumberModule
+    InputNumberModule,
+    ContextMenuModule
   ]
 })
 export class PortalManagementModule {}
