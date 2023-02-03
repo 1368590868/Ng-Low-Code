@@ -73,3 +73,7 @@ formly-form {
     }
   }
 }
+
+.p-orderlist-item.cdk-drag-preview {
+  z-index: 9999 !important;
+}

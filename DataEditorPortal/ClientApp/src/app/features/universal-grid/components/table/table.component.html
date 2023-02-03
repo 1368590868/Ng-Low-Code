@@ -34,7 +34,7 @@
         <div class="flex flex-wrap mr-2">
           <ng-template
             appUniversalGridAction
-            [actions]="actions"
+            [actions]="tableActions"
             [selectedRecords]="selectedRecords"
             [fetchDataParam]="fetchDataParam"
             (savedEvent)="onRefresh()"></ng-template>
@@ -89,28 +89,7 @@
             <ng-template
               class="flex"
               appUniversalGridAction
-              [actions]="[
-                {
-                  name: 'view-record',
-                  wrapper: {
-                    label: '',
-                    icon: 'pi pi-info-circle',
-                    class: 'flex',
-                    buttonStyleClass:
-                      'p-button-lg p-button-rounded p-button-text'
-                  }
-                },
-                {
-                  name: 'edit-record',
-                  wrapper: {
-                    label: '',
-                    icon: 'pi pi-file-edit',
-                    class: 'flex ml-1',
-                    buttonStyleClass:
-                      'p-button-lg p-button-rounded p-button-text'
-                  }
-                }
-              ]"
+              [actions]="rowActions"
               [recordKey]="tableConfig.dataKey"
               [selectedRecords]="[data]"
               (savedEvent)="onRefresh()"></ng-template>

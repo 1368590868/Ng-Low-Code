@@ -25,24 +25,15 @@ export class PortalEditBasicComponent implements OnInit {
   model: PortalItemData = {};
   fields: FormlyFieldConfig[] = [
     {
-      key: 'name',
+      key: 'label',
       type: 'input',
-      className: 'w-6',
       props: {
-        label: 'Portal Name',
-        placeholder: 'Portal Name',
+        label: 'Menu Label',
+        placeholder: 'Menu Label',
         required: true
       },
       modelOptions: {
         updateOn: 'blur'
-      },
-      validators: {
-        doNotAllowSpecial: {
-          expression: (c: AbstractControl) => {
-            return /^[a-zA-Z]\w+/.test(c.value);
-          },
-          message: 'Only number and letter are allowed.'
-        }
       },
       asyncValidators: {
         exist: {
@@ -59,6 +50,15 @@ export class PortalEditBasicComponent implements OnInit {
             return 'The Portal Name has already been exist.';
           }
         }
+      }
+    },
+    {
+      key: 'icon',
+      type: 'iconSelect',
+      props: {
+        label: 'Icon',
+        placeholder: 'Icon',
+        required: true
       }
     },
     {
@@ -97,24 +97,6 @@ export class PortalEditBasicComponent implements OnInit {
             }
           });
         }
-      }
-    },
-    {
-      key: 'label',
-      type: 'input',
-      props: {
-        label: 'Menu Label',
-        placeholder: 'Menu Label',
-        required: true
-      }
-    },
-    {
-      key: 'icon',
-      type: 'input',
-      props: {
-        label: 'Icon',
-        placeholder: 'Icon',
-        required: true
       }
     },
     {
@@ -169,6 +151,7 @@ export class PortalEditBasicComponent implements OnInit {
           .pipe(
             tap(res => {
               if (res && !res.isError) {
+                this.portalItemService.currentPortalItemCaption = data['label'];
                 this.saveSucess();
               }
 
@@ -185,6 +168,7 @@ export class PortalEditBasicComponent implements OnInit {
             tap(res => {
               if (res && !res.isError) {
                 this.portalItemService.currentPortalItemId = res.result;
+                this.portalItemService.currentPortalItemCaption = data['label'];
                 this.saveSucess(res.result);
               }
               this.isSaving = false;
@@ -194,6 +178,13 @@ export class PortalEditBasicComponent implements OnInit {
           )
           .subscribe();
       }
+    } else {
+      this.fields.forEach(x => {
+        if (x.formControl?.invalid) {
+          x.formControl.markAsDirty();
+          x.formControl.updateValueAndValidity();
+        }
+      });
     }
   }
 
@@ -210,7 +201,6 @@ export class PortalEditBasicComponent implements OnInit {
   saveSucess(id?: string) {
     let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      this.portalItemService.saveCurrentStep('datasource');
       next = id
         ? [
             `../../edit/${this.portalItemService.currentPortalItemId}/datasource`

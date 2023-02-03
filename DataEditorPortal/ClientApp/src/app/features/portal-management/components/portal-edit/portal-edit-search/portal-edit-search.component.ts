@@ -36,24 +36,14 @@ export class PortalEditSearchComponent implements OnInit {
       filterType: 'array'
     },
     {
-      label: 'Date',
-      value: 'datepicker',
-      filterType: 'date'
-    },
-    {
-      label: 'Dropdown',
-      value: 'select',
-      filterType: 'text'
-    },
-    {
       label: 'Multiple Dropdown',
       value: 'multiSelect',
       filterType: 'array'
     },
     {
-      label: 'Radio List',
-      value: 'radio',
-      filterType: 'text'
+      label: 'Date',
+      value: 'datepicker',
+      filterType: 'date'
     },
     {
       label: 'Textbox',
@@ -66,8 +56,18 @@ export class PortalEditSearchComponent implements OnInit {
       filterType: 'text'
     },
     {
-      label: 'Textbox',
-      value: 'input',
+      label: 'Dropdown',
+      value: 'select',
+      filterType: 'text'
+    },
+    {
+      label: 'Radio List',
+      value: 'radio',
+      filterType: 'text'
+    },
+    {
+      label: 'Input Number',
+      value: 'inputNumber',
       filterType: 'numeric'
     }
   ];
@@ -158,11 +158,15 @@ export class PortalEditSearchComponent implements OnInit {
           props: {
             label: 'Placeholder',
             placeholder: 'Placeholder'
+          },
+          expressions: {
+            hide: `['checkbox', 'radio', 'checkboxList'].indexOf(field.parent.parent.model.type) >= 0`
           }
         }
       ]
     }
   ];
+  filterMatchModeOptions: any[] = [];
 
   constructor(
     private primeNGConfig: PrimeNGConfig,
@@ -196,8 +200,8 @@ export class PortalEditSearchComponent implements OnInit {
               key: x.columnName,
               type: result[0].value,
               props: {
-                label: x.columnName,
-                placeholder: x.columnName
+                label: x.columnName
+                // placeholder: x.columnName
               },
               filterType: x.filterType,
               searchRule: {
@@ -228,10 +232,28 @@ export class PortalEditSearchComponent implements OnInit {
 
   onTargetSelect({ items }: { items: GridSearchField[] }) {
     if (items.length === 1) {
+      const cacheSearchRule = items[0].searchRule.matchMode;
       this.model = items[0];
+      this.filterMatchModeOptions = this.getFilterMatchModeOptions(
+        items[0].filterType
+      );
+      this.changeDetectorRef.detectChanges();
+      items[0].searchRule.matchMode = cacheSearchRule;
+      this.changeDetectorRef.detectChanges();
     } else {
       this.model = {};
     }
+  }
+
+  valid() {
+    if (!this.targetColumns || this.targetColumns.length === 0) {
+      this.notifyService.notifyWarning(
+        'Warning',
+        'Please select at least one field.'
+      );
+      return false;
+    }
+    return true;
   }
 
   saveGridSearchConfig() {
@@ -257,7 +279,6 @@ export class PortalEditSearchComponent implements OnInit {
   saveSucess() {
     let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      this.portalItemService.saveCurrentStep('form');
       next = ['../form'];
     }
     if (this.isSavingAndExit) {
@@ -273,11 +294,13 @@ export class PortalEditSearchComponent implements OnInit {
   }
 
   onSaveAndNext() {
+    if (!this.valid()) return;
     this.isSavingAndNext = true;
     this.saveGridSearchConfig();
   }
 
   onSaveAndExit() {
+    if (!this.valid()) return;
     this.isSavingAndExit = true;
     this.saveGridSearchConfig();
   }

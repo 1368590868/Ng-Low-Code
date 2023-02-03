@@ -17,6 +17,12 @@
       .p-orderlist-list-container {
         flex: none;
       }
+
+      .p-inputtext,
+      .p-inputnumber,
+      .p-calendar {
+        width: 15rem;
+      }
     }
 
     .p-dropdown {

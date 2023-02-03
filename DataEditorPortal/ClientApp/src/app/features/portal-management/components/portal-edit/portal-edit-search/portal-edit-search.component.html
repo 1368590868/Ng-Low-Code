@@ -35,6 +35,11 @@
             class="p-fluid"></formly-form>
         </div>
       </ng-template>
+      <ng-template pTemplate="emptymessagetarget">
+        <div class="w-full relative" *ngIf="!isLoading">
+          <app-svg-drag></app-svg-drag>
+        </div>
+      </ng-template>
     </p-pickList>
     <div class="config-form p-picklist">
       <div class="p-picklist-header">Configuration Form</div>
@@ -47,7 +52,13 @@
               [model]="model"
               [options]="options"
               class="p-fluid"></formly-form>
-            <p-button styleClass="p-button-text" *ngIf="model.type === 'select'"
+            <p-button
+              styleClass="p-button-text"
+              *ngIf="
+                ['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(
+                  model.type
+                ) >= 0
+              "
               >Configure Options</p-button
             >
           </form>
@@ -58,9 +69,7 @@
               styleClass="w-full"
               appendTo="body"
               [(ngModel)]="model.searchRule.matchMode"
-              [options]="
-                getFilterMatchModeOptions(model.filterType)
-              "></p-dropdown>
+              [options]="filterMatchModeOptions"></p-dropdown>
             <p-button
               class="ml-auto"
               title="Advanced Configuration"

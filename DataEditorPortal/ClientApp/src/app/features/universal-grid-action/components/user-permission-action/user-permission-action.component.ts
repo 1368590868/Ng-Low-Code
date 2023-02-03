@@ -5,11 +5,11 @@ import { UserPemissions } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';
 
 @Component({
-  selector: 'app-user-permission',
+  selector: 'app-user-permission-action',
   templateUrl: './user-permission-action.component.html',
   styleUrls: ['./user-permission-action.component.scss']
 })
-export class UserPermissionComponent
+export class UserPermissionActionComponent
   extends GridActionDirective
   implements OnInit
 {

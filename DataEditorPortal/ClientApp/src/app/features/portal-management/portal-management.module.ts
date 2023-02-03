@@ -12,6 +12,8 @@ import { FormlyInputMaskModule } from '../ngx-formly/inputMask';
 import { FormlySelectModule } from '../ngx-formly/select';
 import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
 import { FormlyCheckBoxModule } from '../ngx-formly/checkbox';
+import { FormlyIconSelectModule } from '../ngx-formly/iconselect';
+import { FormlyInputNumberModule } from '../ngx-formly/inputnumber';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
@@ -37,6 +39,8 @@ import { PickListModule } from 'primeng/picklist';
 import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { ContextMenuModule } from 'primeng/contextmenu';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import {
@@ -49,7 +53,8 @@ import {
   PortalEditDatasourceComponent,
   PortalEditColumnsComponent,
   PortalEditSearchComponent,
-  PortalEditFormComponent
+  PortalEditFormComponent,
+  SvgDragComponent
 } from './components/portal-edit';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
 
@@ -62,7 +67,8 @@ import { UniversalGridActionModule } from 'src/app/features/universal-grid-actio
     PortalEditDatasourceComponent,
     PortalEditColumnsComponent,
     PortalEditSearchComponent,
-    PortalEditFormComponent
+    PortalEditFormComponent,
+    SvgDragComponent
   ],
   imports: [
     CommonModule,
@@ -82,6 +88,8 @@ import { UniversalGridActionModule } from 'src/app/features/universal-grid-actio
     FormlySelectModule,
     FormlyDividerWrapperModule,
     FormlyCheckBoxModule,
+    FormlyIconSelectModule,
+    FormlyInputNumberModule,
 
     // primeNg
     AnimateModule,
@@ -106,7 +114,9 @@ import { UniversalGridActionModule } from 'src/app/features/universal-grid-actio
     PickListModule,
     TooltipModule,
     DividerModule,
-    InputSwitchModule
+    InputSwitchModule,
+    InputNumberModule,
+    ContextMenuModule
   ]
 })
 export class PortalManagementModule {}

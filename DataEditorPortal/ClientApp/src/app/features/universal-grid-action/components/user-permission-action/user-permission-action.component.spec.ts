@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UserPermissionComponent } from './user-permission-action.component';
+import { UserPermissionActionComponent } from './user-permission-action.component';
 
 describe('UserPermissionComponent', () => {
-  let component: UserPermissionComponent;
-  let fixture: ComponentFixture<UserPermissionComponent>;
+  let component: UserPermissionActionComponent;
+  let fixture: ComponentFixture<UserPermissionActionComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [UserPermissionComponent]
+      declarations: [UserPermissionActionComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(UserPermissionComponent);
+    fixture = TestBed.createComponent(UserPermissionActionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,6 +1,13 @@
 <div class="layout-content py-3 px-3">
   <div class="p-card p-4 mb-3 shadow-1">
-    <p-steps [model]="items" [readonly]="true"></p-steps>
+    <h2 class="mb-4" *ngIf="portalItemService.currentPortalItemCaption">
+      {{ portalItemService.currentPortalItemCaption }}
+    </h2>
+    <p-steps
+      [model]="items"
+      [readonly]="
+        !portalItemService.currentPortalItemConfigCompleted
+      "></p-steps>
   </div>
   <router-outlet></router-outlet>
 </div>

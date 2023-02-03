@@ -21,7 +21,8 @@ export class PortalItemService {
 
   public currentPortalItemId?: string;
   public currentPortalItemParentFolder?: string;
-  public currentPortalDataSourceTableColumns?: any;
+  public currentPortalItemConfigCompleted?: boolean;
+  public currentPortalItemCaption?: string;
 
   constructor(
     private http: HttpClient,
@@ -89,6 +90,32 @@ export class PortalItemService {
     return this.http
       .put<ApiResponse<string>>(
         `${this._apiUrl}portal-item/${id}/unpublish`,
+        null
+      )
+      .pipe(
+        tap(() => {
+          this.configDataService.menuChange$.next(null);
+        })
+      );
+  }
+
+  moveUp(id: string): Observable<ApiResponse<boolean>> {
+    return this.http
+      .post<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/${id}/move-up`,
+        null
+      )
+      .pipe(
+        tap(() => {
+          this.configDataService.menuChange$.next(null);
+        })
+      );
+  }
+
+  moveDown(id: string): Observable<ApiResponse<boolean>> {
+    return this.http
+      .post<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/${id}/move-down`,
         null
       )
       .pipe(

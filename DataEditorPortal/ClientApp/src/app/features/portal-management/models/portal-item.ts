@@ -20,6 +20,9 @@ export interface DataSourceTableColumn {
   filterType: string;
   isKey: boolean;
   isUnique: boolean;
+  isAutoIncrement: boolean;
+  isIdentity: boolean;
+  allowDBNull: boolean;
 }
 
 export interface DataSourceConfig {
@@ -33,10 +36,8 @@ export interface DataSourceConfig {
 export interface DataSourceFilter {
   field?: string;
   filterType?: string;
-  matchOptions?: any[];
   matchMode?: string;
   value?: string;
-  errValue?: boolean;
 }
 
 export interface DataSourceSortBy {
@@ -81,6 +82,8 @@ export interface GridFormConfig {
   allowDelete?: boolean;
   allowExport?: boolean;
   useCustomForm?: boolean;
-  customActionName?: string;
+  customAddFormName?: string;
+  customEditFormName?: string;
+  customViewFormName?: string;
   formFields?: GridFormField[];
 }

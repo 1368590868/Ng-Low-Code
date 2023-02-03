@@ -1,6 +1,11 @@
 <div class="layout-content p-2 flex flex-column">
   <div class="p-card flex-grow-1">
-    <p-treeTable [value]="data" styleClass="p-datatable-striped" dataKey="id">
+    <p-treeTable
+      [value]="data"
+      styleClass="p-datatable-striped"
+      dataKey="id"
+      (onContextMenuSelect)="onContextMenuSelect($event)"
+      [contextMenu]="cm">
       <ng-template pTemplate="caption">
         <div class="flex align-items-center my-2">
           <h3 class="">Portal Management</h3>
@@ -20,8 +25,8 @@
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 18%">Name</th>
           <th style="width: 18%">Label</th>
+          <th style="width: 18%">Name</th>
           <th style="width: 12%">Type</th>
           <th>Description</th>
           <th style="width: 12rem">Status</th>
@@ -29,12 +34,12 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
-        <tr [ttRow]="rowNode">
+        <tr [ttContextMenuRow]="rowNode">
           <td style="width: 18%">
             <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
-            {{ rowData.name }}
+            {{ rowData.label }}
           </td>
-          <td style="width: 18%">{{ rowData.label }}</td>
+          <td style="width: 18%">{{ rowData.name }}</td>
           <td style="width: 12%">{{ rowData.type }}</td>
           <td>{{ rowData.description }}</td>
           <td style="width: 12rem">
@@ -55,7 +60,10 @@
                 severity="warning"
                 value="Unpublished"></p-tag>
               <i
-                *ngIf="rowData.configCompleted === false"
+                *ngIf="
+                  rowData.type === 'Portal Item' &&
+                  rowData.configCompleted === false
+                "
                 class="pi pi-exclamation-circle ml-3 text-lg"
                 style="color: var(--yellow-600)"
                 pTooltip="You have't completed all configurations"></i>
@@ -65,7 +73,7 @@
             <p-menu
               #menu
               [popup]="true"
-              [model]="getMenuList(rowData)"
+              [model]="contextMenuItems"
               appendTo="body"
               [style]="{ width: 'auto' }"></p-menu>
             <button
@@ -73,13 +81,18 @@
               pButton
               icon="pi pi-ellipsis-v"
               class="p-button-rounded p-button-text"
-              (click)="menu.toggle($event)"></button>
+              (click)="onShowMenu(menu, $event, rowNode.node)"></button>
           </td>
         </tr>
       </ng-template>
     </p-treeTable>
+    <p-contextMenu
+      #cm
+      appendTo="body"
+      [model]="contextMenuItems"></p-contextMenu>
   </div>
 </div>
+
 <app-add-portal-dialog
   #addDialog
-  (saved)="getPortalList()"></app-add-portal-dialog>
+  (saved)="onDiaglogSaved()"></app-add-portal-dialog>

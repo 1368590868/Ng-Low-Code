@@ -15,7 +15,7 @@ export class PortalEditComponent implements OnInit {
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private portalItemService: PortalItemService
+    public portalItemService: PortalItemService
   ) {}
 
   ngOnInit() {
@@ -28,13 +28,18 @@ export class PortalEditComponent implements OnInit {
       .subscribe(val => {
         this.portalItemService.currentPortalItemId = val;
         if (this.portalItemService.currentPortalItemId) {
-          this.portalItemService.getCurrentStep().subscribe(res => {
-            this.router.navigate([res], {
+          this.portalItemService.getPortalDetails().subscribe(res => {
+            this.portalItemService.currentPortalItemConfigCompleted =
+              res['configCompleted'];
+            this.portalItemService.currentPortalItemCaption = res['label'];
+            this.router.navigate([res['currentStep']], {
               relativeTo: this.activatedRoute,
               replaceUrl: true
             });
           });
         } else {
+          this.portalItemService.currentPortalItemConfigCompleted = false;
+          this.portalItemService.currentPortalItemCaption = undefined;
           this.router.navigate(['basic'], {
             relativeTo: this.activatedRoute,
             replaceUrl: true

@@ -12,7 +12,11 @@ import { PickList } from 'primeng/picklist';
 import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
 import { NotifyService } from 'src/app/core';
 import { GridActionConfig } from 'src/app/features/universal-grid-action';
-import { GridFormField, GridFormConfig } from '../../../models/portal-item';
+import {
+  GridFormField,
+  GridFormConfig,
+  DataSourceTableColumn
+} from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
@@ -30,6 +34,7 @@ export class PortalEditFormComponent implements OnInit {
     allowEdit: true,
     allowDelete: true
   };
+  dbColumns: DataSourceTableColumn[] = [];
   sourceColumns: GridFormField[] = [];
   targetColumns: GridFormField[] = [];
   @ViewChild('pickList') pickList!: PickList;
@@ -46,24 +51,14 @@ export class PortalEditFormComponent implements OnInit {
       filterType: 'array'
     },
     {
-      label: 'Date',
-      value: 'datepicker',
-      filterType: 'date'
-    },
-    {
-      label: 'Dropdown',
-      value: 'select',
-      filterType: 'text'
-    },
-    {
       label: 'Multiple Dropdown',
       value: 'multiSelect',
       filterType: 'array'
     },
     {
-      label: 'Radio List',
-      value: 'radio',
-      filterType: 'text'
+      label: 'Date',
+      value: 'datepicker',
+      filterType: 'date'
     },
     {
       label: 'Textbox',
@@ -76,8 +71,18 @@ export class PortalEditFormComponent implements OnInit {
       filterType: 'text'
     },
     {
-      label: 'Textbox',
-      value: 'input',
+      label: 'Dropdown',
+      value: 'select',
+      filterType: 'text'
+    },
+    {
+      label: 'Radio List',
+      value: 'radio',
+      filterType: 'text'
+    },
+    {
+      label: 'Input Number',
+      value: 'inputNumber',
       filterType: 'numeric'
     }
   ];
@@ -133,6 +138,7 @@ export class PortalEditFormComponent implements OnInit {
         onInit: field => {
           field.formControl?.valueChanges
             .pipe(
+              startWith(field.formControl.value),
               distinctUntilChanged(),
               tap(value => {
                 const dField = field.parent?.get?.('defaultValue');
@@ -145,7 +151,9 @@ export class PortalEditFormComponent implements OnInit {
                   this.changeDetectorRef.detectChanges();
                   this.model.selected = true;
                   if (
-                    'input,datepicker,checkbox,textarea'.indexOf(value) >= 0
+                    'input,datepicker,checkbox,textarea,inputNumber'.indexOf(
+                      value
+                    ) >= 0
                   ) {
                     dField.type = value;
                     dField.hide = false;
@@ -204,6 +212,9 @@ export class PortalEditFormComponent implements OnInit {
           props: {
             label: 'Placeholder',
             placeholder: 'Placeholder'
+          },
+          expressions: {
+            hide: `['checkbox', 'radio', 'checkboxList'].indexOf(field.parent.parent.model.type) >= 0`
           }
         },
         {
@@ -252,6 +263,7 @@ export class PortalEditFormComponent implements OnInit {
             };
           });
         }
+        this.dbColumns = res[1];
         this.sourceColumns = res[1]
           .filter(s => !this.targetColumns.find(t => t.key === s.columnName))
           .map<GridFormField>(x => {
@@ -262,8 +274,8 @@ export class PortalEditFormComponent implements OnInit {
               key: x.columnName,
               type: result[0].value,
               props: {
-                label: x.columnName,
-                placeholder: x.columnName
+                label: x.columnName
+                // placeholder: x.columnName
               },
               filterType: x.filterType
             };
@@ -295,6 +307,32 @@ export class PortalEditFormComponent implements OnInit {
     } else {
       this.model = {};
     }
+  }
+
+  valid() {
+    if (this.formConfig.allowEdit) {
+      // if (
+      //   this.formConfig.useCustomForm &&
+      //   !this.formConfig.customEditFormName
+      // ) {
+      //   this.notifyService.notifyWarning(
+      //     'Warning',
+      //     'Please select one custom action.'
+      //   );
+      //   return false;
+      // }
+      if (
+        !this.formConfig.useCustomForm &&
+        (!this.targetColumns || this.targetColumns.length === 0)
+      ) {
+        this.notifyService.notifyWarning(
+          'Warning',
+          'Please select at least one field.'
+        );
+        return false;
+      }
+    }
+    return true;
   }
 
   saveGridFormConfig() {
@@ -353,11 +391,13 @@ export class PortalEditFormComponent implements OnInit {
   }
 
   onSaveAndNext() {
+    if (!this.valid()) return;
     this.isSavingAndNext = true;
     this.saveGridFormConfig();
   }
 
   onSaveAndExit() {
+    if (!this.valid()) return;
     this.isSavingAndExit = true;
     this.saveGridFormConfig();
   }
@@ -370,5 +410,13 @@ export class PortalEditFormComponent implements OnInit {
 
   cloneColumn(column: GridFormField) {
     return [JSON.parse(JSON.stringify(column))];
+  }
+
+  isRequired(field: GridFormField) {
+    const dbCol = this.dbColumns.find(x => x.columnName == field.key);
+    if (dbCol) {
+      return !dbCol.allowDBNull && !(dbCol.isAutoIncrement || dbCol.isIdentity);
+    }
+    return true;
   }
 }
