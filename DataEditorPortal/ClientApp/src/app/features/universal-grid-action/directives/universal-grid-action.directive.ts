@@ -89,7 +89,11 @@ export class UniversalGridActionDirective
 
         if (
           actionCfg &&
-          (!actionCfg.requireGridRowSelected || this.selectedRecords.length > 0)
+          ((actionCfg.requireGridRowSelected === true &&
+            this.selectedRecords.length > 0) ||
+            actionCfg.requireGridRowSelected === this.selectedRecords.length ||
+            actionCfg.requireGridRowSelected === undefined ||
+            actionCfg.requireGridRowSelected === false)
         ) {
           const wrapperRef =
             this.viewContainerRef.createComponent<ActionWrapperComponent>(

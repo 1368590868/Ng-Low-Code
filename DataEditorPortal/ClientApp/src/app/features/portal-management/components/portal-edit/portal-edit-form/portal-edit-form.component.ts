@@ -311,18 +311,18 @@ export class PortalEditFormComponent implements OnInit {
 
   valid() {
     if (this.formConfig.allowEdit) {
+      // if (
+      //   this.formConfig.useCustomForm &&
+      //   !this.formConfig.customEditFormName
+      // ) {
+      //   this.notifyService.notifyWarning(
+      //     'Warning',
+      //     'Please select one custom action.'
+      //   );
+      //   return false;
+      // }
       if (
-        this.formConfig.useCustomAction &&
-        !this.formConfig.customActionName
-      ) {
-        this.notifyService.notifyWarning(
-          'Warning',
-          'Please select one custom action.'
-        );
-        return false;
-      }
-      if (
-        !this.formConfig.useCustomAction &&
+        !this.formConfig.useCustomForm &&
         (!this.targetColumns || this.targetColumns.length === 0)
       ) {
         this.notifyService.notifyWarning(
@@ -338,7 +338,7 @@ export class PortalEditFormComponent implements OnInit {
   saveGridFormConfig() {
     this.isSaving = true;
     const data = JSON.parse(JSON.stringify(this.formConfig)) as GridFormConfig;
-    if (data.allowEdit && !data.useCustomAction)
+    if (data.allowEdit && !data.useCustomForm)
       data.formFields = this.targetColumns;
 
     if (this.portalItemService.currentPortalItemId) {
