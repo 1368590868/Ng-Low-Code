@@ -32,6 +32,7 @@ export interface FormlySelectFieldConfig
       [min]="props.min ?? null"
       [max]="props.max ?? null"
       [mode]="props.mode || 'decimal'"
+      [maxFractionDigits]="2"
       [formControl]="formControl">
     </p-inputNumber>
   `,

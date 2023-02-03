@@ -82,7 +82,7 @@ export class PortalEditFormComponent implements OnInit {
     },
     {
       label: 'Input Number',
-      value: 'input',
+      value: 'inputNumber',
       filterType: 'numeric'
     }
   ];
@@ -138,6 +138,7 @@ export class PortalEditFormComponent implements OnInit {
         onInit: field => {
           field.formControl?.valueChanges
             .pipe(
+              startWith(field.formControl.value),
               distinctUntilChanged(),
               tap(value => {
                 const dField = field.parent?.get?.('defaultValue');
@@ -150,7 +151,9 @@ export class PortalEditFormComponent implements OnInit {
                   this.changeDetectorRef.detectChanges();
                   this.model.selected = true;
                   if (
-                    'input,datepicker,checkbox,textarea'.indexOf(value) >= 0
+                    'input,datepicker,checkbox,textarea,inputNumber'.indexOf(
+                      value
+                    ) >= 0
                   ) {
                     dField.type = value;
                     dField.hide = false;
