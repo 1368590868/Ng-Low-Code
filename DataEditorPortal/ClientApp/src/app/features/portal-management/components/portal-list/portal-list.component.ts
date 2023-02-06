@@ -71,7 +71,7 @@ export class PortalListComponent implements OnInit {
 
   getMenuList(rowNode: TreeNode) {
     const row = rowNode.data as PortalItemData;
-    console.log(rowNode);
+
     const items: MenuItem[] = [];
     if (row['type'] === 'Portal Item') {
       items.push({

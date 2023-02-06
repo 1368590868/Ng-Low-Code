@@ -142,7 +142,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
   setFormValue(role: RoleItem) {
     this.roleId = role.id || '';
     this.roleName = role.id === '<new_role>' ? '' : role.roleName || '';
-    console.log(role);
+
     this.form.setValue({
       roleId: role.id,
       roleName: this.roleName,

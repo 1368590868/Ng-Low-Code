@@ -61,10 +61,12 @@
           *ngFor="let col of columns"
           pReorderableColumn
           pResizableColumn
-          [pSortableColumn]="col.field">
+          [pSortableColumn]="col.field"
+          [pSortableColumnDisabled]="!col.sortable">
           <span style="vertical-align: middle">{{ col.header }}</span>
-          <p-sortIcon [field]="col.field"></p-sortIcon>
+          <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
           <p-columnFilter
+            *ngIf="col.filterType && col.filterType !== 'none'"
             style="vertical-align: middle"
             [type]="col.filterType"
             [field]="col.field"
