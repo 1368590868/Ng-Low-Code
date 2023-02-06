@@ -61,10 +61,10 @@
     "typescript": "~4.8.2"
   },
   "lint-staged": {
-    "**/*.ts": "tsc-files --noEmit",
     "*.{ts,html}": [
       "eslint --fix"
     ],
+    "**/*.ts": "tsc-files --noEmit",
     "*.scss": [
       "prettier --write"
     ]
