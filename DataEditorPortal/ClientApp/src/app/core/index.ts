@@ -19,8 +19,7 @@ import {
   HomeComponent,
   TileComponent,
   LoginComponent,
-  ErrorPageComponent,
-  OptionDialogComponent
+  ErrorPageComponent
 } from './components';
 import { PermissionDirective } from './directive/permission.directive';
 import { CommonModule } from '@angular/common';
@@ -32,13 +31,6 @@ export { NotifyService } from './utils/notify.service';
 export { NgxFormlyService } from './services/ngx-formly.service';
 export { ConfigDataService } from './services/config-data.service';
 import { DialogModule } from 'primeng/dialog';
-import { DividerModule } from 'primeng/divider';
-import { OrderListModule } from 'primeng/orderlist';
-import { InputSwitchModule } from 'primeng/inputswitch';
-
-import { ReactiveFormsModule } from '@angular/forms';
-
-import { MonacoEditorModule } from 'ngx-monaco-editor';
 
 @NgModule({
   declarations: [
@@ -47,7 +39,6 @@ import { MonacoEditorModule } from 'ngx-monaco-editor';
     AboutComponent,
     ContactComponent,
     HomeComponent,
-    OptionDialogComponent,
     TileComponent,
     LoginComponent,
     ErrorPageComponent,
@@ -63,12 +54,7 @@ import { MonacoEditorModule } from 'ngx-monaco-editor';
     AvatarModule,
     DialogModule,
     ProgressSpinnerModule,
-    InputTextModule,
-    DividerModule,
-    OrderListModule,
-    InputSwitchModule,
-    ReactiveFormsModule,
-    MonacoEditorModule.forRoot()
+    InputTextModule
   ],
   exports: [
     HeaderComponent,
@@ -79,8 +65,7 @@ import { MonacoEditorModule } from 'ngx-monaco-editor';
     TileComponent,
     LoginComponent,
     ErrorPageComponent,
-    PermissionDirective,
-    OptionDialogComponent
+    PermissionDirective
   ],
   providers: [
     {
