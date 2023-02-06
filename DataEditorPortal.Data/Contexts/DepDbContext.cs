@@ -228,6 +228,12 @@ namespace DataEditorPortal.Data.Contexts
                         CustomAddFormName = "user-manager-add",
                         CustomEditFormName = "user-manager-edit",
                         CustomViewFormName = "user-manager-view"
+                    }),
+
+                    CustomActionConfig = JsonSerializer.Serialize(new object[] {
+                        new { Name = "edit-role" },
+                        new { Name = "edit-permission" },
+                        new { Name = "manage-roles" },
                     })
                 }
             );
@@ -235,35 +241,35 @@ namespace DataEditorPortal.Data.Contexts
             modelBuilder.Entity<SitePermission>().HasData(
                 new SitePermission()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = new Guid("23a76524-d095-493e-8603-173c21e9c3cb"),
                     Category = $"Portal Item: User Management",
                     PermissionName = $"VIEW_USER_MANAGEMENT".ToUpper(),
                     PermissionDescription = $"View User Management"
                 },
                 new SitePermission()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = new Guid("1eca5d20-6c93-4296-8328-d27ded7a30fc"),
                     Category = $"Portal Item: User Management",
                     PermissionName = $"ADD_USER_MANAGEMENT".ToUpper(),
                     PermissionDescription = $"Add User Management"
                 },
                 new SitePermission()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = new Guid("2f80b74d-7e82-4df0-ad77-3fda22b8f454"),
                     Category = $"Portal Item: User Management",
                     PermissionName = $"EDIT_USER_MANAGEMENT".ToUpper(),
                     PermissionDescription = $"Edit User Management"
                 },
                 new SitePermission()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = new Guid("a05a95e3-e010-4377-840d-d55025069ed0"),
                     Category = $"Portal Item: User Management",
                     PermissionName = $"DELETE_USER_MANAGEMENT".ToUpper(),
                     PermissionDescription = $"Delete User Management"
                 },
                 new SitePermission()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = new Guid("ccf158bb-7da8-42f7-a18f-7291c871d996"),
                     Category = $"Portal Item: User Management",
                     PermissionName = $"EXPORT_USER_MANAGEMENT".ToUpper(),
                     PermissionDescription = $"Export User Management"
