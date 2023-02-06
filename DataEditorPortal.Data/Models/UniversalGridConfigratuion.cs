@@ -21,6 +21,8 @@ namespace DataEditorPortal.Data.Models
 
         public string DetailConfig { get; set; }
 
+        public string CustomActionConfig { get; set; }
+
         public Guid CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
     }

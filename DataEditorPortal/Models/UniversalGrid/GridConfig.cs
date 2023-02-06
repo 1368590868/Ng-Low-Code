@@ -18,7 +18,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string CustomEditFormName { get; set; }
         public string CustomViewFormName { get; set; }
 
-        public List<string> CustomActions { get; set; }
+        public List<CustomAction> CustomActions { get; set; }
     }
 
     public class FormFieldConfig
@@ -86,5 +86,10 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string QueryForInsert { get; set; }
         public string QueryForUpdate { get; set; }
         public string QueryForDelete { get; set; }
+    }
+
+    public class CustomAction
+    {
+        public string Name { get; set; }
     }
 }

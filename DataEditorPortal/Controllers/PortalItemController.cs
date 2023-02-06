@@ -424,5 +424,24 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         #endregion
+
+        #region Custom Actions
+
+        [HttpGet]
+        [Route("{id}/custom-actions")]
+        public List<CustomAction> GetCustomActions(Guid id)
+        {
+            return _portalItemService.GetCustomActions(id);
+        }
+
+        [HttpPost]
+        [Route("{id}/custom-actions")]
+        public bool SaveCustomActions(Guid id, List<CustomAction> model)
+        {
+            return _portalItemService.SaveCustomActions(id, model);
+        }
+
+        #endregion
+
     }
 }

@@ -68,12 +68,16 @@ namespace DataEditorPortal.Web.Services
                 Name = config.Name,
                 DataKey = dataSourceConfig.IdColumn,
                 Description = item.Description,
-                Caption = item.Label
+                Caption = item.Label,
+                CustomActions = new List<CustomAction>()
             };
 
             // get query text for list data from grid config.
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
             _mapper.Map(detailConfig, result);
+
+            if (!string.IsNullOrEmpty(config.CustomActionConfig))
+                result.CustomActions = JsonSerializer.Deserialize<List<CustomAction>>(config.CustomActionConfig);
 
             return result;
         }

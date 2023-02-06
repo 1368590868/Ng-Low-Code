@@ -38,6 +38,8 @@ namespace DataEditorPortal.Web.Services
         bool SaveGridSearchConfig(Guid id, List<SearchFieldConfig> model);
         DetailConfig GetGridFormConfig(Guid id);
         bool SaveGridFormConfig(Guid id, DetailConfig model);
+        List<CustomAction> GetCustomActions(Guid id);
+        bool SaveCustomActions(Guid id, List<CustomAction> model);
     }
 
     public class PortalItemService : IPortalItemService
@@ -429,6 +431,45 @@ namespace DataEditorPortal.Web.Services
             config.ConfigCompleted = true;
 
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
+
+            _depDbContext.SaveChanges();
+
+            return true;
+        }
+
+        public List<CustomAction> GetCustomActions(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            if (!string.IsNullOrEmpty(config.CustomActionConfig))
+            {
+                return JsonSerializer.Deserialize<List<CustomAction>>(config.CustomActionConfig);
+            }
+            else
+            {
+                return new List<CustomAction>();
+            }
+        }
+
+        public bool SaveCustomActions(Guid id, List<CustomAction> model)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            config.CustomActionConfig = JsonSerializer.Serialize(model);
 
             _depDbContext.SaveChanges();
 

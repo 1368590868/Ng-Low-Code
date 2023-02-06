@@ -232,6 +232,44 @@ namespace DataEditorPortal.Data.Contexts
                 }
             );
 
+            modelBuilder.Entity<SitePermission>().HasData(
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: User Management",
+                    PermissionName = $"VIEW_USER_MANAGEMENT".ToUpper(),
+                    PermissionDescription = $"View User Management"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: User Management",
+                    PermissionName = $"ADD_USER_MANAGEMENT".ToUpper(),
+                    PermissionDescription = $"Add User Management"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: User Management",
+                    PermissionName = $"EDIT_USER_MANAGEMENT".ToUpper(),
+                    PermissionDescription = $"Edit User Management"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: User Management",
+                    PermissionName = $"DELETE_USER_MANAGEMENT".ToUpper(),
+                    PermissionDescription = $"Delete User Management"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: User Management",
+                    PermissionName = $"EXPORT_USER_MANAGEMENT".ToUpper(),
+                    PermissionDescription = $"Export User Management"
+                }
+            );
+
             #endregion
 
             #endregion
