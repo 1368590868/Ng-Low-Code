@@ -137,18 +137,41 @@ export class PortalListComponent implements OnInit {
       }
     }
 
-    if (row['order'] > 0) {
+    const maxOrder = (rowNode: TreeNode) => {
+      const nodes = rowNode.parent?.children
+        ? rowNode.parent?.children
+        : this.data;
+      if (!nodes || nodes.length == 0) return 0;
+      return nodes
+        .map(x => x.data['order'])
+        .reduce(
+          (result: number, current: number) =>
+            current > result ? current : result,
+          0
+        );
+    };
+    const minOrder = (rowNode: TreeNode) => {
+      const nodes = rowNode.parent?.children
+        ? rowNode.parent?.children
+        : this.data;
+      if (!nodes || nodes.length == 0) return 0;
+      return nodes
+        .map(x => x.data['order'])
+        .reduce(
+          (result: number, current: number) =>
+            current < result ? current : result,
+          9999
+        );
+    };
+
+    if (row['order'] > minOrder(rowNode)) {
       items.push({
         label: 'Move Up',
         icon: 'pi pi-fw pi-angle-up',
         command: () => this.moveUp(row)
       });
     }
-
-    const length = rowNode.parent?.children
-      ? rowNode.parent?.children.length - 1
-      : this.data.length - 1;
-    if (row['order'] < length) {
+    if (row['order'] < maxOrder(rowNode)) {
       items.push({
         label: 'Move Down',
         icon: 'pi pi-fw pi-angle-down',

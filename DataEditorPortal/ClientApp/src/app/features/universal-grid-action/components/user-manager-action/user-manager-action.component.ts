@@ -190,9 +190,7 @@ export class UserManagerActionComponent
       props: {
         label: 'Roles'
       },
-      expressions: {
-        hide: () => this.isAddForm
-      }
+      hide: true
     },
     {
       wrappers: ['chip'],
@@ -210,10 +208,15 @@ export class UserManagerActionComponent
             this.userManagerService
               .getUserRole(this.selectedRecords[0][this.recordKey])
               .subscribe(res => {
-                field.props!['forArray'] = res.filter(item => {
+                const roles = res.filter(item => {
                   item.label = item.roleName;
                   return item.selected;
                 });
+
+                if (field.props) field.props['forArray'] = roles;
+                if (field.parent?.fieldGroup) {
+                  field.parent.fieldGroup[4].hide = roles.length === 0;
+                }
               });
           }
         }
@@ -224,9 +227,7 @@ export class UserManagerActionComponent
       props: {
         label: 'Permissions'
       },
-      expressions: {
-        hide: () => this.isAddForm
-      }
+      hide: true
     },
     {
       wrappers: ['chip'],
@@ -242,10 +243,15 @@ export class UserManagerActionComponent
             this.userManagerService
               .getUserPermissions(this.selectedRecords[0][this.recordKey])
               .subscribe(res => {
-                field.props!['forArray'] = res.filter(item => {
+                const permissions = res.filter(item => {
                   item.label = item.permissionName;
                   return item.selected;
                 });
+
+                if (field.props) field.props['forArray'] = permissions;
+                if (field.parent?.fieldGroup) {
+                  field.parent.fieldGroup[6].hide = permissions.length === 0;
+                }
               });
           }
         }

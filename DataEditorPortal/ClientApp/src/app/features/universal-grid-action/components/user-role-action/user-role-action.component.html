@@ -1,8 +1,13 @@
-<div class="p-2" *ngFor="let role of rolesArr">
+<div class="p-2 flex align-items-center" *ngFor="let role of rolesArr">
   <p-checkbox
     [binary]="true"
     name="{{ role.id }}"
     value="{{ role.id }}"
     label="{{ role.roleName }}"
+    [disabled]="role.roleName === 'Users'"
     [(ngModel)]="role.selected"></p-checkbox>
+  <i
+    *ngIf="role.roleName === 'Users'"
+    class="pi pi-question-circle ml-3 text-lg"
+    pTooltip="Default Users role can not be unassigned."></i>
 </div>

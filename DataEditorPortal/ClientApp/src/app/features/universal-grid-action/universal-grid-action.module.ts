@@ -147,7 +147,7 @@ const GRID_ACTION_CONFIG = [
       icon: 'pi pi-users',
       buttonStyleClass: 'p-button-outlined',
       header: 'Manage Roles',
-      dialogStyle: { width: '40rem' },
+      dialogStyle: { width: '60rem' },
       cancelText: 'No',
       okText: 'Yes'
     }
