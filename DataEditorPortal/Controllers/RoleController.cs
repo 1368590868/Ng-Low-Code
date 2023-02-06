@@ -125,20 +125,21 @@ namespace DataEditorPortal.Web.Controllers
             return query.ToList();
         }
 
-        //[HttpGet]
-        //[Route("all-site-permissions")]
-        //public List<AppRolePermission> AllSitePermission()
-        //{
-        //    var query = from p in _depDbContext.SitePermissions
-        //                select new AppRolePermission()
-        //                {
-        //                    Id = p.Id,
-        //                    PermissionName = p.PermissionName,
-        //                    PermissionDescription = p.PermissionDescription,
-        //                    Category = p.Category
-        //                };
+        [HttpGet]
+        [Route("all-site-permissions")]
+        public List<AppRolePermission> AllSitePermission()
+        {
+            var query = from p in _depDbContext.SitePermissions
+                        orderby p.Category, p.PermissionName
+                        select new AppRolePermission()
+                        {
+                            Id = p.Id,
+                            PermissionName = p.PermissionName,
+                            PermissionDescription = p.PermissionDescription,
+                            Category = p.Category
+                        };
 
-        //    return query.ToList();
-        //}
+            return query.ToList();
+        }
     }
 }
