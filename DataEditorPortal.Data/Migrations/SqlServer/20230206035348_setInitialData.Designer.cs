@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    [Migration("20221230061732_siteMenus1")]
-    partial class siteMenus1
+    [Migration("20230206035348_setInitialData")]
+    partial class setInitialData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,6 +21,23 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.Lookup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QueryText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Lookups");
+                });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteMenu", b =>
                 {
@@ -34,7 +51,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("Icon")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Lable")
+                    b.Property<string>("Label")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Link")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -45,6 +65,9 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
@@ -58,12 +81,50 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.HasData(
                         new
                         {
-                            Id = new Guid("4e22e18e-492e-4786-8170-fb8f0c9d3a62"),
-                            Icon = "pi pi-fw pi-user",
-                            Lable = "User Management",
-                            Name = "UserManagement",
+                            Id = new Guid("b82dfe59-e51a-4771-b876-05d62f4207e3"),
+                            Icon = "pi pi-cog",
+                            Label = "Settings",
+                            Link = "",
+                            Name = "settings",
+                            Order = 999,
+                            Status = 1,
+                            Type = "System"
+                        },
+                        new
+                        {
+                            Id = new Guid("b4b490ea-9df3-4f7a-8806-936ca7f87b8f"),
+                            Icon = "pi pi-desktop",
+                            Label = "Portal Management",
+                            Link = "/portal-management/list",
+                            Name = "portal-management",
                             Order = 0,
-                            Type = "PortalItem"
+                            ParentId = new Guid("b82dfe59-e51a-4771-b876-05d62f4207e3"),
+                            Status = 1,
+                            Type = "System"
+                        },
+                        new
+                        {
+                            Id = new Guid("4e22e18e-492e-4786-8170-fb8f0c9d3a62"),
+                            Icon = "pi pi-user",
+                            Label = "User Management",
+                            Link = "/portal-item/user-management",
+                            Name = "user-management",
+                            Order = 1,
+                            ParentId = new Guid("b82dfe59-e51a-4771-b876-05d62f4207e3"),
+                            Status = 1,
+                            Type = "System"
+                        },
+                        new
+                        {
+                            Id = new Guid("cbf29ec9-b605-45f1-a84f-5a7fc99ad6b3"),
+                            Icon = "pi pi-wrench",
+                            Label = "Site Settings",
+                            Link = "",
+                            Name = "site-settings",
+                            Order = 2,
+                            ParentId = new Guid("b82dfe59-e51a-4771-b876-05d62f4207e3"),
+                            Status = 1,
+                            Type = "System"
                         });
                 });
 
@@ -76,9 +137,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDefaultGranted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("PermissionDescription")
                         .HasColumnType("nvarchar(max)");
 
@@ -90,7 +148,31 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.ToTable("SitePermissions");
                 });
 
-            modelBuilder.Entity("DataEditorPortal.Data.Models.SitePermissionRole", b =>
+            modelBuilder.Entity("DataEditorPortal.Data.Models.SiteRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RoleDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SiteRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("33d70a90-0c4c-48ee-ad8f-3051448d19cf"),
+                            RoleName = "Users"
+                        });
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.SiteRolePermission", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -114,24 +196,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("SiteRoleId");
 
-                    b.ToTable("SitePermissionRoles");
-                });
-
-            modelBuilder.Entity("DataEditorPortal.Data.Models.SiteRole", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("RoleDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RoleName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SiteRoles");
+                    b.ToTable("SiteRolePermissions");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.UniversalGridConfiguration", b =>
@@ -143,16 +208,22 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("ColumnsConfig")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("ConfigCompleted")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CurrentStep")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DataSourceConfig")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DetailDialogConfig")
+                    b.Property<string>("DetailConfig")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -160,9 +231,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.Property<string>("SearchConfig")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("UseCustomDetailDialog")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -172,13 +240,14 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         new
                         {
                             Id = new Guid("071f5419-85b8-11ed-a86f-0242ac130004"),
-                            ColumnsConfig = "[{\"field\":\"Username\",\"header\":\"CNP ID\",\"width\":\"130px\",\"filterType\":\"text\"},{\"field\":\"Name\",\"header\":\"Name\",\"width\":\"250px\",\"filterType\":\"text\"},{\"field\":\"Email\",\"header\":\"Email\",\"width\":\"250px\",\"filterType\":\"text\"},{\"field\":\"Phone\",\"header\":\"Phone\",\"width\":\"250px\",\"filterType\":\"text\"},{\"field\":\"AutoEmail\",\"header\":\"Auto Email\",\"width\":\"250px\",\"filterType\":\"text\"},{\"field\":\"Vendor\",\"header\":\"Vendor\",\"width\":\"250px\",\"filterType\":\"text\"},{\"field\":\"Employer\",\"header\":\"Employer\",\"width\":\"250px\",\"filterType\":\"text\"},{\"field\":\"Division\",\"header\":\"Division\",\"width\":\"250px\",\"filterType\":\"text\"},{\"field\":\"Comments\",\"header\":\"Comments\",\"width\":\"250px\",\"filterType\":\"text\"}]",
+                            ColumnsConfig = "[{\"field\":\"Username\",\"header\":\"CNP ID\",\"width\":\"130px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"Name\",\"header\":\"Name\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"Email\",\"header\":\"Email\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"Phone\",\"header\":\"Phone\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"AutoEmail\",\"header\":\"Auto Email\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"Vendor\",\"header\":\"Vendor\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"Employer\",\"header\":\"Employer\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"Division\",\"header\":\"Division\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":false},{\"field\":\"Comments\",\"header\":\"Comments\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true}]",
+                            ConfigCompleted = true,
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedDate = new DateTime(2022, 12, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DataSourceConfig = "{\"TableName\":\"Users\",\"IdColumn\":\"Id\",\"Columns\":[\"Id\",\"Username\",\"Name\",\"Email\",\"Phone\",\"AutoEmail\",\"Vendor\",\"Employer\",\"Division\",\"Comments\"],\"SortBy\":[{\"field\":\"Name\",\"order\":1}]}",
-                            Name = "UserManagement",
-                            SearchConfig = "[{\"Name\":\"Username\",\"Label\":\"CNP ID\",\"Type\":\"pInputText\"},{\"Name\":\"NAME\",\"Label\":\"Name\",\"Type\":\"pInputText\"}]",
-                            UseCustomDetailDialog = false
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DataSourceConfig = "{\"TableName\":\"Users\",\"TableSchema\":\"dep\",\"IdColumn\":\"Id\",\"Columns\":[\"Id\",\"Username\",\"Name\",\"Email\",\"Phone\",\"AutoEmail\",\"Vendor\",\"Employer\",\"Division\",\"Comments\"],\"SortBy\":[{\"field\":\"Name\",\"order\":1}]}",
+                            DetailConfig = "{\"AllowExport\":true,\"AllowDelete\":true,\"AllowEdit\":true,\"UseCustomForm\":true,\"CustomAddFormName\":\"user-manager-add\",\"CustomEditFormName\":\"user-manager-edit\",\"CustomViewFormName\":\"user-manager-view\"}",
+                            Name = "user-management",
+                            SearchConfig = "[{\"key\":\"username\",\"type\":\"input\",\"filterType\":\"text\",\"props\":{\"label\":\"CNP ID\",\"placeholder\":\"CNP ID\"},\"searchRule\":{\"field\":\"Username\",\"matchMode\":\"contains\"}},{\"key\":\"name\",\"type\":\"input\",\"filterType\":\"text\",\"props\":{\"label\":\"Name\",\"placeholder\":\"Name\"},\"searchRule\":{\"field\":\"Name\",\"matchMode\":\"contains\"}},{\"key\":\"roles\",\"type\":\"select\",\"filterType\":\"text\",\"props\":{\"label\":\"Roles\",\"placeholder\":\"Please select\",\"options\":[{\"value\":1,\"label\":\"Option 1\"},{\"value\":2,\"label\":\"Option 2\"},{\"value\":3,\"label\":\"Option 3\"},{\"value\":4,\"label\":\"Option 4\"}]},\"searchRule\":{\"whereClause\":\"Id in (select UserId from USERID_PERMISSION where PERMISSION_GRANT_ID = \\u0027{0}\\u0027)\"}},{\"key\":\"vendor\",\"type\":\"select\",\"filterType\":\"text\",\"props\":{\"label\":\"Vendor\",\"placeholder\":\"Please select\",\"options\":[{\"value\":1,\"label\":\"Option 1\"},{\"value\":2,\"label\":\"Option 2\"},{\"value\":3,\"label\":\"Option 3\"},{\"value\":4,\"label\":\"Option 4\"}]},\"searchRule\":{\"field\":\"Vendor\",\"matchMode\":\"contains\"}},{\"key\":\"employer\",\"type\":\"select\",\"filterType\":\"text\",\"props\":{\"label\":\"Employer\",\"placeholder\":\"Please select\",\"options\":[{\"value\":1,\"label\":\"Option 1\"},{\"value\":2,\"label\":\"Option 2\"},{\"value\":3,\"label\":\"Option 3\"},{\"value\":4,\"label\":\"Option 4\"}]},\"searchRule\":{\"field\":\"Employer\",\"matchMode\":\"contains\"}}]"
                         });
                 });
 
@@ -186,7 +255,8 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<bool>("AutoEmail")
                         .HasColumnType("bit");
@@ -260,7 +330,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("DataEditorPortal.Data.Models.SitePermissionRole", b =>
+            modelBuilder.Entity("DataEditorPortal.Data.Models.SiteRolePermission", b =>
                 {
                     b.HasOne("DataEditorPortal.Data.Models.SitePermission", "SitePermission")
                         .WithMany()

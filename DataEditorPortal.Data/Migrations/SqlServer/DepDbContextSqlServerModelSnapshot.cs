@@ -105,7 +105,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                             Id = new Guid("4e22e18e-492e-4786-8170-fb8f0c9d3a62"),
                             Icon = "pi pi-user",
                             Label = "User Management",
-                            Link = "",
+                            Link = "/portal-item/user-management",
                             Name = "user-management",
                             Order = 1,
                             ParentId = new Guid("b82dfe59-e51a-4771-b876-05d62f4207e3"),
@@ -134,9 +134,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDefaultGranted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("PermissionDescription")
                         .HasColumnType("nvarchar(max)");
