@@ -1,0 +1,26 @@
+.option-list {
+  ::ng-deep {
+    .p-orderlist {
+      display: block;
+      .p-orderlist-controls {
+        display: none;
+      }
+      .p-orderlist-list {
+        border: none;
+        min-height: auto;
+        overflow: hidden;
+        border-radius: 0;
+
+        .p-orderlist-item + .p-orderlist-item {
+          border-top: 1px solid var(--surface-300);
+        }
+      }
+      .p-orderlist-controls {
+        display: none;
+      }
+      .p-orderlist-list-container {
+        flex: none;
+      }
+    }
+  }
+}

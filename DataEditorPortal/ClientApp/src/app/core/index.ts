@@ -10,7 +10,6 @@ import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { AvatarModule } from 'primeng/avatar';
-import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import {
   HeaderComponent,
@@ -24,13 +23,14 @@ import {
 } from './components';
 import { PermissionDirective } from './directive/permission.directive';
 import { CommonModule } from '@angular/common';
-
+import { InputTextModule } from 'primeng/inputtext';
 export * from './components';
 export { RouterGuard } from './guards/router.guard';
 export { ApiResponse } from './models/api-response';
 export { NotifyService } from './utils/notify.service';
 export { NgxFormlyService } from './services/ngx-formly.service';
 export { ConfigDataService } from './services/config-data.service';
+import { DialogModule } from 'primeng/dialog';
 
 @NgModule({
   declarations: [
@@ -53,7 +53,8 @@ export { ConfigDataService } from './services/config-data.service';
     MenubarModule,
     AvatarModule,
     DialogModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    InputTextModule
   ],
   exports: [
     HeaderComponent,

@@ -55,10 +55,10 @@ export class TableComponent implements OnInit, OnDestroy {
 
     // get grid config
     this.gridTableService.getTableConfig().subscribe(result => {
-      // result.customActions = [];
-      // result.customActions?.push('manage-roles');
-      // result.customActions?.push('edit-role');
-      // result.customActions?.push('edit-permission');
+      result.customActions = [];
+      result.customActions?.push('manage-roles');
+      result.customActions?.push('edit-role');
+      result.customActions?.push('edit-permission');
       this.tableConfig = result;
       this.setRowActions();
       this.setTableActions();

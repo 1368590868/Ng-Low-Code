@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NotifyService } from 'src/app/core';
 import { GridActionDirective } from '../../directives/grid-action.directive';
-import { RoleList } from '../../models/user-manager';
+import { RoleItem } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';
 
 @Component({
@@ -13,7 +13,7 @@ export class UserRoleActionComponent
   extends GridActionDirective
   implements OnInit
 {
-  rolesArr: RoleList[] = [];
+  rolesArr: RoleItem[] = [];
 
   constructor(
     private userManagerService: UserManagerService,

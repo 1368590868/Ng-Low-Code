@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { NotifyService } from 'src/app/core';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import {
   ManageRoleForm,
-  RoleList,
+  RoleItem,
   RolePermissions
 } from '../../models/role-permisstion';
 import { RolePermissionService } from '../../services/role-permission.service';
@@ -15,16 +15,13 @@ import { RolePermissionService } from '../../services/role-permission.service';
   templateUrl: './manage-role-action.component.html',
   styleUrls: ['./manage-role-action.component.scss']
 })
-export class ManageRoleActionComponent
-  extends GridActionDirective
-  implements OnInit
-{
+export class ManageRoleActionComponent extends GridActionDirective {
   @ViewChild('editForm') editForm!: NgForm;
   form = new FormGroup({});
   model: ManageRoleForm = {};
   options: FormlyFormOptions = {};
   // Role form config
-  roleList: RoleList[] = [];
+  roleList: RoleItem[] = [];
   roleFields: FormlyFieldConfig[] = [
     {
       fieldGroupClassName: 'flex flex-wrap justify-content-between',
@@ -37,40 +34,42 @@ export class ManageRoleActionComponent
           props: {
             change: () => {
               this.roleId = this.model.roleId || '';
-              const isNew = this.roleId.split(',')[1];
 
-              if (isNew === 'new') {
-                this.roleId = this.roleId.split(',')[0];
+              this.getRolePermissionsList(
+                this.roleId === '<new_role>' ? undefined : this.roleId
+              );
+
+              const role = this.roleList.find(x => this.roleId == x.id);
+              if (role) {
+                this.setFormValue(role);
               }
-              this.getRolePermissionsList(this.roleId, isNew === 'new');
-
-              let roleDesc = '';
-              this.roleList.map(res => {
-                if (this.roleId == res.id) {
-                  this.roleName = res.roleName || '';
-                  roleDesc = res.roleDescription || '';
-                }
-              });
-              this.form.setValue({
-                roleId: isNew === 'new' ? `${this.roleId},new` : this.roleId,
-                roleName: isNew === 'new' ? '' : this.roleName,
-                roleDescription: isNew === 'new' ? '' : roleDesc
-              });
             },
-
             required: true,
             label: 'Roles',
             placeholder: 'Roles',
             valueProp: 'id',
             labelProp: 'roleName',
-            options: this.roleList,
             appendTo: 'body'
           },
           hooks: {
             onInit: (field: FormlyFieldConfig) => {
               this.rolePermissionService.getRoleList().subscribe(res => {
                 if (field.props) {
-                  field.props.options = res;
+                  this.roleList = [
+                    ...res,
+                    {
+                      id: '<new_role>',
+                      roleName: '...',
+                      roleDescription: ''
+                    }
+                  ];
+                  field.props.options = this.roleList;
+
+                  if (res.length > 0) {
+                    this.setFormValue(res[0]);
+                    this.getRolePermissionsList(res[0].id);
+                  }
+                  this.loadedEvent.emit();
                 }
               });
             }
@@ -81,9 +80,11 @@ export class ManageRoleActionComponent
           className: 'w-full',
           props: {
             label: 'Role Details'
+          },
+          expressions: {
+            'props.label': `model.roleId === '<new_role>' ? 'Add New Role' : 'Role Details'`
           }
         },
-
         {
           className: 'w-full',
           key: 'roleName',
@@ -93,6 +94,9 @@ export class ManageRoleActionComponent
             type: 'text',
             label: 'Name',
             placeholder: 'Name'
+          },
+          expressions: {
+            'props.disabled': `model.roleName === 'Users'`
           }
         },
         {
@@ -135,52 +139,37 @@ export class ManageRoleActionComponent
     return Array.from(map).map(item => [...item[1]]);
   }
 
-  ngOnInit(): void {
-    this.rolePermissionService.getRoleList().subscribe(res => {
-      this.roleId = res[0].id || '';
-      this.roleName = res[0].roleName || '';
-      this.initData(res);
-      this.roleList = [
-        ...res,
-        {
-          id: res[0].id + ',new',
-          roleName: 'Add New Role',
-          roleDescription: 'Add new role'
-        }
-      ];
-      this.getRolePermissionsList(this.roleId);
-      this.loadedEvent.emit();
-    });
-  }
+  setFormValue(role: RoleItem) {
+    this.roleId = role.id || '';
+    this.roleName = role.id === '<new_role>' ? '' : role.roleName || '';
 
-  initData(data: RoleList[]) {
     this.form.setValue({
-      roleId: data[0].id,
-      roleName: data[0].roleName,
-      roleDescription: data[0].roleDescription
+      roleId: role.id,
+      roleName: this.roleName,
+      roleDescription: role.id === '<new_role>' ? '' : role.roleDescription
     });
   }
 
-  getRolePermissionsList(roleId = '', isNew = false) {
-    this.rolePermissionService.getRolePermissions(roleId).subscribe(res => {
-      this.groupPermissions = this.groupBy(res);
-      this.groupPermissions.map((item, i) => {
-        this.permissions[i] = item;
-      });
-
-      if (isNew) {
-        this.permissions.map(res => {
-          res.map((item: any) => {
-            item.selected = false;
-          });
-        });
-      }
-      this.permissions.map((res, i) => {
-        this.permissionSelect[i] = res.filter((item: any) => {
-          return item.selected;
-        });
+  setPermissions(res: RolePermissions[]) {
+    this.groupPermissions = this.groupBy(res);
+    this.groupPermissions.forEach((item, i) => {
+      this.permissions[i] = item;
+      this.permissionSelect[i] = item.filter((item: any) => {
+        return item.selected;
       });
     });
+  }
+
+  getRolePermissionsList(roleId: any) {
+    if (roleId) {
+      this.rolePermissionService.getRolePermissions(roleId).subscribe(res => {
+        this.setPermissions(res);
+      });
+    } else {
+      this.rolePermissionService.getSitePermissions().subscribe(res => {
+        this.setPermissions(res);
+      });
+    }
   }
 
   onFormSubmit(model: ManageRoleForm) {
@@ -190,9 +179,7 @@ export class ManageRoleActionComponent
     });
     if (this.form.valid) {
       const apiName =
-        this.model.roleId!.split(',')[1] === 'new'
-          ? 'createRole'
-          : 'updateRole';
+        this.model.roleId === '<new_role>' ? 'createRole' : 'updateRole';
       this.rolePermissionService[apiName]({
         ...model,
         permissions: this.permissionSelect

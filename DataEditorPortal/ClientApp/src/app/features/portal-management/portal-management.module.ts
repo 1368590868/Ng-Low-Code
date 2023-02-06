@@ -56,7 +56,12 @@ import {
   PortalEditFormComponent,
   SvgDragComponent
 } from './components/portal-edit';
+
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
+import { OptionDialogComponent } from './components/option-dialog/option-dialog.component';
+import { MonacoEditorModule } from 'ngx-monaco-editor';
+import { CustomActionsComponent } from './components/custom-actions/custom-actions.component';
+import { SearchRuleComponent } from './components/search-rule/search-rule.component';
 
 @NgModule({
   declarations: [
@@ -68,13 +73,17 @@ import { UniversalGridActionModule } from 'src/app/features/universal-grid-actio
     PortalEditColumnsComponent,
     PortalEditSearchComponent,
     PortalEditFormComponent,
-    SvgDragComponent
+    SvgDragComponent,
+    OptionDialogComponent,
+    CustomActionsComponent,
+    SearchRuleComponent
   ],
   imports: [
     CommonModule,
     PortalManagementRoutingModule,
     UniversalGridActionModule,
     FormsModule,
+    MonacoEditorModule.forRoot(),
     ReactiveFormsModule,
     FormlyModule.forRoot({
       validationMessages: [
