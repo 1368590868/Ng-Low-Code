@@ -5,10 +5,10 @@ import { ApiResponse } from 'src/app/core';
 import {
   Role,
   Permisstion,
-  RoleList,
   RolePermissions,
   updateRole,
-  ManageRoleForm
+  ManageRoleForm,
+  RoleItem
 } from '../models/role-permisstion';
 
 @Injectable({
@@ -53,7 +53,7 @@ export class RolePermissionService {
 
   getRoleList() {
     return this.http
-      .get<ApiResponse<RoleList[]>>(`${this._apiUrl}role/list`)
+      .get<ApiResponse<RoleItem[]>>(`${this._apiUrl}role/list`)
       .pipe(map(res => res.result || []));
   }
 
@@ -61,6 +61,14 @@ export class RolePermissionService {
     return this.http
       .get<ApiResponse<RolePermissions[]>>(
         `${this._apiUrl}role/${roleId}/permissions`
+      )
+      .pipe(map(res => res.result || []));
+  }
+
+  getSitePermissions() {
+    return this.http
+      .get<ApiResponse<RolePermissions[]>>(
+        `${this._apiUrl}role/all-site-permissions`
       )
       .pipe(map(res => res.result || []));
   }

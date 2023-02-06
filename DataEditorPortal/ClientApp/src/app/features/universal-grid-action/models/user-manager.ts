@@ -42,7 +42,7 @@ export interface UserData extends UserPemissions {
   selected?: boolean;
 }
 
-export interface RoleList {
+export interface RoleItem {
   id?: string;
   roleDescription?: string;
   roleName?: string;

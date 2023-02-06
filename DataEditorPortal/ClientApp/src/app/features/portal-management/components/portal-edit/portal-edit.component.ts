@@ -32,7 +32,7 @@ export class PortalEditComponent implements OnInit {
             this.portalItemService.currentPortalItemConfigCompleted =
               res['configCompleted'];
             this.portalItemService.currentPortalItemCaption = res['label'];
-            this.router.navigate([res['currentStep']], {
+            this.router.navigate([res['currentStep'] || 'basic'], {
               relativeTo: this.activatedRoute,
               replaceUrl: true
             });

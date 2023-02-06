@@ -11,7 +11,7 @@ export interface Permisstion {
   desc?: string;
 }
 
-export interface RoleList {
+export interface RoleItem {
   id?: string;
   roleName?: string;
   roleDescription?: string;
