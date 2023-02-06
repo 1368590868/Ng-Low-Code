@@ -103,7 +103,11 @@ namespace DataEditorPortal.Web.Controllers
         public Guid CreateFolder([FromBody] PortalItemData model)
         {
             model.Name = _portalItemService.GetCodeName(model.Label);
-            model.Order = _depDbContext.SiteMenus.Where(x => x.ParentId == model.ParentId).Count();
+            model.Order = _depDbContext.SiteMenus
+                    .Where(x => x.ParentId == model.ParentId)
+                    .OrderByDescending(x => x.Order)
+                    .Select(x => x.Order)
+                    .FirstOrDefault() + 1;
 
             var siteMenu = _mapper.Map<SiteMenu>(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
@@ -131,7 +135,11 @@ namespace DataEditorPortal.Web.Controllers
             if (siteMenu.ParentId != model.ParentId)
             {
                 // parent changed, reorder.
-                model.Order = _depDbContext.SiteMenus.Where(x => x.ParentId == model.ParentId).Count();
+                model.Order = _depDbContext.SiteMenus
+                    .Where(x => x.ParentId == model.ParentId)
+                    .OrderByDescending(x => x.Order)
+                    .Select(x => x.Order)
+                    .FirstOrDefault() + 1;
             }
 
             if (siteMenu.Type == "System")

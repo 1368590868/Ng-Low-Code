@@ -53,9 +53,9 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
         public bool sortable { get; set; }
 
-        public int order { get; set; }
+        //public int order { get; set; }
 
-        public bool aggregate { get; set; } = false;
+        //public bool aggregate { get; set; } = false;
     }
 
     public class DataSourceConfig

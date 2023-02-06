@@ -100,7 +100,11 @@ namespace DataEditorPortal.Web.Services
             var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
             var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
 
-            model.Order = _depDbContext.SiteMenus.Where(x => x.ParentId == model.ParentId).Count();
+            model.Order = _depDbContext.SiteMenus
+                .Where(x => x.ParentId == model.ParentId)
+                .OrderByDescending(x => x.Order)
+                .Select(x => x.Order)
+                .FirstOrDefault() + 1;
 
             // create site menu
             var siteMenu = _mapper.Map<SiteMenu>(model);
@@ -162,7 +166,11 @@ namespace DataEditorPortal.Web.Services
             if (siteMenu.ParentId != model.ParentId)
             {
                 // parent changed, reorder.
-                model.Order = _depDbContext.SiteMenus.Where(x => x.ParentId == model.ParentId).Count();
+                model.Order = _depDbContext.SiteMenus
+                    .Where(x => x.ParentId == model.ParentId)
+                    .OrderByDescending(x => x.Order)
+                .Select(x => x.Order)
+                .FirstOrDefault() + 1;
             }
             _mapper.Map(model, siteMenu);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;

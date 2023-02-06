@@ -29,38 +29,111 @@ namespace DataEditorPortal.Data.Contexts
 
             #region Initial data
 
-            #region user management
+            #region Default menus and pages
+
+            modelBuilder.Entity<SiteMenu>().HasData(
+               // Admin Settings 
+               new SiteMenu()
+               {
+                   Id = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                   Name = "settings",
+                   Label = "Settings",
+                   Icon = "pi pi-cog",
+                   Type = "System",
+                   Link = "",
+                   Order = 999,
+                   Status = Common.PortalItemStatus.Published
+               },
+               // Portal Management
+               new SiteMenu()
+               {
+                   Id = new Guid("B4B490EA-9DF3-4F7A-8806-936CA7F87B8F"),
+                   Name = "portal-management",
+                   Label = "Portal Management",
+                   Icon = "pi pi-desktop",
+                   Type = "System",
+                   Link = "/portal-management/list",
+                   ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                   Order = 0,
+                   Status = Common.PortalItemStatus.Published
+               },
+               // User Management
+               new SiteMenu()
+               {
+                   Id = new Guid("4E22E18E-492E-4786-8170-FB8F0C9D3A62"),
+                   Name = "user-management",
+                   Label = "User Management",
+                   Icon = "pi pi-user",
+                   Type = "System",
+                   Link = "/portal-item/user-management",
+                   ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                   Order = 1,
+                   Status = Common.PortalItemStatus.Published
+               },
+                // site settings
+                new SiteMenu()
+                {
+                    Id = new Guid("CBF29EC9-B605-45F1-A84F-5A7FC99AD6B3"),
+                    Name = "site-settings",
+                    Label = "Site Settings",
+                    Icon = "pi pi-wrench",
+                    Type = "System",
+                    Link = "",
+                    ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                    Order = 2,
+                    Status = Common.PortalItemStatus.Published
+                }
+            );
+
+            #endregion
+
+            #region Default admin user and roles | permissions
+
+            modelBuilder.Entity<SiteRole>().HasData(
+                new SiteRole()
+                {
+                    Id = new Guid("33D70A90-0C4C-48EE-AD8F-3051448D19CF"),
+                    RoleName = "Users"
+                }
+            );
+
+            #endregion
+
+            #region user management configuration
 
             modelBuilder.Entity<UniversalGridConfiguration>().HasData(
                 new UniversalGridConfiguration()
                 {
                     Id = Guid.Parse("071f5419-85b8-11ed-a86f-0242ac130004"),
-                    Name = "UserManagement",
+                    Name = "user-management",
+                    ConfigCompleted = true,
 
                     DataSourceConfig = JsonSerializer.Serialize(new
                     {
                         TableName = "Users",
+                        TableSchema = "dep",
                         IdColumn = "Id",
                         Columns = new List<string>() { "Id", "Username", "Name", "Email", "Phone", "AutoEmail", "Vendor", "Employer", "Division", "Comments" },
                         SortBy = new List<object>() { new { field = "Name", order = 1 } }
                     }),
 
                     ColumnsConfig = JsonSerializer.Serialize(new object[] {
-                        new { field = "Username", header = "CNP ID", width = "130px", filterType = "text" },
-                        new { field = "Name", header = "Name", width = "250px", filterType = "text" },
-                        new { field = "Email", header = "Email", width = "250px", filterType = "text" },
-                        new { field = "Phone", header = "Phone", width = "250px", filterType = "text" },
-                        new { field = "AutoEmail", header = "Auto Email", width = "250px", filterType = "text" },
-                        new { field = "Vendor", header = "Vendor", width = "250px", filterType = "text" },
-                        new { field = "Employer", header = "Employer", width = "250px", filterType = "text" },
-                        new { field = "Division", header = "Division", width = "250px", filterType = "text" },
-                        new { field = "Comments", header = "Comments", width = "250px", filterType = "text" }
+                        new { field = "Username", header = "CNP ID", width = "130px", filterType = "text", sortable = true },
+                        new { field = "Name", header = "Name", width = "250px", filterType = "text", sortable = true },
+                        new { field = "Email", header = "Email", width = "250px", filterType = "text", sortable = true },
+                        new { field = "Phone", header = "Phone", width = "250px", filterType = "text", sortable = true },
+                        new { field = "AutoEmail", header = "Auto Email", width = "250px", filterType = "text", sortable = true },
+                        new { field = "Vendor", header = "Vendor", width = "250px", filterType = "text", sortable = true },
+                        new { field = "Employer", header = "Employer", width = "250px", filterType = "text", sortable = true },
+                        new { field = "Division", header = "Division", width = "250px", filterType = "text", sortable = false },
+                        new { field = "Comments", header = "Comments", width = "250px", filterType = "text", sortable = true }
                     }),
 
                     SearchConfig = JsonSerializer.Serialize(new object[] {
                         new {
                             key = "username",
                             type = "input",
+                            filterType = "text",
                             props = new {
                                 label = "CNP ID",
                                 placeholder = "CNP ID"
@@ -74,6 +147,7 @@ namespace DataEditorPortal.Data.Contexts
                         new {
                             key = "name",
                             type = "input",
+                            filterType = "text",
                             props = new {
                                 label = "Name",
                                 placeholder = "Name"
@@ -87,6 +161,7 @@ namespace DataEditorPortal.Data.Contexts
                         new {
                             key = "roles",
                             type = "select",
+                            filterType = "text",
                             props = new {
                                 label = "Roles",
                                 placeholder = "Please select",
@@ -105,6 +180,7 @@ namespace DataEditorPortal.Data.Contexts
                         new {
                             key = "vendor",
                             type = "select",
+                            filterType = "text",
                             props = new {
                                 label = "Vendor",
                                 placeholder = "Please select",
@@ -124,6 +200,7 @@ namespace DataEditorPortal.Data.Contexts
                         new {
                             key = "employer",
                             type = "select",
+                            filterType = "text",
                             props = new {
                                 label = "Employer",
                                 placeholder = "Please select",
@@ -144,97 +221,14 @@ namespace DataEditorPortal.Data.Contexts
 
                     DetailConfig = JsonSerializer.Serialize(new
                     {
-                        UseCustomAction = false,
-                        FormConfig = new object[] {
-                            new {
-                                key = "Username",
-                                type = "input",
-                                props = new {
-                                    label = "CNP ID",
-                                    placeholder = "CNP ID",
-                                    required= true
-                                }
-                            },
-                            new {
-                                key = "Name",
-                                type = "input",
-                                props = new {
-                                    label = "Name",
-                                    placeholder = "Name",
-                                    required= true
-                                }
-                            },
-                            new {
-                                key = "Email",
-                                type = "input",
-                                props = new {
-                                    label = "Email",
-                                    placeholder = "Email",
-                                    required= true
-                                }
-                            },
-                            new {
-                                key = "Phone",
-                                type = "input",
-                                props = new {
-                                    label = "Phone",
-                                    placeholder = "Phone",
-                                    required= true
-                                }
-                            },
-                            new {
-                                key = "Vendor",
-                                type = "input",
-                                props = new {
-                                    label = "Vendor",
-                                    placeholder = "Vendor"
-                                }
-                            },
-                            new {
-                                key = "Employer",
-                                type = "input",
-                                props = new {
-                                    label = "Employer",
-                                    placeholder = "Employer"
-                                }
-                            },
-                            new {
-                                key = "AutoEmail",
-                                type = "checkbox",
-                                defaultValue = true,
-                                props = new {
-                                    label = "Auto Email",
-                                    required= true
-                                }
-                            }
-                        }
+                        AllowExport = true,
+                        AllowDelete = true,
+                        AllowEdit = true,
+                        UseCustomForm = true,
+                        CustomAddFormName = "user-manager-add",
+                        CustomEditFormName = "user-manager-edit",
+                        CustomViewFormName = "user-manager-view"
                     })
-                }
-            );
-            modelBuilder.Entity<SiteMenu>().HasData(
-                new SiteMenu()
-                {
-                    Id = new Guid("4E22E18E-492E-4786-8170-FB8F0C9D3A62"),
-                    Name = "UserManagement",
-                    Label = "User Management",
-                    Icon = "pi pi-fw pi-user",
-                    Type = "PortalItem"
-                }
-            );
-
-            #endregion
-
-            #region portal manament
-
-            modelBuilder.Entity<SiteMenu>().HasData(
-                new SiteMenu()
-                {
-                    Id = new Guid("B4B490EA-9DF3-4F7A-8806-936CA7F87B8F"),
-                    Name = "PortalManagement",
-                    Label = "Portal Management",
-                    Icon = "pi pi-desktop",
-                    Type = "",
-                    Link = "/portal-management/list"
                 }
             );
 

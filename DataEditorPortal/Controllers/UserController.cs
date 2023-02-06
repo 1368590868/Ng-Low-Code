@@ -41,8 +41,8 @@ namespace DataEditorPortal.Web.Controllers
                 dep_user.Vendor = "NONE";
                 dep_user.AutoEmail = true;
                 dep_user.Division = "NONE";
-                _depDbContext.Users.Add(dep_user);
-                _depDbContext.SaveChanges();
+
+                this.Create(dep_user);
             }
 
             user.DisplayName = dep_user.Name;
@@ -59,27 +59,45 @@ namespace DataEditorPortal.Web.Controllers
 
             if (!user.Disabled)
             {
-                var siteRoles = from up in _depDbContext.UserPermissions
-                                join sr in _depDbContext.SiteRoles on up.PermissionGrantId equals sr.Id
-                                where up.UserId == dep_user.Id && up.GrantType == "GROUP"
-                                select new
-                                {
-                                    PermissionName = sr.RoleName,
-                                    Description = sr.RoleDescription
-                                };
-
-                var sitePermissions = from up in _depDbContext.UserPermissions
-                                      join sp in _depDbContext.SitePermissions on up.PermissionGrantId equals sp.Id
-                                      where up.UserId == dep_user.Id && up.GrantType == "ITEM"
-                                      select new
-                                      {
-                                          PermissionName = sp.PermissionName,
-                                          Description = sp.PermissionDescription
-                                      };
-                var permissions = siteRoles.Union(sitePermissions).Distinct().ToList();
-                foreach (var p in permissions)
+                if (User.IsInRole("Administrators"))
                 {
-                    user.Permissions[p.PermissionName] = true;
+                    var permissions = (from p in _depDbContext.SitePermissions
+                                       select new
+                                       {
+                                           PermissionName = p.PermissionName
+                                       }).Distinct().ToList();
+
+                    foreach (var p in permissions)
+                    {
+                        user.Permissions[p.PermissionName] = true;
+                    }
+                }
+                else
+                {
+                    var siteRolesPermissions = from up in _depDbContext.UserPermissions
+                                               join sr in _depDbContext.SiteRoles on up.PermissionGrantId equals sr.Id
+                                               join srp in _depDbContext.SiteRolePermissions on sr.Id equals srp.SiteRoleId
+                                               join sp in _depDbContext.SitePermissions on srp.SitePermissionId equals sp.Id
+                                               where up.UserId == dep_user.Id && up.GrantType == "GROUP"
+                                               select sp.Id;
+
+                    var sitePermissions = from up in _depDbContext.UserPermissions
+                                          join sp in _depDbContext.SitePermissions on up.PermissionGrantId equals sp.Id
+                                          where up.UserId == dep_user.Id && up.GrantType == "ITEM"
+                                          select sp.Id;
+
+                    var permissionsQuery = from p in _depDbContext.SitePermissions
+                                           where siteRolesPermissions.Contains(p.Id) || sitePermissions.Contains(p.Id)
+                                           select new
+                                           {
+                                               PermissionName = p.PermissionName
+                                           };
+
+                    var permissions = permissionsQuery.Distinct().ToList();
+                    foreach (var p in permissions)
+                    {
+                        user.Permissions[p.PermissionName] = true;
+                    }
                 }
             }
 
@@ -103,7 +121,11 @@ namespace DataEditorPortal.Web.Controllers
         [Route("create")]
         public Guid Create([FromBody] User model)
         {
+            var username = AppUser.ParseUsername(User.Identity.Name).Username;
+            var user = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
+
             var dep_user = new User();
+            dep_user.Id = Guid.NewGuid();
             dep_user.Username = model.Username;
             dep_user.Employer = model.Employer;
             dep_user.Vendor = model.Vendor;
@@ -112,6 +134,21 @@ namespace DataEditorPortal.Web.Controllers
             dep_user.Comments = "ACTIVE";
             dep_user.Email = model.Email;
             dep_user.Phone = model.Phone;
+
+            var role = _depDbContext.SiteRoles.FirstOrDefault(x => x.RoleName == "Users");
+            if (role != null)
+            {
+                var permission = new UserPermission()
+                {
+                    GrantType = "GROUP",
+                    UserId = dep_user.Id,
+                    PermissionGrantId = role.Id,
+                    CreatedBy = user != null ? user.Id : Guid.Empty,
+                    CreatedDate = DateTime.UtcNow
+                };
+
+                _depDbContext.UserPermissions.Add(permission);
+            }
 
             _depDbContext.Users.Add(dep_user);
             _depDbContext.SaveChanges();
