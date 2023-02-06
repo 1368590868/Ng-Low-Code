@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { NotifyService } from 'src/app/core/utils/notify.service';
 import { GridActionConfig } from 'src/app/features/universal-grid-action';
+import { PortalItemService } from '../../services/portal-item.service';
 
 @Component({
   selector: 'app-custom-actions',
@@ -10,19 +11,9 @@ import { GridActionConfig } from 'src/app/features/universal-grid-action';
 })
 export class CustomActionsComponent {
   public optionArr: FormControl[] = [];
-  @Output() actionsChange: EventEmitter<string[]> = new EventEmitter<
-    string[]
-  >();
-  @Input()
-  set actions(val: any) {
-    let funVal: FormControl[] = [];
-    if (val.length > 0) {
-      funVal = val.map((item: any) => {
-        return new FormControl(item);
-      });
-    }
-    this.optionArr = [...this.optionArr, ...funVal];
-  }
+
+  @Input() portalItemId?: string;
+
   public visible = false;
   public buttonDisabled = false;
   public isLoading = false;
@@ -32,7 +23,8 @@ export class CustomActionsComponent {
   constructor(
     @Inject('GRID_ACTION_CONFIG')
     public customActionsConfig: GridActionConfig[],
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private portalItemService: PortalItemService
   ) {
     this.customActions = customActionsConfig
       .filter(x => x.isCustom)
@@ -50,27 +42,44 @@ export class CustomActionsComponent {
   }
 
   showDialog() {
-    this.visible = true;
+    if (!this.portalItemId)
+      throw new Error('Portal Item Id can not be undefined. ');
+    this.portalItemService
+      .getCustomActions(this.portalItemId)
+      .subscribe(res => {
+        this.optionArr = res.map(item => {
+          return new FormControl(item.name);
+        });
+
+        this.visible = true;
+      });
   }
 
   onOk() {
+    if (!this.portalItemId)
+      throw new Error('Portal Item Id can not be undefined. ');
+
     const isValid = this.optionArr
-      .map((item: any) => {
+      .map(item => {
         item.markAsDirty();
         return item.valid;
       })
       .find(item => item === false);
     if (isValid !== false) {
-      let saveData: string[] = [];
-      const optionLabel = this.optionArr.map((item: any) => item.value);
-      saveData = optionLabel;
-
-      if (saveData.length > 0 && saveData[0] != null) {
-        this.actionsChange.emit(saveData);
-        this.visible = false;
-      } else {
-        this.notifyService.notifyWarning('Warning', 'Please select Data');
-      }
+      const data = this.optionArr.map(item => {
+        return { name: item.value };
+      });
+      this.portalItemService
+        .saveCustomActions(this.portalItemId, data)
+        .subscribe(res => {
+          if (res && !res.isError) {
+            this.notifyService.notifySuccess(
+              'Success',
+              'Custom Actions Successfully Saved.'
+            );
+            this.visible = false;
+          }
+        });
     }
   }
 

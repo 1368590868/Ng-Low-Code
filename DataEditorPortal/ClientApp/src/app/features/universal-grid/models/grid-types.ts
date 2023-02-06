@@ -1,4 +1,5 @@
 import { SortMeta, FilterMetadata } from 'primeng/api';
+import { GridActionOption } from '../../universal-grid-action/universal-grid-action.module';
 
 export interface GridParam {
   filters: GridFilterParam[];
@@ -37,7 +38,7 @@ export interface GridConfig {
   customEditFormName?: string;
   customAddFormName?: string;
   customViewFormName?: string;
-  customActions?: string[];
+  customActions?: GridActionOption[];
 }
 
 export interface GridColumn {
