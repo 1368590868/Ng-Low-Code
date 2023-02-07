@@ -9,6 +9,7 @@ import { FormlyFieldSelectProps } from '@ngx-formly/core/select';
 
 interface SelectProps extends FormlyFieldProps, FormlyFieldSelectProps {
   appendTo?: string;
+  autoDisplayFirst: boolean;
 }
 
 export interface FormlySelectFieldConfig
@@ -26,7 +27,8 @@ export interface FormlySelectFieldConfig
       [formlyAttributes]="field"
       [showClear]="!props.required"
       (onChange)="props.change && props.change(field, $event)"
-      [appendTo]="props.appendTo || 'body'">
+      [appendTo]="props.appendTo || 'body'"
+      [autoDisplayFirst]="props.autoDisplayFirst">
     </p-dropdown>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush

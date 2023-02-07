@@ -24,3 +24,22 @@
     }
   }
 }
+
+.p-dialog-title {
+  a {
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    font-weight: normal;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 1rem;
+  }
+}
+
+.monaco-editor-wrapper {
+  background-color: #eeeeee;
+  border: 1px solid transparent;
+  &.ng-dirty.ng-invalid {
+    border-color: #e24c4c;
+  }
+}

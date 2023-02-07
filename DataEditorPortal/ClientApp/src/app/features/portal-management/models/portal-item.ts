@@ -59,7 +59,7 @@ export interface GridColumn {
 export interface GridSearchField {
   key: string;
   type: string;
-  props: { [name: string]: string };
+  props: { [name: string]: any };
   selected?: boolean;
   searchRule: {
     field: string;
@@ -72,7 +72,7 @@ export interface GridFormField {
   key: string;
   type: string;
   defaultValue?: any;
-  props: { [name: string]: string };
+  props: { [name: string]: any };
   selected?: boolean;
   filterType: string;
 }

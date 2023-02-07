@@ -52,15 +52,23 @@
               [model]="model"
               [options]="options"
               class="p-fluid"></formly-form>
-            <p-button
-              styleClass="p-button-text"
+            <ng-container
+              [ngTemplateOutlet]="optionsTemplate"
               *ngIf="
                 ['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(
                   model.type
                 ) >= 0
-              "
-              >Configure Options</p-button
-            >
+              "></ng-container>
+            <ng-template #optionsTemplate>
+              <p-button
+                styleClass="p-button-text"
+                (onClick)="openOptionDialog(optionDialog)"
+                >Configure Options</p-button
+              >
+              <app-option-dialog
+                #optionDialog
+                (valueChange)="optionValueChange($event)"></app-option-dialog>
+            </ng-template>
           </form>
           <p-divider>Search Rule</p-divider>
           <div class="flex align-items-center">
