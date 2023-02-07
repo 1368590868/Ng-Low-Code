@@ -41,6 +41,7 @@ import { DividerModule } from 'primeng/divider';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ContextMenuModule } from 'primeng/contextmenu';
+import { MessageModule } from 'primeng/message';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import {
@@ -125,7 +126,8 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     DividerModule,
     InputSwitchModule,
     InputNumberModule,
-    ContextMenuModule
+    ContextMenuModule,
+    MessageModule
   ]
 })
 export class PortalManagementModule {}
