@@ -6,6 +6,9 @@
         src="assets/Images/cnp.png"
         style="filter: brightness(8)" />
     </div>
+    <div class="title-desc">
+      {{ userService.USER.siteTitle }}
+    </div>
     <p-menubar [model]="items" class="page-link"></p-menubar>
     <span [title]="this.configDataService.headerText.webHeaderDescription">{{
       this.configDataService.headerText.webHeaderMessage
