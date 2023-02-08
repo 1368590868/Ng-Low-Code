@@ -16,6 +16,9 @@ export class SiteSettingsService {
   public _apiUrl: string;
   public durationMs = 5000;
 
+  public oldSiteIcon = '';
+  public oldSiteName = new FormControl('');
+
   public siteSettings: SiteSettings = {
     siteIcon: '',
     siteName: new FormControl('')
@@ -38,9 +41,17 @@ export class SiteSettingsService {
               siteIcon: '',
               siteName: ''
             };
+
+            this.oldSiteIcon = res.result?.siteIcon || '';
+            this.oldSiteName = new FormControl(res.result?.siteName) || '';
           }
         })
       );
+  }
+
+  convertOldSiteSettings() {
+    this.siteSettings.siteIcon = this.oldSiteIcon;
+    this.siteSettings.siteName = this.oldSiteName;
   }
 
   saveData(data: SiteSettings) {
