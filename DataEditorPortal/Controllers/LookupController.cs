@@ -1,15 +1,15 @@
-﻿using DataEditorPortal.Data.Contexts;
+﻿using AutoWrapper.Wrappers;
+using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
+using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -20,12 +20,14 @@ namespace DataEditorPortal.Web.Controllers
         private readonly ILogger<LookupController> _logger;
         private readonly DepDbContext _depDbContext;
         private readonly IConfiguration _config;
+        private readonly IDbSqlBuilder _dbSqlBuilder;
 
-        public LookupController(ILogger<LookupController> logger, DepDbContext depDbContext, IConfiguration config)
+        public LookupController(ILogger<LookupController> logger, DepDbContext depDbContext, IConfiguration config, IDbSqlBuilder dbSqlBuilder)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _config = config;
+            _dbSqlBuilder = dbSqlBuilder;
         }
 
         [HttpGet]
@@ -37,61 +39,50 @@ namespace DataEditorPortal.Web.Controllers
                 .ToList();
         }
 
-        [HttpPut]
-        [Route("create")]
-        public dynamic Create()
+        [HttpGet]
+        [Route("{id}")]
+        public Lookup GetLookup(Guid id)
         {
-            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
-            var filePath = Assembly.GetExecutingAssembly().Location;
-            var date = new FileInfo(filePath).LastWriteTime.ToShortDateString();
-
-            return new
+            var item = _depDbContext.Lookups.FirstOrDefault(x => x.Id == id);
+            if (item == null)
             {
-                version,
-                date
-            };
+                throw new ApiException("Not Found", 404);
+            }
+
+            return item;
         }
 
         [HttpPost]
-        [Route("{id}/update")]
-        public dynamic Update(Guid id, Lookup model)
+        [Route("create")]
+        public Guid Create(LookupItem model)
         {
-            var menus = _depDbContext.SiteMenus.ToList();
+            var item = new Lookup()
+            {
+                Name = model.Name,
+                QueryText = model.QueryText
+            };
+            _depDbContext.Lookups.Add(item);
+            _depDbContext.SaveChanges();
 
-            var root = menus
-                .Where(x => x.ParentId == null)
-                .OrderBy(x => x.Order)
-                .ThenBy(x => x.Name)
-                .Select(x =>
-                {
-                    var items = menus
-                            .Where(m => m.ParentId == x.Id)
-                            .OrderBy(x => x.Order)
-                            .ThenBy(x => x.Name)
-                            .Select(m => new
-                            {
-                                id = m.Id,
-                                name = m.Name,
-                                label = m.Label,
-                                icon = m.Icon,
-                                title = m.Description,
-                                routerLink = new string[] { $"/portal-item/{m.Name.ToLower()}" }
-                            });
+            return item.Id;
+        }
 
-                    return new
-                    {
-                        id = x.Id,
-                        name = x.Name,
-                        label = x.Label,
-                        icon = x.Icon,
-                        title = x.Description,
-                        items = items.Any() ? items : null,
-                        routerLink = items.Any() ? null : new string[] { $"/portal-item/{x.Name.ToLower()}" },
-                    };
-                });
+        [HttpPut]
+        [Route("{id}/update")]
+        public Guid Update(Guid id, LookupItem model)
+        {
+            var item = _depDbContext.Lookups.FirstOrDefault(x => x.Id == id);
+            if (item == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
 
-            return root;
+            item.Name = model.Name;
+            item.QueryText = model.QueryText;
+
+            _depDbContext.SaveChanges();
+
+            return item.Id;
         }
 
         [HttpPost]
@@ -104,30 +95,19 @@ namespace DataEditorPortal.Web.Controllers
 
             if (lookup != null)
             {
+                // replace paramters in query text.
+
+                var queryText = _dbSqlBuilder.ReplaceParamters(lookup.QueryText, model);
+
                 using (var con = _depDbContext.Database.GetDbConnection())
                 {
                     con.Open();
                     var cmd = con.CreateCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = lookup.QueryText;
+                    cmd.CommandText = queryText;
 
                     try
                     {
-                        if (model != null)
-                        {
-                            // add param
-                            foreach (var p in model)
-                            {
-                                if (p.Value != null)
-                                {
-                                    var param = cmd.CreateParameter();
-                                    param.ParameterName = p.Key;
-                                    param.Value = p.Value.ToString();
-                                    cmd.Parameters.Add(param);
-                                }
-                            }
-                        }
-
                         using (var dr = cmd.ExecuteReader())
                         {
                             while (dr.Read())
@@ -157,6 +137,5 @@ namespace DataEditorPortal.Web.Controllers
 
             return result;
         }
-
     }
 }
