@@ -44,12 +44,14 @@ export class NgxFormlyService {
     const model: any = {};
 
     field.props['dependOnFields'].forEach((key: string) => {
+      if (field.key === key) return;
       const control = field.parent.get(key).formControl;
       model[key] = control.value;
     });
     this.initFieldOptions(field, model);
 
     field.props['dependOnFields'].forEach((key: string) => {
+      if (field.key === key) return;
       const control = field.parent.get(key).formControl;
       control?.valueChanges
         .pipe(

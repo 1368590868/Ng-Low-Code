@@ -346,6 +346,7 @@ export class PortalEditSearchComponent implements OnInit {
     } else {
       this.model.props.optionLookup = undefined;
       this.model.props.options = value.options;
+      this.model.props.dependOnFields = [];
     }
   }
 }

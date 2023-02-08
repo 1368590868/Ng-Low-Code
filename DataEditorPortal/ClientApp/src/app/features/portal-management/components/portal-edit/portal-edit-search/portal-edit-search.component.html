@@ -14,8 +14,8 @@
       targetHeader="Selected Fields"
       [dragdrop]="true"
       [responsive]="true"
-      [sourceStyle]="{ height: '400px' }"
-      [targetStyle]="{ height: '475px' }"
+      [sourceStyle]="{ height: '416px' }"
+      [targetStyle]="{ height: '491px' }"
       sourceFilterPlaceholder="Search by name"
       filterBy="name"
       [showTargetFilter]="false"
@@ -52,24 +52,53 @@
               [model]="model"
               [options]="options"
               class="p-fluid"></formly-form>
-            <ng-container
-              [ngTemplateOutlet]="optionsTemplate"
-              *ngIf="
-                ['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(
-                  model.type
-                ) >= 0
-              "></ng-container>
-            <ng-template #optionsTemplate>
-              <p-button
-                styleClass="p-button-text"
-                (onClick)="openOptionDialog(optionDialog)"
-                >Configure Options</p-button
-              >
-              <app-option-dialog
-                #optionDialog
-                (valueChange)="optionValueChange($event)"></app-option-dialog>
-            </ng-template>
           </form>
+          <ng-container
+            [ngTemplateOutlet]="optionsTemplate"
+            *ngIf="
+              ['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(
+                model.type
+              ) >= 0
+            "></ng-container>
+          <ng-template #optionsTemplate>
+            <div class="flex flex-column mb-3">
+              <label class="line-height-3">Options</label>
+              <div class="flex align-items-center justify-content-between">
+                <p-button
+                  styleClass="p-button-outlined"
+                  (onClick)="openOptionDialog(optionDialog)"
+                  >Configure Options</p-button
+                >
+                <p-message
+                  severity="info"
+                  text="{{ model.props.optionLookup ? 'Use Lookup' : '' }}{{
+                    model.props.options
+                      ? model.props.options.length + ' option(s)'
+                      : ''
+                  }}"
+                  styleClass="mr-2"></p-message>
+              </div>
+            </div>
+            <app-option-dialog
+              #optionDialog
+              (valueChange)="optionValueChange($event)"></app-option-dialog>
+
+            <div class="flex flex-column" *ngIf="model.props.optionLookup">
+              <label class="line-height-3">Depends on</label>
+              <p-multiSelect
+                [filter]="false"
+                [showHeader]="false"
+                placeholder="Select fields"
+                display="chip"
+                class="mr-2"
+                styleClass="w-full"
+                appendTo="body"
+                optionLabel="key"
+                optionValue="key"
+                [(ngModel)]="model.props.dependOnFields"
+                [options]="targetColumns"></p-multiSelect>
+            </div>
+          </ng-template>
           <p-divider>Search Rule</p-divider>
           <div class="flex align-items-center">
             <p-dropdown
