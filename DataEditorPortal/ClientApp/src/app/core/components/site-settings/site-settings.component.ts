@@ -1,34 +1,21 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, ViewChild } from '@angular/core';
+import { tap } from 'rxjs';
 import { SiteSettingsService } from '../../services/site-settings.service';
-import { UserService } from '../../services/user.service';
 import { NotifyService } from '../../utils/notify.service';
 @Component({
   selector: 'app-site-settings',
   templateUrl: './site-settings.component.html',
   styleUrls: ['./site-settings.component.scss']
 })
-export class SiteSettingsComponent implements OnInit {
-  constructor(
-    private siteSettingsService: SiteSettingsService,
-    private notifyService: NotifyService,
-    private userService: UserService
-  ) {}
+export class SiteSettingsComponent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @ViewChild('file') file: any;
-  public picture = '';
   public picTips = false;
-  public siteTitle = new FormControl('');
 
-  ngOnInit() {
-    this.userService.USER.picture =
-      'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png';
-    this.userService.USER.siteTitle = 'GIS Work Order Tracking System(WOTS)';
-
-    this.picture = this.userService.USER.picture || '';
-    this.siteTitle.setValue(this.userService.USER.siteTitle || '');
-  }
-
+  constructor(
+    public siteSettingsService: SiteSettingsService,
+    private notifyService: NotifyService
+  ) {}
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   picChange(event: any) {
     const files = event.target.files;
@@ -46,8 +33,8 @@ export class SiteSettingsComponent implements OnInit {
 
         const reader = new FileReader();
         reader.readAsBinaryString(file);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         reader.onload = (event: ProgressEvent<any>) => {
+          console.log(typeof event.target.result);
           const picture = `data:${file.type};base64,${btoa(
             event.target.result
           )}`;
@@ -59,7 +46,7 @@ export class SiteSettingsComponent implements OnInit {
     Promise.all(filePromise)
       .then((res: Array<string | unknown>) => {
         if (res[0] !== undefined) {
-          this.picture = res[0] as string;
+          this.siteSettingsService.siteSettings.siteIcon = res[0] as string;
           this.notifyService.notifySuccess('Success', 'Upload Success');
         }
       })
@@ -69,23 +56,30 @@ export class SiteSettingsComponent implements OnInit {
   }
 
   removePic() {
-    this.picture = '';
+    this.siteSettingsService.siteSettings.siteIcon = '';
   }
   onSave() {
-    this.siteTitle.markAsDirty();
-    if (this.picture === '') {
+    this.siteSettingsService.siteSettings.siteName.markAsDirty();
+    if (!this.siteSettingsService.siteSettings.siteIcon) {
       this.picTips = true;
       return;
     } else {
       this.picTips = false;
     }
-    if (this.siteTitle.valid) {
-      this.siteSettingsService.saveData({
-        siteTitle: this.siteTitle.value || '',
-        picture: this.picture
-      });
-      // View Data Change
-      this.userService.USER.siteTitle = this.siteTitle.value || '';
+    if (this.siteSettingsService.siteSettings.siteName.valid) {
+      this.siteSettingsService
+        .saveData({
+          siteName: this.siteSettingsService.siteSettings.siteName.value || '',
+          siteIcon: this.siteSettingsService.siteSettings.siteIcon
+        })
+        .pipe(
+          tap((res: { isError: boolean }) => {
+            if (!res.isError) {
+              this.notifyService.notifySuccess('Success', 'Save Success');
+            }
+          })
+        )
+        .subscribe();
     }
   }
   onCancle() {

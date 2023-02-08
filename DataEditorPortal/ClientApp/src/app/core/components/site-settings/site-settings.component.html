@@ -9,15 +9,18 @@
       [style]="{ minHeight: '8rem' }">
       <div class="flex flex-column">
         <img
-          *ngIf="picture"
-          [src]="picture"
+          *ngIf="this.siteSettingsService.siteSettings.siteIcon"
+          [src]="this.siteSettingsService.siteSettings.siteIcon"
           height="150"
           width="150"
           [style]="{ maxHeight: '30rem' }" />
         <!-- Upload Button -->
         <p-button
           tabindex="0"
-          *ngIf="!picture; else removeButton"
+          *ngIf="
+            !this.siteSettingsService.siteSettings.siteIcon;
+            else removeButton
+          "
           label="Upload"
           icon="pi pi-plus"
           class="ml-auto relative padding-0"
@@ -45,7 +48,8 @@
         </ng-template>
 
         <!-- Tips -->
-        <span *ngIf="!picture && picTips">
+        <span
+          *ngIf="!this.siteSettingsService.siteSettings.siteIcon && picTips">
           <p class="text-300 text-pink-600 mt-2">* No image</p>
         </span>
       </div>
@@ -56,7 +60,7 @@
         class="w-full"
         pInputText
         [required]="true"
-        [formControl]="siteTitle"
+        [formControl]="this.siteSettingsService.siteSettings.siteName"
         placeholder="Enter a value" />
     </div>
   </div>
