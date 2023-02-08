@@ -11,4 +11,7 @@ export interface AppUser {
   vendor?: string;
   authenticated?: boolean;
   permissions?: UserPermissions;
+
+  picture?: string;
+  siteTitle?: string;
 }

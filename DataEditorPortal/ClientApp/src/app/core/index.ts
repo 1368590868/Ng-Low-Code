@@ -11,6 +11,8 @@ import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { DividerModule } from 'primeng/divider';
+import { CardModule } from 'primeng/card';
 import {
   HeaderComponent,
   NavMenuComponent,
@@ -19,7 +21,8 @@ import {
   HomeComponent,
   TileComponent,
   LoginComponent,
-  ErrorPageComponent
+  ErrorPageComponent,
+  SiteSettingsComponent
 } from './components';
 import { PermissionDirective } from './directive/permission.directive';
 import { CommonModule } from '@angular/common';
@@ -30,6 +33,7 @@ export { ApiResponse } from './models/api-response';
 export { NotifyService } from './utils/notify.service';
 export { NgxFormlyService } from './services/ngx-formly.service';
 export { ConfigDataService } from './services/config-data.service';
+import { ReactiveFormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 
 @NgModule({
@@ -42,6 +46,7 @@ import { DialogModule } from 'primeng/dialog';
     TileComponent,
     LoginComponent,
     ErrorPageComponent,
+    SiteSettingsComponent,
     PermissionDirective
   ],
   imports: [
@@ -54,7 +59,10 @@ import { DialogModule } from 'primeng/dialog';
     AvatarModule,
     DialogModule,
     ProgressSpinnerModule,
-    InputTextModule
+    DividerModule,
+    InputTextModule,
+    CardModule,
+    ReactiveFormsModule
   ],
   exports: [
     HeaderComponent,
@@ -63,6 +71,7 @@ import { DialogModule } from 'primeng/dialog';
     ContactComponent,
     HomeComponent,
     TileComponent,
+    SiteSettingsComponent,
     LoginComponent,
     ErrorPageComponent,
     PermissionDirective

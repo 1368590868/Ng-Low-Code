@@ -1,0 +1,78 @@
+<p-card>
+  <ng-template pTemplate="title">Setting </ng-template>
+  <ng-template pTemplate="subtitle"> Setting Infomation </ng-template>
+  <p-divider styleClass="mt-0"></p-divider>
+  <div class="w-6 pt-3">
+    <p class="mb-2">File</p>
+    <div
+      class="flex align-items-start justify-content-between"
+      [style]="{ minHeight: '8rem' }">
+      <div class="flex flex-column">
+        <img
+          *ngIf="picture"
+          [src]="picture"
+          height="150"
+          width="150"
+          [style]="{ maxHeight: '30rem' }" />
+        <!-- Upload Button -->
+        <p-button
+          tabindex="0"
+          *ngIf="!picture; else removeButton"
+          label="Upload"
+          icon="pi pi-plus"
+          class="ml-auto relative padding-0"
+          styleClass="p-button-outlined">
+          <input
+            #file
+            (change)="picChange($event)"
+            type="file"
+            accept="image/*"
+            [style]="{ height: '60px' }"
+            class="opacity-0 cursor-pointer absolute left-0" />
+          <span class="p-ink"> </span>
+        </p-button>
+
+        <!-- Remove Button -->
+        <ng-template #removeButton>
+          <span
+            tabindex="0"
+            class="p-button p-button-danger p-component mt-3 mb-4"
+            (click)="removePic()"
+            ><span class="p-button-icon p-button-icon-left pi pi-minus"></span
+            ><span class="p-button-label">Remove</span
+            ><span class="p-ink"></span
+          ></span>
+        </ng-template>
+
+        <!-- Tips -->
+        <span *ngIf="!picture && picTips">
+          <p class="text-300 text-pink-600 mt-2">* No image</p>
+        </span>
+      </div>
+    </div>
+    <p class="mb-2">Site Title</p>
+    <div>
+      <input
+        class="w-full"
+        pInputText
+        [required]="true"
+        [formControl]="siteTitle"
+        placeholder="Enter a value" />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="flex align-items-center w-6">
+      <p-button
+        label="Cancle"
+        icon="pi pi-times"
+        class="ml-auto"
+        styleClass="p-button-outlined"
+        (onClick)="onCancle()"></p-button>
+      <p-button
+        label="Save"
+        icon="pi pi-save"
+        [style]="{ 'margin-left': '.5em' }"
+        (onClick)="onSave()"></p-button>
+    </div>
+  </ng-template>
+</p-card>
