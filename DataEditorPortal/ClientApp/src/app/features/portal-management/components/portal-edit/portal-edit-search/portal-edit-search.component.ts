@@ -12,6 +12,7 @@ import {
   OptionDialogComponent,
   OptionValueModel
 } from '../../option-dialog/option-dialog.component';
+import { SearchRuleComponent } from '../../search-rule/search-rule.component';
 
 @Component({
   selector: 'app-portal-edit-search',
@@ -342,11 +343,20 @@ export class PortalEditSearchComponent implements OnInit {
   optionValueChange(value: OptionValueModel) {
     if (value.isAdvanced) {
       this.model.props.optionLookup = value.optionLookup;
-      this.model.props.options = undefined;
+      this.model.props.options = [];
     } else {
       this.model.props.optionLookup = undefined;
       this.model.props.options = value.options;
       this.model.props.dependOnFields = [];
     }
+  }
+
+  openSearchRuleDialog(searchRuleDialog: SearchRuleComponent) {
+    searchRuleDialog.value = this.model.searchRule.whereClause;
+    searchRuleDialog.showDialog();
+  }
+
+  searchRuleValueChange(value: string) {
+    this.model.searchRule.whereClause = value;
   }
 }

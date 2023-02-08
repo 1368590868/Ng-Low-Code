@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { NotifyService } from 'src/app/core/utils/notify.service';
 export interface SaveData {
   label: string;
@@ -9,12 +10,9 @@ export interface SaveData {
   styleUrls: ['./search-rule.component.scss']
 })
 export class SearchRuleComponent {
-  public code = '';
-
   @Output() valueChange: EventEmitter<string> = new EventEmitter<string>();
-  @Input() set value(val: string) {
-    this.code = val;
-  }
+  @Input() value?: string;
+
   public visible = false;
   public buttonDisabled = false;
   public isLoading = false;
@@ -26,14 +24,25 @@ export class SearchRuleComponent {
   public editorOptions = {
     theme: 'vs-studio',
     language: 'sql',
-    minimap: { enabled: false }
+    lineNumbers: 'off',
+    roundedSelection: true,
+    minimap: { enabled: false },
+    scrollbar: {
+      verticalScrollbarSize: 7,
+      horizontalScrollbarSize: 7
+    }
   };
 
-  constructor(private notifyService: NotifyService) {
-    this.code = this.value;
-  }
+  formControlQuery: FormControl = new FormControl();
 
-  onInit() {
+  helperMessage =
+    '-- Enter the where clause, which will be used to filter data \r\n' +
+    '-- Use {{Field Name}} to reference any field value in search form. \r\n' +
+    '-- E.g. \r\n' +
+    '--      FirstName = {{NAME}} \r\n' +
+    "--      FirstName LIKE '%{{NAME}}%'";
+
+  onMonacoInit() {
     monaco.editor.defineTheme('myTheme', {
       base: 'vs',
       inherit: true,
@@ -47,14 +56,20 @@ export class SearchRuleComponent {
 
   showDialog() {
     this.visible = true;
+    if (this.value) this.formControlQuery.setValue(this.value);
+    else this.formControlQuery.setValue(this.helperMessage);
+    setTimeout(() => {
+      this.formControlQuery.setErrors(null);
+    }, 100);
   }
 
   onOk() {
-    if (this.code) {
-      this.valueChange.emit(this.code);
+    this.formControlQuery.updateValueAndValidity();
+    if (this.formControlQuery.valid) {
+      this.valueChange.emit(this.formControlQuery.value);
       this.visible = false;
     } else {
-      this.notifyService.notifyWarning('Warning', 'Please Enter SQL');
+      this.formControlQuery.markAsDirty();
     }
   }
 

@@ -151,14 +151,16 @@
                       >Configure Options</p-button
                     >
                     <p-message
-                      *ngIf="model.props.optionLookup || model.props.options"
+                      *ngIf="
+                        model.props.optionLookup ||
+                        (model.props.options && model.props.options.length > 0)
+                      "
                       severity="info"
                       text="{{ model.props.optionLookup ? 'Use Lookup' : '' }}{{
-                        model.props.options
+                        model.props.options && model.props.options.length > 0
                           ? model.props.options.length + ' option(s)'
                           : ''
-                      }}"
-                      styleClass="mr-2"></p-message>
+                      }}"></p-message>
                   </div>
                 </div>
                 <app-option-dialog

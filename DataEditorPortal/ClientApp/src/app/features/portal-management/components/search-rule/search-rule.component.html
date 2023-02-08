@@ -7,16 +7,22 @@
   appendTo="body"
   contentStyleClass="border-top-1 surface-border py-3">
   <div #container class="dialog-content">
-    <p-divider styleClass="mb-0"> </p-divider>
-    <div class="flex flex-column mb-2">
-      <p-divider styleClass="mb-0"> </p-divider>
-
+    <div class="mb-3 flex flex-column" *ngIf="visible">
+      <label class="line-height-3 flex align-items-center"
+        >Query text
+        <i
+          class="pi pi-question-circle ml-3 text-lg"
+          [pTooltip]="
+            'Enter the where clause to filter the data. Using format &#123;&#123;field&#125;&#125; to reference other value of fields.'
+          "></i>
+      </label>
       <ngx-monaco-editor
-        *ngIf="visible"
-        (onInit)="onInit()"
+        [formControl]="formControlQuery"
+        (onInit)="onMonacoInit()"
         [style]="dialogStyle"
-        [options]="editorOptions"
-        [(ngModel)]="code"></ngx-monaco-editor>
+        [required]="true"
+        class="pt-3 border-round monaco-editor-wrapper"
+        [options]="editorOptions"></ngx-monaco-editor>
     </div>
   </div>
   <ng-template pTemplate="footer">
