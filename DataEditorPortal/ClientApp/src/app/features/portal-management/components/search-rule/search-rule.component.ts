@@ -36,11 +36,11 @@ export class SearchRuleComponent {
   formControlQuery: FormControl = new FormControl();
 
   helperMessage =
-    '-- Enter the where clause, which will be used to filter data \r\n' +
-    '-- Use {{Field Name}} to reference any field value in search form. \r\n' +
+    '-- Enter the where clause, which will be used to filter data. \r\n' +
+    '-- Use ##VALUE## to reference the field value. \r\n' +
     '-- E.g. \r\n' +
-    '--      FirstName = {{NAME}} \r\n' +
-    "--      FirstName LIKE '%{{NAME}}%'";
+    '--      FirstName = ##VALUE## \r\n' +
+    "--      FirstName LIKE '%##VALUE##%'";
 
   onMonacoInit() {
     monaco.editor.defineTheme('myTheme', {
