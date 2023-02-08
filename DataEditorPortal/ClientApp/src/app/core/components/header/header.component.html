@@ -1,13 +1,10 @@
 <header class="header flex flex-nowarp justify-content-between">
   <div class="flex justify-content-center align-items-center">
     <div class="logo-wrapper flex justify-content-center align-items-center">
-      <img
-        class="logo"
-        src="assets/Images/cnp.png"
-        style="filter: brightness(8)" />
+      <img class="logo" [src]="siteSettingsService.siteSettings.siteIcon" />
     </div>
     <div class="title-desc">
-      {{ userService.USER.siteTitle }}
+      {{ siteSettingsService.siteSettings.siteName.value }}
     </div>
     <p-menubar [model]="items" class="page-link"></p-menubar>
     <span [title]="this.configDataService.headerText.webHeaderDescription">{{
@@ -18,7 +15,7 @@
     class="menu-end flex justify-content-center align-items-center"
     *ngIf="this.userService?.isLogin">
     <p-button icon="pi pi-search" styleClass="p-button-rounded mr-2"></p-button>
-    <p-button styleClass="mr-1">
+    <p-button (onClick)="onPerfileDialog()">
       <p-avatar
         image="https://www.primefaces.org/ultima-ng/assets/demo/images/avatar/amyelsner.png"
         styleClass="flex mr-2"
@@ -30,3 +27,37 @@
     </p-button>
   </div>
 </header>
+
+<p-dialog
+  header="Persional Information"
+  [(visible)]="visible"
+  [style]="{ width: '40rem' }"
+  [modal]="true"
+  [dismissableMask]="true"
+  contentStyleClass="border-top-1 surface-border pt-3"
+  appendTo="body">
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onFormSubmit(model)"
+    #editForm="ngForm"
+    class="user-form">
+    <formly-form
+      [model]="model"
+      [fields]="fields"
+      [options]="options"
+      [form]="form"
+      class="p-fluid">
+      <button type="submit" class="btn btn-primary submit-button border">
+        Submit
+      </button>
+    </formly-form>
+  </form>
+  <ng-template pTemplate="footer">
+    <p-button
+      icon="pi pi-times"
+      (onClick)="onCancel()"
+      label="Cancle"
+      styleClass="p-button-text"></p-button>
+    <p-button icon="pi pi-check" (onClick)="onOk()" label="Save"></p-button>
+  </ng-template>
+</p-dialog>

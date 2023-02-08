@@ -35,6 +35,7 @@ export { NgxFormlyService } from './services/ngx-formly.service';
 export { ConfigDataService } from './services/config-data.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
+import { PortalManagementModule } from 'src/app/features/portal-management/portal-management.module';
 
 @NgModule({
   declarations: [
@@ -62,8 +63,10 @@ import { DialogModule } from 'primeng/dialog';
     DividerModule,
     InputTextModule,
     CardModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    PortalManagementModule
   ],
+
   exports: [
     HeaderComponent,
     NavMenuComponent,

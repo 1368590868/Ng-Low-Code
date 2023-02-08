@@ -128,6 +128,7 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     InputNumberModule,
     ContextMenuModule,
     MessageModule
-  ]
+  ],
+  exports: [FormlyModule, FormlyPrimeNGModule]
 })
 export class PortalManagementModule {}
