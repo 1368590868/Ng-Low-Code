@@ -7,18 +7,13 @@ import {
   UrlTree
 } from '@angular/router';
 import { Observable } from 'rxjs';
-import { SiteSettingsService } from '../services/site-settings.service';
 import { UserService } from '../services/user.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RouterGuard implements CanActivate {
-  constructor(
-    private userService: UserService,
-    private router: Router,
-    private siteSettingsService: SiteSettingsService
-  ) {}
+  constructor(private userService: UserService, private router: Router) {}
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
@@ -31,10 +26,6 @@ export class RouterGuard implements CanActivate {
       this.router.navigate(['login'], {
         queryParams: { returnUrl: state.url }
       });
-    } else {
-      if (state.url !== '/site-settings') {
-        this.siteSettingsService.convertOldSiteSettings();
-      }
     }
     return this.userService.isLogin;
   }

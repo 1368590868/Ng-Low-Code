@@ -15,6 +15,8 @@ export class PersonalInfoService {
   public _apiUrl: string;
   public durationMs = 5000;
 
+  public userId = '';
+
   constructor(
     private http: HttpClient,
     @Inject('API_URL') apiUrl: string,
@@ -22,11 +24,9 @@ export class PersonalInfoService {
   ) {
     this._apiUrl = apiUrl;
   }
-  getUserDetail(): Observable<ManageRoleForm> {
+  getUserDetail(id: string): Observable<ManageRoleForm> {
     return this.http
-      .get<ApiResponse<ManageRoleForm>>(
-        `${this._apiUrl}user/detail/${this.userService.USER.identityName}`
-      )
+      .get<ApiResponse<ManageRoleForm>>(`${this._apiUrl}user/detail/${id}`)
       .pipe(map(res => res.result || {}));
   }
 
