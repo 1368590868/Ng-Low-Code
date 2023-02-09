@@ -19,6 +19,12 @@ namespace DataEditorPortal.Data.Contexts
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
             });
+
+            modelBuilder.Entity<DemoTable>(entity =>
+            {
+                entity.ToTable("DemoTables", "dbo");
+                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            });
         }
     }
 }

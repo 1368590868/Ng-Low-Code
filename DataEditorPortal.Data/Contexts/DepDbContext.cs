@@ -25,6 +25,8 @@ namespace DataEditorPortal.Data.Contexts
 
         public virtual DbSet<UniversalGridConfiguration> UniversalGridConfigurations { get; set; }
 
+        public virtual DbSet<DemoTable> DemoTables { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -84,6 +86,30 @@ namespace DataEditorPortal.Data.Contexts
                     ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
                     Order = 2,
                     Status = Common.PortalItemStatus.Published
+                },
+                // demo items
+                new SiteMenu()
+                {
+                    Id = new Guid("41D85A79-9E84-4AB8-AF96-08DAF9CD4412"),
+                    Name = "demo",
+                    Label = "Demo Items",
+                    Icon = "pi pi-list",
+                    Type = "Folder",
+                    Link = "",
+                    Order = 998,
+                    Status = Common.PortalItemStatus.Published
+                },
+                new SiteMenu()
+                {
+                    Id = new Guid("92A804C3-CA4B-4987-5659-08DB05B2DE84"),
+                    Name = "demo-item",
+                    Label = "Demo Item",
+                    Icon = "pi pi-table",
+                    Type = "Portal Item",
+                    Link = "",
+                    ParentId = new Guid("41D85A79-9E84-4AB8-AF96-08DAF9CD4412"),
+                    Order = 0,
+                    Status = Common.PortalItemStatus.Published
                 }
             );
 
@@ -124,7 +150,7 @@ namespace DataEditorPortal.Data.Contexts
                         new { field = "Name", header = "Name", width = "250px", filterType = "text", sortable = true },
                         new { field = "Email", header = "Email", width = "250px", filterType = "text", sortable = true },
                         new { field = "Phone", header = "Phone", width = "250px", filterType = "text", sortable = true },
-                        new { field = "AutoEmail", header = "Auto Email", width = "250px", filterType = "text", sortable = true },
+                        new { field = "AutoEmail", header = "Auto Email", width = "250px", filterType = "boolean", sortable = true },
                         new { field = "Vendor", header = "Vendor", width = "250px", filterType = "text", sortable = true },
                         new { field = "Employer", header = "Employer", width = "250px", filterType = "text", sortable = true },
                         new { field = "Division", header = "Division", width = "250px", filterType = "text", sortable = false },
@@ -275,6 +301,238 @@ namespace DataEditorPortal.Data.Contexts
                     Category = $"Portal Item: User Management",
                     PermissionName = $"EXPORT_USER_MANAGEMENT".ToUpper(),
                     PermissionDescription = $"Export User Management"
+                }
+            );
+
+            #endregion
+
+            #region demo table
+
+            modelBuilder.Entity<UniversalGridConfiguration>().HasData(
+                new UniversalGridConfiguration()
+                {
+                    Id = Guid.Parse("82CFA0D5-1033-4A08-8294-4D4BC2DE3D6B"),
+                    Name = "demo-item",
+                    ConfigCompleted = true,
+
+                    DataSourceConfig = JsonSerializer.Serialize(new
+                    {
+                        TableName = "DemoTables",
+                        TableSchema = "dbo",
+                        IdColumn = "Id",
+                        Columns = new List<string>() { },
+                        SortBy = new List<object>() { }
+                    }),
+
+                    ColumnsConfig = JsonSerializer.Serialize(new object[] {
+                        new { field = "Name", header = "Name", width = "130px", filterType = "text", sortable = true },
+                        new { field = "FirstName", header = "First Name", width = "250px", filterType = "text", sortable = true },
+                        new { field = "Checked", header = "Checked", width = "250px", filterType = "boolean", sortable = false },
+                        new { field = "Number", header = "Number", width = "250px", filterType = "numeric", sortable = true },
+                        new { field = "Total", header = "Total", width = "250px", filterType = "numeric", sortable = true },
+                        new { field = "CreateDate", header = "Create Date", width = "250px", filterType = "date", sortable = true }
+                    }),
+
+                    SearchConfig = JsonSerializer.Serialize(new object[] {
+                        new {
+                            key = "FirstName",
+                            type = "input",
+                            filterType = "text",
+                            props = new {
+                                label = "First Name",
+                                placeholder = "Enter First Name"
+                            },
+                            searchRule = new
+                            {
+                                field = "FirstName",
+                                matchMode = "contains"
+                            }
+                        },
+                        new {
+                            key = "Number",
+                            type = "inputNumber",
+                            filterType = "numeric",
+                            props = new {
+                                label = "Number",
+                                placeholder = "Enter Number"
+                            },
+                            searchRule = new
+                            {
+                                field = "Number",
+                                matchMode = "gt"
+                            }
+                        },
+                        new {
+                            key = "Name",
+                            type = "multiSelect",
+                            filterType = "text",
+                            props = new {
+                                label = "Names",
+                                placeholder = "Please select",
+                                options = new object[] {
+                                    new { value = "James", label = "James" },
+                                    new { value = "Robert", label = "Robert" },
+                                    new { value = "John", label = "John" },
+                                    new { value = "Michael", label = "Michael" }
+                                }
+                            },
+                            searchRule = new
+                            {
+                                field = "Name",
+                                matchMode = "in"
+                            }
+                        },
+                        new {
+                            key = "CreateDate",
+                            type = "datepicker",
+                            filterType = "date",
+                            props = new {
+                                label = "Create Date",
+                                placeholder = "Please select"
+                            },
+                            searchRule = new
+                            {
+                                field = "CreateDate",
+                                matchMode = "dateAfter"
+                            }
+                        },
+                        new {
+                            key = "Checked",
+                            type = "checkbox",
+                            filterType = "boolean",
+                            props = new {
+                                label = "Checked"
+                            },
+                            searchRule = new
+                            {
+                                field = "Checked",
+                                matchMode = "equals"
+                            }
+                        }
+                    }),
+
+                    DetailConfig = JsonSerializer.Serialize(new
+                    {
+                        AllowExport = true,
+                        AllowDelete = true,
+                        AllowEdit = true,
+                        UseCustomForm = false,
+                        FormFields = new object[] {
+                            new
+                            {
+                                filterType = "text",
+                                key = "Name",
+                                type = "input",
+                                props =
+                                new
+                                {
+                                    label = "Name",
+                                    required = true
+                                }
+                            },
+                            new
+                            {
+                                filterType = "text",
+                                key = "FirstName",
+                                type = "input",
+                                props =
+                                new
+                                {
+                                    label = "First Name",
+                                    required = true
+                                }
+                            },
+                            new
+                            {
+                                filterType = "boolean",
+                                key = "Checked",
+                                type = "checkbox",
+                                props =
+                                new
+                                {
+                                    label = "Checked",
+                                    required = true
+                                }
+                            },
+                            new
+                            {
+                                filterType = "numeric",
+                                key = "Number",
+                                type = "inputNumber",
+                                props =
+                                new
+                                {
+                                    label = "Number",
+                                    maxFractionDigits = 0,
+                                    required = true
+                                }
+                            },
+                            new
+                            {
+                                filterType = "numeric",
+                                key = "Total",
+                                type = "inputNumber",
+                                props =
+                                new
+                                {
+                                    label = "Total",
+                                    required = true
+                                }
+                            },
+                            new
+                            {
+                                filterType = "date",
+                                key = "CreateDate",
+                                type = "datepicker",
+                                props =
+                                new
+                                {
+                                    label = "Create Date",
+                                    required = true
+                                }
+                            }
+                        }
+                    }),
+
+                    CustomActionConfig = JsonSerializer.Serialize(new object[] { })
+                }
+            );
+
+            modelBuilder.Entity<SitePermission>().HasData(
+                new SitePermission()
+                {
+                    Id = new Guid("06A315CD-CF13-42CF-8BAE-1F6680651B58"),
+                    Category = $"Portal Item: Demo Item",
+                    PermissionName = $"VIEW_DEMO_ITEM".ToUpper(),
+                    PermissionDescription = $"View Demo Item"
+                },
+                new SitePermission()
+                {
+                    Id = new Guid("804B67E6-AB28-4376-8CE4-98E40515F3B6"),
+                    Category = $"Portal Item: Demo Item",
+                    PermissionName = $"ADD_DEMO_ITEM".ToUpper(),
+                    PermissionDescription = $"Add Demo Item"
+                },
+                new SitePermission()
+                {
+                    Id = new Guid("33881049-8096-47BE-866F-CC686A9BF587"),
+                    Category = $"Portal Item: Demo Item",
+                    PermissionName = $"EDIT_DEMO_ITEM".ToUpper(),
+                    PermissionDescription = $"Edit Demo Item"
+                },
+                new SitePermission()
+                {
+                    Id = new Guid("3145D3C8-8D13-495D-8DD3-525B3D4EBA33"),
+                    Category = $"Portal Item: Demo Item",
+                    PermissionName = $"DELETE_DEMO_ITEM".ToUpper(),
+                    PermissionDescription = $"Delete Demo Item"
+                },
+                new SitePermission()
+                {
+                    Id = new Guid("155A1215-214B-4A89-ACAF-72C48AEBB1E9"),
+                    Category = $"Portal Item: Demo Item",
+                    PermissionName = $"EXPORT_DEMO_ITEM".ToUpper(),
+                    PermissionDescription = $"Export Demo Item"
                 }
             );
 

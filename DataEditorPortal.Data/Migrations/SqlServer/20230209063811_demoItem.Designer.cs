@@ -4,14 +4,16 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20230209063811_demoItem")]
+    partial class demoItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,8 +26,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Checked")
                         .HasColumnType("bit");
@@ -396,15 +397,15 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         new
                         {
                             Id = new Guid("82cfa0d5-1033-4a08-8294-4d4bc2de3d6b"),
-                            ColumnsConfig = "[{\"field\":\"Name\",\"header\":\"Name\",\"width\":\"130px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"FirstName\",\"header\":\"First Name\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"Checked\",\"header\":\"Checked\",\"width\":\"250px\",\"filterType\":\"boolean\",\"sortable\":false},{\"field\":\"Number\",\"header\":\"Number\",\"width\":\"250px\",\"filterType\":\"numeric\",\"sortable\":true},{\"field\":\"Total\",\"header\":\"Total\",\"width\":\"250px\",\"filterType\":\"numeric\",\"sortable\":true},{\"field\":\"CreateDate\",\"header\":\"Create Date\",\"width\":\"250px\",\"filterType\":\"date\",\"sortable\":true}]",
+                            ColumnsConfig = "[{\"field\":\"Name\",\"header\":\"Name\",\"width\":\"130px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"FirstName\",\"header\":\"First Name\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"field\":\"Checked\",\"header\":\"Checked\",\"width\":\"250px\",\"filterType\":\"boolean\",\"sortable\":true},{\"field\":\"Number\",\"header\":\"Number\",\"width\":\"250px\",\"filterType\":\"numeric\",\"sortable\":true},{\"field\":\"Total\",\"header\":\"Total\",\"width\":\"250px\",\"filterType\":\"numeric\",\"sortable\":true},{\"field\":\"CreateDate\",\"header\":\"Create Date\",\"width\":\"250px\",\"filterType\":\"date\",\"sortable\":false}]",
                             ConfigCompleted = true,
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CustomActionConfig = "[]",
+                            CustomActionConfig = "[{\"Name\":\"edit-role\"},{\"Name\":\"edit-permission\"},{\"Name\":\"manage-roles\"}]",
                             DataSourceConfig = "{\"TableName\":\"DemoTables\",\"TableSchema\":\"dbo\",\"IdColumn\":\"Id\",\"Columns\":[],\"SortBy\":[]}",
-                            DetailConfig = "{\"AllowExport\":true,\"AllowDelete\":true,\"AllowEdit\":true,\"UseCustomForm\":false,\"FormFields\":[{\"filterType\":\"text\",\"key\":\"Name\",\"type\":\"input\",\"props\":{\"label\":\"Name\",\"required\":true}},{\"filterType\":\"text\",\"key\":\"FirstName\",\"type\":\"input\",\"props\":{\"label\":\"First Name\",\"required\":true}},{\"filterType\":\"boolean\",\"key\":\"Checked\",\"type\":\"checkbox\",\"props\":{\"label\":\"Checked\",\"required\":true}},{\"filterType\":\"numeric\",\"key\":\"Number\",\"type\":\"inputNumber\",\"props\":{\"label\":\"Number\",\"required\":true}},{\"filterType\":\"numeric\",\"key\":\"Total\",\"type\":\"inputNumber\",\"props\":{\"label\":\"Total\",\"required\":true}},{\"filterType\":\"date\",\"key\":\"CreateDate\",\"type\":\"datepicker\",\"props\":{\"label\":\"Create Date\",\"required\":true}}]}",
+                            DetailConfig = "{\"AllowExport\":true,\"AllowDelete\":true,\"AllowEdit\":true,\"UseCustomForm\":true,\"CustomAddFormName\":\"user-manager-add\",\"CustomEditFormName\":\"user-manager-edit\",\"CustomViewFormName\":\"user-manager-view\"}",
                             Name = "demo-item",
-                            SearchConfig = "[{\"key\":\"FirstName\",\"type\":\"input\",\"filterType\":\"text\",\"props\":{\"label\":\"First Name\",\"placeholder\":\"Enter First Name\"},\"searchRule\":{\"field\":\"FirstName\",\"matchMode\":\"contains\"}},{\"key\":\"Number\",\"type\":\"inputNumber\",\"filterType\":\"numeric\",\"props\":{\"label\":\"Number\",\"placeholder\":\"Enter Number\"},\"searchRule\":{\"field\":\"Number\",\"matchMode\":\"gt\"}},{\"key\":\"Name\",\"type\":\"multiSelect\",\"filterType\":\"text\",\"props\":{\"label\":\"Names\",\"placeholder\":\"Please select\",\"options\":[{\"value\":\"James\",\"label\":\"James\"},{\"value\":\"Robert\",\"label\":\"Robert\"},{\"value\":\"John\",\"label\":\"John\"},{\"value\":\"Michael\",\"label\":\"Michael\"}]},\"searchRule\":{\"field\":\"Name\",\"matchMode\":\"in\"}},{\"key\":\"CreateDate\",\"type\":\"datepicker\",\"filterType\":\"date\",\"props\":{\"label\":\"Create Date\",\"placeholder\":\"Please select\"},\"searchRule\":{\"field\":\"CreateDate\",\"matchMode\":\"dateAfter\"}},{\"key\":\"Checked\",\"type\":\"checkbox\",\"filterType\":\"boolean\",\"props\":{\"label\":\"Checked\"},\"searchRule\":{\"field\":\"Checked\",\"matchMode\":\"equals\"}}]"
+                            SearchConfig = "[{\"key\":\"FirstName\",\"type\":\"input\",\"filterType\":\"text\",\"props\":{\"label\":\"First Name\",\"placeholder\":\"Enter First Name\"},\"searchRule\":{\"field\":\"FirstName\",\"matchMode\":\"contains\"}},{\"key\":\"Number\",\"type\":\"inputNumber\",\"filterType\":\"numeric\",\"props\":{\"label\":\"Number\",\"placeholder\":\"Enter Number\"},\"searchRule\":{\"field\":\"Number\",\"matchMode\":\"gt\"}},{\"key\":\"Name\",\"type\":\"multiSelect\",\"filterType\":\"text\",\"props\":{\"label\":\"Names\",\"placeholder\":\"Please select\",\"options\":[{\"value\":\"James\",\"label\":\"James\"},{\"value\":\"Robert\",\"label\":\"Robert\"},{\"value\":\"John\",\"label\":\"John\"},{\"value\":\"Michael\",\"label\":\"Michael\"}]},\"searchRule\":{\"field\":\"Name\",\"matchMode\":\"in\"}},{\"key\":\"CreateDate\",\"type\":\"datepicker\",\"filterType\":\"date\",\"props\":{\"label\":\"Create Date\",\"placeholder\":\"Please select\"},\"searchRule\":{\"field\":\"CreateDate\",\"matchMode\":\"gt\"}},{\"key\":\"Checked\",\"type\":\"checkbox\",\"filterType\":\"boolean\",\"props\":{\"label\":\"Checked\"},\"searchRule\":{\"field\":\"Checked\",\"matchMode\":\"equals\"}}]"
                         });
                 });
 

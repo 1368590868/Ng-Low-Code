@@ -385,6 +385,7 @@ namespace DataEditorPortal.Web.Services
 
             var queryText = _dbSqlBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
             {
+                TableSchema = dataSourceConfig.TableSchema,
                 TableName = dataSourceConfig.TableName,
                 Columns = columns,
                 QueryText = detailConfig.QueryForInsert
@@ -442,6 +443,7 @@ namespace DataEditorPortal.Web.Services
 
             var queryText = _dbSqlBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
             {
+                TableSchema = dataSourceConfig.TableSchema,
                 TableName = dataSourceConfig.TableName,
                 Columns = detailConfig.FormFields.Select(x => x.key).ToList(),
                 Filters = new List<FilterParam>()
@@ -499,6 +501,7 @@ namespace DataEditorPortal.Web.Services
 
             var queryText = _dbSqlBuilder.GenerateSqlTextForDelete(new DataSourceConfig()
             {
+                TableSchema = dataSourceConfig.TableSchema,
                 TableName = dataSourceConfig.TableName,
                 Filters = new List<FilterParam>()
                 {
