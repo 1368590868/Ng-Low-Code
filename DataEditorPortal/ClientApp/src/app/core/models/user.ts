@@ -3,6 +3,7 @@ interface UserPermissions {
 }
 
 export interface AppUser {
+  id?: string;
   identityName?: string;
   username?: string;
   domain?: string;
@@ -11,7 +12,4 @@ export interface AppUser {
   vendor?: string;
   authenticated?: boolean;
   permissions?: UserPermissions;
-
-  picture?: string;
-  siteTitle?: string;
 }

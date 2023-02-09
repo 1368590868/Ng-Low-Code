@@ -1,0 +1,8 @@
+.user-form {
+  ::ng-deep {
+    app-formly-field-primeng-checkbox {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}

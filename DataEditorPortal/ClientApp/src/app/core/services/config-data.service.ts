@@ -9,6 +9,11 @@ interface HeaderText {
   webHeaderMessage: string;
 }
 
+export interface SiteSettings {
+  siteLogo?: string;
+  siteName: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,16 +39,12 @@ export class ConfigDataService {
     return this.http
       .get<{
         result: HeaderText;
-      }>(`${this._apiUrl}site/environment`)
+      }>(`${this._apiUrl}site/settings`)
       .pipe(
         tap(res => {
           this.headerText = res.result;
         })
       );
-  }
-
-  getLoggedInUser() {
-    return this.http.get(`${this._apiUrl}User/GetLoggedInUser`);
   }
 
   getSiteMenus(): Observable<SiteMenu[]> {
@@ -56,5 +57,34 @@ export class ConfigDataService {
     return this.http
       .post<ApiResponse<SiteMenu[]>>(`${this._apiUrl}site/menus`, null)
       .pipe(map(res => res.result || []));
+  }
+
+  public siteSettings: SiteSettings = {
+    siteLogo: '',
+    siteName: ''
+  };
+
+  public OB_SITE_SETTINGS: Observable<SiteSettings> = of();
+
+  getSiteSettings() {
+    return this.http
+      .get<ApiResponse<SiteSettings>>(`${this._apiUrl}site/settings`)
+      .pipe(
+        tap(res => {
+          if (!res.isError) {
+            this.OB_SITE_SETTINGS = of(res.result ?? { siteName: '' });
+            this.siteSettings = res.result ?? {
+              siteName: ''
+            };
+          }
+        })
+      );
+  }
+
+  saveData(data: SiteSettings) {
+    return this.http.post<ApiResponse<SiteSettings>>(
+      `${this._apiUrl}site/settings`,
+      data
+    );
   }
 }
