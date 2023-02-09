@@ -1,4 +1,5 @@
 ﻿using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -26,18 +27,48 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
-        [Route("environment")]
+        [Route("settings")]
+        [AllowAnonymous]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-        public dynamic GetEnvironment()
+        public dynamic GetSettings()
         {
             var section = _config.GetSection("SiteEvnironment");
             if (section == null) return null;
 
+            var setting = _depDbContext.SiteSettings.FirstOrDefault();
+            if (setting == null)
+            {
+                setting = new SiteSetting();
+                setting.SiteName = "Data Portal Editor";
+                _depDbContext.SiteSettings.Add(setting);
+                _depDbContext.SaveChanges();
+            }
+
             return new
             {
                 WebHeaderMessage = section.GetValue<string>("WebHeaderMessage"),
-                WebHeaderDescription = section.GetValue<string>("WebHeaderDescription")
+                WebHeaderDescription = section.GetValue<string>("WebHeaderDescription"),
+                siteName = setting.SiteName,
+                siteLogo = setting.SiteLogo
             };
+        }
+
+        [HttpPost]
+        [Route("settings")]
+        public bool UpdateSettings([FromBody] SiteSetting model)
+        {
+            var setting = _depDbContext.SiteSettings.FirstOrDefault();
+            if (setting == null)
+            {
+                setting = new SiteSetting();
+                _depDbContext.SiteSettings.Add(setting);
+            }
+
+            setting.SiteName = model.SiteName;
+            setting.SiteLogo = model.SiteLogo;
+
+            _depDbContext.SaveChanges();
+            return true;
         }
 
         [HttpGet]

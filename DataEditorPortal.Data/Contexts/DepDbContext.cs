@@ -12,6 +12,8 @@ namespace DataEditorPortal.Data.Contexts
         {
         }
 
+        public virtual DbSet<SiteSetting> SiteSettings { get; set; }
+
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserPermission> UserPermissions { get; set; }
         public virtual DbSet<SiteRole> SiteRoles { get; set; }
@@ -78,7 +80,7 @@ namespace DataEditorPortal.Data.Contexts
                     Label = "Site Settings",
                     Icon = "pi pi-wrench",
                     Type = "System",
-                    Link = "",
+                    Link = "/site-settings",
                     ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
                     Order = 2,
                     Status = Common.PortalItemStatus.Published

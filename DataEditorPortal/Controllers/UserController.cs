@@ -45,6 +45,7 @@ namespace DataEditorPortal.Web.Controllers
                 this.Create(dep_user);
             }
 
+            user.Id = dep_user.Id;
             user.DisplayName = dep_user.Name;
             if (string.IsNullOrEmpty(user.DisplayName))
             {

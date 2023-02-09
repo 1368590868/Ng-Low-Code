@@ -11,6 +11,7 @@ namespace DataEditorPortal.Web.Models
 
     public class AppUser
     {
+        public Guid Id { get; set; }
         public string IdentityName => Domain + "\\" + Username;
         public string Username { get; set; }
         public string Domain { get; set; }
