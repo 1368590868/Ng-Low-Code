@@ -1,61 +1,115 @@
 <p-dialog
-  header="Advanced Configuration"
   [(visible)]="visible"
-  [style]="{ minWidth: '40rem' }"
+  [style]="{ minWidth: '35rem' }"
   [modal]="true"
   [dismissableMask]="true"
   appendTo="body"
   contentStyleClass="border-top-1 surface-border py-3">
+  <ng-template pTemplate="header">
+    <span class="p-dialog-title"
+      >Options Editor
+      <a (click)="changeMode()">{{
+        !advanced ? 'Advance Mode' : 'Simple Mode'
+      }}</a></span
+    >
+    <div class="flex align-items-center"></div>
+  </ng-template>
   <div #container class="dialog-content">
-    <div class="flex align-items-center">
-      Advanced: &nbsp;&nbsp;
-      <p-inputSwitch
-        [(ngModel)]="advance"
-        (onChange)="changeSwitch($event.checked)"></p-inputSwitch>
-    </div>
-    <p-divider styleClass="mb-0"> </p-divider>
-    <div class="flex flex-column mb-2">
-      <p-orderList
-        *ngIf="!advance; else advanceRef"
-        appendTo="body"
-        class="option-list"
-        [value]="optionArr"
-        [stripedRows]="true"
-        [dragdrop]="true">
-        <ng-template let-option pTemplate="item">
-          <div class="flex align-items-center">
-            <div class="mr-3">
-              <input
-                [formControl]="option.formControl"
-                pInputText
-                placeholder="Enter a value"
-                required />
+    <div class="flex flex-column mb-2" style="min-height: 10rem">
+      <ng-container
+        [ngTemplateOutlet]="!advanced ? simpleRef : advancedRef"></ng-container>
+      <ng-template #simpleRef>
+        <p-orderList
+          appendTo="body"
+          class="option-list"
+          [value]="optionArr"
+          [stripedRows]="true"
+          [dragdrop]="true">
+          <ng-template let-option pTemplate="item">
+            <div class="flex align-items-center justify-content-between">
+              <div class="mr-3 flex-1">
+                <input
+                  [attr.dragstart]="onDragOption"
+                  class="w-full"
+                  [formControl]="option.formControl"
+                  pInputText
+                  placeholder="Enter a value"
+                  required />
+              </div>
+              <div>
+                <p-button
+                  icon="pi pi-trash"
+                  styleClass="p-button-rounded p-button-text"
+                  (onClick)="onRemoveFilter(option)"></p-button>
+              </div>
             </div>
-            <div>
-              <p-button
-                icon="pi pi-trash"
-                styleClass="p-button-rounded p-button-text"
-                (onClick)="onRemoveFilter(option)"></p-button>
-            </div>
+          </ng-template>
+          <ng-template pTemplate="empty">
+            <p-message
+              severity="info"
+              text="There is no Option configed. Click button to add a Option."
+              styleClass="mr-2"></p-message>
+          </ng-template>
+        </p-orderList>
+        <p-button
+          label="Add"
+          icon="pi pi-plus"
+          class="mt-1"
+          styleClass="p-button-text p-button-sm"
+          (onClick)="onAdd()"></p-button>
+      </ng-template>
+      <ng-template #advancedRef>
+        <div class="flex flex-column">
+          <div class="flex align-items-center mt-4">
+            <label class="line-height-3">Select lookup</label>
+            <i
+              class="pi pi-question-circle ml-3 text-lg"
+              pTooltip="Select one pre-defined lookup or create a new one, which get options from database."></i>
+          </div>
+          <p-dropdown
+            [required]="true"
+            [formControl]="formControlLookups"
+            [options]="lookups"
+            placeholder="Please Select"
+            [style]="{ minWidth: '20rem' }"
+            optionLabel="name"
+            optionValue="id"
+            appendTo="body"
+            [required]="true"
+            (onChange)="changeLookup()"></p-dropdown>
+        </div>
+        <ng-container
+          [ngTemplateOutlet]="lookupForm"
+          *ngIf="showLookupForm"></ng-container>
+        <ng-template #lookupForm>
+          <p-divider>Add new lookup</p-divider>
+          <div class="mb-3 flex flex-column">
+            <label class="line-height-3">Name</label>
+            <input
+              [formControl]="formControlName"
+              [required]="true"
+              pInputText
+              placeholder="Enter a name" />
+          </div>
+          <div class="mb-3 flex flex-column">
+            <label class="line-height-3 flex align-items-center"
+              >Query text
+              <i
+                class="pi pi-question-circle ml-3 text-lg"
+                [pTooltip]="
+                  'Enter some query text to get options from database. It needs return two columns at least. Use format ##FIELD##; to reference other fields in same form as paramters.'
+                "></i>
+            </label>
+            <ngx-monaco-editor
+              [formControl]="formControlQuery"
+              (onInit)="onMonacoInit()"
+              [style]="dialogStyle"
+              [required]="true"
+              class="pt-3 border-round monaco-editor-wrapper"
+              [options]="editorOptions"></ngx-monaco-editor>
           </div>
         </ng-template>
-      </p-orderList>
-      <ng-template #advanceRef>
-        <p-divider styleClass="mb-0"> </p-divider>
-
-        <ngx-monaco-editor
-          (onInit)="onInit()"
-          [style]="dialogStyle"
-          [options]="editorOptions"
-          [(ngModel)]="code"></ngx-monaco-editor
-      ></ng-template>
-      <p-button
-        *ngIf="!advance"
-        label="Add"
-        icon="pi pi-plus"
-        class="mt-1"
-        styleClass="p-button-text p-button-sm"
-        (onClick)="onAdd()"></p-button>
+      </ng-template>
     </div>
   </div>
   <ng-template pTemplate="footer">

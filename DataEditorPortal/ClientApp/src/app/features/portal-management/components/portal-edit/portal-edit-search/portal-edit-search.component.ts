@@ -8,6 +8,11 @@ import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
 import { NotifyService } from 'src/app/core';
 import { GridSearchField } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
+import {
+  OptionDialogComponent,
+  OptionValueModel
+} from '../../option-dialog/option-dialog.component';
+import { SearchRuleComponent } from '../../search-rule/search-rule.component';
 
 @Component({
   selector: 'app-portal-edit-search',
@@ -149,7 +154,7 @@ export class PortalEditSearchComponent implements OnInit {
           type: 'input',
           props: {
             label: 'Label',
-            placeholder: 'Control label'
+            placeholder: 'Enter control label'
           }
         },
         {
@@ -157,7 +162,7 @@ export class PortalEditSearchComponent implements OnInit {
           type: 'input',
           props: {
             label: 'Placeholder',
-            placeholder: 'Placeholder'
+            placeholder: 'Enter placeholder'
           },
           expressions: {
             hide: `['checkbox', 'radio', 'checkboxList'].indexOf(field.parent.parent.model.type) >= 0`
@@ -324,5 +329,34 @@ export class PortalEditSearchComponent implements OnInit {
 
   cloneColumn(column: any) {
     return [JSON.parse(JSON.stringify(column))];
+  }
+
+  openOptionDialog(optionDialog: OptionDialogComponent) {
+    optionDialog.value = {
+      isAdvanced: !!this.model.props.optionLookup,
+      optionLookup: this.model.props.optionLookup,
+      options: this.model.props.options
+    };
+    optionDialog.showDialog();
+  }
+
+  optionValueChange(value: OptionValueModel) {
+    if (value.isAdvanced) {
+      this.model.props.optionLookup = value.optionLookup;
+      this.model.props.options = [];
+    } else {
+      this.model.props.optionLookup = undefined;
+      this.model.props.options = value.options;
+      this.model.props.dependOnFields = [];
+    }
+  }
+
+  openSearchRuleDialog(searchRuleDialog: SearchRuleComponent) {
+    searchRuleDialog.value = this.model.searchRule.whereClause;
+    searchRuleDialog.showDialog();
+  }
+
+  searchRuleValueChange(value: string) {
+    this.model.searchRule.whereClause = value;
   }
 }

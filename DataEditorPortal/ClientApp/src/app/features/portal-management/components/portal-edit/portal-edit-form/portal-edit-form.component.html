@@ -89,8 +89,8 @@
           targetHeader="Selected Fields"
           [dragdrop]="true"
           [responsive]="true"
-          [sourceStyle]="{ height: '400px' }"
-          [targetStyle]="{ height: '475px' }"
+          [sourceStyle]="{ height: '28.5714rem' }"
+          [targetStyle]="{ height: '33.9286rem' }"
           filterBy="name"
           sourceFilterPlaceholder="Search by name"
           [showTargetFilter]="false"
@@ -124,28 +124,66 @@
         <div class="config-form p-picklist">
           <div class="p-picklist-header">Configuration Form</div>
           <div class="p-picklist-list flex-grow-1">
-            <form
-              *ngIf="this.model && this.model.key; else emptyMessage"
-              [formGroup]="form"
-              #configForm="ngForm">
-              <formly-form
-                [form]="form"
-                [fields]="fields"
-                [model]="model"
-                [options]="options"
-                class="p-fluid"></formly-form>
-              <div
+            <div *ngIf="this.model && this.model.key; else emptyMessage">
+              <form [formGroup]="form" #configForm="ngForm">
+                <formly-form
+                  [form]="form"
+                  [fields]="fields"
+                  [model]="model"
+                  [options]="options"
+                  class="p-fluid"></formly-form>
+              </form>
+
+              <ng-container
+                [ngTemplateOutlet]="optionsTemplate"
                 *ngIf="
                   ['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(
                     model.type
                   ) >= 0
-                ">
-                <p-divider>Options</p-divider>
-                <p-button styleClass="p-button-text"
-                  >Configure Options</p-button
-                >
-              </div>
-            </form>
+                "></ng-container>
+              <ng-template #optionsTemplate>
+                <div class="flex flex-column mb-3">
+                  <label class="line-height-3">Options</label>
+                  <div class="flex align-items-center justify-content-between">
+                    <p-button
+                      styleClass="p-button-outlined"
+                      (onClick)="openOptionDialog(optionDialog)"
+                      >Configure Options</p-button
+                    >
+                    <p-message
+                      *ngIf="
+                        model.props.optionLookup ||
+                        (model.props.options && model.props.options.length > 0)
+                      "
+                      severity="info"
+                      text="{{ model.props.optionLookup ? 'Use Lookup' : '' }}{{
+                        model.props.options && model.props.options.length > 0
+                          ? model.props.options.length + ' option(s)'
+                          : ''
+                      }}"></p-message>
+                  </div>
+                </div>
+                <app-option-dialog
+                  #optionDialog
+                  (valueChange)="optionValueChange($event)"></app-option-dialog>
+
+                <div class="flex flex-column" *ngIf="model.props.optionLookup">
+                  <label class="line-height-3">Depends on</label>
+                  <p-multiSelect
+                    [filter]="false"
+                    [showHeader]="false"
+                    placeholder="Select fields"
+                    display="chip"
+                    class="mr-2"
+                    styleClass="w-full"
+                    appendTo="body"
+                    optionLabel="key"
+                    optionValue="key"
+                    [(ngModel)]="model.props.dependOnFields"
+                    [options]="targetColumns"></p-multiSelect>
+                </div>
+              </ng-template>
+            </div>
             <ng-template #emptyMessage>
               <div class="pt-4">
                 Please select one row in <b>Selected Fields</b> panel to

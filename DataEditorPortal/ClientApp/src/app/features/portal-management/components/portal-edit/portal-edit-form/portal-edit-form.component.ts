@@ -18,6 +18,10 @@ import {
   DataSourceTableColumn
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
+import {
+  OptionDialogComponent,
+  OptionValueModel
+} from '../../option-dialog/option-dialog.component';
 
 @Component({
   selector: 'app-portal-edit-form',
@@ -418,5 +422,25 @@ export class PortalEditFormComponent implements OnInit {
       return !dbCol.allowDBNull && !(dbCol.isAutoIncrement || dbCol.isIdentity);
     }
     return true;
+  }
+
+  openOptionDialog(optionDialog: OptionDialogComponent) {
+    optionDialog.value = {
+      isAdvanced: !!this.model.props.optionLookup,
+      optionLookup: this.model.props.optionLookup,
+      options: this.model.props.options
+    };
+    optionDialog.showDialog();
+  }
+
+  optionValueChange(value: OptionValueModel) {
+    if (value.isAdvanced) {
+      this.model.props.optionLookup = value.optionLookup;
+      this.model.props.options = undefined;
+    } else {
+      this.model.props.optionLookup = undefined;
+      this.model.props.options = value.options;
+      this.model.props.dependOnFields = [];
+    }
   }
 }
