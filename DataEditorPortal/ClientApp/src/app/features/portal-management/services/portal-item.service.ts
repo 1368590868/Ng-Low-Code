@@ -7,6 +7,7 @@ import {
   DataSourceTable,
   DataSourceTableColumn,
   GridColumn,
+  GridCustomAction,
   GridFormConfig,
   GridSearchField,
   PortalItem,
@@ -261,6 +262,21 @@ export class PortalItemService {
   saveGridFormConfig(data: GridFormConfig) {
     return this.http.post<ApiResponse<boolean>>(
       `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`,
+      data
+    );
+  }
+
+  getCustomActions(id: string): Observable<GridCustomAction[]> {
+    return this.http
+      .get<ApiResponse<GridCustomAction[]>>(
+        `${this._apiUrl}portal-item/${id}/custom-actions`
+      )
+      .pipe(map(x => x.result || []));
+  }
+
+  saveCustomActions(id: string, data: GridCustomAction[]) {
+    return this.http.post<ApiResponse<boolean>>(
+      `${this._apiUrl}portal-item/${id}/custom-actions`,
       data
     );
   }

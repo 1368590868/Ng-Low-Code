@@ -1,14 +1,13 @@
 <p-dialog
   header="Custom Actions Configuration"
   [(visible)]="visible"
-  [style]="{ minWidth: '40rem' }"
+  [style]="{ width: '35rem' }"
   [modal]="true"
   [dismissableMask]="true"
   appendTo="body"
   contentStyleClass="border-top-1 surface-border py-3">
   <div #container class="dialog-content">
-    <p-divider styleClass="mb-0"> </p-divider>
-    <div class="flex flex-column mb-2">
+    <div class="flex flex-column mb-2" style="min-height: 10rem">
       <p-orderList
         appendTo="body"
         class="option-list"
@@ -16,12 +15,13 @@
         [stripedRows]="true"
         [dragdrop]="true">
         <ng-template let-option pTemplate="item">
-          <div class="flex align-items-center">
+          <div class="flex align-items-center justify-content-between">
             <div class="mr-3">
               <p-dropdown
                 [style]="{ minWidth: '15rem' }"
                 [options]="customActions"
                 [formControl]="option"
+                [required]="true"
                 placeholder="Please Select"
                 appendTo="body"></p-dropdown>
             </div>
@@ -32,6 +32,13 @@
                 (onClick)="onRemoveFilter(option)"></p-button>
             </div>
           </div>
+        </ng-template>
+        <ng-template pTemplate="empty">
+          <p-message
+            severity="info"
+            text="There is no Custom Action configed. Click button to add a Custom
+          Action."
+            styleClass="mr-2"></p-message>
         </ng-template>
       </p-orderList>
 

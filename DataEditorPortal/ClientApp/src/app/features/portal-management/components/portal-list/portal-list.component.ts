@@ -7,6 +7,7 @@ import { tap } from 'rxjs';
 import { ConfigDataService, NotifyService } from 'src/app/core';
 import { PortalItem, PortalItemData } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
+import { CustomActionsComponent } from '../custom-actions/custom-actions.component';
 import { AddPortalDialogComponent } from './add-portal-dialog/add-portal-dialog.component';
 
 @Component({
@@ -42,6 +43,7 @@ export class PortalListComponent implements OnInit {
 
   @ViewChild('addDialog') addDialog!: AddPortalDialogComponent;
   @ViewChild('cm') contextMenu!: ContextMenu;
+  @ViewChild('customActions') customActions!: CustomActionsComponent;
 
   constructor(
     private router: Router,
@@ -84,6 +86,16 @@ export class PortalListComponent implements OnInit {
           });
         }
       });
+      if (row['configCompleted']) {
+        items.push({
+          label: 'Config Actions',
+          icon: 'pi pi-fw pi-th-large',
+          command: () => {
+            this.customActions.portalItemId = row['id'];
+            this.customActions.showDialog();
+          }
+        });
+      }
     } else if (row['type'] === 'System') {
       items.push({
         label: 'Edit',

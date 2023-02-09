@@ -6,7 +6,8 @@ import {
   ErrorPageComponent,
   LoginComponent,
   RouterGuard,
-  TileComponent
+  TileComponent,
+  SiteSettingsComponent
 } from './core';
 
 const routes: Routes = [
@@ -14,6 +15,11 @@ const routes: Routes = [
   { path: 'about', component: AboutComponent, canActivate: [RouterGuard] },
   { path: 'contact', component: ContactComponent, canActivate: [RouterGuard] },
   { path: 'login', component: LoginComponent },
+  {
+    path: 'site-settings',
+    component: SiteSettingsComponent,
+    canActivate: [RouterGuard]
+  },
   {
     path: 'portal-item/:name',
     loadChildren: () =>

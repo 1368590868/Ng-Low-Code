@@ -5,6 +5,11 @@
   --topbar-item-text-color: #ffffff;
   --topbar-item-hover-bg: rgba(255, 255, 255, 0.12);
 
+  .title-desc {
+    color: var(--topbar-item-text-color);
+    padding: 0 2rem;
+  }
+
   height: 4rem;
   position: sticky;
   top: 0;
@@ -56,3 +61,14 @@
     }
   }
 }
+
+
+.user-form {
+  ::ng-deep {
+    app-formly-field-primeng-checkbox {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}
+

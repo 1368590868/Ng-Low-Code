@@ -87,3 +87,7 @@ export interface GridFormConfig {
   customViewFormName?: string;
   formFields?: GridFormField[];
 }
+
+export interface GridCustomAction {
+  name?: string;
+}
