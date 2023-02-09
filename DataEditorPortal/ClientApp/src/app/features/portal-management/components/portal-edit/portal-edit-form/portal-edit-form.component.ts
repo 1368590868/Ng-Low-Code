@@ -50,16 +50,6 @@ export class PortalEditFormComponent implements OnInit {
       filterType: 'boolean'
     },
     {
-      label: 'Checkbox List',
-      value: 'checkboxList',
-      filterType: 'array'
-    },
-    {
-      label: 'Multiple Dropdown',
-      value: 'multiSelect',
-      filterType: 'array'
-    },
-    {
       label: 'Date',
       value: 'datepicker',
       filterType: 'date'
@@ -77,6 +67,16 @@ export class PortalEditFormComponent implements OnInit {
     {
       label: 'Dropdown',
       value: 'select',
+      filterType: 'text'
+    },
+    {
+      label: 'Multiple Dropdown',
+      value: 'multiSelect',
+      filterType: 'text'
+    },
+    {
+      label: 'Checkbox List',
+      value: 'checkboxList',
       filterType: 'text'
     },
     {
@@ -222,6 +222,20 @@ export class PortalEditFormComponent implements OnInit {
           }
         },
         {
+          key: 'maxFractionDigits',
+          type: 'inputNumber',
+          defaultValue: 2,
+          props: {
+            label: 'Max Fraction Digits',
+            maxFractionDigits: 0,
+            max: 4,
+            min: 0
+          },
+          expressions: {
+            hide: `'inputNumber' !== field.parent.parent.model.type`
+          }
+        },
+        {
           key: 'required',
           type: 'checkbox',
           defaultValue: true,
@@ -278,7 +292,8 @@ export class PortalEditFormComponent implements OnInit {
               key: x.columnName,
               type: result[0].value,
               props: {
-                label: x.columnName
+                label: x.columnName,
+                required: !x.allowDBNull
                 // placeholder: x.columnName
               },
               filterType: x.filterType

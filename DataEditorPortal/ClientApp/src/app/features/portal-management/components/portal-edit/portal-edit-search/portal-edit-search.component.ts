@@ -36,16 +36,6 @@ export class PortalEditSearchComponent implements OnInit {
       filterType: 'boolean'
     },
     {
-      label: 'Checkbox List',
-      value: 'checkboxList',
-      filterType: 'array'
-    },
-    {
-      label: 'Multiple Dropdown',
-      value: 'multiSelect',
-      filterType: 'array'
-    },
-    {
       label: 'Date',
       value: 'datepicker',
       filterType: 'date'
@@ -63,6 +53,16 @@ export class PortalEditSearchComponent implements OnInit {
     {
       label: 'Dropdown',
       value: 'select',
+      filterType: 'text'
+    },
+    {
+      label: 'Multiple Dropdown',
+      value: 'multiSelect',
+      filterType: 'text'
+    },
+    {
+      label: 'Checkbox List',
+      value: 'checkboxList',
       filterType: 'text'
     },
     {
@@ -99,12 +99,9 @@ export class PortalEditSearchComponent implements OnInit {
 
                     typeField.props.options = result;
 
-                    if (
-                      !result.find(
-                        o => o.value === typeField.formControl?.value
-                      )
-                    )
+                    if (!result.find(o => o.value === this.model.type)) {
                       typeField.formControl?.setValue(result[0].value);
+                    }
                   }
                 }
               })
@@ -128,10 +125,14 @@ export class PortalEditSearchComponent implements OnInit {
         onInit: field => {
           field.formControl?.valueChanges
             .pipe(
+              startWith(field.formControl.value),
               distinctUntilChanged(),
               tap(() => {
+                const cacheSearchRule = this.model.searchRule.matchMode;
+                this.filterMatchModeOptions = this.getFilterMatchModeOptions();
                 this.model.selected = false;
                 this.changeDetectorRef.detectChanges();
+                this.model.searchRule.matchMode = cacheSearchRule;
                 this.model.selected = true;
                 this.changeDetectorRef.detectChanges();
               })
@@ -237,14 +238,7 @@ export class PortalEditSearchComponent implements OnInit {
 
   onTargetSelect({ items }: { items: GridSearchField[] }) {
     if (items.length === 1) {
-      const cacheSearchRule = items[0].searchRule.matchMode;
       this.model = items[0];
-      this.filterMatchModeOptions = this.getFilterMatchModeOptions(
-        items[0].filterType
-      );
-      this.changeDetectorRef.detectChanges();
-      items[0].searchRule.matchMode = cacheSearchRule;
-      this.changeDetectorRef.detectChanges();
     } else {
       this.model = {};
     }
@@ -316,8 +310,11 @@ export class PortalEditSearchComponent implements OnInit {
     });
   }
 
-  getFilterMatchModeOptions(filterType: string) {
-    if (filterType === 'array')
+  getFilterMatchModeOptions() {
+    const filterType = this.model.filterType;
+    const type = this.model.type;
+
+    if (type === 'multiSelect' || type === 'checkboxList')
       return [{ label: 'In selected values', value: 'in' }];
     if (filterType === 'boolean') return [{ label: 'Equals', value: 'equals' }];
     return (this.primeNGConfig.filterMatchModeOptions as any)[filterType]?.map(
