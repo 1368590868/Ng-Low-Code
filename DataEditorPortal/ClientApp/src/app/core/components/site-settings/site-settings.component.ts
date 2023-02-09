@@ -75,6 +75,7 @@ export class SiteSettingsComponent {
         .pipe(
           tap((res: { isError: boolean }) => {
             if (!res.isError) {
+              this.siteSettingsService.convertNewSiteSettings();
               this.notifyService.notifySuccess('Success', 'Save Success');
             }
           })

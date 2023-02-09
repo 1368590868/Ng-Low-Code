@@ -54,6 +54,11 @@ export class SiteSettingsService {
     this.siteSettings.siteName = this.oldSiteName;
   }
 
+  convertNewSiteSettings() {
+    this.oldSiteIcon = this.siteSettings.siteIcon || '';
+    this.oldSiteName = this.siteSettings.siteName;
+  }
+
   saveData(data: SiteSettings) {
     return this.http.post<ApiResponse<SiteSettings>>(
       `${this._apiUrl}site/environment`,
