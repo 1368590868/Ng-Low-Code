@@ -23,7 +23,7 @@ import {
   LoginComponent,
   ErrorPageComponent,
   SiteSettingsComponent,
-  DialogComponent
+  PersonalDialogComponent
 } from './components';
 import { PermissionDirective } from './directive/permission.directive';
 import { CommonModule } from '@angular/common';
@@ -49,7 +49,7 @@ import { PortalManagementModule } from 'src/app/features/portal-management/porta
     LoginComponent,
     ErrorPageComponent,
     SiteSettingsComponent,
-    DialogComponent,
+    PersonalDialogComponent,
     PermissionDirective
   ],
   imports: [
@@ -77,7 +77,7 @@ import { PortalManagementModule } from 'src/app/features/portal-management/porta
     HomeComponent,
     TileComponent,
     SiteSettingsComponent,
-    DialogComponent,
+    PersonalDialogComponent,
     LoginComponent,
     ErrorPageComponent,
     PermissionDirective

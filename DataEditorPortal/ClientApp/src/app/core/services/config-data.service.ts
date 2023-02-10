@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { map, Observable, of, Subject, tap } from 'rxjs';
+import { map, Observable, Subject, tap } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 import { SiteMenu } from '../models/menu';
 
@@ -64,15 +64,12 @@ export class ConfigDataService {
     siteName: ''
   };
 
-  public OB_SITE_SETTINGS: Observable<SiteSettings> = of();
-
   getSiteSettings() {
     return this.http
       .get<ApiResponse<SiteSettings>>(`${this._apiUrl}site/settings`)
       .pipe(
         tap(res => {
           if (!res.isError) {
-            this.OB_SITE_SETTINGS = of(res.result ?? { siteName: '' });
             this.siteSettings = res.result ?? {
               siteName: ''
             };

@@ -25,12 +25,19 @@ export class SiteSettingsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.configDataService.OB_SITE_SETTINGS.subscribe(res => {
-      this.siteSettings = {
-        siteLogo: res.siteLogo || '',
-        siteName: new FormControl(res.siteName)
-      };
-    });
+    this.configDataService
+      .getSiteSettings()
+      .pipe(
+        tap(res => {
+          if (!res.isError && res.result) {
+            this.siteSettings = {
+              siteLogo: res.result.siteLogo || '',
+              siteName: new FormControl(res.result.siteName)
+            };
+          }
+        })
+      )
+      .subscribe();
   }
   picChange(event: any) {
     const files = event.target.files;

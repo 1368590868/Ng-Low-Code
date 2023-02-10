@@ -1,6 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
+import {
+  ManageRoleForm,
+  UpdateRole
+} from 'src/app/features/universal-grid-action/models/user-manager';
 import { ApiResponse } from '../models/api-response';
 import { AppUser } from '../models/user';
 import { ConfigDataService } from './config-data.service';
@@ -42,6 +46,19 @@ export class UserService {
   getLoggedInUser() {
     return this.http.get<ApiResponse<AppUser>>(
       `${this._apiUrl}User/GetLoggedInUser`
+    );
+  }
+
+  getUserDetail(id: string): Observable<ManageRoleForm> {
+    return this.http
+      .get<ApiResponse<ManageRoleForm>>(`${this._apiUrl}user/detail/${id}`)
+      .pipe(map(res => res.result || {}));
+  }
+
+  updateUser(data: ManageRoleForm) {
+    return this.http.put<ApiResponse<UpdateRole[]>>(
+      `${this._apiUrl}user/update/${data.id}`,
+      { ...data, division: JSON.stringify(data.division) }
     );
   }
 }

@@ -39,8 +39,6 @@ export class HeaderComponent implements OnInit {
 
   onpenDialog() {
     this.visible = true;
-    setTimeout(() => {
-      this.dialog.onPerfileDialog();
-    }, 1);
+    this.dialog.onpenDialog();
   }
 }

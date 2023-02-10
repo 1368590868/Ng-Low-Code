@@ -1,19 +1,18 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { NgForm, FormGroup } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { MenuItem } from 'primeng/api';
 import { ManageRoleForm } from 'src/app/features/universal-grid-action/models/user-manager';
 import { ConfigDataService } from '../../services/config-data.service';
-import { PersonalInfoService } from '../../services/personal-info.service';
 import { UserService } from '../../services/user.service';
 import { NotifyService } from '../../utils/notify.service';
 
 @Component({
-  selector: 'app-dialog',
-  templateUrl: './dialog.component.html',
-  styleUrls: ['./dialog.component.scss']
+  selector: 'app-personal-dialog',
+  templateUrl: './personal-dialog.component.html',
+  styleUrls: ['./personal-dialog.component.scss']
 })
-export class DialogComponent implements OnInit {
+export class PersonalDialogComponent {
   @ViewChild('editForm') editForm!: NgForm;
   items!: MenuItem[];
   visible = false;
@@ -189,8 +188,7 @@ export class DialogComponent implements OnInit {
   constructor(
     public configDataService: ConfigDataService,
     public userService: UserService,
-    private notifyService: NotifyService,
-    private personalInfoService: PersonalInfoService
+    private notifyService: NotifyService
   ) {
     this.items = [
       {
@@ -207,8 +205,9 @@ export class DialogComponent implements OnInit {
       }
     ];
   }
-  ngOnInit(): void {
-    this.personalInfoService
+
+  onpenDialog() {
+    this.userService
       .getUserDetail(this.userService.USER.id || '')
       .subscribe(res => {
         this.form.setValue({
@@ -222,17 +221,14 @@ export class DialogComponent implements OnInit {
           division: res.division !== 'NONE' ? JSON.parse(res.division) : []
         });
       });
-  }
-
-  async onPerfileDialog() {
     this.visible = true;
   }
   onFormSubmit(model: ManageRoleForm) {
     if (this.form.valid) {
-      this.personalInfoService
+      this.userService
         .updateUser({
           ...model,
-          id: this.userService.USER.identityName
+          id: this.userService.USER.id
         })
         .subscribe(res => {
           if (!res.isError && res.result) {
