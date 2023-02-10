@@ -63,7 +63,6 @@ export class SiteSettingsComponent implements OnInit {
       .then((res: Array<string | unknown>) => {
         if (res[0] !== undefined) {
           this.siteLogo = res[0] as string;
-          this.notifyService.notifySuccess('Success', 'Upload Success');
         }
       })
       .catch(err => {

@@ -5,14 +5,12 @@
     <p-divider styleClass="mt-0"></p-divider>
     <div class="w-6 pt-3">
       <p class="mb-2">Site Logo</p>
-      <div
-        class="flex align-items-start justify-content-between"
-        [style]="{ minHeight: '8rem' }">
+      <div class="flex align-items-start justify-content-between mb-3">
         <div class="flex flex-column">
           <img
             *ngIf="this.siteLogo"
             [src]="this.siteLogo"
-            [style]="{ maxHeight: '11rem' }" />
+            [style]="{ maxHeight: '3.5rem' }" />
           <!-- Upload Button -->
           <p-button
             tabindex="0"
@@ -33,14 +31,15 @@
 
           <!-- Remove Button -->
           <ng-template #removeButton>
-            <span
-              tabindex="0"
-              class="p-button p-button-danger p-component mt-3 mb-4"
+            <button
               (click)="removePic()"
-              ><span class="p-button-icon p-button-icon-left pi pi-minus"></span
-              ><span class="p-button-label">Remove</span
-              ><span class="p-ink"></span
-            ></span>
+              pButton
+              pRipple
+              type="button"
+              label="Remove"
+              class="p-button-outlined p-button-danger mt-3">
+              <span class="p-button-icon p-button-icon-left pi pi-trash"></span>
+            </button>
           </ng-template>
 
           <!-- Tips -->

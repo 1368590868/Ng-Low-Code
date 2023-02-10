@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { NgForm, FormGroup } from '@angular/forms';
+import { NgForm, FormGroup, AbstractControl } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { MenuItem } from 'primeng/api';
 import { ManageRoleForm } from 'src/app/features/universal-grid-action/models/user-manager';
@@ -31,6 +31,25 @@ export class PersonalDialogComponent {
             type: 'text',
             label: 'CNP ID',
             placeholder: 'CNP ID'
+          },
+          modelOptions: {
+            updateOn: 'blur'
+          },
+          asyncValidators: {
+            exist: {
+              expression: (control: AbstractControl) => {
+                return new Promise((resolve, reject) => {
+                  this.userService
+                    .userNameExists(control.value, this.userService.USER.id)
+                    .subscribe(res =>
+                      !res.isError ? resolve(!res.result) : reject(res.message)
+                    );
+                });
+              },
+              message: () => {
+                return 'The  CNP ID has already been exist.';
+              }
+            }
           }
         },
         {
@@ -53,6 +72,37 @@ export class PersonalDialogComponent {
             type: 'text',
             label: 'Email',
             placeholder: 'Email'
+          },
+          modelOptions: {
+            updateOn: 'blur'
+          },
+          asyncValidators: {
+            emailFormat: {
+              expression: (control: AbstractControl) => {
+                return new Promise((resolve, reject) => {
+                  const emailRegex =
+                    /^([a-zA-Z\d][\w-]{2,})@(\w{2,})\.([a-z]{2,})(\.[a-z]{2,})?$/;
+                  resolve(emailRegex.test(control.value));
+                });
+              },
+              message: () => {
+                return 'Email format error.';
+              }
+            },
+            emailExist: {
+              expression: (control: AbstractControl) => {
+                return new Promise((resolve, reject) => {
+                  this.userService
+                    .emailExists(control.value, this.userService.USER.id)
+                    .subscribe(res =>
+                      !res.isError ? resolve(!res.result) : reject(res.message)
+                    );
+                });
+              },
+              message: () => {
+                return 'The  Email has already been exist.';
+              }
+            }
           }
         },
         {

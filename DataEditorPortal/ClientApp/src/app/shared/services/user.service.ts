@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
 import {
@@ -59,6 +59,28 @@ export class UserService {
     return this.http.put<ApiResponse<UpdateRole[]>>(
       `${this._apiUrl}user/update/${data.id}`,
       { ...data, division: JSON.stringify(data.division) }
+    );
+  }
+
+  userNameExists(name: string, id?: string): Observable<ApiResponse<boolean>> {
+    let params = new HttpParams().set('username', name);
+    if (id) params = params.set('id', id);
+    return this.http.get<ApiResponse<boolean>>(
+      `${this._apiUrl}user/username-exists`,
+      {
+        params
+      }
+    );
+  }
+
+  emailExists(email: string, id?: string): Observable<ApiResponse<boolean>> {
+    let params = new HttpParams().set('email', email);
+    if (id) params = params.set('id', id);
+    return this.http.get<ApiResponse<boolean>>(
+      `${this._apiUrl}user/email-exists`,
+      {
+        params
+      }
     );
   }
 }
