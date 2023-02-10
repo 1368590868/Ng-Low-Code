@@ -27,6 +27,7 @@ export class PersonalDialogComponent {
           key: 'username',
           type: 'input',
           props: {
+            disabled: true,
             required: true,
             type: 'text',
             label: 'CNP ID',

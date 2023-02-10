@@ -20,7 +20,11 @@ export class UserManagerActionComponent
 
   form = new FormGroup({});
   model: ManageRoleForm = {};
-  options: FormlyFormOptions = {};
+  options: FormlyFormOptions = {
+    formState: {
+      isAddForm: this.isAddForm
+    }
+  };
   fields: FormlyFieldConfig[] = [
     {
       fieldGroupClassName: 'flex flex-wrap justify-content-between',
@@ -34,6 +38,9 @@ export class UserManagerActionComponent
             type: 'text',
             label: 'CNP ID',
             placeholder: 'CNP ID'
+          },
+          expressions: {
+            'props.disabled': 'formState.isAddForm'
           },
           modelOptions: {
             updateOn: 'blur'
@@ -328,6 +335,9 @@ export class UserManagerActionComponent
   }
 
   ngOnInit(): void {
+    this.options.formState = {
+      isAddForm: !this.isAddForm
+    };
     if (!this.isAddForm) {
       this.userManagerService
         .getUserDetail(this.selectedRecords[0][this.recordKey])
