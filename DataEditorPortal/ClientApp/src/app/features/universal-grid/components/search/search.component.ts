@@ -42,7 +42,11 @@ export class SearchComponent implements OnInit, OnDestroy {
           this.fields
             .filter(
               // advanced setting: options from lookup
-              x => x.type === 'select' && x.props && x.props['optionLookup']
+              x =>
+                typeof x.type === 'string' &&
+                ['select', 'multiSelect'].indexOf(x.type) >= 0 &&
+                x.props &&
+                x.props['optionLookup']
             )
             .forEach(f => {
               f.hooks = {
@@ -66,7 +70,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(model: SearchParam) {
-    console.log(model);
     if (this.form.valid) {
       this.gridTableService.searchClicked$.next(model);
     }
