@@ -106,6 +106,20 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [Route("username-exists")]
+        public bool ExistName([FromQuery] string username, [FromQuery] Guid? id)
+        {
+            return _depDbContext.Users.Where(x => x.Username == username && x.Id != id).Any();
+        }
+
+        [HttpGet]
+        [Route("email-exists")]
+        public bool ExistEmail([FromQuery] string email, [FromQuery] Guid? id)
+        {
+            return _depDbContext.Users.Where(x => x.Email == email && x.Id != id).Any();
+        }
+
+        [HttpGet]
         [Route("detail/{userId}")]
         public dynamic GetUserDetail(Guid userId)
         {
@@ -175,6 +189,7 @@ namespace DataEditorPortal.Web.Controllers
             dep_user.Comments = "ACTIVE";
             dep_user.Email = model.Email;
             dep_user.Phone = model.Phone;
+            dep_user.Name = model.Name;
 
             _depDbContext.SaveChanges();
 

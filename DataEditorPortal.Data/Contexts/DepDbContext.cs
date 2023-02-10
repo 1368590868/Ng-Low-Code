@@ -27,6 +27,8 @@ namespace DataEditorPortal.Data.Contexts
 
         public virtual DbSet<DemoTable> DemoTables { get; set; }
 
+        public virtual DbSet<DataDictionary> DataDictionaries { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
