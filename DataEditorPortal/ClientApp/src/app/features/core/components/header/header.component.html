@@ -15,14 +15,18 @@
     class="menu-end flex justify-content-center align-items-center"
     *ngIf="this.userService?.isLogin">
     <p-button icon="pi pi-search" styleClass="p-button-rounded mr-2"></p-button>
-    <p-button (onClick)="onpenDialog()">
+    <p-button (onClick)="onpenDialog()" styleClass="mr-1">
       <p-avatar
         image="https://www.primefaces.org/ultima-ng/assets/demo/images/avatar/amyelsner.png"
         styleClass="flex mr-2"
         shape="circle"></p-avatar>
       <span class="flex flex-column align-items-start">
-        <strong>{{ this.userService.USER.displayName }}</strong>
-        <small>Vendor:{{ this.userService.USER.vendor || 'Vendor N/A' }}</small>
+        <strong class="line-height-1">{{
+          this.userService.USER.displayName
+        }}</strong>
+        <small class="line-height-1"
+          >Vendor:{{ this.userService.USER.vendor || 'Vendor N/A' }}</small
+        >
       </span>
     </p-button>
   </div>

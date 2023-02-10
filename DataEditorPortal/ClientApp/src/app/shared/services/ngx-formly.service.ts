@@ -46,9 +46,8 @@ export class NgxFormlyService {
     field.props['dependOnFields'].forEach((key: string) => {
       if (field.key === key) return;
       const control = field.parent.get(key).formControl;
-      model[key] = control.value;
+      model[key] = control.value || '';
     });
-    this.initFieldOptions(field, model);
 
     field.props['dependOnFields'].forEach((key: string) => {
       if (field.key === key) return;
@@ -57,7 +56,7 @@ export class NgxFormlyService {
         .pipe(
           distinctUntilChanged(),
           tap(val => {
-            model[key] = val;
+            model[key] = val || '';
             this.initFieldOptions(field, model);
           })
         )
