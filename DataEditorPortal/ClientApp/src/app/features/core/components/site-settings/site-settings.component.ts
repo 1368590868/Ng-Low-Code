@@ -9,15 +9,12 @@ import { NotifyService, ConfigDataService } from 'src/app/shared';
   styleUrls: ['./site-settings.component.scss']
 })
 export class SiteSettingsComponent implements OnInit {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  @ViewChild('file') file: any;
+  @ViewChild('file') file!: HTMLInputElement;
   public picTips = false;
   public isLoading = false;
 
-  public siteSettings = {
-    siteName: new FormControl(''),
-    siteLogo: ''
-  };
+  public siteLogo = '';
+  public formControlSiteName = new FormControl('');
 
   constructor(
     public configDataService: ConfigDataService,
@@ -30,18 +27,15 @@ export class SiteSettingsComponent implements OnInit {
       .pipe(
         tap(res => {
           if (!res.isError && res.result) {
-            this.siteSettings = {
-              siteLogo: res.result.siteLogo || '',
-              siteName: new FormControl(res.result.siteName)
-            };
+            this.siteLogo = res.result.siteLogo || '';
+            this.formControlSiteName.setValue(res.result.siteName);
           }
         })
       )
       .subscribe();
   }
-  picChange(event: any) {
-    const files = event.target.files;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  picChange(event: Event) {
+    const files = (event.target as HTMLInputElement).files || {};
     const filePromise = Object.entries(files).map((item: any) => {
       return new Promise((resolve, reject) => {
         const [, file] = item;
@@ -55,11 +49,12 @@ export class SiteSettingsComponent implements OnInit {
 
         const reader = new FileReader();
         reader.readAsBinaryString(file);
-        reader.onload = (event: ProgressEvent<any>) => {
-          const picture = `data:${file.type};base64,${btoa(
-            event.target.result
-          )}`;
-          resolve(picture);
+        reader.onload = (event: ProgressEvent<FileReader>) => {
+          const result = event.target?.result;
+          if (typeof result === 'string') {
+            const picture = `data:${file.type};base64,${btoa(result)}`;
+            resolve(picture);
+          }
         };
       });
     });
@@ -67,7 +62,7 @@ export class SiteSettingsComponent implements OnInit {
     Promise.all(filePromise)
       .then((res: Array<string | unknown>) => {
         if (res[0] !== undefined) {
-          this.siteSettings.siteLogo = res[0] as string;
+          this.siteLogo = res[0] as string;
           this.notifyService.notifySuccess('Success', 'Upload Success');
         }
       })
@@ -77,11 +72,11 @@ export class SiteSettingsComponent implements OnInit {
   }
 
   removePic() {
-    this.siteSettings.siteLogo = '';
+    this.siteLogo = '';
   }
   onSave() {
-    this.siteSettings.siteName.markAsDirty();
-    if (!this.siteSettings.siteLogo) {
+    this.formControlSiteName.markAsDirty();
+    if (!this.siteLogo) {
       this.picTips = true;
       return;
     } else {
@@ -89,19 +84,18 @@ export class SiteSettingsComponent implements OnInit {
     }
 
     this.isLoading = true;
-    if (this.siteSettings.siteName.valid) {
-      const { siteName, siteLogo } = this.siteSettings;
+    if (this.formControlSiteName.valid) {
       this.configDataService
         .saveData({
-          siteName: siteName.value || '',
-          siteLogo: siteLogo
+          siteName: this.formControlSiteName.value || '',
+          siteLogo: this.siteLogo
         })
         .pipe(
           tap((res: { isError: boolean }) => {
             if (!res.isError) {
               this.configDataService.siteSettings = {
-                siteName: siteName.value || '',
-                siteLogo: siteLogo
+                siteName: this.formControlSiteName.value || '',
+                siteLogo: this.siteLogo
               };
               this.notifyService.notifySuccess('Success', 'Save Success');
             }

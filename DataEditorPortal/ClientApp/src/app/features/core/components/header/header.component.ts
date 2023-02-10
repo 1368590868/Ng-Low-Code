@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { ConfigDataService, UserService } from 'src/app/shared';
+import { PersonalDialogComponent } from '..';
 
 @Component({
   selector: 'app-header',
@@ -8,7 +9,7 @@ import { ConfigDataService, UserService } from 'src/app/shared';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
-  @ViewChild('dialog') dialog!: any;
+  @ViewChild('dialog') dialog!: PersonalDialogComponent;
   items!: MenuItem[];
 
   public visible = false;
@@ -38,7 +39,6 @@ export class HeaderComponent implements OnInit {
   }
 
   onpenDialog() {
-    this.visible = true;
     this.dialog.onpenDialog();
   }
 }

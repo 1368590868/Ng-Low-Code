@@ -79,7 +79,7 @@ export class UserManagerActionComponent
         {
           className: 'w-6 ',
           key: 'vendor',
-          type: 'iconSelect',
+          type: 'select',
           props: {
             label: 'Vendor',
             placeholder: 'Please select',
