@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { distinctUntilChanged, map, Observable, startWith, tap } from 'rxjs';
+import { distinctUntilChanged, map, Observable, tap, debounceTime } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 
 @Injectable({
@@ -29,10 +29,12 @@ export class NgxFormlyService {
           tap(result => {
             if (field.props) {
               field.props.options = result;
-              const exist = !result.find(
-                o => o.value === field.formControl?.value
-              );
-              if (exist) field.formControl?.setValue(null);
+              const notExist =
+                field.formControl?.value &&
+                !result.find(o => o.value === field.formControl?.value);
+              if (notExist) {
+                field.formControl?.setValue(null);
+              }
             }
           })
         )
@@ -46,7 +48,7 @@ export class NgxFormlyService {
     field.props['dependOnFields'].forEach((key: string) => {
       if (field.key === key) return;
       const control = field.parent.get(key).formControl;
-      model[key] = control.value || '';
+      model[key] = control.value || (field.type === 'select' ? '' : []);
     });
 
     field.props['dependOnFields'].forEach((key: string) => {
@@ -55,8 +57,9 @@ export class NgxFormlyService {
       control?.valueChanges
         .pipe(
           distinctUntilChanged(),
+          debounceTime(300),
           tap(val => {
-            model[key] = val || '';
+            model[key] = val || (field.type === 'select' ? '' : []);
             this.initFieldOptions(field, model);
           })
         )

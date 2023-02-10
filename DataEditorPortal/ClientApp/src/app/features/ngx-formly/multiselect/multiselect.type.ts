@@ -30,7 +30,8 @@ export interface FormlyMultiSelectFieldConfig
       [virtualScrollItemSize]="props.virtualScrollItemSize"
       [showToggleAll]="false"
       [filter]="true"
-      [appendTo]="props.appendTo">
+      [appendTo]="props.appendTo"
+      display="chip">
     </p-multiSelect>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
