@@ -1,4 +1,4 @@
-<div class="layout-content">
+<div class="layout-content p-2">
   <p-card>
     <ng-template pTemplate="title">Setting </ng-template>
     <ng-template pTemplate="subtitle"> Setting Infomation </ng-template>
@@ -6,7 +6,7 @@
     <div class="w-6 pt-3">
       <p class="mb-2">Site Logo</p>
       <div class="flex align-items-start justify-content-between mb-3">
-        <div class="flex flex-column">
+        <div class="flex align-items-center">
           <img
             *ngIf="this.siteLogo"
             [src]="this.siteLogo"
@@ -37,7 +37,7 @@
               pRipple
               type="button"
               label="Remove"
-              class="p-button-outlined p-button-danger mt-3">
+              class="p-button-text p-button-danger p-button-sm ml-3">
               <span class="p-button-icon p-button-icon-left pi pi-trash"></span>
             </button>
           </ng-template>
