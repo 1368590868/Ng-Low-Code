@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { tap } from 'rxjs';
-import { SiteMenu } from '../../models/menu';
-import { ConfigDataService } from 'src/app/shared';
+import { ConfigDataService, SiteMenu } from 'src/app/shared';
 
 @Component({
   selector: 'app-tile',

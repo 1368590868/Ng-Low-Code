@@ -15,6 +15,8 @@ import { PermissionDirective } from './directive/permission.directive';
 // export * from './components';
 export { RouterGuard } from './guards/router.guard';
 export { ApiResponse } from './models/api-response';
+export { SiteMenu } from './models/menu';
+export { AppUser } from './models/user';
 export { NotifyService } from './utils/notify.service';
 export { NgxFormlyService } from './services/ngx-formly.service';
 export { ConfigDataService } from './services/config-data.service';

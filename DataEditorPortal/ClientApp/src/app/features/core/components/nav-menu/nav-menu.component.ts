@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { SiteMenu } from '../../models/menu';
-import { ConfigDataService, UserService } from 'src/app/shared';
+import { ConfigDataService, UserService, SiteMenu } from 'src/app/shared';
 
 @Component({
   selector: 'app-nav-menu',

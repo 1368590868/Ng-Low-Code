@@ -8,7 +8,6 @@ import { FormlyModule } from '@ngx-formly/core';
 
 // primeNG components
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { AvatarModule } from 'primeng/avatar';
