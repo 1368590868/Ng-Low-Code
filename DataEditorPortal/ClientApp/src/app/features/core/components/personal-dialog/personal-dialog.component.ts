@@ -3,9 +3,7 @@ import { NgForm, FormGroup } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { MenuItem } from 'primeng/api';
 import { ManageRoleForm } from 'src/app/features/universal-grid-action/models/user-manager';
-import { ConfigDataService } from '../../services/config-data.service';
-import { UserService } from '../../services/user.service';
-import { NotifyService } from '../../utils/notify.service';
+import { NotifyService, ConfigDataService, UserService } from 'src/app/shared';
 
 @Component({
   selector: 'app-personal-dialog',

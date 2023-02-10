@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
-import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
+import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
+
+import { FormlyModule } from '@ngx-formly/core';
 
 // primeNG components
 import { ToastModule } from 'primeng/toast';
@@ -13,6 +15,9 @@ import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DividerModule } from 'primeng/divider';
 import { CardModule } from 'primeng/card';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+
 import {
   HeaderComponent,
   NavMenuComponent,
@@ -25,18 +30,9 @@ import {
   SiteSettingsComponent,
   PersonalDialogComponent
 } from './components';
-import { PermissionDirective } from './directive/permission.directive';
-import { CommonModule } from '@angular/common';
-import { InputTextModule } from 'primeng/inputtext';
+import { SharedModule } from 'src/app/shared';
+
 export * from './components';
-export { RouterGuard } from './guards/router.guard';
-export { ApiResponse } from './models/api-response';
-export { NotifyService } from './utils/notify.service';
-export { NgxFormlyService } from './services/ngx-formly.service';
-export { ConfigDataService } from './services/config-data.service';
-import { ReactiveFormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { PortalManagementModule } from 'src/app/features/portal-management/portal-management.module';
 
 @NgModule({
   declarations: [
@@ -49,8 +45,7 @@ import { PortalManagementModule } from 'src/app/features/portal-management/porta
     LoginComponent,
     ErrorPageComponent,
     SiteSettingsComponent,
-    PersonalDialogComponent,
-    PermissionDirective
+    PersonalDialogComponent
   ],
   imports: [
     CommonModule,
@@ -66,9 +61,9 @@ import { PortalManagementModule } from 'src/app/features/portal-management/porta
     InputTextModule,
     CardModule,
     ReactiveFormsModule,
-    PortalManagementModule
+    FormlyModule,
+    SharedModule
   ],
-
   exports: [
     HeaderComponent,
     NavMenuComponent,
@@ -79,21 +74,7 @@ import { PortalManagementModule } from 'src/app/features/portal-management/porta
     SiteSettingsComponent,
     PersonalDialogComponent,
     LoginComponent,
-    ErrorPageComponent,
-    PermissionDirective
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: WinAuthInterceptor,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: HttpErrorInterceptor,
-      multi: true
-    },
-    MessageService
+    ErrorPageComponent
   ]
 })
 export class CoreModule {}

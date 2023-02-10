@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { ConfigDataService } from '../../services/config-data.service';
-import { UserService } from '../../services/user.service';
+import { ConfigDataService, UserService } from 'src/app/shared';
+
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',

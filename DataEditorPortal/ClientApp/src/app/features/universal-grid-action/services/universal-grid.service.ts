@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, takeWhile, tap } from 'rxjs';
-import { ApiResponse, NotifyService } from 'src/app/core';
+import { ApiResponse, NotifyService } from 'src/app/shared';
 import { EditFormData, EditFormField } from '../models/edit';
 import { ExportParam } from '../models/export';
 

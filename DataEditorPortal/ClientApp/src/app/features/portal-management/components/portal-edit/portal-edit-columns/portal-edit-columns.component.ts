@@ -4,7 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PickList } from 'primeng/picklist';
 import { forkJoin, tap } from 'rxjs';
-import { NotifyService } from 'src/app/core';
+import { NotifyService } from 'src/app/shared';
 import { DataSourceTableColumn, GridColumn } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 

@@ -10,7 +10,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PickList } from 'primeng/picklist';
 import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
-import { NotifyService } from 'src/app/core';
+import { NotifyService } from 'src/app/shared';
 import { GridActionConfig } from 'src/app/features/universal-grid-action';
 import {
   GridFormField,

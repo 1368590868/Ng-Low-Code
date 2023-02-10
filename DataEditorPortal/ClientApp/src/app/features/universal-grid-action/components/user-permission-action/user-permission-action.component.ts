@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NotifyService } from 'src/app/core';
+import { NotifyService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UserPemissions } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';

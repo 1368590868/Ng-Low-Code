@@ -1,6 +1,6 @@
 import { Component, Inject, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { NotifyService } from 'src/app/core/utils/notify.service';
+import { NotifyService } from 'src/app/shared';
 import { GridActionConfig } from 'src/app/features/universal-grid-action';
 import { PortalItemService } from '../../services/portal-item.service';
 

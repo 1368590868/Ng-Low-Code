@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize, tap } from 'rxjs';
-import { UserService } from '../../services/user.service';
-import { NotifyService } from '../../utils/notify.service';
+import { NotifyService, UserService } from 'src/app/shared';
 
 @Component({
   selector: 'app-login',

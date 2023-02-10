@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { ApiResponse, NotifyService } from 'src/app/core';
+import { ApiResponse, NotifyService } from 'src/app/shared';
 import { Lookup } from '../models/lookup';
 
 @Injectable({

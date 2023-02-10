@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfigDataService } from '../../services/config-data.service';
+import { ConfigDataService } from 'src/app/shared';
 
 @Component({
   selector: 'app-home',

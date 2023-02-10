@@ -4,7 +4,7 @@ import { MenuItem, TreeNode } from 'primeng/api';
 import { ContextMenu } from 'primeng/contextmenu';
 import { Menu } from 'primeng/menu';
 import { tap } from 'rxjs';
-import { ConfigDataService, NotifyService } from 'src/app/core';
+import { ConfigDataService, NotifyService } from 'src/app/shared';
 import { PortalItem, PortalItemData } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
 import { CustomActionsComponent } from '../custom-actions/custom-actions.component';

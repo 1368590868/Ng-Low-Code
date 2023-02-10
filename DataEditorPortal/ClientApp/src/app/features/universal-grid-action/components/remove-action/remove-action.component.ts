@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NotifyService } from 'src/app/core';
+import { NotifyService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UniversalGridService } from '../../services/universal-grid.service';
 

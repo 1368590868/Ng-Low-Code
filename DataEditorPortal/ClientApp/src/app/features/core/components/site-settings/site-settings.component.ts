@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { tap } from 'rxjs';
-import { ConfigDataService } from '../../services/config-data.service';
-import { NotifyService } from '../../utils/notify.service';
+import { NotifyService, ConfigDataService } from 'src/app/shared';
+
 @Component({
   selector: 'app-site-settings',
   templateUrl: './site-settings.component.html',

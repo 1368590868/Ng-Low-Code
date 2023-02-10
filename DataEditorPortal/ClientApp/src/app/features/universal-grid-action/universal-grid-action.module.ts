@@ -1,13 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 // formly
-import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
-import { FormlyPrimeNGModule } from '@ngx-formly/primeng';
-import { FormlyDatepickerModule } from '../ngx-formly/datepicker';
-import { FormlyMultiSelectModule } from '../ngx-formly/multiselect';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
@@ -30,6 +27,7 @@ import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { AccordionModule } from 'primeng/accordion';
 import { DividerModule } from 'primeng/divider';
+import { CheckboxModule } from 'primeng/checkbox';
 
 import { GridActionDirective } from './directives/grid-action.directive';
 import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
@@ -39,15 +37,9 @@ import { ViewRecordActionComponent } from './components/view-record-action/view-
 import { ExportExcelActionComponent } from './components/export-excel-action/export-excel-action.component';
 import { RemoveActionComponent } from './components/remove-action/remove-action.component';
 import { UserManagerActionComponent } from './components/user-manager-action/user-manager-action.component';
-import { FormlySelectModule } from '../ngx-formly/select/select.module';
-import { FormlyCheckBoxModule } from '../ngx-formly/checkbox/checkbox.module';
-import { CheckboxModule } from 'primeng/checkbox';
 import { ManageRoleActionComponent } from './components/manage-role-action/manage-role.component-action';
-import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
 import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
 import { UserPermissionActionComponent } from './components/user-permission-action/user-permission-action.component';
-import { FormlyChipWrapperModule } from '../ngx-formly/chip/chip.module';
-import { FormlyInputNumberModule } from '../ngx-formly/inputnumber';
 
 const GRID_ACTION_CONFIG = [
   {
@@ -201,19 +193,7 @@ const GRID_ACTION_CONFIG = [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    FormlyModule.forRoot({
-      validationMessages: [
-        { name: 'required', message: 'This field is required' }
-      ]
-    }),
-    FormlyPrimeNGModule,
-    FormlyDatepickerModule,
-    FormlyMultiSelectModule,
-    FormlySelectModule,
-    FormlyCheckBoxModule,
-    FormlyDividerWrapperModule,
-    FormlyChipWrapperModule,
-    FormlyInputNumberModule,
+    FormlyModule,
     // primeNg
     AnimateModule,
     ToastModule,

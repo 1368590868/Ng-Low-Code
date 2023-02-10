@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { NotifyService } from 'src/app/core/utils/notify.service';
+import { NotifyService } from 'src/app/shared';
+
 export interface SaveData {
   label: string;
 }

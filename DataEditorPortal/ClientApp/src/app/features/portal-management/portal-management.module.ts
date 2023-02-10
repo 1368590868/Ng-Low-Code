@@ -1,19 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 // formly
-import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
-import { FormlyPrimeNGModule } from '@ngx-formly/primeng';
-import { FormlyDatepickerModule } from '../ngx-formly/datepicker';
-import { FormlyMultiSelectModule } from '../ngx-formly/multiselect';
-import { FormlyInputMaskModule } from '../ngx-formly/inputMask';
-import { FormlySelectModule } from '../ngx-formly/select';
-import { FormlyDividerWrapperModule } from '../ngx-formly/divider';
-import { FormlyCheckBoxModule } from '../ngx-formly/checkbox';
-import { FormlyIconSelectModule } from '../ngx-formly/iconselect';
-import { FormlyInputNumberModule } from '../ngx-formly/inputnumber';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
@@ -42,6 +33,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { MessageModule } from 'primeng/message';
+import { MonacoEditorModule } from 'ngx-monaco-editor';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import {
@@ -60,7 +52,6 @@ import {
 
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
 import { OptionDialogComponent } from './components/option-dialog/option-dialog.component';
-import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { CustomActionsComponent } from './components/custom-actions/custom-actions.component';
 import { SearchRuleComponent } from './components/search-rule/search-rule.component';
 
@@ -86,20 +77,7 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     FormsModule,
     MonacoEditorModule.forRoot(),
     ReactiveFormsModule,
-    FormlyModule.forRoot({
-      validationMessages: [
-        { name: 'required', message: 'This field is required' }
-      ]
-    }),
-    FormlyPrimeNGModule,
-    FormlyDatepickerModule,
-    FormlyMultiSelectModule,
-    FormlyInputMaskModule,
-    FormlySelectModule,
-    FormlyDividerWrapperModule,
-    FormlyCheckBoxModule,
-    FormlyIconSelectModule,
-    FormlyInputNumberModule,
+    FormlyModule,
 
     // primeNg
     AnimateModule,
@@ -128,7 +106,6 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     InputNumberModule,
     ContextMenuModule,
     MessageModule
-  ],
-  exports: [FormlyModule, FormlyPrimeNGModule]
+  ]
 })
 export class PortalManagementModule {}
