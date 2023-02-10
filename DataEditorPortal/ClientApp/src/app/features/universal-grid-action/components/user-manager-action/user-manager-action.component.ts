@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, NgForm } from '@angular/forms';
+import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { NotifyService } from 'src/app/shared';
+import { NotifyService, UserService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { ManageRoleForm } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';
@@ -34,6 +34,30 @@ export class UserManagerActionComponent
             type: 'text',
             label: 'CNP ID',
             placeholder: 'CNP ID'
+          },
+          modelOptions: {
+            updateOn: 'blur'
+          },
+          asyncValidators: {
+            exist: {
+              expression: (control: AbstractControl) => {
+                return new Promise((resolve, reject) => {
+                  this.userService
+                    .userNameExists(
+                      control.value,
+                      this.isAddForm
+                        ? ''
+                        : this.selectedRecords[0][this.recordKey]
+                    )
+                    .subscribe(res =>
+                      !res.isError ? resolve(!res.result) : reject(res.message)
+                    );
+                });
+              },
+              message: () => {
+                return 'The  CNP ID has already been exist.';
+              }
+            }
           }
         },
         {
@@ -56,6 +80,42 @@ export class UserManagerActionComponent
             type: 'text',
             label: 'Email',
             placeholder: 'Email'
+          },
+          modelOptions: {
+            updateOn: 'blur'
+          },
+          asyncValidators: {
+            emailFormat: {
+              expression: (control: AbstractControl) => {
+                return new Promise((resolve, reject) => {
+                  const emailRegex =
+                    /^([a-zA-Z\d][\w-]{2,})@(\w{2,})\.([a-z]{2,})(\.[a-z]{2,})?$/;
+                  resolve(emailRegex.test(control.value));
+                });
+              },
+              message: () => {
+                return 'Email format error.';
+              }
+            },
+            emailExist: {
+              expression: (control: AbstractControl) => {
+                return new Promise((resolve, reject) => {
+                  this.userService
+                    .emailExists(
+                      control.value,
+                      this.isAddForm
+                        ? ''
+                        : this.selectedRecords[0][this.recordKey]
+                    )
+                    .subscribe(res =>
+                      !res.isError ? resolve(!res.result) : reject(res.message)
+                    );
+                });
+              },
+              message: () => {
+                return 'The  Email has already been exist.';
+              }
+            }
           }
         },
         {
@@ -261,7 +321,8 @@ export class UserManagerActionComponent
 
   constructor(
     private userManagerService: UserManagerService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private userService: UserService
   ) {
     super();
   }
