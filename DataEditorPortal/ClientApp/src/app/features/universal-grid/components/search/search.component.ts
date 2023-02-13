@@ -49,6 +49,8 @@ export class SearchComponent implements OnInit, OnDestroy {
                 x.props['optionLookup']
             )
             .forEach(f => {
+              if (f.props && f.props.placeholder)
+                f.props.placeholder = 'Please Select';
               f.hooks = {
                 onInit: field => {
                   if (field.props && field.props['dependOnFields']) {

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PrimeNGConfig } from 'primeng/api';
@@ -128,13 +128,7 @@ export class PortalEditSearchComponent implements OnInit {
               startWith(field.formControl.value),
               distinctUntilChanged(),
               tap(() => {
-                const cacheSearchRule = this.model.searchRule.matchMode;
-                this.filterMatchModeOptions = this.getFilterMatchModeOptions();
-                this.model.selected = false;
-                this.changeDetectorRef.detectChanges();
-                this.model.searchRule.matchMode = cacheSearchRule;
-                this.model.selected = true;
-                this.changeDetectorRef.detectChanges();
+                this.setFilterMatchOptionsAndValue();
               })
             )
             .subscribe();
@@ -173,6 +167,7 @@ export class PortalEditSearchComponent implements OnInit {
     }
   ];
   filterMatchModeOptions: any[] = [];
+  formControlSearchRule: FormControl = new FormControl();
 
   constructor(
     private primeNGConfig: PrimeNGConfig,
@@ -218,6 +213,10 @@ export class PortalEditSearchComponent implements OnInit {
       });
 
       this.portalItemService.saveCurrentStep('search');
+
+      this.formControlSearchRule.valueChanges
+        .pipe(tap(val => (this.model.searchRule.matchMode = val)))
+        .subscribe();
     }
   }
 
@@ -239,9 +238,20 @@ export class PortalEditSearchComponent implements OnInit {
   onTargetSelect({ items }: { items: GridSearchField[] }) {
     if (items.length === 1) {
       this.model = items[0];
+      this.setFilterMatchOptionsAndValue();
     } else {
       this.model = {};
     }
+  }
+
+  setFilterMatchOptionsAndValue() {
+    const cacheSearchRule = this.model.searchRule.matchMode;
+    setTimeout(() => {
+      this.filterMatchModeOptions = this.getFilterMatchModeOptions();
+      setTimeout(() => {
+        this.formControlSearchRule.setValue(cacheSearchRule);
+      });
+    });
   }
 
   valid() {

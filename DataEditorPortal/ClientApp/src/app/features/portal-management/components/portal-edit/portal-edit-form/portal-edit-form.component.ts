@@ -151,9 +151,6 @@ export class PortalEditFormComponent implements OnInit {
                     dField.props['hideLabel'] = value === 'checkbox';
 
                   dField.hide = true;
-                  this.model.selected = false;
-                  this.changeDetectorRef.detectChanges();
-                  this.model.selected = true;
                   if (
                     'input,datepicker,checkbox,textarea,inputNumber'.indexOf(
                       value
@@ -162,7 +159,6 @@ export class PortalEditFormComponent implements OnInit {
                     dField.type = value;
                     dField.hide = false;
                   }
-                  this.changeDetectorRef.detectChanges();
                 }
               })
             )
