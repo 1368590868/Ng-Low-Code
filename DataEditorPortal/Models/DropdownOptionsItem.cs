@@ -6,8 +6,8 @@
         public string Value { get; set; }
 
         //For cases where we need additional info 
-        public string Value2 { get; set; }
+        public string Value1 { get; set; }
 
-        public string Value3 { get; set; }
+        public string Value2 { get; set; }
     }
 }

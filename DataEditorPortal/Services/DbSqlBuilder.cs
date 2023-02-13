@@ -1,18 +1,15 @@
-﻿using DataEditorPortal.Web.Common;
-using DataEditorPortal.Web.Models.UniversalGrid;
+﻿using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Services
 {
     public interface IDbSqlBuilder
     {
         // ultilities
-        string ReplaceParamters(string queryText, Dictionary<string, object> model);
         string UsePagination(string query, int startIndex, int indexCount);
         string UseOrderBy(string query, List<SortParam> sortParams);
         string UseCount(string query);
@@ -323,65 +320,6 @@ namespace DataEditorPortal.Web.Services
                 return Convert.ToBoolean(value);
             else
                 return value.ToString();
-        }
-
-        public string ReplaceParamters(string queryText, Dictionary<string, object> model)
-        {
-            var regex = new Regex(@"\#\#([a-zA-Z]+[a-zA-Z0-9]+)\#\#");
-            var matches = regex.Matches(queryText);
-
-            foreach (Match match in matches)
-            {
-                var key = match.Groups[1].Value;
-
-                if (model.ContainsKey(key) && model[key] != null)
-                {
-                    var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(model[key]));
-                    if (jsonElement.ValueKind == JsonValueKind.True || jsonElement.ValueKind == JsonValueKind.False)
-                    {
-                        var value = jsonElement.GetBoolean();
-                        queryText = queryText.Replace(match.Value, (value ? 1 : 0).ToString());
-                    }
-                    else if (jsonElement.ValueKind == JsonValueKind.Number)
-                    {
-                        var value = jsonElement.GetDecimal();
-                        queryText = queryText.Replace(match.Value, value.ToString());
-                    }
-                    else if (jsonElement.ValueKind == JsonValueKind.Array)
-                    {
-                        if (jsonElement.GetArrayLength() > 0)
-                        {
-                            var inStr = "";
-                            jsonElement.EnumerateArray().ToList().ForEach(value =>
-                            {
-                                if (value.ValueKind == JsonValueKind.Number)
-                                {
-                                    inStr += $",'{value.GetDecimal()}'";
-                                }
-                                else
-                                {
-                                    inStr += $",'{value.GetString().Replace("'", "''")}'";
-                                }
-                            });
-
-                            queryText = queryText.Replace(match.Value, $"{inStr.Substring(1)}");
-                        }
-                        else
-                            queryText = queryText.Replace(match.Value, "('')");
-                    }
-                    else if (jsonElement.ValueKind == JsonValueKind.String)
-                    {
-                        var value = jsonElement.GetString().Replace("'", "''");
-                        queryText = queryText.Replace(match.Value, value);
-                    }
-                }
-                else
-                {
-                    throw new DepException($"Paramter {match.Value} doesn't exist.");
-                }
-            }
-
-            return queryText;
         }
 
         #endregion

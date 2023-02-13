@@ -12,6 +12,10 @@ namespace DataEditorPortal.Data.Models
         public bool Checked { get; set; }
         public int Number { get; set; }
         public decimal Total { get; set; }
+
+        public string Vendor { get; set; }
+        public string Employor { get; set; }
+        public string Division { get; set; }
         public DateTime CreateDate { get; set; }
     }
 }

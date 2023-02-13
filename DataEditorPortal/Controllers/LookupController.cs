@@ -1,6 +1,8 @@
 ﻿using AutoWrapper.Wrappers;
+using Dapper;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -87,7 +90,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("{id}/options")]
-        public dynamic GetLookup(Guid id, [FromBody] Dictionary<string, object> model)
+        public List<DropdownOptionsItem> GetLookup(Guid id, [FromBody] Dictionary<string, JsonElement> model)
         {
             var lookup = _depDbContext.Lookups.Find(id);
 
@@ -97,41 +100,11 @@ namespace DataEditorPortal.Web.Controllers
             {
                 // replace paramters in query text.
 
-                var queryText = _dbSqlBuilder.ReplaceParamters(lookup.QueryText, model);
+                var query = DataHelper.ProcessQueryWithParamters(lookup.QueryText, model);
 
                 using (var con = _depDbContext.Database.GetDbConnection())
                 {
-                    con.Open();
-                    var cmd = con.CreateCommand();
-                    cmd.Connection = con;
-                    cmd.CommandText = queryText;
-
-                    try
-                    {
-                        using (var dr = cmd.ExecuteReader())
-                        {
-                            while (dr.Read())
-                            {
-                                var row = new DropdownOptionsItem();
-                                row.Label = dr[0].ToString();
-                                row.Value = dr[1].ToString(); ;
-                                if (dr.FieldCount > 2)
-                                {
-                                    row.Value2 = dr[2].ToString(); ;
-                                }
-                                if (dr.FieldCount > 3)
-                                {
-                                    row.Value3 = dr[3].ToString(); ;
-                                }
-                                result.Add(row);
-                            }
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception("An Error in the query has occurred: " + ex.Message);
-                    }
+                    result = con.Query<DropdownOptionsItem>(query.Item1, query.Item2).ToList();
                 }
             }
 
