@@ -145,7 +145,6 @@ namespace DataEditorPortal.Web.Controllers
             if (siteMenu.Type == "System")
             {
                 _mapper.Map(model, siteMenu);
-                siteMenu.ParentId = null;
                 siteMenu.Type = "System";
             }
             else

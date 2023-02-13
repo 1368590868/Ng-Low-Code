@@ -58,7 +58,7 @@ namespace DataEditorPortal.Web.Services
             return string.Join(" AND ", filters);
         }
 
-        private string GenerateCriteriaClause(FilterParam item)
+        private string GenerateCriteriaClause(FilterParam item, string whereClause = null)
         {
             string result = string.Empty;
 
@@ -73,45 +73,50 @@ namespace DataEditorPortal.Web.Services
             if (jsonElement.ValueKind == JsonValueKind.True || jsonElement.ValueKind == JsonValueKind.False)
             {
                 var value = jsonElement.GetBoolean();
-                result = $"[{field}] = {(value ? 1 : 0)}";
+                if (whereClause != null)
+                    result = whereClause.Replace("##VALUE##", (value ? 1 : 0).ToString());
+                else
+                    result = $"[{field}] = {(value ? 1 : 0)}";
             }
             else if (jsonElement.ValueKind == JsonValueKind.Number)
             {
                 var value = jsonElement.GetDecimal();
-                switch (item.matchMode)
-                {
-                    case "gt":
-                        result = $"[{field}] > {value}";
-                        break;
+                if (whereClause != null)
+                    result = whereClause.Replace("##VALUE##", value.ToString());
+                else
+                    switch (item.matchMode)
+                    {
+                        case "gt":
+                            result = $"[{field}] > {value}";
+                            break;
 
-                    case "lt":
-                        result = $"[{field}] < {value}";
-                        break;
+                        case "lt":
+                            result = $"[{field}] < {value}";
+                            break;
 
+                        case "gte":
+                            result = $"[{field}] >= {value}";
+                            break;
 
-                    case "gte":
-                        result = $"[{field}] >= {value}";
-                        break;
+                        case "lte":
+                            result = $"[{field}] <= {value}";
+                            break;
 
-                    case "lte":
-                        result = $"[{field}] <= {value}";
-                        break;
+                        case "equals":
+                            result = $"[{field}] = {value}";
+                            break;
 
-                    case "equals":
-                        result = $"[{field}] = {value}";
-                        break;
+                        case "notEquals":
+                            result = $"[{field}] <> {value}";
+                            break;
 
-                    case "notEquals":
-                        result = $"[{field}] <> {value}";
-                        break;
-
-                    default:
-                        break;
-                }
+                        default:
+                            break;
+                    }
             }
             else if (jsonElement.ValueKind == JsonValueKind.Array)
             {
-                if (jsonElement.GetArrayLength() > 0 && item.matchMode == "in")
+                if (jsonElement.GetArrayLength() > 0)
                 {
                     var inStr = "";
                     jsonElement.EnumerateArray().ToList().ForEach(value =>
@@ -125,56 +130,62 @@ namespace DataEditorPortal.Web.Services
                             inStr += $",'{value.GetString().Replace("'", "''")}'";
                         }
                     });
-                    result = $"[{field}] IN ({inStr.Substring(1)})";
+                    if (whereClause != null)
+                        result = whereClause.Replace("##VALUE##", inStr.Substring(1));
+                    else
+                        result = $"[{field}] IN ({inStr.Substring(1)})";
                 }
             }
             else if (jsonElement.ValueKind == JsonValueKind.String)
             {
                 var value = jsonElement.GetString().Replace("'", "''");
-                switch (item.matchMode)
-                {
-                    case "startsWith":
-                        result = $"[{field}] like '{value}%'";
-                        break;
+                if (whereClause != null)
+                    result = whereClause.Replace("##VALUE##", value.ToString());
+                else
+                    switch (item.matchMode)
+                    {
+                        case "startsWith":
+                            result = $"[{field}] like '{value}%'";
+                            break;
 
-                    case "contains":
-                        result = $"[{field}] like '%{value}%'";
-                        break;
+                        case "contains":
+                            result = $"[{field}] like '%{value}%'";
+                            break;
 
-                    case "notContains":
-                        result = $"[{field}] not like '%{value}%'";
-                        break;
+                        case "notContains":
+                            result = $"[{field}] not like '%{value}%'";
+                            break;
 
-                    case "endsWith":
-                        result = $"[{field}] like '%{value}'";
-                        break;
+                        case "endsWith":
+                            result = $"[{field}] like '%{value}'";
+                            break;
 
-                    case "equals":
-                        result = $"[{field}] = '{value}'";
-                        break;
+                        case "equals":
+                            result = $"[{field}] = '{value}'";
+                            break;
 
-                    case "notEquals":
-                        result = $"[{field}] <> '{value}'";
-                        break;
+                        case "notEquals":
+                            result = $"[{field}] <> '{value}'";
+                            break;
 
-                    case "dateIs":
-                        result = $"[{field}] = '{jsonElement.GetDateTime():yyyy/MM/dd}'";
-                        break;
+                        case "dateIs":
+                            result = $"[{field}] = '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                            break;
 
-                    case "dateIsNot":
-                        result = $"[{field}] <> '{jsonElement.GetDateTime():yyyy/MM/dd}'";
-                        break;
+                        case "dateIsNot":
+                            result = $"[{field}] <> '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                            break;
 
-                    case "dateBefore":
-                        result = $"[{field}] < '{jsonElement.GetDateTime():yyyy/MM/dd}'";
-                        break;
+                        case "dateBefore":
+                            result = $"[{field}] < '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                            break;
 
-                    case "dateAfter":
-                        result = $"[{field}] > '{jsonElement.GetDateTime():yyyy/MM/dd}'";
-                        break;
-                    default:
-                        break;
-                }
+                        case "dateAfter":
+                            result = $"[{field}] > '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                            break;
+                        default:
+                            break;
+                    }
             }
 
             return result;
@@ -274,16 +285,9 @@ namespace DataEditorPortal.Web.Services
             {
                 if (!string.IsNullOrEmpty(item.value.ToString()))
                 {
-                    if (string.IsNullOrEmpty(item.whereClause))
-                    {
-                        var criteriaStr = GenerateCriteriaClause(item);
-                        if (!string.IsNullOrEmpty(criteriaStr))
-                            filters.Add(criteriaStr);
-                    }
-                    else
-                    {
-                        filters.Add(item.whereClause.Replace("##VALUE##", item.value.ToString()));
-                    }
+                    var criteriaStr = GenerateCriteriaClause(item, item.whereClause);
+                    if (!string.IsNullOrEmpty(criteriaStr))
+                        filters.Add(criteriaStr);
                 }
             }
 
@@ -360,7 +364,7 @@ namespace DataEditorPortal.Web.Services
                                 }
                             });
 
-                            queryText = queryText.Replace(match.Value, $"({inStr.Substring(1)})");
+                            queryText = queryText.Replace(match.Value, $"{inStr.Substring(1)}");
                         }
                         else
                             queryText = queryText.Replace(match.Value, "('')");

@@ -131,6 +131,27 @@ namespace DataEditorPortal.Data.Contexts
 
             #region user management configuration
 
+            modelBuilder.Entity<Lookup>().HasData(
+                new Lookup()
+                {
+                    Id = Guid.Parse("727052BA-0033-42C9-A39C-06A103E4B021"),
+                    Name = "Roles",
+                    QueryText = "SELECT sr.RoleName, sr.Id FROM dep.SiteRoles sr ORDER BY sr.RoleName"
+                },
+                new Lookup()
+                {
+                    Id = Guid.Parse("E1F3E2C7-25CA-4D69-9405-ABC54923864D"),
+                    Name = "Vendors",
+                    QueryText = "SELECT dd.Label, dd.Value FROM dep.DataDictionaries dd WHERE dd.Category = 'Vendor' ORDER BY dd.Label"
+                },
+                new Lookup()
+                {
+                    Id = Guid.Parse("704A3D00-62DF-4C62-A4BD-457C4DC242CA"),
+                    Name = "Employers",
+                    QueryText = "SELECT dd.Label, dd.Value FROM dep.DataDictionaries dd WHERE dd.Category = 'Employer' ORDER BY dd.Label"
+                }
+            ); ;
+
             modelBuilder.Entity<UniversalGridConfiguration>().HasData(
                 new UniversalGridConfiguration()
                 {
@@ -190,61 +211,46 @@ namespace DataEditorPortal.Data.Contexts
                         },
                         new {
                             key = "roles",
-                            type = "select",
+                            type = "multiSelect",
                             filterType = "text",
                             props = new {
                                 label = "Roles",
                                 placeholder = "Please select",
-                                options = new object[] {
-                                    new { value = 1, label = "Option 1" },
-                                    new { value = 2, label = "Option 2" },
-                                    new { value = 3, label = "Option 3" },
-                                    new { value = 4, label = "Option 4" }
-                                }
+                                optionLookup = "727052BA-0033-42C9-A39C-06A103E4B021"
                             },
                             searchRule = new
                             {
-                                whereClause = "Id in (select UserId from USERID_PERMISSION where PERMISSION_GRANT_ID = '{0}')"
+                                whereClause = "Id in (select UserId from dep.UserPermissions where PermissionGrantId in (##VALUE##))"
                             }
                         },
                         new {
                             key = "vendor",
-                            type = "select",
+                            type = "multiSelect",
                             filterType = "text",
                             props = new {
                                 label = "Vendor",
                                 placeholder = "Please select",
-                                options = new object[] {
-                                    new { value = 1, label = "Option 1" },
-                                    new { value = 2, label = "Option 2" },
-                                    new { value = 3, label = "Option 3" },
-                                    new { value = 4, label = "Option 4" }
-                                }
+                                optionLookup = "E1F3E2C7-25CA-4D69-9405-ABC54923864D"
                             },
                             searchRule = new
                             {
                                 field = "Vendor",
-                                matchMode = "contains"
+                                matchMode = "in"
                             }
                         },
                         new {
                             key = "employer",
-                            type = "select",
+                            type = "multiSelect",
                             filterType = "text",
                             props = new {
                                 label = "Employer",
                                 placeholder = "Please select",
-                                options = new object[] {
-                                    new { value = 1, label = "Option 1" },
-                                    new { value = 2, label = "Option 2" },
-                                    new { value = 3, label = "Option 3" },
-                                    new { value = 4, label = "Option 4" }
-                                }
+                                optionLookup = "704A3D00-62DF-4C62-A4BD-457C4DC242CA"
                             },
                             searchRule = new
                             {
                                 field = "Employer",
-                                matchMode = "contains"
+                                matchMode = "in"
                             }
                         }
                     }),
