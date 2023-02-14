@@ -40,8 +40,6 @@ export class EditRecordActionComponent
         tap(result => {
           this.fields = result;
 
-          this.fields = result;
-
           // fetch lookups
           this.fields
             .filter(

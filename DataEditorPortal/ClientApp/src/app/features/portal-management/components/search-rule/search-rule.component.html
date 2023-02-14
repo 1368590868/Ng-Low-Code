@@ -5,9 +5,9 @@
   [modal]="true"
   [dismissableMask]="true"
   appendTo="body"
-  contentStyleClass="border-top-1 surface-border py-3">
+  contentStyleClass="border-top-1 surface-border pt-4 pb-0">
   <div #container class="dialog-content">
-    <div class="mb-3 flex flex-column" *ngIf="visible">
+    <div class="flex flex-column" *ngIf="visible">
       <label class="line-height-3 flex align-items-center"
         >Query text
         <i
@@ -21,7 +21,7 @@
         (onInit)="onMonacoInit()"
         [style]="dialogStyle"
         [required]="true"
-        class="pt-3 border-round monaco-editor-wrapper"
+        class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
         [options]="editorOptions"></ngx-monaco-editor>
     </div>
   </div>

@@ -28,6 +28,8 @@ export class SearchRuleComponent {
     lineNumbers: 'off',
     roundedSelection: true,
     minimap: { enabled: false },
+    wordWrap: true,
+    contextmenu: false,
     scrollbar: {
       verticalScrollbarSize: 7,
       horizontalScrollbarSize: 7

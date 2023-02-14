@@ -29,11 +29,20 @@ export class NgxFormlyService {
           tap(result => {
             if (field.props) {
               field.props.options = result;
-              const notExist =
-                field.formControl?.value &&
-                !result.find(o => o.value === field.formControl?.value);
-              if (notExist) {
-                field.formControl?.setValue(null);
+              if (field.type === 'select') {
+                const notExist =
+                  field.formControl?.value &&
+                  !result.find(o => o.value === field.formControl?.value);
+                if (notExist) {
+                  field.formControl?.setValue(null);
+                } else {
+                  field.formControl?.setValue(field.formControl?.value);
+                }
+              }
+              if (field.type === 'multiSelect' && field.formControl?.value) {
+                let data = field.formControl?.value || [];
+                data = data.filter((x: any) => result.find(o => o.value === x));
+                field.formControl.setValue(data);
               }
             }
           })
