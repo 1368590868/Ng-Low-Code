@@ -34,6 +34,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { MessageModule } from 'primeng/message';
 import { MonacoEditorModule } from 'ngx-monaco-editor';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import {
@@ -54,6 +55,8 @@ import { UniversalGridActionModule } from 'src/app/features/universal-grid-actio
 import { OptionDialogComponent } from './components/option-dialog/option-dialog.component';
 import { CustomActionsComponent } from './components/custom-actions/custom-actions.component';
 import { SearchRuleComponent } from './components/search-rule/search-rule.component';
+import { PortalDictionaryComponent } from './components/portal-dictionary/portal-dictionary.component';
+import { AddDictionaryDialogComponent } from './components/portal-dictionary/add-dictionary-dialog/add-dictionary-dialog.component';
 
 @NgModule({
   declarations: [
@@ -68,7 +71,9 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     SvgDragComponent,
     OptionDialogComponent,
     CustomActionsComponent,
-    SearchRuleComponent
+    SearchRuleComponent,
+    PortalDictionaryComponent,
+    AddDictionaryDialogComponent
   ],
   imports: [
     CommonModule,
@@ -105,7 +110,8 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     InputSwitchModule,
     InputNumberModule,
     ContextMenuModule,
-    MessageModule
+    MessageModule,
+    ConfirmDialogModule
   ]
 })
 export class PortalManagementModule {}

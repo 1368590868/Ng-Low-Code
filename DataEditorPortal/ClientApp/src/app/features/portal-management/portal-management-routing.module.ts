@@ -9,9 +9,11 @@ import {
   PortalEditSearchComponent,
   PortalEditFormComponent
 } from './components/portal-edit';
+import { PortalDictionaryComponent } from './components/portal-dictionary/portal-dictionary.component';
 
 const routes: Routes = [
   { path: 'list', component: PortalListComponent },
+  { path: 'dictionary', component: PortalDictionaryComponent },
   {
     path: 'edit/:id',
     component: PortalEditComponent,
