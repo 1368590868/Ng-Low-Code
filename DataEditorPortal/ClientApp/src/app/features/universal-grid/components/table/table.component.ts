@@ -205,6 +205,13 @@ export class TableComponent implements OnInit, OnDestroy {
         this.lazyLoadParam.multiSortMeta.length > 0
       ) {
         fetchParam.sorts = this.lazyLoadParam.multiSortMeta;
+      } else {
+        fetchParam.sorts = [
+          {
+            field: this.lazyLoadParam.sortField,
+            order: this.lazyLoadParam.sortOrder
+          }
+        ];
       }
 
       // set pagination
