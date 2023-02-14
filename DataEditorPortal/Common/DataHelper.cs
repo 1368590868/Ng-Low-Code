@@ -25,7 +25,13 @@ namespace DataEditorPortal.Web.Common
                 }
                 else
                 {
-                    keyValuePairs.Add(new KeyValuePair<string, object>(key, null));
+                    if (new Regex(@$"IN {match.Value.ToUpper()}").IsMatch(queryText.ToUpper()))
+                    {
+                        // check the operator, if it is "IN", we need to default the value to empty array.
+                        keyValuePairs.Add(new KeyValuePair<string, object>(key, new object[] { }));
+                    }
+                    else
+                        keyValuePairs.Add(new KeyValuePair<string, object>(key, null));
                 }
                 queryText = queryText.Replace(match.Value, $"@{key}");
             }
