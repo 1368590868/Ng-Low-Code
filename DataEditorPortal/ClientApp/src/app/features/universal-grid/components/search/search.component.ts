@@ -53,7 +53,11 @@ export class SearchComponent implements OnInit, OnDestroy {
                 f.props.placeholder = 'Please Select';
               f.hooks = {
                 onInit: field => {
-                  if (field.props && field.props['dependOnFields']) {
+                  if (
+                    field.props &&
+                    field.props['dependOnFields'] &&
+                    field.props['dependOnFields'].length > 0
+                  ) {
                     this.ngxFormlyService.initDependOnFields(field);
                   } else {
                     this.ngxFormlyService.initFieldOptions(field);
