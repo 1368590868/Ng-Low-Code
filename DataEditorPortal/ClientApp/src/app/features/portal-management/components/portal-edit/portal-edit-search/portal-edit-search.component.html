@@ -108,7 +108,7 @@
               class="mr-2 flex-grow-1"
               styleClass="w-full"
               appendTo="body"
-              [(ngModel)]="model.searchRule.matchMode"
+              [formControl]="formControlSearchRule"
               [options]="filterMatchModeOptions"></p-dropdown>
             <p-message
               *ngIf="model.searchRule && model.searchRule.whereClause"

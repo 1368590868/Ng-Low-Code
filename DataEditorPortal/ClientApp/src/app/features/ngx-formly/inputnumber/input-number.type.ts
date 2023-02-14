@@ -13,6 +13,7 @@ interface InputNumberProps extends FormlyFieldProps {
   min?: number | any;
   max?: number | any;
   mode?: 'decimal' | 'currency' | 'percent';
+  maxFractionDigits?: number;
 }
 
 export interface FormlySelectFieldConfig
@@ -32,7 +33,12 @@ export interface FormlySelectFieldConfig
       [min]="props.min ?? null"
       [max]="props.max ?? null"
       [mode]="props.mode || 'decimal'"
-      [maxFractionDigits]="2"
+      [maxFractionDigits]="
+        props.maxFractionDigits === null ||
+        props.maxFractionDigits === undefined
+          ? 2
+          : props.maxFractionDigits
+      "
       [formControl]="formControl">
     </p-inputNumber>
   `,

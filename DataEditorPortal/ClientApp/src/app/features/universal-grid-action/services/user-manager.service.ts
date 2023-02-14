@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { ApiResponse } from 'src/app/core';
+import { ApiResponse } from 'src/app/shared';
 import {
   ManageRoleForm,
   UpdateRole,

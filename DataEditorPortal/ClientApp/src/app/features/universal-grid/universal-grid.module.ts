@@ -5,18 +5,12 @@ import { FormsModule } from '@angular/forms';
 // formly
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
-import { FormlyPrimeNGModule } from '@ngx-formly/primeng';
-import { FormlyDatepickerModule } from '../ngx-formly/datepicker';
-import { FormlyMultiSelectModule } from '../ngx-formly/multiselect';
-import { FormlyInputMaskModule } from '../ngx-formly/inputMask';
-import { FormlyIconSelectModule } from '../ngx-formly/iconselect/iconselect.module';
 
 import { UniversalGridRoutingModule } from './universal-grid-routing.module';
 import { SplitAreaComponent } from './pages/split-area/split-area.component';
 import { SearchComponent } from './components/search/search.component';
 import { TableComponent } from './components/table/table.component';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
-import { CoreModule } from 'src/app/core';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
@@ -43,19 +37,9 @@ import { ButtonModule } from 'primeng/button';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    FormlyModule.forRoot({
-      validationMessages: [
-        { name: 'required', message: 'This field is required' }
-      ]
-    }),
-    FormlyPrimeNGModule,
-    FormlyDatepickerModule,
-    FormlyMultiSelectModule,
-    FormlyInputMaskModule,
-    FormlyIconSelectModule,
+    FormlyModule,
     UniversalGridRoutingModule,
     UniversalGridActionModule,
-    CoreModule,
     // primeNg
     AnimateModule,
     ToastModule,

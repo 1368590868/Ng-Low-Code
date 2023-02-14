@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, TreeNode } from 'primeng/api';
 import { ContextMenu } from 'primeng/contextmenu';
 import { Menu } from 'primeng/menu';
 import { tap } from 'rxjs';
-import { ConfigDataService, NotifyService } from 'src/app/core';
+import { ConfigDataService, NotifyService } from 'src/app/shared';
 import { PortalItem, PortalItemData } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
 import { CustomActionsComponent } from '../custom-actions/custom-actions.component';
@@ -44,6 +44,7 @@ export class PortalListComponent implements OnInit {
   @ViewChild('addDialog') addDialog!: AddPortalDialogComponent;
   @ViewChild('cm') contextMenu!: ContextMenu;
   @ViewChild('customActions') customActions!: CustomActionsComponent;
+  @ViewChildren(Menu) menu!: Menu[];
 
   constructor(
     private router: Router,
@@ -65,6 +66,9 @@ export class PortalListComponent implements OnInit {
   }
 
   onContextMenuSelect(event: any) {
+    this.menu.forEach(res => {
+      res.hide();
+    });
     this.contextMenuItems = this.getMenuList(event.node);
     setTimeout(() => {
       this.contextMenu.show(event.originalEvent);

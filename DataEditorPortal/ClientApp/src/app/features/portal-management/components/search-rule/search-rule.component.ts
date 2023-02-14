@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { NotifyService } from 'src/app/core/utils/notify.service';
+import { NotifyService } from 'src/app/shared';
+
 export interface SaveData {
   label: string;
 }
@@ -27,6 +28,8 @@ export class SearchRuleComponent {
     lineNumbers: 'off',
     roundedSelection: true,
     minimap: { enabled: false },
+    wordWrap: true,
+    contextmenu: false,
     scrollbar: {
       verticalScrollbarSize: 7,
       horizontalScrollbarSize: 7

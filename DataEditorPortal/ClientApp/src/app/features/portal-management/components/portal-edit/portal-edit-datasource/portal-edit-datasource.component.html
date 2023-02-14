@@ -15,7 +15,8 @@
             (onChange)="onTableNameChange($event)"
             [formControl]="formControlDbTable"
             placeholder="Please Select"
-            [style]="{ minWidth: '20rem' }"></p-dropdown>
+            [style]="{ minWidth: '20rem' }"
+            appendTo="body"></p-dropdown>
           <i
             class="pi pi-question-circle ml-3 text-lg"
             pTooltip="Select one table from database"></i>
@@ -31,7 +32,8 @@
             placeholder="Please Select"
             [style]="{ minWidth: '20rem' }"
             optionLabel="columnName"
-            optionValue="columnName"></p-dropdown>
+            optionValue="columnName"
+            appendTo="body"></p-dropdown>
           <i
             class="pi pi-question-circle ml-3 text-lg"
             pTooltip="Id Column will be used as the key in the grid"></i>

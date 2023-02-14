@@ -15,7 +15,7 @@ import {
 } from '../../models/grid-types';
 import { Table } from 'primeng/table';
 import { TableState } from 'primeng/api';
-import { NotifyService } from 'src/app/core';
+import { NotifyService } from 'src/app/shared';
 
 @Component({
   selector: 'app-table',

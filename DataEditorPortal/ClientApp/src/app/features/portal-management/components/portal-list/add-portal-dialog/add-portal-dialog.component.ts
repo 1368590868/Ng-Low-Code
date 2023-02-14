@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { NotifyService } from 'src/app/core';
+import { NotifyService } from 'src/app/shared';
 import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({

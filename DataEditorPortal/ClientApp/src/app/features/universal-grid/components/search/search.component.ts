@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
-import { NgxFormlyService } from 'src/app/core';
+import { NgxFormlyService } from 'src/app/shared';
 import { SearchParam } from '../../models/grid-types';
 import { GridTableService } from '../../services/grid-table.service';
 
@@ -42,9 +42,15 @@ export class SearchComponent implements OnInit, OnDestroy {
           this.fields
             .filter(
               // advanced setting: options from lookup
-              x => x.type === 'select' && x.props && x.props['optionLookup']
+              x =>
+                typeof x.type === 'string' &&
+                ['select', 'multiSelect'].indexOf(x.type) >= 0 &&
+                x.props &&
+                x.props['optionLookup']
             )
             .forEach(f => {
+              if (f.props && f.props.placeholder)
+                f.props.placeholder = 'Please Select';
               f.hooks = {
                 onInit: field => {
                   if (field.props && field.props['dependOnFields']) {
@@ -66,7 +72,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(model: SearchParam) {
-    console.log(model);
     if (this.form.valid) {
       this.gridTableService.searchClicked$.next(model);
     }

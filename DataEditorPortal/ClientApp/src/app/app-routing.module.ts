@@ -5,10 +5,10 @@ import {
   ContactComponent,
   ErrorPageComponent,
   LoginComponent,
-  RouterGuard,
   TileComponent,
   SiteSettingsComponent
-} from './core';
+} from './features/core';
+import { RouterGuard } from './shared';
 
 const routes: Routes = [
   { path: '', component: TileComponent, canActivate: [RouterGuard] },

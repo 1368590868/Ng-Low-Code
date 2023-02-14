@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { forkJoin, tap } from 'rxjs';
-import { NotifyService } from 'src/app/core';
+import { NotifyService } from 'src/app/shared';
 import {
   DataSourceConfig,
   DataSourceFilter,

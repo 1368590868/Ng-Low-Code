@@ -2,7 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { tap } from 'rxjs';
-import { NotifyService } from 'src/app/core';
+import { NgxFormlyService, NotifyService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { EditFormData } from '../../models/edit';
 import { UniversalGridService } from '../../services/universal-grid.service';
@@ -27,7 +27,8 @@ export class EditRecordActionComponent
 
   constructor(
     private gridService: UniversalGridService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private ngxFormlyService: NgxFormlyService
   ) {
     super();
   }
@@ -38,6 +39,30 @@ export class EditRecordActionComponent
       .pipe(
         tap(result => {
           this.fields = result;
+
+          // fetch lookups
+          this.fields
+            .filter(
+              // advanced setting: options from lookup
+              x =>
+                typeof x.type === 'string' &&
+                ['select', 'multiSelect'].indexOf(x.type) >= 0 &&
+                x.props &&
+                x.props['optionLookup']
+            )
+            .forEach(f => {
+              if (f.props && f.props.placeholder)
+                f.props.placeholder = 'Please Select';
+              f.hooks = {
+                onInit: field => {
+                  if (field.props && field.props['dependOnFields']) {
+                    this.ngxFormlyService.initDependOnFields(field);
+                  } else {
+                    this.ngxFormlyService.initFieldOptions(field);
+                  }
+                }
+              };
+            });
           this.loadedEvent.emit();
         })
       )

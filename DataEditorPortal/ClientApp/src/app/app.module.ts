@@ -9,7 +9,9 @@ import { AppComponent } from './app.component';
 // primeNG components
 import { ToastModule } from 'primeng/toast';
 
-import { CoreModule } from './core';
+import { CoreModule } from './features/core';
+import { FormlyModule } from '@ngx-formly/core';
+import { FormlyCustomTypeModule } from './features/ngx-formly/formly-custom.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,7 +22,13 @@ import { CoreModule } from './core';
     HttpClientModule,
     AppRoutingModule,
     CoreModule,
-    ToastModule
+    ToastModule,
+    FormlyModule.forRoot({
+      validationMessages: [
+        { name: 'required', message: 'This field is required.' }
+      ]
+    }),
+    FormlyCustomTypeModule
   ],
   bootstrap: [AppComponent]
 })
