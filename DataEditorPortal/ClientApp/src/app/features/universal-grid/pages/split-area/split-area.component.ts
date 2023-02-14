@@ -104,4 +104,13 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
         );
     }
   }
+
+  onResizeEnd({ sizes }: { sizes: number[] }) {
+    if (sizes[0] < 20) {
+      this.splitterRef._panelSizes = this.panelSizesPrev;
+    }
+    this.showPanel = true;
+    this.splitterRef.saveState();
+    this.splitterRef.restoreState();
+  }
 }
