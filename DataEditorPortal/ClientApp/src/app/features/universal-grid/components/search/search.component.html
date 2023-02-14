@@ -1,9 +1,9 @@
-<div class="p-card p-3">
-  <div class="flex mb-4" style="margin-top: 0.75rem">
+<div class="p-card pt-3 pb-1">
+  <div class="flex mb-4 px-3" style="margin-top: 0.75rem">
     <h3 class="flex-1">Search Inputs</h3>
   </div>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit(model)">
+  <form [formGroup]="form" (ngSubmit)="onSubmit(model)" class="px-3">
     <formly-form
       [form]="form"
       [fields]="fields"
