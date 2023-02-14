@@ -16,6 +16,7 @@ import { DividerModule } from 'primeng/divider';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
 
 import {
   HeaderComponent,
@@ -50,6 +51,9 @@ export * from './components';
     CommonModule,
     FormsModule,
     HttpClientModule,
+    ReactiveFormsModule,
+    FormlyModule,
+    SharedModule,
     ButtonModule,
     ToastModule,
     MenubarModule,
@@ -59,9 +63,7 @@ export * from './components';
     DividerModule,
     InputTextModule,
     CardModule,
-    ReactiveFormsModule,
-    FormlyModule,
-    SharedModule
+    TooltipModule
   ],
   exports: [
     HeaderComponent,

@@ -120,11 +120,9 @@ export class OptionDialogComponent {
           .subscribe(res => {
             this.formControlName.setValue(res?.name);
             this.formControlQuery.setValue(res?.queryText);
-            this.visible = true;
           });
-      } else {
-        this.visible = true;
       }
+      this.visible = true;
     } else {
       if (this.value.options && this.value.options?.length > 0) {
         this.optionArr = this.value.options.map(item => {

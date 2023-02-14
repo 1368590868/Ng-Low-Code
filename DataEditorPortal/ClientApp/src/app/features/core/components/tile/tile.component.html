@@ -5,7 +5,8 @@
     <div
       class="tile-block bg-white m-3 p-2 flex flex-column align-items-center cursor-pointer shadow-2"
       *ngFor="let menu of homeMenus"
-      [routerLink]="menu?.url">
+      [routerLink]="menu?.url"
+      [pTooltip]="menu.description || ''">
       <i [class]="menu.icon" class="text-7xl text-primary my-5"></i>
       <div class="font-semibold text-xl text-left" [title]="menu.label">
         {{ menu?.label }}
