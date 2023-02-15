@@ -99,7 +99,9 @@
         </td>
 
         <td *ngFor="let col of columns" [title]="data[col.field]">
-          <span *ngIf="!col.template">{{ data[col.field] }}</span>
+          <span *ngIf="!col.template">
+            {{ data[col.field] | booleanText }}
+          </span>
         </td>
       </tr>
     </ng-template>
