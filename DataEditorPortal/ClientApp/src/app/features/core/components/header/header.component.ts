@@ -21,7 +21,8 @@ export class HeaderComponent implements OnInit {
     this.items = [
       {
         label: 'Home',
-        routerLink: ['/']
+        routerLink: ['/'],
+        routerLinkActiveOptions: { exact: true }
       },
       {
         label: 'About',
