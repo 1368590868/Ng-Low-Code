@@ -67,6 +67,9 @@ export class OptionDialogComponent {
       }
     });
     monaco.editor.setTheme('myTheme');
+    setTimeout(() => {
+      this.formControlQuery.markAsPristine();
+    });
   }
 
   changeMode() {
@@ -85,12 +88,8 @@ export class OptionDialogComponent {
             this.formControlQuery.setValue(res?.queryText);
           });
       } else {
-        this.formControlName.setValue(null);
-        this.formControlQuery.setValue(null);
-        setTimeout(() => {
-          this.formControlName.setErrors(null);
-          this.formControlQuery.setErrors(null);
-        }, 100);
+        this.formControlName.reset();
+        this.formControlQuery.reset();
       }
     }
   }
