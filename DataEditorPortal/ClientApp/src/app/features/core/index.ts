@@ -17,6 +17,10 @@ import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TableModule } from 'primeng/table';
+import { SkeletonModule } from 'primeng/skeleton';
+import { MenuModule } from 'primeng/menu';
 
 import {
   HeaderComponent,
@@ -28,8 +32,11 @@ import {
   LoginComponent,
   ErrorPageComponent,
   SiteSettingsComponent,
-  PersonalDialogComponent
+  PersonalDialogComponent,
+  DataDictionaryComponent,
+  AddDictionaryDialogComponent
 } from './components';
+
 import { SharedModule } from 'src/app/shared';
 
 export * from './components';
@@ -45,7 +52,9 @@ export * from './components';
     LoginComponent,
     ErrorPageComponent,
     SiteSettingsComponent,
-    PersonalDialogComponent
+    PersonalDialogComponent,
+    DataDictionaryComponent,
+    AddDictionaryDialogComponent
   ],
   imports: [
     CommonModule,
@@ -63,7 +72,11 @@ export * from './components';
     DividerModule,
     InputTextModule,
     CardModule,
-    TooltipModule
+    TooltipModule,
+    ConfirmDialogModule,
+    TableModule,
+    SkeletonModule,
+    MenuModule
   ],
   exports: [
     HeaderComponent,

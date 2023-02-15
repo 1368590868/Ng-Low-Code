@@ -1,18 +1,20 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MenuItem, ConfirmationService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { NotifyService } from 'src/app/shared';
-import { DictionaryData } from '../../models/dictionary';
-import { PortalDictionaryService } from '../../services/portal-dictionary.service';
+import {
+  DictionaryData,
+  NotifyService,
+  DataDictionaryService
+} from 'src/app/shared';
 import { AddDictionaryDialogComponent } from './add-dictionary-dialog/add-dictionary-dialog.component';
 
 @Component({
-  selector: 'app-portal-dictionary',
-  templateUrl: './portal-dictionary.component.html',
-  styleUrls: ['./portal-dictionary.component.scss'],
+  selector: 'app-data-dictionary',
+  templateUrl: './data-dictionary.component.html',
+  styleUrls: ['./data-dictionary.component.scss'],
   providers: [ConfirmationService]
 })
-export class PortalDictionaryComponent implements OnInit {
+export class DataDictionaryComponent implements OnInit {
   @ViewChild('addDialog') addDialog!: AddDictionaryDialogComponent;
   public data: DictionaryData[] = [];
   contextMenuItems: MenuItem[] = [
@@ -27,7 +29,7 @@ export class PortalDictionaryComponent implements OnInit {
   ];
 
   constructor(
-    private portalDictionaryService: PortalDictionaryService,
+    private dataDictionaryService: DataDictionaryService,
     private notifyService: NotifyService,
     private confirmationService: ConfirmationService
   ) {}
@@ -37,7 +39,7 @@ export class PortalDictionaryComponent implements OnInit {
   }
 
   getDictionaryList() {
-    this.portalDictionaryService.getDictionaryList().subscribe(res => {
+    this.dataDictionaryService.getDictionaryList().subscribe(res => {
       this.data = res;
     });
   }
@@ -81,17 +83,15 @@ export class PortalDictionaryComponent implements OnInit {
       icon: 'pi pi-info-circle',
 
       accept: () => {
-        this.portalDictionaryService
-          .deleteDictionary(rowData)
-          .subscribe(res => {
-            if (!res.isError) {
-              this.notifyService.notifySuccess(
-                'Success',
-                'Record deleted successfully'
-              );
-              this.getDictionaryList();
-            }
-          });
+        this.dataDictionaryService.deleteDictionary(rowData).subscribe(res => {
+          if (!res.isError) {
+            this.notifyService.notifySuccess(
+              'Success',
+              'Record deleted successfully'
+            );
+            this.getDictionaryList();
+          }
+        });
       }
     });
   }

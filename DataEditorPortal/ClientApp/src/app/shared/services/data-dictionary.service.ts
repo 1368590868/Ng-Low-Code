@@ -7,7 +7,7 @@ import { DictionaryData } from '../models/dictionary';
 @Injectable({
   providedIn: 'root'
 })
-export class PortalDictionaryService {
+export class DataDictionaryService {
   public _apiUrl: string;
 
   constructor(

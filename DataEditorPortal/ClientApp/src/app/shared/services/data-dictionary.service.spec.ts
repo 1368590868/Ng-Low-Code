@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { PortalDictionaryService } from './portal-dictionary.service';
+import { DataDictionaryService } from './data-dictionary.service';
 
 describe('PortalDictionaryService', () => {
-  let service: PortalDictionaryService;
+  let service: DataDictionaryService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(PortalDictionaryService);
+    service = TestBed.inject(DataDictionaryService);
   });
 
   it('should be created', () => {

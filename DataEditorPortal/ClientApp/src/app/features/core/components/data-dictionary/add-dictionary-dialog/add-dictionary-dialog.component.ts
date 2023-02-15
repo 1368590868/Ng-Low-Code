@@ -7,9 +7,11 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { NotifyService } from 'src/app/shared';
-import { DictionaryData } from '../../../models/dictionary';
-import { PortalDictionaryService } from '../../../services/portal-dictionary.service';
+import {
+  DictionaryData,
+  NotifyService,
+  DataDictionaryService
+} from 'src/app/shared';
 
 @Component({
   selector: 'app-add-dictionary-dialog',
@@ -97,7 +99,7 @@ export class AddDictionaryDialogComponent {
   ];
 
   constructor(
-    private portalDictionaryService: PortalDictionaryService,
+    private dataDictionaryService: DataDictionaryService,
     private notifyService: NotifyService
   ) {}
   showDialog() {
@@ -122,7 +124,7 @@ export class AddDictionaryDialogComponent {
     if (this.form.valid) {
       this.isLoading = true;
       if (model['id']) {
-        this.portalDictionaryService.updateDictionary(model).subscribe(res => {
+        this.dataDictionaryService.updateDictionary(model).subscribe(res => {
           if (!res.isError && res.result) {
             this.notifyService.notifySuccess(
               'Success',
@@ -135,7 +137,7 @@ export class AddDictionaryDialogComponent {
           }
         });
       } else {
-        this.portalDictionaryService.createDictionary(model).subscribe(res => {
+        this.dataDictionaryService.createDictionary(model).subscribe(res => {
           if (!res.isError && res.result) {
             this.notifyService.notifySuccess(
               'Success',

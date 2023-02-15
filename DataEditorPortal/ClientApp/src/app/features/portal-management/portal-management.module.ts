@@ -55,8 +55,6 @@ import { UniversalGridActionModule } from 'src/app/features/universal-grid-actio
 import { OptionDialogComponent } from './components/option-dialog/option-dialog.component';
 import { CustomActionsComponent } from './components/custom-actions/custom-actions.component';
 import { SearchRuleComponent } from './components/search-rule/search-rule.component';
-import { PortalDictionaryComponent } from './components/portal-dictionary/portal-dictionary.component';
-import { AddDictionaryDialogComponent } from './components/portal-dictionary/add-dictionary-dialog/add-dictionary-dialog.component';
 
 @NgModule({
   declarations: [
@@ -71,9 +69,7 @@ import { AddDictionaryDialogComponent } from './components/portal-dictionary/add
     SvgDragComponent,
     OptionDialogComponent,
     CustomActionsComponent,
-    SearchRuleComponent,
-    PortalDictionaryComponent,
-    AddDictionaryDialogComponent
+    SearchRuleComponent
   ],
   imports: [
     CommonModule,

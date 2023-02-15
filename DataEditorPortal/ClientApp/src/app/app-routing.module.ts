@@ -6,7 +6,8 @@ import {
   ErrorPageComponent,
   LoginComponent,
   TileComponent,
-  SiteSettingsComponent
+  SiteSettingsComponent,
+  DataDictionaryComponent
 } from './features/core';
 import { RouterGuard } from './shared';
 
@@ -18,6 +19,11 @@ const routes: Routes = [
   {
     path: 'site-settings',
     component: SiteSettingsComponent,
+    canActivate: [RouterGuard]
+  },
+  {
+    path: 'data-dictionary',
+    component: DataDictionaryComponent,
     canActivate: [RouterGuard]
   },
   {
