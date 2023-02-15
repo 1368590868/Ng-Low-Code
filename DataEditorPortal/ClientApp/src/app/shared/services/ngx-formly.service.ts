@@ -46,11 +46,13 @@ export class NgxFormlyService {
               if (field.type === 'multiSelect' && field.formControl?.value) {
                 const control = field.formControl as FormControl;
                 if (control.value) {
-                  let data = control.value || [];
-                  data = data.filter((x: any) =>
-                    result.find(o => o.value === x)
+                  const data = control.value || [];
+                  const filteredData = data.filter(
+                    (x: any) => !!result.find(o => o.value === x)
                   );
-                  field.formControl.setValue(data);
+                  if (filteredData.length < data.length)
+                    field.formControl.setValue(filteredData);
+                  else field.formControl.setValue(data, { emitEvent: false });
                 }
               }
             }
