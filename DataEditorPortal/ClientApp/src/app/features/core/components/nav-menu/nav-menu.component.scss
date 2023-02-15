@@ -10,19 +10,36 @@
   ::ng-deep .p-menubar {
     padding-top: 0.125rem;
     padding-bottom: 0.125rem;
+
     .p-menuitem-link {
-      border-radius: 0;
+      border-radius: var(--border-radius);
       padding-top: 0.875rem;
       .p-menuitem-text,
       .p-submenu-icon {
         color: var(--menuitem-text-color);
         font-size: 0.875rem;
       }
+      .p-menuitem-icon {
+        color: var(--menuitem-text-color);
+      }
     }
     .p-submenu-list {
       z-index: 999;
       border-radius: var(--border-radius);
       margin-top: 0.125rem;
+      .p-menuitem-link {
+        border-radius: 0;
+      }
+    }
+
+    .p-menuitem-link-active,
+    .active-parent-menu > a {
+      background-color: #eef2ff !important;
+      .p-menuitem-text,
+      .p-submenu-icon,
+      .p-menuitem-icon {
+        color: #4438ca !important;
+      }
     }
   }
 }
