@@ -13,11 +13,14 @@
 
     .p-menuitem-link {
       border-radius: var(--border-radius);
-      padding-top: 0.875rem;
+      padding-top: 0.625rem;
+      padding-bottom: 0.5rem;
+
       .p-menuitem-text,
       .p-submenu-icon {
         color: var(--menuitem-text-color);
         font-size: 0.875rem;
+        line-height: 1.5rem;
       }
       .p-menuitem-icon {
         color: var(--menuitem-text-color);

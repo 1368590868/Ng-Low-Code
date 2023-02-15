@@ -53,6 +53,11 @@ export class NavMenuComponent implements OnInit {
       menu.url = menu.link;
     } else menu.routerLink = menu.link;
 
+    if (menu.status !== 1) {
+      menu.badge = 'Draft';
+      menu.badgeStyleClass = 'p-badge p-badge-warning';
+    }
+
     menu.items &&
       menu.items.forEach(i => {
         this.setMenu(i);
