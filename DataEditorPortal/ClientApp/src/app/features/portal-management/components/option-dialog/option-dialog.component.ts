@@ -64,6 +64,9 @@ export class OptionDialogComponent implements ControlValueAccessor {
       this.options = val;
     } else if (val) {
       this.optionLookup = val;
+    } else {
+      this.options = [];
+      this.optionLookup = undefined;
     }
     this.onChange?.(val);
     this.onTouch?.(val);
