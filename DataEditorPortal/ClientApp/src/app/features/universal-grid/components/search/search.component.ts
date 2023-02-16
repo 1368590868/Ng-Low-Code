@@ -49,7 +49,10 @@ export class SearchComponent implements OnInit, OnDestroy {
                 x.props['optionLookup']
             )
             .forEach(f => {
-              if (f.props) f.props.placeholder = 'Please Select';
+              if (f.props) {
+                f.props.placeholder = 'Please Select';
+                if (!f.props.options) f.props.options = [];
+              }
               f.hooks = {
                 onInit: field => {
                   if (

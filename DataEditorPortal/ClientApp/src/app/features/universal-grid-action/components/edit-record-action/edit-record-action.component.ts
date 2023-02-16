@@ -69,6 +69,7 @@ export class EditRecordActionComponent
             .forEach(f => {
               if (f.props) {
                 f.props.placeholder = 'Please Select';
+                if (!f.props.options) f.props.options = [];
               }
               f.hooks = {
                 onInit: field => {

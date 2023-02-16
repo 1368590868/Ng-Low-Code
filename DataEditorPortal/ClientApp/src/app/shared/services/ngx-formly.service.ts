@@ -36,10 +36,6 @@ export class NgxFormlyService {
                   const notExist = !result.find(o => o.value === control.value);
                   if (notExist) {
                     control.setValue(null);
-                  } else {
-                    control.setValue(control.value, {
-                      emitEvent: false
-                    });
                   }
                 }
               }
@@ -52,7 +48,6 @@ export class NgxFormlyService {
                   );
                   if (filteredData.length < data.length)
                     field.formControl.setValue(filteredData);
-                  else field.formControl.setValue(data, { emitEvent: false });
                 }
               }
             }

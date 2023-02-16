@@ -447,7 +447,7 @@ export class PortalEditFormComponent implements OnInit {
   optionValueChange(value: OptionValueModel) {
     if (value.isAdvanced) {
       this.model.props.optionLookup = value.optionLookup;
-      this.model.props.options = undefined;
+      this.model.props.options = [];
     } else {
       this.model.props.optionLookup = undefined;
       this.model.props.options = value.options;
