@@ -64,6 +64,7 @@ export interface GridSearchField {
   searchRule: {
     field: string;
     matchMode?: string;
+    whereClause?: string;
   };
   filterType: string;
 }

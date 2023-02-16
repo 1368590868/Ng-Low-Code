@@ -57,7 +57,10 @@ import {
   OptionDialogComponent
 } from './components/option-dialog/option-dialog.component';
 import { CustomActionsComponent } from './components/custom-actions/custom-actions.component';
-import { SearchRuleComponent } from './components/search-rule/search-rule.component';
+import {
+  FormlyFieldSearchRuleEditorComponent,
+  SearchRuleComponent
+} from './components/search-rule/search-rule.component';
 
 @NgModule({
   declarations: [
@@ -73,7 +76,8 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     OptionDialogComponent,
     CustomActionsComponent,
     SearchRuleComponent,
-    FormlyFieldOptionsEditorComponent
+    FormlyFieldOptionsEditorComponent,
+    FormlyFieldSearchRuleEditorComponent
   ],
   imports: [
     CommonModule,
@@ -87,6 +91,11 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
         {
           name: 'optionsEditor',
           component: FormlyFieldOptionsEditorComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'searchRuleEditor',
+          component: FormlyFieldSearchRuleEditorComponent,
           wrappers: ['form-field']
         }
       ]

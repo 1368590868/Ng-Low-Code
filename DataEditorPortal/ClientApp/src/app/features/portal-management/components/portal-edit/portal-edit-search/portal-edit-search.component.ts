@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PrimeNGConfig } from 'primeng/api';
@@ -8,7 +8,6 @@ import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { GridSearchField } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import { SearchRuleComponent } from '../../search-rule/search-rule.component';
 
 @Component({
   selector: 'app-portal-edit-search',
@@ -87,8 +86,8 @@ export class PortalEditSearchComponent implements OnInit {
         onInit: field => {
           field.formControl?.valueChanges
             .pipe(
-              distinctUntilChanged(),
               startWith(field.formControl.value),
+              distinctUntilChanged(),
               tap(value => {
                 if (field.parent?.get) {
                   const typeField = field.parent?.get('type');
@@ -128,7 +127,12 @@ export class PortalEditSearchComponent implements OnInit {
               startWith(field.formControl.value),
               distinctUntilChanged(),
               tap(() => {
-                this.setFilterMatchOptionsAndValue();
+                // update filter match Mode options
+                const searchRuleField = field.parent?.get?.('searchRule');
+                if (searchRuleField && searchRuleField.props) {
+                  searchRuleField.props.options =
+                    this.getFilterMatchModeOptions(field.parent?.model);
+                }
               })
             )
             .subscribe();
@@ -189,16 +193,26 @@ export class PortalEditSearchComponent implements OnInit {
           }
         }
       ]
+    },
+    {
+      wrappers: ['divider'],
+      props: {
+        label: 'Search Rule'
+      }
+    },
+    {
+      key: 'searchRule',
+      type: 'searchRuleEditor',
+      props: {
+        options: []
+      }
     }
   ];
-  filterMatchModeOptions: any[] = [];
-  formControlSearchRule: FormControl = new FormControl();
 
   constructor(
     private primeNGConfig: PrimeNGConfig,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef,
     private portalItemService: PortalItemService,
     private notifyService: NotifyService
   ) {}
@@ -238,10 +252,6 @@ export class PortalEditSearchComponent implements OnInit {
       });
 
       this.portalItemService.saveCurrentStep('search');
-
-      this.formControlSearchRule.valueChanges
-        .pipe(tap(val => (this.model.searchRule.matchMode = val)))
-        .subscribe();
     }
   }
 
@@ -263,7 +273,6 @@ export class PortalEditSearchComponent implements OnInit {
   onTargetSelect({ items }: { items: GridSearchField[] }) {
     if (items.length === 1) {
       this.model = items[0];
-      this.setFilterMatchOptionsAndValue();
 
       // update depends on options
       this.options.formState.dependOnOptions = this.targetColumns
@@ -278,16 +287,6 @@ export class PortalEditSearchComponent implements OnInit {
     } else {
       this.model = {};
     }
-  }
-
-  setFilterMatchOptionsAndValue() {
-    const cacheSearchRule = this.model.searchRule.matchMode;
-    setTimeout(() => {
-      this.filterMatchModeOptions = this.getFilterMatchModeOptions();
-      setTimeout(() => {
-        this.formControlSearchRule.setValue(cacheSearchRule);
-      });
-    });
   }
 
   valid() {
@@ -356,9 +355,9 @@ export class PortalEditSearchComponent implements OnInit {
     });
   }
 
-  getFilterMatchModeOptions() {
-    const filterType = this.model.filterType;
-    const type = this.model.type;
+  getFilterMatchModeOptions(model: any) {
+    const filterType = model.filterType;
+    const type = model.type;
 
     if (type === 'multiSelect' || type === 'checkboxList')
       return [{ label: 'In selected values', value: 'in' }];
@@ -372,14 +371,5 @@ export class PortalEditSearchComponent implements OnInit {
 
   cloneColumn(column: any) {
     return [JSON.parse(JSON.stringify(column))];
-  }
-
-  openSearchRuleDialog(searchRuleDialog: SearchRuleComponent) {
-    searchRuleDialog.value = this.model.searchRule.whereClause;
-    searchRuleDialog.showDialog();
-  }
-
-  searchRuleValueChange(value: string) {
-    this.model.searchRule.whereClause = value;
   }
 }

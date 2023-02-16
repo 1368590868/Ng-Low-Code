@@ -81,3 +81,23 @@ formly-form {
 .p-dialog .p-dialog-footer {
   padding: 1.5rem 1.5rem 1.5rem 1.5rem;
 }
+
+.monaco-editor-wrapper {
+  background-color: #eeeeee;
+  border: 1px solid #ced4da;
+  transition: var(--transition-duration);
+  margin-bottom: 0.25rem;
+
+  &.ng-dirty.ng-invalid {
+    border-color: #e24c4c;
+  }
+  &:focus-within {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2rem #c7d2fe;
+    border-color: var(--primary-color);
+  }
+  &:hover {
+    border-color: var(--primary-color);
+  }
+}

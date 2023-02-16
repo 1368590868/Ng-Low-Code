@@ -1,6 +1,15 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { NotifyService } from 'src/app/shared';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit
+} from '@angular/core';
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR
+} from '@angular/forms';
+import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 
 export interface SaveData {
   label: string;
@@ -8,21 +17,33 @@ export interface SaveData {
 @Component({
   selector: 'app-search-rule',
   templateUrl: './search-rule.component.html',
-  styleUrls: ['./search-rule.component.scss']
+  styleUrls: ['./search-rule.component.scss'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: SearchRuleComponent,
+      multi: true
+    }
+  ]
 })
-export class SearchRuleComponent {
-  @Output() valueChange: EventEmitter<string> = new EventEmitter<string>();
-  @Input() value?: string;
+export class SearchRuleComponent implements ControlValueAccessor, OnInit {
+  @Input()
+  set options(val: any[]) {
+    this._options = val;
+    const matchMode = this.formControlMatchMode.value;
+    if (!matchMode || !this._options.find(x => x.value === matchMode)) {
+      // setTimeout(() => {
+      this.formControlMatchMode.setValue(val[0].value);
+      // });
+    }
+  }
+  _options: any[] = [];
 
-  public visible = false;
-  public buttonDisabled = false;
-  public isLoading = false;
-
-  public dialogStyle: any = {
+  visible = false;
+  dialogStyle: any = {
     minWidth: '40rem'
   };
-
-  public editorOptions = {
+  editorOptions = {
     theme: 'vs-studio',
     language: 'sql',
     lineNumbers: 'off',
@@ -35,15 +56,62 @@ export class SearchRuleComponent {
       horizontalScrollbarSize: 7
     }
   };
-
-  formControlQuery: FormControl = new FormControl();
-
   helperMessage =
     '-- Enter the where clause, which will be used to filter data. \r\n' +
     '-- Use ##VALUE## to reference the field value. \r\n' +
     '-- E.g. \r\n' +
     '--      FirstName = ##VALUE## \r\n' +
-    "--      FirstName LIKE '%##VALUE##%'";
+    "--      FirstName LIKE  ##VALUE## + '%'";
+
+  formControlMatchMode: FormControl = new FormControl();
+  formControlQuery: FormControl = new FormControl();
+  field?: string;
+  disabled = false;
+
+  _whereClause?: string;
+  get whereClause() {
+    return this._whereClause;
+  }
+  set whereClause(val: string | undefined) {
+    this._whereClause = val;
+    this.onChange?.({
+      field: this.field,
+      whereClause: val
+    });
+  }
+  onChange?: any;
+  onTouch?: any;
+
+  set value(val: { field: string; matchMode?: string; whereClause?: string }) {
+    if (val) {
+      this.field = val.field;
+      this.formControlMatchMode.setValue(val.matchMode, { emitEvent: false });
+      this._whereClause = val.whereClause;
+    }
+    this.onChange?.(val);
+    this.onTouch?.(val);
+  }
+  writeValue(value: any): void {
+    this.value = value;
+  }
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: any): void {
+    this.onTouch = fn;
+  }
+  setDisabledState?(isDisabled: boolean): void {
+    this.disabled = isDisabled;
+  }
+
+  ngOnInit(): void {
+    this.formControlMatchMode.valueChanges.subscribe(val => {
+      this.onChange?.({
+        field: this.field,
+        matchMode: val
+      });
+    });
+  }
 
   onMonacoInit() {
     monaco.editor.defineTheme('myTheme', {
@@ -59,17 +127,14 @@ export class SearchRuleComponent {
 
   showDialog() {
     this.visible = true;
-    if (this.value) this.formControlQuery.setValue(this.value);
+    this.formControlQuery.reset();
+    if (this.whereClause) this.formControlQuery.setValue(this.whereClause);
     else this.formControlQuery.setValue(this.helperMessage);
-    setTimeout(() => {
-      this.formControlQuery.setErrors(null);
-    }, 100);
   }
 
   onOk() {
-    this.formControlQuery.updateValueAndValidity();
     if (this.formControlQuery.valid) {
-      this.valueChange.emit(this.formControlQuery.value);
+      this.whereClause = this.formControlQuery.value;
       this.visible = false;
     } else {
       this.formControlQuery.markAsDirty();
@@ -80,3 +145,20 @@ export class SearchRuleComponent {
     this.visible = false;
   }
 }
+
+@Component({
+  selector: 'app-formly-field-search-rule',
+  template: `
+    <app-search-rule
+      [formControl]="formControl"
+      [formlyAttributes]="field"
+      [options]="props.options"
+      (onChange)="
+        props.change && props.change(field, $event)
+      "></app-search-rule>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class FormlyFieldSearchRuleEditorComponent extends FieldType<
+  FieldTypeConfig<FormlyFieldProps & { options: any[] }>
+> {}

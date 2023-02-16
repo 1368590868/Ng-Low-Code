@@ -1,3 +1,30 @@
+<div class="flex align-items-center">
+  <p-dropdown
+    *ngIf="!whereClause"
+    [formControl]="formControlMatchMode"
+    class="mr-2 flex-grow-1"
+    styleClass="w-full"
+    appendTo="body"
+    placeholder="Please Select"
+    [options]="_options"></p-dropdown>
+  <p-message
+    *ngIf="whereClause"
+    severity="info"
+    text="Use Query Text"
+    styleClass="mr-2"></p-message>
+  <p-button
+    *ngIf="whereClause"
+    styleClass="p-button-text p-button-rounded remove-btn"
+    icon="pi pi-times-circle"
+    (onClick)="whereClause = undefined"></p-button>
+  <p-button
+    class="ml-auto"
+    title="Advanced Configuration"
+    styleClass="p-button-text p-button-rounded"
+    icon="pi pi-ellipsis-v"
+    (onClick)="showDialog()"></p-button>
+</div>
+
 <p-dialog
   header="Search Rule Configuration"
   [(visible)]="visible"
@@ -31,11 +58,6 @@
       (onClick)="onCancel()"
       label="Cancle"
       styleClass="p-button-text"></p-button>
-    <p-button
-      icon="pi pi-check"
-      (onClick)="onOk()"
-      label="Ok"
-      [disabled]="buttonDisabled"
-      [loading]="isLoading"></p-button>
+    <p-button icon="pi pi-check" (onClick)="onOk()" label="Ok"></p-button>
   </ng-template>
 </p-dialog>
