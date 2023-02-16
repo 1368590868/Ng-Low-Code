@@ -18,10 +18,6 @@ import {
   DataSourceTableColumn
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import {
-  OptionDialogComponent,
-  OptionValueModel
-} from '../../option-dialog/option-dialog.component';
 
 @Component({
   selector: 'app-portal-edit-form',
@@ -91,7 +87,11 @@ export class PortalEditFormComponent implements OnInit {
     }
   ];
   form = new FormGroup({});
-  options: FormlyFormOptions = {};
+  options: FormlyFormOptions = {
+    formState: {
+      dependOnOptions: []
+    }
+  };
   model: any = {};
   fields: FormlyFieldConfig[] = [
     {
@@ -218,6 +218,31 @@ export class PortalEditFormComponent implements OnInit {
           }
         },
         {
+          key: 'optionsLookup',
+          type: 'optionsEditor',
+          props: {
+            label: 'Options'
+          },
+          expressions: {
+            hide: `['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(field.parent.parent.model.type) < 0`
+          }
+        },
+        {
+          key: 'dependOnFields',
+          type: 'multiSelect',
+          defaultValue: [],
+          props: {
+            label: 'Depends on',
+            placeholder: 'Select fields',
+            showHeader: false,
+            filter: false
+          },
+          expressions: {
+            hide: `!field.parent.model.optionsLookup || Array.isArray(field.parent.model.optionsLookup)`,
+            'props.options': `formState.dependOnOptions`
+          }
+        },
+        {
           key: 'maxFractionDigits',
           type: 'inputNumber',
           defaultValue: 2,
@@ -226,6 +251,18 @@ export class PortalEditFormComponent implements OnInit {
             maxFractionDigits: 0,
             max: 4,
             min: 0
+          },
+          expressions: {
+            hide: `'inputNumber' !== field.parent.parent.model.type`
+          }
+        },
+        {
+          key: 'max',
+          type: 'inputNumber',
+          defaultValue: 2,
+          props: {
+            label: 'Max',
+            maxFractionDigits: 0
           },
           expressions: {
             hide: `'inputNumber' !== field.parent.parent.model.type`
@@ -319,6 +356,17 @@ export class PortalEditFormComponent implements OnInit {
   onTargetSelect({ items }: { items: GridFormField[] }) {
     if (items.length === 1) {
       this.model = items[0];
+
+      // update depends on options
+      this.options.formState.dependOnOptions = this.targetColumns
+        .filter(
+          x =>
+            x.key !== items[0].key &&
+            ['select', 'multiSelect'].indexOf(x.type) >= 0
+        )
+        .map(x => {
+          return { label: x.key, value: x.key };
+        });
     } else {
       this.model = {};
     }
@@ -433,25 +481,5 @@ export class PortalEditFormComponent implements OnInit {
       return !dbCol.allowDBNull && !(dbCol.isAutoIncrement || dbCol.isIdentity);
     }
     return true;
-  }
-
-  openOptionDialog(optionDialog: OptionDialogComponent) {
-    optionDialog.value = {
-      isAdvanced: !!this.model.props.optionLookup,
-      optionLookup: this.model.props.optionLookup,
-      options: this.model.props.options
-    };
-    optionDialog.showDialog();
-  }
-
-  optionValueChange(value: OptionValueModel) {
-    if (value.isAdvanced) {
-      this.model.props.optionLookup = value.optionLookup;
-      this.model.props.options = [];
-    } else {
-      this.model.props.optionLookup = undefined;
-      this.model.props.options = value.options;
-      this.model.props.dependOnFields = [];
-    }
   }
 }
