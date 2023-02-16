@@ -8,10 +8,6 @@ import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { GridSearchField } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import {
-  OptionDialogComponent,
-  OptionValueModel
-} from '../../option-dialog/option-dialog.component';
 import { SearchRuleComponent } from '../../search-rule/search-rule.component';
 
 @Component({
@@ -77,7 +73,11 @@ export class PortalEditSearchComponent implements OnInit {
     }
   ];
   form = new FormGroup({});
-  options: FormlyFormOptions = {};
+  options: FormlyFormOptions = {
+    formState: {
+      dependOnOptions: []
+    }
+  };
   model: any = {};
   fields: FormlyFieldConfig[] = [
     {
@@ -162,6 +162,31 @@ export class PortalEditSearchComponent implements OnInit {
           expressions: {
             hide: `['checkbox', 'radio', 'checkboxList'].indexOf(field.parent.parent.model.type) >= 0`
           }
+        },
+        {
+          key: 'optionsLookup',
+          type: 'optionsEditor',
+          props: {
+            label: 'Options'
+          },
+          expressions: {
+            hide: `['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(field.parent.parent.model.type) < 0`
+          }
+        },
+        {
+          key: 'dependOnFields',
+          type: 'multiSelect',
+          defaultValue: [],
+          props: {
+            label: 'Depends on',
+            placeholder: 'Select fields',
+            showHeader: false,
+            filter: false
+          },
+          expressions: {
+            hide: `!field.parent.model.optionsLookup || Array.isArray(field.parent.model.optionsLookup)`,
+            'props.options': `formState.dependOnOptions`
+          }
         }
       ]
     }
@@ -239,6 +264,17 @@ export class PortalEditSearchComponent implements OnInit {
     if (items.length === 1) {
       this.model = items[0];
       this.setFilterMatchOptionsAndValue();
+
+      // update depends on options
+      this.options.formState.dependOnOptions = this.targetColumns
+        .filter(
+          x =>
+            x.key !== items[0].key &&
+            ['select', 'multiSelect'].indexOf(x.type) >= 0
+        )
+        .map(x => {
+          return { label: x.key, value: x.key };
+        });
     } else {
       this.model = {};
     }
@@ -336,26 +372,6 @@ export class PortalEditSearchComponent implements OnInit {
 
   cloneColumn(column: any) {
     return [JSON.parse(JSON.stringify(column))];
-  }
-
-  openOptionDialog(optionDialog: OptionDialogComponent) {
-    optionDialog.value = {
-      isAdvanced: !!this.model.props.optionLookup,
-      optionLookup: this.model.props.optionLookup,
-      options: this.model.props.options
-    };
-    optionDialog.showDialog();
-  }
-
-  optionValueChange(value: OptionValueModel) {
-    if (value.isAdvanced) {
-      this.model.props.optionLookup = value.optionLookup;
-      this.model.props.options = [];
-    } else {
-      this.model.props.optionLookup = undefined;
-      this.model.props.options = value.options;
-      this.model.props.dependOnFields = [];
-    }
   }
 
   openSearchRuleDialog(searchRuleDialog: SearchRuleComponent) {

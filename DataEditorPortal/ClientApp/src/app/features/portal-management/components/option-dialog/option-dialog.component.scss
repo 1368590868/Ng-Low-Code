@@ -38,8 +38,14 @@
 
 .monaco-editor-wrapper {
   background-color: #eeeeee;
-  border: 1px solid transparent;
+  border: 1px solid #ced4da;
   &.ng-dirty.ng-invalid {
     border-color: #e24c4c;
+  }
+  &:focus-within {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2rem #c7d2fe;
+    border-color: var(--primary-color);
   }
 }

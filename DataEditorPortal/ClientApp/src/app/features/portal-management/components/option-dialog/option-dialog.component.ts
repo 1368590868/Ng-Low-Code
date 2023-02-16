@@ -1,5 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  FormControl,
+  ControlValueAccessor,
+  NG_VALUE_ACCESSOR
+} from '@angular/forms';
+import { FieldType, FieldTypeConfig } from '@ngx-formly/core';
 import { LookupService } from '../../services/lookup.service';
 
 interface OptionItem {
@@ -7,38 +12,34 @@ interface OptionItem {
   label?: string;
 }
 
-export interface OptionValueModel {
-  options?: { label: string }[];
-  isAdvanced?: boolean;
-  optionLookup?: string;
-}
-
 @Component({
   selector: 'app-option-dialog',
   templateUrl: './option-dialog.component.html',
-  styleUrls: ['./option-dialog.component.scss']
+  styleUrls: ['./option-dialog.component.scss'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: OptionDialogComponent,
+      multi: true
+    }
+  ]
 })
-export class OptionDialogComponent {
-  public optionArr: OptionItem[] = [];
-  @Output() valueChange: EventEmitter<OptionValueModel> =
-    new EventEmitter<OptionValueModel>();
+export class OptionDialogComponent implements ControlValueAccessor {
+  isAdvanced = false;
+  optionLookup?: string;
+  options: any[] = [];
+  onChange?: any;
+  onTouch?: any;
+  disabled = false;
 
-  @Input()
-  value: OptionValueModel = {
-    isAdvanced: false,
-    options: []
-  };
-
-  public visible = false;
-  public buttonDisabled = false;
-  public isLoading = false;
-  public advanced = false;
-
-  public dialogStyle: any = {
+  visible = false;
+  buttonDisabled = false;
+  isLoading = false;
+  dialogStyle: any = {
     minWidth: '40rem'
   };
 
-  public editorOptions = {
+  editorOptions = {
     theme: 'vs-studio',
     language: 'sql',
     lineNumbers: 'off',
@@ -52,10 +53,33 @@ export class OptionDialogComponent {
     }
   };
 
+  formControlOptions: OptionItem[] = [];
   formControlName: FormControl = new FormControl();
   formControlQuery: FormControl = new FormControl();
 
   constructor(private lookupService: LookupService) {}
+
+  set value(val: string | any[]) {
+    if (Array.isArray(val)) {
+      this.options = val;
+    } else if (val) {
+      this.optionLookup = val;
+    }
+    this.onChange?.(val);
+    this.onTouch?.(val);
+  }
+  writeValue(value: any): void {
+    this.value = value;
+  }
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: any): void {
+    this.onTouch = fn;
+  }
+  setDisabledState?(isDisabled: boolean): void {
+    this.disabled = isDisabled;
+  }
 
   onMonacoInit() {
     monaco.editor.defineTheme('myTheme', {
@@ -73,116 +97,110 @@ export class OptionDialogComponent {
   }
 
   changeMode() {
-    this.advanced = !this.advanced;
-    if (this.advanced) {
+    this.isAdvanced = !this.isAdvanced;
+    if (this.isAdvanced) {
       this.dialogStyle = {
         minWidth: '50rem',
         minHeight: '20rem'
       };
-      if (this.value.optionLookup) {
-        this.lookupService
-          .getOptionQuery(this.value.optionLookup)
-          .subscribe(res => {
-            this.optionArr = [];
-            this.formControlName.setValue(res?.name);
-            this.formControlQuery.setValue(res?.queryText);
-          });
-      } else {
-        this.formControlName.reset();
-        this.formControlQuery.reset();
+      this.formControlName.reset();
+      this.formControlQuery.reset();
+      if (this.optionLookup) {
+        this.lookupService.getOptionQuery(this.optionLookup).subscribe(res => {
+          this.formControlOptions = [];
+          this.formControlName.setValue(res?.name);
+          this.formControlQuery.setValue(res?.queryText);
+        });
       }
     }
   }
 
   onRemoveFilter(filter: OptionItem) {
-    this.optionArr = this.optionArr.filter(item => item !== filter);
+    this.formControlOptions = this.formControlOptions.filter(
+      item => item !== filter
+    );
   }
 
   onAdd() {
-    this.optionArr = [...this.optionArr, { formControl: new FormControl() }];
+    this.formControlOptions = [
+      ...this.formControlOptions,
+      { formControl: new FormControl() }
+    ];
   }
 
   showDialog() {
-    if (!this.value) {
-      this.value = {
-        isAdvanced: false,
-        options: []
-      };
-    }
-    this.advanced = this.value.isAdvanced || false;
+    this.isAdvanced =
+      (!this.options || this.options.length === 0) && !!this.optionLookup;
 
-    if (this.advanced) {
-      this.optionArr = [];
-      if (this.value.optionLookup) {
-        this.lookupService
-          .getOptionQuery(this.value.optionLookup)
-          .subscribe(res => {
-            this.formControlName.setValue(res?.name);
-            this.formControlQuery.setValue(res?.queryText);
-          });
+    if (this.isAdvanced) {
+      this.formControlOptions = [];
+      if (this.optionLookup) {
+        this.lookupService.getOptionQuery(this.optionLookup).subscribe(res => {
+          this.formControlName.setValue(res?.name);
+          this.formControlQuery.setValue(res?.queryText);
+        });
       }
       this.visible = true;
     } else {
-      if (this.value.options && this.value.options?.length > 0) {
-        this.optionArr = this.value.options.map(item => {
+      if (this.options && this.options?.length > 0) {
+        this.formControlOptions = this.options.map(item => {
           return { ...item, formControl: new FormControl(item.label) };
         });
       } else {
-        this.optionArr = [];
+        this.formControlOptions = [];
       }
       this.visible = true;
     }
   }
 
   validate() {
-    if (this.advanced) {
-      this.formControlName.updateValueAndValidity();
+    if (this.isAdvanced) {
       if (!this.formControlName.valid) {
         this.formControlName.markAsDirty();
       }
-      this.formControlQuery.updateValueAndValidity();
       if (!this.formControlQuery.valid) {
         this.formControlQuery.markAsDirty();
       }
       return this.formControlName.valid && this.formControlQuery.valid;
     } else {
-      const existInvalid = this.optionArr
-        .map(item => {
-          item.formControl.markAsDirty();
-          return item.formControl.valid;
-        })
-        .find(item => item === false);
-      return !existInvalid;
+      const valid = this.formControlOptions.reduce((r, x) => {
+        if (!x.formControl.valid) {
+          x.formControl.markAsDirty();
+          x.formControl.updateValueAndValidity();
+        }
+        return r && x.formControl.valid;
+      }, true);
+
+      return valid;
     }
   }
 
   onOk() {
     if (this.validate()) {
-      if (this.advanced) {
+      if (this.isAdvanced) {
         this.lookupService
           .saveOptionQuery({
-            id: this.value.optionLookup || '',
+            id: this.optionLookup || '',
             name: this.formControlName.value,
             queryText: this.formControlQuery.value
           })
           .subscribe(res => {
             if (res && !res.isError) {
-              this.valueChange.emit({
-                isAdvanced: true,
-                optionLookup: res.result || ''
-              });
+              this.options = [];
+              this.optionLookup = res.result;
+              this.onChange(this.optionLookup);
               this.visible = false;
             }
           });
       } else {
-        this.valueChange.emit({
-          options: this.optionArr.map(item => {
-            return {
-              label: item.formControl.value,
-              value: item.formControl.value
-            };
-          })
+        this.optionLookup = undefined;
+        this.options = this.formControlOptions.map(item => {
+          return {
+            label: item.formControl.value,
+            value: item.formControl.value
+          };
         });
+        this.onChange(this.options);
         this.visible = false;
       }
     }
@@ -192,3 +210,19 @@ export class OptionDialogComponent {
     this.visible = false;
   }
 }
+
+@Component({
+  selector: 'app-formly-field-options-editor',
+  template: `
+    <app-option-dialog
+      [formControl]="formControl"
+      [formlyAttributes]="field"
+      (onChange)="
+        props.change && props.change(field, $event)
+      "></app-option-dialog>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class FormlyFieldOptionsEditorComponent extends FieldType<
+  FieldTypeConfig<any>
+> {}

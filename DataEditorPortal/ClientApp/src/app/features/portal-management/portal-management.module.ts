@@ -52,7 +52,10 @@ import {
 } from './components/portal-edit';
 
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
-import { OptionDialogComponent } from './components/option-dialog/option-dialog.component';
+import {
+  FormlyFieldOptionsEditorComponent,
+  OptionDialogComponent
+} from './components/option-dialog/option-dialog.component';
 import { CustomActionsComponent } from './components/custom-actions/custom-actions.component';
 import { SearchRuleComponent } from './components/search-rule/search-rule.component';
 
@@ -69,7 +72,8 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     SvgDragComponent,
     OptionDialogComponent,
     CustomActionsComponent,
-    SearchRuleComponent
+    SearchRuleComponent,
+    FormlyFieldOptionsEditorComponent
   ],
   imports: [
     CommonModule,
@@ -78,7 +82,15 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     FormsModule,
     MonacoEditorModule.forRoot(),
     ReactiveFormsModule,
-    FormlyModule,
+    FormlyModule.forChild({
+      types: [
+        {
+          name: 'optionsEditor',
+          component: FormlyFieldOptionsEditorComponent,
+          wrappers: ['form-field']
+        }
+      ]
+    }),
 
     // primeNg
     AnimateModule,
