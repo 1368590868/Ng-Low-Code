@@ -61,6 +61,11 @@ import {
   FormlyFieldSearchRuleEditorComponent,
   SearchRuleComponent
 } from './components/search-rule/search-rule.component';
+import { FormDesignerViewComponent } from './components/portal-edit/form-designer/form-designer-view.component';
+import {
+  FormDesignerConfigComponent,
+  FROM_DESIGNER_CONTROLS
+} from './components/portal-edit/form-designer/form-designer-config.component';
 
 @NgModule({
   declarations: [
@@ -77,7 +82,9 @@ import {
     CustomActionsComponent,
     SearchRuleComponent,
     FormlyFieldOptionsEditorComponent,
-    FormlyFieldSearchRuleEditorComponent
+    FormlyFieldSearchRuleEditorComponent,
+    FormDesignerViewComponent,
+    FormDesignerConfigComponent
   ],
   imports: [
     CommonModule,
@@ -129,6 +136,12 @@ import {
     ContextMenuModule,
     MessageModule,
     ConfirmDialogModule
+  ],
+  providers: [
+    {
+      provide: 'FROM_DESIGNER_CONTROLS',
+      useValue: FROM_DESIGNER_CONTROLS
+    }
   ]
 })
 export class PortalManagementModule {}
