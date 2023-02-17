@@ -10,6 +10,7 @@ import {
   NG_VALUE_ACCESSOR
 } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
+import { distinctUntilChanged, startWith } from 'rxjs';
 
 export interface SaveData {
   label: string;
@@ -30,12 +31,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   @Input()
   set options(val: any[]) {
     this._options = val;
-    const matchMode = this.formControlMatchMode.value;
-    if (!matchMode || !this._options.find(x => x.value === matchMode)) {
-      // setTimeout(() => {
-      this.formControlMatchMode.setValue(val[0].value);
-      // });
-    }
+    this.setFirstMatchModeIfEmpty(this.formControlMatchMode.value);
   }
   _options: any[] = [];
 
@@ -82,14 +78,25 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   onChange?: any;
   onTouch?: any;
 
+  setFirstMatchModeIfEmpty(matchMode?: string) {
+    if (!matchMode || !this._options.find(x => x.value === matchMode)) {
+      if (this._options.length > 0) {
+        this.formControlMatchMode.setValue(this._options[0].value);
+      } else {
+        this.formControlMatchMode.setValue(undefined);
+      }
+    }
+  }
+
   set value(val: { field: string; matchMode?: string; whereClause?: string }) {
     if (val) {
       this.field = val.field;
-      this.formControlMatchMode.setValue(val.matchMode, { emitEvent: false });
+      if (val.matchMode)
+        this.formControlMatchMode.setValue(val.matchMode, { emitEvent: false });
       this._whereClause = val.whereClause;
     }
-    this.onChange?.(val);
-    this.onTouch?.(val);
+    // this.onChange?.(val);
+    // this.onTouch?.(val);
   }
   writeValue(value: any): void {
     this.value = value;
@@ -105,12 +112,14 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   }
 
   ngOnInit(): void {
-    this.formControlMatchMode.valueChanges.subscribe(val => {
-      this.onChange?.({
-        field: this.field,
-        matchMode: val
+    this.formControlMatchMode.valueChanges
+      .pipe(startWith(this.formControlMatchMode.value), distinctUntilChanged())
+      .subscribe(val => {
+        this.onChange?.({
+          field: this.field,
+          matchMode: val
+        });
       });
-    });
   }
 
   onMonacoInit() {
