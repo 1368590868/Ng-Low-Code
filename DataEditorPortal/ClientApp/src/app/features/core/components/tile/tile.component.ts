@@ -20,6 +20,7 @@ export class TileComponent implements OnInit {
               return menu.items ? menu.items : menu;
             })
             .flat()
+            .filter(x => x.type !== 'Folder')
             .map(menu => {
               return {
                 ...menu,

@@ -10,6 +10,9 @@ interface MultiSelectProps extends FormlyFieldProps {
   appendTo?: string;
   virtualScroll: boolean;
   virtualScrollItemSize: number;
+  showHeader?: boolean;
+  display?: string;
+  filter?: boolean;
 }
 export interface FormlyMultiSelectFieldConfig
   extends FormlyFieldConfig<MultiSelectProps> {
@@ -29,9 +32,10 @@ export interface FormlyMultiSelectFieldConfig
       [virtualScroll]="props.virtualScroll"
       [virtualScrollItemSize]="props.virtualScrollItemSize"
       [showToggleAll]="false"
-      [filter]="true"
-      [appendTo]="props.appendTo"
-      display="chip">
+      [filter]="props.filter === undefined ? true : props.filter"
+      [appendTo]="props.appendTo || 'body'"
+      [showHeader]="props.showHeader === undefined ? true : props.showHeader"
+      [display]="props.display || 'chip'">
     </p-multiSelect>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -35,11 +35,3 @@
     margin-left: 1rem;
   }
 }
-
-.monaco-editor-wrapper {
-  background-color: #eeeeee;
-  border: 1px solid transparent;
-  &.ng-dirty.ng-invalid {
-    border-color: #e24c4c;
-  }
-}

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
-import { finalize, Subject, takeUntil, tap } from 'rxjs';
+import { finalize, forkJoin, skip, Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import {
   GridActionOption,
@@ -43,6 +43,8 @@ export class TableComponent implements OnInit, OnDestroy {
   rowActions: GridActionOption[] = [];
   tableActions: GridActionOption[] = [];
 
+  firstLoadDone = false;
+
   constructor(
     private route: ActivatedRoute,
     private notifyService: NotifyService,
@@ -53,16 +55,18 @@ export class TableComponent implements OnInit, OnDestroy {
     this.reset();
     this.stateKey = `universal-grid-state-${this.gridTableService.currentPortalItem}`;
 
-    // get grid config
-    this.gridTableService.getTableConfig().subscribe(result => {
-      this.tableConfig = result;
+    forkJoin([
+      // get grid config
+      this.gridTableService.getTableConfig(),
+      // get grid column
+      this.gridTableService.getTableColumns()
+    ]).subscribe(result => {
+      this.tableConfig = result[0];
       this.setRowActions();
       this.setTableActions();
-    });
+      this.cols = result[1];
 
-    // get grid column
-    this.gridTableService.getTableColumns().subscribe(res => {
-      this.cols = res;
+      this.loading = false;
     });
 
     this.gridTableService.searchClicked$
@@ -166,6 +170,7 @@ export class TableComponent implements OnInit, OnDestroy {
         tap(res => {
           this.records = res.data;
           this.totalRecords = res.total;
+          this.firstLoadDone = true;
         }),
         finalize(() => {
           this.loading = false;
@@ -205,6 +210,13 @@ export class TableComponent implements OnInit, OnDestroy {
         this.lazyLoadParam.multiSortMeta.length > 0
       ) {
         fetchParam.sorts = this.lazyLoadParam.multiSortMeta;
+      } else if (this.lazyLoadParam.sortField) {
+        fetchParam.sorts = [
+          {
+            field: this.lazyLoadParam.sortField,
+            order: this.lazyLoadParam.sortOrder
+          }
+        ];
       }
 
       // set pagination
@@ -222,6 +234,7 @@ export class TableComponent implements OnInit, OnDestroy {
   onRefresh() {
     this.selectedRecords = [];
     this.table.reset();
+    this.table.saveState();
   }
 
   reset() {
@@ -236,6 +249,10 @@ export class TableComponent implements OnInit, OnDestroy {
   onStateSave(state: TableState) {
     // do not save selection to state.
     state.selection = undefined;
+    state.filters = undefined;
+    state.multiSortMeta = undefined;
+    state.sortField = undefined;
+    state.sortOrder = undefined;
     this.table.getStorage().setItem(this.stateKey, JSON.stringify(state));
   }
 }

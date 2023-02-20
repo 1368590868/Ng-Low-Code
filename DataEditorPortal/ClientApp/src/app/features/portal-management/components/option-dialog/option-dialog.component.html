@@ -1,3 +1,17 @@
+<div class="flex align-items-center justify-content-between">
+  <p-button
+    styleClass="p-button-outlined"
+    (onClick)="showDialog()"
+    [disabled]="disabled"
+    >Configure</p-button
+  >
+  <p-message
+    *ngIf="optionLookup || (options && options.length > 0)"
+    severity="info"
+    text="{{ optionLookup ? 'Use Lookup' : '' }}{{
+      options && options.length > 0 ? options.length + ' option(s)' : ''
+    }}"></p-message>
+</div>
 <p-dialog
   [(visible)]="visible"
   [style]="{ minWidth: '35rem' }"
@@ -9,7 +23,7 @@
     <span class="p-dialog-title"
       >Options Editor
       <a (click)="changeMode()">{{
-        !advanced ? 'Advance Mode' : 'Simple Mode'
+        !isAdvanced ? 'Advance Mode' : 'Simple Mode'
       }}</a></span
     >
     <div class="flex align-items-center"></div>
@@ -17,12 +31,14 @@
   <div #container class="dialog-content">
     <div class="flex flex-column pt-4" style="min-height: 10rem">
       <ng-container
-        [ngTemplateOutlet]="!advanced ? simpleRef : advancedRef"></ng-container>
+        [ngTemplateOutlet]="
+          !isAdvanced ? simpleRef : advancedRef
+        "></ng-container>
       <ng-template #simpleRef>
         <p-orderList
           appendTo="body"
           class="option-list"
-          [value]="optionArr"
+          [value]="formControlOptions"
           [stripedRows]="true"
           [dragdrop]="true">
           <ng-template let-option pTemplate="item">
@@ -53,7 +69,7 @@
         <p-button
           label="Add"
           icon="pi pi-plus"
-          class="mt-1"
+          class="mt-1 mb-3"
           styleClass="p-button-text p-button-sm"
           (onClick)="onAdd()"></p-button>
       </ng-template>
@@ -79,12 +95,13 @@
                 "></i>
             </label>
             <ngx-monaco-editor
+              *ngIf="visible"
               [formControl]="formControlQuery"
               (onInit)="onMonacoInit()"
               [style]="dialogStyle"
               [required]="true"
               class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
-              [options]="editorOptions"></ngx-monaco-editor>
+              [options]="{}"></ngx-monaco-editor>
           </div>
         </ng-template>
       </ng-template>

@@ -33,7 +33,8 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { MessageModule } from 'primeng/message';
-import { MonacoEditorModule } from 'ngx-monaco-editor';
+import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import {
@@ -51,9 +52,47 @@ import {
 } from './components/portal-edit';
 
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
-import { OptionDialogComponent } from './components/option-dialog/option-dialog.component';
+import {
+  FormlyFieldOptionsEditorComponent,
+  OptionDialogComponent
+} from './components/option-dialog/option-dialog.component';
 import { CustomActionsComponent } from './components/custom-actions/custom-actions.component';
-import { SearchRuleComponent } from './components/search-rule/search-rule.component';
+import {
+  FormlyFieldSearchRuleEditorComponent,
+  SearchRuleComponent
+} from './components/search-rule/search-rule.component';
+import { FormDesignerViewComponent } from './components/portal-edit/form-designer/form-designer-view.component';
+import {
+  FormDesignerConfigComponent,
+  FROM_DESIGNER_CONTROLS
+} from './components/portal-edit/form-designer/form-designer-config.component';
+import { SearchDesignerConfigComponent } from './components/portal-edit/form-designer/search-designer-config.component';
+
+const monacoConfig: NgxMonacoEditorConfig = {
+  defaultOptions: {
+    theme: 'myTheme',
+    language: 'sql',
+    lineNumbers: 'off',
+    roundedSelection: true,
+    minimap: { enabled: false },
+    wordWrap: true,
+    contextmenu: false,
+    scrollbar: {
+      verticalScrollbarSize: 7,
+      horizontalScrollbarSize: 7
+    }
+  },
+  onMonacoLoad: () => {
+    monaco.editor.defineTheme('myTheme', {
+      base: 'vs',
+      inherit: true,
+      rules: [],
+      colors: {
+        'editor.background': '#EEEEEE'
+      }
+    });
+  }
+};
 
 @NgModule({
   declarations: [
@@ -68,16 +107,34 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     SvgDragComponent,
     OptionDialogComponent,
     CustomActionsComponent,
-    SearchRuleComponent
+    SearchRuleComponent,
+    FormlyFieldOptionsEditorComponent,
+    FormlyFieldSearchRuleEditorComponent,
+    FormDesignerViewComponent,
+    FormDesignerConfigComponent,
+    SearchDesignerConfigComponent
   ],
   imports: [
     CommonModule,
     PortalManagementRoutingModule,
     UniversalGridActionModule,
     FormsModule,
-    MonacoEditorModule.forRoot(),
+    MonacoEditorModule.forRoot(monacoConfig),
     ReactiveFormsModule,
-    FormlyModule,
+    FormlyModule.forChild({
+      types: [
+        {
+          name: 'optionsEditor',
+          component: FormlyFieldOptionsEditorComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'searchRuleEditor',
+          component: FormlyFieldSearchRuleEditorComponent,
+          wrappers: ['form-field']
+        }
+      ]
+    }),
 
     // primeNg
     AnimateModule,
@@ -105,7 +162,14 @@ import { SearchRuleComponent } from './components/search-rule/search-rule.compon
     InputSwitchModule,
     InputNumberModule,
     ContextMenuModule,
-    MessageModule
+    MessageModule,
+    ConfirmDialogModule
+  ],
+  providers: [
+    {
+      provide: 'FROM_DESIGNER_CONTROLS',
+      useValue: FROM_DESIGNER_CONTROLS
+    }
   ]
 })
 export class PortalManagementModule {}

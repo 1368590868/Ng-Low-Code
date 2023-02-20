@@ -34,14 +34,30 @@ export class EditRecordActionComponent
   }
 
   ngOnInit(): void {
+    if (!this.isAddForm) {
+      const dataKey = this.selectedRecords[0][this.recordKey];
+      this.gridService
+        .getDetailData(dataKey)
+        .pipe(
+          tap(result => {
+            this.model = result;
+          }),
+          tap(() => this.getFormConfig())
+        )
+        .subscribe();
+    } else {
+      this.getFormConfig();
+    }
+  }
+
+  getFormConfig() {
     this.gridService
       .getDetailConfig()
       .pipe(
         tap(result => {
-          this.fields = result;
-
           // fetch lookups
-          this.fields
+          const fields = result as FormlyFieldConfig[];
+          fields
             .filter(
               // advanced setting: options from lookup
               x =>
@@ -51,8 +67,10 @@ export class EditRecordActionComponent
                 x.props['optionLookup']
             )
             .forEach(f => {
-              if (f.props && f.props.placeholder)
+              if (f.props) {
                 f.props.placeholder = 'Please Select';
+                if (!f.props.options) f.props.options = [];
+              }
               f.hooks = {
                 onInit: field => {
                   if (field.props && field.props['dependOnFields']) {
@@ -63,23 +81,12 @@ export class EditRecordActionComponent
                 }
               };
             });
+
+          this.fields = fields;
           this.loadedEvent.emit();
         })
       )
       .subscribe();
-
-    if (!this.isAddForm) {
-      const dataKey = this.selectedRecords[0][this.recordKey];
-
-      this.gridService
-        .getDetailData(dataKey)
-        .pipe(
-          tap((result: any) => {
-            this.model = result;
-          })
-        )
-        .subscribe();
-    }
   }
 
   onFormSubmit(model: EditFormData) {
@@ -120,7 +127,8 @@ export class EditRecordActionComponent
   }
 
   onCancel(): void {
-    this.options.resetModel?.();
     this.fields = [];
+    this.form.reset(undefined, { emitEvent: false });
+    // this.options.resetModel?.();
   }
 }

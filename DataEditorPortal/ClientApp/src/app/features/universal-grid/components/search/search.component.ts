@@ -36,10 +36,10 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.gridTableService.getSearchConfig().subscribe(result => {
           // this.options.resetModel?.();
           this.model = {};
-          this.fields = result;
 
           // fetch lookups
-          this.fields
+          const fields = result as FormlyFieldConfig[];
+          fields
             .filter(
               // advanced setting: options from lookup
               x =>
@@ -49,11 +49,17 @@ export class SearchComponent implements OnInit, OnDestroy {
                 x.props['optionLookup']
             )
             .forEach(f => {
-              if (f.props && f.props.placeholder)
+              if (f.props) {
                 f.props.placeholder = 'Please Select';
+                if (!f.props.options) f.props.options = [];
+              }
               f.hooks = {
                 onInit: field => {
-                  if (field.props && field.props['dependOnFields']) {
+                  if (
+                    field.props &&
+                    field.props['dependOnFields'] &&
+                    field.props['dependOnFields'].length > 0
+                  ) {
                     this.ngxFormlyService.initDependOnFields(field);
                   } else {
                     this.ngxFormlyService.initFieldOptions(field);
@@ -61,6 +67,8 @@ export class SearchComponent implements OnInit, OnDestroy {
                 }
               };
             });
+
+          this.fields = fields;
         });
       }
     });

@@ -10,35 +10,43 @@
   .search-area {
     padding: 0.5rem 0.25rem 0.25rem;
     background: var(--surface-ground);
-    overflow-y: auto;
-    overflow-x: hidden;
     position: relative;
-
-    .expand-btn {
-      position: absolute;
-      right: 0.75rem;
-      top: 2rem;
-      transition: transform var(--transition-duration);
-      .p-button-rounded {
-        width: 2rem;
-        height: 2rem;
-      }
-    }
   }
-  .table-area {
-    padding: 0.5rem 0.25rem 0.25rem;
-    background: var(--surface-ground);
+
+  .p-splitter-panel {
+    position: relative;
+  }
+
+  .expand-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 2rem;
+    transition: transform var(--transition-duration);
+    z-index: 20;
+    .p-button-rounded {
+      width: 2rem;
+      height: 2rem;
+    }
   }
 
   .hide-panel {
+    .search-area {
+      padding: 0.5rem 0rem 0.25rem;
+    }
     .expand-btn {
-      right: 0.375rem;
+      right: -2.875rem;
+      top: 0.75rem;
       transform: rotate(180deg);
       .p-button-rounded {
-        width: 1.25rem;
-        height: 1.25rem;
+        width: 1.5rem;
+        height: 1.5rem;
         padding: 0.5rem 0;
       }
     }
+  }
+
+  .table-area {
+    padding: 0.5rem 0.25rem 0.25rem;
+    background: var(--surface-ground);
   }
 }

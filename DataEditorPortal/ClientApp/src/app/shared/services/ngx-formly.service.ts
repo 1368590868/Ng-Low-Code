@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { distinctUntilChanged, map, Observable, tap, debounceTime } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 
@@ -30,19 +31,24 @@ export class NgxFormlyService {
             if (field.props) {
               field.props.options = result;
               if (field.type === 'select') {
-                const notExist =
-                  field.formControl?.value &&
-                  !result.find(o => o.value === field.formControl?.value);
-                if (notExist) {
-                  field.formControl?.setValue(null);
-                } else {
-                  field.formControl?.setValue(field.formControl?.value);
+                const control = field.formControl as FormControl;
+                if (control.value) {
+                  const notExist = !result.find(o => o.value === control.value);
+                  if (notExist) {
+                    control.setValue(null);
+                  }
                 }
               }
               if (field.type === 'multiSelect' && field.formControl?.value) {
-                let data = field.formControl?.value || [];
-                data = data.filter((x: any) => result.find(o => o.value === x));
-                field.formControl.setValue(data);
+                const control = field.formControl as FormControl;
+                if (control.value) {
+                  const data = control.value || [];
+                  const filteredData = data.filter(
+                    (x: any) => !!result.find(o => o.value === x)
+                  );
+                  if (filteredData.length < data.length)
+                    field.formControl.setValue(filteredData);
+                }
               }
             }
           })
@@ -54,21 +60,26 @@ export class NgxFormlyService {
   initDependOnFields(field: any) {
     const model: any = {};
 
+    // calculate values for depends on fields
     field.props['dependOnFields'].forEach((key: string) => {
       if (field.key === key) return;
-      const control = field.parent.get(key).formControl;
-      model[key] = control.value || (field.type === 'select' ? '' : []);
+      const dependOnField = field.parent.get(key);
+      model[key] = dependOnField.formControl.value;
     });
 
+    // load lookups for field.
+    this.initFieldOptions(field, model);
+
+    // subscribe depends on fields value changes.
     field.props['dependOnFields'].forEach((key: string) => {
       if (field.key === key) return;
-      const control = field.parent.get(key).formControl;
-      control?.valueChanges
+      const dependOnField = field.parent.get(key);
+      dependOnField.formControl?.valueChanges
         .pipe(
           distinctUntilChanged(),
           debounceTime(300),
           tap(val => {
-            model[key] = val || (field.type === 'select' ? '' : []);
+            model[key] = val;
             this.initFieldOptions(field, model);
           })
         )

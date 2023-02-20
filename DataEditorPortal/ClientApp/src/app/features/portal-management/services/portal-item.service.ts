@@ -200,18 +200,7 @@ export class PortalItemService {
       .get<ApiResponse<DataSourceConfig>>(
         `${this._apiUrl}portal-item/${this.currentPortalItemId}/datasource`
       )
-      .pipe(
-        map(
-          x =>
-            x.result || {
-              tableName: '',
-              tableSchema: '',
-              idColumn: '',
-              filters: [],
-              sortBy: []
-            }
-        )
-      );
+      .pipe(map(x => x.result || {}));
   }
 
   saveDataSourceConfig(data: DataSourceConfig) {

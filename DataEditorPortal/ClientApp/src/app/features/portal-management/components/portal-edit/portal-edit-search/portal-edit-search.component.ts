@@ -1,18 +1,19 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { PrimeNGConfig } from 'primeng/api';
-import { PickList } from 'primeng/picklist';
-import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
-import { NotifyService } from 'src/app/shared';
-import { GridSearchField } from '../../../models/portal-item';
-import { PortalItemService } from '../../../services/portal-item.service';
 import {
-  OptionDialogComponent,
-  OptionValueModel
-} from '../../option-dialog/option-dialog.component';
-import { SearchRuleComponent } from '../../search-rule/search-rule.component';
+  Component,
+  Inject,
+  OnInit,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { FormlyFormOptions } from '@ngx-formly/core';
+import { PickList } from 'primeng/picklist';
+import { forkJoin, tap } from 'rxjs';
+import { NotifyService } from 'src/app/shared';
+import { GridFormField, GridSearchField } from '../../../models/portal-item';
+import { PortalItemService } from '../../../services/portal-item.service';
+import { FormDesignerViewComponent } from '../form-designer/form-designer-view.component';
 
 @Component({
   selector: 'app-portal-edit-search',
@@ -29,153 +30,23 @@ export class PortalEditSearchComponent implements OnInit {
   targetColumns: GridSearchField[] = [];
   @ViewChild('pickList') pickList!: PickList;
 
-  controls: { label: string; value: string; filterType: string }[] = [
-    {
-      label: 'Checkbox',
-      value: 'checkbox',
-      filterType: 'boolean'
-    },
-    {
-      label: 'Date',
-      value: 'datepicker',
-      filterType: 'date'
-    },
-    {
-      label: 'Textbox',
-      value: 'input',
-      filterType: 'text'
-    },
-    {
-      label: 'Textarea',
-      value: 'textarea',
-      filterType: 'text'
-    },
-    {
-      label: 'Dropdown',
-      value: 'select',
-      filterType: 'text'
-    },
-    {
-      label: 'Multiple Dropdown',
-      value: 'multiSelect',
-      filterType: 'text'
-    },
-    {
-      label: 'Checkbox List',
-      value: 'checkboxList',
-      filterType: 'text'
-    },
-    {
-      label: 'Radio List',
-      value: 'radio',
-      filterType: 'text'
-    },
-    {
-      label: 'Input Number',
-      value: 'inputNumber',
-      filterType: 'numeric'
-    }
-  ];
   form = new FormGroup({});
-  options: FormlyFormOptions = {};
-  model: any = {};
-  fields: FormlyFieldConfig[] = [
-    {
-      key: 'filterType',
-      type: 'input',
-      hooks: {
-        onInit: field => {
-          field.formControl?.valueChanges
-            .pipe(
-              distinctUntilChanged(),
-              startWith(field.formControl.value),
-              tap(value => {
-                if (field.parent?.get) {
-                  const typeField = field.parent?.get('type');
-                  if (typeField && typeField.props) {
-                    const result = this.controls.filter(
-                      x => x.filterType === value
-                    );
-
-                    typeField.props.options = result;
-
-                    if (!result.find(o => o.value === this.model.type)) {
-                      typeField.formControl?.setValue(result[0].value);
-                    }
-                  }
-                }
-              })
-            )
-            .subscribe();
-        }
-      },
-      hide: true
-    },
-    {
-      key: 'type',
-      type: 'select',
-      defaultValue: 'input',
-      props: {
-        label: 'Control Type',
-        placeholder: 'Please Select',
-        showClear: false,
-        required: true
-      },
-      hooks: {
-        onInit: field => {
-          field.formControl?.valueChanges
-            .pipe(
-              startWith(field.formControl.value),
-              distinctUntilChanged(),
-              tap(() => {
-                this.setFilterMatchOptionsAndValue();
-              })
-            )
-            .subscribe();
-        }
-      }
-    },
-    {
-      wrappers: ['divider'],
-      props: {
-        label: 'Properties'
-      }
-    },
-    {
-      key: 'props',
-      fieldGroup: [
-        {
-          key: 'label',
-          type: 'input',
-          props: {
-            label: 'Label',
-            placeholder: 'Enter control label'
-          }
-        },
-        {
-          key: 'placeholder',
-          type: 'input',
-          props: {
-            label: 'Placeholder',
-            placeholder: 'Enter placeholder'
-          },
-          expressions: {
-            hide: `['checkbox', 'radio', 'checkboxList'].indexOf(field.parent.parent.model.type) >= 0`
-          }
-        }
-      ]
+  options: FormlyFormOptions = {
+    formState: {
+      dependOnOptions: []
     }
-  ];
-  filterMatchModeOptions: any[] = [];
-  formControlSearchRule: FormControl = new FormControl();
+  };
+  model: any = {};
+  allSelectedFields: { key: string; type: string }[] = [];
+  @ViewChildren(FormDesignerViewComponent)
+  formDesignerViews!: FormDesignerViewComponent[];
 
   constructor(
-    private primeNGConfig: PrimeNGConfig,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef,
     private portalItemService: PortalItemService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    @Inject('FROM_DESIGNER_CONTROLS') private controls: any[]
   ) {}
 
   ngOnInit(): void {
@@ -213,10 +84,6 @@ export class PortalEditSearchComponent implements OnInit {
       });
 
       this.portalItemService.saveCurrentStep('search');
-
-      this.formControlSearchRule.valueChanges
-        .pipe(tap(val => (this.model.searchRule.matchMode = val)))
-        .subscribe();
     }
   }
 
@@ -238,20 +105,19 @@ export class PortalEditSearchComponent implements OnInit {
   onTargetSelect({ items }: { items: GridSearchField[] }) {
     if (items.length === 1) {
       this.model = items[0];
-      this.setFilterMatchOptionsAndValue();
+
+      // update depends on options
+      this.allSelectedFields = this.targetColumns.map(x => {
+        return { key: x.key, type: x.type };
+      });
     } else {
       this.model = {};
     }
   }
 
-  setFilterMatchOptionsAndValue() {
-    const cacheSearchRule = this.model.searchRule.matchMode;
-    setTimeout(() => {
-      this.filterMatchModeOptions = this.getFilterMatchModeOptions();
-      setTimeout(() => {
-        this.formControlSearchRule.setValue(cacheSearchRule);
-      });
-    });
+  configChange(column: GridFormField) {
+    const ref = this.formDesignerViews.find(x => x.key === column.key);
+    ref?.updateConfig(column);
   }
 
   valid() {
@@ -318,52 +184,5 @@ export class PortalEditSearchComponent implements OnInit {
     this.router.navigate(['../columns'], {
       relativeTo: this.activatedRoute
     });
-  }
-
-  getFilterMatchModeOptions() {
-    const filterType = this.model.filterType;
-    const type = this.model.type;
-
-    if (type === 'multiSelect' || type === 'checkboxList')
-      return [{ label: 'In selected values', value: 'in' }];
-    if (filterType === 'boolean') return [{ label: 'Equals', value: 'equals' }];
-    return (this.primeNGConfig.filterMatchModeOptions as any)[filterType]?.map(
-      (key: any) => {
-        return { label: this.primeNGConfig.getTranslation(key), value: key };
-      }
-    );
-  }
-
-  cloneColumn(column: any) {
-    return [JSON.parse(JSON.stringify(column))];
-  }
-
-  openOptionDialog(optionDialog: OptionDialogComponent) {
-    optionDialog.value = {
-      isAdvanced: !!this.model.props.optionLookup,
-      optionLookup: this.model.props.optionLookup,
-      options: this.model.props.options
-    };
-    optionDialog.showDialog();
-  }
-
-  optionValueChange(value: OptionValueModel) {
-    if (value.isAdvanced) {
-      this.model.props.optionLookup = value.optionLookup;
-      this.model.props.options = [];
-    } else {
-      this.model.props.optionLookup = undefined;
-      this.model.props.options = value.options;
-      this.model.props.dependOnFields = [];
-    }
-  }
-
-  openSearchRuleDialog(searchRuleDialog: SearchRuleComponent) {
-    searchRuleDialog.value = this.model.searchRule.whereClause;
-    searchRuleDialog.showDialog();
-  }
-
-  searchRuleValueChange(value: string) {
-    this.model.searchRule.whereClause = value;
   }
 }

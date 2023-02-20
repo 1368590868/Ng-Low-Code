@@ -8,3 +8,5 @@ export { NavMenuComponent } from './nav-menu/nav-menu.component';
 export { HomeComponent } from './home/home.component';
 export { SiteSettingsComponent } from './site-settings/site-settings.component';
 export { PersonalDialogComponent } from './personal-dialog/personal-dialog.component';
+export { DataDictionaryComponent } from './data-dictionary/data-dictionary.component';
+export { AddDictionaryDialogComponent } from './data-dictionary/add-dictionary-dialog/add-dictionary-dialog.component';
