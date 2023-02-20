@@ -66,6 +66,7 @@ import {
   FormDesignerConfigComponent,
   FROM_DESIGNER_CONTROLS
 } from './components/portal-edit/form-designer/form-designer-config.component';
+import { SearchDesignerConfigComponent } from './components/portal-edit/form-designer/search-designer-config.component';
 
 @NgModule({
   declarations: [
@@ -84,7 +85,8 @@ import {
     FormlyFieldOptionsEditorComponent,
     FormlyFieldSearchRuleEditorComponent,
     FormDesignerViewComponent,
-    FormDesignerConfigComponent
+    FormDesignerConfigComponent,
+    SearchDesignerConfigComponent
   ],
   imports: [
     CommonModule,

@@ -1,13 +1,19 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnInit,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { PrimeNGConfig } from 'primeng/api';
+import { FormlyFormOptions } from '@ngx-formly/core';
 import { PickList } from 'primeng/picklist';
-import { distinctUntilChanged, forkJoin, startWith, tap } from 'rxjs';
+import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
-import { GridSearchField } from '../../../models/portal-item';
+import { GridFormField, GridSearchField } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
+import { FormDesignerViewComponent } from '../form-designer/form-designer-view.component';
 
 @Component({
   selector: 'app-portal-edit-search',
@@ -24,53 +30,6 @@ export class PortalEditSearchComponent implements OnInit {
   targetColumns: GridSearchField[] = [];
   @ViewChild('pickList') pickList!: PickList;
 
-  controls: { label: string; value: string; filterType: string }[] = [
-    {
-      label: 'Checkbox',
-      value: 'checkbox',
-      filterType: 'boolean'
-    },
-    {
-      label: 'Date',
-      value: 'datepicker',
-      filterType: 'date'
-    },
-    {
-      label: 'Textbox',
-      value: 'input',
-      filterType: 'text'
-    },
-    {
-      label: 'Textarea',
-      value: 'textarea',
-      filterType: 'text'
-    },
-    {
-      label: 'Dropdown',
-      value: 'select',
-      filterType: 'text'
-    },
-    {
-      label: 'Multiple Dropdown',
-      value: 'multiSelect',
-      filterType: 'text'
-    },
-    {
-      label: 'Checkbox List',
-      value: 'checkboxList',
-      filterType: 'text'
-    },
-    {
-      label: 'Radio List',
-      value: 'radio',
-      filterType: 'text'
-    },
-    {
-      label: 'Input Number',
-      value: 'inputNumber',
-      filterType: 'numeric'
-    }
-  ];
   form = new FormGroup({});
   options: FormlyFormOptions = {
     formState: {
@@ -78,143 +37,16 @@ export class PortalEditSearchComponent implements OnInit {
     }
   };
   model: any = {};
-  fields: FormlyFieldConfig[] = [
-    {
-      key: 'filterType',
-      type: 'input',
-      hooks: {
-        onInit: field => {
-          field.formControl?.valueChanges
-            .pipe(
-              startWith(field.formControl.value),
-              distinctUntilChanged(),
-              tap(value => {
-                if (field.parent?.get) {
-                  const typeField = field.parent?.get('type');
-                  if (typeField && typeField.props) {
-                    const result = this.controls.filter(
-                      x => x.filterType === value
-                    );
-
-                    typeField.props.options = result;
-
-                    if (!result.find(o => o.value === this.model.type)) {
-                      typeField.formControl?.setValue(result[0].value);
-                    }
-                  }
-                }
-              })
-            )
-            .subscribe();
-        }
-      },
-      hide: true
-    },
-    {
-      key: 'type',
-      type: 'select',
-      defaultValue: 'input',
-      props: {
-        label: 'Control Type',
-        placeholder: 'Please Select',
-        showClear: false,
-        required: true
-      },
-      hooks: {
-        onInit: field => {
-          field.formControl?.valueChanges
-            .pipe(
-              startWith(field.formControl.value),
-              distinctUntilChanged(),
-              tap(() => {
-                // update filter match Mode options
-                const searchRuleField = field.parent?.get?.('searchRule');
-                if (searchRuleField && searchRuleField.props) {
-                  searchRuleField.props.options =
-                    this.getFilterMatchModeOptions(field.parent?.model);
-                }
-              })
-            )
-            .subscribe();
-        }
-      }
-    },
-    {
-      wrappers: ['divider'],
-      props: {
-        label: 'Properties'
-      }
-    },
-    {
-      key: 'props',
-      fieldGroup: [
-        {
-          key: 'label',
-          type: 'input',
-          props: {
-            label: 'Label',
-            placeholder: 'Enter control label'
-          }
-        },
-        {
-          key: 'placeholder',
-          type: 'input',
-          props: {
-            label: 'Placeholder',
-            placeholder: 'Enter placeholder'
-          },
-          expressions: {
-            hide: `['checkbox', 'radio', 'checkboxList'].indexOf(field.parent.parent.model.type) >= 0`
-          }
-        },
-        {
-          key: 'optionsLookup',
-          type: 'optionsEditor',
-          props: {
-            label: 'Options'
-          },
-          expressions: {
-            hide: `['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(field.parent.parent.model.type) < 0`
-          }
-        },
-        {
-          key: 'dependOnFields',
-          type: 'multiSelect',
-          defaultValue: [],
-          props: {
-            label: 'Depends on',
-            placeholder: 'Select fields',
-            showHeader: false,
-            filter: false
-          },
-          expressions: {
-            hide: `!field.parent.model.optionsLookup || Array.isArray(field.parent.model.optionsLookup)`,
-            'props.options': `formState.dependOnOptions`
-          }
-        }
-      ]
-    },
-    {
-      wrappers: ['divider'],
-      props: {
-        label: 'Search Rule'
-      }
-    },
-    {
-      key: 'searchRule',
-      type: 'searchRuleEditor',
-      props: {
-        options: []
-      }
-    }
-  ];
+  allSelectedFields: { key: string; type: string }[] = [];
+  @ViewChildren(FormDesignerViewComponent)
+  formDesignerViews!: FormDesignerViewComponent[];
 
   constructor(
-    private primeNGConfig: PrimeNGConfig,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    @Inject('FROM_DESIGNER_CONTROLS') private controls: any[]
   ) {}
 
   ngOnInit(): void {
@@ -275,18 +107,17 @@ export class PortalEditSearchComponent implements OnInit {
       this.model = items[0];
 
       // update depends on options
-      this.options.formState.dependOnOptions = this.targetColumns
-        .filter(
-          x =>
-            x.key !== items[0].key &&
-            ['select', 'multiSelect'].indexOf(x.type) >= 0
-        )
-        .map(x => {
-          return { label: x.key, value: x.key };
-        });
+      this.allSelectedFields = this.targetColumns.map(x => {
+        return { key: x.key, type: x.type };
+      });
     } else {
       this.model = {};
     }
+  }
+
+  configChange(column: GridFormField) {
+    const ref = this.formDesignerViews.find(x => x.key === column.key);
+    ref?.updateConfig(column);
   }
 
   valid() {
@@ -353,23 +184,5 @@ export class PortalEditSearchComponent implements OnInit {
     this.router.navigate(['../columns'], {
       relativeTo: this.activatedRoute
     });
-  }
-
-  getFilterMatchModeOptions(model: any) {
-    const filterType = model.filterType;
-    const type = model.type;
-
-    if (type === 'multiSelect' || type === 'checkboxList')
-      return [{ label: 'In selected values', value: 'in' }];
-    if (filterType === 'boolean') return [{ label: 'Equals', value: 'equals' }];
-    return (this.primeNGConfig.filterMatchModeOptions as any)[filterType]?.map(
-      (key: any) => {
-        return { label: this.primeNGConfig.getTranslation(key), value: key };
-      }
-    );
-  }
-
-  cloneColumn(column: any) {
-    return [JSON.parse(JSON.stringify(column))];
   }
 }

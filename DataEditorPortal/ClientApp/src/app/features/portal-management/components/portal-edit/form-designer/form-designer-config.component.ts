@@ -1,13 +1,7 @@
-import {
-  Component,
-  EventEmitter,
-  Inject,
-  inject,
-  Input,
-  Output
-} from '@angular/core';
+import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { PrimeNGConfig } from 'primeng/api';
 import { distinctUntilChanged, startWith, tap } from 'rxjs';
 import { GridFormField } from '../../../models/portal-item';
 
@@ -284,7 +278,8 @@ export class FormDesignerConfigComponent {
 
   constructor(
     @Inject('FROM_DESIGNER_CONTROLS')
-    private controls: any[]
+    public controls: any[],
+    public primeNGConfig: PrimeNGConfig
   ) {}
 
   @Input()
