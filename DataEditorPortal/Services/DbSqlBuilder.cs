@@ -26,7 +26,7 @@ namespace DataEditorPortal.Web.Services
 
         // database
         string GetSqlTextForDatabaseTables();
-        string GetSqlTextForDatabaseTableSchema(string tableSchema, string tableName);
+        string GetSqlTextForDatabaseSource(DataSourceConfig config);
     }
 
     public class DbSqlServerBuilder : IDbSqlBuilder
@@ -448,6 +448,23 @@ namespace DataEditorPortal.Web.Services
         public string GetSqlTextForDatabaseTableSchema(string tableSchema, string tableName)
         {
             return $"SELECT TOP 1 * FROM {tableSchema}.{tableName}";
+        }
+
+        public string GetSqlTextForDatabaseSource(DataSourceConfig config)
+        {
+            if (!string.IsNullOrEmpty(config.QueryText))
+            {
+                var sqlText = GenerateSqlTextForList(config);
+                sqlText = UseSearches(sqlText, new List<SearchParam>());
+                sqlText = UseFilters(sqlText, new List<FilterParam>());
+                return $"SELECT TOP 1 * FROM ({sqlText}) AS A";
+
+            }
+            else
+            {
+                return $"SELECT TOP 1 * FROM {config.TableSchema}.{config.TableName}";
+            }
+
         }
 
         #endregion

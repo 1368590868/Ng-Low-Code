@@ -2,6 +2,7 @@
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
+using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -19,11 +20,13 @@ namespace DataEditorPortal.Web.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly DepDbContext _depDbContext;
+        private readonly IUserService _userService;
 
-        public UserController(ILogger<UserController> logger, DepDbContext depDbContext)
+        public UserController(ILogger<UserController> logger, DepDbContext depDbContext, IUserService userService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -60,46 +63,7 @@ namespace DataEditorPortal.Web.Controllers
 
             if (!user.Disabled)
             {
-                if (User.IsInRole("Administrators"))
-                {
-                    var permissions = (from p in _depDbContext.SitePermissions
-                                       select new
-                                       {
-                                           PermissionName = p.PermissionName
-                                       }).Distinct().ToList();
-
-                    foreach (var p in permissions)
-                    {
-                        user.Permissions[p.PermissionName] = true;
-                    }
-                }
-                else
-                {
-                    var siteRolesPermissions = from up in _depDbContext.UserPermissions
-                                               join sr in _depDbContext.SiteRoles on up.PermissionGrantId equals sr.Id
-                                               join srp in _depDbContext.SiteRolePermissions on sr.Id equals srp.SiteRoleId
-                                               join sp in _depDbContext.SitePermissions on srp.SitePermissionId equals sp.Id
-                                               where up.UserId == dep_user.Id && up.GrantType == "GROUP"
-                                               select sp.Id;
-
-                    var sitePermissions = from up in _depDbContext.UserPermissions
-                                          join sp in _depDbContext.SitePermissions on up.PermissionGrantId equals sp.Id
-                                          where up.UserId == dep_user.Id && up.GrantType == "ITEM"
-                                          select sp.Id;
-
-                    var permissionsQuery = from p in _depDbContext.SitePermissions
-                                           where siteRolesPermissions.Contains(p.Id) || sitePermissions.Contains(p.Id)
-                                           select new
-                                           {
-                                               PermissionName = p.PermissionName
-                                           };
-
-                    var permissions = permissionsQuery.Distinct().ToList();
-                    foreach (var p in permissions)
-                    {
-                        user.Permissions[p.PermissionName] = true;
-                    }
-                }
+                user.Permissions = _userService.GetUserPermissions();
             }
 
             return user;

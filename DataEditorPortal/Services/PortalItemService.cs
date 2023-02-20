@@ -28,7 +28,7 @@ namespace DataEditorPortal.Web.Services
         Guid Create(PortalItemData model);
         Guid Update(Guid id, PortalItemData model);
         List<DataSourceTable> GetDataSourceTables();
-        List<DataSourceTableColumn> GetDataSourceTableColumns(string tableSchema, string tableName);
+        List<DataSourceTableColumn> GetDataSourceTableColumns(string sqlText);
         List<DataSourceTableColumn> GetDataSourceTableColumns(Guid id);
         DataSourceConfig GetDataSourceConfig(Guid id);
         bool SaveDataSourceConfig(Guid id, DataSourceConfig model);
@@ -218,33 +218,35 @@ namespace DataEditorPortal.Web.Services
             return result;
         }
 
-        public List<DataSourceTableColumn> GetDataSourceTableColumns(string tableSchema, string tableName)
+        public List<DataSourceTableColumn> GetDataSourceTableColumns(string sqlText)
         {
             var result = new List<DataSourceTableColumn>();
 
-            using (var con = _depDbContext.Database.GetDbConnection())
-            {
-                con.Open();
-                var cmd = con.CreateCommand();
-                cmd.Connection = con;
+            var con = _depDbContext.Database.GetDbConnection();
+            con.Open();
+            var cmd = con.CreateCommand();
+            cmd.Connection = con;
+            cmd.CommandText = sqlText;
 
-                cmd.CommandText = _dbSqlBuilder.GetSqlTextForDatabaseTableSchema(tableSchema, tableName);
-                try
+            try
+            {
+                using (var dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly | CommandBehavior.KeyInfo))
                 {
-                    using (var dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly | CommandBehavior.KeyInfo))
+                    var schema = dr.GetColumnSchema();
+                    result = schema.Select(x =>
                     {
-                        var schema = dr.GetColumnSchema();
-                        result = schema.Select(x =>
-                        {
-                            return _mapper.Map<DataSourceTableColumn>(x);
-                        }).ToList();
-                    }
+                        return _mapper.Map<DataSourceTableColumn>(x);
+                    }).ToList();
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.Message, ex);
-                    throw new DepException("An Error in the query has occurred: " + ex.Message);
-                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                throw new DepException("An Error in the query has occurred: " + ex.Message);
+            }
+            finally
+            {
+                con.Close();
             }
 
             return result;
@@ -256,7 +258,7 @@ namespace DataEditorPortal.Web.Services
             if (datasourceConfig == null)
                 throw new DepException("DataSource Config is empty for Portal Item: " + id);
 
-            return GetDataSourceTableColumns(datasourceConfig.TableSchema, datasourceConfig.TableName);
+            return GetDataSourceTableColumns(_dbSqlBuilder.GetSqlTextForDatabaseSource(datasourceConfig));
         }
 
 
@@ -324,7 +326,7 @@ namespace DataEditorPortal.Web.Services
             else
             {
                 var datasourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-                var columns = GetDataSourceTableColumns(datasourceConfig.TableSchema, datasourceConfig.TableName);
+                var columns = GetDataSourceTableColumns(_dbSqlBuilder.GetSqlTextForDatabaseSource(datasourceConfig));
                 return columns.Select(x => new GridColConfig()
                 {
                     field = x.ColumnName,

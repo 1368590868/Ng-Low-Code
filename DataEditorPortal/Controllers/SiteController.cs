@@ -1,5 +1,6 @@
 ﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -18,12 +19,18 @@ namespace DataEditorPortal.Web.Controllers
         private readonly ILogger<SiteController> _logger;
         private readonly DepDbContext _depDbContext;
         private readonly IConfiguration _config;
+        private readonly IUserService _userService;
 
-        public SiteController(ILogger<SiteController> logger, DepDbContext depDbContext, IConfiguration config)
+        public SiteController(
+            ILogger<SiteController> logger,
+            DepDbContext depDbContext,
+            IConfiguration config,
+            IUserService userService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _config = config;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -92,18 +99,42 @@ namespace DataEditorPortal.Web.Controllers
         [Route("menus")]
         public dynamic GetMenus()
         {
-            var menus = _depDbContext.SiteMenus
-                .Where(x => x.Status == Data.Common.PortalItemStatus.Published)
-                .ToList();
+            var isAdmin = _userService.IsAdmin();
+            var userPermissions = _userService.GetUserPermissions().Keys;
+
+            //var menus = _depDbContext.SiteMenus.ToList();
+            var menus = (from m in _depDbContext.SiteMenus
+                         join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name into us
+                         from u in us.DefaultIfEmpty()
+                         where u == null || u.ConfigCompleted
+                         select m).ToList();
 
             var root = menus
-                .Where(x => x.ParentId == null)
+                .Where(x =>
+                {
+                    if (isAdmin) return x.ParentId == null;
+                    else
+                    {
+                        return x.Status == Data.Common.PortalItemStatus.Published
+                            && x.ParentId == null
+                            && (x.Type == "Folder" || userPermissions.Contains($"VIEW_{ x.Name.Replace("-", "_") }".ToUpper()));
+                    }
+                })
                 .OrderBy(x => x.Order)
                 .ThenBy(x => x.Name)
                 .Select(x =>
                 {
                     var items = menus
-                            .Where(m => m.ParentId == x.Id)
+                            .Where(m =>
+                            {
+                                if (isAdmin) return m.ParentId == x.Id;
+                                else
+                                {
+                                    return m.Status == Data.Common.PortalItemStatus.Published
+                                        && m.ParentId == x.Id
+                                        && userPermissions.Contains($"VIEW_{ m.Name.Replace("-", "_") }".ToUpper());
+                                }
+                            })
                             .OrderBy(x => x.Order)
                             .ThenBy(x => x.Name)
                             .Select(m => new
@@ -114,7 +145,8 @@ namespace DataEditorPortal.Web.Controllers
                                 icon = m.Icon,
                                 description = m.Description,
                                 type = m.Type,
-                                link = m.Link
+                                link = m.Link,
+                                status = m.Status
                             });
 
                     return new
@@ -126,9 +158,11 @@ namespace DataEditorPortal.Web.Controllers
                         description = x.Description,
                         items = items.Any() ? items : null,
                         type = x.Type,
-                        link = x.Link
+                        link = x.Link,
+                        status = x.Status
                     };
-                });
+                })
+                .Where(x => x.type != "Folder" || x.items != null);
 
             return root;
         }
