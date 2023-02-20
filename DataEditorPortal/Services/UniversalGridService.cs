@@ -69,7 +69,8 @@ namespace DataEditorPortal.Web.Services
                 DataKey = dataSourceConfig.IdColumn,
                 Description = item.Description,
                 Caption = item.Label,
-                CustomActions = new List<CustomAction>()
+                CustomActions = new List<CustomAction>(),
+                PageSize = dataSourceConfig.PageSize
             };
 
             // get query text for list data from grid config.

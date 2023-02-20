@@ -9,6 +9,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string Caption { get; set; }
         public string Description { get; set; }
         public string DataKey { get; set; }
+        public int PageSize { get; set; } = 100;
 
         public bool AllowExport { get; set; } = true;
         public bool AllowDelete { get; set; } = true;
@@ -63,6 +64,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string TableName { get; set; }
         public string TableSchema { get; set; }
         public string IdColumn { get; set; }
+        public int PageSize { get; set; } = 100;
         public List<string> Columns { get; set; } = new List<string>();
         public List<SortParam> SortBy { get; set; } = new List<SortParam>();
         public List<FilterParam> Filters { get; set; } = new List<FilterParam>();
