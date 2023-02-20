@@ -38,6 +38,8 @@ export class TableComponent implements OnInit, OnDestroy {
 
   cols: GridColumn[] = [];
   stateKey!: string;
+  pageSize = 100;
+  rowsPerPageOptions: any[] = [100, 200, 500, { showAll: 'Show All' }];
 
   tableConfig: GridConfig = { dataKey: 'Id' };
   rowActions: GridActionOption[] = [];
@@ -62,6 +64,15 @@ export class TableComponent implements OnInit, OnDestroy {
       this.gridTableService.getTableColumns()
     ]).subscribe(result => {
       this.tableConfig = result[0];
+      if (this.tableConfig.pageSize && this.tableConfig.pageSize >= 10) {
+        this.pageSize = this.tableConfig.pageSize;
+        if (!this.rowsPerPageOptions.find(x => x === this.pageSize)) {
+          const index = this.rowsPerPageOptions.findIndex(
+            x => x > this.pageSize
+          );
+          this.rowsPerPageOptions.splice(index, 0, this.pageSize);
+        }
+      }
       this.setRowActions();
       this.setTableActions();
       this.cols = result[1];
@@ -185,7 +196,7 @@ export class TableComponent implements OnInit, OnDestroy {
       sorts: [],
       searches: this.searchModel,
       startIndex: 0,
-      indexCount: 50
+      indexCount: this.pageSize
     };
 
     if (this.lazyLoadParam) {
@@ -221,7 +232,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
       // set pagination
       fetchParam.startIndex = this.lazyLoadParam.first ?? 0;
-      fetchParam.indexCount = this.lazyLoadParam.rows ?? 50;
+      fetchParam.indexCount = this.lazyLoadParam.rows ?? this.pageSize;
     }
 
     return fetchParam;

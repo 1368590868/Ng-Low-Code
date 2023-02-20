@@ -58,10 +58,11 @@ export class NavMenuComponent implements OnInit {
       menu.badgeStyleClass = 'p-badge p-badge-warning';
     }
 
-    menu.items &&
+    if (menu.items) {
       menu.items.forEach(i => {
         this.setMenu(i);
       });
+    }
   }
 
   setParentActive(menu: SiteMenu | MenuItem, url?: string) {
