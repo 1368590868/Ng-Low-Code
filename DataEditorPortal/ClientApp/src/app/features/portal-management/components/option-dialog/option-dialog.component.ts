@@ -39,20 +39,6 @@ export class OptionDialogComponent implements ControlValueAccessor {
     minWidth: '40rem'
   };
 
-  editorOptions = {
-    theme: 'vs-studio',
-    language: 'sql',
-    lineNumbers: 'off',
-    roundedSelection: true,
-    minimap: { enabled: false },
-    wordWrap: true,
-    contextmenu: false,
-    scrollbar: {
-      verticalScrollbarSize: 7,
-      horizontalScrollbarSize: 7
-    }
-  };
-
   formControlOptions: OptionItem[] = [];
   formControlName: FormControl = new FormControl();
   formControlQuery: FormControl = new FormControl();
@@ -85,15 +71,6 @@ export class OptionDialogComponent implements ControlValueAccessor {
   }
 
   onMonacoInit() {
-    monaco.editor.defineTheme('myTheme', {
-      base: 'vs',
-      inherit: true,
-      rules: [],
-      colors: {
-        'editor.background': '#EEEEEE'
-      }
-    });
-    monaco.editor.setTheme('myTheme');
     setTimeout(() => {
       this.formControlQuery.markAsPristine();
     });

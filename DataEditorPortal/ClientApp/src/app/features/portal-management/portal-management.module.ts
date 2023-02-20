@@ -33,7 +33,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { MessageModule } from 'primeng/message';
-import { MonacoEditorModule } from 'ngx-monaco-editor';
+import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
@@ -68,6 +68,32 @@ import {
 } from './components/portal-edit/form-designer/form-designer-config.component';
 import { SearchDesignerConfigComponent } from './components/portal-edit/form-designer/search-designer-config.component';
 
+const monacoConfig: NgxMonacoEditorConfig = {
+  defaultOptions: {
+    theme: 'myTheme',
+    language: 'sql',
+    lineNumbers: 'off',
+    roundedSelection: true,
+    minimap: { enabled: false },
+    wordWrap: true,
+    contextmenu: false,
+    scrollbar: {
+      verticalScrollbarSize: 7,
+      horizontalScrollbarSize: 7
+    }
+  },
+  onMonacoLoad: () => {
+    monaco.editor.defineTheme('myTheme', {
+      base: 'vs',
+      inherit: true,
+      rules: [],
+      colors: {
+        'editor.background': '#EEEEEE'
+      }
+    });
+  }
+};
+
 @NgModule({
   declarations: [
     PortalListComponent,
@@ -93,7 +119,7 @@ import { SearchDesignerConfigComponent } from './components/portal-edit/form-des
     PortalManagementRoutingModule,
     UniversalGridActionModule,
     FormsModule,
-    MonacoEditorModule.forRoot(),
+    MonacoEditorModule.forRoot(monacoConfig),
     ReactiveFormsModule,
     FormlyModule.forChild({
       types: [
