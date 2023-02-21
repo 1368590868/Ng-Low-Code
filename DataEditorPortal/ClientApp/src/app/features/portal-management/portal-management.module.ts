@@ -78,7 +78,11 @@ const monacoConfig: NgxMonacoEditorConfig = {
     roundedSelection: true,
     minimap: { enabled: false },
     wordWrap: true,
+    fixedOverflowWidgets: true,
     contextmenu: false,
+    glyphMargin: false,
+    lineDecorationsWidth: 0,
+    lineNumbersMinChars: 0,
     scrollbar: {
       verticalScrollbarSize: 7,
       horizontalScrollbarSize: 7

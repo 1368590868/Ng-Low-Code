@@ -48,6 +48,7 @@ export interface DataSourceSortBy {
 }
 
 export interface GridColumn {
+  type?: string;
   field?: string;
   header?: string;
   width?: string;
