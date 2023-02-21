@@ -125,6 +125,7 @@ namespace DataEditorPortal.Web
 
             app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions()
             {
+                BypassHTMLValidation = true,
                 IsApiOnly = false,
                 WrapWhenApiPathStartsWith = "/api",
                 ExcludePaths = new AutoWrapperExcludePath[]

@@ -311,11 +311,11 @@ namespace DataEditorPortal.Web.Services
             if (value == System.DBNull.Value) return string.Empty;
 
             var sqlDbType = (SqlDbType)schema["ProviderType"];
-            if (sqlDbType == SqlDbType.Date) return Convert.ToDateTime(value).ToString("d");
+            if (sqlDbType == SqlDbType.Date) return Convert.ToDateTime(value);
             if (sqlDbType == SqlDbType.DateTime || sqlDbType == SqlDbType.DateTime2 || sqlDbType == SqlDbType.SmallDateTime)
-                return Convert.ToDateTime(value).ToString();
+                return Convert.ToDateTime(value);
             if (sqlDbType == SqlDbType.Float || sqlDbType == SqlDbType.Decimal || sqlDbType == SqlDbType.Money)
-                return Convert.ToDecimal(value).ToString("N2");
+                return Convert.ToDecimal(value);
             if (sqlDbType == SqlDbType.Bit)
                 return Convert.ToBoolean(value);
             else

@@ -47,6 +47,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class GridColConfig
     {
+        public string type { get; set; }
         public string field { get; set; }
         public string header { get; set; }
         public string width { get; set; }
@@ -57,6 +58,9 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         //public int order { get; set; }
 
         //public bool aggregate { get; set; } = false;
+
+        public string template { get; set; }
+        public string format { get; set; }
     }
 
     public class DataSourceConfig
