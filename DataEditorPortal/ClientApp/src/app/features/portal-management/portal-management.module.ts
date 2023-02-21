@@ -31,6 +31,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { MessageModule } from 'primeng/message';
 import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
@@ -67,6 +68,7 @@ import {
   FROM_DESIGNER_CONTROLS
 } from './components/portal-edit/form-designer/form-designer-config.component';
 import { SearchDesignerConfigComponent } from './components/portal-edit/form-designer/search-designer-config.component';
+import { ValidatorComponent } from './components/validator/validator.component';
 
 const monacoConfig: NgxMonacoEditorConfig = {
   defaultOptions: {
@@ -112,7 +114,8 @@ const monacoConfig: NgxMonacoEditorConfig = {
     FormlyFieldSearchRuleEditorComponent,
     FormDesignerViewComponent,
     FormDesignerConfigComponent,
-    SearchDesignerConfigComponent
+    SearchDesignerConfigComponent,
+    ValidatorComponent
   ],
   imports: [
     CommonModule,
@@ -161,6 +164,7 @@ const monacoConfig: NgxMonacoEditorConfig = {
     DividerModule,
     InputSwitchModule,
     InputNumberModule,
+    InputTextareaModule,
     ContextMenuModule,
     MessageModule,
     ConfirmDialogModule
