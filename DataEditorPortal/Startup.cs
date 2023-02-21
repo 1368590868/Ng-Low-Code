@@ -66,6 +66,7 @@ namespace DataEditorPortal.Web
 
             services.AddScoped<IUniversalGridService, UniversalGridService>();
             services.AddScoped<IPortalItemService, PortalItemService>();
+            services.AddScoped<IUserService, UserService>();
 
             #endregion
 

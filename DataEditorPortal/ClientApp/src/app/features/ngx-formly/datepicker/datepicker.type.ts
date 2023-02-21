@@ -35,12 +35,17 @@ export interface FormlyDatepickerFieldConfig
   template: `
     <p-calendar
       [defaultDate]="props.defaultDate"
+      dateType="string"
       [dateFormat]="props.dateFormat"
       [hourFormat]="props.hourFormat"
       [showTime]="props.showTime"
-      [showIcon]="props.showIcon"
-      [showButtonBar]="props.showButtonBar || true"
-      [showOtherMonths]="props.showOtherMonths || true"
+      [showIcon]="isNotSet(props.showIcon) ? true : props.showIcon"
+      [showButtonBar]="
+        isNotSet(props.showButtonBar) ? true : props.showButtonBar
+      "
+      [showOtherMonths]="
+        isNotSet(props.showOtherMonths) ? true : props.showOtherMonths
+      "
       [selectOtherMonths]="props.selectOtherMonths"
       [selectionMode]="props.selectionMode || 'single'"
       [numberOfMonths]="props.numberOfMonths || 1"
@@ -60,4 +65,8 @@ export interface FormlyDatepickerFieldConfig
 })
 export class FormlyFieldDatepickerComponent extends FieldType<
   FieldTypeConfig<DatepickerProps>
-> {}
+> {
+  isNotSet(val: unknown) {
+    return val === null || val === undefined;
+  }
+}

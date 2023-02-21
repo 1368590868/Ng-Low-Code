@@ -89,8 +89,8 @@
           targetHeader="Selected Fields"
           [dragdrop]="true"
           [responsive]="true"
-          [sourceStyle]="{ height: '28.5714rem' }"
-          [targetStyle]="{ height: '33.9286rem' }"
+          [sourceStyle]="{ height: '31.2143rem' }"
+          [targetStyle]="{ height: '36.5714rem' }"
           filterBy="name"
           sourceFilterPlaceholder="Search by name"
           [showTargetFilter]="false"
@@ -109,11 +109,9 @@
                 >*</span
               >
             </div>
-            <div *ngIf="column.selected">
-              <formly-form
-                [fields]="cloneColumn(column)"
-                class="p-fluid"></formly-form>
-            </div>
+            <app-form-designer-view
+              *ngIf="column.selected"
+              [config]="column"></app-form-designer-view>
           </ng-template>
           <ng-template pTemplate="emptymessagetarget">
             <div class="w-full relative">
@@ -125,14 +123,12 @@
           <div class="p-picklist-header">Configuration Form</div>
           <div class="p-picklist-list flex-grow-1">
             <div *ngIf="this.model && this.model.key; else emptyMessage">
-              <form [formGroup]="form" #configForm="ngForm">
-                <formly-form
-                  [form]="form"
-                  [fields]="fields"
-                  [model]="model"
-                  [options]="options"
-                  class="p-fluid"></formly-form>
-              </form>
+              <app-form-designer-config
+                [config]="model"
+                [allSelectedFields]="allSelectedFields"
+                (configChange)="
+                  configChange($event)
+                "></app-form-designer-config>
             </div>
             <ng-template #emptyMessage>
               <div class="pt-4">

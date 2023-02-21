@@ -26,11 +26,12 @@ export interface DataSourceTableColumn {
 }
 
 export interface DataSourceConfig {
-  tableName: string;
-  tableSchema: string;
-  idColumn: string;
-  filters: DataSourceFilter[];
-  sortBy: DataSourceSortBy[];
+  tableName?: string;
+  tableSchema?: string;
+  idColumn?: string;
+  filters?: DataSourceFilter[];
+  sortBy?: DataSourceSortBy[];
+  queryText?: string;
 }
 
 export interface DataSourceFilter {

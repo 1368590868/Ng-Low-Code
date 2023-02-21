@@ -26,19 +26,22 @@ namespace DataEditorPortal.Web.Controllers
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IPortalItemService _portalItemService;
+        private readonly IDbSqlBuilder _dbSqlBuilder;
 
         public PortalItemController(
             ILogger<PortalItemController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
             IMapper mapper,
-            IPortalItemService portalItemService)
+            IPortalItemService portalItemService,
+            IDbSqlBuilder dbSqlBuilder)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _config = config;
             _mapper = mapper;
             _portalItemService = portalItemService;
+            _dbSqlBuilder = dbSqlBuilder;
         }
 
         [HttpGet]
@@ -344,7 +347,8 @@ namespace DataEditorPortal.Web.Controllers
         [Route("datasource/{schema}/{tableName}/columns")]
         public List<DataSourceTableColumn> GetDataSourceTableColumns(string schema, string tableName)
         {
-            return _portalItemService.GetDataSourceTableColumns(schema, tableName);
+            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(new DataSourceConfig() { TableName = tableName, TableSchema = schema });
+            return _portalItemService.GetDataSourceTableColumns(sqlText);
         }
 
         [HttpGet]
@@ -365,6 +369,10 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{id}/datasource")]
         public bool SaveDataSourceConfig(Guid id, DataSourceConfig model)
         {
+            // validate the data source
+            var queryText = _dbSqlBuilder.GetSqlTextForDatabaseSource(model);
+            _portalItemService.GetDataSourceTableColumns(queryText);
+
             return _portalItemService.SaveDataSourceConfig(id, model);
         }
 

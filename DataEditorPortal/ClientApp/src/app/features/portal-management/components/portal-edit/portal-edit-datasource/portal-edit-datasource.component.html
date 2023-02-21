@@ -1,10 +1,15 @@
 <p-card styleClass="">
-  <ng-template pTemplate="title">Data Source </ng-template>
+  <ng-template pTemplate="title">
+    Data Source
+    <a (click)="changeMode()">{{
+      !isAdvanced ? 'Advance Mode' : 'Simple Mode'
+    }}</a>
+  </ng-template>
   <ng-template pTemplate="subtitle">
     Setup data source for this portal item.
   </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
-  <div class="w-6 pt-3">
+  <div *ngIf="!isAdvanced" class="w-6 pt-3">
     <div class="flex align-items-center">
       <div class="flex flex-column mb-2 mr-4">
         <label for="tableName" class="mb-1">Database Table *</label>
@@ -104,10 +109,7 @@
     <p-divider styleClass="mb-0">Sort By</p-divider>
     <div class="flex flex-column mb-2">
       <!-- <label class="mb-1">Sort By</label> -->
-      <p-orderList
-        [value]="datasourceConfig.sortBy"
-        [stripedRows]="true"
-        [dragdrop]="true">
+      <p-orderList [value]="sortBy" [stripedRows]="true" [dragdrop]="true">
         <ng-template let-sortBy pTemplate="item">
           <div class="flex align-items-center">
             <div class="mr-3">
@@ -142,6 +144,23 @@
         styleClass="p-button-text p-button-sm"
         (onClick)="onAddSortColumn()"></p-button>
     </div>
+  </div>
+  <div *ngIf="isAdvanced" class="w-6 pt-3 flex flex-column">
+    <label class="line-height-3 flex align-items-center"
+      >Query text
+      <i
+        class="pi pi-question-circle ml-3 text-lg"
+        [pTooltip]="
+          'Enter the query to fetch the data. Use ##SEARCHES## and ##FILTERS## as the placeholder to recevie the paramters from front end'
+        "></i>
+    </label>
+    <ngx-monaco-editor
+      [formControl]="formControlQuery"
+      (onInit)="onMonacoInit()"
+      [style]="{ height: '20rem' }"
+      [required]="true"
+      class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
+      [options]="{}"></ngx-monaco-editor>
   </div>
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">

@@ -28,8 +28,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("list")]
         public List<DataDictionary> GetDictionaries()
         {
-            return _depDbContext.DataDictionaries
-                .ToList();
+            return _depDbContext.DataDictionaries.OrderBy(x => x.Category).ThenBy(x => x.Label).ToList();
         }
 
         [HttpGet]

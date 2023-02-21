@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Form, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { forkJoin, tap } from 'rxjs';
@@ -55,9 +55,13 @@ export class PortalEditDatasourceComponent implements OnInit {
   ];
 
   filters: DataSourceFilterControls[] = [];
+  sortBy: DataSourceSortBy[] = [];
 
   formControlDbTable: FormControl = new FormControl();
   formControlIdColumn: FormControl = new FormControl();
+  formControlQuery: FormControl = new FormControl();
+
+  isAdvanced = false;
 
   constructor(
     private router: Router,
@@ -101,6 +105,11 @@ export class PortalEditDatasourceComponent implements OnInit {
         this.dbTables = tables;
 
         const dsConfig = res[0];
+        if (dsConfig && dsConfig.queryText) {
+          this.isAdvanced = true;
+          this.formControlQuery.setValue(dsConfig.queryText);
+        }
+
         if (dsConfig && dsConfig.tableName) {
           this.datasourceConfig = dsConfig;
           this.orginalConfig = { ...dsConfig };
@@ -115,15 +124,22 @@ export class PortalEditDatasourceComponent implements OnInit {
           }
 
           // set filters
-          this.filters = dsConfig.filters.map<DataSourceFilterControls>(x => {
-            return {
-              matchOptions: this.getFilterMatchModeOptions(x.filterType),
-              filterType: x.filterType,
-              formControlField: new FormControl(x.field),
-              formControlMatchMode: new FormControl(x.matchMode),
-              formControlValue: new FormControl(x.value)
-            };
-          });
+          if (dsConfig.filters) {
+            this.filters = dsConfig.filters.map<DataSourceFilterControls>(x => {
+              return {
+                matchOptions: this.getFilterMatchModeOptions(x.filterType),
+                filterType: x.filterType,
+                formControlField: new FormControl(x.field),
+                formControlMatchMode: new FormControl(x.matchMode),
+                formControlValue: new FormControl(x.value)
+              };
+            });
+          }
+
+          // set sortby
+          if (dsConfig.sortBy) {
+            this.sortBy = dsConfig.sortBy;
+          }
         } else {
           // if table schema and table name havn't been stored, use the first from tables.
           this.formControlDbTable.setValue(tables[0].value);
@@ -136,6 +152,19 @@ export class PortalEditDatasourceComponent implements OnInit {
     }
   }
 
+  changeMode() {
+    this.isAdvanced = !this.isAdvanced;
+    if (this.isAdvanced) {
+      // this.formControlQuery.reset();
+    }
+  }
+
+  onMonacoInit() {
+    setTimeout(() => {
+      this.formControlQuery.markAsPristine();
+    });
+  }
+
   onTableNameChange({ value }: { value: string }) {
     const item = this.dbTables.find(x => x.value === value);
     if (item) {
@@ -143,7 +172,7 @@ export class PortalEditDatasourceComponent implements OnInit {
 
       // clear the filters and sortBy, as the database table has changed.
       this.filters = [];
-      this.datasourceConfig.sortBy = [];
+      this.sortBy = [];
     }
   }
 
@@ -170,44 +199,58 @@ export class PortalEditDatasourceComponent implements OnInit {
   }
 
   validate() {
-    if (!this.formControlDbTable.valid) {
-      this.formControlDbTable.markAsDirty();
-      this.formControlDbTable.updateValueAndValidity();
-    }
-    if (!this.formControlIdColumn.valid) {
-      this.formControlIdColumn.markAsDirty();
-      this.formControlIdColumn.updateValueAndValidity();
-    }
-
-    const filterValid = this.filters.reduce((r, x) => {
-      if (!x.formControlValue.valid) {
-        x.formControlValue.markAsDirty();
-        x.formControlValue.updateValueAndValidity();
+    if (!this.isAdvanced) {
+      if (!this.formControlDbTable.valid) {
+        this.formControlDbTable.markAsDirty();
+        this.formControlDbTable.updateValueAndValidity();
       }
-      return r && x.formControlValue.valid;
-    }, true);
+      if (!this.formControlIdColumn.valid) {
+        this.formControlIdColumn.markAsDirty();
+        this.formControlIdColumn.updateValueAndValidity();
+      }
 
-    return (
-      this.formControlDbTable.valid &&
-      this.formControlIdColumn.valid &&
-      filterValid
-    );
+      const filterValid = this.filters.reduce((r, x) => {
+        if (!x.formControlValue.valid) {
+          x.formControlValue.markAsDirty();
+          x.formControlValue.updateValueAndValidity();
+        }
+        return r && x.formControlValue.valid;
+      }, true);
+
+      return (
+        this.formControlDbTable.valid &&
+        this.formControlIdColumn.valid &&
+        filterValid
+      );
+    } else {
+      if (!this.formControlQuery.valid) {
+        this.formControlQuery.markAsDirty();
+        this.formControlQuery.updateValueAndValidity();
+      }
+      return this.formControlQuery.valid;
+    }
   }
 
   saveDatasourceConfig() {
     this.isSaving = true;
     if (this.portalItemService.currentPortalItemId) {
-      const data = JSON.parse(
-        JSON.stringify(this.datasourceConfig)
-      ) as DataSourceConfig;
-      data.filters = this.filters.map<DataSourceFilter>(x => {
-        return {
-          field: x.formControlField.value,
-          matchMode: x.formControlMatchMode.value,
-          value: x.formControlValue.value,
-          filterType: x.filterType
-        };
-      });
+      let data: DataSourceConfig = {};
+      if (!this.isAdvanced) {
+        data = JSON.parse(
+          JSON.stringify(this.datasourceConfig)
+        ) as DataSourceConfig;
+        data.filters = this.filters.map<DataSourceFilter>(x => {
+          return {
+            field: x.formControlField.value,
+            matchMode: x.formControlMatchMode.value,
+            value: x.formControlValue.value,
+            filterType: x.filterType
+          };
+        });
+        data.sortBy = this.sortBy;
+      } else {
+        data.queryText = this.formControlQuery.value;
+      }
 
       this.portalItemService
         .saveDataSourceConfig(data)
@@ -327,18 +370,18 @@ export class PortalEditDatasourceComponent implements OnInit {
     if (this.dbTableColumns.length <= 0)
       this.notifyService.notifyWarning('', 'Please select one Database Table.');
 
-    const newSortBy = [...this.datasourceConfig.sortBy];
+    const newSortBy = [...this.sortBy];
     newSortBy.push({
       field: this.dbTableColumns[0].columnName,
       order: this.dbOrderOptions[0].value
     });
-    this.datasourceConfig.sortBy = newSortBy;
+    this.sortBy = newSortBy;
   }
 
   onRemoveSortColumn(sortByColumn: DataSourceSortBy) {
-    const newSortBy = [...this.datasourceConfig.sortBy];
+    const newSortBy = [...this.sortBy];
     const index = newSortBy.indexOf(sortByColumn);
     newSortBy.splice(index, 1);
-    this.datasourceConfig.sortBy = newSortBy;
+    this.sortBy = newSortBy;
   }
 }

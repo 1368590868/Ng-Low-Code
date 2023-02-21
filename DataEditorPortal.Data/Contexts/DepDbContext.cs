@@ -38,44 +38,57 @@ namespace DataEditorPortal.Data.Contexts
             #region Default menus and pages
 
             modelBuilder.Entity<SiteMenu>().HasData(
-               // Admin Settings 
-               new SiteMenu()
-               {
-                   Id = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
-                   Name = "settings",
-                   Label = "Settings",
-                   Icon = "pi pi-cog",
-                   Type = "System",
-                   Link = "",
-                   Order = 999,
-                   Status = Common.PortalItemStatus.Published
-               },
-               // Portal Management
-               new SiteMenu()
-               {
-                   Id = new Guid("B4B490EA-9DF3-4F7A-8806-936CA7F87B8F"),
-                   Name = "portal-management",
-                   Label = "Portal Management",
-                   Icon = "pi pi-desktop",
-                   Type = "System",
-                   Link = "/portal-management/list",
-                   ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
-                   Order = 0,
-                   Status = Common.PortalItemStatus.Published
-               },
-               // User Management
-               new SiteMenu()
-               {
-                   Id = new Guid("4E22E18E-492E-4786-8170-FB8F0C9D3A62"),
-                   Name = "user-management",
-                   Label = "User Management",
-                   Icon = "pi pi-user",
-                   Type = "System",
-                   Link = "/portal-item/user-management",
-                   ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
-                   Order = 1,
-                   Status = Common.PortalItemStatus.Published
-               },
+                // Admin Settings 
+                new SiteMenu()
+                {
+                    Id = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                    Name = "settings",
+                    Label = "Settings",
+                    Icon = "pi pi-cog",
+                    Type = "System",
+                    Link = "",
+                    Order = 999,
+                    Status = Common.PortalItemStatus.Published
+                },
+                // Portal Management
+                new SiteMenu()
+                {
+                    Id = new Guid("B4B490EA-9DF3-4F7A-8806-936CA7F87B8F"),
+                    Name = "portal-management",
+                    Label = "Portal Management",
+                    Icon = "pi pi-desktop",
+                    Type = "System",
+                    Link = "/portal-management/list",
+                    ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                    Order = 0,
+                    Status = Common.PortalItemStatus.Published
+                },
+                // User Management
+                new SiteMenu()
+                {
+                    Id = new Guid("4E22E18E-492E-4786-8170-FB8F0C9D3A62"),
+                    Name = "user-management",
+                    Label = "User Management",
+                    Icon = "pi pi-user",
+                    Type = "System",
+                    Link = "/portal-item/user-management",
+                    ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                    Order = 1,
+                    Status = Common.PortalItemStatus.Published
+                },
+                // data dictionary
+                new SiteMenu()
+                {
+                    Id = new Guid("32B6E555-846F-4050-A22D-D40D39E0B71F"),
+                    Name = "data-dictionary",
+                    Label = "Data Dictionary",
+                    Icon = "pi pi-book",
+                    Type = "System",
+                    Link = "/data-dictionary",
+                    ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                    Order = 2,
+                    Status = Common.PortalItemStatus.Published
+                },
                 // site settings
                 new SiteMenu()
                 {
@@ -86,7 +99,7 @@ namespace DataEditorPortal.Data.Contexts
                     Type = "System",
                     Link = "/site-settings",
                     ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
-                    Order = 2,
+                    Order = 3,
                     Status = Common.PortalItemStatus.Published
                 },
                 // demo items

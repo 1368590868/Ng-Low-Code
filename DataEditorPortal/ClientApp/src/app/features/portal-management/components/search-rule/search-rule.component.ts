@@ -39,19 +39,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   dialogStyle: any = {
     minWidth: '40rem'
   };
-  editorOptions = {
-    theme: 'vs-studio',
-    language: 'sql',
-    lineNumbers: 'off',
-    roundedSelection: true,
-    minimap: { enabled: false },
-    wordWrap: true,
-    contextmenu: false,
-    scrollbar: {
-      verticalScrollbarSize: 7,
-      horizontalScrollbarSize: 7
-    }
-  };
+
   helperMessage =
     '-- Enter the where clause, which will be used to filter data. \r\n' +
     '-- Use ##VALUE## to reference the field value. \r\n' +
@@ -120,18 +108,6 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
           matchMode: val
         });
       });
-  }
-
-  onMonacoInit() {
-    monaco.editor.defineTheme('myTheme', {
-      base: 'vs',
-      inherit: true,
-      rules: [],
-      colors: {
-        'editor.background': '#EEEEEE'
-      }
-    });
-    monaco.editor.setTheme('myTheme');
   }
 
   showDialog() {

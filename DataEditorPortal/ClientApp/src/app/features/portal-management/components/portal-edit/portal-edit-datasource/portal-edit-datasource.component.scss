@@ -28,5 +28,19 @@
     .p-dropdown {
       width: 13rem;
     }
+
+    .p-card-title {
+      display: flex;
+      align-items: center;
+
+      a {
+        font-size: 0.75rem;
+        color: var(--primary-color);
+        font-weight: normal;
+        text-decoration: underline;
+        cursor: pointer;
+        margin-left: 1rem;
+      }
+    }
   }
 }
