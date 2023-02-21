@@ -57,6 +57,8 @@ export interface GridColumn {
   order?: number;
   aggregate?: boolean;
   selected?: boolean;
+  template?: string;
+  format?: string;
 }
 
 export interface GridSearchField {

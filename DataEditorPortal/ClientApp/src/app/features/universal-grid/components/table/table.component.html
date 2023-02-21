@@ -99,9 +99,25 @@
         </td>
 
         <td *ngFor="let col of columns" [title]="data[col.field] || ''">
-          <span *ngIf="!col.template">
-            {{ data[col.field] | booleanText }}
-          </span>
+          <ng-container
+            *ngIf="!col.template"
+            [ngTemplateOutlet]="
+              col.filterType === 'date'
+                ? date
+                : col.filterType === 'numeric'
+                ? numeric
+                : col.filterType === 'boolean'
+                ? boolean
+                : normal
+            "></ng-container>
+          <ng-template #boolean>{{ data[col.field] | boolean }}</ng-template>
+          <ng-template #date>{{
+            data[col.field] | date : col.format
+          }}</ng-template>
+          <ng-template #numeric>{{
+            data[col.field] | number : col.format
+          }}</ng-template>
+          <ng-template #normal>{{ data[col.field] }}</ng-template>
           <span
             *ngIf="col.template"
             [innerHTML]="calcCustomTemplate(data, col.template)">

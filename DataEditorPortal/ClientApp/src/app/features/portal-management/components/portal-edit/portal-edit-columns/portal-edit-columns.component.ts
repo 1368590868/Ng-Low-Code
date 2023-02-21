@@ -59,7 +59,7 @@ export class PortalEditColumnsComponent implements OnInit {
       key: 'template',
       type: 'monacoEditor',
       props: {
-        label: 'Template',
+        label: 'Data Template',
         config: {
           language: 'javascript'
         }
@@ -109,6 +109,16 @@ export class PortalEditColumnsComponent implements OnInit {
           defaultValue: true,
           props: {
             label: 'Sortable'
+          }
+        },
+        {
+          key: 'format',
+          type: 'input',
+          props: {
+            label: 'Data Format'
+          },
+          expressions: {
+            hide: `['numeric','date'].indexOf(field.parent.model.filterType) < 0`
           }
         }
       ],

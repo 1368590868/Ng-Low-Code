@@ -19,10 +19,10 @@ export class DataFormatService {
   getFormatters() {
     return {
       locale: this.locale,
-      date: this.datePipe.transform,
-      number: this.decimalPipe.transform,
-      currency: this.currencyPipe.transform,
-      percent: this.percentPipe.transform
+      date: this.datePipe,
+      number: this.decimalPipe,
+      currency: this.currencyPipe,
+      percent: this.percentPipe
     };
   }
 }
