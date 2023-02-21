@@ -16,3 +16,7 @@ export const currentDateValidator = () => {
 export const getValidators = () => {
   return [{ name: 'currentDate', validation: currentDateValidator() }];
 };
+
+export const getValidationMessages = () => {
+  return [{ name: 'currentDate', message: 'Invalid date' }];
+};

@@ -4,10 +4,7 @@ import { UniversalRegexp } from './universal-regexp';
 @NgModule({
   imports: [
     FormlyModule.forChild({
-      validationMessages: [
-        { name: 'currentDate', message: 'Invalid date' },
-        ...UniversalRegexp.getValidationMessages()
-      ],
+      validationMessages: [...UniversalRegexp.getValidationMessages()],
       validators: UniversalRegexp.getValidators()
     })
   ]
