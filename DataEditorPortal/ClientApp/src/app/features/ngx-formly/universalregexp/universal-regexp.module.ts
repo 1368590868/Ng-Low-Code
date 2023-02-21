@@ -1,18 +1,15 @@
 import { NgModule } from '@angular/core';
 import { FormlyModule } from '@ngx-formly/core';
-import { UnivaersalValidator } from './universal-regexp';
-
-const validators = UnivaersalValidator.getValidators();
-
-const formlyConfig = {
-  validationMessages: [
-    { name: 'currentDate', message: 'Invalid date' },
-    ...UnivaersalValidator.getValidationMessages()
-  ],
-  validators
-};
-
+import { UniversalRegexp } from './universal-regexp';
 @NgModule({
-  imports: [FormlyModule.forChild(formlyConfig)]
+  imports: [
+    FormlyModule.forChild({
+      validationMessages: [
+        { name: 'currentDate', message: 'Invalid date' },
+        ...UniversalRegexp.getValidationMessages()
+      ],
+      validators: UniversalRegexp.getValidators()
+    })
+  ]
 })
 export class UniversalRegexpModule {}

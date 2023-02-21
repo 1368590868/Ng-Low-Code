@@ -1,16 +1,13 @@
 import { NgModule } from '@angular/core';
 import { FormlyModule } from '@ngx-formly/core';
-
-import { AppValidator } from './current-date';
-
-const validators = AppValidator.getValidators();
-
-const formlyConfig = {
-  validationMessages: [{ name: 'currentDate', message: 'Invalid date' }],
-  validators
-};
+import { getValidators } from './current-date';
 
 @NgModule({
-  imports: [FormlyModule.forChild(formlyConfig)]
+  imports: [
+    FormlyModule.forChild({
+      validationMessages: [{ name: 'currentDate', message: 'Invalid date' }],
+      validators: getValidators()
+    })
+  ]
 })
 export class CurrentDateModule {}

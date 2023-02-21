@@ -6,7 +6,7 @@ interface ValidatorsArr {
   message: string;
 }
 
-export class UnivaersalValidator {
+export class UniversalRegexp {
   static validators: ValidatorsArr[] = [
     {
       name: 'ip',
