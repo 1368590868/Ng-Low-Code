@@ -1,4 +1,6 @@
 ﻿using AutoWrapper.Filters;
+using DataEditorPortal.Web.Common;
+using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -38,6 +40,16 @@ namespace DataEditorPortal.Web.Controllers
         public List<GridColConfig> GridColumns(string name)
         {
             return _universalGridService.GetGridColumnsConfig(name);
+        }
+
+        [HttpGet]
+        [Route("{name}/config/column/filter-options")]
+        public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, [FromQuery] string column)
+        {
+            if (string.IsNullOrEmpty(column))
+                throw new DepException("Column can not be empty.");
+
+            return _universalGridService.GetGridColumnFilterOptions(name, column);
         }
 
         [HttpGet]

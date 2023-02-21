@@ -2,6 +2,7 @@
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
+using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,7 @@ namespace DataEditorPortal.Web.Services
     {
         GridConfig GetGridConfig(string name);
         List<GridColConfig> GetGridColumnsConfig(string name);
+        List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column);
         List<SearchFieldConfig> GetGridSearchConfig(string name);
         List<FormFieldConfig> GetGridDetailConfig(string name);
 
@@ -91,6 +93,48 @@ namespace DataEditorPortal.Web.Services
             if (string.IsNullOrEmpty(config.ColumnsConfig)) config.ColumnsConfig = "[]";
 
             return JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
+        }
+
+        public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column)
+        {
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            var columnsConfig = JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
+
+            var result = new List<string>();
+            var columnConfig = columnsConfig.FirstOrDefault(x => x.field == column);
+            if (columnConfig != null && columnConfig.filterType == "enums")
+            {
+                using (var con = _depDbContext.Database.GetDbConnection())
+                {
+                    con.Open();
+                    var cmd = con.CreateCommand();
+                    cmd.Connection = con;
+
+                    try
+                    {
+                        cmd.CommandText = $"select distinct {column} FROM {dataSourceConfig.TableSchema}.{dataSourceConfig.TableName}";
+                        using (var dr = cmd.ExecuteReader())
+                        {
+                            while (dr.Read())
+                            {
+                                result.Add(dr.GetString(0));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("An Error in the query has occurred: " + ex.Message);
+                    }
+                }
+
+            }
+
+
+
+            return result.Select(x => new DropdownOptionsItem { Label = x, Value = x }).ToList();
         }
 
         public GridData GetGridData(string name, GridParam param)
