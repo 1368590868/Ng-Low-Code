@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
-import { finalize, forkJoin, skip, Subject, takeUntil, tap } from 'rxjs';
+import { finalize, forkJoin, Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import {
   GridActionOption,
@@ -16,6 +16,8 @@ import {
 import { Table } from 'primeng/table';
 import { TableState } from 'primeng/api';
 import { NotifyService } from 'src/app/shared';
+import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
+import { DataFormatService } from '../../services/data-format.service';
 
 @Component({
   selector: 'app-table',
@@ -47,11 +49,16 @@ export class TableComponent implements OnInit, OnDestroy {
 
   firstLoadDone = false;
 
+  formatters?: any;
+
   constructor(
     private route: ActivatedRoute,
     private notifyService: NotifyService,
-    private gridTableService: GridTableService
-  ) {}
+    private gridTableService: GridTableService,
+    private dataFormatService: DataFormatService
+  ) {
+    this.formatters = this.dataFormatService.getFormatters();
+  }
 
   ngOnInit() {
     this.reset();
@@ -265,5 +272,10 @@ export class TableComponent implements OnInit, OnDestroy {
     state.sortField = undefined;
     state.sortOrder = undefined;
     this.table.getStorage().setItem(this.stateKey, JSON.stringify(state));
+  }
+
+  calcCustomTemplate(data: any, template: string) {
+    const expression = evalStringExpression(template, ['row', 'pipes']);
+    return evalExpression(expression, data, [data, this.formatters]);
   }
 }

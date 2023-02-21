@@ -98,9 +98,13 @@
           </div>
         </td>
 
-        <td *ngFor="let col of columns" [title]="data[col.field]">
+        <td *ngFor="let col of columns" [title]="data[col.field] || ''">
           <span *ngIf="!col.template">
             {{ data[col.field] | booleanText }}
+          </span>
+          <span
+            *ngIf="col.template"
+            [innerHTML]="calcCustomTemplate(data, col.template)">
           </span>
         </td>
       </tr>
