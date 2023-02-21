@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ValidatorComponent } from './validator.component';
+import { ValidatorEditComponent } from './validator-edit.component';
 
 describe('ValidatorComponent', () => {
-  let component: ValidatorComponent;
-  let fixture: ComponentFixture<ValidatorComponent>;
+  let component: ValidatorEditComponent;
+  let fixture: ComponentFixture<ValidatorEditComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ValidatorComponent]
+      declarations: [ValidatorEditComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ValidatorComponent);
+    fixture = TestBed.createComponent(ValidatorEditComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

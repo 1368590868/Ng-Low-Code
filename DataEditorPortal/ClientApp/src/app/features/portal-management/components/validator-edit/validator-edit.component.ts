@@ -3,11 +3,11 @@ import { FormControl, Validators } from '@angular/forms';
 import { FormlyConfig } from '@ngx-formly/core';
 
 @Component({
-  selector: 'app-validator',
-  templateUrl: './validator.component.html',
-  styleUrls: ['./validator.component.scss']
+  selector: 'app-validator-edit',
+  templateUrl: './validator-edit.component.html',
+  styleUrls: ['./validator-edit.component.scss']
 })
-export class ValidatorComponent implements OnInit {
+export class ValidatorEditComponent implements OnInit {
   validatorFormControl = new FormControl([], Validators.required);
   regexpFormControl = new FormControl('');
   visible = false;

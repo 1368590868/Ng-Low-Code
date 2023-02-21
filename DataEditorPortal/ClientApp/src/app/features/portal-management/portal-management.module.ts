@@ -68,7 +68,7 @@ import {
   FROM_DESIGNER_CONTROLS
 } from './components/portal-edit/form-designer/form-designer-config.component';
 import { SearchDesignerConfigComponent } from './components/portal-edit/form-designer/search-designer-config.component';
-import { ValidatorComponent } from './components/validator/validator.component';
+import { ValidatorEditComponent } from './components/validator-edit/validator-edit.component';
 
 const monacoConfig: NgxMonacoEditorConfig = {
   defaultOptions: {
@@ -115,7 +115,7 @@ const monacoConfig: NgxMonacoEditorConfig = {
     FormDesignerViewComponent,
     FormDesignerConfigComponent,
     SearchDesignerConfigComponent,
-    ValidatorComponent
+    ValidatorEditComponent
   ],
   imports: [
     CommonModule,
