@@ -12,7 +12,6 @@ import { ToastModule } from 'primeng/toast';
 import { CoreModule } from './features/core';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyCustomTypeModule } from './features/ngx-formly/formly-custom.module';
-import { ValidatorModule } from './features/validator/validator.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -29,8 +28,7 @@ import { ValidatorModule } from './features/validator/validator.module';
         { name: 'required', message: 'This field is required.' }
       ]
     }),
-    FormlyCustomTypeModule,
-    ValidatorModule
+    FormlyCustomTypeModule
   ],
   bootstrap: [AppComponent]
 })

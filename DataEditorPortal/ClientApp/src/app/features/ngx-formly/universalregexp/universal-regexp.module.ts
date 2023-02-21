@@ -13,9 +13,6 @@ const formlyConfig = {
 };
 
 @NgModule({
-  imports: [FormlyModule.forChild(formlyConfig)],
-  providers: [
-    { provide: 'FormlyValidators', multi: true, useValue: validators }
-  ]
+  imports: [FormlyModule.forChild(formlyConfig)]
 })
 export class UniversalRegexpModule {}
