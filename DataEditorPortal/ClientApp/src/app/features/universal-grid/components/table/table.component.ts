@@ -84,6 +84,17 @@ export class TableComponent implements OnInit, OnDestroy {
       this.setTableActions();
       this.cols = result[1];
 
+      // load column filter options
+      this.cols.forEach(col => {
+        if (col.field && col.filterType === 'enums') {
+          this.gridTableService
+            .getTableColumnFilterOptions(col.field)
+            .subscribe(val => {
+              col.filterOptions = val;
+            });
+        }
+      });
+
       this.loading = false;
     });
 

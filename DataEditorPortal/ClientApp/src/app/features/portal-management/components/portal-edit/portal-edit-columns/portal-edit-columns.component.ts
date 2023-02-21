@@ -99,6 +99,10 @@ export class PortalEditColumnsComponent implements OnInit {
               {
                 label: 'Date',
                 value: 'date'
+              },
+              {
+                label: 'Enums',
+                value: 'enums'
               }
             ]
           }

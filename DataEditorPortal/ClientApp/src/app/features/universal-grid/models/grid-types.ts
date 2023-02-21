@@ -50,6 +50,9 @@ export interface GridColumn {
   uiType?: string;
   order?: number;
   aggregate: boolean;
+  template?: string;
+  format?: string;
+  filterOptions?: any[];
 }
 
 export interface GridSearchConfig {

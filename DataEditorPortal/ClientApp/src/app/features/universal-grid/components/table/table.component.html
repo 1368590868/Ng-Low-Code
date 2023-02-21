@@ -66,7 +66,11 @@
           <span style="vertical-align: middle">{{ col.header }}</span>
           <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
           <p-columnFilter
-            *ngIf="col.filterType && col.filterType !== 'none'"
+            *ngIf="
+              col.filterType &&
+              col.filterType !== 'none' &&
+              col.filterType !== 'enums'
+            "
             style="vertical-align: middle"
             [type]="col.filterType"
             [field]="col.field"
@@ -75,6 +79,30 @@
             [showOperator]="false"
             [showAddButton]="false"
             [maxFractionDigits]="2"></p-columnFilter>
+          <p-columnFilter
+            *ngIf="col.filterType && col.filterType === 'enums'"
+            style="vertical-align: middle"
+            [field]="col.field"
+            matchMode="in"
+            display="menu"
+            [hideOnClear]="true"
+            [showMatchModes]="false"
+            [showOperator]="false"
+            [showAddButton]="false">
+            <ng-template
+              pTemplate="filter"
+              let-value
+              let-filter="filterCallback">
+              <p-multiSelect
+                [showToggleAll]="false"
+                appendTo="body"
+                placeholder="Any"
+                [ngModel]="value"
+                [options]="col.filterOptions || []"
+                (onChange)="filter($event.value)">
+              </p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
         </th>
       </tr>
     </ng-template>
@@ -112,10 +140,12 @@
             "></ng-container>
           <ng-template #boolean>{{ data[col.field] | boolean }}</ng-template>
           <ng-template #date>{{
-            data[col.field] | date : col.format
+            data[col.field]
+              | date : (col.format === '' ? undefined : col.format)
           }}</ng-template>
           <ng-template #numeric>{{
-            data[col.field] | number : col.format
+            data[col.field]
+              | number : (col.format === '' ? undefined : col.format)
           }}</ng-template>
           <ng-template #normal>{{ data[col.field] }}</ng-template>
           <span
