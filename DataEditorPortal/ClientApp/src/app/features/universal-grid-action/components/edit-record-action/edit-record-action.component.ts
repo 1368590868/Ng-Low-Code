@@ -83,7 +83,7 @@ export class EditRecordActionComponent
             });
 
           this.fields = fields;
-          this.loadedEvent.emit();
+          if (fields.length > 0) this.loadedEvent.emit();
         })
       )
       .subscribe();
