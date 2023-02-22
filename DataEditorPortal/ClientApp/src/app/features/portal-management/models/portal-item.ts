@@ -32,6 +32,7 @@ export interface DataSourceConfig {
   filters?: DataSourceFilter[];
   sortBy?: DataSourceSortBy[];
   queryText?: string;
+  pageSize?: number;
 }
 
 export interface DataSourceFilter {
@@ -47,6 +48,7 @@ export interface DataSourceSortBy {
 }
 
 export interface GridColumn {
+  type?: string;
   field?: string;
   header?: string;
   width?: string;
@@ -55,6 +57,8 @@ export interface GridColumn {
   order?: number;
   aggregate?: boolean;
   selected?: boolean;
+  template?: string;
+  format?: string;
 }
 
 export interface GridSearchField {

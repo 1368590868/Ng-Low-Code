@@ -9,8 +9,10 @@ import { FormlyInputMaskModule } from './inputMask';
 import { FormlyInputNumberModule } from './inputnumber';
 import { FormlyMultiSelectModule } from './multiselect';
 import { FormlySelectModule } from './select';
+import { FormlyMonacoEditorModule } from './monacoEditor';
 import { CurrentDateModule } from './currentdate';
 import { UniversalRegexpModule } from './universalregexp';
+
 @NgModule({
   imports: [
     FormlyPrimeNGModule,
@@ -23,6 +25,7 @@ import { UniversalRegexpModule } from './universalregexp';
     FormlyChipWrapperModule,
     FormlyIconSelectModule,
     FormlyInputNumberModule,
+    FormlyMonacoEditorModule,
     CurrentDateModule,
     UniversalRegexpModule
   ]

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
-import { finalize, forkJoin, skip, Subject, takeUntil, tap } from 'rxjs';
+import { finalize, forkJoin, Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import {
   GridActionOption,
@@ -16,6 +16,8 @@ import {
 import { Table } from 'primeng/table';
 import { TableState } from 'primeng/api';
 import { NotifyService } from 'src/app/shared';
+import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
+import { DataFormatService } from '../../services/data-format.service';
 
 @Component({
   selector: 'app-table',
@@ -38,6 +40,8 @@ export class TableComponent implements OnInit, OnDestroy {
 
   cols: GridColumn[] = [];
   stateKey!: string;
+  pageSize = 100;
+  rowsPerPageOptions: any[] = [100, 200, 500, { showAll: 'Show All' }];
 
   tableConfig: GridConfig = { dataKey: 'Id' };
   rowActions: GridActionOption[] = [];
@@ -45,11 +49,16 @@ export class TableComponent implements OnInit, OnDestroy {
 
   firstLoadDone = false;
 
+  formatters?: any;
+
   constructor(
     private route: ActivatedRoute,
     private notifyService: NotifyService,
-    private gridTableService: GridTableService
-  ) {}
+    private gridTableService: GridTableService,
+    private dataFormatService: DataFormatService
+  ) {
+    this.formatters = this.dataFormatService.getFormatters();
+  }
 
   ngOnInit() {
     this.reset();
@@ -62,9 +71,29 @@ export class TableComponent implements OnInit, OnDestroy {
       this.gridTableService.getTableColumns()
     ]).subscribe(result => {
       this.tableConfig = result[0];
+      if (this.tableConfig.pageSize && this.tableConfig.pageSize >= 10) {
+        this.pageSize = this.tableConfig.pageSize;
+        if (!this.rowsPerPageOptions.find(x => x === this.pageSize)) {
+          const index = this.rowsPerPageOptions.findIndex(
+            x => x > this.pageSize
+          );
+          this.rowsPerPageOptions.splice(index, 0, this.pageSize);
+        }
+      }
       this.setRowActions();
       this.setTableActions();
       this.cols = result[1];
+
+      // load column filter options
+      this.cols.forEach(col => {
+        if (col.field && col.filterType === 'enums') {
+          this.gridTableService
+            .getTableColumnFilterOptions(col.field)
+            .subscribe(val => {
+              col.filterOptions = val;
+            });
+        }
+      });
 
       this.loading = false;
     });
@@ -185,7 +214,7 @@ export class TableComponent implements OnInit, OnDestroy {
       sorts: [],
       searches: this.searchModel,
       startIndex: 0,
-      indexCount: 50
+      indexCount: this.pageSize
     };
 
     if (this.lazyLoadParam) {
@@ -221,7 +250,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
       // set pagination
       fetchParam.startIndex = this.lazyLoadParam.first ?? 0;
-      fetchParam.indexCount = this.lazyLoadParam.rows ?? 50;
+      fetchParam.indexCount = this.lazyLoadParam.rows ?? this.pageSize;
     }
 
     return fetchParam;
@@ -254,5 +283,10 @@ export class TableComponent implements OnInit, OnDestroy {
     state.sortField = undefined;
     state.sortOrder = undefined;
     this.table.getStorage().setItem(this.stateKey, JSON.stringify(state));
+  }
+
+  calcCustomTemplate(data: any, template: string) {
+    const expression = evalStringExpression(template, ['row', 'pipes']);
+    return evalExpression(expression, data, [data, this.formatters]);
   }
 }

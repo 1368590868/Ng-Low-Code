@@ -43,6 +43,14 @@ export class GridTableService {
       .pipe(map(res => res.result || []));
   }
 
+  getTableColumnFilterOptions(column: string): Observable<any[]> {
+    return this.http
+      .get<ApiResponse<any[]>>(
+        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/column/filter-options?column=${column}`
+      )
+      .pipe(map(res => res.result || []));
+  }
+
   getTableData(tableParams: GridParam): Observable<GridResult> {
     return this.http
       .post<ApiResponse<GridResult>>(

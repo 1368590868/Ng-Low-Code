@@ -14,8 +14,8 @@
       targetHeader="Selected Fields"
       [dragdrop]="true"
       [responsive]="true"
-      [sourceStyle]="{ height: '21.4286rem' }"
-      [targetStyle]="{ height: '21.4286rem' }"
+      [sourceStyle]="{ height: '31.2143rem' }"
+      [targetStyle]="{ height: '31.2143rem' }"
       filterBy="name"
       [showSourceControls]="false"
       [showTargetControls]="false"
@@ -27,6 +27,16 @@
       (onTargetSelect)="onTargetSelect($event)"
       sourceFilterPlaceholder="Search by name"
       targetFilterPlaceholder="Search by name">
+      <ng-template pTemplate="targetHeader">
+        <div
+          class="p-picklist-title flex align-items-center justify-content-between">
+          <span>Selected Fields</span>
+          <p-button
+            label="Add Template Column"
+            styleClass="p-button-sm p-button-text"
+            (onClick)="onAddTemplateColumn()"></p-button>
+        </div>
+      </ng-template>
       <ng-template let-column pTemplate="item">
         <div *ngIf="!column.selected" class="">[{{ column.field }}]</div>
         <div *ngIf="column.selected" class="flex align-items-center">
