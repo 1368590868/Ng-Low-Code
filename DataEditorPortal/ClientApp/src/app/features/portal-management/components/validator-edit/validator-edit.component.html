@@ -1,50 +1,52 @@
-<div class="flex align-items-center">
-  <p-multiSelect
-    [formControl]="validatorFormControl"
-    class="mr-2 flex-grow-1"
-    styleClass="w-full"
-    appendTo="body"
-    placeholder="Please Select"
-    [showClear]="true"
-    [options]="options"></p-multiSelect>
+<form [formGroup]="form">
+  <div class="flex align-items-center">
+    <p-multiSelect
+      formControlName="validatorFormControl"
+      class="mr-2 flex-grow-1"
+      styleClass="w-full"
+      appendTo="body"
+      placeholder="Please Select"
+      [showClear]="true"
+      [options]="selectOptions"></p-multiSelect>
 
-  <p-button
-    class="ml-auto"
-    title="Advanced Configuration"
-    styleClass="p-button-text p-button-rounded"
-    icon="pi pi-ellipsis-v"
-    (onClick)="showDialog()"></p-button>
-</div>
-<div
-  class="flex mt-2 flex-grow-1"
-  *ngIf="this.regexp.length > 0 && this.regexp[0].regex !== ''">
-  <p class="mt-2">
-    Pattern:&nbsp;&nbsp;<p-tag class="" [value]="this.regexp[0].regex"></p-tag>
-  </p>
-</div>
-<p-dialog
-  header="Advanced  Configuration"
-  [(visible)]="visible"
-  [style]="{ minWidth: '40rem' }"
-  [modal]="true"
-  [dismissableMask]="true"
-  appendTo="body"
-  contentStyleClass="border-top-1 surface-border pt-4 pb-0">
-  <div #container class="dialog-content">
-    <label>Advanced </label>
-    <textarea
-      class="w-full mt-2"
-      rows="5"
-      pInputTextarea
-      [formControl]="regexpFormControl"
-      placeholder="Enter a value"></textarea>
-  </div>
-  <ng-template pTemplate="footer">
     <p-button
-      icon="pi pi-times"
-      (onClick)="onCancel()"
-      label="Cancle"
-      styleClass="p-button-text"></p-button>
-    <p-button icon="pi pi-check" (onClick)="onOk()" label="Ok"></p-button>
-  </ng-template>
-</p-dialog>
+      class="ml-auto"
+      title="Advanced Configuration"
+      styleClass="p-button-text p-button-rounded"
+      icon="pi pi-ellipsis-v"
+      (onClick)="showDialog()"></p-button>
+  </div>
+  <p-dialog
+    header="Advanced  Configuration"
+    [(visible)]="visible"
+    [style]="{ minWidth: '40rem' }"
+    [modal]="true"
+    [dismissableMask]="true"
+    appendTo="body"
+    contentStyleClass="border-top-1 surface-border pt-4 pb-0">
+    <div #container class="dialog-content">
+      <label>Advanced </label>
+      <textarea
+        class="w-full mt-2"
+        rows="5"
+        pInputTextarea
+        formControlName="regexpFormControl"
+        placeholder="Enter a value"></textarea>
+      <label>message </label>
+      <input
+        class="w-full mt-2 mb-2"
+        rows="5"
+        pInputText
+        formControlName="messageFormControl"
+        placeholder="Enter a value" />
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button
+        icon="pi pi-times"
+        (onClick)="onCancel()"
+        label="Cancle"
+        styleClass="p-button-text"></p-button>
+      <p-button icon="pi pi-check" (onClick)="onOk()" label="Ok"></p-button>
+    </ng-template>
+  </p-dialog>
+</form>
