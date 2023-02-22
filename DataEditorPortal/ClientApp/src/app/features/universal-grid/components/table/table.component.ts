@@ -46,6 +46,9 @@ export class TableComponent implements OnInit, OnDestroy {
   tableConfig: GridConfig = { dataKey: 'Id' };
   rowActions: GridActionOption[] = [];
   tableActions: GridActionOption[] = [];
+  allowEdit = false; // todo: calculate by user permission
+  allowDelete = false; // todo: calculate by user permission
+  allowExport = false; // todo: calculate by user permission
 
   firstLoadDone = false;
 
@@ -80,6 +83,7 @@ export class TableComponent implements OnInit, OnDestroy {
           this.rowsPerPageOptions.splice(index, 0, this.pageSize);
         }
       }
+      this.setAllows();
       this.setRowActions();
       this.setTableActions();
       this.cols = result[1];
@@ -114,22 +118,26 @@ export class TableComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  setAllows() {
+    this.allowEdit = true; // todo: calculate by user permission
+    this.allowDelete = true; // todo: calculate by user permission
+    this.allowExport = true; // todo: calculate by user permission
+  }
+
   setRowActions() {
     const actions: GridActionOption[] = [];
-    if (this.tableConfig.allowEdit) {
+    if (this.allowEdit) {
       const viewWrapper: GridActionWrapperOption = {
         label: '',
         icon: 'pi pi-info-circle',
         class: 'flex',
         buttonStyleClass: 'p-button-lg p-button-rounded p-button-text'
       };
-      if (this.tableConfig.useCustomForm) {
-        if (this.tableConfig.customViewFormName) {
-          actions.push({
-            name: this.tableConfig.customViewFormName,
-            wrapper: viewWrapper
-          });
-        }
+      if (this.tableConfig.customViewFormName) {
+        actions.push({
+          name: this.tableConfig.customViewFormName,
+          wrapper: viewWrapper
+        });
       } else {
         actions.push({
           name: 'view-record',
@@ -143,13 +151,11 @@ export class TableComponent implements OnInit, OnDestroy {
         class: 'flex',
         buttonStyleClass: 'p-button-lg p-button-rounded p-button-text'
       };
-      if (this.tableConfig.useCustomForm) {
-        if (this.tableConfig.customEditFormName) {
-          actions.push({
-            name: this.tableConfig.customEditFormName,
-            wrapper: editWrapper
-          });
-        }
+      if (this.tableConfig.customEditFormName) {
+        actions.push({
+          name: this.tableConfig.customEditFormName,
+          wrapper: editWrapper
+        });
       } else {
         actions.push({
           name: 'edit-record',
@@ -162,19 +168,18 @@ export class TableComponent implements OnInit, OnDestroy {
 
   setTableActions() {
     const actions: GridActionOption[] = [];
-    if (this.tableConfig.allowEdit) {
-      if (this.tableConfig.useCustomForm) {
-        if (this.tableConfig.customAddFormName) {
-          actions.push({ name: this.tableConfig.customAddFormName });
-        }
+
+    if (this.allowEdit) {
+      if (this.tableConfig.customAddFormName) {
+        actions.push({ name: this.tableConfig.customAddFormName });
       } else {
         actions.push({ name: 'add-record' });
       }
     }
-    if (this.tableConfig.allowDelete) {
+    if (this.allowDelete) {
       actions.push({ name: 'remove-record' });
     }
-    if (this.tableConfig.allowExport) {
+    if (this.allowExport) {
       actions.push({ name: 'export-excel' });
     }
 

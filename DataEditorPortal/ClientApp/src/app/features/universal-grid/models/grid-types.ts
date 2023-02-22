@@ -31,10 +31,6 @@ export interface GridConfig {
   caption?: string;
   description?: string;
   dataKey: string;
-  allowExport?: boolean;
-  allowEdit?: boolean;
-  allowDelete?: boolean;
-  useCustomForm?: boolean;
   customEditFormName?: string;
   customAddFormName?: string;
   customViewFormName?: string;

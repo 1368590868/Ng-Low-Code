@@ -20,10 +20,11 @@ export class UniversalGridService {
     this._apiUrl = apiUrl;
   }
 
-  getDetailConfig(): Observable<EditFormField[]> {
+  getDetailConfig(type: 'ADD' | 'UPDATE'): Observable<EditFormField[]> {
     return this.http
       .get<ApiResponse<EditFormField[]>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`
+        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`,
+        { params: { type } }
       )
       .pipe(map(res => res.result || []));
   }
