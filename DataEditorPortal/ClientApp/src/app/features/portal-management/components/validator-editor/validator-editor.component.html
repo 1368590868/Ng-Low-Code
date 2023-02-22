@@ -25,13 +25,12 @@
     appendTo="body"
     contentStyleClass="border-top-1 surface-border pt-4 pb-0">
     <div #container class="dialog-content">
-      <label>Advanced </label>
-      <textarea
-        class="w-full mt-2"
-        rows="5"
-        pInputTextarea
+      <label class="line-height-3 flex align-items-center">Advanced </label>
+      <ngx-monaco-editor
+        *ngIf="visible"
         formControlName="expressionFormControl"
-        placeholder="Enter a value"></textarea>
+        class="pt-3 border-round monaco-editor-wrapper"
+        [options]="{ language: 'javascript' }"></ngx-monaco-editor>
       <label>message </label>
       <input
         class="w-full mt-2 mb-2"
