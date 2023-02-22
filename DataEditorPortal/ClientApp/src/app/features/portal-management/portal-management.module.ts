@@ -84,6 +84,7 @@ const monacoConfig: NgxMonacoEditorConfig = {
     glyphMargin: false,
     lineDecorationsWidth: 0,
     lineNumbersMinChars: 0,
+    automaticLayout: true,
     scrollbar: {
       verticalScrollbarSize: 7,
       horizontalScrollbarSize: 7
