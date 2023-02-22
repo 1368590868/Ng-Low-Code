@@ -62,14 +62,14 @@ import {
   FormlyFieldSearchRuleEditorComponent,
   SearchRuleComponent
 } from './components/search-rule/search-rule.component';
-import { FormlyFieldValidatorEditorComponent } from './components/validator-edit/validator-edit.component';
+import { FormlyFieldValidatorEditorComponent } from './components/validator-editor/validator-editor.component';
 import { FormDesignerViewComponent } from './components/portal-edit/form-designer/form-designer-view.component';
 import {
   FormDesignerConfigComponent,
   FROM_DESIGNER_CONTROLS
 } from './components/portal-edit/form-designer/form-designer-config.component';
 import { SearchDesignerConfigComponent } from './components/portal-edit/form-designer/search-designer-config.component';
-import { ValidatorEditComponent } from './components/validator-edit/validator-edit.component';
+import { ValidatorEditorComponent } from './components/validator-editor/validator-editor.component';
 
 const monacoConfig: NgxMonacoEditorConfig = {
   defaultOptions: {
@@ -121,7 +121,7 @@ const monacoConfig: NgxMonacoEditorConfig = {
     FormDesignerViewComponent,
     FormDesignerConfigComponent,
     SearchDesignerConfigComponent,
-    ValidatorEditComponent
+    ValidatorEditorComponent
   ],
   imports: [
     CommonModule,
