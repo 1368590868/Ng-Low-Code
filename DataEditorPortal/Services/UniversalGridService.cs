@@ -107,6 +107,9 @@ namespace DataEditorPortal.Web.Services
             var columnConfig = columnsConfig.FirstOrDefault(x => x.field == column);
             if (columnConfig != null && columnConfig.filterType == "enums")
             {
+                dataSourceConfig.Columns = new List<string>() { columnConfig.field };
+                var query = _dbSqlBuilder.GenerateSqlTextForColumnFilterOption(dataSourceConfig);
+
                 using (var con = _depDbContext.Database.GetDbConnection())
                 {
                     con.Open();
@@ -115,7 +118,7 @@ namespace DataEditorPortal.Web.Services
 
                     try
                     {
-                        cmd.CommandText = $"select distinct {column} FROM {dataSourceConfig.TableSchema}.{dataSourceConfig.TableName}";
+                        cmd.CommandText = query;
                         using (var dr = cmd.ExecuteReader())
                         {
                             while (dr.Read())

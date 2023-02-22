@@ -11,10 +11,10 @@ namespace DataEditorPortal.Web.Services
     {
         // ultilities
         string UsePagination(string query, int startIndex, int indexCount);
-        string UseOrderBy(string query, List<SortParam> sortParams);
+        string UseOrderBy(string query, List<SortParam> sortParams = null);
         string UseCount(string query);
-        string UseFilters(string query, List<FilterParam> filterParams);
-        string UseSearches(string query, List<SearchParam> filterParams);
+        string UseFilters(string query, List<FilterParam> filterParams = null);
+        string UseSearches(string query, List<SearchParam> filterParams = null);
         object FormatValue(object value, DataRow schema);
 
         // universal grid
@@ -23,6 +23,8 @@ namespace DataEditorPortal.Web.Services
         string GenerateSqlTextForInsert(DataSourceConfig config);
         string GenerateSqlTextForUpdate(DataSourceConfig config);
         string GenerateSqlTextForDelete(DataSourceConfig config);
+
+        string GenerateSqlTextForColumnFilterOption(DataSourceConfig config);
 
         // database
         string GetSqlTextForDatabaseTables();
@@ -247,8 +249,10 @@ namespace DataEditorPortal.Web.Services
             return queryText;
         }
 
-        public string UseOrderBy(string query, List<SortParam> sortParams)
+        public string UseOrderBy(string query, List<SortParam> sortParams = null)
         {
+            if (sortParams == null) sortParams = new List<SortParam>();
+
             var orderByClause = GenerateOrderClause(sortParams);
 
             // replace the order by clause by input Sorts in queryText
@@ -265,8 +269,10 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public string UseFilters(string query, List<FilterParam> filterParams)
+        public string UseFilters(string query, List<FilterParam> filterParams = null)
         {
+            if (filterParams == null) filterParams = new List<FilterParam>();
+
             var where = GenerateWhereClause(filterParams);
 
             return where.Any()
@@ -274,8 +280,10 @@ namespace DataEditorPortal.Web.Services
                 : query.Replace("##FILTERS##", "");
         }
 
-        public string UseSearches(string query, List<SearchParam> filterParams)
+        public string UseSearches(string query, List<SearchParam> filterParams = null)
         {
+            if (filterParams == null) filterParams = new List<SearchParam>();
+
             List<string> filters = new List<string>();
 
             foreach (var item in filterParams)
@@ -428,6 +436,26 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
+        public string GenerateSqlTextForColumnFilterOption(DataSourceConfig config)
+        {
+            if (config.QueryText != null)
+            {
+                var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
+
+                return $@"SELECT DISTINCT {columns} FROM ({config.QueryText}) A";
+            }
+            else
+            {
+                var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
+
+                var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
+
+                var queryText = $@"SELECT DISTINCT {columns} FROM {config.TableSchema}.{config.TableName} WHERE {where}";
+
+                return queryText;
+            }
+        }
+
         #endregion
 
         #region Database 
@@ -441,22 +469,13 @@ namespace DataEditorPortal.Web.Services
             return $"SELECT TABLE_NAME AS TableName, TABLE_SCHEMA AS TableSchema FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA <> 'dep' AND TABLE_TYPE  = 'BASE TABLE'";
         }
 
-        /// <summary>
-        /// Sql to get table schema from IDataReader
-        /// </summary>
-        /// <returns></returns>
-        public string GetSqlTextForDatabaseTableSchema(string tableSchema, string tableName)
-        {
-            return $"SELECT TOP 1 * FROM {tableSchema}.{tableName}";
-        }
-
         public string GetSqlTextForDatabaseSource(DataSourceConfig config)
         {
             if (!string.IsNullOrEmpty(config.QueryText))
             {
                 var sqlText = GenerateSqlTextForList(config);
-                sqlText = UseSearches(sqlText, new List<SearchParam>());
-                sqlText = UseFilters(sqlText, new List<FilterParam>());
+                sqlText = UseSearches(sqlText);
+                sqlText = UseFilters(sqlText);
                 return $"SELECT TOP 1 * FROM ({sqlText}) AS A";
 
             }
