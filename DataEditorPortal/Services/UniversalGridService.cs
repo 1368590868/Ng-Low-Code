@@ -21,7 +21,7 @@ namespace DataEditorPortal.Web.Services
         List<GridColConfig> GetGridColumnsConfig(string name);
         List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column);
         List<SearchFieldConfig> GetGridSearchConfig(string name);
-        List<FormFieldConfig> GetGridDetailConfig(string name);
+        List<FormFieldConfig> GetGridDetailConfig(string name, string type);
 
         GridData GetGridData(string name, GridParam param);
         MemoryStream ExportExcel(string name, ExportParam param);
@@ -57,10 +57,10 @@ namespace DataEditorPortal.Web.Services
         public GridConfig GetGridConfig(string name)
         {
             var item = _depDbContext.SiteMenus.Where(x => x.Name == name).FirstOrDefault();
-            if (item == null) throw new System.Exception($"Portal Item with name:{name} deosn't exists");
+            if (item == null) throw new DepException($"Portal Item with name:{name} deosn't exists");
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
@@ -77,6 +77,16 @@ namespace DataEditorPortal.Web.Services
 
             // get query text for list data from grid config.
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+            if (detailConfig != null)
+            {
+                if (detailConfig.AddingForm != null && detailConfig.AddingForm.UseCustomForm)
+                    result.CustomAddFormName = detailConfig.AddingForm.CustomFormName;
+                if (detailConfig.UpdatingForm != null && detailConfig.UpdatingForm.UseCustomForm)
+                    result.CustomEditFormName = detailConfig.UpdatingForm.CustomFormName;
+                if (detailConfig.InfoForm != null && detailConfig.InfoForm.UseCustomForm)
+                    result.CustomViewFormName = detailConfig.InfoForm.CustomFormName;
+            }
+
             _mapper.Map(detailConfig, result);
 
             if (!string.IsNullOrEmpty(config.CustomActionConfig))
@@ -88,7 +98,7 @@ namespace DataEditorPortal.Web.Services
         public List<GridColConfig> GetGridColumnsConfig(string name)
         {
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             if (string.IsNullOrEmpty(config.ColumnsConfig)) config.ColumnsConfig = "[]";
 
@@ -98,7 +108,7 @@ namespace DataEditorPortal.Web.Services
         public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column)
         {
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
             var columnsConfig = JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
@@ -129,7 +139,7 @@ namespace DataEditorPortal.Web.Services
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("An Error in the query has occurred: " + ex.Message);
+                        throw new DepException("An Error in the query has occurred: " + ex.Message);
                     }
                 }
 
@@ -143,7 +153,7 @@ namespace DataEditorPortal.Web.Services
         public GridData GetGridData(string name, GridParam param)
         {
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             #region compose the query text
 
@@ -236,7 +246,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("An Error in the query has occurred: " + ex.Message);
+                    throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
 
@@ -246,7 +256,7 @@ namespace DataEditorPortal.Web.Services
         public List<SearchFieldConfig> GetGridSearchConfig(string name)
         {
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             if (string.IsNullOrEmpty(config.SearchConfig)) config.SearchConfig = "[]";
 
@@ -338,27 +348,31 @@ namespace DataEditorPortal.Web.Services
         public Dictionary<string, dynamic> GetGridDataDetail(string name, string id)
         {
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
 
             // get detail config
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            if (detailConfig.UseCustomForm)
+            if (detailConfig.InfoForm != null && detailConfig.InfoForm.UseCustomForm)
             {
-                throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
+            if (detailConfig.InfoForm == null && detailConfig.InfoForm.FormFields.Count == 0)
+            {
+                throw new DepException("No info form configured fomr this portal item. Please go Portal Management to complete the configuration.");
             }
 
             var queryText = _dbSqlBuilder.GenerateSqlTextForDetail(
                 new DataSourceConfig()
                 {
                     TableName = dataSourceConfig.TableName,
-                    Columns = detailConfig.FormFields.Select(x => x.key).ToList(),
+                    Columns = detailConfig.InfoForm.FormFields.Select(x => x.key).ToList(),
                     Filters = new List<FilterParam>() {
                         new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "equals", value = id }
                     },
-                    QueryText = detailConfig.QueryText
+                    QueryText = detailConfig.InfoForm.QueryText
                 });
 
             var result = new Dictionary<string, dynamic>();
@@ -393,41 +407,87 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("An Error in the query has occurred: " + ex.Message);
+                    throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
 
             return result;
         }
 
-        public List<FormFieldConfig> GetGridDetailConfig(string name)
+        public List<FormFieldConfig> GetGridDetailConfig(string name, string type)
         {
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
-            if (string.IsNullOrEmpty(config.DetailConfig)) throw new Exception("Grid Detail Config can not be empty.");
+            if (string.IsNullOrEmpty(config.DetailConfig)) throw new DepException("Grid Detail Config can not be empty.");
 
-            var result = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
 
-            return result.FormFields;
+            #region validation
+            if (type == "ADD")
+            {
+                if (detailConfig.AddingForm != null && detailConfig.AddingForm.UseCustomForm)
+                {
+                    throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+                }
+                if (detailConfig.AddingForm == null || detailConfig.AddingForm.FormFields.Count == 0)
+                {
+                    throw new DepException("No adding form configured for this portal item. Please go Portal Management to complete the configuration.");
+                }
+                if (detailConfig.AddingForm.UseCustomForm)
+                {
+                    throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+                }
+            }
+            if (type == "UPDATE")
+            {
+                if (detailConfig.UpdatingForm != null && detailConfig.UpdatingForm.UseCustomForm)
+                {
+                    throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+                }
+                if (detailConfig.UpdatingForm == null || (!detailConfig.UpdatingForm.UseAddingFormLayout && detailConfig.UpdatingForm.FormFields.Count == 0))
+                {
+                    throw new DepException("No Updating form configured for this portal item. Please go Portal Management to complete the configuration.");
+                }
+                if (detailConfig.UpdatingForm.UseAddingFormLayout &&
+                    (detailConfig.AddingForm == null || detailConfig.AddingForm.UseCustomForm || detailConfig.AddingForm.FormFields.Count == 0))
+                {
+                    throw new DepException("Updating form is configured to use the same configuration of adding form, but no adding form configured. Please go Portal Management to complete the configuration.");
+                }
+            }
+            #endregion
+
+            var formLayout = type == "ADD" ? detailConfig.AddingForm : detailConfig.UpdatingForm;
+            if (formLayout.UseAddingFormLayout)
+                formLayout.FormFields = detailConfig.AddingForm.FormFields;
+
+            return formLayout.FormFields;
         }
 
         public bool AddGridData(string name, Dictionary<string, object> model)
         {
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
 
             // get detail config
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            if (detailConfig.UseCustomForm)
+            if (detailConfig.AddingForm != null && detailConfig.AddingForm.UseCustomForm)
             {
-                throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
+            if (detailConfig.AddingForm == null || detailConfig.AddingForm.FormFields.Count == 0)
+            {
+                throw new DepException("No adding form configured for this portal item. Please go Portal Management to complete the configuration.");
+            }
+            if (detailConfig.AddingForm.UseCustomForm)
+            {
+                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }
 
-            var columns = detailConfig.FormFields
+            var columns = detailConfig.AddingForm.FormFields
                 .Select(x => x.key)
                 .Where(x => model.Keys.Contains(x) && model[x] != null).ToList();
 
@@ -436,7 +496,7 @@ namespace DataEditorPortal.Web.Services
                 TableSchema = dataSourceConfig.TableSchema,
                 TableName = dataSourceConfig.TableName,
                 Columns = columns,
-                QueryText = detailConfig.QueryForInsert
+                QueryText = detailConfig.AddingForm.QueryText
             });
 
             using (var con = _depDbContext.Database.GetDbConnection())
@@ -473,19 +533,36 @@ namespace DataEditorPortal.Web.Services
         public bool UpdateGridData(string name, string id, Dictionary<string, object> model)
         {
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
 
             // get detail config
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            if (detailConfig.UseCustomForm)
+
+            if (detailConfig.UpdatingForm != null && detailConfig.UpdatingForm.UseCustomForm)
             {
-                throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
+            if (detailConfig.UpdatingForm == null || (!detailConfig.UpdatingForm.UseAddingFormLayout && detailConfig.UpdatingForm.FormFields.Count == 0))
+            {
+                throw new DepException("No Updating form configured for this portal item. Please go Portal Management to complete the configuration.");
+            }
+            if (detailConfig.UpdatingForm.UseAddingFormLayout &&
+                (detailConfig.AddingForm == null || detailConfig.AddingForm.UseCustomForm || detailConfig.AddingForm.FormFields.Count == 0))
+            {
+                throw new DepException("Updating form is configured to use the same configuration of adding form, but no adding form configured. Please go Portal Management to complete the configuration.");
             }
 
-            var columns = detailConfig.FormFields
+            var updatingForm = detailConfig.UpdatingForm;
+            if (updatingForm.UseAddingFormLayout)
+            {
+                updatingForm = detailConfig.AddingForm;
+                updatingForm.QueryText = detailConfig.UpdatingForm.QueryText;
+            }
+
+            var columns = updatingForm.FormFields
                 .Select(x => x.key)
                 .Where(x => model.Keys.Contains(x) && model[x] != null).ToList();
 
@@ -493,12 +570,12 @@ namespace DataEditorPortal.Web.Services
             {
                 TableSchema = dataSourceConfig.TableSchema,
                 TableName = dataSourceConfig.TableName,
-                Columns = detailConfig.FormFields.Select(x => x.key).ToList(),
+                Columns = updatingForm.FormFields.Select(x => x.key).ToList(),
                 Filters = new List<FilterParam>()
                 {
                     new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "equals", value = id }
                 },
-                QueryText = detailConfig.QueryForUpdate
+                QueryText = updatingForm.QueryText
             });
 
             using (var con = _depDbContext.Database.GetDbConnection())
@@ -535,17 +612,17 @@ namespace DataEditorPortal.Web.Services
         public bool DeleteGridData(string name, string[] ids)
         {
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new Exception("Grid configuration does not exists with name: " + name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
 
             // get detail config
-            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            if (detailConfig.UseCustomForm)
-            {
-                throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
-            }
+            //var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+            //if (detailConfig.UseCustomForm)
+            //{
+            //    throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            //}
 
             var queryText = _dbSqlBuilder.GenerateSqlTextForDelete(new DataSourceConfig()
             {
@@ -555,7 +632,7 @@ namespace DataEditorPortal.Web.Services
                 {
                     new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "in", value = ids }
                 },
-                QueryText = detailConfig.QueryForDelete
+                //QueryText = detailConfig.QueryForDelete
             });
 
             using (var con = _depDbContext.Database.GetDbConnection())

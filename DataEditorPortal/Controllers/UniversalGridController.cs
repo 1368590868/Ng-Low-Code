@@ -61,9 +61,9 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{name}/config/detail")]
-        public List<FormFieldConfig> GridDetail(string name)
+        public List<FormFieldConfig> GridDetail(string name, [FromQuery] string type)
         {
-            return _universalGridService.GetGridDetailConfig(name);
+            return _universalGridService.GetGridDetailConfig(name, type);
         }
 
         [HttpPost]

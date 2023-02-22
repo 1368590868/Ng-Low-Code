@@ -11,10 +11,6 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string DataKey { get; set; }
         public int PageSize { get; set; } = 100;
 
-        public bool AllowExport { get; set; } = true;
-        public bool AllowDelete { get; set; } = true;
-        public bool AllowEdit { get; set; } = true;
-        public bool UseCustomForm { get; set; }
         public string CustomAddFormName { get; set; }
         public string CustomEditFormName { get; set; }
         public string CustomViewFormName { get; set; }
@@ -78,20 +74,18 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class DetailConfig
     {
-        public bool AllowExport { get; set; } = true;
-        public bool AllowDelete { get; set; } = true;
-        public bool AllowEdit { get; set; } = true;
+        public GridFormLayout InfoForm { get; set; }
+        public GridFormLayout AddingForm { get; set; }
+        public GridFormLayout UpdatingForm { get; set; }
+    }
+
+    public class GridFormLayout
+    {
+        public bool UseAddingFormLayout { get; set; } = true;
         public bool UseCustomForm { get; set; }
-        public string CustomAddFormName { get; set; }
-        public string CustomEditFormName { get; set; }
-        public string CustomViewFormName { get; set; }
-
-        public List<FormFieldConfig> FormFields { get; set; }
-
+        public string CustomFormName { get; set; }
+        public List<FormFieldConfig> FormFields { get; set; } = new List<FormFieldConfig>();
         public string QueryText { get; set; }
-        public string QueryForInsert { get; set; }
-        public string QueryForUpdate { get; set; }
-        public string QueryForDelete { get; set; }
     }
 
     public class CustomAction
