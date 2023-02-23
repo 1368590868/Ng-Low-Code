@@ -15,7 +15,7 @@ import {
 } from '../../models/grid-types';
 import { Table } from 'primeng/table';
 import { TableState } from 'primeng/api';
-import { NotifyService } from 'src/app/shared';
+import { NotifyService, UserService } from 'src/app/shared';
 import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 import { DataFormatService } from '../../services/data-format.service';
 
@@ -49,9 +49,10 @@ export class TableComponent implements OnInit, OnDestroy {
   tableConfig: GridConfig = { dataKey: 'Id' };
   rowActions: GridActionOption[] = [];
   tableActions: GridActionOption[] = [];
-  allowEdit = false; // todo: calculate by user permission
-  allowDelete = false; // todo: calculate by user permission
-  allowExport = false; // todo: calculate by user permission
+  allowAdd = false;
+  allowEdit = false;
+  allowDelete = false;
+  allowExport = false;
 
   firstLoadDone = false;
 
@@ -61,7 +62,8 @@ export class TableComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private notifyService: NotifyService,
     private gridTableService: GridTableService,
-    private dataFormatService: DataFormatService
+    private dataFormatService: DataFormatService,
+    private userService: UserService
   ) {
     this.formatters = this.dataFormatService.getFormatters();
   }
@@ -119,10 +121,22 @@ export class TableComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  getPermission(name: string) {
+    return (
+      this.userService.USER.permissions![
+        name +
+          this.gridTableService.currentPortalItem
+            .toUpperCase()
+            .replace('-', '_')
+      ] ?? false
+    );
+  }
+
   setAllows() {
-    this.allowEdit = true; // todo: calculate by user permission
-    this.allowDelete = true; // todo: calculate by user permission
-    this.allowExport = true; // todo: calculate by user permission
+    this.allowAdd = this.getPermission('ADD_');
+    this.allowEdit = this.getPermission('EDIT_');
+    this.allowDelete = this.getPermission('DELETE_');
+    this.allowExport = this.getPermission('EXPORT_');
   }
 
   setRowActions() {
@@ -170,7 +184,7 @@ export class TableComponent implements OnInit, OnDestroy {
   setTableActions() {
     const actions: GridActionOption[] = [];
 
-    if (this.allowEdit) {
+    if (this.allowAdd) {
       if (this.tableConfig.customAddFormName) {
         actions.push({ name: this.tableConfig.customAddFormName });
       } else {
