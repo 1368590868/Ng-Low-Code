@@ -1,5 +1,6 @@
 using AutoWrapper;
 using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
@@ -88,7 +89,10 @@ namespace DataEditorPortal.Web
 
             services.AddAutoMapper(typeof(Startup));
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new IsoDateTimeConverter());
+            });
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

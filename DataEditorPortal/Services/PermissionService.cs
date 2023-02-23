@@ -94,7 +94,7 @@ namespace DataEditorPortal.Web.Services
                     .Where(p => p.PermissionName.Contains($"_{ node.Name.Replace("-", "_") }".ToUpper()))
                     .Select(x => new PermissionNode
                     {
-                        Label = x.PermissionName,
+                        Label = x.PermissionDescription,
                         Key = x.Id,
                         Name = x.PermissionName,
                         Description = x.PermissionDescription,

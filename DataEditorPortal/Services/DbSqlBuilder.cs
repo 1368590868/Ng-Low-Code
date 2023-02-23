@@ -336,7 +336,7 @@ namespace DataEditorPortal.Web.Services
 
         public string GenerateSqlTextForList(DataSourceConfig config)
         {
-            if (config.QueryText != null)
+            if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore TableName, Columns, SortBy and Filters setting.
                 return config.QueryText;
@@ -357,7 +357,7 @@ namespace DataEditorPortal.Web.Services
 
         public string GenerateSqlTextForDetail(DataSourceConfig config)
         {
-            if (config.QueryText != null)
+            if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore other setting.
                 return config.QueryText;
@@ -376,7 +376,7 @@ namespace DataEditorPortal.Web.Services
 
         public string GenerateSqlTextForInsert(DataSourceConfig config)
         {
-            if (config.QueryText != null)
+            if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore other setting.
                 return config.QueryText;
@@ -397,7 +397,7 @@ namespace DataEditorPortal.Web.Services
 
         public string GenerateSqlTextForUpdate(DataSourceConfig config)
         {
-            if (config.QueryText != null)
+            if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore other setting.
                 return config.QueryText;
@@ -419,7 +419,7 @@ namespace DataEditorPortal.Web.Services
 
         public string GenerateSqlTextForDelete(DataSourceConfig config)
         {
-            if (config.QueryText != null)
+            if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore other setting.
                 return config.QueryText;
@@ -438,7 +438,7 @@ namespace DataEditorPortal.Web.Services
 
         public string GenerateSqlTextForColumnFilterOption(DataSourceConfig config)
         {
-            if (config.QueryText != null)
+            if (!string.IsNullOrEmpty(config.QueryText))
             {
                 var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
 
