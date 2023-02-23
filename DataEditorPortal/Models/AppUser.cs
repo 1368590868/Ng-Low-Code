@@ -22,6 +22,8 @@ namespace DataEditorPortal.Web.Models
 
         public string Vendor { get; set; }
 
+        public bool IsAdmin { get; set; }
+
         public bool Disabled { get; set; }
 
         public Dictionary<string, bool> Permissions { get; set; } = new Dictionary<string, bool>();

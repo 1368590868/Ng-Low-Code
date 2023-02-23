@@ -71,6 +71,7 @@ namespace DataEditorPortal.Web.Controllers
             {
                 user.Permissions = _userService.GetUserPermissions();
             }
+            user.IsAdmin = _userService.IsAdmin();
 
             return user;
         }
