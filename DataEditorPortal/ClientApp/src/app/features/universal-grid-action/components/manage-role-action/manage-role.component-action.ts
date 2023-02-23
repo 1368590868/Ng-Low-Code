@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { TreeNode } from 'primeng/api';
 import { NotifyService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import {
@@ -113,30 +114,16 @@ export class ManageRoleActionComponent extends GridActionDirective {
       ]
     }
   ];
-  permissionSelect: RolePermissions[] = [];
+  permissionSelect: TreeNode[] = [];
   roleId = '';
   roleName = '';
 
-  permissions: any[] = [];
-  groupPermissions: any[] = [];
+  permissions: TreeNode[] = [];
   constructor(
     private notifyService: NotifyService,
     private rolePermissionService: RolePermissionService
   ) {
     super();
-  }
-
-  groupBy(objectArray: any[]) {
-    const map = new Map();
-    objectArray.forEach((item, _, arr) => {
-      if (!map.has(item.category)) {
-        map.set(
-          item.category,
-          arr.filter(a => a.category == item.category)
-        );
-      }
-    });
-    return Array.from(map).map(item => [...item[1]]);
   }
 
   setFormValue(role: RoleItem) {
@@ -150,41 +137,61 @@ export class ManageRoleActionComponent extends GridActionDirective {
     });
   }
 
-  setPermissions(res: RolePermissions[]) {
-    this.groupPermissions = this.groupBy(res);
-    this.groupPermissions.forEach((item, i) => {
-      this.permissions[i] = item;
-      this.permissionSelect[i] = item.filter((item: any) => {
-        return item.selected;
+  childrenSelected(node: TreeNode) {
+    if (node?.children) {
+      node.children.forEach((child: any) => {
+        if (child.selected) {
+          this.permissionSelect.push(child);
+        }
+        if (Array.isArray(node?.children)) {
+          this.childrenSelected(child);
+        }
       });
+    }
+  }
+
+  initData(data: TreeNode[]) {
+    this.permissions = data;
+    data.forEach((item: any) => {
+      if (item.selected) {
+        this.permissionSelect.push(item);
+      }
+
+      this.childrenSelected(item);
     });
   }
 
-  getRolePermissionsList(roleId: any) {
+  getRolePermissionsList(roleId: string | undefined) {
     if (roleId) {
       this.rolePermissionService.getRolePermissions(roleId).subscribe(res => {
-        this.setPermissions(res);
+        this.initData(res);
       });
     } else {
       this.rolePermissionService.getSitePermissions().subscribe(res => {
-        this.setPermissions(res);
+        this.initData(res);
       });
     }
   }
 
   onFormSubmit(model: ManageRoleForm) {
-    this.permissionSelect = this.permissionSelect.flat(3).map(res => {
-      res.selected = true;
-      return res;
-    });
+    const permissionSelect = this.permissionSelect
+      .filter((x: any) => !x.type)
+      .map((res: any) => {
+        return {
+          id: res.key,
+          selected: true,
+          permissionName: res.label,
+          permissionDescription: res.description
+        };
+      });
     if (this.form.valid) {
       const apiName =
         this.model.roleId === '<new_role>' ? 'createRole' : 'updateRole';
       this.rolePermissionService[apiName]({
         ...model,
-        permissions: this.permissionSelect
+        permissions: permissionSelect as RolePermissions[]
       }).subscribe(res => {
-        if (!res.isError) {
+        if (!res?.isError) {
           this.notifyService.notifySuccess(
             'Success',
             'Save Successfully Completed.'

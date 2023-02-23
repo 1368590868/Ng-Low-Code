@@ -28,6 +28,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { AccordionModule } from 'primeng/accordion';
 import { DividerModule } from 'primeng/divider';
 import { CheckboxModule } from 'primeng/checkbox';
+import { TreeModule } from 'primeng/tree';
 
 import { GridActionDirective } from './directives/grid-action.directive';
 import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
@@ -215,7 +216,8 @@ const GRID_ACTION_CONFIG = [
     SkeletonModule,
     AccordionModule,
     CheckboxModule,
-    DividerModule
+    DividerModule,
+    TreeModule
   ],
   exports: [UniversalGridActionDirective],
   providers: [
