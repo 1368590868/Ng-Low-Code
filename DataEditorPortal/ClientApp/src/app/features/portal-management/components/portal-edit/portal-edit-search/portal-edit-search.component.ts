@@ -77,7 +77,11 @@ export class PortalEditSearchComponent implements OnInit {
               },
               filterType: x.filterType,
               searchRule: {
-                field: x.columnName
+                field: x.columnName,
+                matchMode: this.portalItemService.getFilterMatchModeOptions({
+                  filterType: x.filterType,
+                  type: result[0].value
+                })[0].value
               }
             };
           });

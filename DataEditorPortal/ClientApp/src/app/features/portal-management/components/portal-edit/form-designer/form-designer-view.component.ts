@@ -18,7 +18,6 @@ export class FormDesignerViewComponent {
   @Input()
   set config(val: GridFormField) {
     if (val) {
-      console.log('CREATE');
       this.key = val.key;
 
       const field = JSON.parse(JSON.stringify(val));

@@ -35,7 +35,9 @@ export class SearchDesignerConfigComponent
                 const searchRuleField = field.parent?.get?.('searchRule');
                 if (searchRuleField && searchRuleField.props) {
                   searchRuleField.props.options =
-                    this.getFilterMatchModeOptions(field.parent?.model);
+                    this.portalItemService.getFilterMatchModeOptions(
+                      field.parent?.model
+                    );
                 }
               })
             )
@@ -50,6 +52,9 @@ export class SearchDesignerConfigComponent
       const required = props.fieldGroup?.find(x => x.key === 'required');
       if (required) required.hide = true;
     }
+    // remove default value
+    const defaultValue = this.fields.find(x => x.key === 'defaultValue');
+    if (defaultValue) defaultValue.hide = true;
 
     // add search rule editor.
     this.fields.push({
@@ -69,19 +74,5 @@ export class SearchDesignerConfigComponent
         }
       ]
     });
-  }
-
-  getFilterMatchModeOptions(model: any) {
-    const filterType = model.filterType;
-    const type = model.type;
-
-    if (type === 'multiSelect' || type === 'checkboxList')
-      return [{ label: 'In selected values', value: 'in' }];
-    if (filterType === 'boolean') return [{ label: 'Equals', value: 'equals' }];
-    return (this.primeNGConfig.filterMatchModeOptions as any)[filterType]?.map(
-      (key: any) => {
-        return { label: this.primeNGConfig.getTranslation(key), value: key };
-      }
-    );
   }
 }

@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { PrimeNGConfig } from 'primeng/api';
 import { distinctUntilChanged, startWith, tap } from 'rxjs';
 import { GridFormField } from '../../../models/portal-item';
+import { PortalItemService } from '../../../services/portal-item.service';
 
 export const FROM_DESIGNER_CONTROLS: {
   label: string;
@@ -256,7 +256,7 @@ export class FormDesignerConfigComponent {
               type: 'input',
               props: {
                 label: 'Date Format',
-                placeholder: 'Set date format. Eg. dd.mm.yyyy'
+                placeholder: 'Set date format. Eg. dd.mm.yy'
               }
             }
           ],
@@ -279,7 +279,7 @@ export class FormDesignerConfigComponent {
   constructor(
     @Inject('FROM_DESIGNER_CONTROLS')
     public controls: any[],
-    public primeNGConfig: PrimeNGConfig
+    public portalItemService: PortalItemService
   ) {}
 
   @Input()
