@@ -32,15 +32,18 @@ export class TableComponent implements OnInit, OnDestroy {
   selectedRecords: GridData[] = [];
 
   searchModel?: SearchParam;
-  lazyLoadParam: any;
   fetchDataParam?: GridParam;
+  filters?: any;
+  sortMeta?: any;
+  multiSortMeta?: any;
 
   loading = true;
-  @ViewChild('dt') table!: Table;
+  @ViewChild('dataTable') table!: Table;
 
   cols: GridColumn[] = [];
   stateKey!: string;
-  pageSize = 100;
+  first = 0;
+  rows = 100;
   rowsPerPageOptions: any[] = [100, 200, 500, { showAll: 'Show All' }];
 
   tableConfig: GridConfig = { dataKey: 'Id' };
@@ -75,12 +78,10 @@ export class TableComponent implements OnInit, OnDestroy {
     ]).subscribe(result => {
       this.tableConfig = result[0];
       if (this.tableConfig.pageSize && this.tableConfig.pageSize >= 10) {
-        this.pageSize = this.tableConfig.pageSize;
-        if (!this.rowsPerPageOptions.find(x => x === this.pageSize)) {
-          const index = this.rowsPerPageOptions.findIndex(
-            x => x > this.pageSize
-          );
-          this.rowsPerPageOptions.splice(index, 0, this.pageSize);
+        this.rows = this.tableConfig.pageSize;
+        if (!this.rowsPerPageOptions.find(x => x === this.rows)) {
+          const index = this.rowsPerPageOptions.findIndex(x => x > this.rows);
+          this.rowsPerPageOptions.splice(index, 0, this.rows);
         }
       }
       this.setAllows();
@@ -190,8 +191,22 @@ export class TableComponent implements OnInit, OnDestroy {
     this.tableActions = [...actions];
   }
 
-  loadTableLazy(event: any) {
-    this.lazyLoadParam = event;
+  onPageChange(event: any) {
+    const { first, rows } = event;
+    this.first = first;
+    this.rows = rows;
+    this.fetchData();
+  }
+
+  onFilter({ filters }: any) {
+    this.first = 0;
+    this.filters = filters;
+    this.fetchData();
+  }
+
+  onSort(sortMeta: any) {
+    this.first = 0;
+    this.sortMeta = sortMeta;
     this.fetchData();
   }
 
@@ -218,45 +233,35 @@ export class TableComponent implements OnInit, OnDestroy {
       filters: [],
       sorts: [],
       searches: this.searchModel,
-      startIndex: 0,
-      indexCount: this.pageSize
+      startIndex: this.first,
+      indexCount: this.rows
     };
 
-    if (this.lazyLoadParam) {
-      // set filters from table lazyload event
-      const obj = this.lazyLoadParam.filters;
-      for (const prop in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-          // do stuff
-          const fieldProp = obj[prop];
-          for (let i = 0; i < fieldProp.length; i++) {
-            if (fieldProp[i].value != null) {
-              fieldProp[i].field = prop;
-              fetchParam.filters.push(fieldProp[i]);
-            }
+    // set filters from table onFilter params
+    const obj = this.filters;
+    for (const prop in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+        // do stuff
+        const fieldProp = obj[prop];
+        for (let i = 0; i < fieldProp.length; i++) {
+          if (fieldProp[i].value != null) {
+            fieldProp[i].field = prop;
+            fetchParam.filters.push(fieldProp[i]);
           }
         }
       }
-
-      // set sorts from table lazyload event
-      if (
-        this.lazyLoadParam.multiSortMeta &&
-        this.lazyLoadParam.multiSortMeta.length > 0
-      ) {
-        fetchParam.sorts = this.lazyLoadParam.multiSortMeta;
-      } else if (this.lazyLoadParam.sortField) {
-        fetchParam.sorts = [
-          {
-            field: this.lazyLoadParam.sortField,
-            order: this.lazyLoadParam.sortOrder
-          }
-        ];
-      }
-
-      // set pagination
-      fetchParam.startIndex = this.lazyLoadParam.first ?? 0;
-      fetchParam.indexCount = this.lazyLoadParam.rows ?? this.pageSize;
     }
+
+    // set sorts from table onSort event
+    if (this.multiSortMeta && this.multiSortMeta.length > 0) {
+      fetchParam.sorts = this.multiSortMeta;
+    } else if (this.sortMeta) {
+      fetchParam.sorts = [this.sortMeta];
+    }
+
+    // set pagination
+    fetchParam.startIndex = this.first ?? 0;
+    fetchParam.indexCount = this.rows;
 
     return fetchParam;
   }
@@ -269,11 +274,15 @@ export class TableComponent implements OnInit, OnDestroy {
     this.selectedRecords = [];
     this.table.reset();
     this.table.saveState();
+    this.fetchData();
   }
 
   reset() {
     this.searchModel = {};
-    this.lazyLoadParam = null;
+    this.filters = null;
+    this.sortMeta = null;
+    this.multiSortMeta = null;
+    this.first = 0;
     this.totalRecords = 0;
     this.cols = [];
     this.records = [];

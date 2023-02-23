@@ -38,6 +38,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { DataFormatService } from './services/data-format.service';
+import { PaginatorModule } from 'primeng/paginator';
 
 @NgModule({
   declarations: [
@@ -70,7 +71,8 @@ import { DataFormatService } from './services/data-format.service';
     ProgressBarModule,
     SplitButtonModule,
     RippleModule,
-    ButtonModule
+    ButtonModule,
+    PaginatorModule
   ],
   providers: [
     DataFormatService,

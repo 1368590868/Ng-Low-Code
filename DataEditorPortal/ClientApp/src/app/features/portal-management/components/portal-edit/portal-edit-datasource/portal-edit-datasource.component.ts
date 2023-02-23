@@ -143,7 +143,7 @@ export class PortalEditDatasourceComponent implements OnInit {
           }
 
           // set pageSize
-          if (dsConfig.pageSize && dsConfig.pageSize > 10)
+          if (dsConfig.pageSize && dsConfig.pageSize >= 10)
             this.pageSize = dsConfig.pageSize;
         } else {
           // if table schema and table name havn't been stored, use the first from tables.
