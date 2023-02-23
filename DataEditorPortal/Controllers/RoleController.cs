@@ -1,6 +1,7 @@
 ﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
+using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -17,11 +18,16 @@ namespace DataEditorPortal.Web.Controllers
     {
         private readonly ILogger<RoleController> _logger;
         private readonly DepDbContext _depDbContext;
+        private readonly IPermissionService _permissionService;
 
-        public RoleController(ILogger<RoleController> logger, DepDbContext depDbContext)
+        public RoleController(
+            ILogger<RoleController> logger,
+            DepDbContext depDbContext,
+            IPermissionService permissionService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
+            _permissionService = permissionService;
         }
 
         [HttpGet]
@@ -103,7 +109,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{roleId}/permissions")]
-        public List<AppRolePermission> PermissionsForRole(Guid roleId)
+        public List<PermissionNode> PermissionsForRole(Guid roleId)
         {
             var sitePermissions = from sp in _depDbContext.SiteRolePermissions
                                   where sp.SiteRoleId == roleId
@@ -122,7 +128,7 @@ namespace DataEditorPortal.Web.Controllers
                             Selected = rp != null
                         };
 
-            return query.ToList();
+            return _permissionService.GetPermissionTree(query.ToList()); ;
         }
 
         [HttpGet]

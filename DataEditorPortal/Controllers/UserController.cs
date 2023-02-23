@@ -21,12 +21,18 @@ namespace DataEditorPortal.Web.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly DepDbContext _depDbContext;
         private readonly IUserService _userService;
+        private readonly IPermissionService _permissionService;
 
-        public UserController(ILogger<UserController> logger, DepDbContext depDbContext, IUserService userService)
+        public UserController(
+            ILogger<UserController> logger,
+            DepDbContext depDbContext,
+            IUserService userService,
+            IPermissionService permissionService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _userService = userService;
+            _permissionService = permissionService;
         }
 
         [HttpGet]
@@ -162,7 +168,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{userId}/permissions")]
-        public List<AppRolePermission> Permissions(Guid userId)
+        public List<PermissionNode> Permissions(Guid userId)
         {
             var userPermissions = from up in _depDbContext.UserPermissions
                                   where up.UserId == userId && up.GrantType == "ITEM"
@@ -180,7 +186,7 @@ namespace DataEditorPortal.Web.Controllers
                             Selected = up != null
                         };
 
-            return query.ToList();
+            return _permissionService.GetPermissionTree(query.ToList());
         }
 
         [HttpPost]
