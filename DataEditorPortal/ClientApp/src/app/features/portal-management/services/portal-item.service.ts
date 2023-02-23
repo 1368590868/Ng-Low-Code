@@ -6,6 +6,7 @@ import {
   DataSourceConfig,
   DataSourceTable,
   DataSourceTableColumn,
+  GirdDetailConfig,
   GridColumn,
   GridCustomAction,
   GridFormConfig,
@@ -240,15 +241,15 @@ export class PortalItemService {
     );
   }
 
-  getGridFormConfig(): Observable<GridFormConfig> {
+  getGridFormConfig(): Observable<GirdDetailConfig> {
     return this.http
-      .get<ApiResponse<GridFormConfig>>(
+      .get<ApiResponse<GirdDetailConfig>>(
         `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`
       )
       .pipe(map(x => x.result || {}));
   }
 
-  saveGridFormConfig(data: GridFormConfig) {
+  saveGridFormConfig(data: GirdDetailConfig) {
     return this.http.post<ApiResponse<boolean>>(
       `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`,
       data

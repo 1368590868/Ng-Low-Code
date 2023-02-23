@@ -44,14 +44,6 @@ export class ActionWrapperComponent {
     this.renderAction();
   }
 
-  onShow() {
-    if (this.hasEventHandler('onDialogShow')) {
-      (this.componentRef.instance as any).onDialogShow();
-    } else {
-      this.buttonDisabled = false;
-    }
-  }
-
   onHide() {
     if (this.hasEventHandler('onCancel'))
       (this.componentRef.instance as any).onCancel();

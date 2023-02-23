@@ -4,142 +4,30 @@
     Customize the Add / Edit / View Form or select custom Form.
   </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
-  <div class="w-full pt-1 pb-1">
-    <div class="flex align-items-center pb-1">
-      <div class="flex align-items-center mr-4">
-        <p-inputSwitch
-          class="mr-2"
-          [(ngModel)]="formConfig.allowDelete"></p-inputSwitch>
-        Allow Delete
-      </div>
-      <div class="flex align-items-center mr-4">
-        <p-inputSwitch
-          class="mr-2"
-          [(ngModel)]="formConfig.allowExport"></p-inputSwitch>
-        Allow Export
-      </div>
-      <div class="flex align-items-center mr-4">
-        <p-inputSwitch class="mr-2" [(ngModel)]="formConfig.allowEdit">
-        </p-inputSwitch>
-        Allow Add & Edit
-      </div>
-      <div *ngIf="formConfig.allowEdit" class="flex align-items-center">
-        <p-inputSwitch
-          class="mr-2"
-          [(ngModel)]="formConfig.useCustomForm"></p-inputSwitch>
-        Use Custom Form
-      </div>
-    </div>
-    <p-divider></p-divider>
-    <div *ngIf="formConfig.allowEdit && !isLoading">
-      <div class="flex" *ngIf="formConfig.useCustomForm">
-        <div class="flex flex-column mr-6">
-          <label class="line-height-4">Custom Form for adding</label>
-          <div class="flex align-items-center">
-            <p-dropdown
-              [(ngModel)]="formConfig.customAddFormName"
-              styleClass="w-15rem"
-              appendTo="body"
-              [showClear]="true"
-              placeholder="Please Select"
-              [options]="customActions"></p-dropdown>
-            <i
-              class="pi pi-question-circle ml-3 text-lg"
-              pTooltip="Select one Custom Action that pre-defined by developers used for adding new record."></i>
-          </div>
-        </div>
-        <div class="flex flex-column mr-6">
-          <label class="line-height-4">Custom Form for editing</label>
-          <div class="flex align-items-center">
-            <p-dropdown
-              [(ngModel)]="formConfig.customEditFormName"
-              styleClass="w-15rem"
-              appendTo="body"
-              [showClear]="true"
-              placeholder="Please Select"
-              [options]="customActions"></p-dropdown>
-            <i
-              class="pi pi-question-circle ml-3 text-lg"
-              pTooltip="Select one Custom Action that pre-defined by developers used for editing record."></i>
-          </div>
-        </div>
-        <div class="flex flex-column">
-          <label class="line-height-4">Custom Form for viewing</label>
-          <div class="flex align-items-center">
-            <p-dropdown
-              [(ngModel)]="formConfig.customViewFormName"
-              styleClass="w-15rem"
-              appendTo="body"
-              [showClear]="true"
-              placeholder="Please Select"
-              [options]="customActions"></p-dropdown>
-            <i
-              class="pi pi-question-circle ml-3 text-lg"
-              pTooltip="Select one Custom Action that pre-defined by developers used for viewing record."></i>
-          </div>
-        </div>
-      </div>
-      <div class="flex" *ngIf="!formConfig.useCustomForm">
-        <p-pickList
-          #pickList
-          class="flex-grow-1 mr-3"
-          [source]="sourceColumns"
-          [target]="targetColumns"
-          sourceHeader="Available Fields"
-          targetHeader="Selected Fields"
-          [dragdrop]="true"
-          [responsive]="true"
-          [sourceStyle]="{ height: '31.2143rem' }"
-          [targetStyle]="{ height: '36.5714rem' }"
-          filterBy="name"
-          sourceFilterPlaceholder="Search by name"
-          [showTargetFilter]="false"
-          [showSourceControls]="false"
-          [showTargetControls]="false"
-          (onMoveToTarget)="onMoveToTarget($event)"
-          (onMoveToSource)="onMoveToSource($event)"
-          (onMoveAllToTarget)="onMoveToTarget($event)"
-          (onMoveAllToSource)="onMoveToSource($event)"
-          (onTargetSelect)="onTargetSelect($event)">
-          <ng-template let-column pTemplate="item">
-            <div *ngIf="!column.selected">
-              [{{ column.key }}]<span
-                class="text-red-500"
-                *ngIf="isRequired(column)"
-                >*</span
-              >
-            </div>
-            <app-form-designer-view
-              *ngIf="column.selected"
-              [config]="column"></app-form-designer-view>
-          </ng-template>
-          <ng-template pTemplate="emptymessagetarget">
-            <div class="w-full relative">
-              <app-svg-drag></app-svg-drag>
-            </div>
-          </ng-template>
-        </p-pickList>
-        <div class="config-form p-picklist">
-          <div class="p-picklist-header">Configuration Form</div>
-          <div class="p-picklist-list flex-grow-1">
-            <div *ngIf="this.model && this.model.key; else emptyMessage">
-              <app-form-designer-config
-                [config]="model"
-                [allSelectedFields]="allSelectedFields"
-                (configChange)="
-                  configChange($event)
-                "></app-form-designer-config>
-            </div>
-            <ng-template #emptyMessage>
-              <div class="pt-4">
-                Please select one row in <b>Selected Fields</b> panel to
-                configure.
-              </div>
-            </ng-template>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="w-full pb-1" style="margin-top: -1rem">
+    <p-tabView>
+      <p-tabPanel header="Settings for Adding">
+        <app-form-layout
+          #addLayout
+          type="ADD"
+          [config]="addingFormConfig"
+          [dbColumns]="dbColumns"></app-form-layout>
+      </p-tabPanel>
+      <p-tabPanel header="Settings for Editing">
+        <app-form-layout
+          #updateLayout
+          type="UPDATE"
+          [config]="updatingFormConfig"
+          [dbColumns]="dbColumns"></app-form-layout>
+      </p-tabPanel>
+      <p-tabPanel header="Settings for Viewing">
+        <app-form-layout
+          #updateLayout
+          type="UPDATE"
+          [config]="updatingFormConfig"
+          [dbColumns]="dbColumns"></app-form-layout>
+      </p-tabPanel>
+    </p-tabView>
   </div>
 
   <ng-template pTemplate="footer">

@@ -66,6 +66,8 @@ export class ExportExcelActionComponent
         this.gridService.currentPortalItem
       }-${new Date().toLocaleDateString('en-US')}`
     };
+
+    this.loadedEvent.emit();
   }
 
   onFormSubmit(model: ExportForm) {

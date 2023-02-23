@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NotifyService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UniversalGridService } from '../../services/universal-grid.service';
@@ -8,12 +8,18 @@ import { UniversalGridService } from '../../services/universal-grid.service';
   templateUrl: './remove-action.component.html',
   styleUrls: ['./remove-action.component.scss']
 })
-export class RemoveActionComponent extends GridActionDirective {
+export class RemoveActionComponent
+  extends GridActionDirective
+  implements OnInit
+{
   constructor(
     private gridService: UniversalGridService,
     private notifyService: NotifyService
   ) {
     super();
+  }
+  ngOnInit(): void {
+    this.loadedEvent.emit();
   }
 
   onSave(): void {

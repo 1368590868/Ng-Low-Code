@@ -49,8 +49,9 @@ const GRID_ACTION_CONFIG = [
     wrapper: {
       label: 'Add New',
       icon: 'pi pi-plus',
+      header: 'Create new data',
       dialogStyle: { width: '40rem' },
-      okText: 'Add'
+      okText: 'Create'
     },
     props: {
       isAddForm: true
@@ -61,6 +62,7 @@ const GRID_ACTION_CONFIG = [
     requireGridRowSelected: true,
     component: EditRecordActionComponent,
     wrapper: {
+      header: 'Update data details',
       dialogStyle: { width: '40rem' },
       okText: 'Update'
     }
@@ -70,7 +72,7 @@ const GRID_ACTION_CONFIG = [
     requireGridRowSelected: true,
     component: ViewRecordActionComponent,
     wrapper: {
-      header: 'View Info',
+      header: 'View data details',
       cancelText: '',
       dialogStyle: { width: '40rem' }
     }
@@ -124,9 +126,9 @@ const GRID_ACTION_CONFIG = [
     requireGridRowSelected: true,
     component: UserManagerActionComponent,
     wrapper: {
-      header: 'Edit Manager',
+      header: 'Update User details',
       dialogStyle: { width: '40rem' },
-      okText: 'Edit User'
+      okText: 'Update User'
     }
   },
   {

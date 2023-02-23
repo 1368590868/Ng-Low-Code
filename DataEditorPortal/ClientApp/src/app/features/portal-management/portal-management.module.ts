@@ -36,6 +36,7 @@ import { ContextMenuModule } from 'primeng/contextmenu';
 import { MessageModule } from 'primeng/message';
 import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TabViewModule } from 'primeng/tabview';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import {
@@ -70,6 +71,7 @@ import {
 } from './components/portal-edit/form-designer/form-designer-config.component';
 import { SearchDesignerConfigComponent } from './components/portal-edit/form-designer/search-designer-config.component';
 import { ValidatorEditorComponent } from './components/validator-editor/validator-editor.component';
+import { FormLayoutComponent } from './components/portal-edit/portal-edit-form/form-layout/form-layout.component';
 
 const monacoConfig: NgxMonacoEditorConfig = {
   defaultOptions: {
@@ -84,6 +86,7 @@ const monacoConfig: NgxMonacoEditorConfig = {
     glyphMargin: false,
     lineDecorationsWidth: 0,
     lineNumbersMinChars: 0,
+    automaticLayout: true,
     scrollbar: {
       verticalScrollbarSize: 7,
       horizontalScrollbarSize: 7
@@ -121,7 +124,8 @@ const monacoConfig: NgxMonacoEditorConfig = {
     FormDesignerViewComponent,
     FormDesignerConfigComponent,
     SearchDesignerConfigComponent,
-    ValidatorEditorComponent
+    ValidatorEditorComponent,
+    FormLayoutComponent
   ],
   imports: [
     CommonModule,
@@ -178,7 +182,8 @@ const monacoConfig: NgxMonacoEditorConfig = {
     InputTextareaModule,
     ContextMenuModule,
     MessageModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    TabViewModule
   ],
   providers: [
     {

@@ -1,15 +1,18 @@
 .p-card {
   position: relative;
   overflow: hidden;
-
   height: 100%;
+
   .data-table {
     ::ng-deep {
       .p-datatable {
-        // padding: 0rem 0.75rem 0 0.75rem;
+        position: static;
       }
       .p-datatable-wrapper {
         overflow-x: auto;
+        .p-scroller {
+          height: 100% !important;
+        }
       }
       .p-datatable-header {
         padding-top: 1.75rem;

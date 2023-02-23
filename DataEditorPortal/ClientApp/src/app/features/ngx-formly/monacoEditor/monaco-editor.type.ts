@@ -13,7 +13,6 @@ interface MonacoEditorProps extends FormlyFieldProps {
     <ngx-monaco-editor
       [formControl]="formControl"
       (onInit)="props.onInit && props.onInit($event)"
-      [style]="{ height: '10rem' }"
       class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
       [options]="props.config || {}"></ngx-monaco-editor>
   `,

@@ -52,7 +52,7 @@ export class EditRecordActionComponent
 
   getFormConfig() {
     this.gridService
-      .getDetailConfig()
+      .getDetailConfig(this.isAddForm ? 'ADD' : 'UPDATE')
       .pipe(
         tap(result => {
           // fetch lookups
@@ -83,7 +83,7 @@ export class EditRecordActionComponent
             });
 
           this.fields = fields;
-          this.loadedEvent.emit();
+          if (fields.length > 0) this.loadedEvent.emit();
         })
       )
       .subscribe();
