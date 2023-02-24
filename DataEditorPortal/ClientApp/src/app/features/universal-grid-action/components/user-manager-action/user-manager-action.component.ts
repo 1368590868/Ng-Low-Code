@@ -154,15 +154,7 @@ export class UserManagerActionComponent
           },
           hooks: {
             onInit: (field: any) => {
-              if (
-                field.props &&
-                field.props['dependOnFields'] &&
-                field.props['dependOnFields'].length > 0
-              ) {
-                this.ngxFormlyService.initDependOnFields(field);
-              } else {
-                this.ngxFormlyService.initFieldOptions(field);
-              }
+              this.ngxFormlyService.initFieldOptions(field);
             }
           }
         },
@@ -180,15 +172,7 @@ export class UserManagerActionComponent
           },
           hooks: {
             onInit: (field: any) => {
-              if (
-                field.props &&
-                field.props['dependOnFields'] &&
-                field.props['dependOnFields'].length > 0
-              ) {
-                this.ngxFormlyService.initDependOnFields(field);
-              } else {
-                this.ngxFormlyService.initFieldOptions(field);
-              }
+              this.ngxFormlyService.initDependOnFields(field);
             }
           }
         }
@@ -200,7 +184,7 @@ export class UserManagerActionComponent
           key: 'autoEmail',
           type: 'checkbox',
           props: {
-            label: 'Notify',
+            label: 'Receive Email Notifycations',
             binary: true,
             required: true,
             options: [
