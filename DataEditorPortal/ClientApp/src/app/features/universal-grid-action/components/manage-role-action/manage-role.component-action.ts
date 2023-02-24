@@ -98,7 +98,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
             placeholder: 'Name'
           },
           expressions: {
-            'props.disabled': `model.roleName === 'Users'`
+            'props.disabled': `model.roleName === 'Users' || model.roleName === 'Administrators' `
           }
         },
         {
@@ -106,7 +106,6 @@ export class ManageRoleActionComponent extends GridActionDirective {
           key: 'roleDescription',
           type: 'textarea',
           props: {
-            required: true,
             type: 'text',
             label: 'Description',
             placeholder: 'Description'
