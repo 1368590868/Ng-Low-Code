@@ -35,6 +35,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
           props: {
             change: () => {
               this.roleId = this.model.roleId || '';
+              this.permissionSelect = [];
 
               this.getRolePermissionsList(
                 this.roleId === '<new_role>' ? undefined : this.roleId
