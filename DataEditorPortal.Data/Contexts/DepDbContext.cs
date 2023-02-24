@@ -148,6 +148,14 @@ namespace DataEditorPortal.Data.Contexts
             modelBuilder.Entity<SiteRole>().HasData(
                 new SiteRole()
                 {
+                    Id = new Guid("790D7DB8-FEB2-40F8-8F74-5F228C0ADA03"),
+                    RoleName = "Administrators"
+                }
+            );
+
+            modelBuilder.Entity<SiteRole>().HasData(
+                new SiteRole()
+                {
                     Id = new Guid("33D70A90-0C4C-48EE-AD8F-3051448D19CF"),
                     RoleName = "Users"
                 }
