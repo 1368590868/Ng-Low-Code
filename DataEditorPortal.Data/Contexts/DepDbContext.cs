@@ -162,7 +162,7 @@ namespace DataEditorPortal.Data.Contexts
                 {
                     Id = Guid.Parse("727052BA-0033-42C9-A39C-06A103E4B021"),
                     Name = "Roles",
-                    QueryText = "SELECT sr.RoleName, sr.Id FROM dep.SiteRoles sr ORDER BY sr.RoleName"
+                    QueryText = "SELECT sr.RoleName AS Label, sr.Id AS Value FROM dep.SiteRoles sr ORDER BY sr.RoleName"
                 },
                 new Lookup()
                 {
@@ -174,9 +174,9 @@ namespace DataEditorPortal.Data.Contexts
                 {
                     Id = Guid.Parse("704A3D00-62DF-4C62-A4BD-457C4DC242CA"),
                     Name = "Employers",
-                    QueryText = "SELECT dd.Label, dd.Value FROM dep.DataDictionaries dd WHERE dd.Category = 'Employer' ORDER BY dd.Label"
+                    QueryText = "SELECT dd.Label, dd.Value, dd.Value1, dd.Value2 FROM dep.DataDictionaries dd WHERE dd.Category = 'Employer' {{ AND dd.Value1 IN ##vendor## }} ORDER BY dd.Label"
                 }
-            ); ;
+            );
 
             modelBuilder.Entity<UniversalGridConfiguration>().HasData(
                 new UniversalGridConfiguration()
@@ -242,7 +242,7 @@ namespace DataEditorPortal.Data.Contexts
                             props = new {
                                 label = "Roles",
                                 placeholder = "Please select",
-                                optionLookup = "727052BA-0033-42C9-A39C-06A103E4B021"
+                                optionsLookup = "727052BA-0033-42C9-A39C-06A103E4B021"
                             },
                             searchRule = new
                             {
@@ -256,7 +256,7 @@ namespace DataEditorPortal.Data.Contexts
                             props = new {
                                 label = "Vendor",
                                 placeholder = "Please select",
-                                optionLookup = "E1F3E2C7-25CA-4D69-9405-ABC54923864D"
+                                optionsLookup = "E1F3E2C7-25CA-4D69-9405-ABC54923864D"
                             },
                             searchRule = new
                             {
@@ -271,7 +271,8 @@ namespace DataEditorPortal.Data.Contexts
                             props = new {
                                 label = "Employer",
                                 placeholder = "Please select",
-                                optionLookup = "704A3D00-62DF-4C62-A4BD-457C4DC242CA"
+                                optionsLookup = "704A3D00-62DF-4C62-A4BD-457C4DC242CA",
+                                dependOnFields = new object[]{ "vendor" }
                             },
                             searchRule = new
                             {
