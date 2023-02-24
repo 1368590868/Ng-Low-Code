@@ -102,6 +102,19 @@ namespace DataEditorPortal.Data.Contexts
                     Order = 3,
                     Status = Common.PortalItemStatus.Published
                 },
+                // system event log
+                new SiteMenu()
+                {
+                    Id = new Guid("B0864169-8CA1-49E4-AE1E-BFC53756231B"),
+                    Name = "site-settings",
+                    Label = "System Event Logs",
+                    Icon = "pi pi-clock",
+                    Type = "System",
+                    Link = "/system-event-logs",
+                    ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                    Order = 4,
+                    Status = Common.PortalItemStatus.Published
+                },
                 // demo items
                 new SiteMenu()
                 {
@@ -182,15 +195,15 @@ namespace DataEditorPortal.Data.Contexts
                     }),
 
                     ColumnsConfig = JsonSerializer.Serialize(new object[] {
-                        new { field = "Username", header = "CNP ID", width = "130px", filterType = "text", sortable = true },
-                        new { field = "Name", header = "Name", width = "250px", filterType = "text", sortable = true },
-                        new { field = "Email", header = "Email", width = "250px", filterType = "text", sortable = true },
-                        new { field = "Phone", header = "Phone", width = "250px", filterType = "text", sortable = true },
-                        new { field = "AutoEmail", header = "Auto Email", width = "250px", filterType = "boolean", sortable = true },
-                        new { field = "Vendor", header = "Vendor", width = "250px", filterType = "text", sortable = true },
-                        new { field = "Employer", header = "Employer", width = "250px", filterType = "text", sortable = true },
-                        new { field = "Division", header = "Division", width = "250px", filterType = "text", sortable = false },
-                        new { field = "Comments", header = "Comments", width = "250px", filterType = "text", sortable = true }
+                        new { type = "DataBaseField", field = "Username", header = "CNP ID", width = "130px", filterType = "text", sortable = true },
+                        new { type = "DataBaseField", field = "Name", header = "Name", width = "250px", filterType = "text", sortable = true },
+                        new { type = "DataBaseField", field = "Email", header = "Email", width = "250px", filterType = "text", sortable = true },
+                        new { type = "DataBaseField", field = "Phone", header = "Phone", width = "250px", filterType = "text", sortable = true },
+                        new { type = "DataBaseField", field = "AutoEmail", header = "Auto Email", width = "250px", filterType = "boolean", sortable = true },
+                        new { type = "DataBaseField", field = "Vendor", header = "Vendor", width = "250px", filterType = "text", sortable = true },
+                        new { type = "DataBaseField", field = "Employer", header = "Employer", width = "250px", filterType = "text", sortable = true },
+                        new { type = "DataBaseField", field = "Division", header = "Division", width = "250px", filterType = "text", sortable = false },
+                        new { type = "DataBaseField", field = "Comments", header = "Comments", width = "250px", filterType = "text", sortable = true }
                     }),
 
                     SearchConfig = JsonSerializer.Serialize(new object[] {
@@ -270,13 +283,16 @@ namespace DataEditorPortal.Data.Contexts
 
                     DetailConfig = JsonSerializer.Serialize(new
                     {
-                        AllowExport = true,
-                        AllowDelete = true,
-                        AllowEdit = true,
-                        UseCustomForm = true,
-                        CustomAddFormName = "user-manager-add",
-                        CustomEditFormName = "user-manager-edit",
-                        CustomViewFormName = "user-manager-view"
+                        AddingForm = new
+                        {
+                            UseCustomForm = true,
+                            CustomFormName = "user-manager-add"
+                        },
+                        UpdatingForm = new
+                        {
+                            UseCustomForm = true,
+                            CustomFormName = "user-manager-edit"
+                        }
                     }),
 
                     CustomActionConfig = JsonSerializer.Serialize(new object[] {
@@ -346,12 +362,12 @@ namespace DataEditorPortal.Data.Contexts
                     }),
 
                     ColumnsConfig = JsonSerializer.Serialize(new object[] {
-                        new { field = "Name", header = "Name", width = "130px", filterType = "text", sortable = true },
-                        new { field = "FirstName", header = "First Name", width = "250px", filterType = "text", sortable = true },
-                        new { field = "Checked", header = "Checked", width = "250px", filterType = "boolean", sortable = false },
-                        new { field = "Number", header = "Number", width = "250px", filterType = "numeric", sortable = true },
-                        new { field = "Total", header = "Total", width = "250px", filterType = "numeric", sortable = true },
-                        new { field = "CreateDate", header = "Create Date", width = "250px", filterType = "date", sortable = true }
+                        new { type = "DataBaseField", field = "Name", header = "Name", width = "130px", filterType = "text", sortable = true },
+                        new { type = "DataBaseField", field = "FirstName", header = "First Name", width = "250px", filterType = "text", sortable = true },
+                        new { type = "DataBaseField", field = "Checked", header = "Checked", width = "250px", filterType = "boolean", sortable = false },
+                        new { type = "DataBaseField", field = "Number", header = "Number", width = "250px", filterType = "numeric", sortable = true },
+                        new { type = "DataBaseField", field = "Total", header = "Total", width = "250px", filterType = "numeric", sortable = true },
+                        new { type = "DataBaseField", field = "CreateDate", header = "Create Date", width = "250px", filterType = "date", sortable = true }
                     }),
 
                     SearchConfig = JsonSerializer.Serialize(new object[] {
@@ -434,90 +450,94 @@ namespace DataEditorPortal.Data.Contexts
 
                     DetailConfig = JsonSerializer.Serialize(new
                     {
-                        AllowExport = true,
-                        AllowDelete = true,
-                        AllowEdit = true,
-                        UseCustomForm = false,
-                        FormFields = new object[] {
-                            new
-                            {
-                                filterType = "text",
-                                key = "Name",
-                                type = "input",
-                                props =
+                        AddingForm = new
+                        {
+                            UseCustomForm = false,
+                            FormFields = new object[] {
                                 new
                                 {
-                                    label = "Name",
-                                    required = true
-                                }
-                            },
-                            new
-                            {
-                                filterType = "text",
-                                key = "FirstName",
-                                type = "input",
-                                props =
+                                    filterType = "text",
+                                    key = "Name",
+                                    type = "input",
+                                    props =
+                                    new
+                                    {
+                                        label = "Name",
+                                        required = true
+                                    }
+                                },
                                 new
                                 {
-                                    label = "First Name",
-                                    required = true
-                                }
-                            },
-                            new
-                            {
-                                filterType = "boolean",
-                                key = "Checked",
-                                type = "checkbox",
-                                props =
+                                    filterType = "text",
+                                    key = "FirstName",
+                                    type = "input",
+                                    props =
+                                    new
+                                    {
+                                        label = "First Name",
+                                        required = true
+                                    }
+                                },
                                 new
                                 {
-                                    label = "Checked",
-                                    required = true
-                                }
-                            },
-                            new
-                            {
-                                filterType = "numeric",
-                                key = "Number",
-                                type = "inputNumber",
-                                props =
+                                    filterType = "boolean",
+                                    key = "Checked",
+                                    type = "checkbox",
+                                    props =
+                                    new
+                                    {
+                                        label = "Checked",
+                                        required = true
+                                    }
+                                },
                                 new
                                 {
-                                    label = "Number",
-                                    maxFractionDigits = 0,
-                                    required = true
-                                }
-                            },
-                            new
-                            {
-                                filterType = "numeric",
-                                key = "Total",
-                                type = "inputNumber",
-                                props =
+                                    filterType = "numeric",
+                                    key = "Number",
+                                    type = "inputNumber",
+                                    props =
+                                    new
+                                    {
+                                        label = "Number",
+                                        maxFractionDigits = 0,
+                                        required = true
+                                    }
+                                },
                                 new
                                 {
-                                    label = "Total",
-                                    required = true
-                                }
-                            },
-                            new
-                            {
-                                filterType = "date",
-                                key = "CreateDate",
-                                type = "datepicker",
-                                props =
+                                    filterType = "numeric",
+                                    key = "Total",
+                                    type = "inputNumber",
+                                    props =
+                                    new
+                                    {
+                                        label = "Total",
+                                        required = true
+                                    }
+                                },
                                 new
                                 {
-                                    label = "Create Date",
-                                    required = true
+                                    filterType = "date",
+                                    key = "CreateDate",
+                                    type = "datepicker",
+                                    props =
+                                    new
+                                    {
+                                        label = "Create Date",
+                                        required = true
+                                    }
                                 }
                             }
+                        },
+                        UpdatingForm = new
+                        {
+                            UseAddingFormLayout = true
                         }
                     }),
 
                     CustomActionConfig = JsonSerializer.Serialize(new object[] { })
                 }
-            );
+            ); ;
 
             modelBuilder.Entity<SitePermission>().HasData(
                 new SitePermission()
