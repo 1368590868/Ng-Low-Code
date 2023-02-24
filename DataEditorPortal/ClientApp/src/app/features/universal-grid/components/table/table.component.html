@@ -1,120 +1,182 @@
-<div class="p-card">
-  <p-table
-    #dt
-    class="data-table"
-    styleClass="p-datatable-striped"
-    [columns]="cols"
-    [scrollable]="true"
-    scrollHeight="flex"
-    [resizableColumns]="true"
-    columnResizeMode="expand"
-    [reorderableColumns]="true"
-    selectionMode="multiple"
-    [lazy]="true"
-    [lazyLoadOnInit]="false"
-    (onLazyLoad)="loadTableLazy($event)"
-    [value]="records"
-    [(selection)]="selectedRecords"
-    [dataKey]="tableConfig.dataKey"
-    [rowHover]="true"
-    [rows]="100"
-    [showCurrentPageReport]="true"
-    [rowsPerPageOptions]="[100, 200, 500, { showAll: 'Show All' }]"
-    [loading]="loading"
-    [paginator]="totalRecords > 0"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries  "
-    [totalRecords]="totalRecords"
-    [filterDelay]="0"
-    stateStorage="session"
-    [stateKey]="stateKey"
-    (onStateSave)="onStateSave($event)">
-    <ng-template pTemplate="caption">
-      <h3 class="mb-4">{{ tableConfig.caption }}</h3>
-      <div class="table-header flex align-items-center">
-        <div class="flex flex-wrap mr-2">
-          <ng-template
-            appUniversalGridAction
-            [actions]="tableActions"
-            [selectedRecords]="selectedRecords"
-            [fetchDataParam]="fetchDataParam"
-            (savedEvent)="onRefresh()"></ng-template>
-        </div>
-        <div class="flex-none mr-2 ml-auto">
-          <strong *ngIf="selectedRecords.length > 0"
-            >{{ selectedRecords.length }} row(s) selected</strong
-          >
-        </div>
-        <p-button
-          icon="pi pi-refresh text-lg"
-          styleClass="p-button-rounded p-button-outlined"
-          (onClick)="onRefresh()"></p-button>
-      </div>
-    </ng-template>
-
-    <ng-template pTemplate="header" let-columns>
-      <tr>
-        <th style="width: 2.75rem !important; max-width: 2.75rem !important">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
-        <th style="width: 5rem !important; max-width: 5rem !important"></th>
-        <th
-          *ngFor="let col of columns"
-          pReorderableColumn
-          pResizableColumn
-          [pSortableColumn]="col.field"
-          [pSortableColumnDisabled]="!col.sortable">
-          <span style="vertical-align: middle">{{ col.header }}</span>
-          <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
-          <p-columnFilter
-            *ngIf="col.filterType && col.filterType !== 'none'"
-            style="vertical-align: middle"
-            [type]="col.filterType"
-            [field]="col.field"
-            display="menu"
-            [hideOnClear]="true"
-            [showOperator]="false"
-            [showAddButton]="false"
-            [maxFractionDigits]="2"></p-columnFilter>
-        </th>
-      </tr>
-    </ng-template>
-
-    <ng-template pTemplate="body" let-data let-columns="columns">
-      <tr [pSelectableRow]="data">
-        <td style="width: 2.75rem !important; max-width: 2.75rem !important">
-          <p-tableCheckbox
-            [value]="data"
-            (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
-        </td>
-        <td style="width: 5rem !important; max-width: 5rem !important">
-          <div class="row-actions flex">
+<div class="p-card flex flex-column">
+  <div class="flex-grow-1">
+    <p-table
+      #dataTable
+      class="data-table"
+      styleClass="p-datatable-striped"
+      [columns]="cols"
+      [scrollable]="true"
+      scrollHeight="flex"
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      [reorderableColumns]="true"
+      selectionMode="multiple"
+      [lazy]="true"
+      [value]="records"
+      [(selection)]="selectedRecords"
+      [dataKey]="tableConfig.dataKey"
+      [rowHover]="true"
+      [loading]="loading"
+      [filterDelay]="0"
+      stateStorage="session"
+      [stateKey]="stateKey"
+      [virtualScroll]="true"
+      [virtualScrollItemSize]="51.75"
+      [virtualScrollDelay]="0"
+      (onFilter)="onFilter($event)"
+      (onSort)="onSort($event)"
+      (onStateSave)="onStateSave($event)">
+      <ng-template pTemplate="caption">
+        <h3 class="mb-4">{{ tableConfig.caption }}</h3>
+        <div class="table-header flex align-items-center">
+          <div class="flex flex-wrap mr-2">
             <ng-template
-              class="flex"
               appUniversalGridAction
-              [actions]="rowActions"
-              [recordKey]="tableConfig.dataKey"
-              [selectedRecords]="[data]"
+              [actions]="tableActions"
+              [selectedRecords]="selectedRecords"
+              [fetchDataParam]="fetchDataParam"
               (savedEvent)="onRefresh()"></ng-template>
           </div>
-        </td>
+          <div class="flex-none mr-2 ml-auto">
+            <strong *ngIf="selectedRecords.length > 0"
+              >{{ selectedRecords.length }} row(s) selected</strong
+            >
+          </div>
+          <p-button
+            icon="pi pi-refresh text-lg"
+            styleClass="p-button-rounded p-button-outlined"
+            (onClick)="onRefresh()"></p-button>
+        </div>
+      </ng-template>
 
-        <td *ngFor="let col of columns" [title]="data[col.field]">
-          <span *ngIf="!col.template">
-            {{ data[col.field] | booleanText }}
-          </span>
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="emptymessage" let-columns>
-      <tr>
-        <td class="text-center" [attr.colspan]="columns.length + 2">
-          {{
-            this.firstLoadDone
-              ? 'No data were found for your search.'
-              : 'Fill in Search Inputs to get your data.'
-          }}
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th style="width: 2.75rem !important; max-width: 2.75rem !important">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th style="width: 5rem !important; max-width: 5rem !important"></th>
+          <th
+            *ngFor="let col of columns"
+            pReorderableColumn
+            pResizableColumn
+            [pSortableColumn]="col.field"
+            [pSortableColumnDisabled]="!col.sortable">
+            <span style="vertical-align: middle">{{ col.header }}</span>
+            <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
+            <p-columnFilter
+              *ngIf="
+                col.filterType &&
+                col.filterType !== 'none' &&
+                col.filterType !== 'enums'
+              "
+              style="vertical-align: middle"
+              [type]="col.filterType"
+              [field]="col.field"
+              display="menu"
+              [hideOnClear]="true"
+              [showOperator]="false"
+              [showAddButton]="false"
+              [maxFractionDigits]="2"></p-columnFilter>
+            <p-columnFilter
+              *ngIf="col.filterType && col.filterType === 'enums'"
+              style="vertical-align: middle"
+              [field]="col.field"
+              matchMode="in"
+              display="menu"
+              [hideOnClear]="true"
+              [showMatchModes]="false"
+              [showOperator]="false"
+              [showAddButton]="false">
+              <ng-template
+                pTemplate="filter"
+                let-value
+                let-filter="filterCallback">
+                <p-multiSelect
+                  [showToggleAll]="false"
+                  appendTo="body"
+                  placeholder="Any"
+                  [ngModel]="value"
+                  [options]="col.filterOptions || []"
+                  (onChange)="filter($event.value)">
+                </p-multiSelect>
+              </ng-template>
+            </p-columnFilter>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-data let-columns="columns">
+        <tr [pSelectableRow]="data">
+          <td style="width: 2.75rem !important; max-width: 2.75rem !important">
+            <p-tableCheckbox
+              [value]="data"
+              (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
+          </td>
+          <td style="width: 5rem !important; max-width: 5rem !important">
+            <div class="row-actions flex">
+              <ng-template
+                class="flex"
+                appUniversalGridAction
+                [actions]="rowActions"
+                [recordKey]="tableConfig.dataKey"
+                [selectedRecords]="[data]"
+                (savedEvent)="onRefresh()"></ng-template>
+            </div>
+          </td>
+
+          <td *ngFor="let col of columns" [title]="data[col.field] || ''">
+            <ng-container
+              *ngIf="!col.template"
+              [ngTemplateOutlet]="
+                col.filterType === 'date'
+                  ? date
+                  : col.filterType === 'numeric'
+                  ? numeric
+                  : col.filterType === 'boolean'
+                  ? boolean
+                  : normal
+              "></ng-container>
+            <ng-template #boolean>{{ data[col.field] | boolean }}</ng-template>
+            <ng-template #date>{{
+              data[col.field]
+                | date : (col.format === '' ? undefined : col.format)
+            }}</ng-template>
+            <ng-template #numeric>{{
+              data[col.field]
+                | number : (col.format === '' ? undefined : col.format)
+            }}</ng-template>
+            <ng-template #normal>{{ data[col.field] }}</ng-template>
+            <span
+              *ngIf="col.template"
+              [innerHTML]="calcCustomTemplate(data, col.template)">
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr>
+          <td class="text-center" [attr.colspan]="columns.length + 2">
+            {{
+              this.firstLoadDone
+                ? 'No data were found for your search.'
+                : 'Fill in Search Inputs to get your data.'
+            }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <p-paginator
+    [rows]="rows"
+    [first]="first"
+    [totalRecords]="totalRecords"
+    [pageLinkSize]="5"
+    styleClass="p-paginator-bottom"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries  "
+    [alwaysShow]="false"
+    (onPageChange)="onPageChange($event)"
+    [rowsPerPageOptions]="rowsPerPageOptions"
+    [showFirstLastIcon]="true"
+    [showCurrentPageReport]="true"
+    [showPageLinks]="true"></p-paginator>
 </div>

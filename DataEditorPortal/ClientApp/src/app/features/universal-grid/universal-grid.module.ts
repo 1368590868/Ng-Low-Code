@@ -1,5 +1,11 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {
+  CommonModule,
+  CurrencyPipe,
+  DatePipe,
+  DecimalPipe,
+  PercentPipe
+} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 // formly
@@ -31,6 +37,8 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
+import { DataFormatService } from './services/data-format.service';
+import { PaginatorModule } from 'primeng/paginator';
 
 @NgModule({
   declarations: [
@@ -63,7 +71,15 @@ import { ButtonModule } from 'primeng/button';
     ProgressBarModule,
     SplitButtonModule,
     RippleModule,
-    ButtonModule
+    ButtonModule,
+    PaginatorModule
+  ],
+  providers: [
+    DataFormatService,
+    DatePipe,
+    DecimalPipe,
+    CurrencyPipe,
+    PercentPipe
   ]
 })
 export class UniversalGridModule {}

@@ -29,6 +29,14 @@ export class PortalEditColumnsComponent implements OnInit {
   model: any = {};
   fields: FormlyFieldConfig[] = [
     {
+      key: 'type',
+      type: 'input',
+      props: {
+        disabled: true,
+        label: 'Column Type'
+      }
+    },
+    {
       key: 'header',
       type: 'input',
       props: {
@@ -48,44 +56,78 @@ export class PortalEditColumnsComponent implements OnInit {
       }
     },
     {
-      key: 'filterType',
-      type: 'select',
-      defaultValue: 'text',
+      key: 'template',
+      type: 'monacoEditor',
       props: {
-        label: 'Filter Type',
-        placeholder: 'Please Select',
-        required: true,
-        showClear: false,
-        options: [
-          {
-            label: 'None',
-            value: 'none'
-          },
-          {
-            label: 'Text',
-            value: 'text'
-          },
-          {
-            label: 'Numeric',
-            value: 'numeric'
-          },
-          {
-            label: 'Boolean',
-            value: 'boolean'
-          },
-          {
-            label: 'Date',
-            value: 'date'
-          }
-        ]
+        label: 'Data Template',
+        config: {
+          language: 'javascript'
+        }
+      },
+      expressions: {
+        hide: `field.parent.model.type !== 'TemplateField'`
       }
     },
     {
-      key: 'sortable',
-      type: 'checkbox',
-      defaultValue: true,
-      props: {
-        label: 'Sortable'
+      fieldGroup: [
+        {
+          key: 'filterType',
+          type: 'select',
+          defaultValue: 'text',
+          props: {
+            label: 'Filter Type',
+            placeholder: 'Please Select',
+            required: true,
+            showClear: false,
+            options: [
+              {
+                label: 'None',
+                value: 'none'
+              },
+              {
+                label: 'Text',
+                value: 'text'
+              },
+              {
+                label: 'Numeric',
+                value: 'numeric'
+              },
+              {
+                label: 'Boolean',
+                value: 'boolean'
+              },
+              {
+                label: 'Date',
+                value: 'date'
+              },
+              {
+                label: 'Enums',
+                value: 'enums'
+              }
+            ]
+          }
+        },
+        {
+          key: 'sortable',
+          type: 'checkbox',
+          defaultValue: true,
+          props: {
+            label: 'Sortable'
+          }
+        },
+        {
+          key: 'format',
+          type: 'input',
+          props: {
+            label: 'Data Format'
+          },
+          expressions: {
+            hide: `['numeric','date'].indexOf(field.parent.model.filterType) < 0`
+          }
+        }
+      ],
+      expressions: {
+        hide: `field.parent.model.type !== 'DataBaseField'`
       }
     }
   ];
@@ -115,6 +157,7 @@ export class PortalEditColumnsComponent implements OnInit {
           .filter(s => !this.targetColumns.find(t => t.field === s.columnName))
           .map<GridColumn>(x => {
             return {
+              type: 'DataBaseField',
               field: x.columnName,
               key: x.columnName,
               filterType: x.filterType,
@@ -216,5 +259,22 @@ export class PortalEditColumnsComponent implements OnInit {
     this.router.navigate(['../datasource'], {
       relativeTo: this.activatedRoute
     });
+  }
+
+  onAddTemplateColumn() {
+    const count = this.targetColumns.filter(
+      x => x.type === 'TemplateField'
+    ).length;
+    this.targetColumns = [
+      {
+        type: 'TemplateField',
+        field: `Template_${count + 1}`,
+        filterType: 'none',
+        header: `Template_${count + 1}`,
+        width: '10rem',
+        selected: true
+      },
+      ...this.targetColumns
+    ];
   }
 }

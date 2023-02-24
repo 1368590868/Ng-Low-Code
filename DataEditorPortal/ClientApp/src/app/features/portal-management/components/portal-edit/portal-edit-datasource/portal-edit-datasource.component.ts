@@ -56,6 +56,7 @@ export class PortalEditDatasourceComponent implements OnInit {
 
   filters: DataSourceFilterControls[] = [];
   sortBy: DataSourceSortBy[] = [];
+  pageSize = 100;
 
   formControlDbTable: FormControl = new FormControl();
   formControlIdColumn: FormControl = new FormControl();
@@ -140,6 +141,10 @@ export class PortalEditDatasourceComponent implements OnInit {
           if (dsConfig.sortBy) {
             this.sortBy = dsConfig.sortBy;
           }
+
+          // set pageSize
+          if (dsConfig.pageSize && dsConfig.pageSize >= 10)
+            this.pageSize = dsConfig.pageSize;
         } else {
           // if table schema and table name havn't been stored, use the first from tables.
           this.formControlDbTable.setValue(tables[0].value);
@@ -234,11 +239,11 @@ export class PortalEditDatasourceComponent implements OnInit {
   saveDatasourceConfig() {
     this.isSaving = true;
     if (this.portalItemService.currentPortalItemId) {
-      let data: DataSourceConfig = {};
+      const data: DataSourceConfig = { pageSize: this.pageSize };
       if (!this.isAdvanced) {
-        data = JSON.parse(
-          JSON.stringify(this.datasourceConfig)
-        ) as DataSourceConfig;
+        data.tableName = this.datasourceConfig.tableName;
+        data.tableSchema = this.datasourceConfig.tableSchema;
+        data.idColumn = this.datasourceConfig.idColumn;
         data.filters = this.filters.map<DataSourceFilter>(x => {
           return {
             field: x.formControlField.value,

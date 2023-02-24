@@ -9,22 +9,30 @@ import {
   SiteSettingsComponent,
   DataDictionaryComponent
 } from './features/core';
-import { RouterGuard } from './shared';
+import { AuthRouterGuard, PermissionRouterGuard } from './shared';
 
 const routes: Routes = [
-  { path: '', component: TileComponent, canActivate: [RouterGuard] },
-  { path: 'about', component: AboutComponent, canActivate: [RouterGuard] },
-  { path: 'contact', component: ContactComponent, canActivate: [RouterGuard] },
+  { path: '', component: TileComponent, canActivate: [AuthRouterGuard] },
+  {
+    path: 'about',
+    component: AboutComponent,
+    canActivate: [AuthRouterGuard]
+  },
+  {
+    path: 'contact',
+    component: ContactComponent,
+    canActivate: [AuthRouterGuard]
+  },
   { path: 'login', component: LoginComponent },
   {
     path: 'site-settings',
     component: SiteSettingsComponent,
-    canActivate: [RouterGuard]
+    canActivate: [AuthRouterGuard, PermissionRouterGuard]
   },
   {
     path: 'data-dictionary',
     component: DataDictionaryComponent,
-    canActivate: [RouterGuard]
+    canActivate: [AuthRouterGuard, PermissionRouterGuard]
   },
   {
     path: 'portal-item/:name',
@@ -32,7 +40,7 @@ const routes: Routes = [
       import('./features/universal-grid/universal-grid.module').then(
         m => m.UniversalGridModule
       ),
-    canActivate: [RouterGuard]
+    canActivate: [AuthRouterGuard, PermissionRouterGuard]
   },
   {
     path: 'portal-management',
@@ -40,7 +48,7 @@ const routes: Routes = [
       import('./features/portal-management/portal-management.module').then(
         m => m.PortalManagementModule
       ),
-    canActivate: [RouterGuard]
+    canActivate: [AuthRouterGuard, PermissionRouterGuard]
   },
   { path: '**', component: ErrorPageComponent }
 ];

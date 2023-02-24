@@ -4,6 +4,18 @@
 
   .p-picklist-list {
     padding: 0.75rem;
+    height: 31.2143rem;
+
+    &::-webkit-scrollbar {
+      width: 0.25rem;
+      height: 0.25rem;
+    }
+    &::-webkit-scrollbar-track {
+      border-bottom-right-radius: var(--border-radius);
+    }
+    &::-webkit-scrollbar-thumb {
+      border-bottom-right-radius: var(--border-radius);
+    }
   }
 }
 
@@ -17,6 +29,12 @@
     max-width: 20rem;
   }
 
+  .p-picklist-target-wrapper {
+    .p-picklist-header {
+      padding: 0.5875rem 1.25rem;
+    }
+  }
+
   .p-picklist-empty-message {
     app-svg-drag {
       svg {
@@ -24,5 +42,9 @@
         left: calc(50% - 7.5rem);
       }
     }
+  }
+
+  .monaco-editor-wrapper {
+    height: 10rem !important;
   }
 }

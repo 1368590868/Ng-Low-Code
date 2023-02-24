@@ -45,6 +45,19 @@
         </div>
       </div>
     </div>
+    <div class="w-6 pt-3 flex flex-column">
+      <div class="flex flex-column mb-2">
+        <label for="" class="mb-1">Page Size</label>
+        <p-inputNumber
+          [(ngModel)]="pageSize"
+          [style]="{ minWidth: '20rem' }"
+          [showButtons]="true"
+          [allowEmpty]="false"
+          [maxFractionDigits]="0"
+          [max]="1000"
+          [min]="10"></p-inputNumber>
+      </div>
+    </div>
     <p-divider styleClass="mb-0">Filters</p-divider>
     <div class="flex flex-column mb-2">
       <!-- <label class="mb-1">Filters</label> -->
@@ -146,21 +159,27 @@
     </div>
   </div>
   <div *ngIf="isAdvanced" class="w-6 pt-3 flex flex-column">
-    <label class="line-height-3 flex align-items-center"
-      >Query text
-      <i
-        class="pi pi-question-circle ml-3 text-lg"
-        [pTooltip]="
-          'Enter the query to fetch the data. Use ##SEARCHES## and ##FILTERS## as the placeholder to recevie the paramters from front end'
-        "></i>
+    <label class="line-height-3 flex align-items-center mb-2"
+      >Custom your query below to fetch the data. Use ##SEARCHES## and
+      ##FILTERS## as the placeholder to recevie the paramters from front end.
     </label>
     <ngx-monaco-editor
       [formControl]="formControlQuery"
       (onInit)="onMonacoInit()"
       [style]="{ height: '20rem' }"
       [required]="true"
-      class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
+      class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
       [options]="{}"></ngx-monaco-editor>
+
+    <label for="" class="mb-1">Page Size</label>
+    <p-inputNumber
+      [(ngModel)]="pageSize"
+      [style]="{ minWidth: '20rem' }"
+      [showButtons]="true"
+      [allowEmpty]="false"
+      [maxFractionDigits]="0"
+      [max]="1000"
+      [min]="10"></p-inputNumber>
   </div>
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">

@@ -8,12 +8,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class ErrorPageComponent {
   public errorMessage = 'Page Not Found.';
-  public errorCode = 404;
+  public errorCode = '404';
   constructor(private router: Router, private route: ActivatedRoute) {
     this.route.queryParams.subscribe(qp => {
       if (qp['code'] === '401') {
-        this.errorMessage = 'Unauthorized Access.';
-        this.errorCode = 401;
+        this.errorMessage = `You don't have the permissions to access this page`;
+        this.errorCode = 'Access Denied';
       }
     });
   }

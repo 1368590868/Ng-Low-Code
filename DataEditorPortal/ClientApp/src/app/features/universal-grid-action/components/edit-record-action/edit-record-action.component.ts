@@ -40,6 +40,11 @@ export class EditRecordActionComponent
         .getDetailData(dataKey)
         .pipe(
           tap(result => {
+            Object.keys(result).forEach(key => {
+              if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}.*/.test(result[key])) {
+                result[key] = new Date(result[key]);
+              }
+            });
             this.model = result;
           }),
           tap(() => this.getFormConfig())
@@ -52,7 +57,7 @@ export class EditRecordActionComponent
 
   getFormConfig() {
     this.gridService
-      .getDetailConfig()
+      .getDetailConfig(this.isAddForm ? 'ADD' : 'UPDATE')
       .pipe(
         tap(result => {
           // fetch lookups
@@ -83,7 +88,7 @@ export class EditRecordActionComponent
             });
 
           this.fields = fields;
-          this.loadedEvent.emit();
+          if (fields.length > 0) this.loadedEvent.emit();
         })
       )
       .subscribe();

@@ -31,10 +31,12 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { MessageModule } from 'primeng/message';
 import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TabViewModule } from 'primeng/tabview';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import {
@@ -61,12 +63,15 @@ import {
   FormlyFieldSearchRuleEditorComponent,
   SearchRuleComponent
 } from './components/search-rule/search-rule.component';
+import { FormlyFieldValidatorEditorComponent } from './components/validator-editor/validator-editor.component';
 import { FormDesignerViewComponent } from './components/portal-edit/form-designer/form-designer-view.component';
 import {
   FormDesignerConfigComponent,
   FROM_DESIGNER_CONTROLS
 } from './components/portal-edit/form-designer/form-designer-config.component';
 import { SearchDesignerConfigComponent } from './components/portal-edit/form-designer/search-designer-config.component';
+import { ValidatorEditorComponent } from './components/validator-editor/validator-editor.component';
+import { FormLayoutComponent } from './components/portal-edit/portal-edit-form/form-layout/form-layout.component';
 
 const monacoConfig: NgxMonacoEditorConfig = {
   defaultOptions: {
@@ -76,7 +81,12 @@ const monacoConfig: NgxMonacoEditorConfig = {
     roundedSelection: true,
     minimap: { enabled: false },
     wordWrap: true,
+    fixedOverflowWidgets: true,
     contextmenu: false,
+    glyphMargin: false,
+    lineDecorationsWidth: 0,
+    lineNumbersMinChars: 0,
+    automaticLayout: true,
     scrollbar: {
       verticalScrollbarSize: 7,
       horizontalScrollbarSize: 7
@@ -110,9 +120,12 @@ const monacoConfig: NgxMonacoEditorConfig = {
     SearchRuleComponent,
     FormlyFieldOptionsEditorComponent,
     FormlyFieldSearchRuleEditorComponent,
+    FormlyFieldValidatorEditorComponent,
     FormDesignerViewComponent,
     FormDesignerConfigComponent,
-    SearchDesignerConfigComponent
+    SearchDesignerConfigComponent,
+    ValidatorEditorComponent,
+    FormLayoutComponent
   ],
   imports: [
     CommonModule,
@@ -131,6 +144,11 @@ const monacoConfig: NgxMonacoEditorConfig = {
         {
           name: 'searchRuleEditor',
           component: FormlyFieldSearchRuleEditorComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'validatorEditor',
+          component: FormlyFieldValidatorEditorComponent,
           wrappers: ['form-field']
         }
       ]
@@ -161,9 +179,11 @@ const monacoConfig: NgxMonacoEditorConfig = {
     DividerModule,
     InputSwitchModule,
     InputNumberModule,
+    InputTextareaModule,
     ContextMenuModule,
     MessageModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    TabViewModule
   ],
   providers: [
     {

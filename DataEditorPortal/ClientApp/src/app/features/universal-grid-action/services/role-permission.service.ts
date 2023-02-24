@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
+import { TreeNode } from 'primeng/api';
 import { map, Observable } from 'rxjs';
 import { ApiResponse } from 'src/app/shared';
 import {
   Role,
   Permisstion,
-  RolePermissions,
   updateRole,
   ManageRoleForm,
   RoleItem
@@ -59,17 +59,13 @@ export class RolePermissionService {
 
   getRolePermissions(roleId: string) {
     return this.http
-      .get<ApiResponse<RolePermissions[]>>(
-        `${this._apiUrl}role/${roleId}/permissions`
-      )
+      .get<ApiResponse<TreeNode[]>>(`${this._apiUrl}role/${roleId}/permissions`)
       .pipe(map(res => res.result || []));
   }
 
   getSitePermissions() {
     return this.http
-      .get<ApiResponse<RolePermissions[]>>(
-        `${this._apiUrl}role/all-site-permissions`
-      )
+      .get<ApiResponse<TreeNode[]>>(`${this._apiUrl}role/all-site-permissions`)
       .pipe(map(res => res.result || []));
   }
 

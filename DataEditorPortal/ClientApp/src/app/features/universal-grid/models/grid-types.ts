@@ -31,14 +31,11 @@ export interface GridConfig {
   caption?: string;
   description?: string;
   dataKey: string;
-  allowExport?: boolean;
-  allowEdit?: boolean;
-  allowDelete?: boolean;
-  useCustomForm?: boolean;
   customEditFormName?: string;
   customAddFormName?: string;
   customViewFormName?: string;
   customActions?: GridActionOption[];
+  pageSize?: number;
 }
 
 export interface GridColumn {
@@ -49,6 +46,9 @@ export interface GridColumn {
   uiType?: string;
   order?: number;
   aggregate: boolean;
+  template?: string;
+  format?: string;
+  filterOptions?: any[];
 }
 
 export interface GridSearchConfig {

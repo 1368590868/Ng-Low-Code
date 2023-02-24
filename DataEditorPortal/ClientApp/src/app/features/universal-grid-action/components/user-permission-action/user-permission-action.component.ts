@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { TreeNode } from 'primeng/api';
 import { NotifyService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UserPemissions } from '../../models/user-manager';
@@ -15,7 +16,7 @@ export class UserPermissionActionComponent
 {
   groupPermissions: any[] = [];
   permissionSelect: UserPemissions[] = [];
-  permissions: any[] = [];
+  permissions: TreeNode[] = [];
   constructor(
     private userManagerService: UserManagerService,
     private notifyService: NotifyService
@@ -23,33 +24,35 @@ export class UserPermissionActionComponent
     super();
   }
 
-  getPermissionsList(id = '') {
-    this.userManagerService.getUserPermissions(id).subscribe(res => {
-      this.groupPermissions = this.groupBy(res);
-      this.groupPermissions.map((item, i) => {
-        this.permissions[i] = item;
+  childrenSelected(node: TreeNode) {
+    if (node?.children) {
+      node.children.forEach((child: any) => {
+        if (child.selected) {
+          this.permissionSelect.push(child);
+        }
+        if (Array.isArray(node?.children)) {
+          this.childrenSelected(child);
+        }
       });
-      this.permissions.map((res, i) => {
-        this.permissionSelect[i] = res.filter((item: any) => {
-          return item.selected;
-        });
-      });
-      this.loadedEvent.emit();
+    }
+  }
+
+  initData(data: TreeNode[]) {
+    this.permissions = data;
+    data.forEach((item: any) => {
+      if (item.selected) {
+        this.permissionSelect.push(item);
+      }
+
+      this.childrenSelected(item);
     });
   }
 
-  // format data
-  groupBy(objectArray: any[]) {
-    const map = new Map();
-    objectArray.forEach((item, _, arr) => {
-      if (!map.has(item.category)) {
-        map.set(
-          item.category,
-          arr.filter(a => a.category == item.category)
-        );
-      }
+  getPermissionsList(id = '') {
+    this.userManagerService.getUserPermissions(id).subscribe(res => {
+      this.initData(res);
+      this.loadedEvent.emit();
     });
-    return Array.from(map).map(item => [...item[1]]);
   }
 
   // dialog function
@@ -59,15 +62,19 @@ export class UserPermissionActionComponent
   }
 
   onSave(): void {
-    this.permissionSelect = this.permissionSelect.flat(3).map(res => {
-      {
-        res.selected = true;
-        return res;
-      }
-    });
+    const permissionSelect = this.permissionSelect
+      .filter((x: any) => !x.type)
+      .map((res: any) => {
+        return {
+          id: res.key,
+          selected: true,
+          permissionName: res.label,
+          permissionDescription: res.description
+        };
+      });
     this.userManagerService
       .saveUserPermissions(
-        this.permissionSelect,
+        permissionSelect,
         this.selectedRecords[0][this.recordKey]
       )
       .subscribe(res => {

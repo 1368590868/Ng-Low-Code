@@ -9,6 +9,9 @@ import { FormlyInputMaskModule } from './inputMask';
 import { FormlyInputNumberModule } from './inputnumber';
 import { FormlyMultiSelectModule } from './multiselect';
 import { FormlySelectModule } from './select';
+import { FormlyMonacoEditorModule } from './monacoEditor';
+import { CurrentDateModule } from './currentdate';
+import { UniversalRegexpModule } from './universalregexp';
 
 @NgModule({
   imports: [
@@ -21,7 +24,10 @@ import { FormlySelectModule } from './select';
     FormlyCheckBoxModule,
     FormlyChipWrapperModule,
     FormlyIconSelectModule,
-    FormlyInputNumberModule
+    FormlyInputNumberModule,
+    FormlyMonacoEditorModule,
+    CurrentDateModule,
+    UniversalRegexpModule
   ]
 })
 export class FormlyCustomTypeModule {}

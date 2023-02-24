@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { RouterGuard } from './router.guard';
+import { PermissionRouterGuard } from './permission-router.guard';
 
-describe('RouterGuard', () => {
-  let guard: RouterGuard;
+describe('PermissionRouterGuard', () => {
+  let guard: PermissionRouterGuard;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    guard = TestBed.inject(RouterGuard);
+    guard = TestBed.inject(PermissionRouterGuard);
   });
 
   it('should be created', () => {

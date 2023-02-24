@@ -1,14 +1,15 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { delay, map, Observable, of, Subject, tap } from 'rxjs';
+import { PrimeNGConfig } from 'primeng/api';
+import { map, Observable, tap } from 'rxjs';
 import { ApiResponse, ConfigDataService, NotifyService } from 'src/app/shared';
 import {
   DataSourceConfig,
   DataSourceTable,
   DataSourceTableColumn,
+  GirdDetailConfig,
   GridColumn,
   GridCustomAction,
-  GridFormConfig,
   GridSearchField,
   PortalItem,
   PortalItemData
@@ -29,9 +30,21 @@ export class PortalItemService {
     private http: HttpClient,
     private notifyService: NotifyService,
     private configDataService: ConfigDataService,
+    private primeNGConfig: PrimeNGConfig,
     @Inject('API_URL') apiUrl: string
   ) {
     this._apiUrl = apiUrl;
+  }
+
+  getFilterMatchModeOptions({ filterType, type }: any) {
+    if (type === 'multiSelect' || type === 'checkboxList')
+      return [{ label: 'In selected values', value: 'in' }];
+    if (filterType === 'boolean') return [{ label: 'Equals', value: 'equals' }];
+    return (this.primeNGConfig.filterMatchModeOptions as any)[filterType]?.map(
+      (key: any) => {
+        return { label: this.primeNGConfig.getTranslation(key), value: key };
+      }
+    );
   }
 
   getCurrentStep(): Observable<string> {
@@ -240,15 +253,15 @@ export class PortalItemService {
     );
   }
 
-  getGridFormConfig(): Observable<GridFormConfig> {
+  getGridFormConfig(): Observable<GirdDetailConfig> {
     return this.http
-      .get<ApiResponse<GridFormConfig>>(
+      .get<ApiResponse<GirdDetailConfig>>(
         `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`
       )
       .pipe(map(x => x.result || {}));
   }
 
-  saveGridFormConfig(data: GridFormConfig) {
+  saveGridFormConfig(data: GirdDetailConfig) {
     return this.http.post<ApiResponse<boolean>>(
       `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`,
       data

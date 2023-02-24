@@ -35,7 +35,6 @@ export interface FormlyDatepickerFieldConfig
   template: `
     <p-calendar
       [defaultDate]="props.defaultDate"
-      dateType="string"
       [dateFormat]="props.dateFormat"
       [hourFormat]="props.hourFormat"
       [showTime]="props.showTime"

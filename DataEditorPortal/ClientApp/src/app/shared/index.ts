@@ -12,7 +12,8 @@ import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
 import { PermissionDirective } from './directive/permission.directive';
 
-export { RouterGuard } from './guards/router.guard';
+export { AuthRouterGuard } from './guards/auth-router.guard';
+export { PermissionRouterGuard } from './guards/permission-router.guard';
 export { ApiResponse } from './models/api-response';
 export { SiteMenu } from './models/menu';
 export { AppUser } from './models/user';

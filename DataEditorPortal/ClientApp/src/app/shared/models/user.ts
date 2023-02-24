@@ -12,4 +12,5 @@ export interface AppUser {
   vendor?: string;
   authenticated?: boolean;
   permissions?: UserPermissions;
+  isAdmin?: boolean;
 }
