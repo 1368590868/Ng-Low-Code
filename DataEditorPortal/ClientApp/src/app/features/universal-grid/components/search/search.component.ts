@@ -46,26 +46,31 @@ export class SearchComponent implements OnInit, OnDestroy {
                 typeof x.type === 'string' &&
                 ['select', 'multiSelect'].indexOf(x.type) >= 0 &&
                 x.props &&
-                x.props['optionLookup']
+                x.props['optionsLookup']
             )
             .forEach(f => {
               if (f.props) {
                 f.props.placeholder = 'Please Select';
                 if (!f.props.options) f.props.options = [];
-              }
-              f.hooks = {
-                onInit: field => {
-                  if (
-                    field.props &&
-                    field.props['dependOnFields'] &&
-                    field.props['dependOnFields'].length > 0
-                  ) {
-                    this.ngxFormlyService.initDependOnFields(field);
-                  } else {
-                    this.ngxFormlyService.initFieldOptions(field);
-                  }
+
+                if (Array.isArray(f.props['optionsLookup'])) {
+                  f.props.options = f.props['optionsLookup'];
+                } else {
+                  f.hooks = {
+                    onInit: field => {
+                      if (
+                        field.props &&
+                        field.props['dependOnFields'] &&
+                        field.props['dependOnFields'].length > 0
+                      ) {
+                        this.ngxFormlyService.initDependOnFields(field);
+                      } else {
+                        this.ngxFormlyService.initFieldOptions(field);
+                      }
+                    }
+                  };
                 }
-              };
+              }
             });
 
           this.fields = fields;
