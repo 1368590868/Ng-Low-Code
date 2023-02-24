@@ -46,10 +46,7 @@ namespace DataEditorPortal.Web.Controllers
             {
                 dep_user = new Data.Models.User();
                 dep_user.Username = user.Username;
-                dep_user.Employer = "NONE";
-                dep_user.Vendor = "NONE";
                 dep_user.AutoEmail = true;
-                dep_user.Division = "NONE";
 
                 // check site has admin
                 if (_userService.HasAdmin())
@@ -132,7 +129,6 @@ namespace DataEditorPortal.Web.Controllers
             dep_user.Employer = model.Employer;
             dep_user.Vendor = model.Vendor;
             dep_user.AutoEmail = model.AutoEmail;
-            dep_user.Division = model.Division;
             dep_user.Comments = "ACTIVE";
             dep_user.Email = model.Email;
             dep_user.Phone = model.Phone;

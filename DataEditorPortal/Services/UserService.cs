@@ -116,11 +116,11 @@ namespace DataEditorPortal.Web.Services
 
             var dep_user = new User();
             dep_user.Id = Guid.NewGuid();
+            dep_user.Name = model.Name;
             dep_user.Username = model.Username;
             dep_user.Employer = model.Employer;
             dep_user.Vendor = model.Vendor;
             dep_user.AutoEmail = model.AutoEmail;
-            dep_user.Division = model.Division;
             dep_user.Comments = "ACTIVE";
             dep_user.Email = model.Email;
             dep_user.Phone = model.Phone;

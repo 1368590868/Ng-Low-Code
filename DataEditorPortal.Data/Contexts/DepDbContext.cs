@@ -198,7 +198,7 @@ namespace DataEditorPortal.Data.Contexts
                         TableName = "Users",
                         TableSchema = "dep",
                         IdColumn = "Id",
-                        Columns = new List<string>() { "Id", "Username", "Name", "Email", "Phone", "AutoEmail", "Vendor", "Employer", "Division", "Comments" },
+                        Columns = new List<string>() { "Id", "Username", "Name", "Email", "Phone", "AutoEmail", "Vendor", "Employer", "Comments" },
                         SortBy = new List<object>() { new { field = "Name", order = 1 } }
                     }),
 
@@ -210,7 +210,6 @@ namespace DataEditorPortal.Data.Contexts
                         new { type = "DataBaseField", field = "AutoEmail", header = "Auto Email", width = "250px", filterType = "boolean", sortable = true },
                         new { type = "DataBaseField", field = "Vendor", header = "Vendor", width = "250px", filterType = "text", sortable = true },
                         new { type = "DataBaseField", field = "Employer", header = "Employer", width = "250px", filterType = "text", sortable = true },
-                        new { type = "DataBaseField", field = "Division", header = "Division", width = "250px", filterType = "text", sortable = false },
                         new { type = "DataBaseField", field = "Comments", header = "Comments", width = "250px", filterType = "text", sortable = true }
                     }),
 
