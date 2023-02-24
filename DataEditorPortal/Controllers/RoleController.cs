@@ -128,12 +128,12 @@ namespace DataEditorPortal.Web.Controllers
                             Selected = rp != null
                         };
 
-            return _permissionService.GetPermissionTree(query.ToList()); ;
+            return _permissionService.GetPermissionTree(query.ToList());
         }
 
         [HttpGet]
         [Route("all-site-permissions")]
-        public List<AppRolePermission> AllSitePermission()
+        public List<PermissionNode> AllSitePermission()
         {
             var query = from p in _depDbContext.SitePermissions
                         orderby p.Category, p.PermissionName
@@ -145,7 +145,7 @@ namespace DataEditorPortal.Web.Controllers
                             Category = p.Category
                         };
 
-            return query.ToList();
+            return _permissionService.GetPermissionTree(query.ToList());
         }
     }
 }
