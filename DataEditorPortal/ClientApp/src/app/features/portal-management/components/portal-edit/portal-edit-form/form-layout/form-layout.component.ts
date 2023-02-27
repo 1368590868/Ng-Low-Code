@@ -30,6 +30,8 @@ export class FormLayoutComponent {
   @Input()
   set config(val: GridFormConfig) {
     Object.assign(this._formConfig, val);
+    this.showQuery = !!this._formConfig.queryText;
+
     if (val.formFields) {
       this.targetColumns = val.formFields.map<GridFormField>(x => {
         return {
@@ -60,7 +62,7 @@ export class FormLayoutComponent {
   customActions: { label: string | undefined; value: string }[] = [];
 
   showQuery = false;
-  showFetchQuery = false;
+  // showFetchQuery = false;
 
   constructor(
     private notifyService: NotifyService,
