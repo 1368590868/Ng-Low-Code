@@ -58,7 +58,7 @@ export class UserService {
   updateUser(data: ManageRoleForm) {
     return this.http.put<ApiResponse<UpdateRole[]>>(
       `${this._apiUrl}user/update/${data.id}`,
-      { ...data, division: JSON.stringify(data.division) }
+      data
     );
   }
 

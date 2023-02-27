@@ -15,7 +15,6 @@ export interface ManageRoleForm {
   username?: string;
   employer?: string;
   comments?: string;
-  division?: any;
   name?: string;
   email?: string;
   vendor?: string;

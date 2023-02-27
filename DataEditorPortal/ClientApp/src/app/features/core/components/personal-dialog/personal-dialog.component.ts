@@ -217,8 +217,7 @@ export class PersonalDialogComponent {
           phone: res.phone,
           vendor: res.vendor,
           employer: res.employer,
-          autoEmail: res.autoEmail,
-          division: res.division !== 'NONE' ? JSON.parse(res.division) : []
+          autoEmail: res.autoEmail
         });
       });
     this.visible = true;
