@@ -201,11 +201,14 @@ export class PortalEditBasicComponent implements OnInit {
   saveSucess(id?: string) {
     let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      next = id
-        ? [
-            `../../edit/${this.portalItemService.currentPortalItemId}/datasource`
-          ]
-        : ['../datasource'];
+      if (id) {
+        next = [
+          `../../edit/${this.portalItemService.currentPortalItemId}/datasource`
+        ];
+        this.portalItemService.saveCurrentStep('datasource');
+      } else {
+        next = ['../datasource'];
+      }
     }
     if (this.isSavingAndExit) {
       this.notifyService.notifySuccess(
