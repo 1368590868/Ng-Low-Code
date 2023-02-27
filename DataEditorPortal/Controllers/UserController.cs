@@ -51,11 +51,11 @@ namespace DataEditorPortal.Web.Controllers
                 // check site has admin
                 if (_userService.HasAdmin())
                 {
-                    _userService.CreateUser(dep_user, "Users");
+                    _userService.CreateUser(dep_user);
                 }
                 else
                 {
-                    _userService.CreateUser(dep_user, "Administrators");
+                    _userService.CreateUser(dep_user, new List<string>() { "Administrators" });
                 }
             }
 
@@ -112,7 +112,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("create")]
         public Guid Create([FromBody] User model)
         {
-            return _userService.CreateUser(model, "Users");
+            return _userService.CreateUser(model);
         }
 
         [HttpPut]

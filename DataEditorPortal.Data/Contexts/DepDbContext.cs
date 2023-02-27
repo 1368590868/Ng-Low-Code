@@ -106,7 +106,7 @@ namespace DataEditorPortal.Data.Contexts
                 new SiteMenu()
                 {
                     Id = new Guid("B0864169-8CA1-49E4-AE1E-BFC53756231B"),
-                    Name = "site-settings",
+                    Name = "system-event-logs",
                     Label = "System Event Logs",
                     Icon = "pi pi-clock",
                     Type = "System",

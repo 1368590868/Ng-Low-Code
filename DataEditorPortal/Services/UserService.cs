@@ -15,7 +15,7 @@ namespace DataEditorPortal.Web.Services
         Dictionary<string, bool> GetUserPermissions();
         bool IsAdmin(string username);
         bool HasAdmin();
-        Guid CreateUser(User model, string roleName);
+        Guid CreateUser(User model, List<string> roleNames = null);
     }
 
     public class UserService : IUserService
@@ -109,7 +109,7 @@ namespace DataEditorPortal.Web.Services
             return query.Any();
         }
 
-        public Guid CreateUser(User model, string roleName)
+        public Guid CreateUser(User model, List<string> roleNames = null)
         {
             var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
             var user = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
@@ -125,19 +125,25 @@ namespace DataEditorPortal.Web.Services
             dep_user.Email = model.Email;
             dep_user.Phone = model.Phone;
 
-            var role = _depDbContext.SiteRoles.FirstOrDefault(x => x.RoleName == roleName);
-            if (role != null)
-            {
-                var permission = new UserPermission()
-                {
-                    GrantType = "GROUP",
-                    UserId = dep_user.Id,
-                    PermissionGrantId = role.Id,
-                    CreatedBy = user != null ? user.Id : Guid.Empty,
-                    CreatedDate = DateTime.UtcNow
-                };
+            if (roleNames == null) roleNames = new List<string>() { "Users" };
+            if (!roleNames.Contains("Users")) roleNames.Add("Users");
 
-                _depDbContext.UserPermissions.Add(permission);
+            foreach (var roleName in roleNames)
+            {
+                var role = _depDbContext.SiteRoles.FirstOrDefault(x => x.RoleName == roleName);
+                if (role != null)
+                {
+                    var permission = new UserPermission()
+                    {
+                        GrantType = "GROUP",
+                        UserId = dep_user.Id,
+                        PermissionGrantId = role.Id,
+                        CreatedBy = user != null ? user.Id : Guid.Empty,
+                        CreatedDate = DateTime.UtcNow
+                    };
+
+                    _depDbContext.UserPermissions.Add(permission);
+                }
             }
 
             _depDbContext.Users.Add(dep_user);
