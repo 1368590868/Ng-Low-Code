@@ -21,6 +21,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TableModule } from 'primeng/table';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MenuModule } from 'primeng/menu';
+import { PaginatorModule } from 'primeng/paginator';
 
 import {
   HeaderComponent,
@@ -34,7 +35,9 @@ import {
   SiteSettingsComponent,
   PersonalDialogComponent,
   DataDictionaryComponent,
-  AddDictionaryDialogComponent
+  AddDictionaryDialogComponent,
+  SystemLogComponent,
+  SystemLogDialogComponent
 } from './components';
 
 import { SharedModule } from 'src/app/shared';
@@ -54,7 +57,9 @@ export * from './components';
     SiteSettingsComponent,
     PersonalDialogComponent,
     DataDictionaryComponent,
-    AddDictionaryDialogComponent
+    AddDictionaryDialogComponent,
+    SystemLogComponent,
+    SystemLogDialogComponent
   ],
   imports: [
     CommonModule,
@@ -76,7 +81,8 @@ export * from './components';
     ConfirmDialogModule,
     TableModule,
     SkeletonModule,
-    MenuModule
+    MenuModule,
+    PaginatorModule
   ],
   exports: [
     HeaderComponent,

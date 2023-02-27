@@ -7,7 +7,8 @@ import {
   LoginComponent,
   TileComponent,
   SiteSettingsComponent,
-  DataDictionaryComponent
+  DataDictionaryComponent,
+  SystemLogComponent
 } from './features/core';
 import { AuthRouterGuard, PermissionRouterGuard } from './shared';
 
@@ -32,6 +33,11 @@ const routes: Routes = [
   {
     path: 'data-dictionary',
     component: DataDictionaryComponent,
+    canActivate: [AuthRouterGuard, PermissionRouterGuard]
+  },
+  {
+    path: 'system-log',
+    component: SystemLogComponent,
     canActivate: [AuthRouterGuard, PermissionRouterGuard]
   },
   {

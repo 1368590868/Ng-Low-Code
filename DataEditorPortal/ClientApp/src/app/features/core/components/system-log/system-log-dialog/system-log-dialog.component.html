@@ -1,0 +1,37 @@
+<p-dialog
+  header="Log Information"
+  [(visible)]="visible"
+  [style]="{ width: '40rem' }"
+  [modal]="true"
+  [dismissableMask]="true"
+  contentStyleClass="border-top-1 surface-border pt-3"
+  appendTo="body">
+  <p-table
+    *ngIf="!loading; else elseBlock"
+    [value]="viewData"
+    [rowHover]="true"
+    styleClass="p-datatable-striped">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Value</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-viewData>
+      <tr>
+        <td>{{ viewData.name }}</td>
+        <td>{{ viewData.value }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <ng-template #elseBlock>
+    <div class="flex flex-wrap" *ngFor="let e of [].constructor(9)">
+      <p class="w-4 px-2 my-2 py-1">
+        <p-skeleton></p-skeleton>
+      </p>
+      <p class="w-8 px-2 my-2 py-1">
+        <p-skeleton></p-skeleton>
+      </p>
+    </div>
+  </ng-template>
+</p-dialog>
