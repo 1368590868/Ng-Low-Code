@@ -62,7 +62,7 @@ export class PortalEditDatasourceComponent implements OnInit {
   formControlIdColumn: FormControl = new FormControl();
   formControlQuery: FormControl = new FormControl();
 
-  isAdvanced = false;
+  advanceDialogVisible = false;
 
   constructor(
     private router: Router,
@@ -106,49 +106,43 @@ export class PortalEditDatasourceComponent implements OnInit {
         this.dbTables = tables;
 
         const dsConfig = res[0];
-        if (dsConfig && dsConfig.queryText) {
-          this.isAdvanced = true;
-          this.formControlQuery.setValue(dsConfig.queryText);
-        }
+        this.datasourceConfig = dsConfig;
+        this.orginalConfig = { ...dsConfig };
 
-        if (dsConfig && dsConfig.tableName) {
-          this.datasourceConfig = dsConfig;
-          this.orginalConfig = { ...dsConfig };
-
+        if (!dsConfig.queryText) {
           // set form control
           const selectedDbTable = `${dsConfig.tableSchema}.${dsConfig.tableName}`;
-          this.formControlDbTable.setValue(selectedDbTable);
-
           // check if current selected dbTable exists, if not exist, use the first
           if (!tables.find(x => x.value === selectedDbTable)) {
             this.formControlDbTable.setValue(tables[0].value);
+          } else {
+            this.formControlDbTable.setValue(selectedDbTable);
           }
-
-          // set filters
-          if (dsConfig.filters) {
-            this.filters = dsConfig.filters.map<DataSourceFilterControls>(x => {
-              return {
-                matchOptions: this.getFilterMatchModeOptions(x.filterType),
-                filterType: x.filterType,
-                formControlField: new FormControl(x.field),
-                formControlMatchMode: new FormControl(x.matchMode),
-                formControlValue: new FormControl(x.value)
-              };
-            });
-          }
-
-          // set sortby
-          if (dsConfig.sortBy) {
-            this.sortBy = dsConfig.sortBy;
-          }
-
-          // set pageSize
-          if (dsConfig.pageSize && dsConfig.pageSize >= 10)
-            this.pageSize = dsConfig.pageSize;
         } else {
-          // if table schema and table name havn't been stored, use the first from tables.
-          this.formControlDbTable.setValue(tables[0].value);
+          this.formControlQuery.setValue(dsConfig.queryText);
         }
+
+        // set filters
+        if (dsConfig.filters) {
+          this.filters = dsConfig.filters.map<DataSourceFilterControls>(x => {
+            return {
+              matchOptions: this.getFilterMatchModeOptions(x.filterType),
+              filterType: x.filterType,
+              formControlField: new FormControl(x.field),
+              formControlMatchMode: new FormControl(x.matchMode),
+              formControlValue: new FormControl(x.value)
+            };
+          });
+        }
+
+        // set sortby
+        if (dsConfig.sortBy) {
+          this.sortBy = dsConfig.sortBy;
+        }
+
+        // set pageSize
+        if (dsConfig.pageSize && dsConfig.pageSize >= 10)
+          this.pageSize = dsConfig.pageSize;
 
         this.loadTableColumns();
       });
@@ -157,18 +151,45 @@ export class PortalEditDatasourceComponent implements OnInit {
     }
   }
 
-  changeMode() {
-    this.isAdvanced = !this.isAdvanced;
-    if (this.isAdvanced) {
-      // this.formControlQuery.reset();
+  //* advanced query dialog */
+  showAdvanceDialog() {
+    this.advanceDialogVisible = true;
+    this.formControlQuery.reset();
+    if (this.datasourceConfig.queryText)
+      this.formControlQuery.setValue(this.datasourceConfig.queryText);
+  }
+
+  onAdvanceDialogOk() {
+    if (this.formControlQuery.valid) {
+      this.portalItemService
+        .getDataSourceTableColumnsByQuery(this.formControlQuery.value)
+        .subscribe(res => {
+          this.datasourceConfig.queryText = this.formControlQuery.value;
+          this.advanceDialogVisible = false;
+          this.setColumns(res);
+          // clear the filters and sortBy, as the database table has changed.
+          this.filters = [];
+          this.sortBy = [];
+        });
+    } else {
+      this.formControlQuery.markAsDirty();
     }
   }
 
-  onMonacoInit() {
-    setTimeout(() => {
-      this.formControlQuery.markAsPristine();
-    });
+  onAdvanceDialogCancel() {
+    this.advanceDialogVisible = false;
   }
+
+  removeAdvancedQuery() {
+    this.datasourceConfig.queryText = undefined;
+    this.formControlDbTable.setValue(this.dbTables[0].value);
+    this.loadTableColumns();
+
+    // clear the filters and sortBy, as the database table has changed.
+    this.filters = [];
+    this.sortBy = [];
+  }
+  //* advanced query dialog */
 
   onTableNameChange({ value }: { value: string }) {
     const item = this.dbTables.find(x => x.value === value);
@@ -182,77 +203,79 @@ export class PortalEditDatasourceComponent implements OnInit {
   }
 
   loadTableColumns() {
-    const selectedDbTable = this.formControlDbTable.value;
-    if (!selectedDbTable) return;
-    const [tableSchema, tableName] = selectedDbTable.split('.');
-    this.portalItemService
-      .getDataSourceTableColumns(tableSchema, tableName)
-      .pipe(
-        tap(res => {
-          this.dbTableColumns = res;
-          if (
-            !this.datasourceConfig.idColumn ||
-            !res.find(x => x.columnName === this.datasourceConfig.idColumn)
-          ) {
-            this.formControlIdColumn.setValue(res[0].columnName);
-          } else {
-            this.formControlIdColumn.setValue(this.datasourceConfig.idColumn);
-          }
-        })
-      )
-      .subscribe();
+    if (this.datasourceConfig.queryText) {
+      this.portalItemService
+        .getDataSourceTableColumnsByQuery(this.datasourceConfig.queryText)
+        .subscribe(res => this.setColumns(res));
+    } else {
+      const selectedDbTable = this.formControlDbTable.value;
+      if (!selectedDbTable) return;
+      const [tableSchema, tableName] = selectedDbTable.split('.');
+      this.portalItemService
+        .getDataSourceTableColumns(tableSchema, tableName)
+        .subscribe(res => this.setColumns(res));
+    }
+  }
+
+  setColumns(res: DataSourceTableColumn[]) {
+    this.dbTableColumns = res;
+    if (
+      !this.datasourceConfig.idColumn ||
+      !res.find(x => x.columnName === this.datasourceConfig.idColumn)
+    ) {
+      this.formControlIdColumn.setValue(res[0].columnName);
+    } else {
+      this.formControlIdColumn.setValue(this.datasourceConfig.idColumn);
+    }
   }
 
   validate() {
-    if (!this.isAdvanced) {
+    if (!this.datasourceConfig.queryText) {
       if (!this.formControlDbTable.valid) {
         this.formControlDbTable.markAsDirty();
         this.formControlDbTable.updateValueAndValidity();
       }
-      if (!this.formControlIdColumn.valid) {
-        this.formControlIdColumn.markAsDirty();
-        this.formControlIdColumn.updateValueAndValidity();
-      }
-
-      const filterValid = this.filters.reduce((r, x) => {
-        if (!x.formControlValue.valid) {
-          x.formControlValue.markAsDirty();
-          x.formControlValue.updateValueAndValidity();
-        }
-        return r && x.formControlValue.valid;
-      }, true);
-
-      return (
-        this.formControlDbTable.valid &&
-        this.formControlIdColumn.valid &&
-        filterValid
-      );
-    } else {
-      if (!this.formControlQuery.valid) {
-        this.formControlQuery.markAsDirty();
-        this.formControlQuery.updateValueAndValidity();
-      }
-      return this.formControlQuery.valid;
     }
+
+    if (!this.formControlIdColumn.valid) {
+      this.formControlIdColumn.markAsDirty();
+      this.formControlIdColumn.updateValueAndValidity();
+    }
+
+    const filterValid = this.filters.reduce((r, x) => {
+      if (!x.formControlValue.valid) {
+        x.formControlValue.markAsDirty();
+        x.formControlValue.updateValueAndValidity();
+      }
+      return r && x.formControlValue.valid;
+    }, true);
+
+    return (
+      (this.datasourceConfig.queryText || this.formControlDbTable.valid) &&
+      this.formControlIdColumn.valid &&
+      filterValid
+    );
   }
 
   saveDatasourceConfig() {
     this.isSaving = true;
     if (this.portalItemService.currentPortalItemId) {
-      const data: DataSourceConfig = { pageSize: this.pageSize };
-      if (!this.isAdvanced) {
-        data.tableName = this.datasourceConfig.tableName;
-        data.tableSchema = this.datasourceConfig.tableSchema;
-        data.idColumn = this.datasourceConfig.idColumn;
-        data.filters = this.filters.map<DataSourceFilter>(x => {
+      const data: DataSourceConfig = {
+        pageSize: this.pageSize,
+        idColumn: this.datasourceConfig.idColumn,
+        filters: this.filters.map<DataSourceFilter>(x => {
           return {
             field: x.formControlField.value,
             matchMode: x.formControlMatchMode.value,
             value: x.formControlValue.value,
             filterType: x.filterType
           };
-        });
-        data.sortBy = this.sortBy;
+        }),
+        sortBy: this.sortBy
+      };
+      if (!this.datasourceConfig.queryText) {
+        data.tableName = this.datasourceConfig.tableName;
+        data.tableSchema = this.datasourceConfig.tableSchema;
       } else {
         data.queryText = this.formControlQuery.value;
       }
