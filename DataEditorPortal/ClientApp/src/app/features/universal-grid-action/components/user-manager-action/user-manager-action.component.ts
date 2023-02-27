@@ -227,7 +227,7 @@ export class UserManagerActionComponent
 
                 if (field.props) field.props['forArray'] = roles;
                 if (field.parent?.fieldGroup) {
-                  field.parent.fieldGroup[4].hide = roles.length === 0;
+                  field.parent.fieldGroup[3].hide = roles.length === 0;
                 }
               });
           }
@@ -262,7 +262,7 @@ export class UserManagerActionComponent
 
                 if (field.props) field.props['forArray'] = permissions;
                 if (field.parent?.fieldGroup) {
-                  field.parent.fieldGroup[6].hide = permissions.length === 0;
+                  field.parent.fieldGroup[5].hide = permissions.length === 0;
                 }
               });
           }
