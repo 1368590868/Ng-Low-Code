@@ -37,41 +37,33 @@ import { MessageModule } from 'primeng/message';
 import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabViewModule } from 'primeng/tabview';
+import { FieldsetModule } from 'primeng/fieldset';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
+import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
 import {
   PortalListComponent,
-  AddPortalDialogComponent
-} from './components/portal-list';
-import {
+  AddPortalDialogComponent,
   PortalEditComponent,
   PortalEditBasicComponent,
   PortalEditDatasourceComponent,
   PortalEditColumnsComponent,
   PortalEditSearchComponent,
   PortalEditFormComponent,
-  SvgDragComponent
-} from './components/portal-edit';
-
-import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
-import {
+  SvgDragComponent,
   FormlyFieldOptionsEditorComponent,
-  OptionDialogComponent
-} from './components/option-dialog/option-dialog.component';
-import { CustomActionsComponent } from './components/custom-actions/custom-actions.component';
-import {
+  OptionDialogComponent,
+  CustomActionsComponent,
   FormlyFieldSearchRuleEditorComponent,
-  SearchRuleComponent
-} from './components/search-rule/search-rule.component';
-import { FormlyFieldValidatorEditorComponent } from './components/validator-editor/validator-editor.component';
-import { FormDesignerViewComponent } from './components/portal-edit/form-designer/form-designer-view.component';
-import {
+  SearchRuleComponent,
+  FormlyFieldValidatorEditorComponent,
+  FormDesignerViewComponent,
   FormDesignerConfigComponent,
-  FROM_DESIGNER_CONTROLS
-} from './components/portal-edit/form-designer/form-designer-config.component';
-import { SearchDesignerConfigComponent } from './components/portal-edit/form-designer/search-designer-config.component';
-import { ValidatorEditorComponent } from './components/validator-editor/validator-editor.component';
-import { FormLayoutComponent } from './components/portal-edit/portal-edit-form/form-layout/form-layout.component';
+  FROM_DESIGNER_CONTROLS,
+  SearchDesignerConfigComponent,
+  ValidatorEditorComponent,
+  FormLayoutComponent
+} from './components';
 
 const monacoConfig: NgxMonacoEditorConfig = {
   defaultOptions: {
@@ -183,7 +175,8 @@ const monacoConfig: NgxMonacoEditorConfig = {
     ContextMenuModule,
     MessageModule,
     ConfirmDialogModule,
-    TabViewModule
+    TabViewModule,
+    FieldsetModule
   ],
   providers: [
     {

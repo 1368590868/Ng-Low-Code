@@ -59,6 +59,9 @@ export class FormLayoutComponent {
 
   customActions: { label: string | undefined; value: string }[] = [];
 
+  showQuery = false;
+  showFetchQuery = false;
+
   constructor(
     private notifyService: NotifyService,
     @Inject('GRID_ACTION_CONFIG')
