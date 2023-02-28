@@ -89,21 +89,21 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("{name}/data/{id}/update")]
-        public bool UpdateDate(string name, string id, [FromBody] Dictionary<string, object> model)
+        public bool UpdateData(string name, string id, [FromBody] Dictionary<string, object> model)
         {
             return _universalGridService.UpdateGridData(name, id, model);
         }
 
         [HttpDelete]
         [Route("{name}/data/{id}/delete")]
-        public bool DeleteDate(string name, string id)
+        public bool DeleteData(string name, string id)
         {
             return _universalGridService.DeleteGridData(name, new string[] { id });
         }
 
         [HttpPost]
         [Route("{name}/data/batch-delete")]
-        public bool BatchDeleteDate(string name, [FromBody] JsonDocument model)
+        public bool BatchDeleteData(string name, [FromBody] JsonDocument model)
         {
             var ids = model.RootElement
                 .GetProperty("ids")
