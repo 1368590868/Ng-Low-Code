@@ -4,14 +4,16 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20230224063237_removeDivision")]
+    partial class removeDivision
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,7 +229,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                             Icon = "pi pi-clock",
                             Label = "System Event Logs",
                             Link = "/system-event-logs",
-                            Name = "system-event-logs",
+                            Name = "site-settings",
                             Order = 4,
                             ParentId = new Guid("b82dfe59-e51a-4771-b876-05d62f4207e3"),
                             Status = 1,

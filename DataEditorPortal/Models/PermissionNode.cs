@@ -14,6 +14,7 @@ namespace DataEditorPortal.Web.Models
         public bool Selected { get; set; }
         public bool PartialSelected { get; set; }
         public bool Expanded { get; set; }
+        public bool Selectable { get; set; } = true;
         public List<PermissionNode> Children { get; set; }
     }
 }

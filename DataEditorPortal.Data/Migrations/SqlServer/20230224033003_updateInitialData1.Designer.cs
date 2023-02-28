@@ -4,14 +4,16 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20230224033003_updateInitialData1")]
+    partial class updateInitialData1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,7 +229,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                             Icon = "pi pi-clock",
                             Label = "System Event Logs",
                             Link = "/system-event-logs",
-                            Name = "system-event-logs",
+                            Name = "site-settings",
                             Order = 4,
                             ParentId = new Guid("b82dfe59-e51a-4771-b876-05d62f4207e3"),
                             Status = 1,
@@ -369,11 +371,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.HasData(
                         new
                         {
-                            Id = new Guid("790d7db8-feb2-40f8-8f74-5f228c0ada03"),
-                            RoleName = "Administrators"
-                        },
-                        new
-                        {
                             Id = new Guid("33d70a90-0c4c-48ee-ad8f-3051448d19cf"),
                             RoleName = "Users"
                         });
@@ -467,12 +464,12 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         new
                         {
                             Id = new Guid("071f5419-85b8-11ed-a86f-0242ac130004"),
-                            ColumnsConfig = "[{\"type\":\"DataBaseField\",\"field\":\"Username\",\"header\":\"CNP ID\",\"width\":\"130px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Name\",\"header\":\"Name\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Email\",\"header\":\"Email\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Phone\",\"header\":\"Phone\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"AutoEmail\",\"header\":\"Auto Email\",\"width\":\"250px\",\"filterType\":\"boolean\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Vendor\",\"header\":\"Vendor\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Employer\",\"header\":\"Employer\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Comments\",\"header\":\"Comments\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true}]",
+                            ColumnsConfig = "[{\"type\":\"DataBaseField\",\"field\":\"Username\",\"header\":\"CNP ID\",\"width\":\"130px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Name\",\"header\":\"Name\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Email\",\"header\":\"Email\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Phone\",\"header\":\"Phone\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"AutoEmail\",\"header\":\"Auto Email\",\"width\":\"250px\",\"filterType\":\"boolean\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Vendor\",\"header\":\"Vendor\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Employer\",\"header\":\"Employer\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true},{\"type\":\"DataBaseField\",\"field\":\"Division\",\"header\":\"Division\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":false},{\"type\":\"DataBaseField\",\"field\":\"Comments\",\"header\":\"Comments\",\"width\":\"250px\",\"filterType\":\"text\",\"sortable\":true}]",
                             ConfigCompleted = true,
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CustomActionConfig = "[{\"Name\":\"edit-role\"},{\"Name\":\"edit-permission\"},{\"Name\":\"manage-roles\"}]",
-                            DataSourceConfig = "{\"TableName\":\"Users\",\"TableSchema\":\"dep\",\"IdColumn\":\"Id\",\"Columns\":[\"Id\",\"Username\",\"Name\",\"Email\",\"Phone\",\"AutoEmail\",\"Vendor\",\"Employer\",\"Comments\"],\"SortBy\":[{\"field\":\"Name\",\"order\":1}]}",
+                            DataSourceConfig = "{\"TableName\":\"Users\",\"TableSchema\":\"dep\",\"IdColumn\":\"Id\",\"Columns\":[\"Id\",\"Username\",\"Name\",\"Email\",\"Phone\",\"AutoEmail\",\"Vendor\",\"Employer\",\"Division\",\"Comments\"],\"SortBy\":[{\"field\":\"Name\",\"order\":1}]}",
                             DetailConfig = "{\"AddingForm\":{\"UseCustomForm\":true,\"CustomFormName\":\"user-manager-add\"},\"UpdatingForm\":{\"UseCustomForm\":true,\"CustomFormName\":\"user-manager-edit\"}}",
                             Name = "user-management",
                             SearchConfig = "[{\"key\":\"username\",\"type\":\"input\",\"filterType\":\"text\",\"props\":{\"label\":\"CNP ID\",\"placeholder\":\"CNP ID\"},\"searchRule\":{\"field\":\"Username\",\"matchMode\":\"contains\"}},{\"key\":\"name\",\"type\":\"input\",\"filterType\":\"text\",\"props\":{\"label\":\"Name\",\"placeholder\":\"Name\"},\"searchRule\":{\"field\":\"Name\",\"matchMode\":\"contains\"}},{\"key\":\"roles\",\"type\":\"multiSelect\",\"filterType\":\"text\",\"props\":{\"label\":\"Roles\",\"placeholder\":\"Please select\",\"optionsLookup\":\"727052BA-0033-42C9-A39C-06A103E4B021\"},\"searchRule\":{\"whereClause\":\"Id in (select UserId from dep.UserPermissions where PermissionGrantId in (##VALUE##))\"}},{\"key\":\"vendor\",\"type\":\"multiSelect\",\"filterType\":\"text\",\"props\":{\"label\":\"Vendor\",\"placeholder\":\"Please select\",\"optionsLookup\":\"E1F3E2C7-25CA-4D69-9405-ABC54923864D\"},\"searchRule\":{\"field\":\"Vendor\",\"matchMode\":\"in\"}},{\"key\":\"employer\",\"type\":\"multiSelect\",\"filterType\":\"text\",\"props\":{\"label\":\"Employer\",\"placeholder\":\"Please select\",\"optionsLookup\":\"704A3D00-62DF-4C62-A4BD-457C4DC242CA\",\"dependOnFields\":[\"vendor\"]},\"searchRule\":{\"field\":\"Employer\",\"matchMode\":\"in\"}}]"
@@ -503,6 +500,9 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("bit");
 
                     b.Property<string>("Comments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Division")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")

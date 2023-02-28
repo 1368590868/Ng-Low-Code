@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -12,7 +13,9 @@ namespace DataEditorPortal.Web.Services
     public interface IUserService
     {
         Dictionary<string, bool> GetUserPermissions();
-        bool IsAdmin();
+        bool IsAdmin(string username);
+        bool HasAdmin();
+        Guid CreateUser(User model, List<string> roleNames = null);
     }
 
     public class UserService : IUserService
@@ -42,7 +45,7 @@ namespace DataEditorPortal.Web.Services
             var username = AppUser.ParseUsername(user.Identity.Name).Username;
             var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
 
-            if (user.IsInRole("Administrators"))
+            if (IsAdmin(username))
             {
                 var permissions = (from p in _depDbContext.SitePermissions
                                    select new
@@ -86,10 +89,68 @@ namespace DataEditorPortal.Web.Services
             return result;
         }
 
-        public bool IsAdmin()
+        public bool IsAdmin(string username)
         {
-            var user = _httpContextAccessor.HttpContext.User;
-            return user.IsInRole("Administrators");
+            var query = from u in _depDbContext.Users
+                        join up in _depDbContext.UserPermissions on u.Id equals up.UserId
+                        join sr in _depDbContext.SiteRoles on up.PermissionGrantId equals sr.Id
+                        where up.GrantType == "Group" && u.Username == username
+                        select u.Id;
+            return query.Any();
         }
+
+        public bool HasAdmin()
+        {
+            var query = from u in _depDbContext.Users
+                        join up in _depDbContext.UserPermissions on u.Id equals up.UserId
+                        join sr in _depDbContext.SiteRoles on up.PermissionGrantId equals sr.Id
+                        where up.GrantType == "Group"
+                        select u.Id;
+            return query.Any();
+        }
+
+        public Guid CreateUser(User model, List<string> roleNames = null)
+        {
+            var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
+            var user = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
+
+            var dep_user = new User();
+            dep_user.Id = Guid.NewGuid();
+            dep_user.Name = model.Name;
+            dep_user.Username = model.Username;
+            dep_user.Employer = model.Employer;
+            dep_user.Vendor = model.Vendor;
+            dep_user.AutoEmail = model.AutoEmail;
+            dep_user.Comments = "ACTIVE";
+            dep_user.Email = model.Email;
+            dep_user.Phone = model.Phone;
+
+            if (roleNames == null) roleNames = new List<string>() { "Users" };
+            if (!roleNames.Contains("Users")) roleNames.Add("Users");
+
+            foreach (var roleName in roleNames)
+            {
+                var role = _depDbContext.SiteRoles.FirstOrDefault(x => x.RoleName == roleName);
+                if (role != null)
+                {
+                    var permission = new UserPermission()
+                    {
+                        GrantType = "GROUP",
+                        UserId = dep_user.Id,
+                        PermissionGrantId = role.Id,
+                        CreatedBy = user != null ? user.Id : Guid.Empty,
+                        CreatedDate = DateTime.UtcNow
+                    };
+
+                    _depDbContext.UserPermissions.Add(permission);
+                }
+            }
+
+            _depDbContext.Users.Add(dep_user);
+            _depDbContext.SaveChanges();
+
+            return dep_user.Id;
+        }
+
     }
 }

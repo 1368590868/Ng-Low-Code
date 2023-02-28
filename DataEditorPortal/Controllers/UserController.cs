@@ -46,12 +46,17 @@ namespace DataEditorPortal.Web.Controllers
             {
                 dep_user = new Data.Models.User();
                 dep_user.Username = user.Username;
-                dep_user.Employer = "NONE";
-                dep_user.Vendor = "NONE";
                 dep_user.AutoEmail = true;
-                dep_user.Division = "NONE";
 
-                this.Create(dep_user);
+                // check site has admin
+                if (_userService.HasAdmin())
+                {
+                    _userService.CreateUser(dep_user);
+                }
+                else
+                {
+                    _userService.CreateUser(dep_user, new List<string>() { "Administrators" });
+                }
             }
 
             user.Id = dep_user.Id;
@@ -71,7 +76,7 @@ namespace DataEditorPortal.Web.Controllers
             {
                 user.Permissions = _userService.GetUserPermissions();
             }
-            user.IsAdmin = _userService.IsAdmin();
+            user.IsAdmin = _userService.IsAdmin(user.Username);
 
             return user;
         }
@@ -107,39 +112,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("create")]
         public Guid Create([FromBody] User model)
         {
-            var username = AppUser.ParseUsername(User.Identity.Name).Username;
-            var user = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
-
-            var dep_user = new User();
-            dep_user.Id = Guid.NewGuid();
-            dep_user.Username = model.Username;
-            dep_user.Employer = model.Employer;
-            dep_user.Vendor = model.Vendor;
-            dep_user.AutoEmail = model.AutoEmail;
-            dep_user.Division = model.Division;
-            dep_user.Comments = "ACTIVE";
-            dep_user.Email = model.Email;
-            dep_user.Phone = model.Phone;
-
-            var role = _depDbContext.SiteRoles.FirstOrDefault(x => x.RoleName == "Users");
-            if (role != null)
-            {
-                var permission = new UserPermission()
-                {
-                    GrantType = "GROUP",
-                    UserId = dep_user.Id,
-                    PermissionGrantId = role.Id,
-                    CreatedBy = user != null ? user.Id : Guid.Empty,
-                    CreatedDate = DateTime.UtcNow
-                };
-
-                _depDbContext.UserPermissions.Add(permission);
-            }
-
-            _depDbContext.Users.Add(dep_user);
-            _depDbContext.SaveChanges();
-
-            return dep_user.Id;
+            return _userService.CreateUser(model);
         }
 
         [HttpPut]
@@ -156,7 +129,6 @@ namespace DataEditorPortal.Web.Controllers
             dep_user.Employer = model.Employer;
             dep_user.Vendor = model.Vendor;
             dep_user.AutoEmail = model.AutoEmail;
-            dep_user.Division = model.Division;
             dep_user.Comments = "ACTIVE";
             dep_user.Email = model.Email;
             dep_user.Phone = model.Phone;

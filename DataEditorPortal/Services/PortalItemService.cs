@@ -230,7 +230,7 @@ namespace DataEditorPortal.Web.Services
 
             try
             {
-                using (var dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly | CommandBehavior.KeyInfo))
+                using (var dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly))
                 {
                     var schema = dr.GetColumnSchema();
                     result = schema.Select(x =>

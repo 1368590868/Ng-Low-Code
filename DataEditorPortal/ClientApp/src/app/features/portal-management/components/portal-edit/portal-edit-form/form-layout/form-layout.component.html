@@ -96,7 +96,7 @@
       styleClass="p-button-text p-button-sm"
       (onClick)="showQuery = !showQuery"></p-button>
   </p-divider>
-  <p *ngIf="showQuery">
+  <p *ngIf="showQuery" class="mb-1">
     Enter your query text that will be run when
     {{ type === 'ADD' ? 'creating new data' : 'updating details' }}. This is
     required if you use <b>custom query</b> as the Grid Datasource.
@@ -109,7 +109,7 @@
     [options]="{}"></ngx-monaco-editor>
   <!-- For ADD and UPDATE -->
   <!-- For UPDATE -->
-  <div *ngIf="type === 'UPDATE'">
+  <!-- <div *ngIf="type === 'UPDATE'">
     <p-divider>
       <p-button
         label="Query for Fetching details"
@@ -117,16 +117,16 @@
         styleClass="p-button-text p-button-sm"
         (onClick)="showFetchQuery = !showFetchQuery"></p-button>
     </p-divider>
-    <p *ngIf="showFetchQuery">
+    <p *ngIf="showFetchQuery" class="mb-1">
       Enter your query text that will be run when fetching details for updating.
       This is required if you use <b>custom query</b> as the Grid Datasource.
     </p>
     <ngx-monaco-editor
       *ngIf="showFetchQuery"
-      [(ngModel)]="_formConfig.queryText"
+      [(ngModel)]="_formConfig.fetchDetailQueryText"
       [style]="{ height: '20rem' }"
       class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
       [options]="{}"></ngx-monaco-editor>
-  </div>
+  </div> -->
   <!-- For UPDATE -->
 </div>

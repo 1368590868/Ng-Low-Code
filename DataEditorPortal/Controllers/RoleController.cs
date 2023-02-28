@@ -111,6 +111,8 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{roleId}/permissions")]
         public List<PermissionNode> PermissionsForRole(Guid roleId)
         {
+            var isAdmin = _depDbContext.SiteRoles.Any(x => x.Id == roleId && x.RoleName == "Administrators");
+
             var sitePermissions = from sp in _depDbContext.SiteRolePermissions
                                   where sp.SiteRoleId == roleId
                                   select sp;
@@ -125,10 +127,10 @@ namespace DataEditorPortal.Web.Controllers
                             PermissionName = sp.PermissionName,
                             PermissionDescription = sp.PermissionDescription,
                             Category = sp.Category,
-                            Selected = rp != null
+                            Selected = isAdmin || rp != null
                         };
 
-            return _permissionService.GetPermissionTree(query.ToList());
+            return _permissionService.GetPermissionTree(query.ToList(), isAdmin);
         }
 
         [HttpGet]

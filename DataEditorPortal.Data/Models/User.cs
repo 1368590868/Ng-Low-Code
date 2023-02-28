@@ -10,7 +10,6 @@ namespace DataEditorPortal.Data.Models
         public string Username { get; set; }
         public string Employer { get; set; }
         public string Comments { get; set; }
-        public string Division { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Vendor { get; set; }

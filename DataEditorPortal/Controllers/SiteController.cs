@@ -1,5 +1,6 @@
 ﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -99,7 +100,8 @@ namespace DataEditorPortal.Web.Controllers
         [Route("menus")]
         public dynamic GetMenus()
         {
-            var isAdmin = _userService.IsAdmin();
+            var username = AppUser.ParseUsername(User.Identity.Name).Username;
+            var isAdmin = _userService.IsAdmin(username);
             var userPermissions = _userService.GetUserPermissions().Keys;
 
             //var menus = _depDbContext.SiteMenus.ToList();

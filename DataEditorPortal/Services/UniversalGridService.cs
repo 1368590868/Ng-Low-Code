@@ -163,9 +163,10 @@ namespace DataEditorPortal.Web.Services
 
             // convert search criteria to where clause
             var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
+            var searchRules = new List<SearchParam>();
             if (param.Searches != null)
             {
-                var searchRules = param.Searches
+                searchRules = param.Searches
                     .Where(x => x.Value != null)
                     .Select(x =>
                     {
@@ -186,24 +187,23 @@ namespace DataEditorPortal.Web.Services
                         return param;
                     })
                     .ToList();
-
-                queryText = _dbSqlBuilder.UseSearches(queryText, searchRules);
             }
+            queryText = _dbSqlBuilder.UseSearches(queryText, searchRules);
 
             // convert grid filter to where clause
             queryText = _dbSqlBuilder.UseFilters(queryText, param.Filters);
 
-            // generate order by clause
-            if (param.Sorts.Any())
+            if (param.IndexCount > 0)
+            {
+                if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = dataSourceConfig.IdColumn, order = 1 } };
+                // use pagination
+                queryText = _dbSqlBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
+            }
+            else
             {
                 // replace the order by clause by input Sorts in queryText
                 queryText = _dbSqlBuilder.UseOrderBy(queryText, param.Sorts);
             }
-
-            // use pagination
-            var pagedQueryText = _dbSqlBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount);
-            // generate sql to calculate count
-            var totalQueryText = _dbSqlBuilder.UseCount(queryText);
 
             #endregion
 
@@ -217,10 +217,7 @@ namespace DataEditorPortal.Web.Services
 
                 try
                 {
-                    cmd.CommandText = totalQueryText;
-                    output.Total = int.Parse(cmd.ExecuteScalar().ToString());
-
-                    cmd.CommandText = pagedQueryText;
+                    cmd.CommandText = queryText;
                     using (var dr = cmd.ExecuteReader())
                     {
                         var fields = dr.FieldCount;
@@ -242,6 +239,16 @@ namespace DataEditorPortal.Web.Services
                             }
                             output.Data.Add(row);
                         }
+                    }
+
+                    if (output.Data.Any() && output.Data[0].Keys.Contains("DEP_TOTAL"))
+                    {
+                        output.Total = Convert.ToInt32(output.Data[0]["DEP_TOTAL"]);
+                    }
+                    foreach (var data in output.Data)
+                    {
+                        if (data.Keys.Contains("DEP_TOTAL")) data.Remove("DEP_TOTAL");
+                        if (data.Keys.Contains("DEP_ROWNUMBER")) data.Remove("DEP_ROWNUMBER");
                     }
                 }
                 catch (Exception ex)
@@ -352,28 +359,7 @@ namespace DataEditorPortal.Web.Services
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-
-            // get detail config
-            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            if (detailConfig.InfoForm != null && detailConfig.InfoForm.UseCustomForm)
-            {
-                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
-            }
-            if (detailConfig.InfoForm == null && detailConfig.InfoForm.FormFields.Count == 0)
-            {
-                throw new DepException("No info form configured fomr this portal item. Please go Portal Management to complete the configuration.");
-            }
-
-            var queryText = _dbSqlBuilder.GenerateSqlTextForDetail(
-                new DataSourceConfig()
-                {
-                    TableName = dataSourceConfig.TableName,
-                    Columns = detailConfig.InfoForm.FormFields.Select(x => x.key).ToList(),
-                    Filters = new List<FilterParam>() {
-                        new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "equals", value = id }
-                    },
-                    QueryText = detailConfig.InfoForm.QueryText
-                });
+            var queryText = _dbSqlBuilder.GenerateSqlTextForDetail(dataSourceConfig);
 
             var result = new Dictionary<string, dynamic>();
             using (var con = _depDbContext.Database.GetDbConnection())
@@ -385,6 +371,13 @@ namespace DataEditorPortal.Web.Services
                 try
                 {
                     cmd.CommandText = queryText;
+
+                    // always provide Id column parameter
+                    var idParam = cmd.CreateParameter();
+                    idParam.ParameterName = dataSourceConfig.IdColumn;
+                    idParam.Value = id;
+                    cmd.Parameters.Add(idParam);
+
                     using (var dr = cmd.ExecuteReader())
                     {
                         var fields = dr.FieldCount;
@@ -570,11 +563,8 @@ namespace DataEditorPortal.Web.Services
             {
                 TableSchema = dataSourceConfig.TableSchema,
                 TableName = dataSourceConfig.TableName,
-                Columns = updatingForm.FormFields.Select(x => x.key).ToList(),
-                Filters = new List<FilterParam>()
-                {
-                    new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "equals", value = id }
-                },
+                IdColumn = dataSourceConfig.IdColumn, // this should always has value even user use advanced sql query text.
+                Columns = columns, // this is used to generate set value clause
                 QueryText = updatingForm.QueryText
             });
 
@@ -596,6 +586,12 @@ namespace DataEditorPortal.Web.Services
                         param.Value = value;
                         cmd.Parameters.Add(param);
                     }
+
+                    // always provide Id column parameter
+                    var idParam = cmd.CreateParameter();
+                    idParam.ParameterName = dataSourceConfig.IdColumn;
+                    idParam.Value = id;
+                    cmd.Parameters.Add(idParam);
 
                     cmd.ExecuteNonQuery();
                 }

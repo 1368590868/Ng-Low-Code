@@ -9,7 +9,7 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IPermissionService
     {
-        List<PermissionNode> GetPermissionTree(List<AppRolePermission> permissions);
+        List<PermissionNode> GetPermissionTree(List<AppRolePermission> permissions, bool isAdmin = false);
     }
 
     public class PermissionService : IPermissionService
@@ -28,7 +28,7 @@ namespace DataEditorPortal.Web.Services
             _mapper = mapper;
         }
 
-        public List<PermissionNode> GetPermissionTree(List<AppRolePermission> permissions)
+        public List<PermissionNode> GetPermissionTree(List<AppRolePermission> permissions, bool isAdmin = false)
         {
             #region get the menu structure in tree view
 
@@ -51,7 +51,8 @@ namespace DataEditorPortal.Web.Services
                                 Name = m.Name,
                                 Icon = m.Icon,
                                 Description = m.Description,
-                                Type = m.Type
+                                Type = m.Type,
+                                Selectable = !isAdmin
                             })
                             .ToList();
 
@@ -63,6 +64,7 @@ namespace DataEditorPortal.Web.Services
                         Icon = x.Icon,
                         Description = x.Description,
                         Type = x.Type,
+                        Selectable = !isAdmin,
                         Children = items.Any() ? items : null
                     };
                 })
@@ -73,19 +75,19 @@ namespace DataEditorPortal.Web.Services
 
             permissionNodes.ForEach(x =>
             {
-                SetPortalItemPermissions(x, permissions);
+                SetPortalItemPermissions(x, permissions, isAdmin);
             });
 
             return permissionNodes;
         }
 
-        private void SetPortalItemPermissions(PermissionNode node, List<AppRolePermission> rolePermissions)
+        private void SetPortalItemPermissions(PermissionNode node, List<AppRolePermission> rolePermissions, bool isAdmin)
         {
             if (node.Children != null)
             {
                 node.Children.ForEach(x =>
                 {
-                    SetPortalItemPermissions(x, rolePermissions);
+                    SetPortalItemPermissions(x, rolePermissions, isAdmin);
                 });
             }
             else
@@ -98,7 +100,8 @@ namespace DataEditorPortal.Web.Services
                         Key = x.Id,
                         Name = x.PermissionName,
                         Description = x.PermissionDescription,
-                        Selected = x.Selected
+                        Selected = x.Selected,
+                        Selectable = !isAdmin
                     })
                     .ToList();
             }

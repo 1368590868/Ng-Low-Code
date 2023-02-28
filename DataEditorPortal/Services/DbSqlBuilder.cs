@@ -1,18 +1,19 @@
-﻿using DataEditorPortal.Web.Models.UniversalGrid;
+﻿using DataEditorPortal.Web.Common;
+using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Services
 {
     public interface IDbSqlBuilder
     {
         // ultilities
-        string UsePagination(string query, int startIndex, int indexCount);
+        string UsePagination(string query, int startIndex, int indexCount, List<SortParam> sortParams);
         string UseOrderBy(string query, List<SortParam> sortParams = null);
-        string UseCount(string query);
         string UseFilters(string query, List<FilterParam> filterParams = null);
         string UseSearches(string query, List<SearchParam> filterParams = null);
         object FormatValue(object value, DataRow schema);
@@ -225,25 +226,25 @@ namespace DataEditorPortal.Web.Services
             return orderby;
         }
 
-        public string UsePagination(string query, int startIndex, int indexCount)
+        public string UsePagination(string query, int startIndex, int indexCount, List<SortParam> sortParams)
         {
-            // get order by clause
-            var index = query.IndexOf("ORDER BY", StringComparison.InvariantCultureIgnoreCase);
-            if (index <= 0) throw new Exception("The input query doesn't contains order by clause");
+            if (sortParams == null || !sortParams.Any())
+                throw new DepException("The paged query cannot be executed without the orderBy set");
 
-            var orderby = query.Substring(index);
-            var queryWithoutOrderBy = query.Substring(0, index);
+            var orderby = GenerateOrderClause(sortParams);
+            var queryWithoutOrderBy = RemoveOrderBy(query);
 
             var queryText = $@"
-                WITH OrderedOrders AS
+                WITH AllData AS
                 (
-                    SELECT ROW_NUMBER() OVER({orderby}) AS RowNumber, A.*
+                    SELECT ROW_NUMBER() OVER(ORDER BY {orderby}) AS DEP_ROWNUMBER, A.*
                     FROM (
                         {queryWithoutOrderBy}
                     ) A
                 ) 
-                SELECT * FROM OrderedOrders
-                WHERE RowNumber > {startIndex} AND RowNumber < {startIndex + indexCount};
+                SELECT *, (SELECT COUNT(*) FROM AllData) AS DEP_TOTAL
+                FROM AllData
+                WHERE DEP_ROWNUMBER > {startIndex} AND DEP_ROWNUMBER < {startIndex + indexCount};
             ";
 
             return queryText;
@@ -255,18 +256,23 @@ namespace DataEditorPortal.Web.Services
 
             var orderByClause = GenerateOrderClause(sortParams);
 
-            // replace the order by clause by input Sorts in queryText
-            var index = query.IndexOf("ORDER BY", StringComparison.InvariantCultureIgnoreCase);
-
-            if (index > 0)
+            if (string.IsNullOrEmpty(orderByClause))
             {
-                var queryWithoutOrderBy = query.Substring(0, index);
-                return $"{queryWithoutOrderBy} ORDER BY {orderByClause}";
+                query = RemoveOrderBy(query);
             }
             else
             {
-                return $"{query} ORDER BY {orderByClause}";
+                query = query.Replace("##ORDERBY##", orderByClause);
             }
+            return query;
+        }
+
+        private string RemoveOrderBy(string queryText)
+        {
+            queryText = queryText.Replace("##ORDERBY##", "1");
+            var noOrderByRegExp = new Regex("(?:\\s+order\\s+by\\s+1)", RegexOptions.IgnoreCase);
+            queryText = noOrderByRegExp.Replace(queryText, "");
+            return queryText;
         }
 
         public string UseFilters(string query, List<FilterParam> filterParams = null)
@@ -276,8 +282,8 @@ namespace DataEditorPortal.Web.Services
             var where = GenerateWhereClause(filterParams);
 
             return where.Any()
-                ? query.Replace("##FILTERS##", $" AND ({string.Join(" AND ", where)}) ")
-                : query.Replace("##FILTERS##", "");
+                ? query.Replace("##FILTERS##", $" ({string.Join(" AND ", where)}) ")
+                : query.Replace("##FILTERS##", " 1=1 ");
         }
 
         public string UseSearches(string query, List<SearchParam> filterParams = null)
@@ -297,21 +303,8 @@ namespace DataEditorPortal.Web.Services
             }
 
             return filters.Any()
-                ? query.Replace("##SEARCHES##", $" AND ({string.Join(" AND ", filters)}) ")
-                : query.Replace("##SEARCHES##", "");
-        }
-
-        public string UseCount(string query)
-        {
-            var queryWithoutOrderBy = query;
-
-            var index = query.IndexOf("ORDER BY", StringComparison.InvariantCultureIgnoreCase);
-            if (index > 0)
-            {
-                queryWithoutOrderBy = query.Substring(0, index);
-            }
-
-            return $"SELECT COUNT(*) FROM ({queryWithoutOrderBy}) A";
+                ? query.Replace("##SEARCHES##", $" ({string.Join(" AND ", filters)}) ")
+                : query.Replace("##SEARCHES##", " 1=1");
         }
 
         public object FormatValue(object value, DataRow schema)
@@ -336,20 +329,19 @@ namespace DataEditorPortal.Web.Services
 
         public string GenerateSqlTextForList(DataSourceConfig config)
         {
+            var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
+
             if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore TableName, Columns, SortBy and Filters setting.
-                return config.QueryText;
+                var queryText = config.QueryText;
+                return queryText.Replace("##WHERE##", where);
             }
             else
             {
                 var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
 
-                var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
-
-                var orderBy = config.SortBy.Count > 0 ? GenerateOrderClause(config.SortBy) : $"[{config.IdColumn}] ASC";
-
-                var queryText = $@"SELECT {columns} FROM {config.TableSchema}.{config.TableName} WHERE {where} ##SEARCHES## ##FILTERS## ORDER BY {orderBy}";
+                var queryText = $@"SELECT {columns} FROM {config.TableSchema}.{config.TableName} WHERE {where} AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##";
 
                 return queryText;
             }
@@ -357,21 +349,12 @@ namespace DataEditorPortal.Web.Services
 
         public string GenerateSqlTextForDetail(DataSourceConfig config)
         {
-            if (!string.IsNullOrEmpty(config.QueryText))
-            {
-                // advanced datasource, ingore other setting.
-                return config.QueryText;
-            }
-            else
-            {
-                var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
+            var queryText = GenerateSqlTextForList(config);
+            queryText = UseSearches(queryText);
+            queryText = UseFilters(queryText);
+            queryText = RemoveOrderBy(queryText);
 
-                var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
-
-                var queryText = $@"SELECT {columns} FROM {config.TableSchema}.{config.TableName} WHERE {where}";
-
-                return queryText;
-            }
+            return $@"SELECT * FROM ({queryText}) A WHERE [{config.IdColumn}] = @{config.IdColumn}";
         }
 
         public string GenerateSqlTextForInsert(DataSourceConfig config)
@@ -400,18 +383,19 @@ namespace DataEditorPortal.Web.Services
             if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore other setting.
+                if (!config.QueryText.Contains($"@{ config.IdColumn}"))
+                {
+                    throw new DepException("There is no parameter for Id in query text. All records in database may be updated.");
+                }
                 return config.QueryText;
             }
             else
             {
                 if (config.Columns.Count <= 0) throw new Exception("Columns can not be empty during generating update script.");
-                if (config.Filters.Count <= 0) throw new Exception("Filters can not be empty during generating update script.");
 
                 var sets = string.Join(",", config.Columns.Select(x => $"[{x}] = @{x}"));
 
-                var where = string.Join(" AND ", GenerateWhereClause(config.Filters));
-
-                var queryText = $@"UPDATE {config.TableSchema}.{config.TableName} SET {sets} WHERE {where}";
+                var queryText = $@"UPDATE {config.TableSchema}.{config.TableName} SET {sets} WHERE [{config.IdColumn}] = @{config.IdColumn}";
 
                 return queryText;
             }
@@ -476,6 +460,8 @@ namespace DataEditorPortal.Web.Services
                 var sqlText = GenerateSqlTextForList(config);
                 sqlText = UseSearches(sqlText);
                 sqlText = UseFilters(sqlText);
+                sqlText = RemoveOrderBy(sqlText);
+
                 return $"SELECT TOP 1 * FROM ({sqlText}) AS A";
 
             }

@@ -11,6 +11,11 @@
     padding-top: 0.125rem;
     padding-bottom: 0.125rem;
 
+    .p-menubar-root-list {
+      & > li.p-menuitem {
+        margin-right: 0.25rem;
+      }
+    }
     .p-menuitem-link {
       border-radius: var(--border-radius);
       padding-top: 0.625rem;
