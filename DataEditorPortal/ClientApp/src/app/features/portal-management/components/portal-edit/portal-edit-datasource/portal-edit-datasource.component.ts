@@ -157,6 +157,22 @@ export class PortalEditDatasourceComponent implements OnInit {
     '-- E.g. \r\n' +
     '-- SELECT * FROM dbo.demoTables WHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##';
 
+  onMonacoEditorInit(editor: any) {
+    editor.onMouseDown(() => {
+      if (this.formControlQuery.value === this.helperMessage) {
+        this.formControlQuery.reset();
+        setTimeout(() => {
+          this.formControlQuery.markAsPristine();
+        }, 100);
+      }
+    });
+    editor.onDidBlurEditorText(() => {
+      if (!this.formControlQuery.value) {
+        this.formControlQuery.setValue(this.helperMessage);
+      }
+    });
+  }
+
   showAdvanceDialog() {
     this.advanceDialogVisible = true;
     this.formControlQuery.reset();
