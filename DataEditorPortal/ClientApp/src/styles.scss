@@ -78,8 +78,11 @@ formly-form {
   z-index: 9999 !important;
 }
 
-.p-dialog .p-dialog-footer {
-  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+.p-dialog {
+  transform: none !important;
+  .p-dialog-footer {
+    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+  }
 }
 
 .monaco-editor-wrapper {
