@@ -152,26 +152,38 @@ export class PortalEditDatasourceComponent implements OnInit {
   }
 
   //* advanced query dialog */
+  helperMessage =
+    '-- Enter the query text for fetching the data. \r\n\r\n' +
+    '-- E.g. \r\n' +
+    '-- SELECT * FROM dbo.demoTables WHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##';
+
   showAdvanceDialog() {
     this.advanceDialogVisible = true;
     this.formControlQuery.reset();
     if (this.datasourceConfig.queryText)
       this.formControlQuery.setValue(this.datasourceConfig.queryText);
+    else this.formControlQuery.setValue(this.helperMessage);
   }
 
   onAdvanceDialogOk() {
-    if (this.formControlQuery.valid) {
+    if (
+      this.formControlQuery.valid &&
+      this.formControlQuery.value != this.helperMessage
+    ) {
       this.portalItemService
         .getDataSourceTableColumnsByQuery(this.formControlQuery.value)
         .subscribe(res => {
-          this.datasourceConfig.queryText = this.formControlQuery.value;
-          this.advanceDialogVisible = false;
-          this.setColumns(res);
-          // clear the filters and sortBy, as the database table has changed.
-          this.filters = [];
-          this.sortBy = [];
+          if (!res.isError) {
+            this.datasourceConfig.queryText = this.formControlQuery.value;
+            this.advanceDialogVisible = false;
+            this.setColumns(res.result || []);
+            // clear the filters and sortBy, as the database table has changed.
+            this.filters = [];
+            this.sortBy = [];
+          }
         });
     } else {
+      this.notifyService.notifyWarning('', 'Query text is required.');
       this.formControlQuery.markAsDirty();
     }
   }
@@ -206,7 +218,7 @@ export class PortalEditDatasourceComponent implements OnInit {
     if (this.datasourceConfig.queryText) {
       this.portalItemService
         .getDataSourceTableColumnsByQuery(this.datasourceConfig.queryText)
-        .subscribe(res => this.setColumns(res));
+        .subscribe(res => this.setColumns(res.result || []));
     } else {
       const selectedDbTable = this.formControlDbTable.value;
       if (!selectedDbTable) return;

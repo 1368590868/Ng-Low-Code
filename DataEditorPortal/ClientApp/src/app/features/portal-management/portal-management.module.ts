@@ -73,7 +73,6 @@ const monacoConfig: NgxMonacoEditorConfig = {
     roundedSelection: true,
     minimap: { enabled: false },
     wordWrap: true,
-    fixedOverflowWidgets: true,
     contextmenu: false,
     glyphMargin: false,
     lineDecorationsWidth: 0,

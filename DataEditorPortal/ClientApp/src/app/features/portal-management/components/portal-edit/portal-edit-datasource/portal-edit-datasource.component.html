@@ -20,17 +20,20 @@
             placeholder="Please Select"
             [style]="{ minWidth: '20rem' }"
             appendTo="body"></p-dropdown>
-          <p-message
-            *ngIf="datasourceConfig.queryText"
-            severity="info"
-            text="Use Query Text"
-            styleClass="mr-2"></p-message>
+          <div style="cursor: pointer" (click)="showAdvanceDialog()">
+            <p-message
+              *ngIf="datasourceConfig.queryText"
+              severity="info"
+              text="Customized Query Text"
+              styleClass="mr-2"></p-message>
+          </div>
           <p-button
             *ngIf="datasourceConfig.queryText"
-            styleClass="p-button-text p-button-rounded remove-btn"
+            styleClass="p-button-text p-button-rounded p-button-lg"
             icon="pi pi-times-circle"
             (onClick)="removeAdvancedQuery()"></p-button>
           <p-button
+            *ngIf="!datasourceConfig.queryText"
             class="ml-2"
             pTooltip="Advanced Configuration"
             styleClass="p-button-text p-button-rounded"
@@ -216,7 +219,8 @@
           [pTooltip]="
             'Enter the query text for fetching the data. <br>' +
             'Use helper macros: <br><br>' +
-            '##ORDERBY## : placeholder for Sort By expressions<br>' +
+            '##WHERE## : placeholder for Where expressions<br>' +
+            '##ORDERBY## : placeholder for Order By expressions<br>' +
             '##SEARCHES## : placeholder for Search Criteria<br>' +
             '##FILTERS## : placeholder for Column Filters.'
           "></i>
