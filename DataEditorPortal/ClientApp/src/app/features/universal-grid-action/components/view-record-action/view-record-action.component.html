@@ -12,7 +12,33 @@
   <ng-template pTemplate="body" let-viewData>
     <tr>
       <td>{{ viewData.name }}</td>
-      <td>{{ viewData.value }}</td>
+      <td>
+        <ng-container
+          *ngIf="!viewData.template"
+          [ngTemplateOutlet]="
+            viewData.filterType === 'date'
+              ? date
+              : viewData.filterType === 'numeric'
+              ? numeric
+              : viewData.filterType === 'boolean'
+              ? boolean
+              : normal
+          "></ng-container>
+        <ng-template #boolean>{{ viewData.value | boolean }}</ng-template>
+        <ng-template #date>{{
+          viewData.value
+            | date : (viewData.format === '' ? undefined : viewData.format)
+        }}</ng-template>
+        <ng-template #numeric>{{
+          viewData.value
+            | number : (viewData.format === '' ? undefined : viewData.format)
+        }}</ng-template>
+        <ng-template #normal>{{ viewData.value }}</ng-template>
+        <span
+          *ngIf="viewData.template"
+          [innerHTML]="calcCustomTemplate(viewData, viewData.template)">
+        </span>
+      </td>
     </tr>
   </ng-template>
 </p-table>
