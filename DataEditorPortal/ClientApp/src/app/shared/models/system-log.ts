@@ -11,7 +11,7 @@ export interface SortMetaEvent {
 }
 
 export interface GridProp {
-  id: string;
+  Id: string;
   EventTime?: string;
   EventSection?: string;
   Category?: string;
@@ -20,4 +20,9 @@ export interface GridProp {
   Details?: string;
   Params?: string;
   Result?: string;
+}
+
+export interface GridResult {
+  data: GridProp[];
+  total: number;
 }
