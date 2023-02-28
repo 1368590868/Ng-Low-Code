@@ -9,6 +9,7 @@ import { ConfigDataService, SiteMenu } from 'src/app/shared';
 })
 export class TileComponent implements OnInit {
   public homeMenus: SiteMenu[] = [];
+  public loading = false;
   constructor(private configDataService: ConfigDataService) {}
   ngOnInit() {
     this.configDataService
@@ -30,6 +31,7 @@ export class TileComponent implements OnInit {
                     : menu.link
               };
             });
+          this.loading = true;
         })
       )
       .subscribe();

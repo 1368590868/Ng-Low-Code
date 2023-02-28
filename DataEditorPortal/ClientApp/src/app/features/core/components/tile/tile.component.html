@@ -17,6 +17,7 @@
   </div>
   <ng-template #emptyMessage>
     <div
+      *ngIf="loading"
       class="flex flex-column justify-content-center align-items-center"
       style="margin-top: -8rem">
       <h3 class="text-8xl">404</h3>
