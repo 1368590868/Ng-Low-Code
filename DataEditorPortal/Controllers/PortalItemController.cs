@@ -351,6 +351,14 @@ namespace DataEditorPortal.Web.Controllers
             return _portalItemService.GetDataSourceTableColumns(sqlText);
         }
 
+        [HttpPost]
+        [Route("datasource/query/columns")]
+        public List<DataSourceTableColumn> GetDataSourceQueryColumns(DataSourceConfig queryText)
+        {
+            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(queryText);
+            return _portalItemService.GetDataSourceTableColumns(sqlText);
+        }
+
         [HttpGet]
         [Route("{id}/datasource/columns")]
         public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid id)

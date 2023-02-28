@@ -163,9 +163,10 @@ namespace DataEditorPortal.Web.Services
 
             // convert search criteria to where clause
             var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
+            var searchRules = new List<SearchParam>();
             if (param.Searches != null)
             {
-                var searchRules = param.Searches
+                searchRules = param.Searches
                     .Where(x => x.Value != null)
                     .Select(x =>
                     {
@@ -186,9 +187,8 @@ namespace DataEditorPortal.Web.Services
                         return param;
                     })
                     .ToList();
-
-                queryText = _dbSqlBuilder.UseSearches(queryText, searchRules);
             }
+            queryText = _dbSqlBuilder.UseSearches(queryText, searchRules);
 
             // convert grid filter to where clause
             queryText = _dbSqlBuilder.UseFilters(queryText, param.Filters);
