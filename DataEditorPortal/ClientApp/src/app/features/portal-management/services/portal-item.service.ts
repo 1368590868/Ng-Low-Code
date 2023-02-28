@@ -36,6 +36,10 @@ export class PortalItemService {
     this._apiUrl = apiUrl;
   }
 
+  refreshMenu() {
+    this.configDataService.menuChange$.next(null);
+  }
+
   getFilterMatchModeOptions({ filterType, type }: any) {
     if (type === 'multiSelect' || type === 'checkboxList')
       return [{ label: 'In selected values', value: 'in' }];
@@ -93,11 +97,7 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${id}/publish`,
         null
       )
-      .pipe(
-        tap(() => {
-          this.configDataService.menuChange$.next(null);
-        })
-      );
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   unpublish(id: string): Observable<ApiResponse<string>> {
@@ -106,11 +106,7 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${id}/unpublish`,
         null
       )
-      .pipe(
-        tap(() => {
-          this.configDataService.menuChange$.next(null);
-        })
-      );
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   moveUp(id: string): Observable<ApiResponse<boolean>> {
@@ -119,11 +115,7 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${id}/move-up`,
         null
       )
-      .pipe(
-        tap(() => {
-          this.configDataService.menuChange$.next(null);
-        })
-      );
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   moveDown(id: string): Observable<ApiResponse<boolean>> {
@@ -132,11 +124,7 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${id}/move-down`,
         null
       )
-      .pipe(
-        tap(() => {
-          this.configDataService.menuChange$.next(null);
-        })
-      );
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   nameExists(name: string, id?: string): Observable<ApiResponse<boolean>> {
@@ -173,11 +161,7 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${this.currentPortalItemId}/update`,
         data
       )
-      .pipe(
-        tap(() => {
-          this.configDataService.menuChange$.next(null);
-        })
-      );
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   // datasource
@@ -226,10 +210,12 @@ export class PortalItemService {
   }
 
   saveDataSourceConfig(data: DataSourceConfig) {
-    return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}portal-item/${this.currentPortalItemId}/datasource`,
-      data
-    );
+    return this.http
+      .post<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/${this.currentPortalItemId}/datasource`,
+        data
+      )
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   getGridColumnsConfig(): Observable<GridColumn[]> {
@@ -271,10 +257,12 @@ export class PortalItemService {
   }
 
   saveGridFormConfig(data: GirdDetailConfig) {
-    return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`,
-      data
-    );
+    return this.http
+      .post<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`,
+        data
+      )
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   getCustomActions(id: string): Observable<GridCustomAction[]> {

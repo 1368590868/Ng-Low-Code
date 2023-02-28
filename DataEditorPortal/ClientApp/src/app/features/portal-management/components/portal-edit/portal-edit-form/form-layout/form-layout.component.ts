@@ -85,6 +85,7 @@ export class FormLayoutComponent {
         return {
           key: x.columnName,
           type: result[0].value,
+          defaultValue: result[0].value === 'checkbox' ? false : null,
           props: {
             label: x.columnName,
             required: !x.allowDBNull
