@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { NotifyService, UserService } from 'src/app/shared';
+import { NgxFormlyService, NotifyService, UserService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { ManageRoleForm } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';
@@ -27,7 +27,6 @@ export class UserManagerActionComponent
   };
   fields: FormlyFieldConfig[] = [
     {
-      fieldGroupClassName: 'flex flex-wrap justify-content-between',
       fieldGroup: [
         {
           className: 'w-6',
@@ -141,94 +140,40 @@ export class UserManagerActionComponent
       ]
     },
     {
-      fieldGroupClassName: 'flex flex-warp justify-between w-full ',
       fieldGroup: [
         {
-          className: 'w-6 ',
+          className: 'w-6',
           key: 'vendor',
           type: 'select',
+          defaultValue: null,
           props: {
             label: 'Vendor',
             placeholder: 'Please select',
-            options: [
-              {
-                value: '1',
-                label: 'Option 1'
-              },
-              {
-                value: '2',
-                label: 'Option 2'
-              },
-              {
-                value: '3',
-                label: 'Option 3'
-              },
-              {
-                value: '4',
-                label: 'Option 4'
-              }
-            ],
-            appendTo: 'body'
+            optionsLookup: 'E1F3E2C7-25CA-4D69-9405-ABC54923864D',
+            options: []
+          },
+          hooks: {
+            onInit: (field: any) => {
+              this.ngxFormlyService.initFieldOptions(field);
+            }
           }
         },
         {
-          className: 'w-6 ml-2',
+          className: 'w-6',
           key: 'employer',
           type: 'select',
+          defaultValue: null,
           props: {
             label: 'Employer',
             placeholder: 'Please select',
-            options: [
-              {
-                value: '1',
-                label: 'Option 1'
-              },
-              {
-                value: '2',
-                label: 'Option 2'
-              },
-              {
-                value: '3',
-                label: 'Option 3'
-              },
-              {
-                value: '4',
-                label: 'Option 4'
-              }
-            ],
-            appendTo: 'body'
-          }
-        }
-      ]
-    },
-    {
-      fieldGroupClassName: 'flex flex-warp justify-content-between w-full ',
-      fieldGroup: [
-        {
-          className: 'w-full',
-
-          key: 'division',
-          type: 'checkboxList',
-          props: {
-            label: 'Division(s)',
-            options: [
-              {
-                value: 'Gas',
-                label: 'Gas'
-              },
-              {
-                value: 'ELECTRIC',
-                label: 'Electric'
-              },
-              {
-                value: 'LANDBASE',
-                label: 'Landbase'
-              },
-              {
-                value: 'UNDERGROUND',
-                label: 'Underground'
-              }
-            ]
+            optionsLookup: '704A3D00-62DF-4C62-A4BD-457C4DC242CA',
+            dependOnFields: ['vendor'],
+            options: []
+          },
+          hooks: {
+            onInit: (field: any) => {
+              this.ngxFormlyService.initDependOnFields(field);
+            }
           }
         }
       ]
@@ -239,7 +184,7 @@ export class UserManagerActionComponent
           key: 'autoEmail',
           type: 'checkbox',
           props: {
-            label: 'Notify',
+            label: 'Receive Email Notifycations',
             binary: true,
             required: true,
             options: [
@@ -282,7 +227,7 @@ export class UserManagerActionComponent
 
                 if (field.props) field.props['forArray'] = roles;
                 if (field.parent?.fieldGroup) {
-                  field.parent.fieldGroup[4].hide = roles.length === 0;
+                  field.parent.fieldGroup[3].hide = roles.length === 0;
                 }
               });
           }
@@ -317,7 +262,7 @@ export class UserManagerActionComponent
 
                 if (field.props) field.props['forArray'] = permissions;
                 if (field.parent?.fieldGroup) {
-                  field.parent.fieldGroup[6].hide = permissions.length === 0;
+                  field.parent.fieldGroup[5].hide = permissions.length === 0;
                 }
               });
           }
@@ -329,7 +274,8 @@ export class UserManagerActionComponent
   constructor(
     private userManagerService: UserManagerService,
     private notifyService: NotifyService,
-    private userService: UserService
+    private userService: UserService,
+    private ngxFormlyService: NgxFormlyService
   ) {
     super();
   }
@@ -349,8 +295,7 @@ export class UserManagerActionComponent
             phone: res.phone,
             vendor: res.vendor,
             employer: res.employer,
-            autoEmail: res.autoEmail,
-            division: res.division !== 'NONE' ? JSON.parse(res.division) : []
+            autoEmail: res.autoEmail
           });
         });
     }

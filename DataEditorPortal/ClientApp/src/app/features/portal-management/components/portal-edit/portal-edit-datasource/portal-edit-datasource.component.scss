@@ -44,3 +44,8 @@
     }
   }
 }
+::ng-deep {
+  .p-tooltip.advanced-query-tooltip .p-tooltip-text {
+    width: 400px;
+  }
+}

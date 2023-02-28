@@ -200,6 +200,15 @@ export class PortalItemService {
       .pipe(map(x => x.result || []));
   }
 
+  getDataSourceTableColumnsByQuery(
+    queryText: string
+  ): Observable<ApiResponse<DataSourceTableColumn[]>> {
+    return this.http.post<ApiResponse<DataSourceTableColumn[]>>(
+      `${this._apiUrl}portal-item/datasource/query/columns`,
+      { queryText }
+    );
+  }
+
   getDataSourceTableColumnsByPortalId(): Observable<DataSourceTableColumn[]> {
     return this.http
       .get<ApiResponse<DataSourceTableColumn[]>>(

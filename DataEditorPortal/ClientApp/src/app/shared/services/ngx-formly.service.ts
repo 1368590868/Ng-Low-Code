@@ -23,9 +23,9 @@ export class NgxFormlyService {
   }
 
   initFieldOptions(field: any, data?: any) {
-    if (field.props && field.props['optionLookup']) {
+    if (field.props && field.props['optionsLookup']) {
       // get lookups from server
-      this.getLookup(field.props['optionLookup'], data)
+      this.getLookup(field.props['optionsLookup'], data)
         .pipe(
           tap(result => {
             if (field.props) {

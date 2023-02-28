@@ -3,7 +3,12 @@ import { NgForm, FormGroup, AbstractControl } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { MenuItem } from 'primeng/api';
 import { ManageRoleForm } from 'src/app/features/universal-grid-action/models/user-manager';
-import { NotifyService, ConfigDataService, UserService } from 'src/app/shared';
+import {
+  NotifyService,
+  ConfigDataService,
+  UserService,
+  NgxFormlyService
+} from 'src/app/shared';
 
 @Component({
   selector: 'app-personal-dialog',
@@ -20,7 +25,6 @@ export class PersonalDialogComponent {
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [
     {
-      fieldGroupClassName: 'flex flex-wrap justify-content-between',
       fieldGroup: [
         {
           className: 'w-6',
@@ -54,7 +58,7 @@ export class PersonalDialogComponent {
           }
         },
         {
-          className: 'w-6 pl-2',
+          className: 'w-6',
           key: 'name',
           type: 'input',
           props: {
@@ -107,7 +111,7 @@ export class PersonalDialogComponent {
           }
         },
         {
-          className: 'w-6 pl-2',
+          className: 'w-6',
           key: 'phone',
           type: 'inputMask',
           defaultValue: '',
@@ -122,94 +126,40 @@ export class PersonalDialogComponent {
       ]
     },
     {
-      fieldGroupClassName: 'flex flex-warp justify-between w-full ',
       fieldGroup: [
         {
-          className: 'w-6 ',
+          className: 'w-6',
           key: 'vendor',
           type: 'select',
+          defaultValue: null,
           props: {
             label: 'Vendor',
             placeholder: 'Please select',
-            options: [
-              {
-                value: '1',
-                label: 'Option 1'
-              },
-              {
-                value: '2',
-                label: 'Option 2'
-              },
-              {
-                value: '3',
-                label: 'Option 3'
-              },
-              {
-                value: '4',
-                label: 'Option 4'
-              }
-            ],
-            appendTo: 'body'
+            optionsLookup: 'E1F3E2C7-25CA-4D69-9405-ABC54923864D',
+            options: []
+          },
+          hooks: {
+            onInit: (field: any) => {
+              this.ngxFormlyService.initFieldOptions(field);
+            }
           }
         },
         {
-          className: 'w-6 ml-2',
+          className: 'w-6',
           key: 'employer',
           type: 'select',
+          defaultValue: null,
           props: {
             label: 'Employer',
             placeholder: 'Please select',
-            options: [
-              {
-                value: '1',
-                label: 'Option 1'
-              },
-              {
-                value: '2',
-                label: 'Option 2'
-              },
-              {
-                value: '3',
-                label: 'Option 3'
-              },
-              {
-                value: '4',
-                label: 'Option 4'
-              }
-            ],
-            appendTo: 'body'
-          }
-        }
-      ]
-    },
-    {
-      fieldGroupClassName: 'flex flex-warp justify-content-between w-full ',
-      fieldGroup: [
-        {
-          className: 'w-full',
-
-          key: 'division',
-          type: 'checkboxList',
-          props: {
-            label: 'Division(s)',
-            options: [
-              {
-                value: 'Gas',
-                label: 'Gas'
-              },
-              {
-                value: 'ELECTRIC',
-                label: 'Electric'
-              },
-              {
-                value: 'LANDBASE',
-                label: 'Landbase'
-              },
-              {
-                value: 'UNDERGROUND',
-                label: 'Underground'
-              }
-            ]
+            optionsLookup: '704A3D00-62DF-4C62-A4BD-457C4DC242CA',
+            dependOnFields: ['vendor'],
+            options: []
+          },
+          hooks: {
+            onInit: (field: any) => {
+              this.ngxFormlyService.initDependOnFields(field);
+            }
           }
         }
       ]
@@ -220,7 +170,7 @@ export class PersonalDialogComponent {
           key: 'autoEmail',
           type: 'checkbox',
           props: {
-            label: 'Notify',
+            label: 'Receive Email Notifycations',
             binary: true,
             required: true,
             options: [
@@ -237,6 +187,7 @@ export class PersonalDialogComponent {
   constructor(
     public configDataService: ConfigDataService,
     public userService: UserService,
+    private ngxFormlyService: NgxFormlyService,
     private notifyService: NotifyService
   ) {
     this.items = [
@@ -266,8 +217,7 @@ export class PersonalDialogComponent {
           phone: res.phone,
           vendor: res.vendor,
           employer: res.employer,
-          autoEmail: res.autoEmail,
-          division: res.division !== 'NONE' ? JSON.parse(res.division) : []
+          autoEmail: res.autoEmail
         });
       });
     this.visible = true;

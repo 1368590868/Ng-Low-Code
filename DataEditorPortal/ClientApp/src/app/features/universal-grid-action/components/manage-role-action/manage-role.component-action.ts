@@ -35,6 +35,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
           props: {
             change: () => {
               this.roleId = this.model.roleId || '';
+              this.permissionSelect = [];
 
               this.getRolePermissionsList(
                 this.roleId === '<new_role>' ? undefined : this.roleId
@@ -97,7 +98,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
             placeholder: 'Name'
           },
           expressions: {
-            'props.disabled': `model.roleName === 'Users'`
+            'props.disabled': `model.roleName === 'Users' || model.roleName === 'Administrators' `
           }
         },
         {
@@ -105,7 +106,6 @@ export class ManageRoleActionComponent extends GridActionDirective {
           key: 'roleDescription',
           type: 'textarea',
           props: {
-            required: true,
             type: 'text',
             label: 'Description',
             placeholder: 'Description'

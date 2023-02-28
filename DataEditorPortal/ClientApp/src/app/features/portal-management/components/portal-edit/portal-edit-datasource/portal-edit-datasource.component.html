@@ -1,20 +1,18 @@
 <p-card styleClass="">
-  <ng-template pTemplate="title">
-    Data Source
-    <a (click)="changeMode()">{{
-      !isAdvanced ? 'Advance Mode' : 'Simple Mode'
-    }}</a>
-  </ng-template>
+  <ng-template pTemplate="title"> Data Source </ng-template>
   <ng-template pTemplate="subtitle">
     Setup data source for this portal item.
   </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
-  <div *ngIf="!isAdvanced" class="w-6 pt-3">
-    <div class="flex align-items-center">
-      <div class="flex flex-column mb-2 mr-4">
-        <label for="tableName" class="mb-1">Database Table *</label>
+  <div class="w-6 pt-3">
+    <div class="w-6 flex flex-column">
+      <div class="flex flex-column mb-3">
+        <label *ngIf="!datasourceConfig.queryText" for="tableName" class="mb-1"
+          >Database Table *</label
+        >
         <div class="flex align-items-center">
           <p-dropdown
+            *ngIf="!datasourceConfig.queryText"
             [required]="true"
             [options]="dbTables"
             (onChange)="onTableNameChange($event)"
@@ -22,12 +20,30 @@
             placeholder="Please Select"
             [style]="{ minWidth: '20rem' }"
             appendTo="body"></p-dropdown>
-          <i
-            class="pi pi-question-circle ml-3 text-lg"
-            pTooltip="Select one table from database"></i>
+          <div style="cursor: pointer" (click)="showAdvanceDialog()">
+            <p-message
+              *ngIf="datasourceConfig.queryText"
+              severity="info"
+              text="Customized Query Text"
+              styleClass="mr-2"></p-message>
+          </div>
+          <p-button
+            *ngIf="datasourceConfig.queryText"
+            styleClass="p-button-text p-button-rounded p-button-lg"
+            icon="pi pi-times-circle"
+            (onClick)="removeAdvancedQuery()"></p-button>
+          <p-button
+            *ngIf="!datasourceConfig.queryText"
+            class="ml-2"
+            pTooltip="Advanced Configuration"
+            styleClass="p-button-text p-button-rounded"
+            icon="pi pi-ellipsis-v"
+            (onClick)="showAdvanceDialog()"></p-button>
         </div>
       </div>
-      <div class="flex flex-column mb-2">
+    </div>
+    <div class="flex align-items-center">
+      <div class="flex flex-column mb-2 mr-4">
         <label for="idColumn" class="mb-1">Id Column *</label>
         <div class="flex align-items-center">
           <p-dropdown
@@ -44,8 +60,6 @@
             pTooltip="Id Column will be used as the key in the grid"></i>
         </div>
       </div>
-    </div>
-    <div class="w-6 pt-3 flex flex-column">
       <div class="flex flex-column mb-2">
         <label for="" class="mb-1">Page Size</label>
         <p-inputNumber
@@ -58,7 +72,7 @@
           [min]="10"></p-inputNumber>
       </div>
     </div>
-    <p-divider styleClass="mb-0">Filters</p-divider>
+    <p-divider styleClass="mb-0">Where</p-divider>
     <div class="flex flex-column mb-2">
       <!-- <label class="mb-1">Filters</label> -->
       <p-orderList [value]="filters" [stripedRows]="true">
@@ -119,7 +133,7 @@
         styleClass="p-button-text p-button-sm"
         (onClick)="onAddFilter()"></p-button>
     </div>
-    <p-divider styleClass="mb-0">Sort By</p-divider>
+    <p-divider styleClass="mb-0">Order By</p-divider>
     <div class="flex flex-column mb-2">
       <!-- <label class="mb-1">Sort By</label> -->
       <p-orderList [value]="sortBy" [stripedRows]="true" [dragdrop]="true">
@@ -158,29 +172,6 @@
         (onClick)="onAddSortColumn()"></p-button>
     </div>
   </div>
-  <div *ngIf="isAdvanced" class="w-6 pt-3 flex flex-column">
-    <label class="line-height-3 flex align-items-center mb-2"
-      >Custom your query below to fetch the data. Use ##SEARCHES## and
-      ##FILTERS## as the placeholder to recevie the paramters from front end.
-    </label>
-    <ngx-monaco-editor
-      [formControl]="formControlQuery"
-      (onInit)="onMonacoInit()"
-      [style]="{ height: '20rem' }"
-      [required]="true"
-      class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
-      [options]="{}"></ngx-monaco-editor>
-
-    <label for="" class="mb-1">Page Size</label>
-    <p-inputNumber
-      [(ngModel)]="pageSize"
-      [style]="{ minWidth: '20rem' }"
-      [showButtons]="true"
-      [allowEmpty]="false"
-      [maxFractionDigits]="0"
-      [max]="1000"
-      [min]="10"></p-inputNumber>
-  </div>
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
       <p-button
@@ -208,3 +199,49 @@
     </div>
   </ng-template>
 </p-card>
+
+<p-dialog
+  header="Advanced Query Configuration"
+  [(visible)]="advanceDialogVisible"
+  [style]="{ minWidth: '50rem' }"
+  [modal]="true"
+  [dismissableMask]="true"
+  appendTo="body"
+  contentStyleClass="border-top-1 surface-border pt-4 pb-0">
+  <div #container class="dialog-content">
+    <div class="flex flex-column" *ngIf="advanceDialogVisible">
+      <label class="line-height-3 flex align-items-center mb-1"
+        >Query text
+        <i
+          class="pi pi-question-circle ml-3 text-lg"
+          [escape]="false"
+          tooltipStyleClass="advanced-query-tooltip"
+          [pTooltip]="
+            'Enter the query text for fetching the data. <br>' +
+            'Use helper macros: <br><br>' +
+            '##WHERE## : placeholder for Where expressions<br>' +
+            '##ORDERBY## : placeholder for Order By expressions<br>' +
+            '##SEARCHES## : placeholder for Search Criteria<br>' +
+            '##FILTERS## : placeholder for Column Filters.'
+          "></i>
+      </label>
+      <ngx-monaco-editor
+        [formControl]="formControlQuery"
+        [style]="{ minWidth: '40rem' }"
+        [required]="true"
+        class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
+        [options]="{}"></ngx-monaco-editor>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button
+      icon="pi pi-times"
+      (onClick)="onAdvanceDialogCancel()"
+      label="Cancle"
+      styleClass="p-button-text"></p-button>
+    <p-button
+      icon="pi pi-check"
+      (onClick)="onAdvanceDialogOk()"
+      label="Ok"></p-button>
+  </ng-template>
+</p-dialog>

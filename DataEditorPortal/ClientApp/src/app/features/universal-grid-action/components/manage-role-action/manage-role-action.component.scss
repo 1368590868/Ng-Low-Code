@@ -1,7 +1,7 @@
-.table-last-border {
+:host {
   ::ng-deep {
-    .p-datatable .p-datatable-tbody > tr:last-child > td {
-      border: none;
+    .p-tree .p-tree-container .p-treenode {
+      padding: 0.143rem 0 0 0;
     }
   }
 }

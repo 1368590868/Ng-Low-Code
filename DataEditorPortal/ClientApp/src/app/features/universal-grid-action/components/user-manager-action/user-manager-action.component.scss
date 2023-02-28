@@ -1,8 +1,13 @@
 .user-form {
   ::ng-deep {
-    app-formly-field-primeng-checkbox {
+    formly-group {
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      margin: 0 -0.5rem;
+      & > formly-field {
+        width: 100%;
+        padding: 0 0.5rem;
+      }
     }
   }
 }

@@ -142,9 +142,9 @@ const GRID_ACTION_CONFIG = [
       icon: 'pi pi-users',
       buttonStyleClass: 'p-button-outlined',
       header: 'Manage Roles',
-      dialogStyle: { width: '60rem' },
-      cancelText: 'No',
-      okText: 'Yes'
+      dialogStyle: { width: '50rem' },
+      cancelText: 'Cancel',
+      okText: 'Save'
     }
   },
   {
@@ -173,7 +173,7 @@ const GRID_ACTION_CONFIG = [
       buttonStyleClass: 'p-button-outlined',
       header: 'Edit User Permissions',
       okText: 'Update User Permissions',
-      dialogStyle: { width: '60rem' }
+      dialogStyle: { width: '50rem' }
     }
   }
 ];

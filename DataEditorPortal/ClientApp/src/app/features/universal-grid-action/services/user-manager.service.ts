@@ -30,7 +30,7 @@ export class UserManagerService {
   createUser(data: ManageRoleForm) {
     return this.http.post<ApiResponse<UpdateRole[]>>(
       `${this._apiUrl}user/create`,
-      { ...data, division: JSON.stringify(data.division) }
+      data
     );
   }
 
@@ -43,7 +43,7 @@ export class UserManagerService {
   updateUser(data: ManageRoleForm) {
     return this.http.put<ApiResponse<UpdateRole[]>>(
       `${this._apiUrl}user/update/${data.id}`,
-      { ...data, division: JSON.stringify(data.division) }
+      data
     );
   }
 

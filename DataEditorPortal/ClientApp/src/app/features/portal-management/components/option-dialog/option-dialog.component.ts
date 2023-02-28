@@ -26,7 +26,7 @@ interface OptionItem {
 })
 export class OptionDialogComponent implements ControlValueAccessor {
   isAdvanced = false;
-  optionLookup?: string;
+  optionsLookup?: string;
   options: any[] = [];
   onChange?: any;
   onTouch?: any;
@@ -49,10 +49,10 @@ export class OptionDialogComponent implements ControlValueAccessor {
     if (Array.isArray(val)) {
       this.options = val;
     } else if (val) {
-      this.optionLookup = val;
+      this.optionsLookup = val;
     } else {
       this.options = [];
-      this.optionLookup = undefined;
+      this.optionsLookup = undefined;
     }
     this.onChange?.(val);
     this.onTouch?.(val);
@@ -85,8 +85,8 @@ export class OptionDialogComponent implements ControlValueAccessor {
       };
       this.formControlName.reset();
       this.formControlQuery.reset();
-      if (this.optionLookup) {
-        this.lookupService.getOptionQuery(this.optionLookup).subscribe(res => {
+      if (this.optionsLookup) {
+        this.lookupService.getOptionQuery(this.optionsLookup).subscribe(res => {
           this.formControlOptions = [];
           this.formControlName.setValue(res?.name);
           this.formControlQuery.setValue(res?.queryText);
@@ -110,12 +110,12 @@ export class OptionDialogComponent implements ControlValueAccessor {
 
   showDialog() {
     this.isAdvanced =
-      (!this.options || this.options.length === 0) && !!this.optionLookup;
+      (!this.options || this.options.length === 0) && !!this.optionsLookup;
 
     if (this.isAdvanced) {
       this.formControlOptions = [];
-      if (this.optionLookup) {
-        this.lookupService.getOptionQuery(this.optionLookup).subscribe(res => {
+      if (this.optionsLookup) {
+        this.lookupService.getOptionQuery(this.optionsLookup).subscribe(res => {
           this.formControlName.setValue(res?.name);
           this.formControlQuery.setValue(res?.queryText);
         });
@@ -160,20 +160,20 @@ export class OptionDialogComponent implements ControlValueAccessor {
       if (this.isAdvanced) {
         this.lookupService
           .saveOptionQuery({
-            id: this.optionLookup || '',
+            id: this.optionsLookup || '',
             name: this.formControlName.value,
             queryText: this.formControlQuery.value
           })
           .subscribe(res => {
             if (res && !res.isError) {
               this.options = [];
-              this.optionLookup = res.result;
-              this.onChange(this.optionLookup);
+              this.optionsLookup = res.result;
+              this.onChange(this.optionsLookup);
               this.visible = false;
             }
           });
       } else {
-        this.optionLookup = undefined;
+        this.optionsLookup = undefined;
         this.options = this.formControlOptions.map(item => {
           return {
             label: item.formControl.value,

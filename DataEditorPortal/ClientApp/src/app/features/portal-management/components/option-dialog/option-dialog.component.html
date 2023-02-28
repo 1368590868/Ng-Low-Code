@@ -6,9 +6,9 @@
     >Configure</p-button
   >
   <p-message
-    *ngIf="optionLookup || (options && options.length > 0)"
+    *ngIf="optionsLookup || (options && options.length > 0)"
     severity="info"
-    text="{{ optionLookup ? 'Use Lookup' : '' }}{{
+    text="{{ optionsLookup ? 'Use Lookup' : '' }}{{
       options && options.length > 0 ? options.length + ' option(s)' : ''
     }}"></p-message>
 </div>
