@@ -48,7 +48,7 @@ body {
 
 @media screen and (min-width: 1729px) {
   .layout-content {
-    width: 1504px;
+    width: 1504px !important;
     margin-left: auto !important;
     margin-right: auto !important;
     min-height: calc(100% - 7rem);
