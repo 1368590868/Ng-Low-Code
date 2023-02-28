@@ -17,8 +17,6 @@ import { SplitAreaComponent } from './pages/split-area/split-area.component';
 import { SearchComponent } from './components/search/search.component';
 import { TableComponent } from './components/table/table.component';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
-import { BooleanTextPipe } from './pipes/boolean-text.pipe';
-
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
 import { ToastModule } from 'primeng/toast';
@@ -39,14 +37,10 @@ import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { DataFormatService } from './services/data-format.service';
 import { PaginatorModule } from 'primeng/paginator';
+import { SharedModule } from 'src/app/shared';
 
 @NgModule({
-  declarations: [
-    SplitAreaComponent,
-    SearchComponent,
-    TableComponent,
-    BooleanTextPipe
-  ],
+  declarations: [SplitAreaComponent, SearchComponent, TableComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -54,6 +48,7 @@ import { PaginatorModule } from 'primeng/paginator';
     FormlyModule,
     UniversalGridRoutingModule,
     UniversalGridActionModule,
+    SharedModule,
     // primeNg
     AnimateModule,
     ToastModule,

@@ -11,6 +11,7 @@ import { MessageService } from 'primeng/api';
 import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
 import { PermissionDirective } from './directive/permission.directive';
+import { BooleanTextPipe } from './pipes/boolean-text.pipe';
 
 export { AuthRouterGuard } from './guards/auth-router.guard';
 export { PermissionRouterGuard } from './guards/permission-router.guard';
@@ -27,9 +28,9 @@ export { SystemLogService } from './services/system-log.service';
 export { SystemLogDialogComponent } from '../features/core/components/system-log/system-log-dialog/system-log-dialog.component';
 
 @NgModule({
-  declarations: [PermissionDirective],
+  declarations: [PermissionDirective, BooleanTextPipe],
   imports: [CommonModule, FormsModule, HttpClientModule, FormlyModule],
-  exports: [PermissionDirective],
+  exports: [PermissionDirective, BooleanTextPipe],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
