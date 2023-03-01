@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { finalize, tap } from 'rxjs';
-import { GridParam } from 'src/app/features/universal-grid/models/grid-types';
 import { SystemLogDialogComponent, SystemLogService } from 'src/app/shared';
 import {
+  GridParam,
   GridProp,
   PaginationEvent,
   SortMetaEvent
