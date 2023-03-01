@@ -104,13 +104,26 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   onSendData() {
-    this.onChange?.([
+    const data = [
       ...this.form.get('validatorFormControl')!.value,
       {
         expression: this.form.get('expressionFormControl')?.value,
         message: this.form.get('messageFormControl')?.value
       }
-    ]);
+    ];
+    data.forEach((item: any, index: number) => {
+      if (typeof item === 'object') {
+        Object.keys(item).forEach((key: string) => {
+          if (!item[key]) {
+            delete data[index][key];
+          }
+        });
+        if (Object.keys(item).length === 0) {
+          data.splice(index, 1);
+        }
+      }
+    });
+    this.onChange?.(data);
   }
 
   onCancel() {
