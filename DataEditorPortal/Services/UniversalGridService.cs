@@ -138,7 +138,8 @@ namespace DataEditorPortal.Web.Services
                         {
                             while (dr.Read())
                             {
-                                result.Add(dr.GetString(0));
+                                if (dr[0] != DBNull.Value)
+                                    result.Add(dr.GetString(0));
                             }
                         }
                     }
@@ -150,9 +151,10 @@ namespace DataEditorPortal.Web.Services
 
             }
 
-
-
-            return result.Select(x => new DropdownOptionsItem { Label = x, Value = x }).ToList();
+            return result
+                .Select(x => new DropdownOptionsItem { Label = x, Value = x })
+                .OrderBy(x => x.Label)
+                .ToList();
         }
 
         public GridData GetGridData(string name, GridParam param)

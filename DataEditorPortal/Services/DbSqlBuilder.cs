@@ -127,7 +127,8 @@ namespace DataEditorPortal.Web.Services
                         }
                         else
                         {
-                            inStr += $",'{value.GetString().Replace("'", "''")}'";
+                            if (!string.IsNullOrEmpty(value.GetString()))
+                                inStr += $",'{value.GetString().Replace("'", "''")}'";
                         }
                     });
                     if (whereClause != null)
