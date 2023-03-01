@@ -18,6 +18,7 @@ namespace DataEditorPortal.Data.Contexts
             modelBuilder.Entity<User>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+                entity.Property(e => e.UserId).UseIdentityColumn();
             });
 
             modelBuilder.Entity<DemoTable>(entity =>

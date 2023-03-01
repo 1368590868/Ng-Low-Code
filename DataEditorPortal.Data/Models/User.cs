@@ -7,6 +7,7 @@ namespace DataEditorPortal.Data.Models
     {
         [Key]
         public Guid Id { get; set; }
+        public int UserId { get; set; }
         public string Username { get; set; }
         public string Employer { get; set; }
         public string Comments { get; set; }

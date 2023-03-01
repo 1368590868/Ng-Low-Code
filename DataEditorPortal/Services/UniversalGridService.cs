@@ -4,6 +4,7 @@ using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -41,19 +42,22 @@ namespace DataEditorPortal.Web.Services
         private readonly IDbSqlBuilder _dbSqlBuilder;
         private readonly ILogger<UniversalGridService> _logger;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UniversalGridService(
             IServiceProvider serviceProvider,
             DepDbContext depDbContext,
             IDbSqlBuilder dbSqlBuilder,
             ILogger<UniversalGridService> logger,
-            IMapper mapper)
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
             _dbSqlBuilder = dbSqlBuilder;
             _logger = logger;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #region Grid cofnig, columns config, search config and list data
@@ -487,41 +491,57 @@ namespace DataEditorPortal.Web.Services
                 throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }
 
-            var columns = detailConfig.AddingForm.FormFields
-                .Select(x => x.key)
-                .Where(x => model.Keys.Contains(x) && model[x] != null).ToList();
-
-            var queryText = _dbSqlBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
-            {
-                TableSchema = dataSourceConfig.TableSchema,
-                TableName = dataSourceConfig.TableName,
-                Columns = columns,
-                QueryText = detailConfig.AddingForm.QueryText
-            });
+            var formLayout = detailConfig.AddingForm;
 
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.Open();
+
+                // calculate the computed field values
+                AssignComputedValues(formLayout.FormFields, model, con);
+
+                // filter the columns that have values
+                var columns = formLayout.FormFields
+                    .Select(x => x.key)
+                    .Where(x => model.Keys.Contains(x) && model[x] != null)
+                    .ToList();
+
+                // generate the query text
+                var queryText = _dbSqlBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
+                {
+                    TableSchema = dataSourceConfig.TableSchema,
+                    TableName = dataSourceConfig.TableName,
+                    Columns = columns,
+                    QueryText = formLayout.QueryText
+                });
+
+                // generate the insert command
+                var trans = con.BeginTransaction();
                 var cmd = con.CreateCommand();
                 cmd.Connection = con;
+                cmd.Transaction = trans;
+                cmd.CommandText = queryText;
 
+                // add query parameters
+                foreach (var column in columns)
+                {
+                    var value = model[column].ToString();
+                    var param = cmd.CreateParameter();
+                    param.ParameterName = column;
+                    param.Value = value;
+                    cmd.Parameters.Add(param);
+                }
+
+                // excute command
                 try
                 {
-                    cmd.CommandText = queryText;
-
-                    foreach (var column in columns)
-                    {
-                        var value = model[column].ToString();
-                        var param = cmd.CreateParameter();
-                        param.ParameterName = column;
-                        param.Value = value;
-                        cmd.Parameters.Add(param);
-                    }
-
                     cmd.ExecuteNonQuery();
+                    trans.Commit();
                 }
                 catch (Exception ex)
                 {
+                    trans.Rollback();
+
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -562,48 +582,62 @@ namespace DataEditorPortal.Web.Services
                 updatingForm.QueryText = detailConfig.UpdatingForm.QueryText;
             }
 
-            var columns = updatingForm.FormFields
-                .Select(x => x.key)
-                .Where(x => model.Keys.Contains(x) && model[x] != null).ToList();
-
-            var queryText = _dbSqlBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
-            {
-                TableSchema = dataSourceConfig.TableSchema,
-                TableName = dataSourceConfig.TableName,
-                IdColumn = dataSourceConfig.IdColumn, // this should always has value even user use advanced sql query text.
-                Columns = columns, // this is used to generate set value clause
-                QueryText = updatingForm.QueryText
-            });
+            var formLayout = updatingForm;
 
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.Open();
+
+                // calculate the computed field values
+                AssignComputedValues(formLayout.FormFields, model, con);
+
+                // filter the columns that have values
+                var columns = formLayout.FormFields
+                    .Select(x => x.key)
+                    .Where(x => model.Keys.Contains(x) && model[x] != null)
+                    .ToList();
+
+                // generate the query text
+                var queryText = _dbSqlBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
+                {
+                    TableSchema = dataSourceConfig.TableSchema,
+                    TableName = dataSourceConfig.TableName,
+                    Columns = columns,
+                    QueryText = formLayout.QueryText
+                });
+
+                // generate the update command
+                var trans = con.BeginTransaction();
                 var cmd = con.CreateCommand();
                 cmd.Connection = con;
+                cmd.Transaction = trans;
+                cmd.CommandText = queryText;
 
+                // add query parameters
+                foreach (var column in columns)
+                {
+                    var value = model[column].ToString();
+                    var param = cmd.CreateParameter();
+                    param.ParameterName = column;
+                    param.Value = value;
+                    cmd.Parameters.Add(param);
+                }
+                // always provide Id column parameter
+                var idParam = cmd.CreateParameter();
+                idParam.ParameterName = dataSourceConfig.IdColumn;
+                idParam.Value = id;
+                cmd.Parameters.Add(idParam);
+
+                // excute command
                 try
                 {
-                    cmd.CommandText = queryText;
-
-                    foreach (var column in columns)
-                    {
-                        var value = model[column].ToString();
-                        var param = cmd.CreateParameter();
-                        param.ParameterName = column;
-                        param.Value = value;
-                        cmd.Parameters.Add(param);
-                    }
-
-                    // always provide Id column parameter
-                    var idParam = cmd.CreateParameter();
-                    idParam.ParameterName = dataSourceConfig.IdColumn;
-                    idParam.Value = id;
-                    cmd.Parameters.Add(idParam);
-
                     cmd.ExecuteNonQuery();
+                    trans.Commit();
                 }
                 catch (Exception ex)
                 {
+                    trans.Rollback();
+
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -657,6 +691,77 @@ namespace DataEditorPortal.Web.Services
             }
 
             return true;
+        }
+
+        private void AssignComputedValues(List<FormFieldConfig> formFields, Dictionary<string, object> model, DbConnection con)
+        {
+            var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
+            var currentUser = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
+
+            foreach (var field in formFields)
+            {
+                if (!model.Keys.Contains(field.key) || model[field.key] == null)
+                {
+                    // model value doesn't exist or is null, check if it is computed field
+                    if (field.computedConfig != null)
+                    {
+                        if (!string.IsNullOrEmpty(field.computedConfig.queryText))
+                        {
+                            try
+                            {
+                                var value = GetComputedValueFromDb(con, field.computedConfig.queryText, field.computedConfig.type);
+                                SetModelValue(model, field.key, value);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex.Message, ex);
+                                throw new DepException($"An Error has occurred when calculate computed value for field: {field.key}. Error: {ex.Message}");
+                            }
+                        }
+                        else
+                        {
+                            if (field.computedConfig.name == ComputedValueName.CurrentDateTime)
+                            {
+                                SetModelValue(model, field.key, DateTime.UtcNow);
+                            }
+                            if (field.computedConfig.name == ComputedValueName.CurrentUserGuid)
+                            {
+                                SetModelValue(model, field.key, currentUser.Id);
+                            }
+                            if (field.computedConfig.name == ComputedValueName.CurrentUserName)
+                            {
+                                SetModelValue(model, field.key, currentUser.Username);
+                            }
+                            if (field.computedConfig.name == ComputedValueName.CurrentUserId)
+                            {
+                                SetModelValue(model, field.key, currentUser.UserId);
+                            }
+                            if (field.computedConfig.name == ComputedValueName.CurrentUserEmail)
+                            {
+                                SetModelValue(model, field.key, currentUser.Email);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private object GetComputedValueFromDb(DbConnection con, string commandText, CommandType type = CommandType.Text)
+        {
+            var cmd = con.CreateCommand();
+            cmd.Connection = con;
+            cmd.CommandType = type;
+            cmd.CommandText = commandText;
+
+            var value = cmd.ExecuteScalar();
+            return value == DBNull.Value ? null : value;
+        }
+
+        private void SetModelValue(Dictionary<string, object> model, string key, object value)
+        {
+            if (model.Keys.Contains(key)) model[key] = value;
+            else
+                model.Add(key, value);
         }
 
         #endregion

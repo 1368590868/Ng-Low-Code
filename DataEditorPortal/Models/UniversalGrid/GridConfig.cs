@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Data;
+using System.Text.Json.Serialization;
 
 namespace DataEditorPortal.Web.Models.UniversalGrid
 {
@@ -25,6 +27,22 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string type { get; set; }
         public object defaultValue { get; set; }
         public object props { get; set; }
+        public object validatorConfig { get; set; }
+        public ComputedConfig computedConfig { get; set; }
+    }
+
+    public class ComputedConfig
+    {
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ComputedValueName? name { get; set; }
+        public string queryText { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public CommandType type { get; set; }
+    }
+
+    public enum ComputedValueName
+    {
+        CurrentUserName, CurrentUserId, CurrentUserGuid, CurrentUserEmail, CurrentDateTime
     }
 
     public class SearchFieldConfig : FormFieldConfig
