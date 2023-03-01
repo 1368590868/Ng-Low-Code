@@ -273,6 +273,23 @@ export class FormDesignerConfigComponent {
           }
         }
       ]
+    },
+    {
+      fieldGroup: [
+        {
+          wrappers: ['divider'],
+          props: {
+            label: 'Validator'
+          }
+        },
+        {
+          key: 'validatorConfig',
+          type: 'validatorEditor',
+          props: {
+            label: ''
+          }
+        }
+      ]
     }
   ];
 

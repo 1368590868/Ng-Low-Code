@@ -96,6 +96,11 @@ export class EditRecordActionComponent
               }
             });
 
+          fields
+            .filter(
+              (x: any) => x.validatorConfig && Array.isArray(x.validatorConfig)
+            )
+            .forEach(x => this.ngxFormlyService.initValidators(x));
           this.fields = fields;
           if (fields.length > 0) this.loadedEvent.emit();
         })

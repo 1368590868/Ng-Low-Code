@@ -62,7 +62,9 @@
       </ng-template>
     </p-pickList>
     <div class="config-form p-picklist">
-      <div class="p-picklist-header">Configuration Form</div>
+      <div class="p-picklist-header">
+        <div class="p-picklist-title">Configuration Form</div>
+      </div>
       <div class="p-picklist-list flex-grow-1">
         <form
           *ngIf="this.model && this.model.field; else emptyMessage"

@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { distinctUntilChanged, map, Observable, tap, debounceTime } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
+import { evalExpression, evalStringExpression } from '../utils';
 
 @Injectable({
   providedIn: 'root'
@@ -85,5 +86,33 @@ export class NgxFormlyService {
         )
         .subscribe();
     });
+  }
+
+  initValidators(field: any) {
+    if (Array.isArray(field.validatorConfig)) {
+      const validators: any = { validation: [] };
+      field.validatorConfig.forEach(
+        (x: string | { expression: string; message: string }) => {
+          if (typeof x === 'string') validators.validation.push(x);
+          else if (x.expression && x.message) {
+            validators.customValidation = {
+              expression: (control: AbstractControl, field: any, msg: any) => {
+                const form = control.root as FormGroup;
+                const model = { ...form.value };
+                model[field.key] = control.value;
+                return evalExpression(
+                  evalStringExpression(x.expression, ['form', 'model']),
+                  control,
+                  [form, model]
+                );
+              },
+              message: x.message
+            };
+          }
+        }
+      );
+      field.validators = validators;
+      field.validatorConfig = undefined;
+    }
   }
 }
