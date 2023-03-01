@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Data.Common;
 
 namespace DataEditorPortal.Web
 {
@@ -31,6 +33,8 @@ namespace DataEditorPortal.Web
         {
             #region Dependency Injection
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            #region DbContext and DbConnection
             services.AddTransient<DepDbContextSqlServer>();
             services.AddScoped(sp =>
             {
@@ -54,6 +58,15 @@ namespace DataEditorPortal.Web
                 else
                     throw new NotImplementedException();
             });
+            services.AddTransient<DbConnection>(sp =>
+            {
+                var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
+                if (databaseProvider == "SqlConnection")
+                    return new SqlConnection(Configuration.GetConnectionString("Default"));
+                else
+                    throw new NotImplementedException();
+            });
+            #endregion
 
             services.AddScoped<DbSqlServerBuilder>();
             services.AddScoped<IDbSqlBuilder>(sp =>

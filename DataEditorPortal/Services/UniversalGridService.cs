@@ -5,10 +5,12 @@ using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -34,18 +36,20 @@ namespace DataEditorPortal.Web.Services
 
     public class UniversalGridService : IUniversalGridService
     {
-
+        private readonly IServiceProvider _serviceProvider;
         private readonly DepDbContext _depDbContext;
         private readonly IDbSqlBuilder _dbSqlBuilder;
         private readonly ILogger<UniversalGridService> _logger;
         private readonly IMapper _mapper;
 
         public UniversalGridService(
+            IServiceProvider serviceProvider,
             DepDbContext depDbContext,
             IDbSqlBuilder dbSqlBuilder,
             ILogger<UniversalGridService> logger,
             IMapper mapper)
         {
+            _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
             _dbSqlBuilder = dbSqlBuilder;
             _logger = logger;
@@ -120,8 +124,9 @@ namespace DataEditorPortal.Web.Services
                 dataSourceConfig.Columns = new List<string>() { columnConfig.field };
                 var query = _dbSqlBuilder.GenerateSqlTextForColumnFilterOption(dataSourceConfig);
 
-                using (var con = _depDbContext.Database.GetDbConnection())
+                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                 {
+                    //con.ConnectionString = ""
                     con.Open();
                     var cmd = con.CreateCommand();
                     cmd.Connection = con;
@@ -209,7 +214,7 @@ namespace DataEditorPortal.Web.Services
 
             // run sql query text
             var output = new GridData();
-            using (var con = _depDbContext.Database.GetDbConnection())
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.Open();
                 var cmd = con.CreateCommand();
@@ -362,7 +367,7 @@ namespace DataEditorPortal.Web.Services
             var queryText = _dbSqlBuilder.GenerateSqlTextForDetail(dataSourceConfig);
 
             var result = new Dictionary<string, dynamic>();
-            using (var con = _depDbContext.Database.GetDbConnection())
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.Open();
                 var cmd = con.CreateCommand();
@@ -492,7 +497,7 @@ namespace DataEditorPortal.Web.Services
                 QueryText = detailConfig.AddingForm.QueryText
             });
 
-            using (var con = _depDbContext.Database.GetDbConnection())
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.Open();
                 var cmd = con.CreateCommand();
@@ -568,7 +573,7 @@ namespace DataEditorPortal.Web.Services
                 QueryText = updatingForm.QueryText
             });
 
-            using (var con = _depDbContext.Database.GetDbConnection())
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.Open();
                 var cmd = con.CreateCommand();
@@ -631,7 +636,7 @@ namespace DataEditorPortal.Web.Services
                 //QueryText = detailConfig.QueryForDelete
             });
 
-            using (var con = _depDbContext.Database.GetDbConnection())
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.Open();
                 var cmd = con.CreateCommand();

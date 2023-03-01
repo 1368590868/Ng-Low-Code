@@ -7,7 +7,7 @@ using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.PortalItem;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -44,6 +44,7 @@ namespace DataEditorPortal.Web.Services
 
     public class PortalItemService : IPortalItemService
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly DepDbContext _depDbContext;
         private readonly IDbSqlBuilder _dbSqlBuilder;
         private readonly ILogger<PortalItemService> _logger;
@@ -51,12 +52,14 @@ namespace DataEditorPortal.Web.Services
         private IHttpContextAccessor _httpContextAccessor;
 
         public PortalItemService(
+            IServiceProvider serviceProvider,
             DepDbContext depDbContext,
             IDbSqlBuilder dbSqlBuilder,
             ILogger<PortalItemService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor)
         {
+            _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
             _dbSqlBuilder = dbSqlBuilder;
             _logger = logger;
@@ -186,7 +189,7 @@ namespace DataEditorPortal.Web.Services
         {
             var result = new List<DataSourceTable>();
 
-            using (var con = _depDbContext.Database.GetDbConnection())
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.Open();
                 var cmd = con.CreateCommand();
@@ -222,31 +225,33 @@ namespace DataEditorPortal.Web.Services
         {
             var result = new List<DataSourceTableColumn>();
 
-            var con = _depDbContext.Database.GetDbConnection();
-            con.Open();
-            var cmd = con.CreateCommand();
-            cmd.Connection = con;
-            cmd.CommandText = sqlText;
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+            {
+                con.Open();
+                var cmd = con.CreateCommand();
+                cmd.Connection = con;
+                cmd.CommandText = sqlText;
 
-            try
-            {
-                using (var dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly))
+                try
                 {
-                    var schema = dr.GetColumnSchema();
-                    result = schema.Select(x =>
+                    using (var dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly))
                     {
-                        return _mapper.Map<DataSourceTableColumn>(x);
-                    }).ToList();
+                        var schema = dr.GetColumnSchema();
+                        result = schema.Select(x =>
+                        {
+                            return _mapper.Map<DataSourceTableColumn>(x);
+                        }).ToList();
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message, ex);
-                throw new DepException("An Error in the query has occurred: " + ex.Message);
-            }
-            finally
-            {
-                con.Close();
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, ex);
+                    throw new DepException("An Error in the query has occurred: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
             }
 
             return result;
