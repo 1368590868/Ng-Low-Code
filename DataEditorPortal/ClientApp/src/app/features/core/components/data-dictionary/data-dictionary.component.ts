@@ -6,6 +6,7 @@ import {
   NotifyService,
   DataDictionaryService
 } from 'src/app/shared';
+import { PaginationEvent } from 'src/app/shared/models/system-log';
 import { AddDictionaryDialogComponent } from './add-dictionary-dialog/add-dictionary-dialog.component';
 
 @Component({
@@ -17,6 +18,11 @@ import { AddDictionaryDialogComponent } from './add-dictionary-dialog/add-dictio
 export class DataDictionaryComponent implements OnInit {
   @ViewChild('addDialog') addDialog!: AddDictionaryDialogComponent;
   public data: DictionaryData[] = [];
+
+  totalRecords = 0;
+  first = 0;
+  rows = 10;
+  rowsPerPageOptions: number[] = [10, 20, 50];
   contextMenuItems: MenuItem[] = [
     {
       label: 'Edit',
@@ -38,9 +44,16 @@ export class DataDictionaryComponent implements OnInit {
     this.getDictionaryList();
   }
 
+  onPageChange(event: PaginationEvent) {
+    const { first, rows } = event;
+    this.first = first;
+    this.rows = rows;
+  }
+
   getDictionaryList() {
     this.dataDictionaryService.getDictionaryList().subscribe(res => {
       this.data = res;
+      this.totalRecords = res.length;
     });
   }
 
