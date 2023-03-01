@@ -51,6 +51,7 @@ export class DataDictionaryComponent implements OnInit {
 
   onNewOpen() {
     this.addDialog.header = 'Add Dictionary';
+    this.addDialog.model = {};
     this.addDialog.showDialog();
   }
 
