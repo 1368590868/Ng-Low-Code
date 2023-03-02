@@ -54,11 +54,19 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
       expressionFormControl: new FormControl('', { updateOn: 'blur' }),
       messageFormControl: new FormControl('', { updateOn: 'blur' })
     });
+    this.selectOptions = this.extractNameAndLabel(this.formlyConfig.validators);
+  }
 
-    const validators = this.formlyConfig.validators;
-    Object.keys(validators).forEach((key: string) => {
-      this.selectOptions.push({ label: key, value: key });
-    });
+  extractNameAndLabel(obj: any) {
+    const data = [];
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const value = obj[key].name;
+        const label = obj[key].options.label;
+        data.push({ label, value });
+      }
+    }
+    return data;
   }
 
   initForm(val: any) {

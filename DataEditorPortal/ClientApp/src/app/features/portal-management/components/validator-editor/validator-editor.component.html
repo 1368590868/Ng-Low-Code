@@ -1,6 +1,7 @@
 <form [formGroup]="form">
   <div class="flex align-items-center">
     <p-multiSelect
+      #select
       formControlName="validatorFormControl"
       class="mr-2 flex-grow-1"
       styleClass="w-full"
@@ -9,7 +10,24 @@
       [showHeader]="false"
       [filter]="false"
       display="chip"
-      [options]="selectOptions"></p-multiSelect>
+      [options]="selectOptions">
+      <ng-template let-value pTemplate="selectedItems">
+        <div
+          *ngFor="let item of value; let i = index"
+          class="p-multiselect-token">
+          <span class="p-multiselect-token-label">{{
+            select.findLabelByValue(item)
+          }}</span>
+          <span
+            *ngIf="!select.disabled"
+            class="p-multiselect-token-icon pi pi-times-circle"
+            (click)="select.removeChip(item, $event)"></span>
+        </div>
+        <ng-container *ngIf="!value || value.length === 0">{{
+          select.placeholder || select.defaultLabel || 'empty'
+        }}</ng-container>
+      </ng-template>
+    </p-multiSelect>
 
     <p-button
       class="ml-auto"
