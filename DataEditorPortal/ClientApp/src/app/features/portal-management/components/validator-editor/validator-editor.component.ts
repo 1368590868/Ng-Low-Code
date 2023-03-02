@@ -43,6 +43,9 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   onChange!: any;
   onTouch!: any;
 
+  advanceData: any = [];
+  hasAdvanceData = false;
+
   @Input()
   set value(val: any) {
     this.initForm(val ?? []);
@@ -54,11 +57,19 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
       expressionFormControl: new FormControl('', { updateOn: 'blur' }),
       messageFormControl: new FormControl('', { updateOn: 'blur' })
     });
+    this.selectOptions = this.extractNameAndLabel(this.formlyConfig.validators);
+  }
 
-    const validators = this.formlyConfig.validators;
-    Object.keys(validators).forEach((key: string) => {
-      this.selectOptions.push({ label: key, value: key });
-    });
+  extractNameAndLabel(obj: any) {
+    const data = [];
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const value = obj[key].name;
+        const label = obj[key].options.label;
+        data.push({ label, value });
+      }
+    }
+    return data;
   }
 
   initForm(val: any) {
@@ -99,22 +110,53 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   onOk() {
+    this.advanceData.forEach((item: any) => {
+      if (item?.expression || item?.message) {
+        this.hasAdvanceData = true;
+      }
+    });
     this.onSendData();
     this.visible = false;
   }
 
   onSendData() {
-    this.onChange?.([
+    const data = [
       ...this.form.get('validatorFormControl')!.value,
       {
         expression: this.form.get('expressionFormControl')?.value,
         message: this.form.get('messageFormControl')?.value
       }
-    ]);
+    ];
+    data.forEach((item: any, index: number) => {
+      if (typeof item === 'object') {
+        Object.keys(item).forEach((key: string) => {
+          if (!item[key]) {
+            delete data[index][key];
+          }
+        });
+        if (Object.keys(item).length === 0) {
+          data.splice(index, 1);
+        }
+      }
+    });
+    this.advanceData = data;
+    this.onChange?.(data);
   }
 
   onCancel() {
     this.visible = false;
+  }
+
+  removeAdvance() {
+    this.advanceData.forEach((item: any, index: number) => {
+      if (typeof item === 'object') {
+        if (Object.keys(item).length > 0) {
+          this.advanceData.splice(index, 1);
+        }
+      }
+    });
+    this.onChange?.(this.advanceData);
+    this.hasAdvanceData = false;
   }
 }
 
