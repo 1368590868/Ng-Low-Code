@@ -85,6 +85,11 @@ formly-form {
   }
 }
 
+.p-inputwrapper-filled .p-multiselect.p-multiselect-chip .p-multiselect-label {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .monaco-editor-wrapper {
   background-color: #eeeeee;
   border: 1px solid #ced4da;
