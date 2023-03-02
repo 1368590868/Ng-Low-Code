@@ -23,9 +23,21 @@
             class="p-multiselect-token-icon pi pi-times-circle"
             (click)="select.removeChip(item, $event)"></span>
         </div>
-        <ng-container *ngIf="!value || value.length === 0">{{
-          select.placeholder || select.defaultLabel || 'empty'
-        }}</ng-container>
+        <ng-container *ngIf="hasAdvanceData">
+          <div class="p-multiselect-token">
+            <span class="p-multiselect-token-label">Advanced</span>
+            <span
+              class="p-multiselect-token-icon pi pi-times-circle"
+              (click)="removeAdvance()"></span>
+          </div>
+        </ng-container>
+        <ng-container
+          #empty
+          *ngIf="(!value || value.length === 0) && !hasAdvanceData"
+          >{{
+            select.placeholder || select.defaultLabel || 'empty'
+          }}</ng-container
+        >
       </ng-template>
     </p-multiSelect>
 

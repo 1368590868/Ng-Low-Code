@@ -43,6 +43,9 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   onChange!: any;
   onTouch!: any;
 
+  advanceData: any = [];
+  hasAdvanceData = false;
+
   @Input()
   set value(val: any) {
     this.initForm(val ?? []);
@@ -107,6 +110,11 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   onOk() {
+    this.advanceData.forEach((item: any) => {
+      if (item?.expression || item?.message) {
+        this.hasAdvanceData = true;
+      }
+    });
     this.onSendData();
     this.visible = false;
   }
@@ -131,11 +139,24 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
         }
       }
     });
+    this.advanceData = data;
     this.onChange?.(data);
   }
 
   onCancel() {
     this.visible = false;
+  }
+
+  removeAdvance() {
+    this.advanceData.forEach((item: any, index: number) => {
+      if (typeof item === 'object') {
+        if (Object.keys(item).length > 0) {
+          this.advanceData.splice(index, 1);
+        }
+      }
+    });
+    this.onChange?.(this.advanceData);
+    this.hasAdvanceData = false;
   }
 }
 
