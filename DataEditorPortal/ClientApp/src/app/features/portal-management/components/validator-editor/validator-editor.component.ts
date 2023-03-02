@@ -73,19 +73,22 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   initForm(val: any) {
-    const selected: never[] = [];
+    const selected: any[] = [];
 
-    val.map((item: never) => {
+    val.map((item: any) => {
       if (typeof item === 'string') {
         selected.push(item);
       } else {
         this.expressions = item;
+        if (item?.expression?.trim() || item?.message?.trim()) {
+          this.hasAdvanceData = true;
+        }
       }
     });
     this.form.setValue({
       validatorFormControl: selected,
-      expressionFormControl: this.expressions.expression,
-      messageFormControl: this.expressions.message
+      expressionFormControl: this.expressions?.expression ?? '',
+      messageFormControl: this.expressions?.message ?? ''
     });
   }
 
@@ -111,8 +114,10 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
 
   onOk() {
     this.advanceData.forEach((item: any) => {
-      if (item?.expression || item?.message) {
+      if (item?.expression?.trim() || item?.message?.trim()) {
         this.hasAdvanceData = true;
+      } else {
+        this.hasAdvanceData = false;
       }
     });
     this.onSendData();
@@ -155,6 +160,8 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
         }
       }
     });
+    this.form.get('expressionFormControl')?.setValue('');
+    this.form.get('messageFormControl')?.setValue('');
     this.onChange?.(this.advanceData);
     this.hasAdvanceData = false;
   }
