@@ -160,6 +160,8 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
         }
       }
     });
+    this.form.get('expressionFormControl')?.setValue('');
+    this.form.get('messageFormControl')?.setValue('');
     this.onChange?.(this.advanceData);
     this.hasAdvanceData = false;
   }
