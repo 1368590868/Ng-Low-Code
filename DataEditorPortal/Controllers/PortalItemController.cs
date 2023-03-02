@@ -8,10 +8,13 @@ using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 
 namespace DataEditorPortal.Web.Controllers
@@ -27,6 +30,7 @@ namespace DataEditorPortal.Web.Controllers
         private readonly IMapper _mapper;
         private readonly IPortalItemService _portalItemService;
         private readonly IDbSqlBuilder _dbSqlBuilder;
+        private readonly IServiceProvider _serviceProvider;
 
         public PortalItemController(
             ILogger<PortalItemController> logger,
@@ -34,7 +38,8 @@ namespace DataEditorPortal.Web.Controllers
             IConfiguration config,
             IMapper mapper,
             IPortalItemService portalItemService,
-            IDbSqlBuilder dbSqlBuilder)
+            IDbSqlBuilder dbSqlBuilder,
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
             _depDbContext = depDbContext;
@@ -42,6 +47,7 @@ namespace DataEditorPortal.Web.Controllers
             _mapper = mapper;
             _portalItemService = portalItemService;
             _dbSqlBuilder = dbSqlBuilder;
+            _serviceProvider = serviceProvider;
         }
 
         [HttpGet]
@@ -336,34 +342,123 @@ namespace DataEditorPortal.Web.Controllers
 
         #region Datasource configuration
 
-        [HttpGet]
-        [Route("datasource/tables")]
-        public List<DataSourceTable> GetDataSourceTables()
-        {
-            return _portalItemService.GetDataSourceTables();
-        }
+        #region datasource connection crud
 
         [HttpGet]
-        [Route("datasource/{schema}/{tableName}/columns")]
-        public List<DataSourceTableColumn> GetDataSourceTableColumns(string schema, string tableName)
+        [Route("datasource/connections/list")]
+        public List<DataSourceConnection> GetDataSourceConnectionList()
         {
-            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(new DataSourceConfig() { TableName = tableName, TableSchema = schema });
-            return _portalItemService.GetDataSourceTableColumns(sqlText);
+            return _depDbContext.DataSourceConnections
+                .Include(x => x.UniversalGridConfigurations)
+                .Select(x => new DataSourceConnection()
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ConnectionString = x.ConnectionString,
+                    UsedCount = x.UniversalGridConfigurations.Count()
+                })
+                .ToList();
         }
 
         [HttpPost]
-        [Route("datasource/query/columns")]
-        public List<DataSourceTableColumn> GetDataSourceQueryColumns(DataSourceConfig queryText)
+        [Route("datasource/connections/create")]
+        public Guid CreateDataSourceConnection([FromBody] DataSourceConnection model)
         {
-            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(queryText);
-            return _portalItemService.GetDataSourceTableColumns(sqlText);
+            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.ConnectionString))
+                throw new ArgumentNullException();
+
+            try
+            {
+                // try to connect to database to validate if the connection string is valid.
+                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                {
+                    con.ConnectionString = model.ConnectionString;
+                    con.Open();
+                    con.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                throw new DepException(ex.Message);
+            }
+
+            _depDbContext.DataSourceConnections.Add(model);
+            _depDbContext.SaveChanges();
+
+            return model.Id;
+        }
+
+        [HttpPut]
+        [Route("datasource/connections/{id}/update")]
+        public Guid UpdateDataSourceConnection(Guid id, [FromBody] DataSourceConnection model)
+        {
+            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.ConnectionString))
+                throw new ArgumentNullException();
+
+            var dsc = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Id == id);
+            if (dsc == null)
+                throw new ApiException("Not Found", 404);
+            try
+            {
+                // try to connect to database to validate if the connection string is valid.
+                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                {
+                    con.ConnectionString = model.ConnectionString;
+                    con.Open();
+                    con.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                throw new DepException(ex.Message);
+            }
+
+            dsc.Name = model.Name;
+            dsc.ConnectionString = model.ConnectionString;
+            _depDbContext.SaveChanges();
+
+            return model.Id;
+        }
+
+        #endregion
+
+        [HttpGet]
+        [Route("datasource/connections")]
+        public List<DataSourceConnection> GetDataSourceConnections()
+        {
+            return _depDbContext.DataSourceConnections.Select(x => new DataSourceConnection() { Name = x.Name, Id = x.Id }).ToList();
+        }
+
+        [HttpGet]
+        [Route("datasource/{connectionId}/tables")]
+        public List<DataSourceTable> GetDataSourceTables(Guid connectionId)
+        {
+            return _portalItemService.GetDataSourceTables(connectionId);
+        }
+
+        [HttpGet]
+        [Route("datasource/{connectionId}/table-columns")]
+        public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid connectionId, [FromQuery] string schema, [FromQuery] string tableName)
+        {
+            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(new DataSourceConfig() { TableName = tableName, TableSchema = schema });
+            return _portalItemService.GetDataSourceTableColumns(connectionId, sqlText);
+        }
+
+        [HttpPost]
+        [Route("datasource/{connectionId}/query-columns")]
+        public List<DataSourceTableColumn> GetDataSourceQueryColumns(Guid connectionId, DataSourceConfig dsConfig)
+        {
+            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(dsConfig);
+            return _portalItemService.GetDataSourceTableColumns(connectionId, sqlText);
         }
 
         [HttpGet]
         [Route("{id}/datasource/columns")]
-        public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid id)
+        public List<DataSourceTableColumn> GetDataSourceTableColumnsByPortalId(Guid id)
         {
-            return _portalItemService.GetDataSourceTableColumns(id);
+            return _portalItemService.GetDataSourceTableColumnsByPortalId(id);
         }
 
         [HttpGet]
@@ -377,10 +472,6 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{id}/datasource")]
         public bool SaveDataSourceConfig(Guid id, DataSourceConfig model)
         {
-            // validate the data source
-            var queryText = _dbSqlBuilder.GetSqlTextForDatabaseSource(model);
-            _portalItemService.GetDataSourceTableColumns(queryText);
-
             return _portalItemService.SaveDataSourceConfig(id, model);
         }
 

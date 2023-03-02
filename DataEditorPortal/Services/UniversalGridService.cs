@@ -115,7 +115,7 @@ namespace DataEditorPortal.Web.Services
 
         public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
@@ -130,14 +130,15 @@ namespace DataEditorPortal.Web.Services
 
                 using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                 {
-                    //con.ConnectionString = ""
-                    con.Open();
+                    con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
                     var cmd = con.CreateCommand();
                     cmd.Connection = con;
+                    cmd.CommandText = query;
 
                     try
                     {
-                        cmd.CommandText = query;
+                        con.Open();
                         using (var dr = cmd.ExecuteReader())
                         {
                             while (dr.Read())
@@ -151,6 +152,10 @@ namespace DataEditorPortal.Web.Services
                     {
                         throw new DepException("An Error in the query has occurred: " + ex.Message);
                     }
+                    finally
+                    {
+                        con.Close();
+                    }
                 }
 
             }
@@ -163,7 +168,7 @@ namespace DataEditorPortal.Web.Services
 
         public GridData GetGridData(string name, GridParam param)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             #region compose the query text
@@ -222,13 +227,15 @@ namespace DataEditorPortal.Web.Services
             var output = new GridData();
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
-                con.Open();
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
                 var cmd = con.CreateCommand();
                 cmd.Connection = con;
+                cmd.CommandText = queryText;
 
                 try
                 {
-                    cmd.CommandText = queryText;
+                    con.Open();
                     using (var dr = cmd.ExecuteReader())
                     {
                         var fields = dr.FieldCount;
@@ -265,6 +272,10 @@ namespace DataEditorPortal.Web.Services
                 catch (Exception ex)
                 {
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
                 }
             }
 
@@ -365,7 +376,7 @@ namespace DataEditorPortal.Web.Services
 
         public Dictionary<string, dynamic> GetGridDataDetail(string name, string id)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
@@ -375,6 +386,8 @@ namespace DataEditorPortal.Web.Services
             var result = new Dictionary<string, dynamic>();
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
                 con.Open();
                 var cmd = con.CreateCommand();
                 cmd.Connection = con;
@@ -470,7 +483,7 @@ namespace DataEditorPortal.Web.Services
 
         public bool AddGridData(string name, Dictionary<string, object> model)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
@@ -495,6 +508,8 @@ namespace DataEditorPortal.Web.Services
 
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
                 con.Open();
 
                 // calculate the computed field values
@@ -552,7 +567,7 @@ namespace DataEditorPortal.Web.Services
 
         public bool UpdateGridData(string name, string id, Dictionary<string, object> model)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
@@ -586,6 +601,8 @@ namespace DataEditorPortal.Web.Services
 
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
                 con.Open();
 
                 // calculate the computed field values
@@ -648,7 +665,7 @@ namespace DataEditorPortal.Web.Services
 
         public bool DeleteGridData(string name, string[] ids)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
@@ -674,6 +691,8 @@ namespace DataEditorPortal.Web.Services
 
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
                 con.Open();
                 var cmd = con.CreateCommand();
                 cmd.Connection = con;

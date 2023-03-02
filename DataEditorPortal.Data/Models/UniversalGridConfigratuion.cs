@@ -25,5 +25,8 @@ namespace DataEditorPortal.Data.Models
 
         public Guid CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
+
+        public Guid? DataSourceConnectionId { get; set; }
+        public virtual DataSourceConnection DataSourceConnection { get; set; }
     }
 }

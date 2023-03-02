@@ -27,9 +27,9 @@ namespace DataEditorPortal.Web.Services
         bool ExistName(string name, Guid? id);
         Guid Create(PortalItemData model);
         Guid Update(Guid id, PortalItemData model);
-        List<DataSourceTable> GetDataSourceTables();
-        List<DataSourceTableColumn> GetDataSourceTableColumns(string sqlText);
-        List<DataSourceTableColumn> GetDataSourceTableColumns(Guid id);
+        List<DataSourceTable> GetDataSourceTables(Guid connectionId);
+        List<DataSourceTableColumn> GetDataSourceTableColumns(Guid connectionId, string sqlText);
+        List<DataSourceTableColumn> GetDataSourceTableColumnsByPortalId(Guid id);
         DataSourceConfig GetDataSourceConfig(Guid id);
         bool SaveDataSourceConfig(Guid id, DataSourceConfig model);
         List<GridColConfig> GetGridColumnsConfig(Guid id);
@@ -185,20 +185,23 @@ namespace DataEditorPortal.Web.Services
             return siteMenu.Id;
         }
 
-        public List<DataSourceTable> GetDataSourceTables()
+        public List<DataSourceTable> GetDataSourceTables(Guid connectionId)
         {
             var result = new List<DataSourceTable>();
 
+            var dsConnection = _depDbContext.DataSourceConnections.Find(connectionId);
+
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
-                con.Open();
+                con.ConnectionString = dsConnection.ConnectionString;
+
                 var cmd = con.CreateCommand();
                 cmd.Connection = con;
-
                 cmd.CommandText = _dbSqlBuilder.GetSqlTextForDatabaseTables();
 
                 try
                 {
+                    con.Open();
                     using (var dr = cmd.ExecuteReader())
                     {
                         while (dr.Read())
@@ -216,24 +219,32 @@ namespace DataEditorPortal.Web.Services
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
+                finally
+                {
+                    con.Close();
+                }
             }
 
             return result;
         }
 
-        public List<DataSourceTableColumn> GetDataSourceTableColumns(string sqlText)
+        public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid connectionId, string sqlText)
         {
             var result = new List<DataSourceTableColumn>();
 
+            var dsConnection = _depDbContext.DataSourceConnections.Find(connectionId);
+
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
-                con.Open();
+                con.ConnectionString = dsConnection.ConnectionString;
+
                 var cmd = con.CreateCommand();
                 cmd.Connection = con;
                 cmd.CommandText = sqlText;
 
                 try
                 {
+                    con.Open();
                     using (var dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly))
                     {
                         var schema = dr.GetColumnSchema();
@@ -257,15 +268,15 @@ namespace DataEditorPortal.Web.Services
             return result;
         }
 
-        public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid id)
+        public List<DataSourceTableColumn> GetDataSourceTableColumnsByPortalId(Guid id)
         {
             var datasourceConfig = GetDataSourceConfig(id);
             if (datasourceConfig == null)
                 throw new DepException("DataSource Config is empty for Portal Item: " + id);
 
-            return GetDataSourceTableColumns(_dbSqlBuilder.GetSqlTextForDatabaseSource(datasourceConfig));
+            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(datasourceConfig);
+            return GetDataSourceTableColumns(datasourceConfig.DataSourceConnectionId, sqlText);
         }
-
 
         public DataSourceConfig GetDataSourceConfig(Guid id)
         {
@@ -295,7 +306,9 @@ namespace DataEditorPortal.Web.Services
             if (!string.IsNullOrEmpty(config.DataSourceConfig))
             {
                 var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-                if (dataSourceConfig.TableSchema != model.TableSchema || dataSourceConfig.TableName != model.TableName)
+                if (dataSourceConfig.DataSourceConnectionId != model.DataSourceConnectionId ||
+                    dataSourceConfig.TableSchema != model.TableSchema || dataSourceConfig.TableName != model.TableName ||
+                    dataSourceConfig.QueryText != dataSourceConfig.QueryText)
                 {
                     // data table changed, need  to clear columns, search and form configurations
                     config.ColumnsConfig = null;
@@ -306,6 +319,7 @@ namespace DataEditorPortal.Web.Services
             }
 
             config.DataSourceConfig = JsonSerializer.Serialize(model);
+            config.DataSourceConnectionId = model.DataSourceConnectionId;
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
 
             _depDbContext.SaveChanges();
@@ -331,7 +345,8 @@ namespace DataEditorPortal.Web.Services
             else
             {
                 var datasourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-                var columns = GetDataSourceTableColumns(_dbSqlBuilder.GetSqlTextForDatabaseSource(datasourceConfig));
+                var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(datasourceConfig);
+                var columns = GetDataSourceTableColumns(datasourceConfig.DataSourceConnectionId, sqlText);
                 return columns.Select(x => new GridColConfig()
                 {
                     field = x.ColumnName,

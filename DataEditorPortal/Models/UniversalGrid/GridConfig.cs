@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Text.Json.Serialization;
 
@@ -79,6 +80,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class DataSourceConfig
     {
+        public Guid DataSourceConnectionId { get; set; }
         public string TableName { get; set; }
         public string TableSchema { get; set; }
         public string IdColumn { get; set; }
