@@ -5,11 +5,30 @@
   </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
   <div class="w-6 pt-3">
-    <div class="w-6 flex flex-column">
-      <div class="flex flex-column mb-3">
-        <label *ngIf="!datasourceConfig.queryText" for="tableName" class="mb-1"
-          >Database Table *</label
-        >
+    <div class="flex flex-column mb-3">
+      <label for="" class="mb-1">Database Connection</label>
+      <div class="flex align-items-center">
+        <p-dropdown
+          [required]="true"
+          [options]="dbConnections"
+          (onChange)="onConnectionChange($event)"
+          [formControl]="formControlConnection"
+          placeholder="Please Select"
+          [style]="{ minWidth: '20rem' }"
+          appendTo="body"></p-dropdown>
+        <p-button
+          class="ml-1"
+          pTooltip="Advanced Configuration"
+          styleClass="p-button-text p-button-rounded"
+          icon="pi pi-ellipsis-v"
+          (onClick)="dbConnectionDialog.showDialog()"></p-button>
+      </div>
+      <app-db-connection-dialog #dbConnectionDialog></app-db-connection-dialog>
+    </div>
+    <div class="flex flex-column mb-3">
+      <ng-container *ngIf="!datasourceConfig.queryText">
+        <label for="tableName" class="mb-1">Database Table</label>
+
         <div class="flex align-items-center">
           <p-dropdown
             *ngIf="!datasourceConfig.queryText"
@@ -20,33 +39,37 @@
             placeholder="Please Select"
             [style]="{ minWidth: '20rem' }"
             appendTo="body"></p-dropdown>
-          <div
-            style="cursor: pointer"
-            (click)="advancedQueryDialog.showAdvanceDialog()">
-            <p-message
-              *ngIf="datasourceConfig.queryText"
-              severity="info"
-              text="Customized Query Text"
-              styleClass="mr-2"></p-message>
-          </div>
           <p-button
-            *ngIf="datasourceConfig.queryText"
-            styleClass="p-button-text p-button-rounded p-button-lg"
-            icon="pi pi-times-circle"
-            (onClick)="removeAdvancedQuery()"></p-button>
-          <p-button
-            *ngIf="!datasourceConfig.queryText"
-            class="ml-2"
+            class="ml-1"
             pTooltip="Advanced Configuration"
             styleClass="p-button-text p-button-rounded"
             icon="pi pi-ellipsis-v"
             (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button>
         </div>
-      </div>
+      </ng-container>
+      <ng-container *ngIf="datasourceConfig.queryText">
+        <label class="mb-1">Database Query</label>
+        <div class="flex align-items-center">
+          <div (click)="advancedQueryDialog.showAdvanceDialog()">
+            <ngx-monaco-editor
+              [ngModel]="datasourceConfig.queryText"
+              [style]="{ minWidth: '40rem' }"
+              class="pt-3 border-round monaco-editor-wrapper display-only overflow-hidden"
+              [options]="{
+                readOnly: true,
+                domReadOnly: true
+              }"></ngx-monaco-editor>
+          </div>
+          <p-button
+            styleClass="p-button-text p-button-rounded ml-2"
+            icon="pi pi-times-circle"
+            (onClick)="removeAdvancedQuery()"></p-button>
+        </div>
+      </ng-container>
     </div>
     <div class="flex align-items-center">
       <div class="flex flex-column mb-2 mr-4">
-        <label for="idColumn" class="mb-1">Id Column *</label>
+        <label for="idColumn" class="mb-1">Id Column</label>
         <div class="flex align-items-center">
           <p-dropdown
             [required]="true"
@@ -57,9 +80,6 @@
             optionLabel="columnName"
             optionValue="columnName"
             appendTo="body"></p-dropdown>
-          <i
-            class="pi pi-question-circle ml-3 text-lg"
-            pTooltip="Id Column will be used as the key in the grid"></i>
         </div>
       </div>
       <div class="flex flex-column mb-2">

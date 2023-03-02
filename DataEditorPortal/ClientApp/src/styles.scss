@@ -104,3 +104,13 @@ formly-form {
     border-color: var(--primary-color);
   }
 }
+
+.p-tooltip {
+  max-width: 20rem;
+}
+
+.p-button-icon-only {
+  .pi.p-button-icon {
+    font-size: 1.25rem;
+  }
+}

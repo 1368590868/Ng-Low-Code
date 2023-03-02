@@ -42,6 +42,7 @@ export class PortalEditDatasourceComponent implements OnInit {
     sortBy: []
   };
 
+  dbConnections: { label: string; value: string }[] = [];
   dbTables: DataSourceTable[] = [];
   dbTableColumns: DataSourceTableColumn[] = [];
   dbOrderOptions: { label: string; value: string }[] = [
@@ -59,6 +60,7 @@ export class PortalEditDatasourceComponent implements OnInit {
   sortBy: DataSourceSortBy[] = [];
   pageSize = 100;
 
+  formControlConnection: FormControl = new FormControl();
   formControlDbTable: FormControl = new FormControl();
   formControlIdColumn: FormControl = new FormControl();
 
@@ -166,6 +168,17 @@ export class PortalEditDatasourceComponent implements OnInit {
     this.sortBy = [];
   }
   //* advanced query dialog */
+
+  onConnectionChange({ value }: { value: string }) {
+    const item = this.dbConnections.find(x => x.value === value);
+    if (item) {
+      this.loadTableColumns();
+
+      // clear the filters and sortBy, as the database connection has changed.
+      this.filters = [];
+      this.sortBy = [];
+    }
+  }
 
   onTableNameChange({ value }: { value: string }) {
     const item = this.dbTables.find(x => x.value === value);

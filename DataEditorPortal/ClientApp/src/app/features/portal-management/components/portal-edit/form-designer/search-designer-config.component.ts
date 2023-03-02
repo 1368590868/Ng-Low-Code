@@ -55,6 +55,11 @@ export class SearchDesignerConfigComponent
     // remove default value
     const defaultValue = this.fields.find(x => x.key === 'defaultValue');
     if (defaultValue) defaultValue.hide = true;
+    // remove validator
+    const validatorIndex = this.fields.findIndex(
+      x => x.fieldGroup && x.fieldGroup.find(f => f.key === 'validatorConfig')
+    );
+    if (validatorIndex) this.fields.splice(validatorIndex, 1);
 
     // add search rule editor.
     this.fields.push({
