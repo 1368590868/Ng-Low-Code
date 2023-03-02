@@ -1,5 +1,5 @@
 <p-dialog
-  header="Database Connection Configuration"
+  header="Create Database Connection"
   [(visible)]="visible"
   [style]="{ minWidth: '40rem' }"
   [modal]="true"
@@ -9,7 +9,7 @@
   <div #container class="dialog-content">
     <div class="flex flex-column mb-3">
       <label class="line-height-3 flex align-items-center"> Name </label>
-      <input pInputText />
+      <input pInputText [formControl]="formControlName" required />
     </div>
     <div class="flex flex-column">
       <label class="line-height-3 flex align-items-center mb-1">
@@ -30,6 +30,10 @@
       (onClick)="onCancel()"
       label="Cancle"
       styleClass="p-button-text"></p-button>
-    <p-button icon="pi pi-check" (onClick)="onDialogOk()" label="Ok"></p-button>
+    <p-button
+      icon="pi pi-check"
+      (onClick)="onDialogOk()"
+      [loading]="loading"
+      label="Create"></p-button>
   </ng-template>
 </p-dialog>

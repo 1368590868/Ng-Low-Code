@@ -15,11 +15,13 @@ export interface AdvancedQueryModel {
   styleUrls: ['./advanced-query-dialog.component.scss']
 })
 export class AdvancedQueryDialogComponent {
+  @Input() connectionId = '';
   @Input() queryText?: string;
   @Output() queryChange = new EventEmitter<AdvancedQueryModel>();
 
   formControlQuery: FormControl = new FormControl();
 
+  loading = false;
   advanceDialogVisible = false;
   helperMessage =
     '-- Enter the query text for fetching the data. \r\n\r\n' +
@@ -61,8 +63,12 @@ export class AdvancedQueryDialogComponent {
     ) {
       if (this.formControlQuery.value != this.queryText) {
         // validate if the query can be run against database succesfully
+        this.loading = true;
         this.portalItemService
-          .getDataSourceTableColumnsByQuery(this.formControlQuery.value)
+          .getDataSourceTableColumnsByQuery(
+            this.connectionId,
+            this.formControlQuery.value
+          )
           .subscribe(res => {
             if (!res.isError) {
               this.queryChange.emit({
@@ -71,6 +77,7 @@ export class AdvancedQueryDialogComponent {
               });
               this.advanceDialogVisible = false;
             }
+            this.loading = false;
           });
       } else {
         this.advanceDialogVisible = false;

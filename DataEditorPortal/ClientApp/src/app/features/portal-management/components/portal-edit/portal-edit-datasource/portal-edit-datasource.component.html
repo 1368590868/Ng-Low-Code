@@ -18,12 +18,14 @@
           appendTo="body"></p-dropdown>
         <p-button
           class="ml-1"
-          pTooltip="Advanced Configuration"
+          pTooltip="Create new Connection"
           styleClass="p-button-text p-button-rounded"
           icon="pi pi-ellipsis-v"
           (onClick)="dbConnectionDialog.showDialog()"></p-button>
       </div>
-      <app-db-connection-dialog #dbConnectionDialog></app-db-connection-dialog>
+      <app-db-connection-dialog
+        #dbConnectionDialog
+        (connectionChange)="connectionSaved($event)"></app-db-connection-dialog>
     </div>
     <div class="flex flex-column mb-3">
       <ng-container *ngIf="!datasourceConfig.queryText">
@@ -40,8 +42,9 @@
             [style]="{ minWidth: '20rem' }"
             appendTo="body"></p-dropdown>
           <p-button
+            [disabled]="!datasourceConfig.dataSourceConnectionId"
             class="ml-1"
-            pTooltip="Advanced Configuration"
+            pTooltip="Create new Query"
             styleClass="p-button-text p-button-rounded"
             icon="pi pi-ellipsis-v"
             (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button>
@@ -66,6 +69,11 @@
             (onClick)="removeAdvancedQuery()"></p-button>
         </div>
       </ng-container>
+      <app-advanced-query-dialog
+        #advancedQueryDialog
+        [connectionId]="datasourceConfig.dataSourceConnectionId"
+        [queryText]="datasourceConfig.queryText"
+        (queryChange)="queryChange($event)"></app-advanced-query-dialog>
     </div>
     <div class="flex align-items-center">
       <div class="flex flex-column mb-2 mr-4">
@@ -221,8 +229,3 @@
     </div>
   </ng-template>
 </p-card>
-
-<app-advanced-query-dialog
-  #advancedQueryDialog
-  [queryText]="datasourceConfig.queryText"
-  (queryChange)="queryChange($event)"></app-advanced-query-dialog>

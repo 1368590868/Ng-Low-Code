@@ -6,6 +6,7 @@ import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import {
   DataSourceConfig,
+  DataSourceConnection,
   DataSourceFilter,
   DataSourceSortBy,
   DataSourceTable,
@@ -35,11 +36,13 @@ export class PortalEditDatasourceComponent implements OnInit {
 
   orginalConfig?: DataSourceConfig;
   datasourceConfig: DataSourceConfig = {
+    dataSourceConnectionId: '',
     tableName: '',
     tableSchema: '',
     idColumn: '',
     filters: [],
-    sortBy: []
+    sortBy: [],
+    pageSize: 100
   };
 
   dbConnections: { label: string; value: string }[] = [];
@@ -86,38 +89,33 @@ export class PortalEditDatasourceComponent implements OnInit {
     this.formControlIdColumn.valueChanges.subscribe(
       value => (this.datasourceConfig.idColumn = value)
     );
+    this.formControlConnection.valueChanges.subscribe(
+      value => (this.datasourceConfig.dataSourceConnectionId = value)
+    );
 
     // get protal item datasource config
     if (this.portalItemService.currentPortalItemId) {
       forkJoin([
         this.portalItemService.getDataSourceConfig(),
         // load database tables
-        this.portalItemService.getDataSourceTables()
+        this.portalItemService.getDataSourceConnections()
       ]).subscribe(res => {
         this.isLoading = false;
-        const tables: DataSourceTable[] = res[1];
-        if (tables.length === 0) return;
-
-        // create label and value for dropdown
-        tables.forEach(x => {
-          x.label = `${x.tableSchema}.${x.tableName}`;
-          x.value = `${x.tableSchema}.${x.tableName}`;
+        const connections: DataSourceConnection[] = res[1];
+        if (connections.length === 0) return;
+        this.dbConnections = connections.map(x => {
+          return { label: x.name, value: x.id || '' };
         });
-        this.dbTables = tables;
 
         const dsConfig = res[0];
         this.datasourceConfig = dsConfig;
         this.orginalConfig = { ...dsConfig };
 
-        if (!dsConfig.queryText) {
-          // set form control
-          const selectedDbTable = `${dsConfig.tableSchema}.${dsConfig.tableName}`;
-          // check if current selected dbTable exists, if not exist, use the first
-          if (!tables.find(x => x.value === selectedDbTable)) {
-            this.formControlDbTable.setValue(tables[0].value);
-          } else {
-            this.formControlDbTable.setValue(selectedDbTable);
-          }
+        // check if current selected connections exists, if not exist, use the first
+        if (!connections.find(x => x.id === dsConfig.dataSourceConnectionId)) {
+          this.formControlConnection.setValue(connections[0].id);
+        } else {
+          this.formControlConnection.setValue(dsConfig.dataSourceConnectionId);
         }
 
         // set filters
@@ -142,18 +140,18 @@ export class PortalEditDatasourceComponent implements OnInit {
         if (dsConfig.pageSize && dsConfig.pageSize >= 10)
           this.pageSize = dsConfig.pageSize;
 
-        this.loadTableColumns();
+        this.getDbTables();
       });
 
       this.portalItemService.saveCurrentStep('datasource');
     }
   }
 
-  //* advanced query dialog */
+  /* advanced query dialog */
   queryChange({ queryText, columns }: AdvancedQueryModel) {
     this.datasourceConfig.queryText = queryText;
     this.setColumns(columns);
-    // clear the filters and sortBy, as the database table has changed.
+    // db query added or updated, need to clear configurations base on previous db table or query.
     this.filters = [];
     this.sortBy = [];
   }
@@ -161,47 +159,91 @@ export class PortalEditDatasourceComponent implements OnInit {
   removeAdvancedQuery() {
     this.datasourceConfig.queryText = undefined;
     this.formControlDbTable.setValue(this.dbTables[0].value);
-    this.loadTableColumns();
-
-    // clear the filters and sortBy, as the database table has changed.
+    // db query removed and db table changed, need to clear configurations base on previous db query.
     this.filters = [];
     this.sortBy = [];
+
+    this.getDbTableColumns();
   }
-  //* advanced query dialog */
+  /* advanced query dialog */
+
+  /* db connection dialog */
+  connectionSaved(item: { label: string; value: string }) {
+    this.dbConnections.push(item);
+    this.formControlConnection.setValue(item.value);
+    this.onConnectionChange(item);
+  }
+  /* db connection dialog */
 
   onConnectionChange({ value }: { value: string }) {
     const item = this.dbConnections.find(x => x.value === value);
     if (item) {
-      this.loadTableColumns();
-
-      // clear the filters and sortBy, as the database connection has changed.
+      // db connection changed, need to clear configurations base on previous connection.
+      this.datasourceConfig.queryText = undefined;
       this.filters = [];
       this.sortBy = [];
+
+      this.getDbTables();
     }
   }
 
   onTableNameChange({ value }: { value: string }) {
     const item = this.dbTables.find(x => x.value === value);
     if (item) {
-      this.loadTableColumns();
-
-      // clear the filters and sortBy, as the database table has changed.
+      // db table changed, need to clear configurations base on previous db table.
       this.filters = [];
       this.sortBy = [];
+
+      this.getDbTableColumns();
     }
   }
 
-  loadTableColumns() {
+  getDbTables() {
+    this.portalItemService
+      .getDataSourceTables(this.formControlConnection.value)
+      .subscribe(res => {
+        const tables: DataSourceTable[] = res;
+        if (tables.length === 0) return;
+
+        // create label and value for dropdown
+        tables.forEach(x => {
+          x.label = `${x.tableSchema}.${x.tableName}`;
+          x.value = `${x.tableSchema}.${x.tableName}`;
+        });
+        this.dbTables = tables;
+
+        if (!this.datasourceConfig.queryText) {
+          const selectedDbTable = `${this.datasourceConfig.tableSchema}.${this.datasourceConfig.tableName}`;
+          // check if current selected dbTable exists, if not exist, use the first
+          if (!tables.find(x => x.value === selectedDbTable)) {
+            this.formControlDbTable.setValue(tables[0].value);
+          } else {
+            this.formControlDbTable.setValue(selectedDbTable);
+          }
+        }
+
+        this.getDbTableColumns();
+      });
+  }
+
+  getDbTableColumns() {
     if (this.datasourceConfig.queryText) {
       this.portalItemService
-        .getDataSourceTableColumnsByQuery(this.datasourceConfig.queryText)
+        .getDataSourceTableColumnsByQuery(
+          this.formControlConnection.value,
+          this.datasourceConfig.queryText
+        )
         .subscribe(res => this.setColumns(res.result || []));
     } else {
       const selectedDbTable = this.formControlDbTable.value;
       if (!selectedDbTable) return;
       const [tableSchema, tableName] = selectedDbTable.split('.');
       this.portalItemService
-        .getDataSourceTableColumns(tableSchema, tableName)
+        .getDataSourceTableColumns(
+          this.formControlConnection.value,
+          tableSchema,
+          tableName
+        )
         .subscribe(res => this.setColumns(res));
     }
   }
@@ -219,6 +261,11 @@ export class PortalEditDatasourceComponent implements OnInit {
   }
 
   validate() {
+    if (!this.formControlConnection.valid) {
+      this.formControlConnection.markAsDirty();
+      this.formControlConnection.updateValueAndValidity();
+    }
+
     if (!this.datasourceConfig.queryText) {
       if (!this.formControlDbTable.valid) {
         this.formControlDbTable.markAsDirty();
@@ -240,6 +287,7 @@ export class PortalEditDatasourceComponent implements OnInit {
     }, true);
 
     return (
+      this.formControlConnection.valid &&
       (this.datasourceConfig.queryText || this.formControlDbTable.valid) &&
       this.formControlIdColumn.valid &&
       filterValid
@@ -250,6 +298,7 @@ export class PortalEditDatasourceComponent implements OnInit {
     this.isSaving = true;
     if (this.portalItemService.currentPortalItemId) {
       const data: DataSourceConfig = {
+        dataSourceConnectionId: this.datasourceConfig.dataSourceConnectionId,
         pageSize: this.pageSize,
         idColumn: this.datasourceConfig.idColumn,
         filters: this.filters.map<DataSourceFilter>(x => {
@@ -331,7 +380,10 @@ export class PortalEditDatasourceComponent implements OnInit {
 
   onAddFilter() {
     if (this.dbTableColumns.length <= 0)
-      this.notifyService.notifyWarning('', 'Please select one Database Table.');
+      this.notifyService.notifyWarning(
+        '',
+        'Please complete Database Connection, Database Table or Database Query first.'
+      );
     const column = this.dbTableColumns[0];
     const matchOptions = this.getFilterMatchModeOptions(column.filterType);
 
