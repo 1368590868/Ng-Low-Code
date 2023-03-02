@@ -20,7 +20,9 @@
             placeholder="Please Select"
             [style]="{ minWidth: '20rem' }"
             appendTo="body"></p-dropdown>
-          <div style="cursor: pointer" (click)="showAdvanceDialog()">
+          <div
+            style="cursor: pointer"
+            (click)="advancedQueryDialog.showAdvanceDialog()">
             <p-message
               *ngIf="datasourceConfig.queryText"
               severity="info"
@@ -38,7 +40,7 @@
             pTooltip="Advanced Configuration"
             styleClass="p-button-text p-button-rounded"
             icon="pi pi-ellipsis-v"
-            (onClick)="showAdvanceDialog()"></p-button>
+            (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button>
         </div>
       </div>
     </div>
@@ -200,49 +202,7 @@
   </ng-template>
 </p-card>
 
-<p-dialog
-  header="Advanced Query Configuration"
-  [(visible)]="advanceDialogVisible"
-  [style]="{ minWidth: '50rem' }"
-  [modal]="true"
-  [dismissableMask]="true"
-  appendTo="body"
-  contentStyleClass="border-top-1 surface-border pt-4 pb-0 advanced-query-dialog">
-  <div #container class="dialog-content">
-    <div class="flex flex-column" *ngIf="advanceDialogVisible">
-      <label class="line-height-3 flex align-items-center mb-1"
-        >Query text
-        <i
-          class="pi pi-question-circle ml-3 text-lg"
-          [escape]="false"
-          tooltipStyleClass="advanced-query-tooltip"
-          [pTooltip]="
-            'Enter the query text for fetching the data. <br>' +
-            'Use helper macros: <br><br>' +
-            '##WHERE## : placeholder for Where expressions<br>' +
-            '##ORDERBY## : placeholder for Order By expressions<br>' +
-            '##SEARCHES## : placeholder for Search Criteria<br>' +
-            '##FILTERS## : placeholder for Column Filters.'
-          "></i>
-      </label>
-      <ngx-monaco-editor
-        [formControl]="formControlQuery"
-        [style]="{ minWidth: '40rem' }"
-        [required]="true"
-        (onInit)="onMonacoEditorInit($event)"
-        class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
-        [options]="{}"></ngx-monaco-editor>
-    </div>
-  </div>
-  <ng-template pTemplate="footer">
-    <p-button
-      icon="pi pi-times"
-      (onClick)="onAdvanceDialogCancel()"
-      label="Cancle"
-      styleClass="p-button-text"></p-button>
-    <p-button
-      icon="pi pi-check"
-      (onClick)="onAdvanceDialogOk()"
-      label="Ok"></p-button>
-  </ng-template>
-</p-dialog>
+<app-advanced-query-dialog
+  #advancedQueryDialog
+  [queryText]="datasourceConfig.queryText"
+  (queryChange)="queryChange($event)"></app-advanced-query-dialog>

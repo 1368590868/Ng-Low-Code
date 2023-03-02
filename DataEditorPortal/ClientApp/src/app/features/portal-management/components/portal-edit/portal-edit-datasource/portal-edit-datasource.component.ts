@@ -12,6 +12,7 @@ import {
   DataSourceTableColumn
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
+import { AdvancedQueryModel } from './advanced-query-dialog/advanced-query-dialog.component';
 
 interface DataSourceFilterControls {
   formControlField: FormControl;
@@ -60,9 +61,6 @@ export class PortalEditDatasourceComponent implements OnInit {
 
   formControlDbTable: FormControl = new FormControl();
   formControlIdColumn: FormControl = new FormControl();
-  formControlQuery: FormControl = new FormControl();
-
-  advanceDialogVisible = false;
 
   constructor(
     private router: Router,
@@ -118,8 +116,6 @@ export class PortalEditDatasourceComponent implements OnInit {
           } else {
             this.formControlDbTable.setValue(selectedDbTable);
           }
-        } else {
-          this.formControlQuery.setValue(dsConfig.queryText);
         }
 
         // set filters
@@ -152,60 +148,12 @@ export class PortalEditDatasourceComponent implements OnInit {
   }
 
   //* advanced query dialog */
-  helperMessage =
-    '-- Enter the query text for fetching the data. \r\n\r\n' +
-    '-- E.g. \r\n' +
-    '-- SELECT * FROM dbo.demoTables WHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##';
-
-  onMonacoEditorInit(editor: any) {
-    editor.onMouseDown(() => {
-      if (this.formControlQuery.value === this.helperMessage) {
-        this.formControlQuery.reset();
-        setTimeout(() => {
-          this.formControlQuery.markAsPristine();
-        }, 100);
-      }
-    });
-    editor.onDidBlurEditorText(() => {
-      if (!this.formControlQuery.value) {
-        this.formControlQuery.setValue(this.helperMessage);
-      }
-    });
-  }
-
-  showAdvanceDialog() {
-    this.advanceDialogVisible = true;
-    this.formControlQuery.reset();
-    if (this.datasourceConfig.queryText)
-      this.formControlQuery.setValue(this.datasourceConfig.queryText);
-    else this.formControlQuery.setValue(this.helperMessage);
-  }
-
-  onAdvanceDialogOk() {
-    if (
-      this.formControlQuery.valid &&
-      this.formControlQuery.value != this.helperMessage
-    ) {
-      this.portalItemService
-        .getDataSourceTableColumnsByQuery(this.formControlQuery.value)
-        .subscribe(res => {
-          if (!res.isError) {
-            this.datasourceConfig.queryText = this.formControlQuery.value;
-            this.advanceDialogVisible = false;
-            this.setColumns(res.result || []);
-            // clear the filters and sortBy, as the database table has changed.
-            this.filters = [];
-            this.sortBy = [];
-          }
-        });
-    } else {
-      this.notifyService.notifyWarning('', 'Query text is required.');
-      this.formControlQuery.markAsDirty();
-    }
-  }
-
-  onAdvanceDialogCancel() {
-    this.advanceDialogVisible = false;
+  queryChange({ queryText, columns }: AdvancedQueryModel) {
+    this.datasourceConfig.queryText = queryText;
+    this.setColumns(columns);
+    // clear the filters and sortBy, as the database table has changed.
+    this.filters = [];
+    this.sortBy = [];
   }
 
   removeAdvancedQuery() {
@@ -305,7 +253,7 @@ export class PortalEditDatasourceComponent implements OnInit {
         data.tableName = this.datasourceConfig.tableName;
         data.tableSchema = this.datasourceConfig.tableSchema;
       } else {
-        data.queryText = this.formControlQuery.value;
+        data.queryText = this.datasourceConfig.queryText;
       }
 
       this.portalItemService

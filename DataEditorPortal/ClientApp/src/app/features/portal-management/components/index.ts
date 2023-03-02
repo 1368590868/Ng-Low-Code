@@ -8,4 +8,3 @@ export * from './portal-edit/form-designer/form-designer-view.component';
 export * from './portal-edit/form-designer/form-designer-config.component';
 export * from './portal-edit/form-designer/search-designer-config.component';
 export * from './validator-editor/validator-editor.component';
-export * from './portal-edit/portal-edit-form/form-layout/form-layout.component';
