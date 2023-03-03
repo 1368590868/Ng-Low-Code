@@ -1,14 +1,24 @@
 <form [formGroup]="form">
   <div class="flex align-items-center">
     <p-dropdown
+      *ngIf="!hasAdvanceData"
       formControlName="nameFormControl"
       class="mr-2 flex-grow-1"
       styleClass="w-full"
       appendTo="body"
       [showClear]="true"
-      placeholder="Please Select"
       [options]="selectOptions">
     </p-dropdown>
+    <p-message
+      *ngIf="hasAdvanceData"
+      severity="info"
+      text="Use Query Text"
+      styleClass="mr-1"></p-message>
+    <p-button
+      *ngIf="hasAdvanceData"
+      styleClass="p-button-text p-button-rounded remove-btn"
+      icon="pi pi-times-circle"
+      (onClick)="onRemove()"></p-button>
 
     <p-button
       class="ml-auto"
@@ -31,6 +41,7 @@
         styleClass="w-full"
         [options]="typeOptions"
         [showClear]="true"
+        (onClear)="onClear()"
         formControlName="typeFormControl"
         placeholder="Please Select"></p-dropdown>
       <label class="line-height-3 flex align-items-center">Query Text </label>

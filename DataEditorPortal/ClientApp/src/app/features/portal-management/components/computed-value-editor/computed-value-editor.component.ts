@@ -68,10 +68,10 @@ export class ComputedValueEditorComponent
   }
 
   initForm(val: any) {
-    const selected: any[] = [];
+    let selected = 'CurrentUserName';
 
     if (val?.name) {
-      selected.push(val.name);
+      selected = val.name;
     }
     if (val?.type?.trim() || val?.queryText?.trim()) {
       this.expressions = val;
@@ -88,6 +88,7 @@ export class ComputedValueEditorComponent
     this.form.valueChanges.subscribe(() => {
       this.onSendData();
     });
+    this.form.get('nameFormControl')?.setValue('CurrentUserName');
   }
 
   writeValue(value: any): void {
@@ -109,7 +110,6 @@ export class ComputedValueEditorComponent
       this.form.get('typeFormControl')?.value?.trim() ||
       this.form.get('queryTextFormControl')?.value.trim()
     ) {
-      this.form.get('nameFormControl')!.reset();
       this.hasAdvanceData = true;
     } else {
       this.hasAdvanceData = false;
@@ -120,27 +120,45 @@ export class ComputedValueEditorComponent
 
   onSendData() {
     const name = this.form.get('nameFormControl')!.value ?? '';
-    let data = {};
-    if (name) {
-      data = { name };
-      this.onChange?.(data);
-      this.advanceData = data;
-      console.log(data);
-      return;
-    }
-
+    let data: { type?: string; name?: string; queryText?: string } = {};
     if (this.hasAdvanceData) {
       data = {
         type: this.form.get('typeFormControl')?.value,
         queryText: this.form.get('queryTextFormControl')?.value
       };
+    } else {
+      data = { name };
     }
+    if (
+      Object.prototype.hasOwnProperty.call(data, 'type') &&
+      !data.type?.trim()
+    ) {
+      delete data.type;
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(data, 'queryText') &&
+      !data.queryText?.trim()
+    ) {
+      delete data.queryText;
+    }
+
     this.advanceData = data;
     this.onChange?.(data);
   }
 
   onCancel() {
     this.visible = false;
+  }
+
+  onClear() {
+    this.form.get('typeFormControl')?.reset();
+  }
+
+  onRemove() {
+    this.hasAdvanceData = false;
+    this.form.get('typeFormControl')?.reset();
+    this.form.get('queryTextFormControl')?.reset();
   }
 
   removeAdvance() {
