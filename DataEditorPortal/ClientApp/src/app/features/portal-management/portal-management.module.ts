@@ -62,6 +62,8 @@ import {
   FROM_DESIGNER_CONTROLS,
   SearchDesignerConfigComponent,
   ValidatorEditorComponent,
+  ComputedValueEditorComponent,
+  FormlyFieldComputedValueEditorComponent,
   FormLayoutComponent,
   AdvancedQueryDialogComponent,
   DbConnectionDialogComponent
@@ -90,6 +92,8 @@ import { MonacoEditorConfig } from './monaco-editor-config';
     SearchDesignerConfigComponent,
     ValidatorEditorComponent,
     FormLayoutComponent,
+    ComputedValueEditorComponent,
+    FormlyFieldComputedValueEditorComponent,
     AdvancedQueryDialogComponent,
     DbConnectionDialogComponent
   ],
@@ -115,6 +119,11 @@ import { MonacoEditorConfig } from './monaco-editor-config';
         {
           name: 'validatorEditor',
           component: FormlyFieldValidatorEditorComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'computedValueEditor',
+          component: FormlyFieldComputedValueEditorComponent,
           wrappers: ['form-field']
         }
       ]
