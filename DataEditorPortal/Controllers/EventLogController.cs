@@ -14,16 +14,16 @@ using System.Linq;
 namespace DataEditorPortal.Web.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class DictionaryController : ControllerBase
+    [Route("api/event-log")]
+    public class EventLogController : ControllerBase
     {
-        private readonly ILogger<DictionaryController> _logger;
+        private readonly ILogger<EventLogController> _logger;
         private readonly DepDbContext _depDbContext;
         private readonly IDbSqlBuilder _dbSqlBuilder;
         private readonly IUniversalGridService _universalGridService;
 
-        public DictionaryController(
-            ILogger<DictionaryController> logger,
+        public EventLogController(
+            ILogger<EventLogController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
             IDbSqlBuilder dbSqlBuilder,
@@ -37,12 +37,12 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("list")]
-        public GridData GetDictionaries([FromBody] GridParam param)
+        public GridData GetEventLogs([FromBody] GridParam param)
         {
             var dataSourceConfig = new DataSourceConfig()
             {
                 TableSchema = "dep",
-                TableName = "DataDictionaries"
+                TableName = "EventLogs"
             };
             var queryText = _dbSqlBuilder.GenerateSqlTextForList(dataSourceConfig);
             queryText = _dbSqlBuilder.UseFilters(queryText, param.Filters);
@@ -50,7 +50,7 @@ namespace DataEditorPortal.Web.Controllers
 
             if (param.IndexCount > 0)
             {
-                if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = "Category", order = 1 } };
+                if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = "EventTime", order = 0 } };
                 queryText = _dbSqlBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
             }
             else
@@ -69,9 +69,9 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public DataDictionary GetDataDictionary(Guid id)
+        public EventLog GetEventLog(Guid id)
         {
-            var item = _depDbContext.DataDictionaries.FirstOrDefault(x => x.Id == id);
+            var item = _depDbContext.EventLogs.FirstOrDefault(x => x.Id == id);
             if (item == null)
             {
                 throw new ApiException("Not Found", 404);
@@ -82,47 +82,26 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("create")]
-        public Guid Create(DataDictionary model)
+        public Guid Create(EventLog model)
         {
             model.Id = Guid.NewGuid();
-            _depDbContext.DataDictionaries.Add(model);
+            _depDbContext.EventLogs.Add(model);
             _depDbContext.SaveChanges();
 
             return model.Id;
-        }
-
-        [HttpPut]
-        [Route("{id}/update")]
-        public Guid Update(Guid id, DataDictionary model)
-        {
-            var item = _depDbContext.DataDictionaries.FirstOrDefault(x => x.Id == id);
-            if (item == null)
-            {
-                throw new ApiException("Not Found", 404);
-            }
-
-            item.Label = model.Label;
-            item.Value = model.Value;
-            item.Value1 = model.Value1;
-            item.Value2 = model.Value2;
-            item.Category = model.Category;
-
-            _depDbContext.SaveChanges();
-
-            return item.Id;
         }
 
         [HttpDelete]
         [Route("{id}/delete")]
         public bool Delete(Guid id)
         {
-            var item = _depDbContext.DataDictionaries.FirstOrDefault(x => x.Id == id);
+            var item = _depDbContext.EventLogs.FirstOrDefault(x => x.Id == id);
             if (item == null)
             {
                 throw new ApiException("Not Found", 404);
             }
 
-            _depDbContext.DataDictionaries.Remove(item);
+            _depDbContext.EventLogs.Remove(item);
             _depDbContext.SaveChanges();
 
             return true;

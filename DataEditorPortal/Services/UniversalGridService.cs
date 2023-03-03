@@ -27,6 +27,7 @@ namespace DataEditorPortal.Web.Services
         List<FormFieldConfig> GetGridDetailConfig(string name, string type);
 
         GridData GetGridData(string name, GridParam param);
+        GridData QueryGridData(DbConnection con, string queryText);
         MemoryStream ExportExcel(string name, ExportParam param);
 
         Dictionary<string, dynamic> GetGridDataDetail(string name, string id);
@@ -229,54 +230,63 @@ namespace DataEditorPortal.Web.Services
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
 
-                var cmd = con.CreateCommand();
-                cmd.Connection = con;
-                cmd.CommandText = queryText;
+                output = QueryGridData(con, queryText);
+            }
 
-                try
+            return output;
+        }
+
+        public GridData QueryGridData(DbConnection con, string queryText)
+        {
+            var output = new GridData();
+
+            var cmd = con.CreateCommand();
+            cmd.Connection = con;
+            cmd.CommandText = queryText;
+
+            try
+            {
+                con.Open();
+                using (var dr = cmd.ExecuteReader())
                 {
-                    con.Open();
-                    using (var dr = cmd.ExecuteReader())
+                    var fields = dr.FieldCount;
+                    var fieldnames = new string[fields];
+                    for (int i = 0; i < fields; i++)
                     {
-                        var fields = dr.FieldCount;
-                        var fieldnames = new string[fields];
+                        fieldnames[i] = dr.GetName(i);
+                    }
+
+                    var schema = dr.GetSchemaTable();
+
+                    while (dr.Read())
+                    {
+                        var row = new Dictionary<string, dynamic>();
                         for (int i = 0; i < fields; i++)
                         {
-                            fieldnames[i] = dr.GetName(i);
+                            var typename = dr.GetFieldType(i);
+                            row[fieldnames[i]] = _dbSqlBuilder.FormatValue(dr[i], schema.Rows[i]);
                         }
-
-                        var schema = dr.GetSchemaTable();
-
-                        while (dr.Read())
-                        {
-                            var row = new Dictionary<string, dynamic>();
-                            for (int i = 0; i < fields; i++)
-                            {
-                                var typename = dr.GetFieldType(i);
-                                row[fieldnames[i]] = _dbSqlBuilder.FormatValue(dr[i], schema.Rows[i]);
-                            }
-                            output.Data.Add(row);
-                        }
-                    }
-
-                    if (output.Data.Any() && output.Data[0].Keys.Contains("DEP_TOTAL"))
-                    {
-                        output.Total = Convert.ToInt32(output.Data[0]["DEP_TOTAL"]);
-                    }
-                    foreach (var data in output.Data)
-                    {
-                        if (data.Keys.Contains("DEP_TOTAL")) data.Remove("DEP_TOTAL");
-                        if (data.Keys.Contains("DEP_ROWNUMBER")) data.Remove("DEP_ROWNUMBER");
+                        output.Data.Add(row);
                     }
                 }
-                catch (Exception ex)
+
+                if (output.Data.Any() && output.Data[0].Keys.Contains("DEP_TOTAL"))
                 {
-                    throw new DepException("An Error in the query has occurred: " + ex.Message);
+                    output.Total = Convert.ToInt32(output.Data[0]["DEP_TOTAL"]);
                 }
-                finally
+                foreach (var data in output.Data)
                 {
-                    con.Close();
+                    if (data.Keys.Contains("DEP_TOTAL")) data.Remove("DEP_TOTAL");
+                    if (data.Keys.Contains("DEP_ROWNUMBER")) data.Remove("DEP_ROWNUMBER");
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new DepException("An Error in the query has occurred: " + ex.Message);
+            }
+            finally
+            {
+                con.Close();
             }
 
             return output;
