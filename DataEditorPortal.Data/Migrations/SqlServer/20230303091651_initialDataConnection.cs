@@ -19,7 +19,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 schema: "dep",
                 table: "DataSourceConnections",
                 columns: new[] { "Id", "ConnectionString", "Name" },
-                values: new object[] { new Guid("4deff6db-d3d6-447f-b3de-ce2d8b242e36"), "", "Default" });
+                values: new object[] { new Guid("4deff6db-d3d6-447f-b3de-ce2d8b242e36"), defaultConnectionString, "Default" });
 
             migrationBuilder.UpdateData(
                 schema: "dep",
@@ -60,6 +60,30 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 keyValue: new Guid("82cfa0d5-1033-4a08-8294-4d4bc2de3d6b"),
                 columns: new[] { "DataSourceConfig", "DataSourceConnectionId" },
                 values: new object[] { "{\"DataSourceConnectionId\":\"4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36\",\"TableName\":\"DemoTables\",\"TableSchema\":\"dbo\",\"IdColumn\":\"Id\",\"Columns\":[],\"SortBy\":[]}", new Guid("4deff6db-d3d6-447f-b3de-ce2d8b242e36") });
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "DataSourceConnectionId",
+                schema: "dep",
+                table: "Lookups",
+                type: "uniqueidentifier",
+                nullable: false,
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lookups_DataSourceConnectionId",
+                schema: "dep",
+                table: "Lookups",
+                column: "DataSourceConnectionId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Lookups_DataSourceConnections_DataSourceConnectionId",
+                schema: "dep",
+                table: "Lookups",
+                column: "DataSourceConnectionId",
+                principalSchema: "dep",
+                principalTable: "DataSourceConnections",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
