@@ -8,9 +8,11 @@ using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text.Json;
 
@@ -24,13 +26,20 @@ namespace DataEditorPortal.Web.Controllers
         private readonly DepDbContext _depDbContext;
         private readonly IConfiguration _config;
         private readonly IDbSqlBuilder _dbSqlBuilder;
+        private readonly IServiceProvider _serviceProvider;
 
-        public LookupController(ILogger<LookupController> logger, DepDbContext depDbContext, IConfiguration config, IDbSqlBuilder dbSqlBuilder)
+        public LookupController(
+            ILogger<LookupController> logger,
+            DepDbContext depDbContext,
+            IConfiguration config,
+            IDbSqlBuilder dbSqlBuilder,
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _config = config;
             _dbSqlBuilder = dbSqlBuilder;
+            _serviceProvider = serviceProvider;
         }
 
         [HttpGet]
@@ -44,7 +53,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public Lookup GetLookup(Guid id)
+        public LookupItem GetLookup(Guid id)
         {
             var item = _depDbContext.Lookups.FirstOrDefault(x => x.Id == id);
             if (item == null)
@@ -52,17 +61,29 @@ namespace DataEditorPortal.Web.Controllers
                 throw new ApiException("Not Found", 404);
             }
 
-            return item;
+            return new LookupItem()
+            {
+                Id = item.Id,
+                QueryText = item.QueryText,
+                ConnectionId = item.DataSourceConnectionId,
+                Name = item.Name
+            };
         }
 
         [HttpPost]
         [Route("create")]
         public Guid Create(LookupItem model)
         {
+            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.QueryText) || model.ConnectionId == Guid.Empty)
+                throw new ArgumentNullException();
+
+            ValidateLookupItem(model);
+
             var item = new Lookup()
             {
                 Name = model.Name,
-                QueryText = model.QueryText
+                QueryText = model.QueryText,
+                DataSourceConnectionId = model.ConnectionId
             };
             _depDbContext.Lookups.Add(item);
             _depDbContext.SaveChanges();
@@ -74,25 +95,52 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{id}/update")]
         public Guid Update(Guid id, LookupItem model)
         {
+            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.QueryText) || model.ConnectionId == Guid.Empty)
+                throw new ArgumentNullException();
+
             var item = _depDbContext.Lookups.FirstOrDefault(x => x.Id == id);
             if (item == null)
             {
                 throw new ApiException("Not Found", 404);
             }
 
+            ValidateLookupItem(model);
+
             item.Name = model.Name;
             item.QueryText = model.QueryText;
+            item.DataSourceConnectionId = model.ConnectionId;
 
             _depDbContext.SaveChanges();
 
             return item.Id;
         }
 
+        private void ValidateLookupItem(LookupItem model)
+        {
+            #region validate connection and query text
+            try
+            {
+                var connection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Id == model.ConnectionId);
+                var query = DataHelper.ProcessQueryWithParamters(model.QueryText, new Dictionary<string, JsonElement>());
+
+                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                {
+                    con.ConnectionString = connection.ConnectionString;
+                    con.Query<DropdownOptionsItem>(query.Item1, query.Item2).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new DepException(ex.Message);
+            }
+            #endregion
+        }
+
         [HttpPost]
         [Route("{id}/options")]
         public List<DropdownOptionsItem> GetLookup(Guid id, [FromBody] Dictionary<string, JsonElement> model)
         {
-            var lookup = _depDbContext.Lookups.Find(id);
+            var lookup = _depDbContext.Lookups.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Id == id);
 
             var result = new List<DropdownOptionsItem>();
 
@@ -102,8 +150,9 @@ namespace DataEditorPortal.Web.Controllers
 
                 var query = DataHelper.ProcessQueryWithParamters(lookup.QueryText, model);
 
-                using (var con = _depDbContext.Database.GetDbConnection())
+                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                 {
+                    con.ConnectionString = lookup.DataSourceConnection.ConnectionString;
                     result = con.Query<DropdownOptionsItem>(query.Item1, query.Item2).ToList();
                 }
             }

@@ -9,5 +9,7 @@ namespace DataEditorPortal.Data.Models
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string QueryText { get; set; }
+        public Guid DataSourceConnectionId { get; set; }
+        public virtual DataSourceConnection DataSourceConnection { get; set; }
     }
 }

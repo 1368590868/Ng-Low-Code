@@ -478,7 +478,10 @@ namespace DataEditorPortal.Web.Services
             if (formLayout.UseAddingFormLayout)
                 formLayout.FormFields = detailConfig.AddingForm.FormFields;
 
-            return formLayout.FormFields;
+            return formLayout.FormFields
+                // filter the auto calculated fields.
+                .Where(x => x.computedConfig == null || x.computedConfig.name == null || !string.IsNullOrEmpty(x.computedConfig.queryText))
+                .ToList();
         }
 
         public bool AddGridData(string name, Dictionary<string, object> model)
