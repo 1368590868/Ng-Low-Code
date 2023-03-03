@@ -165,6 +165,17 @@ namespace DataEditorPortal.Data.Contexts
 
             #endregion
 
+            #region Default Database Connection
+            modelBuilder.Entity<DataSourceConnection>().HasData(
+                new DataSourceConnection
+                {
+                    Id = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
+                    Name = "Default",
+                    ConnectionString = ""
+                }
+            );
+            #endregion
+
             #region user management configuration
 
             modelBuilder.Entity<Lookup>().HasData(
@@ -172,19 +183,22 @@ namespace DataEditorPortal.Data.Contexts
                 {
                     Id = Guid.Parse("727052BA-0033-42C9-A39C-06A103E4B021"),
                     Name = "Roles",
-                    QueryText = "SELECT sr.RoleName AS Label, sr.Id AS Value FROM dep.SiteRoles sr ORDER BY sr.RoleName"
+                    QueryText = "SELECT sr.RoleName AS Label, sr.Id AS Value FROM dep.SiteRoles sr ORDER BY sr.RoleName",
+                    DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36")
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("E1F3E2C7-25CA-4D69-9405-ABC54923864D"),
                     Name = "Vendors",
-                    QueryText = "SELECT dd.Label, dd.Value FROM dep.DataDictionaries dd WHERE dd.Category = 'Vendor' ORDER BY dd.Label"
+                    QueryText = "SELECT dd.Label, dd.Value FROM dep.DataDictionaries dd WHERE dd.Category = 'Vendor' ORDER BY dd.Label",
+                    DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36")
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("704A3D00-62DF-4C62-A4BD-457C4DC242CA"),
                     Name = "Employers",
-                    QueryText = "SELECT dd.Label, dd.Value, dd.Value1, dd.Value2 FROM dep.DataDictionaries dd WHERE dd.Category = 'Employer' {{ AND dd.Value1 IN ##vendor## }} ORDER BY dd.Label"
+                    QueryText = "SELECT dd.Label, dd.Value, dd.Value1, dd.Value2 FROM dep.DataDictionaries dd WHERE dd.Category = 'Employer' {{ AND dd.Value1 IN ##vendor## }} ORDER BY dd.Label",
+                    DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36")
                 }
             );
 
@@ -194,9 +208,11 @@ namespace DataEditorPortal.Data.Contexts
                     Id = Guid.Parse("071f5419-85b8-11ed-a86f-0242ac130004"),
                     Name = "user-management",
                     ConfigCompleted = true,
+                    DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
 
                     DataSourceConfig = JsonSerializer.Serialize(new
                     {
+                        DataSourceConnectionId = "4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36",
                         TableName = "Users",
                         TableSchema = "dep",
                         IdColumn = "Id",
@@ -361,9 +377,11 @@ namespace DataEditorPortal.Data.Contexts
                     Id = Guid.Parse("82CFA0D5-1033-4A08-8294-4D4BC2DE3D6B"),
                     Name = "demo-item",
                     ConfigCompleted = true,
+                    DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
 
                     DataSourceConfig = JsonSerializer.Serialize(new
                     {
+                        DataSourceConnectionId = "4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36",
                         TableName = "DemoTables",
                         TableSchema = "dbo",
                         IdColumn = "Id",
@@ -547,7 +565,7 @@ namespace DataEditorPortal.Data.Contexts
 
                     CustomActionConfig = JsonSerializer.Serialize(new object[] { })
                 }
-            ); ;
+            );
 
             modelBuilder.Entity<SitePermission>().HasData(
                 new SitePermission()

@@ -440,9 +440,9 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("datasource/{connectionId}/table-columns")]
-        public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid connectionId, [FromQuery] string schema, [FromQuery] string tableName)
+        public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid connectionId, [FromQuery] string tableSchema, [FromQuery] string tableName)
         {
-            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(new DataSourceConfig() { TableName = tableName, TableSchema = schema });
+            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(new DataSourceConfig() { TableName = tableName, TableSchema = tableSchema });
             return _portalItemService.GetDataSourceTableColumns(connectionId, sqlText);
         }
 
