@@ -8,6 +8,12 @@ export interface PortalItemData {
   [name: string]: any;
 }
 
+export interface DataSourceConnection {
+  name: string;
+  id?: string;
+  connectionString: string;
+}
+
 export interface DataSourceTable {
   tableName: string;
   tableSchema: string;
@@ -26,13 +32,14 @@ export interface DataSourceTableColumn {
 }
 
 export interface DataSourceConfig {
+  dataSourceConnectionId: string;
   tableName?: string;
   tableSchema?: string;
-  idColumn?: string;
+  idColumn: string;
   filters?: DataSourceFilter[];
   sortBy?: DataSourceSortBy[];
   queryText?: string;
-  pageSize?: number;
+  pageSize: number;
 }
 
 export interface DataSourceFilter {

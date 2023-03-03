@@ -34,7 +34,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { MessageModule } from 'primeng/message';
-import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
+import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabViewModule } from 'primeng/tabview';
 import { FieldsetModule } from 'primeng/fieldset';
@@ -64,89 +64,11 @@ import {
   ValidatorEditorComponent,
   ComputedValueEditorComponent,
   FormlyFieldComputedValueEditorComponent,
-  FormLayoutComponent
+  FormLayoutComponent,
+  AdvancedQueryDialogComponent,
+  DbConnectionDialogComponent
 } from './components';
-
-const monacoConfig: NgxMonacoEditorConfig = {
-  defaultOptions: {
-    theme: 'myTheme',
-    language: 'sql',
-    lineNumbers: 'off',
-    roundedSelection: true,
-    minimap: { enabled: false },
-    wordWrap: true,
-    fixedOverflowWidgets: true,
-    contextmenu: false,
-    glyphMargin: false,
-    lineDecorationsWidth: 0,
-    lineNumbersMinChars: 0,
-    automaticLayout: true,
-    scrollbar: {
-      verticalScrollbarSize: 7,
-      horizontalScrollbarSize: 7
-    },
-    'semanticHighlighting.enabled': true
-  },
-  onMonacoLoad: () => {
-    const legend = {
-      tokenTypes: ['##MACRO##'],
-      tokenModifiers: []
-    };
-
-    (<any>window).monaco.languages.registerDocumentSemanticTokensProvider(
-      'sql',
-      {
-        getLegend: function () {
-          return legend;
-        },
-        provideDocumentSemanticTokens: function (model: any) {
-          const lines = model.getLinesContent();
-          const data = [];
-
-          let prevLine = 0;
-          let prevChar = 0;
-
-          const tokenPattern = new RegExp('##([a-zA-Z]+[a-zA-Z0-9]+)##', 'g');
-          for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-
-            for (let match = null; (match = tokenPattern.exec(line)); ) {
-              data.push(
-                // translate line to deltaLine
-                i - prevLine,
-                // for the same line, translate start to deltaStart
-                prevLine === i ? match.index - prevChar : match.index,
-                match[0].length,
-                0,
-                0
-              );
-
-              prevLine = i;
-              prevChar = match.index;
-            }
-          }
-          return {
-            data: new Uint32Array(data),
-            resultId: undefined
-          };
-        },
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        releaseDocumentSemanticTokens: function () {}
-      }
-    );
-
-    (<any>window).monaco.editor.defineTheme('myTheme', {
-      base: 'vs',
-      inherit: true,
-      rules: [
-        { token: '##MACRO##', foreground: '615a60', fontStyle: 'italic bold' }
-      ],
-      colors: {
-        'editor.background': '#EEEEEE'
-      }
-    });
-  }
-};
+import { MonacoEditorConfig } from './monaco-editor-config';
 
 @NgModule({
   declarations: [
@@ -171,14 +93,16 @@ const monacoConfig: NgxMonacoEditorConfig = {
     ValidatorEditorComponent,
     FormLayoutComponent,
     ComputedValueEditorComponent,
-    FormlyFieldComputedValueEditorComponent
+    FormlyFieldComputedValueEditorComponent,
+    AdvancedQueryDialogComponent,
+    DbConnectionDialogComponent
   ],
   imports: [
     CommonModule,
     PortalManagementRoutingModule,
     UniversalGridActionModule,
     FormsModule,
-    MonacoEditorModule.forRoot(monacoConfig),
+    MonacoEditorModule.forRoot(MonacoEditorConfig),
     ReactiveFormsModule,
     FormlyModule.forChild({
       types: [
