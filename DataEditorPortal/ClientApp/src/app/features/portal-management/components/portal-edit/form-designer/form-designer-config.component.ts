@@ -290,6 +290,23 @@ export class FormDesignerConfigComponent {
           }
         }
       ]
+    },
+    {
+      fieldGroup: [
+        {
+          wrappers: ['divider'],
+          props: {
+            label: 'Computed Value'
+          }
+        },
+        {
+          key: 'computedConfig',
+          type: 'computedValueEditor',
+          props: {
+            label: ''
+          }
+        }
+      ]
     }
   ];
 

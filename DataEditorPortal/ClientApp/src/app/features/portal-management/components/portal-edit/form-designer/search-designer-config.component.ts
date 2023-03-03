@@ -60,6 +60,11 @@ export class SearchDesignerConfigComponent
       x => x.fieldGroup && x.fieldGroup.find(f => f.key === 'validatorConfig')
     );
     if (validatorIndex) this.fields.splice(validatorIndex, 1);
+    // remove computed
+    const computedIndex = this.fields.findIndex(
+      x => x.fieldGroup && x.fieldGroup.find(f => f.key === 'computedConfig')
+    );
+    if (computedIndex) this.fields.splice(computedIndex, 1);
 
     // add search rule editor.
     this.fields.push({
