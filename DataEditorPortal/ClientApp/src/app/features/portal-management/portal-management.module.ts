@@ -62,6 +62,8 @@ import {
   FROM_DESIGNER_CONTROLS,
   SearchDesignerConfigComponent,
   ValidatorEditorComponent,
+  ComputedValueEditorComponent,
+  FormlyFieldComputedValueEditorComponent,
   FormLayoutComponent
 } from './components';
 
@@ -167,7 +169,9 @@ const monacoConfig: NgxMonacoEditorConfig = {
     FormDesignerConfigComponent,
     SearchDesignerConfigComponent,
     ValidatorEditorComponent,
-    FormLayoutComponent
+    FormLayoutComponent,
+    ComputedValueEditorComponent,
+    FormlyFieldComputedValueEditorComponent
   ],
   imports: [
     CommonModule,
@@ -191,6 +195,11 @@ const monacoConfig: NgxMonacoEditorConfig = {
         {
           name: 'validatorEditor',
           component: FormlyFieldValidatorEditorComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'computedValueEditor',
+          component: FormlyFieldComputedValueEditorComponent,
           wrappers: ['form-field']
         }
       ]
