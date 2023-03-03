@@ -349,6 +349,7 @@ namespace DataEditorPortal.Web.Services
                 var columns = GetDataSourceTableColumns(datasourceConfig.DataSourceConnectionId, sqlText);
                 return columns.Select(x => new GridColConfig()
                 {
+                    type = "DataBaseField",
                     field = x.ColumnName,
                     header = x.ColumnName,
                     width = "250px",
