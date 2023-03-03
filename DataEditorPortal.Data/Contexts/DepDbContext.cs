@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 
 namespace DataEditorPortal.Data.Contexts
@@ -608,6 +609,17 @@ namespace DataEditorPortal.Data.Contexts
             #endregion
 
             #endregion
+        }
+
+        public void SetDefaultDataSourceConnection()
+        {
+            var defaultConnection = DataSourceConnections
+                .FirstOrDefault(x => x.Id == new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"));
+            if (defaultConnection != null && string.IsNullOrEmpty(defaultConnection.ConnectionString))
+            {
+                defaultConnection.ConnectionString = this.Database.GetConnectionString();
+                SaveChanges();
+            }
         }
     }
 }

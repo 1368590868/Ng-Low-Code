@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.Extensions.Configuration;
 using System;
-using System.IO;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
@@ -9,17 +7,11 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
-
-            var defaultConnectionString = builder.Build()["ConnectionStrings:Default"];
-
             migrationBuilder.InsertData(
                 schema: "dep",
                 table: "DataSourceConnections",
                 columns: new[] { "Id", "ConnectionString", "Name" },
-                values: new object[] { new Guid("4deff6db-d3d6-447f-b3de-ce2d8b242e36"), defaultConnectionString, "Default" });
+                values: new object[] { new Guid("4deff6db-d3d6-447f-b3de-ce2d8b242e36"), "", "Default" });
 
             migrationBuilder.UpdateData(
                 schema: "dep",

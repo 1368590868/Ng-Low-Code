@@ -121,6 +121,7 @@ namespace DataEditorPortal.Web
             {
                 var dbContext = scope.ServiceProvider.GetService<DepDbContext>();
                 dbContext.Database.Migrate();
+                dbContext.SetDefaultDataSourceConnection();
             }
 
             // Enable Log files
