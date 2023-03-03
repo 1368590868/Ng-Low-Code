@@ -14,7 +14,11 @@
 </div>
 <p-dialog
   [(visible)]="visible"
-  [style]="{ minWidth: '35rem' }"
+  [style]="
+    isAdvanced
+      ? { minWidth: '50rem', minHeight: '20rem' }
+      : { minWidth: '35rem' }
+  "
   [modal]="true"
   [dismissableMask]="true"
   appendTo="body"
@@ -74,9 +78,31 @@
           (onClick)="onAdd()"></p-button>
       </ng-template>
       <ng-template #advancedRef>
-        <ng-container [ngTemplateOutlet]="lookupForm"></ng-container>
-        <ng-template #lookupForm>
+        <ng-container>
           <!-- <p-divider>Add new lookup</p-divider> -->
+          <div class="mb-3 flex flex-column">
+            <label class="line-height-3">Database Connection</label>
+            <div class="flex align-items-center">
+              <p-dropdown
+                [required]="true"
+                [options]="dbConnections"
+                [formControl]="formControlConnection"
+                placeholder="Please Select"
+                [style]="{ minWidth: '20rem' }"
+                appendTo="body"></p-dropdown>
+              <p-button
+                class="ml-1"
+                pTooltip="Create new Connection"
+                styleClass="p-button-text p-button-rounded"
+                icon="pi pi-ellipsis-v"
+                (onClick)="dbConnectionDialog.showDialog()"></p-button>
+            </div>
+            <app-db-connection-dialog
+              #dbConnectionDialog
+              (connectionChange)="
+                connectionSaved($event)
+              "></app-db-connection-dialog>
+          </div>
           <div class="mb-3 flex flex-column">
             <label class="line-height-3">Name</label>
             <input
@@ -98,12 +124,11 @@
               *ngIf="visible"
               [formControl]="formControlQuery"
               (onInit)="onMonacoInit()"
-              [style]="dialogStyle"
               [required]="true"
               class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
               [options]="{}"></ngx-monaco-editor>
           </div>
-        </ng-template>
+        </ng-container>
       </ng-template>
     </div>
   </div>
@@ -116,8 +141,7 @@
     <p-button
       icon="pi pi-check"
       (onClick)="onOk()"
-      label="Ok"
-      [disabled]="buttonDisabled"
+      label="Save"
       [loading]="isLoading"></p-button>
   </ng-template>
 </p-dialog>
