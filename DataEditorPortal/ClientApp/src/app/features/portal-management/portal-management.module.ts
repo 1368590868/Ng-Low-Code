@@ -37,7 +37,6 @@ import { MessageModule } from 'primeng/message';
 import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabViewModule } from 'primeng/tabview';
-import { FieldsetModule } from 'primeng/fieldset';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
@@ -158,8 +157,7 @@ import { MonacoEditorConfig } from './monaco-editor-config';
     ContextMenuModule,
     MessageModule,
     ConfirmDialogModule,
-    TabViewModule,
-    FieldsetModule
+    TabViewModule
   ],
   providers: [
     {

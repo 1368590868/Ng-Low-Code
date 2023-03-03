@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Form, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { PrimeNGConfig } from 'primeng/api';
+import { ConfirmationService, PrimeNGConfig } from 'primeng/api';
 import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import {
@@ -26,7 +26,8 @@ interface DataSourceFilterControls {
 @Component({
   selector: 'app-portal-edit-datasource',
   templateUrl: './portal-edit-datasource.component.html',
-  styleUrls: ['./portal-edit-datasource.component.scss']
+  styleUrls: ['./portal-edit-datasource.component.scss'],
+  providers: [ConfirmationService]
 })
 export class PortalEditDatasourceComponent implements OnInit {
   isLoading = true;
@@ -72,7 +73,8 @@ export class PortalEditDatasourceComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
     private primeNGConfig: PrimeNGConfig,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -295,52 +297,75 @@ export class PortalEditDatasourceComponent implements OnInit {
   }
 
   saveDatasourceConfig() {
-    this.isSaving = true;
-    if (this.portalItemService.currentPortalItemId) {
-      const data: DataSourceConfig = {
-        dataSourceConnectionId: this.datasourceConfig.dataSourceConnectionId,
-        pageSize: this.pageSize,
-        idColumn: this.datasourceConfig.idColumn,
-        filters: this.filters.map<DataSourceFilter>(x => {
-          return {
-            field: x.formControlField.value,
-            matchMode: x.formControlMatchMode.value,
-            value: x.formControlValue.value,
-            filterType: x.filterType
-          };
-        }),
-        sortBy: this.sortBy
-      };
-      if (!this.datasourceConfig.queryText) {
-        data.tableName = this.datasourceConfig.tableName;
-        data.tableSchema = this.datasourceConfig.tableSchema;
-      } else {
-        data.queryText = this.datasourceConfig.queryText;
-      }
+    const save = () => {
+      this.isSaving = true;
+      if (this.portalItemService.currentPortalItemId) {
+        const data: DataSourceConfig = {
+          dataSourceConnectionId: this.datasourceConfig.dataSourceConnectionId,
+          pageSize: this.pageSize,
+          idColumn: this.datasourceConfig.idColumn,
+          filters: this.filters.map<DataSourceFilter>(x => {
+            return {
+              field: x.formControlField.value,
+              matchMode: x.formControlMatchMode.value,
+              value: x.formControlValue.value,
+              filterType: x.filterType
+            };
+          }),
+          sortBy: this.sortBy
+        };
+        if (!this.datasourceConfig.queryText) {
+          data.tableName = this.datasourceConfig.tableName;
+          data.tableSchema = this.datasourceConfig.tableSchema;
+        } else {
+          data.queryText = this.datasourceConfig.queryText;
+        }
 
-      this.portalItemService
-        .saveDataSourceConfig(data)
-        .pipe(
-          tap(res => {
-            if (res && !res.isError) {
-              if (
-                this.orginalConfig &&
-                (this.orginalConfig.tableName != data.tableName ||
-                  this.orginalConfig?.tableSchema != data.tableSchema)
-              ) {
-                // if user changed the tableSchema or tableName, user need to continue config column, search, form
-                this.portalItemService.currentPortalItemConfigCompleted = false;
+        this.portalItemService
+          .saveDataSourceConfig(data)
+          .pipe(
+            tap(res => {
+              if (res && !res.isError) {
+                if (this.dataSourceChanged()) {
+                  // if user changed the tableSchema or tableName, user need to continue config column, search, form
+                  this.portalItemService.currentPortalItemConfigCompleted =
+                    false;
+                }
+                this.saveSucess();
               }
-              this.saveSucess();
-            }
 
-            this.isSaving = false;
-            this.isSavingAndExit = false;
-            this.isSavingAndNext = false;
-          })
-        )
-        .subscribe();
+              this.isSaving = false;
+              this.isSavingAndExit = false;
+              this.isSavingAndNext = false;
+            })
+          )
+          .subscribe();
+      }
+    };
+
+    if (this.dataSourceChanged()) {
+      this.confirmationService.confirm({
+        message:
+          'You are going to change the <b>Data Source</b>.<br><br>' +
+          'The column settings, search settings and form settings based on previous data source will be removed, ' +
+          'and you need to complete them before preview this portal item. <br> <br>' +
+          'Are you sure that you want to perform this action?',
+        accept: save
+      });
+    } else {
+      save();
     }
+  }
+
+  dataSourceChanged() {
+    return (
+      this.orginalConfig &&
+      (this.datasourceConfig.dataSourceConnectionId !=
+        this.orginalConfig.dataSourceConnectionId ||
+        this.datasourceConfig.queryText != this.orginalConfig.queryText ||
+        this.datasourceConfig.tableName != this.orginalConfig.tableName ||
+        this.datasourceConfig.tableSchema != this.orginalConfig.tableSchema)
+    );
   }
 
   saveSucess() {
@@ -363,11 +388,13 @@ export class PortalEditDatasourceComponent implements OnInit {
   onSaveAndNext() {
     if (!this.validate()) return;
     this.isSavingAndNext = true;
+    this.isSavingAndExit = false;
     this.saveDatasourceConfig();
   }
 
   onSaveAndExit() {
     if (!this.validate()) return;
+    this.isSavingAndNext = false;
     this.isSavingAndExit = true;
     this.saveDatasourceConfig();
   }

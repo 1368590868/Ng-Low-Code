@@ -29,6 +29,8 @@ export class PortalEditFormComponent implements OnInit {
   @ViewChild('addLayout') addLayout!: FormLayoutComponent;
   @ViewChild('updateLayout') updateLayout!: FormLayoutComponent;
 
+  dataSourceIsQueryText = false;
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -41,7 +43,8 @@ export class PortalEditFormComponent implements OnInit {
     if (this.portalItemService.currentPortalItemId) {
       forkJoin([
         this.portalItemService.getGridFormConfig(),
-        this.portalItemService.getDataSourceTableColumnsByPortalId()
+        this.portalItemService.getDataSourceTableColumnsByPortalId(),
+        this.portalItemService.getDataSourceConfig()
       ]).subscribe(res => {
         this.isLoading = false;
 
@@ -49,6 +52,8 @@ export class PortalEditFormComponent implements OnInit {
         this.updatingFormConfig = res[0].updatingForm || { sameAsAdd: true };
         this.infoFormConfig = res[0].infoForm || {};
         this.dbColumns = res[1];
+
+        this.dataSourceIsQueryText = !!res[2].queryText;
       });
 
       this.portalItemService.saveCurrentStep('form');
@@ -57,17 +62,9 @@ export class PortalEditFormComponent implements OnInit {
 
   valid() {
     if (!this.addLayout.validate()) {
-      this.notifyService.notifyWarning(
-        'Warning',
-        'Please complete the configuration for Adding.'
-      );
       return false;
     }
     if (!this.updateLayout.validate()) {
-      this.notifyService.notifyWarning(
-        'Warning',
-        'Please complete the configuration for Updating.'
-      );
       return false;
     }
     return true;
