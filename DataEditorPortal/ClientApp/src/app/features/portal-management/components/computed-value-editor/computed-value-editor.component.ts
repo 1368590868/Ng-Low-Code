@@ -9,9 +9,11 @@ import {
   FormBuilder,
   FormControl,
   FormGroup,
-  NG_VALUE_ACCESSOR
+  NG_VALUE_ACCESSOR,
+  Validators
 } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
+import { NotifyService } from 'src/app/shared';
 
 @Component({
   selector: 'app-computed-value-editor',
@@ -48,6 +50,11 @@ export class ComputedValueEditorComponent
     message: ''
   };
 
+  helperMessage =
+    '-- Enter the query text for fetching the data. \r\n\r\n' +
+    '-- E.g. \r\n' +
+    '-- SELECT * FROM dbo.demoTables WHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##';
+
   onChange!: any;
   onTouch!: any;
 
@@ -58,37 +65,60 @@ export class ComputedValueEditorComponent
   set value(val: any) {
     this.initForm(val ?? {});
   }
-
-  constructor() {
+  constructor(private notifyService: NotifyService) {
     this.form = this.formBuilder.group({
       nameFormControl: new FormControl(''),
-      queryTextFormControl: new FormControl('', { updateOn: 'blur' }),
-      typeFormControl: new FormControl('', { updateOn: 'blur' })
+      queryTextFormControl: new FormControl('', {
+        validators: [Validators.required]
+      }),
+      typeFormControl: new FormControl('', {
+        validators: [Validators.required]
+      })
+    });
+  }
+  onMonacoEditorInit(editor: any) {
+    const queryTextFormControl = this.form.get('queryTextFormControl');
+    editor.onMouseDown(() => {
+      if (queryTextFormControl?.value === this.helperMessage) {
+        queryTextFormControl.reset();
+        setTimeout(() => {
+          queryTextFormControl.markAsPristine();
+        }, 100);
+      }
+    });
+    editor.onDidBlurEditorText(() => {
+      if (!queryTextFormControl?.value) {
+        queryTextFormControl?.setValue(this.helperMessage);
+      }
+    });
+    setTimeout(() => {
+      queryTextFormControl?.markAsPristine();
     });
   }
 
   initForm(val: any) {
-    let selected = 'CurrentUserName';
-
-    if (val?.name) {
-      selected = val.name;
-    }
-    if (val?.type?.trim() || val?.queryText?.trim()) {
-      this.expressions = val;
+    if (val?.type && val?.queryText) {
+      this.form.setValue({
+        nameFormControl: null,
+        queryTextFormControl: val.queryText ?? this.helperMessage,
+        typeFormControl: val?.type ?? ''
+      });
       this.hasAdvanceData = true;
+    } else {
+      if (val?.name) {
+        this.form.setValue({
+          nameFormControl: val.name,
+          queryTextFormControl: null,
+          typeFormControl: null
+        });
+      }
     }
-    this.form.setValue({
-      nameFormControl: selected,
-      queryTextFormControl: this.expressions?.expression ?? '',
-      typeFormControl: this.expressions?.message ?? ''
-    });
   }
 
   ngOnInit() {
     this.form.valueChanges.subscribe(() => {
       this.onSendData();
     });
-    this.form.get('nameFormControl')?.setValue('CurrentUserName');
   }
 
   writeValue(value: any): void {
@@ -106,16 +136,26 @@ export class ComputedValueEditorComponent
   }
 
   onOk() {
+    const queryTextFormControl = this.form.get('queryTextFormControl');
+    const typeFormControl = this.form.get('typeFormControl');
     if (
-      this.form.get('typeFormControl')?.value?.trim() ||
-      this.form.get('queryTextFormControl')?.value.trim()
+      typeFormControl?.valid &&
+      queryTextFormControl?.valid &&
+      queryTextFormControl?.value != this.helperMessage
     ) {
       this.hasAdvanceData = true;
+      this.visible = false;
     } else {
+      this.notifyService.notifyWarning(
+        '',
+        'Query Type or Query Text is required.'
+      );
+      queryTextFormControl?.markAsDirty();
+      typeFormControl?.markAsDirty();
+
       this.hasAdvanceData = false;
     }
     this.onSendData();
-    this.visible = false;
   }
 
   onSendData() {
@@ -148,6 +188,8 @@ export class ComputedValueEditorComponent
   }
 
   onCancel() {
+    this.form.get('typeFormControl')?.reset();
+    this.form.get('queryTextFormControl')?.reset();
     this.visible = false;
   }
 

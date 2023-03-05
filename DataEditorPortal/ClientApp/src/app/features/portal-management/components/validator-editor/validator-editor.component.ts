@@ -9,7 +9,8 @@ import {
   FormBuilder,
   FormControl,
   FormGroup,
-  NG_VALUE_ACCESSOR
+  NG_VALUE_ACCESSOR,
+  Validators
 } from '@angular/forms';
 import {
   FieldType,
@@ -17,6 +18,7 @@ import {
   FormlyConfig,
   FormlyFieldProps
 } from '@ngx-formly/core';
+import { NotifyService } from 'src/app/shared';
 
 @Component({
   selector: 'app-validator-editor',
@@ -35,27 +37,33 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   form!: FormGroup;
   visible = false;
   selectOptions: { label: string; value: string }[] = [];
-  expressions: { expression: string; message: string } = {
-    expression: '',
-    message: ''
-  };
 
   onChange!: any;
   onTouch!: any;
 
   advanceData: any = [];
   hasAdvanceData = false;
+  helperMessage =
+    '//Please enter the connection string to connect to your server.\r\n\r\n' +
+    '//form.get(`filedKey`).value === xxx';
 
   @Input()
   set value(val: any) {
     this.initForm(val ?? []);
   }
 
-  constructor(private formlyConfig: FormlyConfig) {
+  constructor(
+    private formlyConfig: FormlyConfig,
+    private notifyService: NotifyService
+  ) {
     this.form = this.formBuilder.group({
       validatorFormControl: new FormControl([]),
-      expressionFormControl: new FormControl('', { updateOn: 'blur' }),
-      messageFormControl: new FormControl('', { updateOn: 'blur' })
+      expressionFormControl: new FormControl('', {
+        validators: [Validators.required]
+      }),
+      messageFormControl: new FormControl('', {
+        validators: [Validators.required]
+      })
     });
     this.selectOptions = this.extractNameAndLabel(this.formlyConfig.validators);
   }
@@ -72,14 +80,35 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     return data;
   }
 
+  onMonacoEditorInit(editor: any) {
+    const expressionFormControl = this.form.get('expressionFormControl');
+    editor.onMouseDown(() => {
+      if (expressionFormControl?.value === this.helperMessage) {
+        expressionFormControl.reset();
+        setTimeout(() => {
+          expressionFormControl.markAsPristine();
+        }, 100);
+      }
+    });
+    editor.onDidBlurEditorText(() => {
+      if (!expressionFormControl?.value) {
+        expressionFormControl?.setValue(this.helperMessage);
+      }
+    });
+    setTimeout(() => {
+      expressionFormControl?.markAsPristine();
+    });
+  }
+
   initForm(val: any) {
     const selected: any[] = [];
+    let expressions: any = {};
 
     val.map((item: any) => {
       if (typeof item === 'string') {
         selected.push(item);
       } else {
-        this.expressions = item;
+        expressions = item;
         if (item?.expression?.trim() || item?.message?.trim()) {
           this.hasAdvanceData = true;
         }
@@ -87,13 +116,13 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     });
     this.form.setValue({
       validatorFormControl: selected,
-      expressionFormControl: this.expressions?.expression ?? '',
-      messageFormControl: this.expressions?.message ?? ''
+      expressionFormControl: expressions.expression ?? this.helperMessage,
+      messageFormControl: expressions.message ?? ''
     });
   }
 
   ngOnInit() {
-    this.form.valueChanges.subscribe(() => {
+    this.form.get('validatorFormControl')?.valueChanges.subscribe(() => {
       this.onSendData();
     });
   }
@@ -113,15 +142,25 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   onOk() {
-    this.advanceData.forEach((item: any) => {
-      if (item?.expression?.trim() || item?.message?.trim()) {
-        this.hasAdvanceData = true;
-      } else {
-        this.hasAdvanceData = false;
-      }
-    });
+    const expressionFormControl = this.form.get('expressionFormControl');
+    const messageFormControl = this.form.get('messageFormControl');
+    if (
+      expressionFormControl?.valid &&
+      messageFormControl?.valid &&
+      expressionFormControl.value != this.helperMessage
+    ) {
+      this.visible = false;
+      this.hasAdvanceData = true;
+    } else {
+      this.notifyService.notifyWarning(
+        '',
+        'Javascript Expression or Error Message is required.'
+      );
+      expressionFormControl?.markAsDirty();
+      messageFormControl?.markAsDirty();
+      this.hasAdvanceData = false;
+    }
     this.onSendData();
-    this.visible = false;
   }
 
   onSendData() {
@@ -149,6 +188,8 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   onCancel() {
+    this.form.get('expressionFormControl')?.reset();
+    this.form.get('messageFormControl')?.reset();
     this.visible = false;
   }
 
@@ -160,8 +201,8 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
         }
       }
     });
-    this.form.get('expressionFormControl')?.setValue('');
-    this.form.get('messageFormControl')?.setValue('');
+    this.form.get('expressionFormControl')?.reset();
+    this.form.get('messageFormControl')?.reset();
     this.onChange?.(this.advanceData);
     this.hasAdvanceData = false;
   }

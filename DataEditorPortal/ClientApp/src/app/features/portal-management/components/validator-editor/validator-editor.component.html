@@ -57,13 +57,18 @@
     appendTo="body"
     contentStyleClass="border-top-1 surface-border pt-4 pb-0">
     <div #container class="dialog-content">
-      <label class="line-height-3 flex align-items-center">Advanced </label>
-      <ngx-monaco-editor
-        *ngIf="visible"
-        formControlName="expressionFormControl"
-        class="pt-3 border-round monaco-editor-wrapper"
-        [options]="{ language: 'javascript' }"></ngx-monaco-editor>
-      <label class="line-height-3 flex align-items-center">message </label>
+      <div class="mb-3">
+        <label class="line-height-2 mb-1 flex align-items-center"
+          >Javascript Expression
+        </label>
+        <ngx-monaco-editor
+          *ngIf="visible"
+          formControlName="expressionFormControl"
+          class="pt-3 border-round monaco-editor-wrapper"
+          (onInit)="onMonacoEditorInit($event)"
+          [options]="{ language: 'javascript' }"></ngx-monaco-editor>
+      </div>
+      <label class="line-height-3 flex align-items-center">Message </label>
       <input
         class="w-full mb-2"
         rows="5"

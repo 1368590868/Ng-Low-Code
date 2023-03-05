@@ -6,6 +6,7 @@
       class="mr-1 flex-grow-1"
       styleClass="w-full"
       appendTo="body"
+      placeholder="Please Select"
       [showClear]="true"
       [options]="selectOptions">
     </p-dropdown>
@@ -36,19 +37,24 @@
     appendTo="body"
     contentStyleClass="border-top-1 surface-border pt-4 pb-0">
     <div #container class="dialog-content">
-      <label class="line-height-3 flex align-items-center">Query Type </label>
-      <p-dropdown
-        styleClass="w-full"
-        [options]="typeOptions"
-        [showClear]="true"
-        (onClear)="onClear()"
-        formControlName="typeFormControl"
-        placeholder="Please Select"></p-dropdown>
-      <label class="line-height-3 flex align-items-center">Query Text </label>
+      <div class="mb-3">
+        <label class="line-height-3 flex align-items-center">Query Type </label>
+        <p-dropdown
+          styleClass="w-full"
+          [options]="typeOptions"
+          [showClear]="true"
+          (onClear)="onClear()"
+          formControlName="typeFormControl"
+          placeholder="Please Select"></p-dropdown>
+      </div>
+      <label class="line-height-2 mb-1 flex align-items-center"
+        >Query Text
+      </label>
       <ngx-monaco-editor
         *ngIf="visible"
         formControlName="queryTextFormControl"
         class="pt-3 border-round monaco-editor-wrapper"
+        (onInit)="onMonacoEditorInit($event)"
         [options]="{}"></ngx-monaco-editor>
     </div>
     <ng-template pTemplate="footer">
