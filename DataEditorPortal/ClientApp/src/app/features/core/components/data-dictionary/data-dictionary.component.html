@@ -1,18 +1,20 @@
 <div class="layout-content flex flex-column p-card">
   <div class="flex-grow-1">
     <p-table
+      styleClass="p-datatable-striped"
       [value]="data"
       [rowHover]="true"
       [rows]="10"
+      [showCurrentPageReport]="true"
+      [lazy]="true"
       [scrollable]="true"
       scrollHeight="flex"
       [filterDelay]="0"
       [virtualScroll]="true"
       [virtualScrollItemSize]="51.75"
       [virtualScrollDelay]="0"
-      [lazy]="true"
-      [showCurrentPageReport]="true"
-      styleClass="p-datatable-striped"
+      (onFilter)="onFilter($event)"
+      (onSort)="onSort($event)"
       dataKey="id">
       <ng-template pTemplate="caption">
         <div class="flex align-items-center my-2">
@@ -27,23 +29,83 @@
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 20%">Label</th>
-          <th style="width: 20%">Value</th>
-          <th style="width: 20%">Value1</th>
-          <th style="width: 20%">Value2</th>
-          <th style="width: 18%">Category</th>
+          <th style="width: 20%" pSortableColumn="Label">
+            <span style="vertical-align: middle">Label</span>
+            <p-sortIcon field="Label"></p-sortIcon>
+            <p-columnFilter
+              style="vertical-align: middle"
+              type="text"
+              field="Label"
+              display="menu"
+              [hideOnClear]="true"
+              [showOperator]="false"
+              [showAddButton]="false"
+              [maxFractionDigits]="2"></p-columnFilter>
+          </th>
+          <th style="width: 20%" pSortableColumn="Value">
+            <span style="vertical-align: middle">Value</span>
+            <p-sortIcon field="Value"></p-sortIcon>
+            <p-columnFilter
+              style="vertical-align: middle"
+              type="text"
+              field="Value"
+              display="menu"
+              [hideOnClear]="true"
+              [showOperator]="false"
+              [showAddButton]="false"
+              [maxFractionDigits]="2"></p-columnFilter>
+          </th>
+          <th style="width: 20%" pSortableColumn="Value1">
+            <span style="vertical-align: middle">Value1</span>
+            <p-sortIcon field="Value1"></p-sortIcon>
+            <p-columnFilter
+              style="vertical-align: middle"
+              type="text"
+              field="Value1"
+              display="menu"
+              [hideOnClear]="true"
+              [showOperator]="false"
+              [showAddButton]="false"
+              [maxFractionDigits]="2"></p-columnFilter>
+          </th>
+          <th style="width: 20%" pSortableColumn="Value2">
+            <span style="vertical-align: middle">Value2</span>
+            <p-sortIcon field="Value2"></p-sortIcon>
+            <p-columnFilter
+              style="vertical-align: middle"
+              type="text"
+              field="Value2"
+              display="menu"
+              [hideOnClear]="true"
+              [showOperator]="false"
+              [showAddButton]="false"
+              [maxFractionDigits]="2"></p-columnFilter>
+          </th>
+          <th style="width: 18%" pSortableColumn="Category">
+            <span style="vertical-align: middle">Category</span>
+            <p-sortIcon field="Category"></p-sortIcon>
+            <p-columnFilter
+              style="vertical-align: middle"
+              type="text"
+              field="Category"
+              display="menu"
+              [hideOnClear]="true"
+              [showOperator]="false"
+              [showAddButton]="false"
+              [maxFractionDigits]="2"></p-columnFilter>
+          </th>
           <th style="width: 5rem"></th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-rowData>
         <tr>
           <td style="width: 18%">
-            {{ rowData.label }}
+            {{ rowData.Label }}
           </td>
-          <td style="width: 18%">{{ rowData.value }}</td>
-          <td style="width: 12%">{{ rowData.value1 }}</td>
-          <td>{{ rowData.value2 }}</td>
-          <td style="width: 12rem">{{ rowData.category }}</td>
+          <td style="width: 18%">{{ rowData.Value }}</td>
+          <td style="width: 12%">{{ rowData.Value1 }}</td>
+          <td>{{ rowData.Value2 }}</td>
+          <td style="width: 12rem">{{ rowData.Category }}</td>
           <td style="width: 5rem">
             <p-menu
               #menu
