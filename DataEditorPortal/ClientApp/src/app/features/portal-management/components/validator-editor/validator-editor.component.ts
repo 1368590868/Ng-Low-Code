@@ -153,7 +153,6 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   showDialog() {
-    console.log(this.advanceData);
     if (this.isOk || this.isCancle) {
       this.initForm(this.advanceData);
     } else {
@@ -205,7 +204,6 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
         }
       }
     });
-    console.log('data', data);
     this.advanceData = data;
     this.onChange?.(data);
   }
