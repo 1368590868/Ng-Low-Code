@@ -123,7 +123,7 @@
             <ngx-monaco-editor
               *ngIf="visible"
               [formControl]="formControlQuery"
-              (onInit)="onMonacoInit()"
+              (onInit)="onMonacoEditorInit($event)"
               [required]="true"
               class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
               [options]="{}"></ngx-monaco-editor>

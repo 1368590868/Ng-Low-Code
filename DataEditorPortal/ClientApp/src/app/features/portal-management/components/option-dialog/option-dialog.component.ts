@@ -5,6 +5,7 @@ import {
   NG_VALUE_ACCESSOR
 } from '@angular/forms';
 import { FieldType, FieldTypeConfig } from '@ngx-formly/core';
+import { NotifyService } from 'src/app/shared';
 import { DataSourceConnection } from '../../models/portal-item';
 import { LookupService } from '../../services/lookup.service';
 import { PortalItemService } from '../../services/portal-item.service';
@@ -44,9 +45,17 @@ export class OptionDialogComponent implements ControlValueAccessor {
   formControlName: FormControl = new FormControl();
   formControlQuery: FormControl = new FormControl();
 
+  helperMessage =
+    '-- Enter some query text to get options from database.  \r\n\r\n' +
+    '-- It needs return two columns at least. Use format ##FIELD## to reference other fields in same form as paramters. And use {{}} mark the criteria is optional.   \r\n\r\n' +
+    '\r\n' +
+    '-- E.g. \r\n' +
+    '-- SELECT dd.Label, dd.Value, dd.Value1, dd.Value2 FROM dep.DataDictionaries dd WHERE dd.Category = "Employer" {{ AND dd.Value1 IN ##vendor## }} ORDER BY dd.Label';
+
   constructor(
     private lookupService: LookupService,
-    private portalItemService: PortalItemService
+    private portalItemService: PortalItemService,
+    private notifyService: NotifyService
   ) {}
 
   set value(val: string | any[]) {
@@ -74,9 +83,23 @@ export class OptionDialogComponent implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  onMonacoInit() {
+  onMonacoEditorInit(editor: any) {
+    const formControlQuery = this.formControlQuery;
+    editor.onMouseDown(() => {
+      if (formControlQuery?.value === this.helperMessage) {
+        formControlQuery.reset();
+        setTimeout(() => {
+          formControlQuery.markAsPristine();
+        }, 100);
+      }
+    });
+    editor.onDidBlurEditorText(() => {
+      if (!formControlQuery?.value) {
+        formControlQuery?.setValue(this.helperMessage);
+      }
+    });
     setTimeout(() => {
-      this.formControlQuery.markAsPristine();
+      formControlQuery?.markAsPristine();
     });
   }
 
@@ -84,7 +107,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
     this.isAdvanced = !this.isAdvanced;
     if (this.isAdvanced) {
       this.formControlName.reset();
-      this.formControlQuery.reset();
+      this.formControlQuery.setValue(this.helperMessage);
       this.getOptionQueryDetail();
     }
   }
@@ -131,7 +154,6 @@ export class OptionDialogComponent implements ControlValueAccessor {
   showDialog() {
     this.isAdvanced =
       (!this.options || this.options.length === 0) && !!this.optionsLookup;
-
     if (this.isAdvanced) {
       this.getOptionQueryDetail();
       this.visible = true;
@@ -158,10 +180,14 @@ export class OptionDialogComponent implements ControlValueAccessor {
       if (!this.formControlQuery.valid) {
         this.formControlQuery.markAsDirty();
       }
+      if (this.formControlQuery.value === this.helperMessage) {
+        this.notifyService.notifyWarning('', 'Query  Text is required.');
+      }
       return (
         this.formControlConnection.valid &&
         this.formControlName.valid &&
-        this.formControlQuery.valid
+        this.formControlQuery.valid &&
+        this.formControlQuery.value !== this.helperMessage
       );
     } else {
       const valid = this.formControlOptions.reduce((r, x) => {
@@ -184,7 +210,10 @@ export class OptionDialogComponent implements ControlValueAccessor {
           .saveOptionQuery({
             id: this.optionsLookup || '',
             name: this.formControlName.value,
-            queryText: this.formControlQuery.value,
+            queryText:
+              this.formControlQuery.value === this.helperMessage
+                ? ''
+                : this.formControlQuery.value,
             connectionId: this.formControlConnection.value
           })
           .subscribe(res => {
