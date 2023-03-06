@@ -40,15 +40,29 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
 
   onChange!: any;
   onTouch!: any;
+  isOk!: any;
+  isCancle!: any;
 
   advanceData: any = [];
   hasAdvanceData = false;
   helperMessage =
-    '//Please enter the connection string to connect to your server.\r\n\r\n' +
-    '//form.get(`filedKey`).value === xxx';
+    '// Please enter the validation expression that returns boolen.\r\n' +
+    '// E.g. \r\n' +
+    '// model.Name && model.Name.length > 5 \r\n' +
+    '// model.Password === model.ConfirmPassowrd \r\n' +
+    '// /^[0-9]*$/.test(model.PhoneNumber)';
+
+  _validatorValue: any;
+  get validatorValue() {
+    return this._validatorValue;
+  }
+  set validatorValue(val: any) {
+    this._validatorValue = val;
+  }
 
   @Input()
   set value(val: any) {
+    this._validatorValue = val;
     this.initForm(val ?? []);
   }
 
@@ -109,7 +123,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
         selected.push(item);
       } else {
         expressions = item;
-        if (item?.expression?.trim() || item?.message?.trim()) {
+        if (item?.expression || item?.message) {
           this.hasAdvanceData = true;
         }
       }
@@ -123,6 +137,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
 
   ngOnInit() {
     this.form.get('validatorFormControl')?.valueChanges.subscribe(() => {
+      this.isCancle = true;
       this.onSendData();
     });
   }
@@ -138,6 +153,13 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   showDialog() {
+    console.log(this.advanceData);
+    if (this.isOk || this.isCancle) {
+      this.initForm(this.advanceData);
+    } else {
+      this.initForm(this.validatorValue ?? []);
+    }
+
     this.visible = true;
   }
 
@@ -150,7 +172,9 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
       expressionFormControl.value != this.helperMessage
     ) {
       this.visible = false;
+      this.isOk = true;
       this.hasAdvanceData = true;
+      this.onSendData();
     } else {
       this.notifyService.notifyWarning(
         '',
@@ -158,9 +182,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
       );
       expressionFormControl?.markAsDirty();
       messageFormControl?.markAsDirty();
-      this.hasAdvanceData = false;
     }
-    this.onSendData();
   }
 
   onSendData() {
@@ -183,12 +205,13 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
         }
       }
     });
+    console.log('data', data);
     this.advanceData = data;
     this.onChange?.(data);
   }
 
   onCancel() {
-    this.form.get('expressionFormControl')?.reset();
+    this.form.get('expressionFormControl')?.setValue('');
     this.form.get('messageFormControl')?.reset();
     this.visible = false;
   }
@@ -204,6 +227,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     this.form.get('expressionFormControl')?.reset();
     this.form.get('messageFormControl')?.reset();
     this.onChange?.(this.advanceData);
+    this.isCancle = true;
     this.hasAdvanceData = false;
   }
 }

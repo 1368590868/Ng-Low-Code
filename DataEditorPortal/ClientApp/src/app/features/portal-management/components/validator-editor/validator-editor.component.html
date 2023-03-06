@@ -64,7 +64,7 @@
         <ngx-monaco-editor
           *ngIf="visible"
           formControlName="expressionFormControl"
-          class="pt-3 border-round monaco-editor-wrapper"
+          class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
           (onInit)="onMonacoEditorInit($event)"
           [options]="{ language: 'javascript' }"></ngx-monaco-editor>
       </div>

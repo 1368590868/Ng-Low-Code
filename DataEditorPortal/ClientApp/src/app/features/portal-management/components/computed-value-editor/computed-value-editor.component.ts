@@ -50,6 +50,8 @@ export class ComputedValueEditorComponent
     message: ''
   };
 
+  isOk!: boolean | undefined;
+
   helperMessage =
     '-- Enter the query text for fetching the data. \r\n\r\n' +
     '-- E.g. \r\n' +
@@ -61,8 +63,17 @@ export class ComputedValueEditorComponent
   advanceData: any = [];
   hasAdvanceData = false;
 
+  _computedValue: any;
+  get computedValue() {
+    return this._computedValue;
+  }
+  set computedValue(val: any) {
+    this._computedValue = val;
+  }
+
   @Input()
   set value(val: any) {
+    this._computedValue = val;
     this.initForm(val ?? {});
   }
   constructor(private notifyService: NotifyService) {
@@ -108,7 +119,7 @@ export class ComputedValueEditorComponent
       if (val?.name) {
         this.form.setValue({
           nameFormControl: val.name,
-          queryTextFormControl: null,
+          queryTextFormControl: this.helperMessage,
           typeFormControl: null
         });
       }
@@ -116,7 +127,7 @@ export class ComputedValueEditorComponent
   }
 
   ngOnInit() {
-    this.form.valueChanges.subscribe(() => {
+    this.form.get('nameFormControl')?.valueChanges.subscribe(() => {
       this.onSendData();
     });
   }
@@ -132,6 +143,11 @@ export class ComputedValueEditorComponent
   }
 
   showDialog() {
+    if (this.isOk) {
+      this.initForm(this.advanceData);
+    } else {
+      this.initForm(this.computedValue ?? {});
+    }
     this.visible = true;
   }
 
@@ -144,7 +160,9 @@ export class ComputedValueEditorComponent
       queryTextFormControl?.value != this.helperMessage
     ) {
       this.hasAdvanceData = true;
+      this.isOk = true;
       this.visible = false;
+      this.onSendData();
     } else {
       this.notifyService.notifyWarning(
         '',
@@ -152,14 +170,11 @@ export class ComputedValueEditorComponent
       );
       queryTextFormControl?.markAsDirty();
       typeFormControl?.markAsDirty();
-
-      this.hasAdvanceData = false;
     }
-    this.onSendData();
   }
 
   onSendData() {
-    const name = this.form.get('nameFormControl')!.value ?? '';
+    const name = this.form.get('nameFormControl')!.value ?? null;
     let data: { type?: string; name?: string; queryText?: string } = {};
     if (this.hasAdvanceData) {
       data = {
@@ -178,7 +193,7 @@ export class ComputedValueEditorComponent
 
     if (
       Object.prototype.hasOwnProperty.call(data, 'queryText') &&
-      !data.queryText?.trim()
+      !data.queryText
     ) {
       delete data.queryText;
     }
@@ -199,8 +214,7 @@ export class ComputedValueEditorComponent
 
   onRemove() {
     this.hasAdvanceData = false;
-    this.form.get('typeFormControl')?.reset();
-    this.form.get('queryTextFormControl')?.reset();
+    this.form.reset();
   }
 
   removeAdvance() {
