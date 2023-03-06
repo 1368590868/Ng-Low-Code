@@ -20,7 +20,16 @@
     <ng-template pTemplate="body" let-viewData>
       <tr>
         <td>{{ viewData.name }}</td>
-        <td>{{ viewData.value }}</td>
+        <td>
+          <ng-container>
+            <ng-container *ngIf="viewData.name === 'eventTime'">
+              {{ viewData.value | date : 'dd/MM/yyyy HH:mm:ss' }}
+            </ng-container>
+            <ng-container *ngIf="viewData.name !== 'eventTime'">
+              {{ viewData.value }}
+            </ng-container>
+          </ng-container>
+        </td>
       </tr>
     </ng-template>
   </p-table>
