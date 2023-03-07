@@ -105,7 +105,7 @@
   </p>
   <ngx-monaco-editor
     *ngIf="showQuery || queryTextRequired"
-    [(ngModel)]="_formConfig.queryText"
+    [formControl]="formControlQueryText"
     (onInit)="onMonacoEditorInit($event)"
     [style]="{ height: '20rem' }"
     class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"

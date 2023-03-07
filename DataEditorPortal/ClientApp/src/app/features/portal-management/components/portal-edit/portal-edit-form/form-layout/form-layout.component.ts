@@ -5,6 +5,7 @@ import {
   ViewChild,
   ViewChildren
 } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { PickList } from 'primeng/picklist';
 import {
   GridFormConfig,
@@ -44,6 +45,12 @@ export class FormLayoutComponent {
     Object.assign(this._formConfig, val);
     this.showQuery = !!this._formConfig.queryText;
 
+    if (!this._formConfig.queryText) {
+      this.formControlQueryText.setValue(this.helperMessage);
+    } else {
+      this.formControlQueryText.setValue(this._formConfig.queryText);
+    }
+
     if (val.formFields) {
       this.targetColumns = val.formFields.map<GridFormField>(x => {
         return {
@@ -77,6 +84,7 @@ export class FormLayoutComponent {
 
   showQuery = false;
   // showFetchQuery = false;
+  formControlQueryText = new FormControl();
 
   constructor(
     private notifyService: NotifyService,
@@ -89,17 +97,24 @@ export class FormLayoutComponent {
       .map(x => {
         return { label: x.label, value: x.name };
       });
+
+    this.formControlQueryText.valueChanges.subscribe(
+      val => (this._formConfig.queryText = val)
+    );
   }
 
   onMonacoEditorInit(editor: any) {
     editor.onMouseDown(() => {
-      if (this._formConfig.queryText === this.helperMessage) {
-        this._formConfig.queryText = '';
+      if (this.formControlQueryText.value === this.helperMessage) {
+        this.formControlQueryText.reset();
+        setTimeout(() => {
+          this.formControlQueryText.markAsPristine();
+        }, 100);
       }
     });
     editor.onDidBlurEditorText(() => {
-      if (!this._formConfig.queryText) {
-        this._formConfig.queryText = this.helperMessage;
+      if (!this.formControlQueryText.value) {
+        this.formControlQueryText.setValue(this.helperMessage);
       }
     });
   }
@@ -176,8 +191,8 @@ export class FormLayoutComponent {
         }
         if (
           this.queryTextRequired &&
-          !this._formConfig.queryText &&
-          this._formConfig.queryText === this.helperMessage
+          (!this._formConfig.queryText ||
+            this._formConfig.queryText === this.helperMessage)
         ) {
           this.notifyService.notifyWarning(
             'Warning',
@@ -197,11 +212,10 @@ export class FormLayoutComponent {
           );
           return false;
         }
-        alert(this._formConfig.queryText === this.helperMessage);
         if (
           this.queryTextRequired &&
-          !this._formConfig.queryText &&
-          this._formConfig.queryText === this.helperMessage
+          (!this._formConfig.queryText ||
+            this._formConfig.queryText === this.helperMessage)
         ) {
           this.notifyService.notifyWarning(
             'Warning',
@@ -218,6 +232,7 @@ export class FormLayoutComponent {
   getValue(): GridFormConfig {
     const data = JSON.parse(JSON.stringify(this._formConfig)) as GridFormConfig;
     if (!data.useCustomForm) data.formFields = this.targetColumns;
+    if (data.queryText === this.helperMessage) data.queryText = undefined;
     return data;
   }
 
