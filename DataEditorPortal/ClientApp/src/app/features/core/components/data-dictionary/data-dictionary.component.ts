@@ -4,13 +4,11 @@ import { Menu } from 'primeng/menu';
 import {
   DictionaryData,
   NotifyService,
-  DataDictionaryService
-} from 'src/app/shared';
-import {
-  GridParam,
+  DataDictionaryService,
   PaginationEvent,
-  SortMetaEvent
-} from 'src/app/shared/models/dictionary';
+  SortMetaEvent,
+  GridParam
+} from 'src/app/shared';
 import { AddDictionaryDialogComponent } from './add-dictionary-dialog/add-dictionary-dialog.component';
 
 @Component({
@@ -90,8 +88,9 @@ export class DataDictionaryComponent implements OnInit {
   }
 
   onNewOpen() {
-    this.addDialog.header = 'Add Dictionary';
+    this.addDialog.header = 'Create Data Dictionaries';
     this.addDialog.model = {};
+    this.addDialog.okText = 'Create Dictionary';
     this.addDialog.showDialog();
   }
 
@@ -102,7 +101,8 @@ export class DataDictionaryComponent implements OnInit {
           {
             res.command = () => {
               this.addDialog.model = JSON.parse(JSON.stringify(rowData));
-              this.addDialog.header = 'Edit Dictionary';
+              this.addDialog.header = 'Update Data Dictionary';
+              this.addDialog.okText = 'Update Dictionary';
               this.addDialog.showDialog();
             };
           }
@@ -119,8 +119,8 @@ export class DataDictionaryComponent implements OnInit {
 
   deleteConfirm(rowData: DictionaryData) {
     this.confirmationService.confirm({
-      message: 'Do you want to delete this record?',
-      header: 'Delete Confirmation',
+      message: 'Do you want to delete this data dictionary?',
+      header: 'Delete Data Dictionary',
       icon: 'pi pi-info-circle',
 
       accept: () => {
