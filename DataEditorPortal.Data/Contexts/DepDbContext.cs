@@ -621,5 +621,20 @@ namespace DataEditorPortal.Data.Contexts
                 SaveChanges();
             }
         }
+
+        public void AddClientDataSourceConnection(string name, string connectionString)
+        {
+            var connection = DataSourceConnections.FirstOrDefault(x => x.Name == name);
+            if (connection == null)
+            {
+                connection = new DataSourceConnection()
+                {
+                    Name = name,
+                    ConnectionString = connectionString
+                };
+                DataSourceConnections.Add(connection);
+                SaveChanges();
+            }
+        }
     }
 }

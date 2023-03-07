@@ -121,7 +121,12 @@ namespace DataEditorPortal.Web
             {
                 var dbContext = scope.ServiceProvider.GetService<DepDbContext>();
                 dbContext.Database.Migrate();
+
                 dbContext.SetDefaultDataSourceConnection();
+                foreach (var con in Configuration.GetSection("ConnectionStrings").GetChildren())
+                {
+                    dbContext.AddClientDataSourceConnection(con.Key, con.Value);
+                }
             }
 
             // Enable Log files
@@ -138,7 +143,7 @@ namespace DataEditorPortal.Web
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
