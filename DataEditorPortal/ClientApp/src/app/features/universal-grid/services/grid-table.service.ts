@@ -1,14 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable, Subject } from 'rxjs';
-import { ApiResponse, NotifyService } from 'src/app/shared';
+import {
+  ApiResponse,
+  GridParam,
+  NotifyService,
+  SearchParam
+} from 'src/app/shared';
 import {
   GridColumn,
   GridConfig,
-  GridParam,
   GridResult,
-  GridSearchConfig,
-  SearchParam
+  GridSearchConfig
 } from '../models/grid-types';
 
 @Injectable({

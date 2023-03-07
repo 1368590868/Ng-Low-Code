@@ -1,10 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import {
-  GridParam,
-  GridResult
-} from 'src/app/features/universal-grid/models/grid-types';
-import { ApiResponse } from '..';
+import { GridResult } from 'src/app/features/universal-grid/models/grid-types';
+import { ApiResponse, GridParam } from '..';
 
 @Injectable({
   providedIn: 'root'

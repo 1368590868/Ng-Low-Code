@@ -1,21 +1,14 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { finalize, forkJoin, Subject, takeUntil, tap } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
 import {
   GridActionOption,
   GridActionWrapperOption
 } from 'src/app/features/universal-grid-action';
-import {
-  GridColumn,
-  GridConfig,
-  GridParam,
-  GridData,
-  SearchParam
-} from '../../models/grid-types';
+import { GridColumn, GridConfig, GridData } from '../../models/grid-types';
 import { Table } from 'primeng/table';
 import { TableState } from 'primeng/api';
-import { NotifyService, UserService } from 'src/app/shared';
+import { GridParam, SearchParam, UserService } from 'src/app/shared';
 import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 import { DataFormatService } from '../../services/data-format.service';
 
@@ -59,8 +52,6 @@ export class TableComponent implements OnInit, OnDestroy {
   formatters?: any;
 
   constructor(
-    private route: ActivatedRoute,
-    private notifyService: NotifyService,
     private gridTableService: GridTableService,
     private dataFormatService: DataFormatService,
     private userService: UserService
