@@ -7,7 +7,7 @@
   </div>
   <div
     class="flex align-items-center py-2 mr-4"
-    *ngIf="type === 'UPDATE' && !_formConfig.useCustomForm">
+    *ngIf="_type === 'UPDATE' && !_formConfig.useCustomForm">
     <p-inputSwitch
       class="mr-2"
       [(ngModel)]="_formConfig.sameAsAdd"></p-inputSwitch>
@@ -27,7 +27,7 @@
   </div>
 </div>
 <div *ngIf="!_formConfig.useCustomForm">
-  <div *ngIf="type === 'ADD' || !_formConfig.sameAsAdd">
+  <div *ngIf="_type === 'ADD' || !_formConfig.sameAsAdd">
     <p-divider>Layout</p-divider>
     <div class="flex">
       <p-pickList
@@ -93,25 +93,26 @@
   <!-- For ADD and UPDATE -->
   <p-divider>
     <p-button
-      [label]="type === 'ADD' ? 'Query for Adding' : 'Query for Updating'"
+      [label]="_type === 'ADD' ? 'Query for Adding' : 'Query for Updating'"
       [icon]="showQuery || queryTextRequired ? 'pi pi-minus' : 'pi pi-plus'"
       styleClass="p-button-text p-button-sm"
       (onClick)="showQuery = !showQuery || queryTextRequired"></p-button>
   </p-divider>
   <p *ngIf="showQuery || queryTextRequired" class="line-height-2 mb-1">
     Enter your query text that will be run when
-    {{ type === 'ADD' ? 'creating new data' : 'updating details' }}. This is
+    {{ _type === 'ADD' ? 'creating new data' : 'updating details' }}. This is
     required if you use <b>custom query</b> as the Grid Datasource.
   </p>
   <ngx-monaco-editor
     *ngIf="showQuery || queryTextRequired"
     [(ngModel)]="_formConfig.queryText"
+    (onInit)="onMonacoEditorInit($event)"
     [style]="{ height: '20rem' }"
     class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
     [options]="{}"></ngx-monaco-editor>
   <!-- For ADD and UPDATE -->
   <!-- For UPDATE -->
-  <!-- <div *ngIf="type === 'UPDATE'">
+  <!-- <div *ngIf="_type === 'UPDATE'">
     <p-divider>
       <p-button
         label="Query for Fetching details"

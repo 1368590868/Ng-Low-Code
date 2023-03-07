@@ -21,8 +21,20 @@ import { FormDesignerViewComponent } from '../../form-designer/form-designer-vie
   styleUrls: ['./form-layout.component.scss']
 })
 export class FormLayoutComponent {
+  _type: 'ADD' | 'UPDATE' = 'ADD';
   @Input()
-  type: 'ADD' | 'UPDATE' = 'ADD';
+  set type(val: 'ADD' | 'UPDATE') {
+    this._type = val;
+    if (val === 'UPDATE') {
+      this.helperMessage =
+        '-- E.g. \r\n\r\n' +
+        '-- UPDATE dbo.demoTables SET Name = @Name, FirstName = @FirstName, Total = @Total WHERE Id = @Id';
+    }
+  }
+
+  helperMessage =
+    '-- E.g. \r\n\r\n' +
+    '-- INSERT INTO dbo.demoTables (Id, Name, FirstName, Total, CreateDate) VALUES (NEWID(), @Name, @FirstName, @Total, GETDATE())';
 
   _formConfig: GridFormConfig = {
     sameAsAdd: true
@@ -77,6 +89,19 @@ export class FormLayoutComponent {
       .map(x => {
         return { label: x.label, value: x.name };
       });
+  }
+
+  onMonacoEditorInit(editor: any) {
+    editor.onMouseDown(() => {
+      if (this._formConfig.queryText === this.helperMessage) {
+        this._formConfig.queryText = '';
+      }
+    });
+    editor.onDidBlurEditorText(() => {
+      if (!this._formConfig.queryText) {
+        this._formConfig.queryText = this.helperMessage;
+      }
+    });
   }
 
   updateSourceColumns() {
@@ -135,13 +160,13 @@ export class FormLayoutComponent {
         this.notifyService.notifyWarning(
           'Warning',
           `Please select one Custom Form for ${
-            this.type === 'ADD' ? 'Adding' : 'Updating'
+            this._type === 'ADD' ? 'Adding' : 'Updating'
           }.`
         );
         return false;
       }
     } else {
-      if (this.type === 'ADD') {
+      if (this._type === 'ADD') {
         if (!this.targetColumns || this.targetColumns.length === 0) {
           this.notifyService.notifyWarning(
             'Warning',
@@ -149,7 +174,11 @@ export class FormLayoutComponent {
           );
           return false;
         }
-        if (this.queryTextRequired && !this._formConfig.queryText) {
+        if (
+          this.queryTextRequired &&
+          !this._formConfig.queryText &&
+          this._formConfig.queryText === this.helperMessage
+        ) {
           this.notifyService.notifyWarning(
             'Warning',
             'Query for Adding is required if your data source is configured as SQL statements.'
@@ -157,7 +186,7 @@ export class FormLayoutComponent {
           return false;
         }
       }
-      if (this.type === 'UPDATE') {
+      if (this._type === 'UPDATE') {
         if (
           !this._formConfig.sameAsAdd &&
           (!this.targetColumns || this.targetColumns.length === 0)
@@ -168,7 +197,12 @@ export class FormLayoutComponent {
           );
           return false;
         }
-        if (this.queryTextRequired && !this._formConfig.queryText) {
+        alert(this._formConfig.queryText === this.helperMessage);
+        if (
+          this.queryTextRequired &&
+          !this._formConfig.queryText &&
+          this._formConfig.queryText === this.helperMessage
+        ) {
           this.notifyService.notifyWarning(
             'Warning',
             'Query for Updating is required if your data source is configured as SQL statements.'
