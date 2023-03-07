@@ -5,6 +5,7 @@ import { map, Observable, tap } from 'rxjs';
 import { ApiResponse, ConfigDataService, NotifyService } from 'src/app/shared';
 import {
   DataSourceConfig,
+  DataSourceConnection,
   DataSourceTable,
   DataSourceTableColumn,
   GirdDetailConfig,
@@ -34,6 +35,10 @@ export class PortalItemService {
     @Inject('API_URL') apiUrl: string
   ) {
     this._apiUrl = apiUrl;
+  }
+
+  refreshMenu() {
+    this.configDataService.menuChange$.next(null);
   }
 
   getFilterMatchModeOptions({ filterType, type }: any) {
@@ -93,11 +98,7 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${id}/publish`,
         null
       )
-      .pipe(
-        tap(() => {
-          this.configDataService.menuChange$.next(null);
-        })
-      );
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   unpublish(id: string): Observable<ApiResponse<string>> {
@@ -106,11 +107,7 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${id}/unpublish`,
         null
       )
-      .pipe(
-        tap(() => {
-          this.configDataService.menuChange$.next(null);
-        })
-      );
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   moveUp(id: string): Observable<ApiResponse<boolean>> {
@@ -119,11 +116,7 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${id}/move-up`,
         null
       )
-      .pipe(
-        tap(() => {
-          this.configDataService.menuChange$.next(null);
-        })
-      );
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   moveDown(id: string): Observable<ApiResponse<boolean>> {
@@ -132,11 +125,7 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${id}/move-down`,
         null
       )
-      .pipe(
-        tap(() => {
-          this.configDataService.menuChange$.next(null);
-        })
-      );
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   nameExists(name: string, id?: string): Observable<ApiResponse<boolean>> {
@@ -173,38 +162,69 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${this.currentPortalItemId}/update`,
         data
       )
-      .pipe(
-        tap(() => {
-          this.configDataService.menuChange$.next(null);
-        })
-      );
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   // datasource
-  getDataSourceTables(): Observable<DataSourceTable[]> {
+  getDataSourceConnections(): Observable<DataSourceConnection[]> {
+    return this.http
+      .get<ApiResponse<DataSourceConnection[]>>(
+        `${this._apiUrl}portal-item/datasource/connections`
+      )
+      .pipe(map(x => x.result || []));
+  }
+
+  createDataSourceConnection(
+    data: DataSourceConnection
+  ): Observable<ApiResponse<string>> {
+    return this.http.post<ApiResponse<string>>(
+      `${this._apiUrl}portal-item/datasource/connections/create`,
+      data
+    );
+  }
+
+  updateDataSourceConnection(
+    id: string,
+    data: DataSourceConnection
+  ): Observable<ApiResponse<string>> {
+    return this.http.put<ApiResponse<string>>(
+      `${this._apiUrl}portal-item/datasource/connections${id}/update`,
+      data
+    );
+  }
+
+  getDataSourceTables(connectionId: string): Observable<DataSourceTable[]> {
     return this.http
       .get<ApiResponse<DataSourceTable[]>>(
-        `${this._apiUrl}portal-item/datasource/tables`
+        `${this._apiUrl}portal-item/datasource/${connectionId}/tables`
       )
       .pipe(map(x => x.result || []));
   }
 
   getDataSourceTableColumns(
+    connectionId: string,
     tableSchema: string,
     tableName: string
   ): Observable<DataSourceTableColumn[]> {
     return this.http
       .get<ApiResponse<DataSourceTableColumn[]>>(
-        `${this._apiUrl}portal-item/datasource/${tableSchema}/${tableName}/columns`
+        `${this._apiUrl}portal-item/datasource/${connectionId}/table-columns`,
+        {
+          params: {
+            tableSchema,
+            tableName
+          }
+        }
       )
       .pipe(map(x => x.result || []));
   }
 
   getDataSourceTableColumnsByQuery(
+    connectionId: string,
     queryText: string
   ): Observable<ApiResponse<DataSourceTableColumn[]>> {
     return this.http.post<ApiResponse<DataSourceTableColumn[]>>(
-      `${this._apiUrl}portal-item/datasource/query/columns`,
+      `${this._apiUrl}portal-item/datasource/${connectionId}/query-columns`,
       { queryText }
     );
   }
@@ -222,14 +242,25 @@ export class PortalItemService {
       .get<ApiResponse<DataSourceConfig>>(
         `${this._apiUrl}portal-item/${this.currentPortalItemId}/datasource`
       )
-      .pipe(map(x => x.result || {}));
+      .pipe(
+        map(
+          x =>
+            x.result || {
+              dataSourceConnectionId: '',
+              pageSize: 100,
+              idColumn: ''
+            }
+        )
+      );
   }
 
   saveDataSourceConfig(data: DataSourceConfig) {
-    return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}portal-item/${this.currentPortalItemId}/datasource`,
-      data
-    );
+    return this.http
+      .post<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/${this.currentPortalItemId}/datasource`,
+        data
+      )
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   getGridColumnsConfig(): Observable<GridColumn[]> {
@@ -271,10 +302,12 @@ export class PortalItemService {
   }
 
   saveGridFormConfig(data: GirdDetailConfig) {
-    return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`,
-      data
-    );
+    return this.http
+      .post<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`,
+        data
+      )
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   getCustomActions(id: string): Observable<GridCustomAction[]> {

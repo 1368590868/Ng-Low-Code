@@ -10,6 +10,7 @@
         <app-form-layout
           #addLayout
           type="ADD"
+          [queryTextRequired]="dataSourceIsQueryText"
           [config]="addingFormConfig"
           [dbColumns]="dbColumns"></app-form-layout>
       </p-tabPanel>
@@ -17,6 +18,7 @@
         <app-form-layout
           #updateLayout
           type="UPDATE"
+          [queryTextRequired]="dataSourceIsQueryText"
           [config]="updatingFormConfig"
           [dbColumns]="dbColumns"></app-form-layout>
       </p-tabPanel>

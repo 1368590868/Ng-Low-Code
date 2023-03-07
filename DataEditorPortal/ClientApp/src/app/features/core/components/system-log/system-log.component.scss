@@ -14,7 +14,6 @@
       }
     }
     .p-datatable-header {
-      padding-top: 1.75rem;
       z-index: 11;
       border-top: none;
     }
@@ -23,7 +22,6 @@
     }
     .p-paginator {
       border-bottom: none;
-      padding: 1rem 0.375rem;
     }
     .p-datatable-loading-overlay {
       z-index: 12;
@@ -34,6 +32,14 @@
         width: 1.625rem;
         padding: 0.30375rem 0.4375rem;
       }
+    }
+  }
+}
+
+:host {
+  @media screen and (min-width: 1729px) {
+    .layout-content {
+      min-height: calc(100% - 8rem);
     }
   }
 }

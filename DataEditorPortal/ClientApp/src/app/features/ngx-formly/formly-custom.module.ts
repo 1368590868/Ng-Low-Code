@@ -10,7 +10,7 @@ import { FormlyInputNumberModule } from './inputnumber';
 import { FormlyMultiSelectModule } from './multiselect';
 import { FormlySelectModule } from './select';
 import { FormlyMonacoEditorModule } from './monacoEditor';
-import { CurrentDateModule } from './currentdate';
+import { DateValidatorModule } from './datevalidator';
 import { UniversalRegexpModule } from './universalregexp';
 
 @NgModule({
@@ -26,7 +26,7 @@ import { UniversalRegexpModule } from './universalregexp';
     FormlyIconSelectModule,
     FormlyInputNumberModule,
     FormlyMonacoEditorModule,
-    CurrentDateModule,
+    DateValidatorModule,
     UniversalRegexpModule
   ]
 })

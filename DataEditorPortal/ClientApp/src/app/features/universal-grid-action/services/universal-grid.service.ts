@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { catchError, map, Observable, takeWhile, tap } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ApiResponse, NotifyService } from 'src/app/shared';
+import { GridColumn } from '../../portal-management/models/portal-item';
 import { EditFormData, EditFormField } from '../models/edit';
 import { ExportParam } from '../models/export';
 
@@ -67,5 +68,13 @@ export class UniversalGridService {
       param,
       { responseType: 'blob' }
     );
+  }
+
+  getTableColumns(): Observable<GridColumn[]> {
+    return this.http
+      .get<ApiResponse<GridColumn[]>>(
+        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/columns`
+      )
+      .pipe(map(res => res.result || []));
   }
 }

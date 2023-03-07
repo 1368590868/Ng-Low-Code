@@ -70,7 +70,9 @@
         </ng-template>
       </p-pickList>
       <div class="config-form p-picklist">
-        <div class="p-picklist-header">Configuration Form</div>
+        <div class="p-picklist-header">
+          <div class="p-picklist-title">Configuration Form</div>
+        </div>
         <div class="p-picklist-list flex-grow-1">
           <div *ngIf="this.model && this.model.key; else emptyMessage">
             <app-form-designer-config
@@ -92,17 +94,17 @@
   <p-divider>
     <p-button
       [label]="type === 'ADD' ? 'Query for Adding' : 'Query for Updating'"
-      [icon]="showQuery ? 'pi pi-minus' : 'pi pi-plus'"
+      [icon]="showQuery || queryTextRequired ? 'pi pi-minus' : 'pi pi-plus'"
       styleClass="p-button-text p-button-sm"
-      (onClick)="showQuery = !showQuery"></p-button>
+      (onClick)="showQuery = !showQuery || queryTextRequired"></p-button>
   </p-divider>
-  <p *ngIf="showQuery" class="mb-1">
+  <p *ngIf="showQuery || queryTextRequired" class="line-height-2 mb-1">
     Enter your query text that will be run when
     {{ type === 'ADD' ? 'creating new data' : 'updating details' }}. This is
     required if you use <b>custom query</b> as the Grid Datasource.
   </p>
   <ngx-monaco-editor
-    *ngIf="showQuery"
+    *ngIf="showQuery || queryTextRequired"
     [(ngModel)]="_formConfig.queryText"
     [style]="{ height: '20rem' }"
     class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"

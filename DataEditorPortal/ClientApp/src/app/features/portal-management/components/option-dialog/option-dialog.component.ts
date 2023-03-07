@@ -5,7 +5,10 @@ import {
   NG_VALUE_ACCESSOR
 } from '@angular/forms';
 import { FieldType, FieldTypeConfig } from '@ngx-formly/core';
+import { NotifyService } from 'src/app/shared';
+import { DataSourceConnection } from '../../models/portal-item';
 import { LookupService } from '../../services/lookup.service';
+import { PortalItemService } from '../../services/portal-item.service';
 
 interface OptionItem {
   formControl: FormControl;
@@ -33,17 +36,27 @@ export class OptionDialogComponent implements ControlValueAccessor {
   disabled = false;
 
   visible = false;
-  buttonDisabled = false;
   isLoading = false;
-  dialogStyle: any = {
-    minWidth: '40rem'
-  };
 
+  dbConnections: { label: string; value: string }[] = [];
+
+  formControlConnection: FormControl = new FormControl();
   formControlOptions: OptionItem[] = [];
   formControlName: FormControl = new FormControl();
   formControlQuery: FormControl = new FormControl();
 
-  constructor(private lookupService: LookupService) {}
+  helperMessage =
+    '-- Enter some query text to get options from database.  \r\n\r\n' +
+    '-- It needs return two columns at least. Use format ##FIELD## to reference other fields in same form as paramters. And use {{}} mark the criteria is optional.   \r\n\r\n' +
+    '\r\n' +
+    '-- E.g. \r\n' +
+    '-- SELECT dd.Label, dd.Value, dd.Value1, dd.Value2 FROM dep.DataDictionaries dd WHERE dd.Category = "Employer" {{ AND dd.Value1 IN ##vendor## }} ORDER BY dd.Label';
+
+  constructor(
+    private lookupService: LookupService,
+    private portalItemService: PortalItemService,
+    private notifyService: NotifyService
+  ) {}
 
   set value(val: string | any[]) {
     if (Array.isArray(val)) {
@@ -70,28 +83,32 @@ export class OptionDialogComponent implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  onMonacoInit() {
+  onMonacoEditorInit(editor: any) {
+    const formControlQuery = this.formControlQuery;
+    editor.onMouseDown(() => {
+      if (formControlQuery?.value === this.helperMessage) {
+        formControlQuery.reset();
+        setTimeout(() => {
+          formControlQuery.markAsPristine();
+        }, 100);
+      }
+    });
+    editor.onDidBlurEditorText(() => {
+      if (!formControlQuery?.value) {
+        formControlQuery?.setValue(this.helperMessage);
+      }
+    });
     setTimeout(() => {
-      this.formControlQuery.markAsPristine();
+      formControlQuery?.markAsPristine();
     });
   }
 
   changeMode() {
     this.isAdvanced = !this.isAdvanced;
     if (this.isAdvanced) {
-      this.dialogStyle = {
-        minWidth: '50rem',
-        minHeight: '20rem'
-      };
       this.formControlName.reset();
-      this.formControlQuery.reset();
-      if (this.optionsLookup) {
-        this.lookupService.getOptionQuery(this.optionsLookup).subscribe(res => {
-          this.formControlOptions = [];
-          this.formControlName.setValue(res?.name);
-          this.formControlQuery.setValue(res?.queryText);
-        });
-      }
+      this.formControlQuery.setValue(this.helperMessage);
+      this.getOptionQueryDetail();
     }
   }
 
@@ -108,18 +125,37 @@ export class OptionDialogComponent implements ControlValueAccessor {
     ];
   }
 
-  showDialog() {
-    this.isAdvanced =
-      (!this.options || this.options.length === 0) && !!this.optionsLookup;
-
-    if (this.isAdvanced) {
-      this.formControlOptions = [];
+  getOptionQueryDetail() {
+    this.formControlOptions = [];
+    this.portalItemService.getDataSourceConnections().subscribe(res => {
+      const connections: DataSourceConnection[] = res;
+      if (connections.length === 0) return;
+      this.dbConnections = connections.map(x => {
+        return { label: x.name, value: x.id || '' };
+      });
       if (this.optionsLookup) {
         this.lookupService.getOptionQuery(this.optionsLookup).subscribe(res => {
           this.formControlName.setValue(res?.name);
           this.formControlQuery.setValue(res?.queryText);
+
+          // check if current selected connections exists, if not exist, use the first
+          if (!connections.find(x => x.id === res?.connectionId)) {
+            this.formControlConnection.setValue(connections[0].id);
+          } else {
+            this.formControlConnection.setValue(res?.connectionId);
+          }
         });
+      } else {
+        this.formControlConnection.setValue(connections[0].id);
       }
+    });
+  }
+
+  showDialog() {
+    this.isAdvanced =
+      (!this.options || this.options.length === 0) && !!this.optionsLookup;
+    if (this.isAdvanced) {
+      this.getOptionQueryDetail();
       this.visible = true;
     } else {
       if (this.options && this.options?.length > 0) {
@@ -135,13 +171,24 @@ export class OptionDialogComponent implements ControlValueAccessor {
 
   validate() {
     if (this.isAdvanced) {
+      if (!this.formControlConnection.valid) {
+        this.formControlConnection.markAsDirty();
+      }
       if (!this.formControlName.valid) {
         this.formControlName.markAsDirty();
       }
       if (!this.formControlQuery.valid) {
         this.formControlQuery.markAsDirty();
       }
-      return this.formControlName.valid && this.formControlQuery.valid;
+      if (this.formControlQuery.value === this.helperMessage) {
+        this.notifyService.notifyWarning('', 'Query  Text is required.');
+      }
+      return (
+        this.formControlConnection.valid &&
+        this.formControlName.valid &&
+        this.formControlQuery.valid &&
+        this.formControlQuery.value !== this.helperMessage
+      );
     } else {
       const valid = this.formControlOptions.reduce((r, x) => {
         if (!x.formControl.valid) {
@@ -158,13 +205,19 @@ export class OptionDialogComponent implements ControlValueAccessor {
   onOk() {
     if (this.validate()) {
       if (this.isAdvanced) {
+        this.isLoading = true;
         this.lookupService
           .saveOptionQuery({
             id: this.optionsLookup || '',
             name: this.formControlName.value,
-            queryText: this.formControlQuery.value
+            queryText:
+              this.formControlQuery.value === this.helperMessage
+                ? ''
+                : this.formControlQuery.value,
+            connectionId: this.formControlConnection.value
           })
           .subscribe(res => {
+            this.isLoading = false;
             if (res && !res.isError) {
               this.options = [];
               this.optionsLookup = res.result;
@@ -189,6 +242,13 @@ export class OptionDialogComponent implements ControlValueAccessor {
   onCancel() {
     this.visible = false;
   }
+
+  /* db connection dialog */
+  connectionSaved(item: { label: string; value: string }) {
+    this.dbConnections.push(item);
+    this.formControlConnection.setValue(item.value);
+  }
+  /* db connection dialog */
 }
 
 @Component({

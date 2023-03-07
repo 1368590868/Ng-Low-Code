@@ -41,6 +41,7 @@ import { UserManagerActionComponent } from './components/user-manager-action/use
 import { ManageRoleActionComponent } from './components/manage-role-action/manage-role.component-action';
 import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
 import { UserPermissionActionComponent } from './components/user-permission-action/user-permission-action.component';
+import { SharedModule } from 'src/app/shared';
 
 const GRID_ACTION_CONFIG = [
   {
@@ -197,6 +198,7 @@ const GRID_ACTION_CONFIG = [
     FormsModule,
     ReactiveFormsModule,
     FormlyModule,
+    SharedModule,
     // primeNg
     AnimateModule,
     ToastModule,

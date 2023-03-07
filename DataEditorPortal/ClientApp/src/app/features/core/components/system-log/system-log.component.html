@@ -1,4 +1,4 @@
-<div class="layout-content p-2 flex flex-column p-card">
+<div class="layout-content flex flex-column p-card">
   <div class="flex-grow-1">
     <p-table
       styleClass="p-datatable-striped"
@@ -19,61 +19,71 @@
       dataKey="id">
       <ng-template pTemplate="caption">
         <div class="flex align-items-center my-2">
-          <h3 class="">System log</h3>
+          <h3 class="h-3rem flex align-items-center">System Event Logs</h3>
         </div>
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
           <th style="width: 2.5rem"></th>
-          <th style="width: 20%" pSortableColumn="CreateDate">
-            Event Time <p-sortIcon field="CreateDate"></p-sortIcon>
+          <th style="width: 20%" pSortableColumn="EventTime">
+            <span style="vertical-align: middle">Event Time</span>
+            <p-sortIcon field="EventTime"></p-sortIcon>
             <p-columnFilter
-              type="text"
-              field="CreateDate"
+              style="vertical-align: middle"
+              type="date"
+              field="EventTime"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 20%" pSortableColumn="RowNumber">
-            Event Section <p-sortIcon field="RowNumber"></p-sortIcon>
+          <th style="width: 20%" pSortableColumn="EventSection">
+            <span style="vertical-align: middle">Event Section</span>
+            <p-sortIcon field="EventSection"></p-sortIcon>
             <p-columnFilter
+              style="vertical-align: middle"
               type="text"
-              field="RowNumber"
+              field="EventSection"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 20%" pSortableColumn="Division">
-            Category <p-sortIcon field="Division"></p-sortIcon>
+          <th style="width: 20%" pSortableColumn="Category">
+            <span style="vertical-align: middle">Category</span>
+            <p-sortIcon field="Category"></p-sortIcon>
             <p-columnFilter
+              style="vertical-align: middle"
               type="text"
-              field="Division"
+              field="Category"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 16%" pSortableColumn="Name">
-            Event Name <p-sortIcon field="Name"></p-sortIcon>
+          <th style="width: 16%" pSortableColumn="EventName">
+            <span style="vertical-align: middle">Event Name</span>
+            <p-sortIcon field="EventName"></p-sortIcon>
             <p-columnFilter
+              style="vertical-align: middle"
               type="text"
-              field="Name"
+              field="EventName"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 20%" pSortableColumn="FirstName">
-            User Name <p-sortIcon field="FirstName"></p-sortIcon>
+          <th style="width: 20%" pSortableColumn="UserName">
+            <span style="vertical-align: middle">User Name</span>
+            <p-sortIcon field="UserName"></p-sortIcon>
             <p-columnFilter
+              style="vertical-align: middle"
               type="text"
-              field="FirstName"
+              field="UserName"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
@@ -95,12 +105,12 @@
             </div>
           </td>
           <td>
-            {{ rowData.CreateDate | date : 'dd/MM/yyyy HH:mm:ss' }}
+            {{ rowData.EventTime | date : 'dd/MM/yyyy HH:mm:ss' }}
           </td>
-          <td>{{ rowData.RowNumber }}</td>
-          <td>{{ rowData.Division }}</td>
-          <td>{{ rowData.Name }}</td>
-          <td>{{ rowData.FirstName }}</td>
+          <td>{{ rowData.EventSection }}</td>
+          <td>{{ rowData.Category }}</td>
+          <td>{{ rowData.EventName }}</td>
+          <td>{{ rowData.Username }}</td>
         </tr>
       </ng-template>
     </p-table>
@@ -112,7 +122,7 @@
     [pageLinkSize]="5"
     styleClass="p-paginator-bottom"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries  "
-    [alwaysShow]="false"
+    [alwaysShow]="true"
     (onPageChange)="onPageChange($event)"
     [rowsPerPageOptions]="rowsPerPageOptions"
     [showFirstLastIcon]="true"

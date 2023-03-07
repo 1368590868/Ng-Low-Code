@@ -133,10 +133,17 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   setAllows() {
-    this.allowAdd = this.getPermission('ADD_');
-    this.allowEdit = this.getPermission('EDIT_');
-    this.allowDelete = this.getPermission('DELETE_');
-    this.allowExport = this.getPermission('EXPORT_');
+    if (this.userService.USER.isAdmin) {
+      this.allowAdd = true;
+      this.allowEdit = true;
+      this.allowDelete = true;
+      this.allowExport = true;
+    } else {
+      this.allowAdd = this.getPermission('ADD_');
+      this.allowEdit = this.getPermission('EDIT_');
+      this.allowDelete = this.getPermission('DELETE_');
+      this.allowExport = this.getPermission('EXPORT_');
+    }
   }
 
   setRowActions() {

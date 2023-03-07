@@ -36,7 +36,7 @@ const routes: Routes = [
     canActivate: [AuthRouterGuard, PermissionRouterGuard]
   },
   {
-    path: 'system-log',
+    path: 'system-event-logs',
     component: SystemLogComponent,
     canActivate: [AuthRouterGuard, PermissionRouterGuard]
   },

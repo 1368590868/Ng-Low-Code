@@ -1,13 +1,45 @@
 <form [formGroup]="form">
   <div class="flex align-items-center">
     <p-multiSelect
+      #select
       formControlName="validatorFormControl"
-      class="mr-2 flex-grow-1"
+      class="mr-1 flex-grow-1"
       styleClass="w-full"
       appendTo="body"
       placeholder="Please Select"
-      [showClear]="true"
-      [options]="selectOptions"></p-multiSelect>
+      [showHeader]="false"
+      [filter]="false"
+      display="chip"
+      [options]="selectOptions">
+      <ng-template let-value pTemplate="selectedItems">
+        <div
+          *ngFor="let item of value; let i = index"
+          class="p-multiselect-token">
+          <span class="p-multiselect-token-label">{{
+            select.findLabelByValue(item)
+          }}</span>
+          <span
+            *ngIf="!select.disabled"
+            class="p-multiselect-token-icon pi pi-times-circle"
+            (click)="select.removeChip(item, $event)"></span>
+        </div>
+        <ng-container *ngIf="hasAdvanceData">
+          <div class="p-multiselect-token">
+            <span class="p-multiselect-token-label">Advanced</span>
+            <span
+              class="p-multiselect-token-icon pi pi-times-circle"
+              (click)="removeAdvance()"></span>
+          </div>
+        </ng-container>
+        <ng-container
+          #empty
+          *ngIf="(!value || value.length === 0) && !hasAdvanceData"
+          >{{
+            select.placeholder || select.defaultLabel || 'empty'
+          }}</ng-container
+        >
+      </ng-template>
+    </p-multiSelect>
 
     <p-button
       class="ml-auto"
@@ -25,15 +57,20 @@
     appendTo="body"
     contentStyleClass="border-top-1 surface-border pt-4 pb-0">
     <div #container class="dialog-content">
-      <label class="line-height-3 flex align-items-center">Advanced </label>
-      <ngx-monaco-editor
-        *ngIf="visible"
-        formControlName="expressionFormControl"
-        class="pt-3 border-round monaco-editor-wrapper"
-        [options]="{ language: 'javascript' }"></ngx-monaco-editor>
-      <label>message </label>
+      <div class="mb-3">
+        <label class="line-height-2 mb-1 flex align-items-center"
+          >Javascript Expression
+        </label>
+        <ngx-monaco-editor
+          *ngIf="visible"
+          formControlName="expressionFormControl"
+          class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
+          (onInit)="onMonacoEditorInit($event)"
+          [options]="{ language: 'javascript' }"></ngx-monaco-editor>
+      </div>
+      <label class="line-height-3 flex align-items-center">Message </label>
       <input
-        class="w-full mt-2 mb-2"
+        class="w-full mb-2"
         rows="5"
         pInputText
         formControlName="messageFormControl"

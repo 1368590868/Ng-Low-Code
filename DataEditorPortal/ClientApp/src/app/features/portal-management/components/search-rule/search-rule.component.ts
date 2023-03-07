@@ -11,6 +11,7 @@ import {
 } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { distinctUntilChanged, startWith } from 'rxjs';
+import { NotifyService } from 'src/app/shared';
 
 export interface SaveData {
   label: string;
@@ -99,6 +100,8 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
     this.disabled = isDisabled;
   }
 
+  constructor(private notifyService: NotifyService) {}
+
   ngOnInit(): void {
     this.formControlMatchMode.valueChanges
       .pipe(startWith(this.formControlMatchMode.value), distinctUntilChanged())
@@ -110,6 +113,22 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
       });
   }
 
+  onMonacoEditorInit(editor: any) {
+    editor.onMouseDown(() => {
+      if (this.formControlQuery.value === this.helperMessage) {
+        this.formControlQuery.reset();
+        setTimeout(() => {
+          this.formControlQuery.markAsPristine();
+        }, 100);
+      }
+    });
+    editor.onDidBlurEditorText(() => {
+      if (!this.formControlQuery.value) {
+        this.formControlQuery.setValue(this.helperMessage);
+      }
+    });
+  }
+
   showDialog() {
     this.visible = true;
     this.formControlQuery.reset();
@@ -118,10 +137,14 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   }
 
   onOk() {
-    if (this.formControlQuery.valid) {
+    if (
+      this.formControlQuery.valid &&
+      this.formControlQuery.value != this.helperMessage
+    ) {
       this.whereClause = this.formControlQuery.value;
       this.visible = false;
     } else {
+      this.notifyService.notifyWarning('', 'Query text is required.');
       this.formControlQuery.markAsDirty();
     }
   }

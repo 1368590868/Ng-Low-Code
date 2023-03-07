@@ -3,7 +3,47 @@
     width: 2rem;
     height: 2rem;
   }
-  .p-treetable-header {
-    border-top: none;
+  @media screen and (min-width: 1729px) {
+    .layout-content {
+      min-height: calc(100% - 8rem);
+    }
+  }
+}
+
+.p-card {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  height: calc(100% - 8rem);
+  width: calc(100% - 1rem);
+  left: 0.5rem;
+  top: 0.5rem;
+  ::ng-deep {
+    .p-datatable-wrapper {
+      overflow-x: auto;
+      .p-scroller {
+        height: 100% !important;
+      }
+    }
+    .p-datatable-header {
+      z-index: 11;
+      border-top: none;
+    }
+    [styleClass='p-paginator-bottom'] {
+      z-index: 11;
+    }
+    .p-paginator {
+      border-bottom: none;
+    }
+    .p-datatable-loading-overlay {
+      z-index: 12;
+    }
+    .row-actions {
+      .p-button.p-button-icon-only.p-button-rounded {
+        height: 1.625rem;
+        width: 1.625rem;
+        padding: 0.30375rem 0.4375rem;
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { FormlyModule } from '@ngx-formly/core';
-import { getValidationMessages, getValidators } from './current-date';
+import { getValidationMessages, getValidators } from './date-validator';
 
 @NgModule({
   imports: [
@@ -10,4 +10,4 @@ import { getValidationMessages, getValidators } from './current-date';
     })
   ]
 })
-export class CurrentDateModule {}
+export class DateValidatorModule {}

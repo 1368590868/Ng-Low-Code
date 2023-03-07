@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
 import {
   GridParam,
   GridResult
@@ -16,25 +15,14 @@ export class SystemLogService {
     this._apiUrl = apiUrl;
   }
 
-  getTableData(tableParams: GridParam): Observable<GridResult> {
-    return this.http
-      .post<ApiResponse<GridResult>>(
-        `${this._apiUrl}UniversalGrid/demo-item/data`,
-        tableParams
-      )
-      .pipe(map(res => res.result || { data: [], total: 0 }));
+  getTableData(tableParams: GridParam) {
+    return this.http.post<ApiResponse<GridResult>>(
+      `${this._apiUrl}event-log/list`,
+      tableParams
+    );
   }
 
   getRowData(id: string) {
-    return of({
-      EventTime: '2020-03-01',
-      EventSection: 'test page delete',
-      Category: 'Success',
-      EventName: 'delte page',
-      UserName: 'Admin',
-      Details: 'more details',
-      Params: '{str:test,str:test,str:test,str:test}',
-      Result: 'null'
-    });
+    return this.http.get<ApiResponse<string>>(`${this._apiUrl}event-log/${id}`);
   }
 }

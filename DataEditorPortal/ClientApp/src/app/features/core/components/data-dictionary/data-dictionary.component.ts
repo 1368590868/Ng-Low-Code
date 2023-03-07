@@ -6,6 +6,11 @@ import {
   NotifyService,
   DataDictionaryService
 } from 'src/app/shared';
+import {
+  GridParam,
+  PaginationEvent,
+  SortMetaEvent
+} from 'src/app/shared/models/dictionary';
 import { AddDictionaryDialogComponent } from './add-dictionary-dialog/add-dictionary-dialog.component';
 
 @Component({
@@ -17,6 +22,15 @@ import { AddDictionaryDialogComponent } from './add-dictionary-dialog/add-dictio
 export class DataDictionaryComponent implements OnInit {
   @ViewChild('addDialog') addDialog!: AddDictionaryDialogComponent;
   public data: DictionaryData[] = [];
+
+  totalRecords = 0;
+  first = 0;
+  rows = 10;
+  searchModel = {};
+  filters?: any;
+  multiSortMeta?: any;
+  sortMeta?: any;
+  rowsPerPageOptions: number[] = [10, 20, 50];
   contextMenuItems: MenuItem[] = [
     {
       label: 'Edit',
@@ -35,13 +49,39 @@ export class DataDictionaryComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.getDictionaryList();
+    this.fetchData();
   }
 
-  getDictionaryList() {
-    this.dataDictionaryService.getDictionaryList().subscribe(res => {
-      this.data = res;
-    });
+  onPageChange(event: PaginationEvent) {
+    const { first, rows } = event;
+    this.first = first;
+    this.rows = rows;
+    this.fetchData();
+  }
+
+  onFilter({ filters }: any) {
+    this.first = 0;
+    this.filters = filters;
+    this.fetchData();
+  }
+
+  onSort(sortMeta: SortMetaEvent) {
+    this.first = 0;
+    this.sortMeta = sortMeta;
+    this.fetchData();
+  }
+
+  fetchData() {
+    const fetchDataParam = this.getFetchParam();
+
+    this.dataDictionaryService
+      .getDictionaryList(fetchDataParam)
+      .subscribe(res => {
+        if (!res.isError) {
+          this.data = res.result?.data ?? [];
+          this.totalRecords = res.result?.total ?? 0;
+        }
+      });
   }
 
   onShowMenu(menu: Menu, $event: any, rowData: DictionaryData) {
@@ -51,6 +91,7 @@ export class DataDictionaryComponent implements OnInit {
 
   onNewOpen() {
     this.addDialog.header = 'Add Dictionary';
+    this.addDialog.model = {};
     this.addDialog.showDialog();
   }
 
@@ -89,7 +130,7 @@ export class DataDictionaryComponent implements OnInit {
               'Success',
               'Record deleted successfully'
             );
-            this.getDictionaryList();
+            this.fetchData();
           }
         });
       }
@@ -97,6 +138,44 @@ export class DataDictionaryComponent implements OnInit {
   }
 
   onDiaglogSaved() {
-    this.getDictionaryList();
+    this.fetchData();
+  }
+
+  getFetchParam() {
+    const fetchParam: GridParam = {
+      filters: [],
+      sorts: [],
+      searches: this.searchModel,
+      startIndex: this.first,
+      indexCount: this.rows
+    };
+
+    // set filters from table onFilter params
+    const obj = this.filters;
+    for (const prop in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+        // do stuff
+        const fieldProp = obj[prop];
+        for (let i = 0; i < fieldProp.length; i++) {
+          if (fieldProp[i].value != null) {
+            fieldProp[i].field = prop;
+            fetchParam.filters.push(fieldProp[i]);
+          }
+        }
+      }
+    }
+
+    // set sorts from table onSort event
+    if (this.multiSortMeta && this.multiSortMeta.length > 0) {
+      fetchParam.sorts = this.multiSortMeta;
+    } else if (this.sortMeta) {
+      fetchParam.sorts = [this.sortMeta];
+    }
+
+    // set pagination
+    fetchParam.startIndex = this.first ?? 0;
+    fetchParam.indexCount = this.rows;
+
+    return fetchParam;
   }
 }

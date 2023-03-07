@@ -50,6 +50,8 @@ export class FormLayoutComponent {
     this.updateSourceColumns();
   }
 
+  @Input() queryTextRequired = false;
+
   sourceColumns: GridFormField[] = [];
   targetColumns: GridFormField[] = [];
   @ViewChild('pickList') pickList!: PickList;
@@ -85,6 +87,7 @@ export class FormLayoutComponent {
         return {
           key: x.columnName,
           type: result[0].value,
+          defaultValue: result[0].value === 'checkbox' ? false : null,
           props: {
             label: x.columnName,
             required: !x.allowDBNull
@@ -127,15 +130,51 @@ export class FormLayoutComponent {
   }
 
   validate() {
-    if (
-      this.type === 'ADD' ||
-      (this.type === 'UPDATE' && !this._formConfig.sameAsAdd)
-    ) {
-      if (
-        !this._formConfig.useCustomForm &&
-        (!this.targetColumns || this.targetColumns.length === 0)
-      ) {
+    if (this._formConfig.useCustomForm) {
+      if (!this._formConfig.customFormName) {
+        this.notifyService.notifyWarning(
+          'Warning',
+          `Please select one Custom Form for ${
+            this.type === 'ADD' ? 'Adding' : 'Updating'
+          }.`
+        );
         return false;
+      }
+    } else {
+      if (this.type === 'ADD') {
+        if (!this.targetColumns || this.targetColumns.length === 0) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Please select some fields for Adding Form.'
+          );
+          return false;
+        }
+        if (this.queryTextRequired && !this._formConfig.queryText) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Query for Adding is required if your data source is configured as SQL statements.'
+          );
+          return false;
+        }
+      }
+      if (this.type === 'UPDATE') {
+        if (
+          !this._formConfig.sameAsAdd &&
+          (!this.targetColumns || this.targetColumns.length === 0)
+        ) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Please select some fields for Updating Form.'
+          );
+          return false;
+        }
+        if (this.queryTextRequired && !this._formConfig.queryText) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Query for Updating is required if your data source is configured as SQL statements.'
+          );
+          return false;
+        }
       }
     }
 

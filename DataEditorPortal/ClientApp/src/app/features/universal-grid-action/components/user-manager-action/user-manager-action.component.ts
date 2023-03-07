@@ -183,6 +183,7 @@ export class UserManagerActionComponent
         {
           key: 'autoEmail',
           type: 'checkbox',
+          defaultValue: true,
           props: {
             label: 'Receive Email Notifycations',
             binary: true,

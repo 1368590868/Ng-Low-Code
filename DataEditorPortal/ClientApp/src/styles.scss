@@ -48,7 +48,7 @@ body {
 
 @media screen and (min-width: 1729px) {
   .layout-content {
-    width: 1504px;
+    width: 1504px !important;
     margin-left: auto !important;
     margin-right: auto !important;
     min-height: calc(100% - 7rem);
@@ -78,8 +78,16 @@ formly-form {
   z-index: 9999 !important;
 }
 
-.p-dialog .p-dialog-footer {
-  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+.p-dialog {
+  transform: none !important;
+  .p-dialog-footer {
+    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+  }
+}
+
+.p-inputwrapper-filled .p-multiselect.p-multiselect-chip .p-multiselect-label {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .monaco-editor-wrapper {
@@ -99,5 +107,15 @@ formly-form {
   }
   &:hover {
     border-color: var(--primary-color);
+  }
+}
+
+.p-tooltip {
+  max-width: 20rem;
+}
+
+.p-button-icon-only {
+  .pi.p-button-icon {
+    font-size: 1.25rem;
   }
 }

@@ -34,10 +34,9 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { MessageModule } from 'primeng/message';
-import { MonacoEditorModule, NgxMonacoEditorConfig } from 'ngx-monaco-editor';
+import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabViewModule } from 'primeng/tabview';
-import { FieldsetModule } from 'primeng/fieldset';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
@@ -62,38 +61,13 @@ import {
   FROM_DESIGNER_CONTROLS,
   SearchDesignerConfigComponent,
   ValidatorEditorComponent,
-  FormLayoutComponent
+  ComputedValueEditorComponent,
+  FormlyFieldComputedValueEditorComponent,
+  FormLayoutComponent,
+  AdvancedQueryDialogComponent,
+  DbConnectionDialogComponent
 } from './components';
-
-const monacoConfig: NgxMonacoEditorConfig = {
-  defaultOptions: {
-    theme: 'myTheme',
-    language: 'sql',
-    lineNumbers: 'off',
-    roundedSelection: true,
-    minimap: { enabled: false },
-    wordWrap: true,
-    contextmenu: false,
-    glyphMargin: false,
-    lineDecorationsWidth: 0,
-    lineNumbersMinChars: 0,
-    automaticLayout: true,
-    scrollbar: {
-      verticalScrollbarSize: 7,
-      horizontalScrollbarSize: 7
-    }
-  },
-  onMonacoLoad: () => {
-    monaco.editor.defineTheme('myTheme', {
-      base: 'vs',
-      inherit: true,
-      rules: [],
-      colors: {
-        'editor.background': '#EEEEEE'
-      }
-    });
-  }
-};
+import { MonacoEditorConfig } from './monaco-editor-config';
 
 @NgModule({
   declarations: [
@@ -116,14 +90,18 @@ const monacoConfig: NgxMonacoEditorConfig = {
     FormDesignerConfigComponent,
     SearchDesignerConfigComponent,
     ValidatorEditorComponent,
-    FormLayoutComponent
+    FormLayoutComponent,
+    ComputedValueEditorComponent,
+    FormlyFieldComputedValueEditorComponent,
+    AdvancedQueryDialogComponent,
+    DbConnectionDialogComponent
   ],
   imports: [
     CommonModule,
     PortalManagementRoutingModule,
     UniversalGridActionModule,
     FormsModule,
-    MonacoEditorModule.forRoot(monacoConfig),
+    MonacoEditorModule.forRoot(MonacoEditorConfig),
     ReactiveFormsModule,
     FormlyModule.forChild({
       types: [
@@ -140,6 +118,11 @@ const monacoConfig: NgxMonacoEditorConfig = {
         {
           name: 'validatorEditor',
           component: FormlyFieldValidatorEditorComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'computedValueEditor',
+          component: FormlyFieldComputedValueEditorComponent,
           wrappers: ['form-field']
         }
       ]
@@ -174,8 +157,7 @@ const monacoConfig: NgxMonacoEditorConfig = {
     ContextMenuModule,
     MessageModule,
     ConfirmDialogModule,
-    TabViewModule,
-    FieldsetModule
+    TabViewModule
   ],
   providers: [
     {

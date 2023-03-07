@@ -1,8 +1,26 @@
+import { FilterMetadata, SortMeta } from 'primeng/api';
+
+export interface SearchParam {
+  [name: string]: string;
+}
+
+export interface GridFilterParam extends FilterMetadata {
+  field: string;
+}
+
 export interface PaginationEvent {
   page?: number;
   first: number;
   rows: number;
   pageCount?: number;
+}
+
+export interface GridParam {
+  filters: GridFilterParam[];
+  sorts: SortMeta[];
+  searches?: SearchParam;
+  startIndex: number;
+  indexCount: number;
 }
 
 export interface SortMetaEvent {
@@ -11,7 +29,7 @@ export interface SortMetaEvent {
 }
 
 export interface GridProp {
-  id: string;
+  Id: string;
   EventTime?: string;
   EventSection?: string;
   Category?: string;
@@ -20,4 +38,9 @@ export interface GridProp {
   Details?: string;
   Params?: string;
   Result?: string;
+}
+
+export interface GridResult {
+  data: GridProp[];
+  total: number;
 }

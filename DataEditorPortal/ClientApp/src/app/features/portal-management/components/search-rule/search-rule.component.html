@@ -2,7 +2,7 @@
   <p-dropdown
     *ngIf="!whereClause"
     [formControl]="formControlMatchMode"
-    class="mr-2 flex-grow-1"
+    class="mr-1 flex-grow-1"
     styleClass="w-full"
     appendTo="body"
     placeholder="Please Select"
@@ -11,7 +11,7 @@
     *ngIf="whereClause"
     severity="info"
     text="Use Query Text"
-    styleClass="mr-2"></p-message>
+    styleClass="mr-1"></p-message>
   <p-button
     *ngIf="whereClause"
     styleClass="p-button-text p-button-rounded remove-btn"
@@ -47,8 +47,9 @@
         [formControl]="formControlQuery"
         [style]="dialogStyle"
         [required]="true"
+        (onInit)="onMonacoEditorInit($event)"
         class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
-        [options]="{ fixedOverflowWidgets: true }"></ngx-monaco-editor>
+        [options]="{}"></ngx-monaco-editor>
     </div>
   </div>
   <ng-template pTemplate="footer">

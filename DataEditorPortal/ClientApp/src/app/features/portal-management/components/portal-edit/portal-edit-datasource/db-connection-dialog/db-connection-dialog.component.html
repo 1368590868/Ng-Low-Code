@@ -1,0 +1,39 @@
+<p-dialog
+  header="Create Database Connection"
+  [(visible)]="visible"
+  [style]="{ minWidth: '40rem' }"
+  [modal]="true"
+  [dismissableMask]="true"
+  appendTo="body"
+  contentStyleClass="border-top-1 surface-border pt-4 pb-0">
+  <div #container class="dialog-content">
+    <div class="flex flex-column mb-3">
+      <label class="line-height-3 flex align-items-center"> Name </label>
+      <input pInputText [formControl]="formControlName" required />
+    </div>
+    <div class="flex flex-column">
+      <label class="line-height-2 flex align-items-center mb-1">
+        Connection String
+      </label>
+      <ngx-monaco-editor
+        [formControl]="formControlConnection"
+        [style]="{ minWidth: '40rem' }"
+        [required]="true"
+        (onInit)="onMonacoEditorInit($event)"
+        class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
+        [options]="{}"></ngx-monaco-editor>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button
+      icon="pi pi-times"
+      (onClick)="onCancel()"
+      label="Cancle"
+      styleClass="p-button-text"></p-button>
+    <p-button
+      icon="pi pi-check"
+      (onClick)="onDialogOk()"
+      [loading]="loading"
+      label="Create"></p-button>
+  </ng-template>
+</p-dialog>

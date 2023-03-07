@@ -1,13 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { finalize, tap } from 'rxjs';
-import { GridParam } from 'src/app/features/universal-grid/models/grid-types';
+import { SystemLogDialogComponent, SystemLogService } from 'src/app/shared';
 import {
+  GridParam,
   GridProp,
   PaginationEvent,
   SortMetaEvent
 } from 'src/app/shared/models/system-log';
-import { SystemLogService } from 'src/app/shared/services/system-log.service';
-import { SystemLogDialogComponent } from './system-log-dialog/system-log-dialog.component';
 
 @Component({
   selector: 'app-system-log',
@@ -26,7 +25,6 @@ export class SystemLogComponent implements OnInit {
   filters?: any;
   multiSortMeta?: any;
   sortMeta?: any;
-  firstLoadDone = false;
   rowsPerPageOptions: number[] = [10, 20, 50];
 
   constructor(private systemLogService: SystemLogService) {}
@@ -103,9 +101,10 @@ export class SystemLogComponent implements OnInit {
       .getTableData(fetchDataParam)
       .pipe(
         tap(res => {
-          this.data = res.data;
-          this.totalRecords = res.total;
-          this.firstLoadDone = true;
+          if (!res.isError) {
+            this.data = res.result?.data;
+            this.totalRecords = res.result?.total ?? 0;
+          }
         }),
         finalize(() => {
           this.loading = false;

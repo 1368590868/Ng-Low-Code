@@ -1,7 +1,9 @@
 <div
   class="flex justify-content-center pt-8 bg-gray-300"
   style="min-height: calc(100% - 7rem)">
-  <div class="w-10 flex align-content-start flex-wrap">
+  <div
+    class="w-10 flex align-content-start flex-wrap"
+    *ngIf="homeMenus.length > 0; else emptyMessage">
     <div
       class="tile-block bg-white m-3 p-2 flex flex-column align-items-center cursor-pointer shadow-2"
       *ngFor="let menu of homeMenus"
@@ -13,4 +15,13 @@
       </div>
     </div>
   </div>
+  <ng-template #emptyMessage>
+    <div
+      *ngIf="loading"
+      class="flex flex-column justify-content-center align-items-center"
+      style="margin-top: -8rem">
+      <h3 class="text-8xl">404</h3>
+      <span class="text-5xl">Your permissions do not access the content</span>
+    </div>
+  </ng-template>
 </div>
