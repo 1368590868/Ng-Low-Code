@@ -121,11 +121,14 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
       }
     });
 
-    this.form.setValue({
-      validatorFormControl: selected,
-      expressionFormControl: expressions.expression ?? this.helperMessage,
-      messageFormControl: expressions.message ?? ''
-    });
+    this.form.setValue(
+      {
+        validatorFormControl: selected,
+        expressionFormControl: expressions.expression ?? this.helperMessage,
+        messageFormControl: expressions.message ?? ''
+      },
+      { emitEvent: false }
+    );
   }
 
   ngOnInit() {
