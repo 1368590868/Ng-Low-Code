@@ -18,6 +18,7 @@ import {
   FormlyConfig,
   FormlyFieldProps
 } from '@ngx-formly/core';
+import { concat } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 
 @Component({
@@ -40,10 +41,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
 
   onChange!: any;
   onTouch!: any;
-  isOk!: any;
-  isCancle!: any;
 
-  advanceData: any = [];
   hasAdvanceData = false;
   helperMessage =
     '// Please enter the validation expression that returns boolen.\r\n' +
@@ -52,17 +50,11 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     '// model.Password === model.ConfirmPassowrd \r\n' +
     '// /^[0-9]*$/.test(model.PhoneNumber)';
 
-  _validatorValue: any;
-  get validatorValue() {
-    return this._validatorValue;
-  }
-  set validatorValue(val: any) {
-    this._validatorValue = val;
-  }
+  innerValue: any;
 
   @Input()
   set value(val: any) {
-    this._validatorValue = val;
+    this.innerValue = val;
     this.initForm(val ?? []);
   }
 
@@ -118,7 +110,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     const selected: any[] = [];
     let expressions: any = {};
 
-    val.map((item: any) => {
+    val.forEach((item: any) => {
       if (typeof item === 'string') {
         selected.push(item);
       } else {
@@ -128,6 +120,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
         }
       }
     });
+
     this.form.setValue({
       validatorFormControl: selected,
       expressionFormControl: expressions.expression ?? this.helperMessage,
@@ -137,7 +130,6 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
 
   ngOnInit() {
     this.form.get('validatorFormControl')?.valueChanges.subscribe(() => {
-      this.isCancle = true;
       this.onSendData();
     });
   }
@@ -153,12 +145,10 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   showDialog() {
-    if (this.isOk || this.isCancle) {
-      this.initForm(this.advanceData);
-    } else {
-      this.initForm(this.validatorValue ?? []);
-    }
-
+    this.initForm(this.innerValue);
+    setTimeout(() => {
+      this.form.markAsPristine();
+    });
     this.visible = true;
   }
 
@@ -171,7 +161,6 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
       expressionFormControl.value != this.helperMessage
     ) {
       this.visible = false;
-      this.isOk = true;
       this.hasAdvanceData = true;
       this.onSendData();
     } else {
@@ -185,48 +174,34 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   onSendData() {
-    const data = [
-      ...this.form.get('validatorFormControl')!.value,
-      {
+    let data: any[] = [];
+    if (this.form.get('validatorFormControl')?.value) {
+      data = data.concat(this.form.get('validatorFormControl')?.value);
+    }
+    if (
+      this.form.get('expressionFormControl')?.value &&
+      this.form.get('messageFormControl')?.value &&
+      this.form.get('expressionFormControl')?.value != this.helperMessage
+    ) {
+      data.push({
         expression: this.form.get('expressionFormControl')?.value,
         message: this.form.get('messageFormControl')?.value
-      }
-    ];
-    data.forEach((item: any, index: number) => {
-      if (typeof item === 'object') {
-        Object.keys(item).forEach((key: string) => {
-          if (!item[key]) {
-            delete data[index][key];
-          }
-        });
-        if (Object.keys(item).length === 0) {
-          data.splice(index, 1);
-        }
-      }
-    });
-    this.advanceData = data;
+      });
+    }
+
+    this.innerValue = data;
     this.onChange?.(data);
   }
 
   onCancel() {
-    this.form.get('expressionFormControl')?.setValue('');
-    this.form.get('messageFormControl')?.reset();
     this.visible = false;
   }
 
   removeAdvance() {
-    this.advanceData.forEach((item: any, index: number) => {
-      if (typeof item === 'object') {
-        if (Object.keys(item).length > 0) {
-          this.advanceData.splice(index, 1);
-        }
-      }
-    });
     this.form.get('expressionFormControl')?.reset();
     this.form.get('messageFormControl')?.reset();
-    this.onChange?.(this.advanceData);
-    this.isCancle = true;
     this.hasAdvanceData = false;
+    this.onSendData();
   }
 }
 
