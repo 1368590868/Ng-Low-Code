@@ -7,10 +7,27 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>Setup</AssemblyName>
     <RootNamespace>Setup</RootNamespace>
+    <WebDirectory>web</WebDirectory>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 
+  <Target Name="PublishWeb" AfterTargets="ComputeFilesToPublish">
+      <Exec Command="dotnet publish &quot;$(SolutionDir)\DataEditorPortal.Web\DataEditorPortal.Web.csproj&quot; --configuration Release /p:PublishProfile=Production --output &quot;$(ProjectDir)\web&quot;" />
+
+      <ItemGroup>
+          <WebFiles Include="web\**" />
+          <ResolvedFileToPublish Include="@(WebFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+              <RelativePath>%(WebFiles.Identity)</RelativePath>
+              <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+              <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+          </ResolvedFileToPublish>
+      </ItemGroup>
+  </Target>
+
+    <Target Name="CleanPublishWeb" AfterTargets="Publish">
+        <RemoveDir Directories="web" />
+    </Target>
 </Project>
