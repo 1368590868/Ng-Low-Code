@@ -29,6 +29,13 @@
           [config]="updatingFormConfig"
           [dbColumns]="dbColumns"></app-form-layout>
       </p-tabPanel> -->
+      <p-tabPanel header="Settings for Deleting">
+        <app-form-layout-delete
+          #deleteLayout
+          type="Delete"
+          [queryTextRequired]="dataSourceIsQueryText"
+          [config]="deleteFormConfig"></app-form-layout-delete>
+      </p-tabPanel>
     </p-tabView>
   </div>
 

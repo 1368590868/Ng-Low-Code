@@ -8,6 +8,7 @@ import {
   GirdDetailConfig
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
+import { FormLayoutDeleteComponent } from './form-layout-delete/form-layout-delete.component';
 import { FormLayoutComponent } from './form-layout/form-layout.component';
 
 @Component({
@@ -22,11 +23,13 @@ export class PortalEditFormComponent implements OnInit {
   isSavingAndExit = false;
 
   addingFormConfig: GridFormConfig = {};
+  deleteFormConfig: GridFormConfig = {};
   updatingFormConfig: GridFormConfig = {};
   infoFormConfig: GridFormConfig = {};
 
   dbColumns: DataSourceTableColumn[] = [];
   @ViewChild('addLayout') addLayout!: FormLayoutComponent;
+  @ViewChild('deleteLayout') deleteLayout!: FormLayoutDeleteComponent;
   @ViewChild('updateLayout') updateLayout!: FormLayoutComponent;
 
   dataSourceIsQueryText = false;
@@ -47,8 +50,8 @@ export class PortalEditFormComponent implements OnInit {
         this.portalItemService.getDataSourceConfig()
       ]).subscribe(res => {
         this.isLoading = false;
-
         this.addingFormConfig = res[0].addingForm || {};
+        this.deleteFormConfig = res[0].deletingForm || {};
         this.updatingFormConfig = res[0].updatingForm || { sameAsAdd: true };
         this.infoFormConfig = res[0].infoForm || {};
         this.dbColumns = res[1];
@@ -67,6 +70,9 @@ export class PortalEditFormComponent implements OnInit {
     if (!this.updateLayout.validate()) {
       return false;
     }
+    if (!this.deleteLayout.validate()) {
+      return false;
+    }
     return true;
   }
 
@@ -76,6 +82,7 @@ export class PortalEditFormComponent implements OnInit {
     const data: GirdDetailConfig = {
       addingForm: this.addLayout.getValue(),
       updatingForm: this.updateLayout.getValue(),
+      deletingForm: this.deleteLayout.getValue(),
       infoForm: {}
     };
 

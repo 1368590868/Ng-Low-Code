@@ -93,6 +93,7 @@ export interface GridFormField {
 export interface GirdDetailConfig {
   addingForm?: GridFormConfig;
   updatingForm?: GridFormConfig;
+  deletingForm?: GridFormConfig;
   infoForm?: GridFormConfig;
 }
 
