@@ -11,7 +11,7 @@ import { NotifyService } from 'src/app/shared';
 })
 export class FormLayoutDeleteComponent {
   helperMessage =
-    '-- E.g. \r\n\r\n' + '-- DELETE dbo.demoTables WHERE Id = @Id';
+    '-- E.g. \r\n\r\n' + '-- DELETE dbo.demoTables WHERE Id IN @Id';
 
   _formConfig: GridFormConfig = {};
   @Input() type!: string;
@@ -31,7 +31,6 @@ export class FormLayoutDeleteComponent {
   customActions: { label: string | undefined; value: string }[] = [];
 
   showQuery = false;
-  // showFetchQuery = false;
   formControlQueryText = new FormControl();
 
   constructor(
