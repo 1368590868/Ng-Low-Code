@@ -2,13 +2,13 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
+import { FormLayoutDeleteComponent } from '../..';
 import {
   GridFormConfig,
   DataSourceTableColumn,
   GirdDetailConfig
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import { FormLayoutDeleteComponent } from './form-layout-delete/form-layout-delete.component';
 import { FormLayoutComponent } from './form-layout/form-layout.component';
 
 @Component({

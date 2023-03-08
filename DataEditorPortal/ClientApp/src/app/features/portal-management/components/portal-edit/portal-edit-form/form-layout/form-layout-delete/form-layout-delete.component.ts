@@ -13,9 +13,7 @@ export class FormLayoutDeleteComponent {
   helperMessage =
     '-- E.g. \r\n\r\n' + '-- DELETE dbo.demoTables WHERE Id = @Id';
 
-  _formConfig: GridFormConfig = {
-    sameAsAdd: true
-  };
+  _formConfig: GridFormConfig = {};
   @Input() type!: string;
   @Input()
   set config(val: GridFormConfig) {
