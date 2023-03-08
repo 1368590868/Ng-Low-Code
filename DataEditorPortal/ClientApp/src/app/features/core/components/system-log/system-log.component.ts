@@ -4,10 +4,10 @@ import {
   GridParam,
   PaginationEvent,
   SortMetaEvent,
+  SystemLogData,
   SystemLogDialogComponent,
   SystemLogService
 } from 'src/app/shared';
-import { GridProp } from 'src/app/shared/models/system-log';
 
 @Component({
   selector: 'app-system-log',
@@ -90,7 +90,7 @@ export class SystemLogComponent implements OnInit {
     return fetchParam;
   }
 
-  showDescription(row: GridProp) {
+  showDescription(row: SystemLogData) {
     this.systemDialog.show(row);
   }
 

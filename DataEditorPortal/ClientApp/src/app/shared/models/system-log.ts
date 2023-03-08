@@ -1,4 +1,4 @@
-export interface GridProp {
+export interface SystemLogData {
   Id: string;
   EventTime?: string;
   EventSection?: string;
@@ -11,6 +11,6 @@ export interface GridProp {
 }
 
 export interface GridResult {
-  data: GridProp[];
+  data: SystemLogData[];
   total: number;
 }
