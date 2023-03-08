@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataEditorPortal.Web", "Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataEditorPortal.Data", "DataEditorPortal.Data\DataEditorPortal.Data.csproj", "{A189ABFB-3AD3-496C-8828-5D9C9623676E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEditorPortal.ExcelExport", "DataEditorPortal.ExcelExport\DataEditorPortal.ExcelExport.csproj", "{82B54F25-0379-4216-BCA8-FDC1C66B8C8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataEditorPortal.ExcelExport", "DataEditorPortal.ExcelExport\DataEditorPortal.ExcelExport.csproj", "{82B54F25-0379-4216-BCA8-FDC1C66B8C8E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Setup", "DataEditorPortal.Setup\Setup.csproj", "{68BC8666-64C0-4710-8B0A-DBA17ACD78A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{82B54F25-0379-4216-BCA8-FDC1C66B8C8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82B54F25-0379-4216-BCA8-FDC1C66B8C8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82B54F25-0379-4216-BCA8-FDC1C66B8C8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68BC8666-64C0-4710-8B0A-DBA17ACD78A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68BC8666-64C0-4710-8B0A-DBA17ACD78A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68BC8666-64C0-4710-8B0A-DBA17ACD78A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68BC8666-64C0-4710-8B0A-DBA17ACD78A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

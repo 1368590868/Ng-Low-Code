@@ -1,0 +1,25 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Setup"
+        xmlns:Models="clr-namespace:Setup.Models" x:Class="Setup.Connection"
+        mc:Ignorable="d"
+        Title="Connection" Height="300" Width="397" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
+    <Grid>
+        <Label x:Name="label" Content="Name:" Margin="5,3,0,0" HorizontalAlignment="Left" Width="44" Height="26" VerticalAlignment="Top"/>
+        <TextBox x:Name="textBox" Margin="10,28,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding ConnectionName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsConnectionNameEnabled, Mode=OneWay}">
+            <TextBox.DataContext>
+                <Models:DatabaseConnection/>
+            </TextBox.DataContext>
+        </TextBox>
+        <Label x:Name="label1" Content="Connection String:" HorizontalAlignment="Left" Margin="5,47,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="textBox1" Margin="10,71,10,36" TextWrapping="Wrap" Text="{Binding ConnectionString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <TextBox.DataContext>
+                <Models:DatabaseConnection/>
+            </TextBox.DataContext>
+        </TextBox>
+        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Right" Margin="0,0,10,10" Width="40" Click="btnSave_Click" Height="20" VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>
