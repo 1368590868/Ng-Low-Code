@@ -66,15 +66,18 @@ export class FormLayoutDeleteComponent {
   }
 
   validate() {
-    if (this.type === 'Delete') {
-      if (
-        this.queryTextRequired &&
-        (!this._formConfig.queryText ||
-          this._formConfig.queryText === this.helperMessage)
-      ) {
+    if (this._formConfig.useCustomForm) {
+      if (!this._formConfig.customFormName) {
         this.notifyService.notifyWarning(
           'Warning',
-          'Query for Deleting is required if your data source is configured as SQL statements.'
+          `Please select one Custom Form for Deleting.`
+        );
+        return false;
+      }
+      if (!this._formConfig.queryText) {
+        this.notifyService.notifyWarning(
+          'Warning',
+          `Query for Deleting is required if your data source is configured as SQL statements.`
         );
         return false;
       }
