@@ -26,6 +26,7 @@
         color: var(--menuitem-text-color);
         font-size: 0.875rem;
         line-height: 1.5rem;
+        white-space: nowrap;
       }
       .p-menuitem-icon {
         color: var(--menuitem-text-color);
@@ -35,6 +36,7 @@
       z-index: 999;
       border-radius: var(--border-radius);
       margin-top: 0.125rem;
+      width: auto;
       .p-menuitem-link {
         border-radius: 0;
       }
