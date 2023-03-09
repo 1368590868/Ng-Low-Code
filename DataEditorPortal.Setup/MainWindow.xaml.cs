@@ -159,13 +159,19 @@ namespace Setup
             containerPublish.Visibility = Visibility.Hidden;
             containerOutput.Visibility = Visibility.Visible;
 
-            var sourcePath = @"C:\Users\Administrator\source\repos\DataEditorPortal";
+            var sourcePath = AppDomain.CurrentDomain.BaseDirectory;
+            var targetPath = SitePublishModel.TargetFolder;
             var siteName = SitePublishModel.SiteName;
             var sitePort = SitePublishModel.SitePort;
-            var targetPath = SitePublishModel.TargetFolder;
+
+            var bindings = $@"http://localhost:{sitePort}";
+            if (!string.IsNullOrEmpty(SitePublishModel.SiteDomain) && SitePublishModel.SiteDomain != "localhost")
+            {
+                bindings += $@",http://{SitePublishModel.SiteDomain}:{sitePort}";
+            }
 
             var process = new Process();
-            process.StartInfo.WorkingDirectory = Path.Combine(sourcePath, "DataEditorPortal");
+            process.StartInfo.WorkingDirectory = Path.Combine(sourcePath);
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.FileName = "cmd.exe";
             //process.StartInfo.Arguments = $@"/C {cmd} ";
@@ -185,10 +191,10 @@ namespace Setup
             {
                 if (sw.BaseStream.CanWrite)
                 {
-                    sw.WriteLine($@"dotnet publish ""DataEditorPortal.Web.csproj"" --configuration Release /p:PublishProfile=Production --output ""{targetPath}""");
-                    sw.WriteLine(@"cd c:\Windows\System32\inetsrv");
+                    sw.WriteLine($@"xcopy ""{sourcePath}\web"" ""{targetPath}"" /I /R /Y /S /E");
+                    sw.WriteLine(@"cd %systemroot%\System32\inetsrv");
                     sw.WriteLine($@"appcmd add apppool /name:""{siteName}""");
-                    sw.WriteLine($@"appcmd add site /name:""{siteName}"" /physicalPath:""{targetPath}"" /bindings:http://*:{sitePort}");
+                    sw.WriteLine($@"appcmd add site /name:""{siteName}"" /physicalPath:""{targetPath}"" /bindings:""{bindings}""");
                     sw.WriteLine($@"appcmd set site ""{siteName}"" /[path='/'].applicationPool:""{siteName}""");
                     sw.WriteLine($@"appcmd set config ""{siteName}"" /section:windowsAuthentication /enabled:true /commit:apphost");
                 }

@@ -35,7 +35,7 @@
             <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,20,0,0" Text="Setup Administrator" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.881,0.559" FontSize="16"/>
         </Grid>
         <Grid x:Name="containerPublish" Visibility="Visible">
-            <Label x:Name="label2" Content="Target Folder:" HorizontalAlignment="Left" Margin="19,87,0,0" VerticalAlignment="Top" Padding="0,0,0,0" Height="20"/>
+            <Label x:Name="label2" Content="Target folder:" HorizontalAlignment="Left" Margin="19,87,0,0" VerticalAlignment="Top" Padding="0,0,0,0" Height="20"/>
             <Label x:Name="label3" Content="Site name:" HorizontalAlignment="Left" Margin="36,115,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
             <Label x:Name="label4" Content="Site port:" HorizontalAlignment="Left" Margin="43,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
             <Label x:Name="label5" Content="Site domain:" HorizontalAlignment="Left" Margin="25,171,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
