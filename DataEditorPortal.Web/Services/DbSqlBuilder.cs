@@ -245,7 +245,8 @@ namespace DataEditorPortal.Web.Services
                 ) 
                 SELECT *, (SELECT COUNT(*) FROM AllData) AS DEP_TOTAL
                 FROM AllData
-                WHERE DEP_ROWNUMBER > {startIndex} AND DEP_ROWNUMBER < {startIndex + indexCount};
+                WHERE DEP_ROWNUMBER > {startIndex} AND DEP_ROWNUMBER < {startIndex + indexCount}
+                ORDER BY DEP_ROWNUMBER;
             ";
 
             return queryText;

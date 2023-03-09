@@ -212,9 +212,16 @@ namespace DataEditorPortal.Web.Services
             // convert grid filter to where clause
             queryText = _dbSqlBuilder.UseFilters(queryText, param.Filters);
 
+            // set default sorts
+            if (!param.Sorts.Any())
+            {
+                param.Sorts = dataSourceConfig.SortBy;
+                if (!param.Sorts.Any())
+                    param.Sorts = new List<SortParam>() { new SortParam { field = dataSourceConfig.IdColumn, order = 1 } };
+            }
+
             if (param.IndexCount > 0)
             {
-                if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = dataSourceConfig.IdColumn, order = 1 } };
                 // use pagination
                 queryText = _dbSqlBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
             }
