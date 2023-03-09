@@ -51,7 +51,7 @@ export interface DataSourceFilter {
 
 export interface DataSourceSortBy {
   field?: string;
-  order?: string;
+  order?: number;
 }
 
 export interface GridColumn {
