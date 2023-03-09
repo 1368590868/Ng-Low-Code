@@ -17,7 +17,7 @@
                 </Style.Triggers>
             </Style>
         </Grid.Resources>
-        <Grid x:Name="containerConnection" Visibility="Hidden">
+        <Grid x:Name="containerConnection" Visibility="Visible">
             <DataGrid x:Name="dataGridConnection" ItemsSource="{Binding}" Margin="10,59,10,40" AutoGenerateColumns="False" ColumnWidth="SizeToHeader" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="Gainsboro" CanUserAddRows="False">
                 <DataGrid.RowStyle>
                     <Style TargetType="{x:Type DataGridRow}">
@@ -36,13 +36,44 @@
         <Grid x:Name="containerAdmin" Visibility="Hidden">
             <Label x:Name="label" Content="Username:" HorizontalAlignment="Left" Margin="32,87,0,0" VerticalAlignment="Top" Height="20" Padding="0,0,0,0" RenderTransformOrigin="1.05,0.864"/>
             <Label x:Name="label1" Content="Password:" HorizontalAlignment="Left" Margin="36,115,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Height="20" Padding="0,0,0,0"/>
-            <TextBox x:Name="textUsername" Margin="98,87,164,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Administrator.Username, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged}" Height="20"/>
-            <TextBox x:Name="textPassword" Margin="98,115,164,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Administrator.Password, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged}" Height="20"/>
+            <TextBox x:Name="textUsername" Margin="98,87,164,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Style="{DynamicResource ValidatingControl}">
+                <TextBox.Text>
+                    <Binding Path="Administrator.Username" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}">
+                        <Binding.ValidationRules>
+                            <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox x:Name="textPassword" Margin="98,115,164,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Style="{DynamicResource ValidatingControl}">
+                <TextBox.Text>
+                    <Binding Path="Administrator.Password" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}">
+                        <Binding.ValidationRules>
+                            <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
             <Button x:Name="btnAdminBack" Content="Back" Margin="10,0,0,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="50" Click="btnAdminBack_Click"/>
-            <Button x:Name="btnAdminNext" Content="Next" Margin="0,0,10,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="50" Click="btnAdminNext_Click"/>
+            <Button x:Name="btnAdminNext" Content="Next" Margin="0,0,10,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="50" Click="btnAdminNext_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="IsEnabled" Value="False"></Setter>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding ElementName=textUsername, Path=(Validation.HasError)}" Value="False"/>
+                                    <Condition Binding="{Binding ElementName=textPassword, Path=(Validation.HasError)}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="IsEnabled" Value="True"></Setter>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
             <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,20,0,0" Text="Setup Administrator" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.881,0.559" FontSize="16"/>
         </Grid>
-        <Grid x:Name="containerPublish" Visibility="Visible">
+        <Grid x:Name="containerPublish" Visibility="Hidden">
             <Label x:Name="label2" Content="Target folder:" HorizontalAlignment="Left" Margin="19,87,0,0" VerticalAlignment="Top" Padding="0,0,0,0" Height="20"/>
             <Label x:Name="label3" Content="Site name:" HorizontalAlignment="Left" Margin="36,115,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
             <Label x:Name="label4" Content="Site port:" HorizontalAlignment="Left" Margin="43,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>

@@ -2,6 +2,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Setup
 {
@@ -15,20 +16,12 @@ namespace Setup
             InitializeComponent();
         }
 
-        public DatabaseConnection DatabaseConnection { get; set; }
+        public DatabaseConnection DatabaseConnection { get; set; } = new DatabaseConnection();
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(DatabaseConnection.ConnectionName))
-            {
-                MessageBox.Show("Please enter the Name.");
+            if (!IsModelValid())
                 return;
-            }
-            if (string.IsNullOrEmpty(DatabaseConnection.ConnectionString))
-            {
-                MessageBox.Show("Please enter the Connection String.");
-                return;
-            }
 
             try
             {
@@ -49,11 +42,11 @@ namespace Setup
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private bool IsModelValid()
         {
-            if (DatabaseConnection == null) DatabaseConnection = new DatabaseConnection();
-            textBox.DataContext = DatabaseConnection;
-            textBox1.DataContext = DatabaseConnection;
+            textBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            textBox1.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            return !Validation.GetHasError(textBox) && !Validation.GetHasError(textBox1);
         }
     }
 }

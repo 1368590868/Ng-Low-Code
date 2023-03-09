@@ -122,6 +122,8 @@ namespace Setup
 
         private void btnAdminNext_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsAdministratorValid()) return;
+
             if (!IsValidateCredentials(Administrator.Username, Administrator.Password, ".\\"))
             {
                 MessageBox.Show("Username or password is not correct. ");
@@ -136,6 +138,13 @@ namespace Setup
         {
             containerAdmin.Visibility = Visibility.Hidden;
             containerConnection.Visibility = Visibility.Visible;
+        }
+
+        private bool IsAdministratorValid()
+        {
+            textUsername.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            textPassword.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            return !Validation.GetHasError(textUsername) && !Validation.GetHasError(textPassword);
         }
 
         #endregion

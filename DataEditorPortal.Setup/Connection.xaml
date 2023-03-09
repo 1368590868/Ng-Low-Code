@@ -6,20 +6,52 @@
         xmlns:local="clr-namespace:Setup"
         xmlns:Models="clr-namespace:Setup.Models" x:Class="Setup.Connection"
         mc:Ignorable="d"
-        Title="Connection" Height="300" Width="397" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
+        Title="Connection" Height="300" Width="397" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
     <Grid>
+        <Grid.Resources>
+            <Style TargetType="{x:Type FrameworkElement}" x:Key="ValidatingControl">
+                <Style.Triggers>
+                    <Trigger Property="Validation.HasError" Value="True">
+                        <Setter Property="ToolTip" Value="{Binding Path=(Validation.Errors)/ErrorContent,RelativeSource={x:Static RelativeSource.Self}}"></Setter>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Resources>
         <Label x:Name="label" Content="Name:" Margin="5,3,0,0" HorizontalAlignment="Left" Width="44" Height="26" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox" Margin="10,28,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding ConnectionName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsConnectionNameEnabled, Mode=OneWay}">
-            <TextBox.DataContext>
-                <Models:DatabaseConnection/>
-            </TextBox.DataContext>
+        <TextBox x:Name="textBox" Margin="10,28,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="{Binding DatabaseConnection.IsConnectionNameEnabled, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Connection}}}" Height="20" Style="{DynamicResource ValidatingControl}">
+            <TextBox.Text>
+                <Binding Path="DatabaseConnection.ConnectionName" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
+                    <Binding.ValidationRules>
+                        <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
         </TextBox>
         <Label x:Name="label1" Content="Connection String:" HorizontalAlignment="Left" Margin="5,47,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox1" Margin="10,71,10,36" TextWrapping="Wrap" Text="{Binding ConnectionString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-            <TextBox.DataContext>
-                <Models:DatabaseConnection/>
-            </TextBox.DataContext>
+        <TextBox x:Name="textBox1" Margin="10,71,10,36" TextWrapping="Wrap" Style="{DynamicResource ValidatingControl}">
+            <TextBox.Text>
+                <Binding Path="DatabaseConnection.ConnectionString" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
+                    <Binding.ValidationRules>
+                        <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
         </TextBox>
-        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Right" Margin="0,0,10,10" Width="40" Click="btnSave_Click" Height="20" VerticalAlignment="Bottom"/>
+        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Right" Margin="0,0,10,10" Width="50" Click="btnSave_Click" Height="20" VerticalAlignment="Bottom">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="IsEnabled" Value="False"></Setter>
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=textBox, Path=(Validation.HasError)}" Value="False"/>
+                                <Condition Binding="{Binding ElementName=textBox1, Path=(Validation.HasError)}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="IsEnabled" Value="True"></Setter>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
     </Grid>
 </Window>
