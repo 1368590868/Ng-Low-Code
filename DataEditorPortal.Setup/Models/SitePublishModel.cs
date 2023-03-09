@@ -1,6 +1,8 @@
-﻿namespace Setup.Models
+﻿using System.ComponentModel;
+
+namespace Setup.Models
 {
-    public class SitePublishModel : NotifyPropertyObject
+    public class SitePublishModel : NotifyPropertyObject, IDataErrorInfo
     {
         private string _targetFolder;
         public string TargetFolder
@@ -55,6 +57,38 @@
             {
                 _siteDomain = value;
                 OnPropertyChanged("SiteDomain");
+            }
+        }
+
+        public string Error { get { return null; } }
+
+        public string this[string columnName]
+        {
+            get
+            {
+                if (columnName == "SiteDomain")
+                {
+                    if (string.IsNullOrEmpty(SiteDomain))
+                        return "Site domain is Required";
+                }
+                if (columnName == "TargetFolder")
+                {
+                    if (string.IsNullOrEmpty(TargetFolder))
+                        return "Target folder is Required";
+                }
+                if (columnName == "SiteName")
+                {
+                    if (string.IsNullOrEmpty(SiteName))
+                        return "Site name is Required";
+                }
+                if (columnName == "SitePort")
+                {
+                    if (string.IsNullOrEmpty(SitePort))
+                        return "Site port is Required";
+                }
+
+
+                return null;
             }
         }
     }
