@@ -51,7 +51,7 @@ export interface DataSourceFilter {
 
 export interface DataSourceSortBy {
   field?: string;
-  order?: string;
+  order?: number;
 }
 
 export interface GridColumn {
@@ -93,6 +93,7 @@ export interface GridFormField {
 export interface GirdDetailConfig {
   addingForm?: GridFormConfig;
   updatingForm?: GridFormConfig;
+  deletingForm?: GridFormConfig;
   infoForm?: GridFormConfig;
 }
 

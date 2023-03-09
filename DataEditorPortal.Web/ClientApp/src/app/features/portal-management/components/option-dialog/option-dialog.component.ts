@@ -48,7 +48,6 @@ export class OptionDialogComponent implements ControlValueAccessor {
   helperMessage =
     '-- Enter some query text to get options from database.  \r\n\r\n' +
     '-- It needs return two columns at least. Use format ##FIELD## to reference other fields in same form as paramters. And use {{}} mark the criteria is optional.   \r\n\r\n' +
-    '\r\n' +
     '-- E.g. \r\n' +
     '-- SELECT dd.Label, dd.Value, dd.Value1, dd.Value2 FROM dep.DataDictionaries dd WHERE dd.Category = "Employer" {{ AND dd.Value1 IN ##vendor## }} ORDER BY dd.Label';
 

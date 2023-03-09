@@ -65,7 +65,8 @@ import {
   FormlyFieldComputedValueEditorComponent,
   FormLayoutComponent,
   AdvancedQueryDialogComponent,
-  DbConnectionDialogComponent
+  DbConnectionDialogComponent,
+  FormLayoutDeleteComponent
 } from './components';
 import { MonacoEditorConfig } from './monaco-editor-config';
 
@@ -94,7 +95,8 @@ import { MonacoEditorConfig } from './monaco-editor-config';
     ComputedValueEditorComponent,
     FormlyFieldComputedValueEditorComponent,
     AdvancedQueryDialogComponent,
-    DbConnectionDialogComponent
+    DbConnectionDialogComponent,
+    FormLayoutDeleteComponent
   ],
   imports: [
     CommonModule,

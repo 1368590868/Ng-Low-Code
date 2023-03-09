@@ -10,3 +10,4 @@ export * from './portal-edit/form-designer/search-designer-config.component';
 export * from './validator-editor/validator-editor.component';
 export * from './computed-value-editor/computed-value-editor.component';
 export * from './portal-edit/portal-edit-form/form-layout/form-layout.component';
+export * from './portal-edit/portal-edit-form/form-layout/form-layout-delete/form-layout-delete.component';

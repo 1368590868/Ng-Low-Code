@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { GridProp } from 'src/app/shared/models/system-log';
+import { SystemLogData } from 'src/app/shared';
 import { SystemLogService } from 'src/app/shared/services/system-log.service';
 
 @Component({
@@ -13,7 +13,7 @@ export class SystemLogDialogComponent {
   public loading = true;
   constructor(private systemLogService: SystemLogService) {}
 
-  show(row: GridProp) {
+  show(row: SystemLogData) {
     this.systemLogService.getRowData(row.Id).subscribe(res => {
       if (!res.isError) {
         this.viewData = res.result;

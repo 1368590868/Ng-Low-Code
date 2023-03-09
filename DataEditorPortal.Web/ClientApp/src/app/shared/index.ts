@@ -26,6 +26,8 @@ export { UserService } from './services/user.service';
 export { DataDictionaryService } from './services/data-dictionary.service';
 export { SystemLogService } from './services/system-log.service';
 export { SystemLogDialogComponent } from '../features/core/components/system-log/system-log-dialog/system-log-dialog.component';
+export * from './models/universal.type';
+export { SystemLogData } from '../shared/models/system-log';
 
 @NgModule({
   declarations: [PermissionDirective, BooleanTextPipe],

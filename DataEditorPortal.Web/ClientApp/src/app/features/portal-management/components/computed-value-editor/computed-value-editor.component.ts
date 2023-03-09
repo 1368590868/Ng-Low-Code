@@ -49,31 +49,20 @@ export class ComputedValueEditorComponent
     expression: '',
     message: ''
   };
-
-  isOk!: boolean | undefined;
+  innerValue: any;
 
   helperMessage =
-    '-- Enter the query text for fetching the data. \r\n\r\n' +
+    '-- Enter the query text for fetching the computed value. \r\n\r\n' +
     '-- E.g. \r\n' +
-    '-- SELECT * FROM dbo.demoTables WHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##';
+    '-- SELECT Max(Amount) FROM dbo.demoTables';
 
   onChange!: any;
   onTouch!: any;
-
-  advanceData: any = [];
   hasAdvanceData = false;
-
-  _computedValue: any;
-  get computedValue() {
-    return this._computedValue;
-  }
-  set computedValue(val: any) {
-    this._computedValue = val;
-  }
 
   @Input()
   set value(val: any) {
-    this._computedValue = val;
+    this.innerValue = val;
     this.initForm(val ?? {});
   }
   constructor(private notifyService: NotifyService) {
@@ -109,20 +98,24 @@ export class ComputedValueEditorComponent
 
   initForm(val: any) {
     if (val?.type && val?.queryText) {
-      this.form.setValue({
-        nameFormControl: null,
-        queryTextFormControl: val.queryText ?? this.helperMessage,
-        typeFormControl: val?.type ?? ''
-      });
+      this.form.setValue(
+        {
+          nameFormControl: null,
+          queryTextFormControl: val.queryText ?? this.helperMessage,
+          typeFormControl: val?.type ?? ''
+        },
+        { emitEvent: false }
+      );
       this.hasAdvanceData = true;
     } else {
-      if (val?.name) {
-        this.form.setValue({
-          nameFormControl: val.name,
+      this.form.setValue(
+        {
+          nameFormControl: val.name ?? null,
           queryTextFormControl: this.helperMessage,
           typeFormControl: null
-        });
-      }
+        },
+        { emitEvent: false }
+      );
     }
   }
 
@@ -143,11 +136,10 @@ export class ComputedValueEditorComponent
   }
 
   showDialog() {
-    if (this.isOk) {
-      this.initForm(this.advanceData);
-    } else {
-      this.initForm(this.computedValue ?? {});
-    }
+    this.initForm(this.innerValue);
+    setTimeout(() => {
+      this.form.markAsPristine();
+    });
     this.visible = true;
   }
 
@@ -160,7 +152,6 @@ export class ComputedValueEditorComponent
       queryTextFormControl?.value != this.helperMessage
     ) {
       this.hasAdvanceData = true;
-      this.isOk = true;
       this.visible = false;
       this.onSendData();
     } else {
@@ -184,27 +175,11 @@ export class ComputedValueEditorComponent
     } else {
       data = { name };
     }
-    if (
-      Object.prototype.hasOwnProperty.call(data, 'type') &&
-      !data.type?.trim()
-    ) {
-      delete data.type;
-    }
-
-    if (
-      Object.prototype.hasOwnProperty.call(data, 'queryText') &&
-      !data.queryText
-    ) {
-      delete data.queryText;
-    }
-
-    this.advanceData = data;
+    this.innerValue = data;
     this.onChange?.(data);
   }
 
   onCancel() {
-    this.form.get('typeFormControl')?.reset();
-    this.form.get('queryTextFormControl')?.reset();
     this.visible = false;
   }
 
@@ -218,17 +193,10 @@ export class ComputedValueEditorComponent
   }
 
   removeAdvance() {
-    this.advanceData.forEach((item: any, index: number) => {
-      if (typeof item === 'object') {
-        if (Object.keys(item).length > 0) {
-          this.advanceData.splice(index, 1);
-        }
-      }
-    });
-    this.form.get('queryTextFormControl')?.setValue('');
-    this.form.get('typeFormControl')?.setValue('');
-    this.onChange?.(this.advanceData);
+    this.form.get('queryTextFormControl')?.reset();
+    this.form.get('typeFormControl')?.reset();
     this.hasAdvanceData = false;
+    this.onSendData();
   }
 }
 

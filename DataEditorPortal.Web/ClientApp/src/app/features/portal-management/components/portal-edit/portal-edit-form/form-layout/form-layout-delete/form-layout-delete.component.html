@@ -1,0 +1,40 @@
+<div class="flex align-items-center">
+  <div class="flex align-items-center py-2 mr-4">
+    <p-inputSwitch
+      class="mr-2"
+      [(ngModel)]="_formConfig.useCustomForm"></p-inputSwitch>
+    Use Custom Action
+  </div>
+  <div class="flex align-items-center" *ngIf="_formConfig.useCustomForm">
+    <p-dropdown
+      [(ngModel)]="_formConfig.customFormName"
+      styleClass="w-15rem"
+      appendTo="body"
+      [showClear]="true"
+      placeholder="Please Select"
+      [options]="customActions"></p-dropdown>
+    <i
+      class="pi pi-question-circle ml-3 text-lg"
+      pTooltip="Select one Custom Action that pre-defined by developers used for deleting  record."></i>
+  </div>
+</div>
+<div *ngIf="!_formConfig.useCustomForm">
+  <p-divider>
+    <p-button
+      [label]="'Query for Deleting'"
+      [icon]="showQuery ? 'pi pi-minus' : 'pi pi-plus'"
+      styleClass="p-button-text p-button-sm"
+      (onClick)="showQuery = !showQuery"></p-button>
+  </p-divider>
+  <p *ngIf="showQuery" class="line-height-2 mb-1">
+    Enter your query text that will be run when deleting data. This is required
+    if you use <b>custom query</b> as the Grid Datasource.
+  </p>
+  <ngx-monaco-editor
+    *ngIf="showQuery"
+    [formControl]="formControlQueryText"
+    (onInit)="onMonacoEditorInit($event)"
+    [style]="{ height: '20rem' }"
+    class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
+    [options]="{}"></ngx-monaco-editor>
+</div>

@@ -1,12 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { finalize, tap } from 'rxjs';
-import { SystemLogDialogComponent, SystemLogService } from 'src/app/shared';
+import { tap } from 'rxjs';
 import {
   GridParam,
-  GridProp,
   PaginationEvent,
-  SortMetaEvent
-} from 'src/app/shared/models/system-log';
+  SortMetaEvent,
+  SystemLogData,
+  SystemLogDialogComponent,
+  SystemLogService
+} from 'src/app/shared';
 
 @Component({
   selector: 'app-system-log',
@@ -16,7 +17,6 @@ import {
 export class SystemLogComponent implements OnInit {
   @ViewChild('systemDialog') systemDialog!: SystemLogDialogComponent;
   public data: any = [];
-  public loading = false;
   public totalRecords = 0;
 
   searchModel = {};
@@ -90,12 +90,11 @@ export class SystemLogComponent implements OnInit {
     return fetchParam;
   }
 
-  showDescription(row: GridProp) {
+  showDescription(row: SystemLogData) {
     this.systemDialog.show(row);
   }
 
   fetchData() {
-    this.loading = true;
     const fetchDataParam = this.getFetchParam();
     this.systemLogService
       .getTableData(fetchDataParam)
@@ -105,9 +104,6 @@ export class SystemLogComponent implements OnInit {
             this.data = res.result?.data;
             this.totalRecords = res.result?.total ?? 0;
           }
-        }),
-        finalize(() => {
-          this.loading = false;
         })
       )
       .subscribe();

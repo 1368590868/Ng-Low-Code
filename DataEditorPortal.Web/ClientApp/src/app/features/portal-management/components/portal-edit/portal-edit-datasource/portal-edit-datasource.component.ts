@@ -49,14 +49,14 @@ export class PortalEditDatasourceComponent implements OnInit {
   dbConnections: { label: string; value: string }[] = [];
   dbTables: DataSourceTable[] = [];
   dbTableColumns: DataSourceTableColumn[] = [];
-  dbOrderOptions: { label: string; value: string }[] = [
+  dbOrderOptions: { label: string; value: number }[] = [
     {
       label: 'ASC',
-      value: '0'
+      value: 0
     },
     {
       label: 'DESC',
-      value: '1'
+      value: 1
     }
   ];
 

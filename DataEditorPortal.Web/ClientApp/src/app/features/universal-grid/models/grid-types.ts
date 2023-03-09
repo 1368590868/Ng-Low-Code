@@ -1,21 +1,4 @@
-import { SortMeta, FilterMetadata } from 'primeng/api';
 import { GridActionOption } from '../../universal-grid-action/universal-grid-action.module';
-
-export interface GridParam {
-  filters: GridFilterParam[];
-  sorts: SortMeta[];
-  searches?: SearchParam;
-  startIndex: number;
-  indexCount: number;
-}
-
-export interface SearchParam {
-  [name: string]: string;
-}
-
-export interface GridFilterParam extends FilterMetadata {
-  field: string;
-}
 
 export interface GridResult {
   total: number;
