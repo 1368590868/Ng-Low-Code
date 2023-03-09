@@ -384,7 +384,7 @@ namespace DataEditorPortal.Web.Services
             if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore other setting.
-                if (!config.QueryText.Contains($"@{ config.IdColumn}"))
+                if (!config.QueryText.Contains($"@{config.IdColumn}"))
                 {
                     throw new DepException("There is no parameter for Id in query text. All records in database may be updated.");
                 }
@@ -407,15 +407,15 @@ namespace DataEditorPortal.Web.Services
             if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore other setting.
+                if (!config.QueryText.Contains($"@{config.IdColumn}"))
+                {
+                    throw new DepException("There is no parameter for Id in query text. All records in database may be deleted.");
+                }
                 return config.QueryText;
             }
             else
             {
-                if (config.Filters.Count <= 0) throw new Exception("Filters can not be empty during generating delete script.");
-
-                var where = string.Join(" AND ", GenerateWhereClause(config.Filters));
-
-                var queryText = $@"DELETE FROM {config.TableSchema}.{config.TableName} WHERE {where}";
+                var queryText = $@"DELETE FROM {config.TableSchema}.{config.TableName} WHERE [{config.IdColumn}] IN @{config.IdColumn}";
 
                 return queryText;
             }

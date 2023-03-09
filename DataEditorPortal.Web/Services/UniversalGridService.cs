@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Dapper;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -632,6 +634,7 @@ namespace DataEditorPortal.Web.Services
                 {
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
+                    IdColumn = dataSourceConfig.IdColumn,
                     Columns = columns,
                     QueryText = formLayout.QueryText
                 });
@@ -685,35 +688,33 @@ namespace DataEditorPortal.Web.Services
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
 
             // get detail config
-            //var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            //if (detailConfig.UseCustomForm)
-            //{
-            //    throw new Exception("This universal detail api doesn't support custom action. Please use custom api in custom action.");
-            //}
+            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+            if (detailConfig.DeletingForm != null && detailConfig.DeletingForm.UseCustomForm)
+            {
+                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
 
             var queryText = _dbSqlBuilder.GenerateSqlTextForDelete(new DataSourceConfig()
             {
                 TableSchema = dataSourceConfig.TableSchema,
                 TableName = dataSourceConfig.TableName,
-                Filters = new List<FilterParam>()
-                {
-                    new FilterParam() { field = dataSourceConfig.IdColumn, matchMode = "in", value = ids }
-                },
-                //QueryText = detailConfig.QueryForDelete
+                IdColumn = dataSourceConfig.IdColumn,
+                QueryText = detailConfig.DeletingForm?.QueryText
             });
 
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
 
-                con.Open();
-                var cmd = con.CreateCommand();
-                cmd.Connection = con;
-
                 try
                 {
-                    cmd.CommandText = queryText;
-                    cmd.ExecuteNonQuery();
+                    var dict = new Dictionary<string, object> { { dataSourceConfig.IdColumn, ids } };
+                    dynamic param = dict.Aggregate(
+                        new ExpandoObject() as IDictionary<string, object>,
+                        (a, p) => { a.Add(p); return a; }
+                    );
+
+                    con.Execute(queryText, (object)param);
                 }
                 catch (Exception ex)
                 {

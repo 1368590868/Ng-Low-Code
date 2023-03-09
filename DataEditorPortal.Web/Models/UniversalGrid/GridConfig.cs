@@ -97,6 +97,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public GridFormLayout InfoForm { get; set; }
         public GridFormLayout AddingForm { get; set; }
         public GridFormLayout UpdatingForm { get; set; }
+        public GridFormLayout DeletingForm { get; set; }
     }
 
     public class GridFormLayout
