@@ -18,7 +18,7 @@
       pTooltip="Select one Custom Action that pre-defined by developers used for deleting  record."></i>
   </div>
 </div>
-<div *ngIf="_formConfig.useCustomForm">
+<div *ngIf="!_formConfig.useCustomForm">
   <p-divider>
     <p-button
       [label]="'Query for Deleting'"

@@ -74,12 +74,19 @@ export class FormLayoutDeleteComponent {
         );
         return false;
       }
-      if (!this._formConfig.queryText) {
-        this.notifyService.notifyWarning(
-          'Warning',
-          `Query for Deleting is required if your data source is configured as SQL statements.`
-        );
-        return false;
+    } else {
+      if (this.type === 'Delete') {
+        if (
+          this.queryTextRequired &&
+          (!this._formConfig.queryText ||
+            this._formConfig.queryText === this.helperMessage)
+        ) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            `Query for Deleting is required if your data source is configured as SQL statements.`
+          );
+          return false;
+        }
       }
     }
     return true;
