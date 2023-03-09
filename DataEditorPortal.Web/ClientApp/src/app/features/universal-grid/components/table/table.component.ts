@@ -60,7 +60,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.reset();
+    // this.reset();
     this.stateKey = `universal-grid-state-${this.gridTableService.currentPortalItem}`;
 
     forkJoin([
@@ -283,7 +283,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   onRefresh() {
-    this.selectedRecords = [];
+    this.reset();
     this.table.reset();
     this.table.saveState();
     this.fetchData();
@@ -295,9 +295,6 @@ export class TableComponent implements OnInit, OnDestroy {
     this.sortMeta = null;
     this.multiSortMeta = null;
     this.first = 0;
-    this.totalRecords = 0;
-    this.cols = [];
-    this.records = [];
     this.selectedRecords = [];
   }
 
