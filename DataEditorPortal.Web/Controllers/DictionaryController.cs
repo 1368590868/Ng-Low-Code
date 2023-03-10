@@ -1,4 +1,5 @@
 ﻿using AutoWrapper.Wrappers;
+using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
@@ -41,7 +42,7 @@ namespace DataEditorPortal.Web.Controllers
         {
             var dataSourceConfig = new DataSourceConfig()
             {
-                TableSchema = "dep",
+                TableSchema = Constants.DEFAULT_SCHEMA,
                 TableName = "DataDictionaries"
             };
             var queryText = _dbSqlBuilder.GenerateSqlTextForList(dataSourceConfig);

@@ -1,6 +1,7 @@
 using AutoWrapper;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Common;
+using DataEditorPortal.Web.Common.Install;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
@@ -44,7 +45,7 @@ namespace DataEditorPortal.Web
                     .UseSqlServer(Configuration.GetConnectionString("Default"), b =>
                     {
                         b.CommandTimeout(300);
-                        b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "dep");
+                        b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Data.Common.Constants.DEFAULT_SCHEMA);
                     })
                     .Options;
                 else
@@ -68,6 +69,7 @@ namespace DataEditorPortal.Web
             });
             #endregion
 
+            services.AddScoped<ISeedDataCreator, SeedDataCreator>();
             services.AddScoped<DbSqlServerBuilder>();
             services.AddScoped<IDbSqlBuilder>(sp =>
             {
@@ -122,10 +124,10 @@ namespace DataEditorPortal.Web
                 var dbContext = scope.ServiceProvider.GetService<DepDbContext>();
                 dbContext.Database.Migrate();
 
-                dbContext.SetDefaultDataSourceConnection();
-                foreach (var con in Configuration.GetSection("ConnectionStrings").GetChildren())
+                var seedDataCreator = scope.ServiceProvider.GetService<ISeedDataCreator>();
+                if (!seedDataCreator.IsInstalled())
                 {
-                    dbContext.AddClientDataSourceConnection(con.Key, con.Value);
+                    seedDataCreator.Create();
                 }
             }
 

@@ -341,9 +341,11 @@ namespace DataEditorPortal.Web.Services
             }
             else
             {
+                var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
+
                 var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
 
-                var queryText = $@"SELECT {columns} FROM {config.TableSchema}.{config.TableName} WHERE {where} AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##";
+                var queryText = $@"SELECT {columns} FROM {source} WHERE {where} AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##";
 
                 return queryText;
             }
@@ -370,11 +372,13 @@ namespace DataEditorPortal.Web.Services
             {
                 if (config.Columns.Count <= 0) throw new Exception("Columns can not be empty during generating insert script.");
 
+                var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
+
                 var columns = string.Join(",", config.Columns.Select(x => $"[{x}]"));
 
                 var param = string.Join(",", config.Columns.Select(x => $"@{x}"));
 
-                var queryText = $@"INSERT INTO {config.TableSchema}.{config.TableName} ({columns}) VALUES ({param})";
+                var queryText = $@"INSERT INTO {source} ({columns}) VALUES ({param})";
 
                 return queryText;
             }
@@ -395,9 +399,11 @@ namespace DataEditorPortal.Web.Services
             {
                 if (config.Columns.Count <= 0) throw new Exception("Columns can not be empty during generating update script.");
 
+                var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
+
                 var sets = string.Join(",", config.Columns.Select(x => $"[{x}] = @{x}"));
 
-                var queryText = $@"UPDATE {config.TableSchema}.{config.TableName} SET {sets} WHERE [{config.IdColumn}] = @{config.IdColumn}";
+                var queryText = $@"UPDATE {source} SET {sets} WHERE [{config.IdColumn}] = @{config.IdColumn}";
 
                 return queryText;
             }
@@ -416,7 +422,8 @@ namespace DataEditorPortal.Web.Services
             }
             else
             {
-                var queryText = $@"DELETE FROM {config.TableSchema}.{config.TableName} WHERE [{config.IdColumn}] IN @{config.IdColumn}";
+                var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
+                var queryText = $@"DELETE FROM {source} WHERE [{config.IdColumn}] IN @{config.IdColumn}";
 
                 return queryText;
             }
@@ -432,11 +439,13 @@ namespace DataEditorPortal.Web.Services
             }
             else
             {
+                var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
+
                 var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => $"[{x}]")) : "*";
 
                 var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
 
-                var queryText = $@"SELECT DISTINCT {columns} FROM {config.TableSchema}.{config.TableName} WHERE {where}";
+                var queryText = $@"SELECT DISTINCT {columns} FROM {source} WHERE {where}";
 
                 return queryText;
             }
@@ -452,7 +461,7 @@ namespace DataEditorPortal.Web.Services
         /// <returns></returns>
         public string GetSqlTextForDatabaseTables()
         {
-            return $"SELECT TABLE_NAME AS TableName, TABLE_SCHEMA AS TableSchema FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA <> 'dep' AND TABLE_TYPE  = 'BASE TABLE'";
+            return $"SELECT TABLE_NAME AS TableName, TABLE_SCHEMA AS TableSchema FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME != '__EFMigrationsHistory' AND TABLE_TYPE = 'BASE TABLE'";
         }
 
         public string GetSqlTextForDatabaseSource(DataSourceConfig config)
@@ -465,13 +474,13 @@ namespace DataEditorPortal.Web.Services
                 sqlText = RemoveOrderBy(sqlText);
 
                 return $"SELECT TOP 1 * FROM ({sqlText}) AS A";
-
             }
             else
             {
-                return $"SELECT TOP 1 * FROM {config.TableSchema}.{config.TableName}";
-            }
+                var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
 
+                return $"SELECT TOP 1 * FROM {source}";
+            }
         }
 
         #endregion

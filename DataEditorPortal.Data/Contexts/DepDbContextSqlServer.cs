@@ -1,4 +1,5 @@
-﻿using DataEditorPortal.Data.Models;
+﻿using DataEditorPortal.Data.Common;
+using DataEditorPortal.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataEditorPortal.Data.Contexts
@@ -13,17 +14,16 @@ namespace DataEditorPortal.Data.Contexts
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.HasDefaultSchema("dep");
+            modelBuilder.HasDefaultSchema(Constants.DEFAULT_SCHEMA);
 
             modelBuilder.Entity<User>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
-                entity.Property(e => e.UserId).UseIdentityColumn();
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(entity.Property(e => e.UserId));
             });
 
             modelBuilder.Entity<DemoTable>(entity =>
             {
-                entity.ToTable("DemoTables", "dbo");
                 entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
             });
         }

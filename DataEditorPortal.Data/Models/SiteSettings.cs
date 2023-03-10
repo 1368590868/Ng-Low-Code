@@ -9,5 +9,6 @@ namespace DataEditorPortal.Data.Models
         public Guid Id { get; set; }
         public string SiteName { get; set; }
         public string SiteLogo { get; set; }
+        public bool Installed { get; set; }
     }
 }
