@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Data.Common;
 
@@ -37,6 +38,7 @@ namespace DataEditorPortal.Web
 
             #region DbContext and DbConnection
             services.AddTransient<DepDbContextSqlServer>();
+            services.AddTransient<DepDbContextOracle>();
             services.AddScoped(sp =>
             {
                 var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
@@ -44,6 +46,15 @@ namespace DataEditorPortal.Web
                     return new DbContextOptionsBuilder<DepDbContext>()
                     .UseSqlServer(Configuration.GetConnectionString("Default"), b =>
                     {
+                        b.CommandTimeout(300);
+                        b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Data.Common.Constants.DEFAULT_SCHEMA);
+                    })
+                    .Options;
+                else if (databaseProvider == "Oracle")
+                    return new DbContextOptionsBuilder<DepDbContext>()
+                    .UseOracle(Configuration.GetConnectionString("Default"), b =>
+                    {
+                        b.UseOracleSQLCompatibility("11");
                         b.CommandTimeout(300);
                         b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Data.Common.Constants.DEFAULT_SCHEMA);
                     })
@@ -56,6 +67,8 @@ namespace DataEditorPortal.Web
                 var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
                 if (databaseProvider == "SqlConnection")
                     return sp.GetService<DepDbContextSqlServer>();
+                else if (databaseProvider == "Oracle")
+                    return sp.GetService<DepDbContextOracle>();
                 else
                     throw new NotImplementedException();
             });
@@ -64,6 +77,8 @@ namespace DataEditorPortal.Web
                 var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
                 if (databaseProvider == "SqlConnection")
                     return new SqlConnection(Configuration.GetConnectionString("Default"));
+                else if (databaseProvider == "Oracle")
+                    return new OracleConnection(Configuration.GetConnectionString("Default"));
                 else
                     throw new NotImplementedException();
             });
