@@ -186,6 +186,7 @@ namespace DataEditorPortal.Web.Common.Install
 
 
             #endregion
+
             #region Data Dictionaries
 
             var dic = new List<DataDictionary>(){
@@ -278,21 +279,21 @@ namespace DataEditorPortal.Web.Common.Install
                 {
                     Id = Guid.Parse("727052BA-0033-42C9-A39C-06A103E4B021"),
                     Name = "Roles",
-                    QueryText = $"SELECT sr.RoleName AS Label, sr.Id AS Value FROM {Constants.DEFAULT_SCHEMA}.SiteRoles sr ORDER BY sr.RoleName",
+                    QueryText = $"SELECT sr.ROLE_NAME AS LABEL, sr.ID AS VALUE FROM {Constants.DEFAULT_SCHEMA}.SITE_ROLES sr ORDER BY sr.ROLE_NAME",
                     DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36")
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("E1F3E2C7-25CA-4D69-9405-ABC54923864D"),
                     Name = "Vendors",
-                    QueryText = $"SELECT dd.Label, dd.Value FROM {Constants.DEFAULT_SCHEMA}.DataDictionaries dd WHERE dd.Category = 'Vendor' ORDER BY dd.Label",
+                    QueryText = $"SELECT dd.LABEL, dd.VALUE FROM {Constants.DEFAULT_SCHEMA}.DATA_DICTIONARIES dd WHERE dd.CATEGORY = 'Vendor' ORDER BY dd.LABEL",
                     DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36")
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("704A3D00-62DF-4C62-A4BD-457C4DC242CA"),
                     Name = "Employers",
-                    QueryText = $"SELECT dd.Label, dd.Value, dd.Value1, dd.Value2 FROM {Constants.DEFAULT_SCHEMA}.DataDictionaries dd WHERE dd.Category = 'Employer' {{{{ AND dd.Value1 IN ##vendor## }}}} ORDER BY dd.Label",
+                    QueryText = $"SELECT dd.LABEL, dd.VALUE, dd.VALUE1, dd.VALUE2 FROM {Constants.DEFAULT_SCHEMA}.DATA_DICTIONARIES dd WHERE dd.CATEGORY = 'Employer' {{{{ AND dd.VALUE1 IN ##VENDOR## }}}} ORDER BY dd.LABEL",
                     DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36")
                 }
             };
@@ -311,41 +312,41 @@ namespace DataEditorPortal.Web.Common.Install
                 DataSourceConfig = JsonSerializer.Serialize(new DataSourceConfig
                 {
                     DataSourceConnectionId = Guid.Parse("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
-                    TableName = "Users",
+                    TableName = "USERS",
                     TableSchema = Constants.DEFAULT_SCHEMA,
-                    IdColumn = "Id",
-                    Columns = new List<string>() { "Id", "Username", "Name", "Email", "Phone", "AutoEmail", "Vendor", "Employer", "Comments" },
+                    IdColumn = "ID",
+                    Columns = new List<string>() { "ID", "USERNAME", "NAME", "EMAIL", "PHONE", "AUTO_EMAIL", "VENDOR", "EMPLOYER", "COMMENTS" },
                     SortBy = new List<SortParam>() { new SortParam { field = "Name", order = 1 } }
                 }),
 
                 ColumnsConfig = JsonSerializer.Serialize(new GridColConfig[] {
-                        new GridColConfig { type = "DataBaseField", field = "Username", header = "CNP ID", width = "130px", filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "Name", header = "Name", width = "250px", filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "Email", header = "Email", width = "250px", filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "Phone", header = "Phone", width = "250px", filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "AutoEmail", header = "Auto Email", width = "250px", filterType = "boolean", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "Vendor", header = "Vendor", width = "250px", filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "Employer", header = "Employer", width = "250px", filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "Comments", header = "Comments", width = "250px", filterType = "text", sortable = true }
+                        new GridColConfig { type = "DataBaseField", field = "USERNAME", header = "User ID", width = "130px", filterType = "text", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "NAME", header = "Name", width = "250px", filterType = "text", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "EMAIL", header = "Email", width = "250px", filterType = "text", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "PHONE", header = "Phone", width = "250px", filterType = "text", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "AUTO_EMAIL", header = "Auto Email", width = "250px", filterType = "boolean", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "VENDOR", header = "Vendor", width = "250px", filterType = "text", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "EMPLOYER", header = "Employer", width = "250px", filterType = "text", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "COMMENTS", header = "Comments", width = "250px", filterType = "text", sortable = true }
                     }),
 
                 SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
                         new SearchFieldConfig {
-                            key = "username",
+                            key = "USERNAME",
                             type = "input",
                             filterType = "text",
                             props = new {
-                                label = "CNP ID",
-                                placeholder = "CNP ID"
+                                label = "User ID",
+                                placeholder = "User ID"
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                field = "Username",
+                                field = "USERNAME",
                                 matchMode = "contains"
                             }
                         },
                         new SearchFieldConfig {
-                            key = "name",
+                            key = "NAME",
                             type = "input",
                             filterType = "text",
                             props = new {
@@ -354,12 +355,12 @@ namespace DataEditorPortal.Web.Common.Install
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                field = "Name",
+                                field = "NAME",
                                 matchMode = "contains"
                             }
                         },
                         new SearchFieldConfig {
-                            key = "roles",
+                            key = "ROLES",
                             type = "multiSelect",
                             filterType = "text",
                             props = new {
@@ -369,11 +370,11 @@ namespace DataEditorPortal.Web.Common.Install
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                whereClause = $"Id in (select UserId from {Constants.DEFAULT_SCHEMA}.UserPermissions where PermissionGrantId in (##VALUE##))"
+                                whereClause = $"ID IN (SELECT USER_ID FROM {Constants.DEFAULT_SCHEMA}.USER_PERMISSIONS WHERE PERMISSION_GRANT_ID IN (##VALUE##))"
                             }
                         },
                         new SearchFieldConfig {
-                            key = "vendor",
+                            key = "VENDOR",
                             type = "multiSelect",
                             filterType = "text",
                             props = new {
@@ -383,23 +384,23 @@ namespace DataEditorPortal.Web.Common.Install
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                field = "Vendor",
+                                field = "VENDOR",
                                 matchMode = "in"
                             }
                         },
                         new SearchFieldConfig {
-                            key = "employer",
+                            key = "EMPLOYER",
                             type = "multiSelect",
                             filterType = "text",
                             props = new {
                                 label = "Employer",
                                 placeholder = "Please select",
                                 optionsLookup = "704A3D00-62DF-4C62-A4BD-457C4DC242CA",
-                                dependOnFields = new object[]{ "vendor" }
+                                dependOnFields = new object[]{ "VENDOR" }
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                field = "Employer",
+                                field = "EMPLOYER",
                                 matchMode = "in"
                             }
                         }
@@ -483,25 +484,25 @@ namespace DataEditorPortal.Web.Common.Install
                 DataSourceConfig = JsonSerializer.Serialize(new DataSourceConfig
                 {
                     DataSourceConnectionId = Guid.Parse("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
-                    TableName = "DemoTables",
+                    TableName = "DEMO_TABLE",
                     TableSchema = Constants.DEFAULT_SCHEMA,
-                    IdColumn = "Id",
+                    IdColumn = "ID",
                     Columns = new List<string>() { },
                     SortBy = new List<SortParam>() { }
                 }),
 
                 ColumnsConfig = JsonSerializer.Serialize(new GridColConfig[] {
-                        new GridColConfig { type = "DataBaseField", field = "Name", header = "Name", width = "130px", filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "FirstName", header = "First Name", width = "250px", filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "Checked", header = "Checked", width = "250px", filterType = "boolean", sortable = false },
-                        new GridColConfig { type = "DataBaseField", field = "Number", header = "Number", width = "250px", filterType = "numeric", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "Total", header = "Total", width = "250px", filterType = "numeric", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "CreateDate", header = "Create Date", width = "250px", filterType = "date", sortable = true }
+                        new GridColConfig { type = "DataBaseField", field = "NAME", header = "Name", width = "130px", filterType = "text", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "FIRST_NAME", header = "First Name", width = "250px", filterType = "text", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "CHECKED", header = "Checked", width = "250px", filterType = "boolean", sortable = false },
+                        new GridColConfig { type = "DataBaseField", field = "NUMBER", header = "Number", width = "250px", filterType = "numeric", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "TOTAL", header = "Total", width = "250px", filterType = "numeric", sortable = true },
+                        new GridColConfig { type = "DataBaseField", field = "CREATE_DATE", header = "Create Date", width = "250px", filterType = "date", sortable = true }
                     }),
 
                 SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
                         new SearchFieldConfig {
-                            key = "FirstName",
+                            key = "FIRST_NAME",
                             type = "input",
                             filterType = "text",
                             props = new {
@@ -510,12 +511,12 @@ namespace DataEditorPortal.Web.Common.Install
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                field = "FirstName",
+                                field = "FIRST_NAME",
                                 matchMode = "contains"
                             }
                         },
                         new SearchFieldConfig {
-                            key = "Number",
+                            key = "NUMBER",
                             type = "inputNumber",
                             filterType = "numeric",
                             props = new {
@@ -524,12 +525,12 @@ namespace DataEditorPortal.Web.Common.Install
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                field = "Number",
+                                field = "NUMBER",
                                 matchMode = "gt"
                             }
                         },
                         new SearchFieldConfig {
-                            key = "Name",
+                            key = "NAME",
                             type = "multiSelect",
                             filterType = "text",
                             props = new {
@@ -544,12 +545,12 @@ namespace DataEditorPortal.Web.Common.Install
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                field = "Name",
+                                field = "NAME",
                                 matchMode = "in"
                             }
                         },
                         new SearchFieldConfig {
-                            key = "CreateDate",
+                            key = "CREATE_DATE",
                             type = "datepicker",
                             filterType = "date",
                             props = new {
@@ -558,12 +559,12 @@ namespace DataEditorPortal.Web.Common.Install
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                field = "CreateDate",
+                                field = "CREATE_DATE",
                                 matchMode = "dateAfter"
                             }
                         },
                         new SearchFieldConfig {
-                            key = "Checked",
+                            key = "CHECKED",
                             type = "checkbox",
                             filterType = "boolean",
                             props = new {
@@ -571,7 +572,7 @@ namespace DataEditorPortal.Web.Common.Install
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                field = "Checked",
+                                field = "CHECKED",
                                 matchMode = "equals"
                             }
                         }
@@ -586,7 +587,7 @@ namespace DataEditorPortal.Web.Common.Install
                                 new FormFieldConfig
                                 {
                                     filterType = "text",
-                                    key = "Name",
+                                    key = "NAME",
                                     type = "input",
                                     props = new
                                     {
@@ -597,7 +598,7 @@ namespace DataEditorPortal.Web.Common.Install
                                 new FormFieldConfig
                                 {
                                     filterType = "text",
-                                    key = "FirstName",
+                                    key = "FIRST_NAME",
                                     type = "input",
                                     props = new
                                     {
@@ -608,7 +609,7 @@ namespace DataEditorPortal.Web.Common.Install
                                 new FormFieldConfig
                                 {
                                     filterType = "boolean",
-                                    key = "Checked",
+                                    key = "CHECKED",
                                     type = "checkbox",
                                     props = new
                                     {
@@ -619,7 +620,7 @@ namespace DataEditorPortal.Web.Common.Install
                                 new FormFieldConfig
                                 {
                                     filterType = "numeric",
-                                    key = "Number",
+                                    key = "NUMBER",
                                     type = "inputNumber",
                                     props = new
                                     {
@@ -631,7 +632,7 @@ namespace DataEditorPortal.Web.Common.Install
                                 new FormFieldConfig
                                 {
                                     filterType = "numeric",
-                                    key = "Total",
+                                    key = "TOTAL",
                                     type = "inputNumber",
                                     props = new
                                     {
@@ -642,7 +643,7 @@ namespace DataEditorPortal.Web.Common.Install
                                 new FormFieldConfig
                                 {
                                     filterType = "date",
-                                    key = "CreateDate",
+                                    key = "CREATE_DATE",
                                     type = "datepicker",
                                     props = new
                                     {
