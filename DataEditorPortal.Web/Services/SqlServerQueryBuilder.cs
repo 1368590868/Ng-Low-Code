@@ -9,32 +9,9 @@ using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Services
 {
-    public interface IDbSqlBuilder
+    public class SqlServerQueryBuilder : IQueryBuilder
     {
-        // ultilities
-        string UsePagination(string query, int startIndex, int indexCount, List<SortParam> sortParams);
-        string UseOrderBy(string query, List<SortParam> sortParams = null);
-        string UseFilters(string query, List<FilterParam> filterParams = null);
-        string UseSearches(string query, List<SearchParam> filterParams = null);
-        object FormatValue(object value, DataRow schema);
-
-        // universal grid
-        string GenerateSqlTextForList(DataSourceConfig config);
-        string GenerateSqlTextForDetail(DataSourceConfig config);
-        string GenerateSqlTextForInsert(DataSourceConfig config);
-        string GenerateSqlTextForUpdate(DataSourceConfig config);
-        string GenerateSqlTextForDelete(DataSourceConfig config);
-
-        string GenerateSqlTextForColumnFilterOption(DataSourceConfig config);
-
-        // database
-        string GetSqlTextForDatabaseTables();
-        string GetSqlTextForDatabaseSource(DataSourceConfig config);
-    }
-
-    public class DbSqlServerBuilder : IDbSqlBuilder
-    {
-        public DbSqlServerBuilder()
+        public SqlServerQueryBuilder()
         {
 
         }
@@ -243,10 +220,9 @@ namespace DataEditorPortal.Web.Services
                         {queryWithoutOrderBy}
                     ) A
                 ) 
-                SELECT *, (SELECT COUNT(*) FROM AllData) AS DEP_TOTAL
+                SELECT AllData.*, (SELECT COUNT(*) FROM AllData) AS DEP_TOTAL
                 FROM AllData
                 WHERE DEP_ROWNUMBER > {startIndex} AND DEP_ROWNUMBER < {startIndex + indexCount}
-                ORDER BY DEP_ROWNUMBER;
             ";
 
             return queryText;

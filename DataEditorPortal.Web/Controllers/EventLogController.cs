@@ -20,19 +20,19 @@ namespace DataEditorPortal.Web.Controllers
     {
         private readonly ILogger<EventLogController> _logger;
         private readonly DepDbContext _depDbContext;
-        private readonly IDbSqlBuilder _dbSqlBuilder;
+        private readonly IQueryBuilder _queryBuilder;
         private readonly IUniversalGridService _universalGridService;
 
         public EventLogController(
             ILogger<EventLogController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
-            IDbSqlBuilder dbSqlBuilder,
+            IQueryBuilder queryBuilder,
             IUniversalGridService universalGridService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
-            _dbSqlBuilder = dbSqlBuilder;
+            _queryBuilder = queryBuilder;
             _universalGridService = universalGridService;
         }
 
@@ -45,18 +45,18 @@ namespace DataEditorPortal.Web.Controllers
                 TableSchema = Constants.DEFAULT_SCHEMA,
                 TableName = "EventLogs"
             };
-            var queryText = _dbSqlBuilder.GenerateSqlTextForList(dataSourceConfig);
-            queryText = _dbSqlBuilder.UseFilters(queryText, param.Filters);
-            queryText = _dbSqlBuilder.UseSearches(queryText);
+            var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
+            queryText = _queryBuilder.UseFilters(queryText, param.Filters);
+            queryText = _queryBuilder.UseSearches(queryText);
 
             if (param.IndexCount > 0)
             {
                 if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = "EventTime", order = 0 } };
-                queryText = _dbSqlBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
+                queryText = _queryBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
             }
             else
             {
-                queryText = _dbSqlBuilder.UseOrderBy(queryText, param.Sorts);
+                queryText = _queryBuilder.UseOrderBy(queryText, param.Sorts);
             }
 
             var output = new GridData();

@@ -25,20 +25,20 @@ namespace DataEditorPortal.Web.Controllers
         private readonly ILogger<LookupController> _logger;
         private readonly DepDbContext _depDbContext;
         private readonly IConfiguration _config;
-        private readonly IDbSqlBuilder _dbSqlBuilder;
+        private readonly IQueryBuilder _queryBuilder;
         private readonly IServiceProvider _serviceProvider;
 
         public LookupController(
             ILogger<LookupController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
-            IDbSqlBuilder dbSqlBuilder,
+            IQueryBuilder queryBuilder,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _config = config;
-            _dbSqlBuilder = dbSqlBuilder;
+            _queryBuilder = queryBuilder;
             _serviceProvider = serviceProvider;
         }
 

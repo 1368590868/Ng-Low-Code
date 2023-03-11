@@ -85,12 +85,15 @@ namespace DataEditorPortal.Web
             #endregion
 
             services.AddScoped<ISeedDataCreator, SeedDataCreator>();
-            services.AddScoped<DbSqlServerBuilder>();
-            services.AddScoped<IDbSqlBuilder>(sp =>
+            services.AddScoped<SqlServerQueryBuilder>();
+            services.AddScoped<OracleQueryBuilder>();
+            services.AddScoped<IQueryBuilder>(sp =>
             {
                 var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
                 if (databaseProvider == "SqlConnection")
-                    return sp.GetService<DbSqlServerBuilder>();
+                    return sp.GetService<SqlServerQueryBuilder>();
+                else if (databaseProvider == "Oracle")
+                    return sp.GetService<OracleQueryBuilder>();
                 else
                     throw new NotImplementedException();
             });

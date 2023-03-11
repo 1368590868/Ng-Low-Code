@@ -29,7 +29,7 @@ namespace DataEditorPortal.Web.Controllers
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IPortalItemService _portalItemService;
-        private readonly IDbSqlBuilder _dbSqlBuilder;
+        private readonly IQueryBuilder _queryBuilder;
         private readonly IServiceProvider _serviceProvider;
 
         public PortalItemController(
@@ -38,7 +38,7 @@ namespace DataEditorPortal.Web.Controllers
             IConfiguration config,
             IMapper mapper,
             IPortalItemService portalItemService,
-            IDbSqlBuilder dbSqlBuilder,
+            IQueryBuilder queryBuilder,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
@@ -46,7 +46,7 @@ namespace DataEditorPortal.Web.Controllers
             _config = config;
             _mapper = mapper;
             _portalItemService = portalItemService;
-            _dbSqlBuilder = dbSqlBuilder;
+            _queryBuilder = queryBuilder;
             _serviceProvider = serviceProvider;
         }
 
@@ -442,7 +442,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("datasource/{connectionId}/table-columns")]
         public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid connectionId, [FromQuery] string tableSchema, [FromQuery] string tableName)
         {
-            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(new DataSourceConfig() { TableName = tableName, TableSchema = tableSchema });
+            var sqlText = _queryBuilder.GetSqlTextForDatabaseSource(new DataSourceConfig() { TableName = tableName, TableSchema = tableSchema });
             return _portalItemService.GetDataSourceTableColumns(connectionId, sqlText);
         }
 
@@ -450,7 +450,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("datasource/{connectionId}/query-columns")]
         public List<DataSourceTableColumn> GetDataSourceQueryColumns(Guid connectionId, DataSourceConfig dsConfig)
         {
-            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(dsConfig);
+            var sqlText = _queryBuilder.GetSqlTextForDatabaseSource(dsConfig);
             return _portalItemService.GetDataSourceTableColumns(connectionId, sqlText);
         }
 

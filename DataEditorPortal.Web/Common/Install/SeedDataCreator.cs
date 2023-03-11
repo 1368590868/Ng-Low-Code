@@ -316,7 +316,7 @@ namespace DataEditorPortal.Web.Common.Install
                     TableSchema = Constants.DEFAULT_SCHEMA,
                     IdColumn = "ID",
                     Columns = new List<string>() { "ID", "USERNAME", "NAME", "EMAIL", "PHONE", "AUTO_EMAIL", "VENDOR", "EMPLOYER", "COMMENTS" },
-                    SortBy = new List<SortParam>() { new SortParam { field = "Name", order = 1 } }
+                    SortBy = new List<SortParam>() { new SortParam { field = "NAME", order = 1 } }
                 }),
 
                 ColumnsConfig = JsonSerializer.Serialize(new GridColConfig[] {
@@ -708,19 +708,20 @@ namespace DataEditorPortal.Web.Common.Install
             var names = new string[] { "John", "Robert", "James", "Tony" };
             var lorem = new string[] { "Lorem", "Ipsum", "Dolor", "Amet" };
 
+            var random = new Random();
             for (var i = 0; i < 1000; i++)
             {
                 _depDbContext.DemoTables.Add(new DemoTable()
                 {
-                    Checked = new Random().Next(0, 1) == 0,
-                    CreateDate = DateTime.Now.AddDays(new Random().Next(-365 * 3, 365 * 3)),
-                    Division = lorem[new Random().Next(0, 3)],
-                    Employor = lorem[new Random().Next(0, 3)],
-                    Vendor = lorem[new Random().Next(0, 3)],
-                    FirstName = names[new Random().Next(0, 3)],
-                    Name = names[new Random().Next(0, 3)],
-                    Number = new Random().Next(0, 100),
-                    Total = (decimal)new Random().NextDouble() * 100,
+                    Checked = random.Next(0, 100) % 2 == 0,
+                    CreateDate = DateTime.Now.AddDays(random.Next(-365 * 3, 365 * 3)),
+                    Division = lorem[random.Next(0, 100) % 3],
+                    Employor = lorem[random.Next(0, 100) % 3],
+                    Vendor = lorem[random.Next(0, 100) % 3],
+                    FirstName = names[random.Next(0, 100) % 3],
+                    Name = names[random.Next(0, 100) % 3],
+                    Number = random.Next(0, 100),
+                    Total = (decimal)random.NextDouble() * 100,
                 });
             }
 
