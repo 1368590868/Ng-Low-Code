@@ -247,11 +247,20 @@ namespace DataEditorPortal.Web.Services
                     con.Open();
                     using (var dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly))
                     {
-                        var schema = dr.GetColumnSchema();
-                        result = schema.Select(x =>
+                        var schema = dr.GetSchemaTable();
+                        foreach (DataRow row in schema.Rows)
                         {
-                            return _mapper.Map<DataSourceTableColumn>(x);
-                        }).ToList();
+                            result.Add(new DataSourceTableColumn()
+                            {
+                                AllowDBNull = (bool)row["AllowDBNull"],
+                                ColumnName = (string)row["ColumnName"],
+                                DataType = _queryBuilder.GetValueType(row),
+                                IsAutoIncrement = (bool)row["IsAutoIncrement"],
+                                IsIdentity = (bool)row["IsIdentity"],
+                                IsKey = row["IsKey"] == DBNull.Value ? false : (bool)row["IsKey"],
+                                IsUnique = row["IsUnique"] == DBNull.Value ? false : (bool)row["IsUnique"]
+                            });
+                        }
                     }
                 }
                 catch (Exception ex)

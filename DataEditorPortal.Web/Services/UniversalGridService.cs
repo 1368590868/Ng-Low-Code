@@ -273,7 +273,7 @@ namespace DataEditorPortal.Web.Services
                         for (int i = 0; i < fields; i++)
                         {
                             var typename = dr.GetFieldType(i);
-                            row[fieldnames[i]] = _queryBuilder.FormatValue(dr[i], schema.Rows[i]);
+                            row[fieldnames[i]] = _queryBuilder.GetTypedValue(dr[i], schema.Rows[i]);
                         }
                         output.Data.Add(row);
                     }
@@ -416,10 +416,7 @@ namespace DataEditorPortal.Web.Services
                     cmd.CommandText = queryText;
 
                     // always provide Id column parameter
-                    var idParam = cmd.CreateParameter();
-                    idParam.ParameterName = dataSourceConfig.IdColumn;
-                    idParam.Value = id;
-                    cmd.Parameters.Add(idParam);
+                    _queryBuilder.AddDbParameter(cmd, dataSourceConfig.IdColumn, id);
 
                     using (var dr = cmd.ExecuteReader())
                     {
@@ -436,7 +433,7 @@ namespace DataEditorPortal.Web.Services
                         {
                             for (int i = 0; i < fields; i++)
                             {
-                                result[fieldnames[i]] = _queryBuilder.FormatValue(dr[i], schema.Rows[i]);
+                                result[fieldnames[i]] = _queryBuilder.GetTypedValue(dr[i], schema.Rows[i]);
                             }
                         }
                     }
@@ -562,11 +559,7 @@ namespace DataEditorPortal.Web.Services
                 // add query parameters
                 foreach (var column in columns)
                 {
-                    var value = model[column].ToString();
-                    var param = cmd.CreateParameter();
-                    param.ParameterName = column;
-                    param.Value = value;
-                    cmd.Parameters.Add(param);
+                    _queryBuilder.AddDbParameter(cmd, column, model[column]);
                 }
 
                 // excute command
@@ -656,17 +649,10 @@ namespace DataEditorPortal.Web.Services
                 // add query parameters
                 foreach (var column in columns)
                 {
-                    var value = model[column].ToString();
-                    var param = cmd.CreateParameter();
-                    param.ParameterName = column;
-                    param.Value = value;
-                    cmd.Parameters.Add(param);
+                    _queryBuilder.AddDbParameter(cmd, column, model[column]);
                 }
                 // always provide Id column parameter
-                var idParam = cmd.CreateParameter();
-                idParam.ParameterName = dataSourceConfig.IdColumn;
-                idParam.Value = id;
-                cmd.Parameters.Add(idParam);
+                _queryBuilder.AddDbParameter(cmd, dataSourceConfig.IdColumn, id);
 
                 // excute command
                 try
