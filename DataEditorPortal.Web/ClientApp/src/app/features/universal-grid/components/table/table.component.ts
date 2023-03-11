@@ -290,7 +290,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   reset() {
-    this.searchModel = {};
+    // this.searchModel = {};
     this.filters = null;
     this.sortMeta = null;
     this.multiSortMeta = null;

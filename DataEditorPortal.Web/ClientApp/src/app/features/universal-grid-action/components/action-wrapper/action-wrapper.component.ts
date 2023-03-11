@@ -26,7 +26,6 @@ export class ActionWrapperComponent {
   @Input() dialogStyle = { width: '31.25rem' };
 
   @Input() actionConfig!: GridActionConfig;
-  @Input() fetchDataParam!: any;
 
   @Output() savedEvent = new EventEmitter();
 
@@ -86,7 +85,7 @@ export class ActionWrapperComponent {
 
     // actionRef.instance.selectedRecords = this.selectedRecords;
     // actionRef.instance.recordKey = this.recordKey;
-    actionRef.instance.fetchDataParam = this.fetchDataParam;
+    // actionRef.instance.fetchDataParam = this.fetchDataParam;
 
     // bind action events
     actionRef.instance.savedEvent.asObservable().subscribe(() => {

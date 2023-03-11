@@ -34,8 +34,9 @@
               appUniversalGridAction
               [actions]="tableActions"
               [selectedRecords]="selectedRecords"
+              [recordKey]="tableConfig.dataKey"
               [fetchDataParam]="fetchDataParam"
-              (savedEvent)="onRefresh()"></ng-template>
+              (savedEvent)="fetchData()"></ng-template>
           </div>
           <div class="flex-none mr-2 ml-auto">
             <strong *ngIf="selectedRecords.length > 0"
@@ -51,7 +52,8 @@
 
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th style="width: 2.75rem !important; max-width: 2.75rem !important">
+          <th
+            style="width: 2.875rem !important; max-width: 2.875rem !important">
             <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
           </th>
           <th style="width: 5rem !important; max-width: 5rem !important"></th>
@@ -108,7 +110,8 @@
 
       <ng-template pTemplate="body" let-data let-columns="columns">
         <tr [pSelectableRow]="data">
-          <td style="width: 2.75rem !important; max-width: 2.75rem !important">
+          <td
+            style="width: 2.875rem !important; max-width: 2.875rem !important">
             <p-tableCheckbox
               [value]="data"
               (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
@@ -121,7 +124,7 @@
                 [actions]="rowActions"
                 [recordKey]="tableConfig.dataKey"
                 [selectedRecords]="[data]"
-                (savedEvent)="onRefresh()"></ng-template>
+                (savedEvent)="fetchData()"></ng-template>
             </div>
           </td>
 
