@@ -26,7 +26,7 @@ export class AdvancedQueryDialogComponent {
   helperMessage =
     '-- Enter the query text for fetching the data. \r\n\r\n' +
     '-- E.g. \r\n' +
-    '-- SELECT * FROM dbo.demoTables WHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##';
+    '-- SELECT * FROM DEMOTABLES WHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##';
 
   constructor(
     private portalItemService: PortalItemService,

@@ -45,8 +45,8 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
     '-- Enter the where clause, which will be used to filter data. \r\n' +
     '-- Use ##VALUE## to reference the field value. \r\n' +
     '-- E.g. \r\n' +
-    '--      FirstName = ##VALUE## \r\n' +
-    "--      FirstName LIKE  ##VALUE## + '%'";
+    '--      FIRSTNAME = ##VALUE## \r\n' +
+    "--      FIRSTNAME LIKE  ##VALUE## + '%'";
 
   formControlMatchMode: FormControl = new FormControl();
   formControlQuery: FormControl = new FormControl();
