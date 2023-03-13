@@ -31,7 +31,7 @@ const routes: Routes = [
     canActivate: [AuthRouterGuard, PermissionRouterGuard]
   },
   {
-    path: 'data-dictionary',
+    path: 'data-dictionaries',
     component: DataDictionaryComponent,
     canActivate: [AuthRouterGuard, PermissionRouterGuard]
   },
