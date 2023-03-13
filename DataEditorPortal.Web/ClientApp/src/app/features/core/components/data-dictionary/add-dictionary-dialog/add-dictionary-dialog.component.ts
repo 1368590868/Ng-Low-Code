@@ -37,7 +37,7 @@ export class AddDictionaryDialogComponent {
   model: DictionaryData = {};
   fields: FormlyFieldConfig[] = [
     {
-      key: 'Label',
+      key: 'LABEL',
       type: 'input',
       props: {
         label: 'Label',
@@ -61,7 +61,7 @@ export class AddDictionaryDialogComponent {
       }
     },
     {
-      key: 'Value',
+      key: 'VALUE',
       type: 'input',
       props: {
         label: 'Value',
@@ -70,7 +70,7 @@ export class AddDictionaryDialogComponent {
       }
     },
     {
-      key: 'Value1',
+      key: 'VALUE1',
       type: 'input',
       props: {
         label: 'Value1',
@@ -79,7 +79,7 @@ export class AddDictionaryDialogComponent {
       }
     },
     {
-      key: 'Value2',
+      key: 'VALUE2',
       type: 'input',
       props: {
         label: 'Value2',
@@ -88,7 +88,7 @@ export class AddDictionaryDialogComponent {
       }
     },
     {
-      key: 'Category',
+      key: 'CATEGORY',
       type: 'input',
       props: {
         label: 'category',
@@ -123,7 +123,7 @@ export class AddDictionaryDialogComponent {
   onFormSubmit(model: DictionaryData) {
     if (this.form.valid) {
       this.isLoading = true;
-      if (model['Id']) {
+      if (model['ID']) {
         this.dataDictionaryService.updateDictionary(model).subscribe(res => {
           if (!res.isError && res.result) {
             this.notifyService.notifySuccess(
