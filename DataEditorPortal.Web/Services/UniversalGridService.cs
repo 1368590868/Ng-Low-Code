@@ -328,7 +328,7 @@ namespace DataEditorPortal.Web.Services
 
         public MemoryStream ExportExcel(string name, ExportParam param)
         {
-            var columns = GetGridColumnsConfig(name);
+            var columns = GetGridColumnsConfig(name).Where(x => x.type == "DataBaseField").ToList();
 
             var result = GetGridData(name, param);
 
@@ -362,22 +362,15 @@ namespace DataEditorPortal.Web.Services
                 rowIndex++;
                 foreach (var item in columns)
                 {
-                    try
+                    colIndex++;
+                    DataParam data = new DataParam()
                     {
-                        colIndex++;
-                        DataParam data = new DataParam()
-                        {
-                            C2 = colIndex,
-                            R2 = rowIndex,
-                            Text = row[item.field],
-                            Type = item.filterType
-                        };
-                        sheetData.Add(data);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex.Message, ex);
-                    }
+                        C2 = colIndex,
+                        R2 = rowIndex,
+                        Text = FormatExportedValue(item, row[item.field]),
+                        Type = item.filterType
+                    };
+                    sheetData.Add(data);
                 }
             }
             #endregion
@@ -398,6 +391,19 @@ namespace DataEditorPortal.Web.Services
             exp.Addsheet(sheet, sheetData, stream);
             stream.Seek(0, SeekOrigin.Begin);
             return stream;
+        }
+
+        private object FormatExportedValue(GridColConfig column, dynamic value)
+        {
+            if (value == null) return "";
+            if (column.filterType == "boolean")
+            {
+                return (bool)value ? "Yes" : "No";
+            }
+            else
+            {
+                return value.ToString();
+            }
         }
 
         #endregion
