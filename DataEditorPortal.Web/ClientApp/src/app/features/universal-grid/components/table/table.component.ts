@@ -190,7 +190,11 @@ export class TableComponent implements OnInit, OnDestroy {
       }
     }
     if (this.allowDelete) {
-      actions.push({ name: 'remove-record' });
+      if (this.tableConfig.customDeleteFormName) {
+        actions.push({ name: this.tableConfig.customDeleteFormName });
+      } else {
+        actions.push({ name: 'remove-record' });
+      }
     }
     if (this.allowExport) {
       actions.push({ name: 'export-excel' });
