@@ -104,7 +104,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
 
   ngOnInit(): void {
     this.formControlMatchMode.valueChanges
-      .pipe(startWith(this.formControlMatchMode.value), distinctUntilChanged())
+      .pipe(distinctUntilChanged())
       .subscribe(val => {
         this.onChange?.({
           field: this.field,
