@@ -29,13 +29,13 @@ export class FormLayoutComponent {
     if (val === 'UPDATE') {
       this.helperMessage =
         '-- E.g. \r\n\r\n' +
-        '-- UPDATE dbo.demoTables SET Name = @Name, FirstName = @FirstName, Total = @Total WHERE Id = @Id';
+        '-- UPDATE DEMOTABLES SET NAME = ##NAME##, FIRSTNAME = ##FIRSTNAME##, TOTAL = ##TOTAL## WHERE ID = ##ID##';
     }
   }
 
   helperMessage =
     '-- E.g. \r\n\r\n' +
-    '-- INSERT INTO dbo.demoTables (Id, Name, FirstName, Total, CreateDate) VALUES (NEWID(), @Name, @FirstName, @Total, GETDATE())';
+    '-- INSERT INTO DEMOTABLES (ID, NAME, FIRSTNAME, TOTAL, CREATEDATE) VALUES (NEWID(), ##NAME##, ##FIRSTNAME##, ##TOTAL##, GETDATE())';
 
   _formConfig: GridFormConfig = {
     sameAsAdd: true
