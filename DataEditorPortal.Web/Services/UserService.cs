@@ -94,7 +94,7 @@ namespace DataEditorPortal.Web.Services
             var query = from u in _depDbContext.Users
                         join up in _depDbContext.UserPermissions on u.Id equals up.UserId
                         join sr in _depDbContext.SiteRoles on up.PermissionGrantId equals sr.Id
-                        where up.GrantType == "Group" && u.Username == username
+                        where up.GrantType == "GROUP" && u.Username == username
                         select u.Id;
             return query.Any();
         }
@@ -104,7 +104,7 @@ namespace DataEditorPortal.Web.Services
             var query = from u in _depDbContext.Users
                         join up in _depDbContext.UserPermissions on u.Id equals up.UserId
                         join sr in _depDbContext.SiteRoles on up.PermissionGrantId equals sr.Id
-                        where up.GrantType == "Group"
+                        where up.GrantType == "GROUP"
                         select u.Id;
             return query.Any();
         }

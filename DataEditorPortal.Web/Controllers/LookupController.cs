@@ -25,20 +25,20 @@ namespace DataEditorPortal.Web.Controllers
         private readonly ILogger<LookupController> _logger;
         private readonly DepDbContext _depDbContext;
         private readonly IConfiguration _config;
-        private readonly IDbSqlBuilder _dbSqlBuilder;
+        private readonly IQueryBuilder _queryBuilder;
         private readonly IServiceProvider _serviceProvider;
 
         public LookupController(
             ILogger<LookupController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
-            IDbSqlBuilder dbSqlBuilder,
+            IQueryBuilder queryBuilder,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _config = config;
-            _dbSqlBuilder = dbSqlBuilder;
+            _queryBuilder = queryBuilder;
             _serviceProvider = serviceProvider;
         }
 
@@ -121,7 +121,7 @@ namespace DataEditorPortal.Web.Controllers
             try
             {
                 var connection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Id == model.ConnectionId);
-                var query = DataHelper.ProcessQueryWithParamters(model.QueryText, new Dictionary<string, JsonElement>());
+                var query = _queryBuilder.ProcessQueryWithParamters(model.QueryText, new Dictionary<string, JsonElement>());
 
                 using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                 {
@@ -148,7 +148,7 @@ namespace DataEditorPortal.Web.Controllers
             {
                 // replace paramters in query text.
 
-                var query = DataHelper.ProcessQueryWithParamters(lookup.QueryText, model);
+                var query = _queryBuilder.ProcessQueryWithParamters(lookup.QueryText, model);
 
                 using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                 {

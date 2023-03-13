@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataEditorPortal.Data.Contexts
 {
-    public class DepDbContextSqlServer : DepDbContext
+    public class DepDbContextOracle : DepDbContext
     {
-        public DepDbContextSqlServer(DbContextOptions<DepDbContext> options) : base(options)
+        public DepDbContextOracle(DbContextOptions<DepDbContext> options) : base(options)
         {
         }
 
@@ -14,17 +14,19 @@ namespace DataEditorPortal.Data.Contexts
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Model.SetMaxIdentifierLength(30);
+
             modelBuilder.HasDefaultSchema(Constants.DEFAULT_SCHEMA);
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(entity.Property(e => e.UserId));
+                entity.Property(e => e.Id).HasDefaultValueSql("sys_guid()");
+                OraclePropertyBuilderExtensions.UseIdentityColumn(entity.Property(e => e.UserId));
             });
 
             modelBuilder.Entity<DemoTable>(entity =>
             {
-                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+                entity.Property(e => e.Id).HasDefaultValueSql("sys_guid()");
             });
         }
     }

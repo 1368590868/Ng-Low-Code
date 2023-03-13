@@ -1,4 +1,5 @@
 ﻿using AutoWrapper.Wrappers;
+using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
@@ -19,19 +20,19 @@ namespace DataEditorPortal.Web.Controllers
     {
         private readonly ILogger<DictionaryController> _logger;
         private readonly DepDbContext _depDbContext;
-        private readonly IDbSqlBuilder _dbSqlBuilder;
+        private readonly IQueryBuilder _queryBuilder;
         private readonly IUniversalGridService _universalGridService;
 
         public DictionaryController(
             ILogger<DictionaryController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
-            IDbSqlBuilder dbSqlBuilder,
+            IQueryBuilder queryBuilder,
             IUniversalGridService universalGridService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
-            _dbSqlBuilder = dbSqlBuilder;
+            _queryBuilder = queryBuilder;
             _universalGridService = universalGridService;
         }
 
@@ -41,21 +42,21 @@ namespace DataEditorPortal.Web.Controllers
         {
             var dataSourceConfig = new DataSourceConfig()
             {
-                TableSchema = "dep",
+                TableSchema = Constants.DEFAULT_SCHEMA,
                 TableName = "DataDictionaries"
             };
-            var queryText = _dbSqlBuilder.GenerateSqlTextForList(dataSourceConfig);
-            queryText = _dbSqlBuilder.UseFilters(queryText, param.Filters);
-            queryText = _dbSqlBuilder.UseSearches(queryText);
+            var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
+            queryText = _queryBuilder.UseFilters(queryText, param.Filters);
+            queryText = _queryBuilder.UseSearches(queryText);
 
             if (param.IndexCount > 0)
             {
                 if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = "Category", order = 1 } };
-                queryText = _dbSqlBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
+                queryText = _queryBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
             }
             else
             {
-                queryText = _dbSqlBuilder.UseOrderBy(queryText, param.Sorts);
+                queryText = _queryBuilder.UseOrderBy(queryText, param.Sorts);
             }
 
             var output = new GridData();

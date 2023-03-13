@@ -46,7 +46,7 @@ namespace DataEditorPortal.Web.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly DepDbContext _depDbContext;
-        private readonly IDbSqlBuilder _dbSqlBuilder;
+        private readonly IQueryBuilder _queryBuilder;
         private readonly ILogger<PortalItemService> _logger;
         private readonly IMapper _mapper;
         private IHttpContextAccessor _httpContextAccessor;
@@ -54,14 +54,14 @@ namespace DataEditorPortal.Web.Services
         public PortalItemService(
             IServiceProvider serviceProvider,
             DepDbContext depDbContext,
-            IDbSqlBuilder dbSqlBuilder,
+            IQueryBuilder queryBuilder,
             ILogger<PortalItemService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
-            _dbSqlBuilder = dbSqlBuilder;
+            _queryBuilder = queryBuilder;
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -197,7 +197,7 @@ namespace DataEditorPortal.Web.Services
 
                 var cmd = con.CreateCommand();
                 cmd.Connection = con;
-                cmd.CommandText = _dbSqlBuilder.GetSqlTextForDatabaseTables();
+                cmd.CommandText = _queryBuilder.GetSqlTextForDatabaseTables();
 
                 try
                 {
@@ -247,11 +247,20 @@ namespace DataEditorPortal.Web.Services
                     con.Open();
                     using (var dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly))
                     {
-                        var schema = dr.GetColumnSchema();
-                        result = schema.Select(x =>
+                        var schema = dr.GetSchemaTable();
+                        foreach (DataRow row in schema.Rows)
                         {
-                            return _mapper.Map<DataSourceTableColumn>(x);
-                        }).ToList();
+                            result.Add(new DataSourceTableColumn()
+                            {
+                                AllowDBNull = (bool)row["AllowDBNull"],
+                                ColumnName = (string)row["ColumnName"],
+                                DataType = _queryBuilder.GetValueType(row),
+                                IsAutoIncrement = (bool)row["IsAutoIncrement"],
+                                IsIdentity = (bool)row["IsIdentity"],
+                                IsKey = row["IsKey"] == DBNull.Value ? false : (bool)row["IsKey"],
+                                IsUnique = row["IsUnique"] == DBNull.Value ? false : (bool)row["IsUnique"]
+                            });
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -274,7 +283,7 @@ namespace DataEditorPortal.Web.Services
             if (datasourceConfig == null)
                 throw new DepException("DataSource Config is empty for Portal Item: " + id);
 
-            var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(datasourceConfig);
+            var sqlText = _queryBuilder.GetSqlTextForDatabaseSource(datasourceConfig);
             return GetDataSourceTableColumns(datasourceConfig.DataSourceConnectionId, sqlText);
         }
 
@@ -345,7 +354,7 @@ namespace DataEditorPortal.Web.Services
             else
             {
                 var datasourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-                var sqlText = _dbSqlBuilder.GetSqlTextForDatabaseSource(datasourceConfig);
+                var sqlText = _queryBuilder.GetSqlTextForDatabaseSource(datasourceConfig);
                 var columns = GetDataSourceTableColumns(datasourceConfig.DataSourceConnectionId, sqlText);
                 return columns.Select(x => new GridColConfig()
                 {

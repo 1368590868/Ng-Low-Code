@@ -1,6 +1,7 @@
 using AutoWrapper;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Common;
+using DataEditorPortal.Web.Common.Install;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Data.Common;
 
@@ -36,6 +38,7 @@ namespace DataEditorPortal.Web
 
             #region DbContext and DbConnection
             services.AddTransient<DepDbContextSqlServer>();
+            services.AddTransient<DepDbContextOracle>();
             services.AddScoped(sp =>
             {
                 var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
@@ -44,7 +47,16 @@ namespace DataEditorPortal.Web
                     .UseSqlServer(Configuration.GetConnectionString("Default"), b =>
                     {
                         b.CommandTimeout(300);
-                        b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "dep");
+                        b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Data.Common.Constants.DEFAULT_SCHEMA);
+                    })
+                    .Options;
+                else if (databaseProvider == "Oracle")
+                    return new DbContextOptionsBuilder<DepDbContext>()
+                    .UseOracle(Configuration.GetConnectionString("Default"), b =>
+                    {
+                        b.UseOracleSQLCompatibility("11");
+                        b.CommandTimeout(300);
+                        b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Data.Common.Constants.DEFAULT_SCHEMA);
                     })
                     .Options;
                 else
@@ -55,6 +67,8 @@ namespace DataEditorPortal.Web
                 var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
                 if (databaseProvider == "SqlConnection")
                     return sp.GetService<DepDbContextSqlServer>();
+                else if (databaseProvider == "Oracle")
+                    return sp.GetService<DepDbContextOracle>();
                 else
                     throw new NotImplementedException();
             });
@@ -63,17 +77,23 @@ namespace DataEditorPortal.Web
                 var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
                 if (databaseProvider == "SqlConnection")
                     return new SqlConnection(Configuration.GetConnectionString("Default"));
+                else if (databaseProvider == "Oracle")
+                    return new OracleConnection(Configuration.GetConnectionString("Default"));
                 else
                     throw new NotImplementedException();
             });
             #endregion
 
-            services.AddScoped<DbSqlServerBuilder>();
-            services.AddScoped<IDbSqlBuilder>(sp =>
+            services.AddScoped<ISeedDataCreator, SeedDataCreator>();
+            services.AddScoped<SqlServerQueryBuilder>();
+            services.AddScoped<OracleQueryBuilder>();
+            services.AddScoped<IQueryBuilder>(sp =>
             {
                 var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
                 if (databaseProvider == "SqlConnection")
-                    return sp.GetService<DbSqlServerBuilder>();
+                    return sp.GetService<SqlServerQueryBuilder>();
+                else if (databaseProvider == "Oracle")
+                    return sp.GetService<OracleQueryBuilder>();
                 else
                     throw new NotImplementedException();
             });
@@ -122,10 +142,10 @@ namespace DataEditorPortal.Web
                 var dbContext = scope.ServiceProvider.GetService<DepDbContext>();
                 dbContext.Database.Migrate();
 
-                dbContext.SetDefaultDataSourceConnection();
-                foreach (var con in Configuration.GetSection("ConnectionStrings").GetChildren())
+                var seedDataCreator = scope.ServiceProvider.GetService<ISeedDataCreator>();
+                if (!seedDataCreator.IsInstalled())
                 {
-                    dbContext.AddClientDataSourceConnection(con.Key, con.Value);
+                    seedDataCreator.Create();
                 }
             }
 

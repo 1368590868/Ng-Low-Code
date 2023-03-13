@@ -42,7 +42,7 @@ namespace DataEditorPortal.Web.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly DepDbContext _depDbContext;
-        private readonly IDbSqlBuilder _dbSqlBuilder;
+        private readonly IQueryBuilder _queryBuilder;
         private readonly ILogger<UniversalGridService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -50,14 +50,14 @@ namespace DataEditorPortal.Web.Services
         public UniversalGridService(
             IServiceProvider serviceProvider,
             DepDbContext depDbContext,
-            IDbSqlBuilder dbSqlBuilder,
+            IQueryBuilder queryBuilder,
             ILogger<UniversalGridService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
-            _dbSqlBuilder = dbSqlBuilder;
+            _queryBuilder = queryBuilder;
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -129,7 +129,7 @@ namespace DataEditorPortal.Web.Services
             if (columnConfig != null && columnConfig.filterType == "enums")
             {
                 dataSourceConfig.Columns = new List<string>() { columnConfig.field };
-                var query = _dbSqlBuilder.GenerateSqlTextForColumnFilterOption(dataSourceConfig);
+                var query = _queryBuilder.GenerateSqlTextForColumnFilterOption(dataSourceConfig);
 
                 using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                 {
@@ -178,7 +178,7 @@ namespace DataEditorPortal.Web.Services
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-            var queryText = _dbSqlBuilder.GenerateSqlTextForList(dataSourceConfig);
+            var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
 
             // convert search criteria to where clause
             var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
@@ -207,10 +207,10 @@ namespace DataEditorPortal.Web.Services
                     })
                     .ToList();
             }
-            queryText = _dbSqlBuilder.UseSearches(queryText, searchRules);
+            queryText = _queryBuilder.UseSearches(queryText, searchRules);
 
             // convert grid filter to where clause
-            queryText = _dbSqlBuilder.UseFilters(queryText, param.Filters);
+            queryText = _queryBuilder.UseFilters(queryText, param.Filters);
 
             // set default sorts
             if (!param.Sorts.Any())
@@ -223,12 +223,12 @@ namespace DataEditorPortal.Web.Services
             if (param.IndexCount > 0)
             {
                 // use pagination
-                queryText = _dbSqlBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
+                queryText = _queryBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
             }
             else
             {
                 // replace the order by clause by input Sorts in queryText
-                queryText = _dbSqlBuilder.UseOrderBy(queryText, param.Sorts);
+                queryText = _queryBuilder.UseOrderBy(queryText, param.Sorts);
             }
 
             #endregion
@@ -273,7 +273,7 @@ namespace DataEditorPortal.Web.Services
                         for (int i = 0; i < fields; i++)
                         {
                             var typename = dr.GetFieldType(i);
-                            row[fieldnames[i]] = _dbSqlBuilder.FormatValue(dr[i], schema.Rows[i]);
+                            row[fieldnames[i]] = _queryBuilder.GetTypedValue(dr[i], schema.Rows[i]);
                         }
                         output.Data.Add(row);
                     }
@@ -400,7 +400,7 @@ namespace DataEditorPortal.Web.Services
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-            var queryText = _dbSqlBuilder.GenerateSqlTextForDetail(dataSourceConfig);
+            var queryText = _queryBuilder.GenerateSqlTextForDetail(dataSourceConfig);
 
             var result = new Dictionary<string, dynamic>();
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
@@ -416,10 +416,7 @@ namespace DataEditorPortal.Web.Services
                     cmd.CommandText = queryText;
 
                     // always provide Id column parameter
-                    var idParam = cmd.CreateParameter();
-                    idParam.ParameterName = dataSourceConfig.IdColumn;
-                    idParam.Value = id;
-                    cmd.Parameters.Add(idParam);
+                    _queryBuilder.AddDbParameter(cmd, dataSourceConfig.IdColumn, id);
 
                     using (var dr = cmd.ExecuteReader())
                     {
@@ -436,7 +433,7 @@ namespace DataEditorPortal.Web.Services
                         {
                             for (int i = 0; i < fields; i++)
                             {
-                                result[fieldnames[i]] = _dbSqlBuilder.FormatValue(dr[i], schema.Rows[i]);
+                                result[fieldnames[i]] = _queryBuilder.GetTypedValue(dr[i], schema.Rows[i]);
                             }
                         }
                     }
@@ -544,7 +541,7 @@ namespace DataEditorPortal.Web.Services
                     .ToList();
 
                 // generate the query text
-                var queryText = _dbSqlBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
+                var queryText = _queryBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
                 {
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
@@ -562,11 +559,7 @@ namespace DataEditorPortal.Web.Services
                 // add query parameters
                 foreach (var column in columns)
                 {
-                    var value = model[column].ToString();
-                    var param = cmd.CreateParameter();
-                    param.ParameterName = column;
-                    param.Value = value;
-                    cmd.Parameters.Add(param);
+                    _queryBuilder.AddDbParameter(cmd, column, model[column]);
                 }
 
                 // excute command
@@ -637,7 +630,7 @@ namespace DataEditorPortal.Web.Services
                     .ToList();
 
                 // generate the query text
-                var queryText = _dbSqlBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
+                var queryText = _queryBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
                 {
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
@@ -656,17 +649,10 @@ namespace DataEditorPortal.Web.Services
                 // add query parameters
                 foreach (var column in columns)
                 {
-                    var value = model[column].ToString();
-                    var param = cmd.CreateParameter();
-                    param.ParameterName = column;
-                    param.Value = value;
-                    cmd.Parameters.Add(param);
+                    _queryBuilder.AddDbParameter(cmd, column, model[column]);
                 }
                 // always provide Id column parameter
-                var idParam = cmd.CreateParameter();
-                idParam.ParameterName = dataSourceConfig.IdColumn;
-                idParam.Value = id;
-                cmd.Parameters.Add(idParam);
+                _queryBuilder.AddDbParameter(cmd, dataSourceConfig.IdColumn, id);
 
                 // excute command
                 try
@@ -701,7 +687,7 @@ namespace DataEditorPortal.Web.Services
                 throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
             }
 
-            var queryText = _dbSqlBuilder.GenerateSqlTextForDelete(new DataSourceConfig()
+            var queryText = _queryBuilder.GenerateSqlTextForDelete(new DataSourceConfig()
             {
                 TableSchema = dataSourceConfig.TableSchema,
                 TableName = dataSourceConfig.TableName,
@@ -715,7 +701,13 @@ namespace DataEditorPortal.Web.Services
 
                 try
                 {
-                    var dict = new Dictionary<string, object> { { dataSourceConfig.IdColumn, ids } };
+                    var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(ids));
+                    var dict = new Dictionary<string, object> {
+                        {
+                            _queryBuilder.ParameterName(dataSourceConfig.IdColumn),
+                            _queryBuilder.GetJsonElementValue(jsonElement)
+                        }
+                    };
                     dynamic param = dict.Aggregate(
                         new ExpandoObject() as IDictionary<string, object>,
                         (a, p) => { a.Add(p); return a; }

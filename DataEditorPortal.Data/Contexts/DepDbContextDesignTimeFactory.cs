@@ -17,4 +17,19 @@ namespace DataEditorPortal.Data.Contexts
             return new DepDbContextSqlServer(optionsBuilder.Options);
         }
     }
+
+    // Add-Migration InitialCreate -Context DepDbContextOracle -OutputDir Migrations\Oracle -StartupProject "DataEditorPortal.Data" -Project "DataEditorPortal.Data"
+    // Remove-Migration -Context DepDbContextOracle -StartupProject "DataEditorPortal.Data" -Project "DataEditorPortal.Data"
+    // Update-Database -Context DepDbContextOracle -StartupProject "DataEditorPortal.Data" -Project "DataEditorPortal.Data"
+    public class DepDbContextOracleDesignTimeFactory : IDesignTimeDbContextFactory<DepDbContextOracle>
+    {
+        public DepDbContextOracle CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<DepDbContext>();
+            var connection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.246)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=dep.lan)));User ID=system;Password=123456";
+            optionsBuilder.UseOracle(connection, b => b.UseOracleSQLCompatibility("11"));
+
+            return new DepDbContextOracle(optionsBuilder.Options);
+        }
+    }
 }
