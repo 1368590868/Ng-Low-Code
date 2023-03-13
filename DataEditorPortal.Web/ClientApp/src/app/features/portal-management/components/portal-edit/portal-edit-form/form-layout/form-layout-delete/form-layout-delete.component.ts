@@ -11,7 +11,7 @@ import { NotifyService } from 'src/app/shared';
 })
 export class FormLayoutDeleteComponent {
   helperMessage =
-    '-- E.g. \r\n\r\n' + '-- DELETE DEMO_TABLES WHERE ID IN ##ID##';
+    '-- E.g. \r\n\r\n' + '-- DELETE DEMO_TABLE WHERE ID IN ##ID##';
 
   _formConfig: GridFormConfig = {};
   @Input() type!: string;

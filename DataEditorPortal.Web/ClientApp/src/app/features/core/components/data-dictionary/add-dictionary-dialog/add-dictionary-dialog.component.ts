@@ -65,7 +65,7 @@ export class AddDictionaryDialogComponent {
       type: 'input',
       props: {
         label: 'Value',
-        placeholder: 'value',
+        placeholder: 'Value',
         required: true
       }
     },
@@ -74,7 +74,7 @@ export class AddDictionaryDialogComponent {
       type: 'input',
       props: {
         label: 'Value1',
-        placeholder: 'value1',
+        placeholder: 'Value1',
         required: false
       }
     },
@@ -83,7 +83,7 @@ export class AddDictionaryDialogComponent {
       type: 'input',
       props: {
         label: 'Value2',
-        placeholder: 'value2',
+        placeholder: 'Value2',
         required: false
       }
     },
@@ -91,8 +91,8 @@ export class AddDictionaryDialogComponent {
       key: 'CATEGORY',
       type: 'input',
       props: {
-        label: 'category',
-        placeholder: 'category',
+        label: 'Category',
+        placeholder: 'Category',
         required: true
       }
     }

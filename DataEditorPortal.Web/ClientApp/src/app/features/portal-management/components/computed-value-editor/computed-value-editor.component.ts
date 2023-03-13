@@ -54,7 +54,7 @@ export class ComputedValueEditorComponent
   helperMessage =
     '-- Enter the query text for fetching the computed value. \r\n\r\n' +
     '-- E.g. \r\n' +
-    '-- SELECT Max(AMOUNT) FROM DEMO_TABLES';
+    '-- SELECT Max(AMOUNT) FROM DEMO_TABLE';
 
   onChange!: any;
   onTouch!: any;

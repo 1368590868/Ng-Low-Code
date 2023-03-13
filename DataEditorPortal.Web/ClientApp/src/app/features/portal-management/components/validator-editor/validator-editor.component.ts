@@ -47,8 +47,8 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     '// Please enter the validation expression that returns boolen.\r\n' +
     '// E.g. \r\n' +
     '// model.NAME && model.NAME.length > 5 \r\n' +
-    '// model.PASSWORD === model.CONFIRMPASSOWRD \r\n' +
-    '// /^[0-9]*$/.test(model.PHONENUMBER)';
+    '// model.PASSWORD === model.CONFIRM_PASSOWRD \r\n' +
+    '// /^[0-9]*$/.test(model.PHONE_NUMBER)';
 
   innerValue: any;
 
