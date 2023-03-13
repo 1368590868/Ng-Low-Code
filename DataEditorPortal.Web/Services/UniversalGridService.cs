@@ -29,7 +29,7 @@ namespace DataEditorPortal.Web.Services
         List<FormFieldConfig> GetGridDetailConfig(string name, string type);
 
         GridData GetGridData(string name, GridParam param);
-        GridData QueryGridData(DbConnection con, string queryText);
+        GridData QueryGridData(DbConnection con, string queryText, bool writeLog = false);
         MemoryStream ExportExcel(string name, ExportParam param);
 
         Dictionary<string, dynamic> GetGridDataDetail(string name, string id);
@@ -46,6 +46,7 @@ namespace DataEditorPortal.Web.Services
         private readonly ILogger<UniversalGridService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEventLogService _eventLogService;
 
         public UniversalGridService(
             IServiceProvider serviceProvider,
@@ -53,7 +54,8 @@ namespace DataEditorPortal.Web.Services
             IQueryBuilder queryBuilder,
             ILogger<UniversalGridService> logger,
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IEventLogService eventLogService)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
@@ -61,6 +63,7 @@ namespace DataEditorPortal.Web.Services
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _eventLogService = eventLogService;
         }
 
         #region Grid cofnig, columns config, search config and list data
@@ -150,9 +153,11 @@ namespace DataEditorPortal.Web.Services
                                     result.Add(dr.GetString(0));
                             }
                         }
+                        _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, name);
                     }
                     catch (Exception ex)
                     {
+                        _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, name, ex.Message);
                         throw new DepException("An Error in the query has occurred: " + ex.Message);
                     }
                     finally
@@ -245,7 +250,7 @@ namespace DataEditorPortal.Web.Services
             return output;
         }
 
-        public GridData QueryGridData(DbConnection con, string queryText)
+        public GridData QueryGridData(DbConnection con, string queryText, bool writeLog = true)
         {
             var output = new GridData();
 
@@ -288,9 +293,15 @@ namespace DataEditorPortal.Web.Services
                     if (data.Keys.Contains("DEP_TOTAL")) data.Remove("DEP_TOTAL");
                     if (data.Keys.Contains("DEP_ROWNUMBER")) data.Remove("DEP_ROWNUMBER");
                 }
+
+                if (writeLog)
+                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, "Query Grid Data");
             }
             catch (Exception ex)
             {
+                if (writeLog)
+                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, "Query Grid Data", ex.Message);
+                _logger.LogError(ex.Message, ex);
                 throw new DepException("An Error in the query has occurred: " + ex.Message);
             }
             finally
@@ -437,9 +448,13 @@ namespace DataEditorPortal.Web.Services
                             }
                         }
                     }
+
+                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, name);
                 }
                 catch (Exception ex)
                 {
+                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, name, ex.Message);
+                    _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
@@ -565,13 +580,16 @@ namespace DataEditorPortal.Web.Services
                 // excute command
                 try
                 {
-                    cmd.ExecuteNonQuery();
+                    var affected = cmd.ExecuteNonQuery();
                     trans.Commit();
+
+                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, name, $"{affected} rows affected.");
                 }
                 catch (Exception ex)
                 {
                     trans.Rollback();
 
+                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, name, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -657,13 +675,16 @@ namespace DataEditorPortal.Web.Services
                 // excute command
                 try
                 {
-                    cmd.ExecuteNonQuery();
+                    var affected = cmd.ExecuteNonQuery();
                     trans.Commit();
+
+                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, name, $"{affected} rows affected.");
                 }
                 catch (Exception ex)
                 {
                     trans.Rollback();
 
+                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, name, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -785,8 +806,18 @@ namespace DataEditorPortal.Web.Services
             cmd.CommandType = type;
             cmd.CommandText = commandText;
 
-            var value = cmd.ExecuteScalar();
-            return value == DBNull.Value ? null : value;
+            try
+            {
+                var value = cmd.ExecuteScalar();
+                _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, "Get Computed Value");
+                return value == DBNull.Value ? null : value;
+            }
+            catch (Exception ex)
+            {
+                _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, "Get Computed Value", ex.Message);
+                _logger.LogError(ex.Message, ex);
+                throw;
+            }
         }
 
         private void SetModelValue(Dictionary<string, object> model, string key, object value)

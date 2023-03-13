@@ -2,6 +2,7 @@
 using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,18 +23,21 @@ namespace DataEditorPortal.Web.Controllers
         private readonly DepDbContext _depDbContext;
         private readonly IQueryBuilder _queryBuilder;
         private readonly IUniversalGridService _universalGridService;
+        private readonly IEventLogService _eventLogService;
 
         public EventLogController(
             ILogger<EventLogController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
             IQueryBuilder queryBuilder,
-            IUniversalGridService universalGridService)
+            IUniversalGridService universalGridService,
+            IEventLogService eventLogService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _queryBuilder = queryBuilder;
             _universalGridService = universalGridService;
+            _eventLogService = eventLogService;
         }
 
         [HttpPost]
@@ -43,7 +47,7 @@ namespace DataEditorPortal.Web.Controllers
             var dataSourceConfig = new DataSourceConfig()
             {
                 TableSchema = Constants.DEFAULT_SCHEMA,
-                TableName = "EventLogs"
+                TableName = "EVENT_LOGS"
             };
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
             queryText = _queryBuilder.UseFilters(queryText, param.Filters);
@@ -51,7 +55,7 @@ namespace DataEditorPortal.Web.Controllers
 
             if (param.IndexCount > 0)
             {
-                if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = "EventTime", order = 0 } };
+                if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = "EVENT_TIME", order = 0 } };
                 queryText = _queryBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
             }
             else
@@ -62,7 +66,7 @@ namespace DataEditorPortal.Web.Controllers
             var output = new GridData();
             using (var con = _depDbContext.Database.GetDbConnection())
             {
-                output = _universalGridService.QueryGridData(con, queryText);
+                output = _universalGridService.QueryGridData(con, queryText, false);
             }
 
             return output;
@@ -106,6 +110,13 @@ namespace DataEditorPortal.Web.Controllers
             _depDbContext.SaveChanges();
 
             return true;
+        }
+
+        [HttpPost]
+        [Route("page-request")]
+        public void AddPageRequestLog([FromBody] EventLogModel model)
+        {
+            _eventLogService.AddPageRequestLog(model);
         }
     }
 }
