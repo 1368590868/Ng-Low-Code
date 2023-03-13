@@ -17,6 +17,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string CustomAddFormName { get; set; }
         public string CustomEditFormName { get; set; }
         public string CustomViewFormName { get; set; }
+        public string CustomDeleteFormName { get; set; }
 
         public List<CustomAction> CustomActions { get; set; }
     }

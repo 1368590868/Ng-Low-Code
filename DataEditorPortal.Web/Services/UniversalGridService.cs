@@ -99,6 +99,8 @@ namespace DataEditorPortal.Web.Services
                     result.CustomEditFormName = detailConfig.UpdatingForm.CustomFormName;
                 if (detailConfig.InfoForm != null && detailConfig.InfoForm.UseCustomForm)
                     result.CustomViewFormName = detailConfig.InfoForm.CustomFormName;
+                if (detailConfig.DeletingForm != null && detailConfig.DeletingForm.UseCustomForm)
+                    result.CustomDeleteFormName = detailConfig.DeletingForm.CustomFormName;
             }
 
             _mapper.Map(detailConfig, result);

@@ -184,7 +184,7 @@ namespace DataEditorPortal.Web.Services
                 sqlText = UseFilters(sqlText);
                 sqlText = RemoveOrderBy(sqlText);
 
-                return $"SELECT TOP 1 * FROM ({sqlText}) AS A";
+                return $"SELECT TOP 1 * FROM ({sqlText}) A";
             }
             else
             {

@@ -203,7 +203,7 @@ namespace DataEditorPortal.Web.Services
                 sqlText = UseFilters(sqlText);
                 sqlText = RemoveOrderBy(sqlText);
 
-                return $"SELECT * FROM ({sqlText}) AS A WHERE rownum = 1";
+                return $"SELECT * FROM ({sqlText}) A WHERE rownum = 1";
             }
             else
             {

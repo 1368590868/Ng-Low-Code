@@ -369,7 +369,12 @@ namespace DataEditorPortal.Web.Services
             {
                 var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => EscapeColumnName(x))) : "*";
 
-                return $@"SELECT DISTINCT {columns} FROM ({config.QueryText}) A";
+                var queryText = GenerateSqlTextForList(config);
+                queryText = UseSearches(queryText);
+                queryText = UseFilters(queryText);
+                queryText = RemoveOrderBy(queryText);
+
+                return $@"SELECT DISTINCT {columns} FROM ({queryText}) A";
             }
             else
             {
