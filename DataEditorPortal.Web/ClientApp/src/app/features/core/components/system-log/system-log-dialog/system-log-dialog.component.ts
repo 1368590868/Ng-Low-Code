@@ -14,7 +14,7 @@ export class SystemLogDialogComponent {
   constructor(private systemLogService: SystemLogService) {}
 
   show(row: SystemLogData) {
-    this.systemLogService.getRowData(row.Id).subscribe(res => {
+    this.systemLogService.getRowData(row.ID).subscribe(res => {
       if (!res.isError) {
         this.viewData = res.result;
         this.viewData = Object.keys(this.viewData).map(key => {
