@@ -27,26 +27,20 @@ export class DataDictionaryService {
   createDictionary(data: DictionaryData) {
     return this.http.post<ApiResponse<string>>(
       `${this._apiUrl}dictionary/create`,
-      {
-        label: data.Label,
-        value: data.Value,
-        value1: data.Value1,
-        value2: data.Value2,
-        category: data.Category
-      }
+      data
     );
   }
 
   updateDictionary(data: DictionaryData) {
     return this.http.put<ApiResponse<string>>(
-      `${this._apiUrl}dictionary/${data.Id}/update`,
+      `${this._apiUrl}dictionary/${data.ID}/update`,
       data
     );
   }
 
   deleteDictionary(data: DictionaryData) {
     return this.http.delete<ApiResponse<string>>(
-      `${this._apiUrl}dictionary/${data.Id}/delete`
+      `${this._apiUrl}dictionary/${data.ID}/delete`
     );
   }
 }
