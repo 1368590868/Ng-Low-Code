@@ -8,6 +8,8 @@ namespace DataEditorPortal.Web.Services
 {
     public class SqlServerQueryBuilder : QueryBuilder, IQueryBuilder
     {
+        protected override string ParameterPrefix => "@";
+
         #region Ultilities
 
         protected override string GenerateCriteriaClause(FilterParam item, string whereClause = null)
@@ -162,11 +164,6 @@ namespace DataEditorPortal.Web.Services
         protected override string EscapeColumnName(string columnName)
         {
             return string.Format("[{0}]", columnName);
-        }
-
-        protected override string ParameterName(string name)
-        {
-            return string.Format("@{0}", name);
         }
 
         #endregion

@@ -701,7 +701,13 @@ namespace DataEditorPortal.Web.Services
 
                 try
                 {
-                    var dict = new Dictionary<string, object> { { dataSourceConfig.IdColumn, ids } };
+                    var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(ids));
+                    var dict = new Dictionary<string, object> {
+                        {
+                            _queryBuilder.ParameterName(dataSourceConfig.IdColumn),
+                            _queryBuilder.GetJsonElementValue(jsonElement)
+                        }
+                    };
                     dynamic param = dict.Aggregate(
                         new ExpandoObject() as IDictionary<string, object>,
                         (a, p) => { a.Add(p); return a; }

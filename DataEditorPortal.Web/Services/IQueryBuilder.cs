@@ -20,6 +20,8 @@ namespace DataEditorPortal.Web.Services
         object GetTypedValue(object value, DataRow schema);
         Type GetValueType(DataRow schema);
         void AddDbParameter(DbCommand cmd, string name, object value);
+        string ParameterName(string name);
+        object GetJsonElementValue(JsonElement jsonElement);
 
         // universal grid
         string GenerateSqlTextForList(DataSourceConfig config);
@@ -40,6 +42,8 @@ namespace DataEditorPortal.Web.Services
 
     public abstract class QueryBuilder
     {
+        protected abstract string ParameterPrefix { get; }
+
         #region Ultilities
 
         protected virtual string GenerateWhereClause(List<FilterParam> filterParams)
@@ -216,7 +220,7 @@ namespace DataEditorPortal.Web.Services
             cmd.Parameters.Add(param);
         }
 
-        protected virtual object GetJsonElementValue(JsonElement jsonElement)
+        public virtual object GetJsonElementValue(JsonElement jsonElement)
         {
             if (jsonElement.ValueKind == JsonValueKind.Array)
             {
@@ -248,7 +252,10 @@ namespace DataEditorPortal.Web.Services
 
         protected abstract string EscapeColumnName(string columnName);
 
-        protected abstract string ParameterName(string name);
+        public virtual string ParameterName(string name)
+        {
+            return string.Format("P_{0}", name);
+        }
 
         #endregion
 
@@ -283,7 +290,7 @@ namespace DataEditorPortal.Web.Services
             queryText = UseFilters(queryText);
             queryText = RemoveOrderBy(queryText);
 
-            return $@"SELECT * FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} = {ParameterName(config.IdColumn)}";
+            return $@"SELECT * FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} = {ParameterPrefix}{ParameterName(config.IdColumn)}";
         }
 
         public virtual string GenerateSqlTextForInsert(DataSourceConfig config)
@@ -301,7 +308,7 @@ namespace DataEditorPortal.Web.Services
 
                 var columns = string.Join(",", config.Columns.Select(x => EscapeColumnName(x)));
 
-                var param = string.Join(",", config.Columns.Select(x => ParameterName(x)));
+                var param = string.Join(",", config.Columns.Select(x => $"{ParameterPrefix}{ParameterName(x)}"));
 
                 var queryText = $@"INSERT INTO {source} ({columns}) VALUES ({param})";
 
@@ -326,9 +333,9 @@ namespace DataEditorPortal.Web.Services
 
                 var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
 
-                var sets = string.Join(",", config.Columns.Select(x => $"{EscapeColumnName(x)} = {ParameterName(x)}"));
+                var sets = string.Join(", ", config.Columns.Select(x => $"{EscapeColumnName(x)}={ParameterPrefix}{ParameterName(x)}"));
 
-                var queryText = $@"UPDATE {source} SET {sets} WHERE {EscapeColumnName(config.IdColumn)} = {ParameterName(config.IdColumn)}";
+                var queryText = $@"UPDATE {source} SET {sets} WHERE {EscapeColumnName(config.IdColumn)} = {ParameterPrefix}{ParameterName(config.IdColumn)}";
 
                 return queryText;
             }
@@ -348,7 +355,7 @@ namespace DataEditorPortal.Web.Services
             else
             {
                 var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
-                var queryText = $@"DELETE FROM {source} WHERE {EscapeColumnName(config.IdColumn)} IN {ParameterName(config.IdColumn)}";
+                var queryText = $@"DELETE FROM {source} WHERE {EscapeColumnName(config.IdColumn)} IN {ParameterPrefix}{ParameterName(config.IdColumn)}";
 
                 return queryText;
             }
@@ -413,9 +420,9 @@ namespace DataEditorPortal.Web.Services
                     }
                     else
                     {
-                        keyValuePairs.Add(new KeyValuePair<string, object>(key, value));
+                        keyValuePairs.Add(new KeyValuePair<string, object>(ParameterName(key), value));
 
-                        var criteria = match.Groups[1].Value.Replace(fieldMatch.Value, ParameterName(key));
+                        var criteria = match.Groups[1].Value.Replace(fieldMatch.Value, $"{ParameterPrefix}{ParameterName(key)}");
                         queryText = queryText.Replace(match.Value, criteria);
                     }
 
@@ -437,16 +444,16 @@ namespace DataEditorPortal.Web.Services
                     // check the operator, if it is "IN", value should be IEnumerable<object>
                     // If not, we need to default the value to empty array.
                     if (value != null && value is IEnumerable<object>)
-                        keyValuePairs.Add(new KeyValuePair<string, object>(key, value));
+                        keyValuePairs.Add(new KeyValuePair<string, object>(ParameterName(key), value));
                     else
-                        keyValuePairs.Add(new KeyValuePair<string, object>(key, new object[] { }));
+                        keyValuePairs.Add(new KeyValuePair<string, object>(ParameterName(key), new object[] { }));
                 }
                 else
                 {
-                    if (value != null) keyValuePairs.Add(new KeyValuePair<string, object>(key, value));
-                    else keyValuePairs.Add(new KeyValuePair<string, object>(key, null));
+                    if (value != null) keyValuePairs.Add(new KeyValuePair<string, object>(ParameterName(key), value));
+                    else keyValuePairs.Add(new KeyValuePair<string, object>(ParameterName(key), null));
                 }
-                queryText = queryText.Replace(match.Value, ParameterName(key));
+                queryText = queryText.Replace(match.Value, $"{ParameterPrefix}{ParameterName(key)}");
             }
 
             return (queryText, keyValuePairs);
