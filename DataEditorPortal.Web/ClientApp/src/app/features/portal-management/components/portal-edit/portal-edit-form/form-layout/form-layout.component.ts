@@ -43,7 +43,9 @@ export class FormLayoutComponent {
   @Input()
   set config(val: GridFormConfig) {
     Object.assign(this._formConfig, val);
-    this.showQuery = !!this._formConfig.queryText;
+    this.showQuery =
+      !!this._formConfig.queryText &&
+      this._formConfig.queryText != this.helperMessage;
 
     if (!this._formConfig.queryText) {
       this.formControlQueryText.setValue(this.helperMessage);
