@@ -282,7 +282,13 @@ export class TableComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
 
-  onRefresh() {
+  refresh() {
+    this.selectedRecords = [];
+    this.table.saveState();
+    this.fetchData();
+  }
+
+  resetAndRefresh() {
     this.reset();
     this.table.reset();
     this.table.saveState();

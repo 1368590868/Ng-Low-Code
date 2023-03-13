@@ -36,7 +36,7 @@
               [selectedRecords]="selectedRecords"
               [recordKey]="tableConfig.dataKey"
               [fetchDataParam]="fetchDataParam"
-              (savedEvent)="fetchData()"></ng-template>
+              (savedEvent)="refresh()"></ng-template>
           </div>
           <div class="flex-none mr-2 ml-auto">
             <strong *ngIf="selectedRecords.length > 0"
@@ -46,7 +46,7 @@
           <p-button
             icon="pi pi-refresh text-lg"
             styleClass="p-button-rounded p-button-outlined"
-            (onClick)="onRefresh()"></p-button>
+            (onClick)="resetAndRefresh()"></p-button>
         </div>
       </ng-template>
 
@@ -124,7 +124,7 @@
                 [actions]="rowActions"
                 [recordKey]="tableConfig.dataKey"
                 [selectedRecords]="[data]"
-                (savedEvent)="fetchData()"></ng-template>
+                (savedEvent)="refresh()"></ng-template>
             </div>
           </td>
 
