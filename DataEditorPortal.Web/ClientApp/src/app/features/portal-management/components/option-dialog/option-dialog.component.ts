@@ -207,7 +207,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
         this.isLoading = true;
         this.lookupService
           .saveOptionQuery({
-            id: this.optionsLookup || '',
+            id: this.optionsLookup,
             name: this.formControlName.value,
             queryText:
               this.formControlQuery.value === this.helperMessage

@@ -54,7 +54,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
 
   @Input()
   set value(val: any) {
-    this.innerValue = val;
+    this.innerValue = val ?? [];
     this.initForm(val ?? []);
   }
 

@@ -60,6 +60,7 @@
             pReorderableColumn
             pResizableColumn
             [pSortableColumn]="col.field"
+            [style.width]="col.width"
             [pSortableColumnDisabled]="!col.sortable">
             <span style="vertical-align: middle">{{ col.header }}</span>
             <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>

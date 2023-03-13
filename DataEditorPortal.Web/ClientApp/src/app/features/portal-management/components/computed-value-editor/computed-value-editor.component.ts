@@ -110,7 +110,7 @@ export class ComputedValueEditorComponent
     } else {
       this.form.setValue(
         {
-          nameFormControl: val.name ?? null,
+          nameFormControl: val?.name ?? null,
           queryTextFormControl: this.helperMessage,
           typeFormControl: null
         },

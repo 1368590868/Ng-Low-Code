@@ -31,7 +31,7 @@ export class LookupService {
   }
 
   saveOptionQuery(data: Lookup) {
-    if (data.id) {
+    if (data.id !== undefined) {
       return this.http.put<ApiResponse<string>>(
         `${this._apiUrl}lookup/${data.id}/update`,
         data
