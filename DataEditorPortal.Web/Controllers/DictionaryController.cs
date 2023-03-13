@@ -62,7 +62,7 @@ namespace DataEditorPortal.Web.Controllers
             var output = new GridData();
             using (var con = _depDbContext.Database.GetDbConnection())
             {
-                output = _universalGridService.QueryGridData(con, queryText);
+                output = _universalGridService.QueryGridData(con, queryText, "data-dictionaries");
             }
 
             return output;

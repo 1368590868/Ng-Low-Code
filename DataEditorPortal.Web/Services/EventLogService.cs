@@ -43,7 +43,7 @@ namespace DataEditorPortal.Web.Services
                 _depDbContext.Add(new EventLog()
                 {
                     Category = EventLogCategory.PAGE_REQUEST,
-                    EventSection = model.Section,
+                    EventSection = model.Section.Replace("-", "_").ToUpper(),
                     EventName = model.Action,
                     EventTime = DateTime.UtcNow,
                     Username = username,
@@ -75,7 +75,7 @@ namespace DataEditorPortal.Web.Services
                 _depDbContext.Add(new EventLog()
                 {
                     Category = category,
-                    EventSection = section,
+                    EventSection = section.Replace("-", "_").ToUpper(),
                     EventName = "Database Command",
                     EventTime = DateTime.UtcNow,
                     Username = username,

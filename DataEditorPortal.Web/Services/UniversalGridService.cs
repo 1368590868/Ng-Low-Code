@@ -29,7 +29,7 @@ namespace DataEditorPortal.Web.Services
         List<FormFieldConfig> GetGridDetailConfig(string name, string type);
 
         GridData GetGridData(string name, GridParam param);
-        GridData QueryGridData(DbConnection con, string queryText, bool writeLog = false);
+        GridData QueryGridData(DbConnection con, string queryText, string gridName, bool writeLog = false);
         MemoryStream ExportExcel(string name, ExportParam param);
 
         Dictionary<string, dynamic> GetGridDataDetail(string name, string id);
@@ -244,13 +244,13 @@ namespace DataEditorPortal.Web.Services
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
 
-                output = QueryGridData(con, queryText);
+                output = QueryGridData(con, queryText, name);
             }
 
             return output;
         }
 
-        public GridData QueryGridData(DbConnection con, string queryText, bool writeLog = true)
+        public GridData QueryGridData(DbConnection con, string queryText, string gridName, bool writeLog = true)
         {
             var output = new GridData();
 
@@ -295,12 +295,12 @@ namespace DataEditorPortal.Web.Services
                 }
 
                 if (writeLog)
-                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, "Query Grid Data");
+                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, gridName);
             }
             catch (Exception ex)
             {
                 if (writeLog)
-                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, "Query Grid Data", ex.Message);
+                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, gridName, ex.Message);
                 _logger.LogError(ex.Message, ex);
                 throw new DepException("An Error in the query has occurred: " + ex.Message);
             }

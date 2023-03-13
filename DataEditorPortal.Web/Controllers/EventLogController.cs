@@ -66,7 +66,7 @@ namespace DataEditorPortal.Web.Controllers
             var output = new GridData();
             using (var con = _depDbContext.Database.GetDbConnection())
             {
-                output = _universalGridService.QueryGridData(con, queryText, false);
+                output = _universalGridService.QueryGridData(con, queryText, "event-logs", false);
             }
 
             return output;
