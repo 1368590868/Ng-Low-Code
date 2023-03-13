@@ -1,5 +1,7 @@
-﻿using Setup.Models;
+﻿using Oracle.ManagedDataAccess.Client;
+using Setup.Models;
 using System;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +18,7 @@ namespace Setup
             InitializeComponent();
         }
 
+        public string DatabaseProvider { get; set; }
         public DatabaseConnection DatabaseConnection { get; set; } = new DatabaseConnection();
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -25,7 +28,7 @@ namespace Setup
 
             try
             {
-                using (var con = new SqlConnection())
+                using (DbConnection con = DatabaseProvider == "SqlConnection" ? new SqlConnection() : new OracleConnection())
                 {
                     con.ConnectionString = DatabaseConnection.ConnectionString;
                     con.Open();

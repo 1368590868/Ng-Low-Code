@@ -18,7 +18,7 @@
             </Style>
         </Grid.Resources>
         <Grid x:Name="containerConnection" Visibility="Visible">
-            <DataGrid x:Name="dataGridConnection" ItemsSource="{Binding}" Margin="10,59,10,40" AutoGenerateColumns="False" ColumnWidth="SizeToHeader" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="Gainsboro" CanUserAddRows="False">
+            <DataGrid x:Name="dataGridConnection" ItemsSource="{Binding}" Margin="10,87,10,40" AutoGenerateColumns="False" ColumnWidth="SizeToHeader" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="Gainsboro" CanUserAddRows="False">
                 <DataGrid.RowStyle>
                     <Style TargetType="{x:Type DataGridRow}">
                         <EventSetter Event="Control.MouseDoubleClick" Handler="dataGridRow_MouseDoubleClick"/>
@@ -32,6 +32,11 @@
             <Button x:Name="btnConnectionNext" Content="Next" Margin="0,0,10,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="50" Click="btnConnectionNext_Click"/>
             <Button x:Name="btnAddConnection" Content="Add" Margin="0,0,75,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="50" Click="btnAddConnection_Click"/>
             <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,20,0,0" Text="Setup Database" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.881,0.559" FontSize="16"/>
+            <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="125,59,0,0" VerticalAlignment="Top" Width="120" IsTextSearchEnabled="False" SelectedValue="{Binding DatabaseProvider.Value, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0" SelectionChanged="comboBox_SelectionChanged" SelectedValuePath="Tag">
+                <ComboBoxItem Content="Sql Connection" Tag="SqlConnection" />
+                <ComboBoxItem Content="Oracle" Tag="Oracle"/>
+            </ComboBox>
+            <Label x:Name="label6" Content="Database Provider:" HorizontalAlignment="Left" Margin="11,60,0,0" VerticalAlignment="Top" Height="20" Padding="0,0,0,0"/>
         </Grid>
         <Grid x:Name="containerAdmin" Visibility="Hidden">
             <Label x:Name="label" Content="Username:" HorizontalAlignment="Left" Margin="32,87,0,0" VerticalAlignment="Top" Height="20" Padding="0,0,0,0" RenderTransformOrigin="1.05,0.864"/>

@@ -611,6 +611,7 @@ namespace DataEditorPortal.Web.Common.Install
                                     filterType = "boolean",
                                     key = "CHECKED",
                                     type = "checkbox",
+                                    defaultValue = false,
                                     props = new
                                     {
                                         label = "Checked",
