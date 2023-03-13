@@ -10,6 +10,18 @@ export interface SystemLogData {
   RESULT?: string;
 }
 
+export interface SystemLogViewInfo {
+  id: string;
+  eventTime?: string;
+  eventSection?: string;
+  category?: string;
+  eventName?: string;
+  username?: string;
+  details?: string;
+  params?: string;
+  result?: string;
+}
+
 export interface GridResult {
   data: SystemLogData[];
   total: number;

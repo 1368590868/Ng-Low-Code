@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { GridResult } from 'src/app/features/universal-grid/models/grid-types';
 import { ApiResponse, GridParam } from '..';
+import { SystemLogViewInfo } from '../models/system-log';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,8 @@ export class SystemLogService {
   }
 
   getRowData(id: string) {
-    return this.http.get<ApiResponse<string>>(`${this._apiUrl}event-log/${id}`);
+    return this.http.get<ApiResponse<SystemLogViewInfo>>(
+      `${this._apiUrl}event-log/${id}`
+    );
   }
 }
