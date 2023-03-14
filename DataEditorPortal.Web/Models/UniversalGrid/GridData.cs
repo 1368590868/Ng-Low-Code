@@ -4,7 +4,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 {
     public class GridData
     {
-        public List<Dictionary<string, dynamic>> Data { get; set; } = new List<Dictionary<string, dynamic>>();
+        public List<IDictionary<string, object>> Data { get; set; } = new List<IDictionary<string, object>>();
         public int Total { get; set; }
     }
 }

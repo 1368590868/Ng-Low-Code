@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
-
-namespace DataEditorPortal.Web.Models.PortalItem
+﻿namespace DataEditorPortal.Web.Models.PortalItem
 {
     public class DataSourceTable
     {
@@ -17,22 +14,6 @@ namespace DataEditorPortal.Web.Models.PortalItem
         public bool IsAutoIncrement { get; set; }
         public bool IsIdentity { get; set; }
         public bool AllowDBNull { get; set; }
-
-        [JsonIgnore]
-        public Type DataType { get; set; }
-        public string FilterType
-        {
-            get
-            {
-                if (DataType == typeof(int) || DataType == typeof(long) || DataType == typeof(short) ||
-                    DataType == typeof(float) || DataType == typeof(decimal) || DataType == typeof(double))
-                    return "numeric";
-                if (DataType == typeof(DateTime))
-                    return "date";
-                if (DataType == typeof(bool))
-                    return "boolean";
-                return "text";
-            }
-        }
+        public string FilterType { get; set; }
     }
 }

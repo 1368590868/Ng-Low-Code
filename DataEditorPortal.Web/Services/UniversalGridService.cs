@@ -32,7 +32,7 @@ namespace DataEditorPortal.Web.Services
         GridData QueryGridData(DbConnection con, string queryText, string gridName, bool writeLog = false);
         MemoryStream ExportExcel(string name, ExportParam param);
 
-        Dictionary<string, dynamic> GetGridDataDetail(string name, string id);
+        IDictionary<string, object> GetGridDataDetail(string name, string id);
         bool UpdateGridData(string name, string id, Dictionary<string, object> model);
         bool AddGridData(string name, Dictionary<string, object> model);
         bool DeleteGridData(string name, string[] ids);
@@ -129,7 +129,7 @@ namespace DataEditorPortal.Web.Services
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
             var columnsConfig = JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
 
-            var result = new List<string>();
+            var result = new List<dynamic>();
             var columnConfig = columnsConfig.FirstOrDefault(x => x.field == column);
             if (columnConfig != null && columnConfig.filterType == "enums")
             {
@@ -140,26 +140,14 @@ namespace DataEditorPortal.Web.Services
                 {
                     con.ConnectionString = config.DataSourceConnection.ConnectionString;
 
-                    var cmd = con.CreateCommand();
-                    cmd.Connection = con;
-                    cmd.CommandText = query;
-
                     try
                     {
-                        con.Open();
-                        using (var dr = cmd.ExecuteReader())
-                        {
-                            while (dr.Read())
-                            {
-                                if (dr[0] != DBNull.Value)
-                                    result.Add(dr.GetString(0));
-                            }
-                        }
-                        _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, name);
+                        result = con.Query(query).Where(x => x != null && x != DBNull.Value).ToList();
+                        _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, query, null);
                     }
                     catch (Exception ex)
                     {
-                        _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, name, ex.Message);
+                        _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, query, null, ex.Message);
                         throw new DepException("An Error in the query has occurred: " + ex.Message);
                     }
                     finally
@@ -255,54 +243,45 @@ namespace DataEditorPortal.Web.Services
         public GridData QueryGridData(DbConnection con, string queryText, string gridName, bool writeLog = true)
         {
             var output = new GridData();
-
-            var cmd = con.CreateCommand();
-            cmd.Connection = con;
-            cmd.CommandText = queryText;
-
             try
             {
                 con.Open();
-                using (var dr = cmd.ExecuteReader())
+
+                DataTable schema;
+                using (var dr = con.ExecuteReader(queryText))
                 {
-                    var fields = dr.FieldCount;
-                    var fieldnames = new string[fields];
-                    for (int i = 0; i < fields; i++)
-                    {
-                        fieldnames[i] = dr.GetName(i);
-                    }
-
-                    var schema = dr.GetSchemaTable();
-
-                    while (dr.Read())
-                    {
-                        var row = new Dictionary<string, dynamic>();
-                        for (int i = 0; i < fields; i++)
-                        {
-                            var typename = dr.GetFieldType(i);
-                            row[fieldnames[i]] = _queryBuilder.GetTypedValue(dr[i], schema.Rows[i]);
-                        }
-                        output.Data.Add(row);
-                    }
+                    schema = dr.GetSchemaTable();
                 }
+
+                var data = con.Query<dynamic>(queryText).ToList();
+                data.ForEach(item =>
+                {
+                    var row = (IDictionary<string, object>)item;
+                    foreach (var key in row.Keys)
+                    {
+                        var index = row.Keys.ToList().IndexOf(key);
+                        row[key] = _queryBuilder.TransformValue(row[key], schema.Rows[index]);
+                    }
+                    output.Data.Add(row);
+                });
 
                 if (output.Data.Any() && output.Data[0].Keys.Contains("DEP_TOTAL"))
                 {
                     output.Total = Convert.ToInt32(output.Data[0]["DEP_TOTAL"]);
                 }
-                foreach (var data in output.Data)
+                foreach (var item in output.Data)
                 {
-                    if (data.Keys.Contains("DEP_TOTAL")) data.Remove("DEP_TOTAL");
-                    if (data.Keys.Contains("DEP_ROWNUMBER")) data.Remove("DEP_ROWNUMBER");
+                    if (item.Keys.Contains("DEP_TOTAL")) item.Remove("DEP_TOTAL");
+                    if (item.Keys.Contains("DEP_ROWNUMBER")) item.Remove("DEP_ROWNUMBER");
                 }
 
                 if (writeLog)
-                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, gridName);
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, gridName, queryText);
             }
             catch (Exception ex)
             {
                 if (writeLog)
-                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, gridName, ex.Message);
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, gridName, queryText, null, ex.Message);
                 _logger.LogError(ex.Message, ex);
                 throw new DepException("An Error in the query has occurred: " + ex.Message);
             }
@@ -369,7 +348,7 @@ namespace DataEditorPortal.Web.Services
                     {
                         C2 = colIndex,
                         R2 = rowIndex,
-                        Text = FormatExportedValue(item, row[item.field]),
+                        Text = (string)FormatExportedValue(item, row[item.field]),
                         Type = item.filterType
                     };
                     sheetData.Add(data);
@@ -395,7 +374,7 @@ namespace DataEditorPortal.Web.Services
             return stream;
         }
 
-        private object FormatExportedValue(GridColConfig column, dynamic value)
+        private object FormatExportedValue(GridColConfig column, object value)
         {
             if (value == null) return "";
             if (column.filterType == "boolean")
@@ -412,7 +391,7 @@ namespace DataEditorPortal.Web.Services
 
         #region Grid detail and config, add, update and remove
 
-        public Dictionary<string, dynamic> GetGridDataDetail(string name, string id)
+        public IDictionary<string, object> GetGridDataDetail(string name, string id)
         {
             var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
@@ -421,47 +400,35 @@ namespace DataEditorPortal.Web.Services
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
             var queryText = _queryBuilder.GenerateSqlTextForDetail(dataSourceConfig);
 
-            var result = new Dictionary<string, dynamic>();
+            IDictionary<string, object> result = new Dictionary<string, object>();
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
 
-                con.Open();
-                var cmd = con.CreateCommand();
-                cmd.Connection = con;
+                // always provide Id column parameter
+                var param = GenerateDynamicParameter(new Dictionary<string, object>() { { dataSourceConfig.IdColumn, id } });
 
                 try
                 {
-                    cmd.CommandText = queryText;
+                    con.Open();
 
-                    // always provide Id column parameter
-                    _queryBuilder.AddDbParameter(cmd, dataSourceConfig.IdColumn, id);
-
-                    using (var dr = cmd.ExecuteReader())
+                    DataTable schema;
+                    using (var dr = con.ExecuteReader(queryText, param))
                     {
-                        var fields = dr.FieldCount;
-                        var fieldnames = new string[fields];
-                        for (int i = 0; i < fields; i++)
-                        {
-                            fieldnames[i] = dr.GetName(i);
-                        }
-
-                        var schema = dr.GetSchemaTable();
-
-                        while (dr.Read())
-                        {
-                            for (int i = 0; i < fields; i++)
-                            {
-                                result[fieldnames[i]] = _queryBuilder.GetTypedValue(dr[i], schema.Rows[i]);
-                            }
-                        }
+                        schema = dr.GetSchemaTable();
+                    }
+                    result = (IDictionary<string, object>)con.QueryFirst(queryText, param);
+                    foreach (var key in result.Keys)
+                    {
+                        var index = result.Keys.ToList().IndexOf(key);
+                        result[key] = _queryBuilder.TransformValue(result[key], schema.Rows[index]);
                     }
 
-                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, name);
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param);
                 }
                 catch (Exception ex)
                 {
-                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, name, ex.Message);
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -574,30 +541,23 @@ namespace DataEditorPortal.Web.Services
 
                 // generate the insert command
                 var trans = con.BeginTransaction();
-                var cmd = con.CreateCommand();
-                cmd.Connection = con;
-                cmd.Transaction = trans;
-                cmd.CommandText = queryText;
 
                 // add query parameters
-                foreach (var column in columns)
-                {
-                    _queryBuilder.AddDbParameter(cmd, column, model[column]);
-                }
+                var param = GenerateDynamicParameter(model.AsEnumerable().Where(x => columns.Contains(x.Key)));
 
                 // excute command
                 try
                 {
-                    var affected = cmd.ExecuteNonQuery();
+                    var affected = con.Execute(queryText, param, trans);
                     trans.Commit();
 
-                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, name, $"{affected} rows affected.");
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
                 }
                 catch (Exception ex)
                 {
                     trans.Rollback();
 
-                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, name, ex.Message);
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -667,32 +627,26 @@ namespace DataEditorPortal.Web.Services
 
                 // generate the update command
                 var trans = con.BeginTransaction();
-                var cmd = con.CreateCommand();
-                cmd.Connection = con;
-                cmd.Transaction = trans;
-                cmd.CommandText = queryText;
 
                 // add query parameters
-                foreach (var column in columns)
-                {
-                    _queryBuilder.AddDbParameter(cmd, column, model[column]);
-                }
+                var paramKeyValues = model.AsEnumerable().Where(x => columns.Contains(x.Key)).ToList();
                 // always provide Id column parameter
-                _queryBuilder.AddDbParameter(cmd, dataSourceConfig.IdColumn, id);
+                paramKeyValues.Add(new KeyValuePair<string, object>(dataSourceConfig.IdColumn, id));
+                var param = GenerateDynamicParameter(paramKeyValues);
 
                 // excute command
                 try
                 {
-                    var affected = cmd.ExecuteNonQuery();
+                    var affected = con.Execute(queryText, param, trans);
                     trans.Commit();
 
-                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, name, $"{affected} rows affected.");
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, $"{affected} rows affected.");
                 }
                 catch (Exception ex)
                 {
                     trans.Rollback();
 
-                    _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, name, ex.Message);
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -727,25 +681,24 @@ namespace DataEditorPortal.Web.Services
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
+                con.Open();
+                var trans = con.BeginTransaction();
 
                 try
                 {
-                    var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(ids));
-                    var dict = new Dictionary<string, object> {
-                        {
-                            _queryBuilder.ParameterName(dataSourceConfig.IdColumn),
-                            _queryBuilder.GetJsonElementValue(jsonElement)
+                    var param = GenerateDynamicParameter(
+                        new List<KeyValuePair<string, object>>() {
+                            new KeyValuePair<string, object>(dataSourceConfig.IdColumn, ids)
                         }
-                    };
-                    dynamic param = dict.Aggregate(
-                        new ExpandoObject() as IDictionary<string, object>,
-                        (a, p) => { a.Add(p); return a; }
                     );
 
-                    con.Execute(queryText, (object)param);
+                    con.Execute(queryText, param, trans);
+                    trans.Commit();
                 }
                 catch (Exception ex)
                 {
+                    trans.Rollback();
+
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -768,13 +721,16 @@ namespace DataEditorPortal.Web.Services
                     {
                         if (!string.IsNullOrEmpty(field.computedConfig.queryText))
                         {
+                            var queryText = field.computedConfig.queryText;
                             try
                             {
-                                var value = GetComputedValueFromDb(con, field.computedConfig.queryText, field.computedConfig.type);
+                                var value = con.ExecuteScalar(queryText, null, null, null, field.computedConfig.type);
                                 SetModelValue(model, field.key, value);
+                                _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, "Get Computed Value", queryText);
                             }
                             catch (Exception ex)
                             {
+                                _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, "Get Computed Value", queryText, null, ex.Message);
                                 _logger.LogError(ex.Message, ex);
                                 throw new DepException($"An Error has occurred when calculate computed value for field: {field.key}. Error: {ex.Message}");
                             }
@@ -807,32 +763,32 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        private object GetComputedValueFromDb(DbConnection con, string commandText, CommandType type = CommandType.Text)
-        {
-            var cmd = con.CreateCommand();
-            cmd.Connection = con;
-            cmd.CommandType = type;
-            cmd.CommandText = commandText;
-
-            try
-            {
-                var value = cmd.ExecuteScalar();
-                _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_SUCCESS, "Get Computed Value");
-                return value == DBNull.Value ? null : value;
-            }
-            catch (Exception ex)
-            {
-                _eventLogService.AddDdCommandLog(cmd, EventLogCategory.DB_ERROR, "Get Computed Value", ex.Message);
-                _logger.LogError(ex.Message, ex);
-                throw;
-            }
-        }
-
         private void SetModelValue(Dictionary<string, object> model, string key, object value)
         {
             if (model.Keys.Contains(key)) model[key] = value;
             else
                 model.Add(key, value);
+        }
+
+        #endregion
+
+        #region private method
+
+        private object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues)
+        {
+            var dict = new Dictionary<string, object>();
+            foreach (var item in keyValues)
+            {
+                var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(item.Value));
+                dict.Add(_queryBuilder.ParameterName(item.Key), _queryBuilder.GetJsonElementValue(jsonElement));
+            }
+
+            dynamic param = dict.Aggregate(
+                new ExpandoObject() as IDictionary<string, object>,
+                (a, p) => { a.Add(p); return a; }
+            );
+
+            return (object)param;
         }
 
         #endregion

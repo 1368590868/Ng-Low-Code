@@ -254,11 +254,11 @@ namespace DataEditorPortal.Web.Services
                             {
                                 AllowDBNull = (bool)row["AllowDBNull"],
                                 ColumnName = (string)row["ColumnName"],
-                                DataType = _queryBuilder.GetValueType(row),
                                 IsAutoIncrement = (bool)row["IsAutoIncrement"],
                                 IsIdentity = (bool)row["IsIdentity"],
                                 IsKey = row["IsKey"] == DBNull.Value ? false : (bool)row["IsKey"],
-                                IsUnique = row["IsUnique"] == DBNull.Value ? false : (bool)row["IsUnique"]
+                                IsUnique = row["IsUnique"] == DBNull.Value ? false : (bool)row["IsUnique"],
+                                FilterType = _queryBuilder.GetFilterType(row)
                             });
                         }
                     }
