@@ -80,5 +80,73 @@ export const MonacoEditorConfig: NgxMonacoEditorConfig = {
         'editor.background': '#EEEEEE'
       }
     });
+
+    // extra libraries
+    const libSource = [
+      '/**',
+      '* Returns all data of the current row',
+      '*/',
+      'let RowData : any;',
+      'declare class DecimalPipe {',
+      '/**',
+      '   * @param value The value to be formatted.',
+      '   * @param digitsInfo Sets digit and decimal representation.',
+      " * The value's decimal representation is specified by the `digitsInfo`",
+      ' * parameter, written in the following format:<br>',
+      ' *',
+      ' * ```',
+      ' * {minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}',
+      ' * ```',
+      ' *',
+      ' *  - `minIntegerDigits`:',
+      ' * The minimum number of integer digits before the decimal point.',
+      ' * Default is 1.',
+      ' *',
+      ' * - `minFractionDigits`:',
+      ' * The minimum number of digits after the decimal point.',
+      ' * Default is 0.',
+      ' *',
+      ' *  - `maxFractionDigits`:',
+      ' * The maximum number of digits after the decimal point.',
+      ' * Default is 3.',
+      '   * @param locale Specifies what locale format rules to use.',
+      '   * [See more](#locale).',
+      '   */',
+      '     transform(value: number | string | null | undefined, digitsInfo?: string, locale?: string): string | null;',
+      '}',
+      'declare class DatePipe {',
+      '     transform(value: Date | string | number, format?: string, timezone?: string, locale?: string): string | null;',
+      '}',
+      'declare class Pipes {',
+      '    /**',
+      '     * Formats a value according to digit options and locale rules. [See more](https://angular.io/api/common/DatePipe)',
+      '     */',
+      '    static decimal:DecimalPipe',
+      '    /**',
+      '     * Returns the next fact',
+      '     */',
+      '    static date:DatePipe',
+      '    /**',
+      '     * Returns the next fact',
+      '     */',
+      '    static currency():string',
+      '}'
+    ].join('\n');
+    const libUri = 'ts:filename/facts.d.ts';
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(
+      libSource,
+      libUri
+    );
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    monaco.editor.createModel(
+      libSource,
+      'typescript',
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      monaco.Uri.parse(libUri)
+    );
   }
 };
