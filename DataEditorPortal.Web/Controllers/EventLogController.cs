@@ -74,7 +74,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public EventLog GetEventLog(Guid id)
+        public ApiResponse GetEventLog(Guid id)
         {
             var item = _depDbContext.EventLogs.FirstOrDefault(x => x.Id == id);
             if (item == null)
@@ -82,7 +82,8 @@ namespace DataEditorPortal.Web.Controllers
                 throw new ApiException("Not Found", 404);
             }
 
-            return item;
+            return new ApiResponse(item);
+
         }
 
         [HttpPost]
