@@ -16,6 +16,7 @@ namespace Setup
     /// </summary>
     public partial class MainWindow : Window
     {
+        public DatabaseProvider DatabaseProvider { get; set; } = new DatabaseProvider() { Value = "SqlConnection" };
 
         public ObservableCollection<DatabaseConnection> ConnectionList =
             new ObservableCollection<DatabaseConnection>() {
@@ -38,7 +39,7 @@ namespace Setup
             SitePublishModel.TargetFolder = $@"C:\inetpub\DataEditorPortal";
             SitePublishModel.SiteName = "Data Editor Portal";
             SitePublishModel.SitePort = "80";
-            SitePublishModel.SiteDomain = "example.com";
+            SitePublishModel.SiteDomain = "localhost";
         }
 
         #region Connections
@@ -47,6 +48,7 @@ namespace Setup
         {
             var connectionWindow = new Connection();
             connectionWindow.Owner = this;
+            connectionWindow.DatabaseProvider = DatabaseProvider.Value;
             connectionWindow.ShowDialog();
             if (connectionWindow.DialogResult.HasValue && connectionWindow.DialogResult.Value)
             {
@@ -87,6 +89,7 @@ namespace Setup
 
                 var connectionWindow = new Connection();
                 connectionWindow.Owner = this;
+                connectionWindow.DatabaseProvider = DatabaseProvider.Value;
                 connectionWindow.DatabaseConnection = new DatabaseConnection()
                 {
                     ConnectionName = data.ConnectionName,
@@ -104,6 +107,12 @@ namespace Setup
                     }
                 }
             }
+        }
+
+        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ConnectionList.Clear();
+            ConnectionList.Add(new DatabaseConnection() { ConnectionName = "Default" });
         }
 
         #endregion
@@ -248,6 +257,11 @@ namespace Setup
 
                                 utf8JsonWriter1.WriteEndObject();
                             }
+                            else if (element.Name == "DatabaseProvider")
+                            {
+                                utf8JsonWriter1.WritePropertyName(element.Name);
+                                utf8JsonWriter1.WriteStringValue(DatabaseProvider.Value);
+                            }
                             else
                             {
                                 element.WriteTo(utf8JsonWriter1);
@@ -264,7 +278,7 @@ namespace Setup
 
             MessageBox.Show("Publish Complete.");
 
-            Process.Start(new ProcessStartInfo("cmd.exe", $"/c start http://localhost:{SitePublishModel.SitePort}") { CreateNoWindow = true });
+            Process.Start(new ProcessStartInfo("cmd.exe", $"/c start http://{SitePublishModel.SiteDomain}:{SitePublishModel.SitePort}") { CreateNoWindow = true });
         }
 
         private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
@@ -287,6 +301,7 @@ namespace Setup
 
 
         #endregion
+
     }
 
     public class ConsoleOutputModel : NotifyPropertyObject

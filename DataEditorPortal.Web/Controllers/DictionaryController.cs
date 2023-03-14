@@ -43,7 +43,7 @@ namespace DataEditorPortal.Web.Controllers
             var dataSourceConfig = new DataSourceConfig()
             {
                 TableSchema = Constants.DEFAULT_SCHEMA,
-                TableName = "DataDictionaries"
+                TableName = "DATA_DICTIONARIES"
             };
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
             queryText = _queryBuilder.UseFilters(queryText, param.Filters);
@@ -51,7 +51,7 @@ namespace DataEditorPortal.Web.Controllers
 
             if (param.IndexCount > 0)
             {
-                if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = "Category", order = 1 } };
+                if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = "CATEGORY", order = 1 } };
                 queryText = _queryBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
             }
             else
@@ -62,7 +62,7 @@ namespace DataEditorPortal.Web.Controllers
             var output = new GridData();
             using (var con = _depDbContext.Database.GetDbConnection())
             {
-                output = _universalGridService.QueryGridData(con, queryText);
+                output = _universalGridService.QueryGridData(con, queryText, "data-dictionaries");
             }
 
             return output;

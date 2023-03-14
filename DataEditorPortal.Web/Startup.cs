@@ -102,6 +102,7 @@ namespace DataEditorPortal.Web
             services.AddScoped<IPortalItemService, PortalItemService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<IEventLogService, EventLogService>();
 
             #endregion
 

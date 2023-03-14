@@ -298,7 +298,7 @@ namespace DataEditorPortal.Web.Services
             if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore other setting.
-                return config.QueryText;
+                return ReplaceQueryParamters(config.QueryText);
             }
             else
             {
@@ -321,11 +321,12 @@ namespace DataEditorPortal.Web.Services
             if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore other setting.
-                if (!config.QueryText.Contains($"@{config.IdColumn}"))
-                {
+                var queryText = ReplaceQueryParamters(config.QueryText);
+
+                if (!queryText.Contains($"{ParameterPrefix}{ParameterName(config.IdColumn)}"))
                     throw new DepException("There is no parameter for Id in query text. All records in database may be updated.");
-                }
-                return config.QueryText;
+
+                return queryText;
             }
             else
             {
@@ -346,11 +347,12 @@ namespace DataEditorPortal.Web.Services
             if (!string.IsNullOrEmpty(config.QueryText))
             {
                 // advanced datasource, ingore other setting.
-                if (!config.QueryText.Contains($"@{config.IdColumn}"))
-                {
+                var queryText = ReplaceQueryParamters(config.QueryText);
+
+                if (!queryText.Contains($"{ParameterPrefix}{ParameterName(config.IdColumn)}"))
                     throw new DepException("There is no parameter for Id in query text. All records in database may be deleted.");
-                }
-                return config.QueryText;
+
+                return queryText;
             }
             else
             {
@@ -367,7 +369,12 @@ namespace DataEditorPortal.Web.Services
             {
                 var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => EscapeColumnName(x))) : "*";
 
-                return $@"SELECT DISTINCT {columns} FROM ({config.QueryText}) A";
+                var queryText = GenerateSqlTextForList(config);
+                queryText = UseSearches(queryText);
+                queryText = UseFilters(queryText);
+                queryText = RemoveOrderBy(queryText);
+
+                return $@"SELECT DISTINCT {columns} FROM ({queryText}) A";
             }
             else
             {
@@ -387,8 +394,8 @@ namespace DataEditorPortal.Web.Services
 
         public (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, Dictionary<string, JsonElement> model)
         {
-            var fieldRegex = new Regex(@"\#\#([a-zA-Z]+[a-zA-Z0-9]+)\#\#");
-            var regex = new Regex(@"\{\{(.+)\}\}");
+            var fieldRegex = new Regex(@"\#\#([a-zA-Z]{1}[a-zA-Z0-9_]+?)\#\#");
+            var regex = new Regex(@"\{\{(.+?)\}\}");
             var optionalCriterias = regex.Matches(queryText);
 
             var keyValuePairs = new List<KeyValuePair<string, object>>();
@@ -457,6 +464,21 @@ namespace DataEditorPortal.Web.Services
             }
 
             return (queryText, keyValuePairs);
+        }
+
+        public string ReplaceQueryParamters(string queryText)
+        {
+            var fieldRegex = new Regex(@"\#\#([a-zA-Z]{1}[a-zA-Z0-9_]+?)\#\#");
+
+            var fieldCriterias = fieldRegex.Matches(queryText);
+
+            foreach (Match match in fieldCriterias)
+            {
+                var key = match.Groups[1].Value;
+                queryText = queryText.Replace(match.Value, $"{ParameterPrefix}{ParameterName(key)}");
+            }
+
+            return queryText;
         }
     }
 }
