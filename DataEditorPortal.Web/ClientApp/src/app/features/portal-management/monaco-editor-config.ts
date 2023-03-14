@@ -164,7 +164,7 @@ export const MonacoEditorConfig: NgxMonacoEditorConfig = {
       '    /**',
       '     * Formats a value according to digit options and locale rules. [See more](https://angular.io/api/common/DecimalPipe)',
       '     */',
-      '    static decimal:DecimalPipe',
+      '    static number:DecimalPipe',
       '    /**',
       '     * Formats a value according to digit options and locale rules. [See more](https://angular.io/api/common/DatePipe)',
       '     */',
