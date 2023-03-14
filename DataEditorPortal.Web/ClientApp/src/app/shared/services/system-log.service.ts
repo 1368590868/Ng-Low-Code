@@ -25,4 +25,13 @@ export class SystemLogService {
       `${this._apiUrl}event-log/${id}`
     );
   }
+
+  addSiteVisitLog(data: { action: string; section: string; params: string }) {
+    this.http
+      .post<ApiResponse<GridResult>>(
+        `${this._apiUrl}event-log/page-request`,
+        data
+      )
+      .subscribe();
+  }
 }

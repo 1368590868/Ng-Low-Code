@@ -1,7 +1,12 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { NgxFormlyService, NotifyService, UserService } from 'src/app/shared';
+import {
+  NgxFormlyService,
+  NotifyService,
+  SystemLogService,
+  UserService
+} from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { ManageRoleForm } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';
@@ -276,7 +281,8 @@ export class UserManagerActionComponent
     private userManagerService: UserManagerService,
     private notifyService: NotifyService,
     private userService: UserService,
-    private ngxFormlyService: NgxFormlyService
+    private ngxFormlyService: NgxFormlyService,
+    private systemLogService: SystemLogService
   ) {
     super();
   }
@@ -306,7 +312,11 @@ export class UserManagerActionComponent
   onFormSubmit(model: ManageRoleForm) {
     if (this.form.valid) {
       const apiName = this.isAddForm ? 'createUser' : 'updateUser';
-
+      this.systemLogService.addSiteVisitLog({
+        action: this.isAddForm ? 'Add User' : 'Update User',
+        section: this.userService.routerName,
+        params: JSON.stringify(model)
+      });
       this.userManagerService[apiName](
         this.isAddForm
           ? model

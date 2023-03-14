@@ -27,6 +27,11 @@ export class PortalEditColumnsComponent implements OnInit {
   form = new FormGroup({});
   options: FormlyFormOptions = {};
   model: any = {};
+  helperMessage =
+    '// E.g. \r\n' +
+    "// Pipes.date.transform(RowData.CREATE_DATE,'short') \r\n" +
+    '// OR \r\n' +
+    '// RowData.NAME + RowData.CHECKED';
   fields: FormlyFieldConfig[] = [
     {
       key: 'type',
@@ -62,7 +67,8 @@ export class PortalEditColumnsComponent implements OnInit {
         label: 'Data Template',
         config: {
           language: 'javascript'
-        }
+        },
+        onInit: (editor: any) => this.onMonacoEditorInit(editor)
       },
       expressions: {
         hide: `field.parent.model.type !== 'TemplateField'`
@@ -171,6 +177,28 @@ export class PortalEditColumnsComponent implements OnInit {
       this.portalItemService.saveCurrentStep('columns');
     }
   }
+  onMonacoEditorInit(editor: any) {
+    const formControlTemplate = this.form.get('template');
+    if (formControlTemplate?.value === null) {
+      formControlTemplate?.setValue(this.helperMessage as never);
+    }
+    editor.onMouseDown(() => {
+      if (formControlTemplate?.value === this.helperMessage) {
+        formControlTemplate?.setValue(null as never);
+        setTimeout(() => {
+          formControlTemplate.markAsPristine();
+        }, 100);
+      }
+    });
+    editor.onDidBlurEditorText(() => {
+      if (!formControlTemplate?.value) {
+        formControlTemplate?.setValue(this.helperMessage as never);
+      }
+    });
+    setTimeout(() => {
+      formControlTemplate?.markAsPristine();
+    });
+  }
 
   onMoveToTarget({ items }: { items: GridColumn[] }) {
     items.forEach(item => {
@@ -209,8 +237,14 @@ export class PortalEditColumnsComponent implements OnInit {
   saveGridColumnsConfig() {
     this.isSaving = true;
     if (this.portalItemService.currentPortalItemId) {
+      const data = JSON.parse(JSON.stringify(this.targetColumns));
+      data.forEach((x: GridColumn) => {
+        if (x.template === this.helperMessage) {
+          x.template = null as never;
+        }
+      });
       this.portalItemService
-        .saveGridColumnsConfig(this.targetColumns)
+        .saveGridColumnsConfig(data)
         .pipe(
           tap(res => {
             if (res && !res.isError) {

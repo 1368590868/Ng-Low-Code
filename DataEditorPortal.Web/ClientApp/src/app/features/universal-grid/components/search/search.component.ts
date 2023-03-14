@@ -3,7 +3,12 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
-import { NgxFormlyService, SearchParam } from 'src/app/shared';
+import {
+  NgxFormlyService,
+  SearchParam,
+  SystemLogService,
+  UserService
+} from 'src/app/shared';
 import { GridTableService } from '../../services/grid-table.service';
 
 @Component({
@@ -24,7 +29,9 @@ export class SearchComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private gridTableService: GridTableService,
-    private ngxFormlyService: NgxFormlyService
+    private ngxFormlyService: NgxFormlyService,
+    private systemLogService: SystemLogService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -94,6 +101,11 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   onSubmit(model: SearchParam) {
     if (this.form.valid) {
+      this.systemLogService.addSiteVisitLog({
+        action: 'Search',
+        section: this.userService.routerName,
+        params: JSON.stringify(model)
+      });
       this.gridTableService.searchClicked$.next(model);
     }
   }
