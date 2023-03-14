@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NotifyService } from 'src/app/shared';
+import { NotifyService, SystemLogService, UserService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { RoleItem } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';
@@ -17,7 +17,9 @@ export class UserRoleActionComponent
 
   constructor(
     private userManagerService: UserManagerService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private systemLogService: SystemLogService,
+    private userService: UserService
   ) {
     super();
   }
@@ -32,6 +34,14 @@ export class UserRoleActionComponent
   }
 
   onSave(): void {
+    this.systemLogService.addSiteVisitLog({
+      action: 'Update User Role',
+      section: this.userService.routerName,
+      params: JSON.stringify({
+        permissions: this.selectedRecords,
+        userId: this.selectedRecords[0][this.recordKey]
+      })
+    });
     this.userManagerService
       .saveUserRole(this.rolesArr, this.selectedRecords[0][this.recordKey])
       .subscribe(res => {

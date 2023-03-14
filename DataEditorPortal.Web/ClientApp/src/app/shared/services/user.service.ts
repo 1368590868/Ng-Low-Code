@@ -17,6 +17,7 @@ export class UserService {
   public USER: AppUser = {};
   public isLogin = false;
   public durationMs = 5000;
+  public routerName = '';
 
   constructor(
     private http: HttpClient,

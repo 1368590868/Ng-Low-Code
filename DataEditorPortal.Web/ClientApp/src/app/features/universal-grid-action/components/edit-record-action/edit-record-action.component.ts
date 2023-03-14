@@ -2,7 +2,12 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { tap } from 'rxjs';
-import { NgxFormlyService, NotifyService } from 'src/app/shared';
+import {
+  NgxFormlyService,
+  NotifyService,
+  SystemLogService,
+  UserService
+} from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { EditFormData } from '../../models/edit';
 import { UniversalGridService } from '../../services/universal-grid.service';
@@ -28,7 +33,9 @@ export class EditRecordActionComponent
   constructor(
     private gridService: UniversalGridService,
     private notifyService: NotifyService,
-    private ngxFormlyService: NgxFormlyService
+    private ngxFormlyService: NgxFormlyService,
+    private systemLogService: SystemLogService,
+    private userService: UserService
   ) {
     super();
   }
@@ -111,6 +118,12 @@ export class EditRecordActionComponent
   onFormSubmit(model: EditFormData) {
     if (this.form.valid) {
       if (this.isAddForm) {
+        this.systemLogService.addSiteVisitLog({
+          action: 'Add New',
+          section: this.userService.routerName,
+          params: JSON.stringify(model)
+        });
+
         this.gridService.addGridData(model).subscribe(res => {
           if (!res.isError && res.result) {
             this.notifyService.notifySuccess(
@@ -124,6 +137,11 @@ export class EditRecordActionComponent
         });
       } else {
         const dataKey = this.selectedRecords[0][this.recordKey];
+        this.systemLogService.addSiteVisitLog({
+          action: 'Update',
+          section: this.userService.routerName,
+          params: JSON.stringify(model)
+        });
         this.gridService.updateGridData(dataKey, this.model).subscribe(res => {
           if (!res.isError && res.result) {
             this.notifyService.notifySuccess(
