@@ -72,6 +72,15 @@ export class SearchComponent implements OnInit, OnDestroy {
               }
             });
 
+          // set triStateCheckbox
+          fields
+            .filter(x => x.type == 'checkbox')
+            .forEach(f => {
+              f.type = 'triStateCheckbox';
+              f.defaultValue = null;
+              if (f.props) f.props['hideLabel'] = true;
+            });
+
           this.fields = fields;
         });
       }

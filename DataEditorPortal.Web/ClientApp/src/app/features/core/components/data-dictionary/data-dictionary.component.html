@@ -29,65 +29,65 @@
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 20%" pSortableColumn="Label">
+          <th style="width: 20%" pSortableColumn="LABEL">
             <span style="vertical-align: middle">Label</span>
-            <p-sortIcon field="Label"></p-sortIcon>
+            <p-sortIcon field="LABEL"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
-              field="Label"
+              field="LABEL"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 20%" pSortableColumn="Value">
+          <th style="width: 20%" pSortableColumn="VALUE">
             <span style="vertical-align: middle">Value</span>
-            <p-sortIcon field="Value"></p-sortIcon>
+            <p-sortIcon field="VALUE"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
-              field="Value"
+              field="VALUE"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 20%" pSortableColumn="Value1">
+          <th style="width: 20%" pSortableColumn="VALUE1">
             <span style="vertical-align: middle">Value1</span>
-            <p-sortIcon field="Value1"></p-sortIcon>
+            <p-sortIcon field="VALUE1"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
-              field="Value1"
+              field="VALUE1"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 20%" pSortableColumn="Value2">
+          <th style="width: 20%" pSortableColumn="VALUE2">
             <span style="vertical-align: middle">Value2</span>
-            <p-sortIcon field="Value2"></p-sortIcon>
+            <p-sortIcon field="VALUE2"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
-              field="Value2"
+              field="VALUE2"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 18%" pSortableColumn="Category">
+          <th style="width: 18%" pSortableColumn="CATEGORY">
             <span style="vertical-align: middle">Category</span>
-            <p-sortIcon field="Category"></p-sortIcon>
+            <p-sortIcon field="CATEGORY"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
-              field="Category"
+              field="CATEGORY"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
@@ -100,12 +100,12 @@
       <ng-template pTemplate="body" let-rowData>
         <tr>
           <td style="width: 18%">
-            {{ rowData.Label }}
+            {{ rowData.LABEL }}
           </td>
-          <td style="width: 18%">{{ rowData.Value }}</td>
-          <td style="width: 12%">{{ rowData.Value1 }}</td>
-          <td>{{ rowData.Value2 }}</td>
-          <td style="width: 12rem">{{ rowData.Category }}</td>
+          <td style="width: 18%">{{ rowData.VALUE }}</td>
+          <td style="width: 12%">{{ rowData.VALUE1 }}</td>
+          <td>{{ rowData.VALUE2 }}</td>
+          <td style="width: 12rem">{{ rowData.CATEGORY }}</td>
           <td style="width: 5rem">
             <p-menu
               #menu

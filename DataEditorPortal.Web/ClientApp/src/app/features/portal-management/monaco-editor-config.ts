@@ -40,7 +40,7 @@ export const MonacoEditorConfig: NgxMonacoEditorConfig = {
         let prevLine = 0;
         let prevChar = 0;
 
-        const tokenPattern = new RegExp('##([a-zA-Z]+[a-zA-Z0-9]+)##', 'g');
+        const tokenPattern = new RegExp('##([a-zA-Z]{1}[a-zA-Z0-9_]+?)##', 'g');
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
 

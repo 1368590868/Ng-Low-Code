@@ -21,11 +21,11 @@ export class SystemLogComponent implements OnInit {
 
   searchModel = {};
   first = 0;
-  rows = 10;
+  rows = 50;
   filters?: any;
   multiSortMeta?: any;
   sortMeta?: any;
-  rowsPerPageOptions: number[] = [10, 20, 50];
+  rowsPerPageOptions: number[] = [50, 100, 150];
 
   constructor(private systemLogService: SystemLogService) {}
 

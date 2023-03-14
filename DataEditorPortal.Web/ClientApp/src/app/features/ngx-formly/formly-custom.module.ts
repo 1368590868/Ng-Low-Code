@@ -10,6 +10,7 @@ import { FormlyInputNumberModule } from './inputnumber';
 import { FormlyMultiSelectModule } from './multiselect';
 import { FormlySelectModule } from './select';
 import { FormlyMonacoEditorModule } from './monacoEditor';
+import { FormlyTriStateCheckBoxModule } from './triStateCheckbox';
 import { DateValidatorModule } from './datevalidator';
 import { UniversalRegexpModule } from './universalregexp';
 
@@ -26,6 +27,7 @@ import { UniversalRegexpModule } from './universalregexp';
     FormlyIconSelectModule,
     FormlyInputNumberModule,
     FormlyMonacoEditorModule,
+    FormlyTriStateCheckBoxModule,
     DateValidatorModule,
     UniversalRegexpModule
   ]

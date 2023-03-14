@@ -190,7 +190,11 @@ export class TableComponent implements OnInit, OnDestroy {
       }
     }
     if (this.allowDelete) {
-      actions.push({ name: 'remove-record' });
+      if (this.tableConfig.customDeleteFormName) {
+        actions.push({ name: this.tableConfig.customDeleteFormName });
+      } else {
+        actions.push({ name: 'remove-record' });
+      }
     }
     if (this.allowExport) {
       actions.push({ name: 'export-excel' });
@@ -282,7 +286,13 @@ export class TableComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
 
-  onRefresh() {
+  refresh() {
+    this.selectedRecords = [];
+    this.table.saveState();
+    this.fetchData();
+  }
+
+  resetAndRefresh() {
     this.reset();
     this.table.reset();
     this.table.saveState();
@@ -290,7 +300,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   reset() {
-    this.searchModel = {};
+    // this.searchModel = {};
     this.filters = null;
     this.sortMeta = null;
     this.multiSortMeta = null;

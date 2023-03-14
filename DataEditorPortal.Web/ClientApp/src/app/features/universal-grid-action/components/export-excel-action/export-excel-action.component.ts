@@ -72,7 +72,7 @@ export class ExportExcelActionComponent
 
   onFormSubmit(model: ExportForm) {
     if (this.form.valid) {
-      const param = this.fetchDataParam as ExportParam;
+      const param = (this.fetchDataParam || {}) as ExportParam;
       param.fileName = model.fileName;
       if (model.exportOption === 'Selection') {
         const selectedIds = this.selectedRecords.map((x: any) => {

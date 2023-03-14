@@ -6,7 +6,7 @@ import { Directive, EventEmitter, Input, Output } from '@angular/core';
 export class GridActionDirective {
   @Input() fetchDataParam: any;
   @Input() selectedRecords: any = [];
-  @Input() recordKey = 'Id';
+  @Input() recordKey = 'ID';
 
   @Output() loadedEvent = new EventEmitter<void>();
   @Output() savedEvent = new EventEmitter<void>();

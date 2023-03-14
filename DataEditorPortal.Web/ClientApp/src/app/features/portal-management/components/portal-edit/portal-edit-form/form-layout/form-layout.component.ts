@@ -29,13 +29,13 @@ export class FormLayoutComponent {
     if (val === 'UPDATE') {
       this.helperMessage =
         '-- E.g. \r\n\r\n' +
-        '-- UPDATE dbo.demoTables SET Name = @Name, FirstName = @FirstName, Total = @Total WHERE Id = @Id';
+        '-- UPDATE DEMO_TABLE SET NAME = ##NAME##, FIRS_TNAME = ##FIRST_NAME##, TOTAL = ##TOTAL## WHERE ID = ##ID##';
     }
   }
 
   helperMessage =
     '-- E.g. \r\n\r\n' +
-    '-- INSERT INTO dbo.demoTables (Id, Name, FirstName, Total, CreateDate) VALUES (NEWID(), @Name, @FirstName, @Total, GETDATE())';
+    '-- INSERT INTO DEMO_TABLE (ID, NAME, FIRST_NAME, TOTAL, CREATED_DATE) VALUES (NEWID(), ##NAME##, ##FIRST_NAME##, ##TOTAL##, GETDATE())';
 
   _formConfig: GridFormConfig = {
     sameAsAdd: true
@@ -43,7 +43,9 @@ export class FormLayoutComponent {
   @Input()
   set config(val: GridFormConfig) {
     Object.assign(this._formConfig, val);
-    this.showQuery = !!this._formConfig.queryText;
+    this.showQuery =
+      !!this._formConfig.queryText &&
+      this._formConfig.queryText != this.helperMessage;
 
     if (!this._formConfig.queryText) {
       this.formControlQueryText.setValue(this.helperMessage);

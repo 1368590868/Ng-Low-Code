@@ -360,6 +360,7 @@ export class PortalEditDatasourceComponent implements OnInit {
   dataSourceChanged() {
     return (
       this.orginalConfig &&
+      (this.orginalConfig.queryText || this.orginalConfig.tableName) &&
       (this.datasourceConfig.dataSourceConnectionId !=
         this.orginalConfig.dataSourceConnectionId ||
         this.datasourceConfig.queryText != this.orginalConfig.queryText ||

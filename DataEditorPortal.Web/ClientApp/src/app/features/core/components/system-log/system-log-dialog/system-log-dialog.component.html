@@ -1,7 +1,7 @@
 <p-dialog
-  header="Log Information"
+  header="Event Log Details"
   [(visible)]="visible"
-  [style]="{ width: '40rem' }"
+  [style]="{ width: '50rem' }"
   [modal]="true"
   [dismissableMask]="true"
   contentStyleClass="border-top-1 surface-border pt-3"
@@ -13,7 +13,7 @@
     styleClass="p-datatable-striped">
     <ng-template pTemplate="header">
       <tr>
-        <th>Name</th>
+        <th [style.width.rem]="9">Name</th>
         <th>Value</th>
       </tr>
     </ng-template>

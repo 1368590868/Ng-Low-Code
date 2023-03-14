@@ -1,10 +1,10 @@
 export interface DictionaryData {
-  Id?: string;
-  Label?: string;
-  Value?: string;
-  Value1?: string;
-  Value2?: string;
-  Category?: string;
+  ID?: string;
+  LABEL?: string;
+  VALUE?: string;
+  VALUE1?: string;
+  VALUE2?: string;
+  CATEGORY?: string;
 }
 
 export interface DictionaryResult {

@@ -11,7 +11,6 @@ import {
   SimpleChanges,
   ViewContainerRef
 } from '@angular/core';
-import { GridActionDirective } from './grid-action.directive';
 import { GridActionConfig, GridActionOption } from '../models/grid-config';
 import { ActionWrapperComponent } from '../components/action-wrapper/action-wrapper.component';
 import { ActivatedRoute } from '@angular/router';
@@ -26,7 +25,7 @@ export class UniversalGridActionDirective
 {
   @Input() actions: GridActionOption[] = [];
   @Input() selectedRecords: any[] = [];
-  @Input() recordKey = 'Id';
+  @Input() recordKey = 'ID';
   @Input() fetchDataParam: any;
 
   @Output() savedEvent = new EventEmitter<void>();
@@ -61,7 +60,9 @@ export class UniversalGridActionDirective
     }
     if ('fetchDataParam' in changes) {
       this.actionWrapperRefs.forEach(wrapper => {
-        wrapper.instance.fetchDataParam = this.fetchDataParam;
+        if (wrapper.instance.actionConfig.props)
+          wrapper.instance.actionConfig.props['fetchDataParam'] =
+            this.fetchDataParam;
       });
     }
   }

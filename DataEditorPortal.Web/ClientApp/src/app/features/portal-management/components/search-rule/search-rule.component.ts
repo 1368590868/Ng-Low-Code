@@ -45,8 +45,8 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
     '-- Enter the where clause, which will be used to filter data. \r\n' +
     '-- Use ##VALUE## to reference the field value. \r\n' +
     '-- E.g. \r\n' +
-    '--      FirstName = ##VALUE## \r\n' +
-    "--      FirstName LIKE  ##VALUE## + '%'";
+    '--      FIRST_NAME = ##VALUE## \r\n' +
+    "--      FIRST_NAME LIKE ##VALUE## + '%'";
 
   formControlMatchMode: FormControl = new FormControl();
   formControlQuery: FormControl = new FormControl();
@@ -104,7 +104,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
 
   ngOnInit(): void {
     this.formControlMatchMode.valueChanges
-      .pipe(startWith(this.formControlMatchMode.value), distinctUntilChanged())
+      .pipe(distinctUntilChanged())
       .subscribe(val => {
         this.onChange?.({
           field: this.field,

@@ -23,12 +23,12 @@ export class DataDictionaryComponent implements OnInit {
 
   totalRecords = 0;
   first = 0;
-  rows = 10;
+  rows = 50;
   searchModel = {};
   filters?: any;
   multiSortMeta?: any;
   sortMeta?: any;
-  rowsPerPageOptions: number[] = [10, 20, 50];
+  rowsPerPageOptions: number[] = [50, 100, 150];
   contextMenuItems: MenuItem[] = [
     {
       label: 'Edit',

@@ -127,6 +127,9 @@ const GRID_ACTION_CONFIG = [
     requireGridRowSelected: true,
     component: UserManagerActionComponent,
     wrapper: {
+      label: 'Edit User',
+      icon: 'pi pi-pencil',
+      buttonStyleClass: 'p-button-outlined',
       header: 'Update User details',
       dialogStyle: { width: '40rem' },
       okText: 'Update User'

@@ -17,6 +17,7 @@ export interface GridConfig {
   customEditFormName?: string;
   customAddFormName?: string;
   customViewFormName?: string;
+  customDeleteFormName?: string;
   customActions?: GridActionOption[];
   pageSize?: number;
 }

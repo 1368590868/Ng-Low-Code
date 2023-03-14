@@ -24,65 +24,66 @@
       <ng-template pTemplate="header">
         <tr>
           <th style="width: 2.5rem"></th>
-          <th style="width: 20%" pSortableColumn="EventTime">
+          <th style="width: 20%" pSortableColumn="EVENT_TIME">
             <span style="vertical-align: middle">Event Time</span>
-            <p-sortIcon field="EventTime"></p-sortIcon>
+            <p-sortIcon field="EVENT_TIME"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="date"
-              field="EventTime"
+              field="EVENT_TIME"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 20%" pSortableColumn="EventSection">
-            <span style="vertical-align: middle">Event Section</span>
-            <p-sortIcon field="EventSection"></p-sortIcon>
-            <p-columnFilter
-              style="vertical-align: middle"
-              type="text"
-              field="EventSection"
-              display="menu"
-              [hideOnClear]="true"
-              [showOperator]="false"
-              [showAddButton]="false"
-              [maxFractionDigits]="2"></p-columnFilter>
-          </th>
-          <th style="width: 20%" pSortableColumn="Category">
+          <th style="width: 20%" pSortableColumn="CATEGORY">
             <span style="vertical-align: middle">Category</span>
-            <p-sortIcon field="Category"></p-sortIcon>
+            <p-sortIcon field="CATEGORY"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
-              field="Category"
+              field="CATEGORY"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 16%" pSortableColumn="EventName">
+          <th style="width: 20%" pSortableColumn="EVENT_SECTION">
+            <span style="vertical-align: middle">Event Section</span>
+            <p-sortIcon field="EVENT_SECTION"></p-sortIcon>
+            <p-columnFilter
+              style="vertical-align: middle"
+              type="text"
+              field="EVENT_SECTION"
+              display="menu"
+              [hideOnClear]="true"
+              [showOperator]="false"
+              [showAddButton]="false"
+              [maxFractionDigits]="2"></p-columnFilter>
+          </th>
+
+          <th style="width: 16%" pSortableColumn="EVENT_NAME">
             <span style="vertical-align: middle">Event Name</span>
-            <p-sortIcon field="EventName"></p-sortIcon>
+            <p-sortIcon field="EVENT_NAME"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
-              field="EventName"
+              field="EVENT_NAME"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
               [showAddButton]="false"
               [maxFractionDigits]="2"></p-columnFilter>
           </th>
-          <th style="width: 20%" pSortableColumn="UserName">
+          <th style="width: 20%" pSortableColumn="USERNAME">
             <span style="vertical-align: middle">User Name</span>
-            <p-sortIcon field="UserName"></p-sortIcon>
+            <p-sortIcon field="USERNAME"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
-              field="UserName"
+              field="USERNAME"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
@@ -104,12 +105,12 @@
             </div>
           </td>
           <td>
-            {{ rowData.EventTime | date : 'dd/MM/yyyy HH:mm:ss' }}
+            {{ rowData.EVENT_TIME | date : 'dd/MM/yyyy HH:mm:ss' }}
           </td>
-          <td>{{ rowData.EventSection }}</td>
-          <td>{{ rowData.Category }}</td>
-          <td>{{ rowData.EventName }}</td>
-          <td>{{ rowData.Username }}</td>
+          <td>{{ rowData.CATEGORY }}</td>
+          <td>{{ rowData.EVENT_SECTION }}</td>
+          <td>{{ rowData.EVENT_NAME }}</td>
+          <td>{{ rowData.USERNAME }}</td>
         </tr>
       </ng-template>
     </p-table>
