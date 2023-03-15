@@ -21,36 +21,6 @@ export class RolePermissionService {
     this._apiUrl = apiUrl;
   }
 
-  getRoles(): Observable<Role[]> {
-    return this.http
-      .get<ApiResponse<Role[]>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`
-      )
-      .pipe(map(res => res.result || []));
-  }
-
-  saveRoles(roles: Role[]): Observable<ApiResponse<Role[]>> {
-    return this.http.post<ApiResponse<Role[]>>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`,
-      roles
-    );
-  }
-
-  getPermissions(): Observable<Permisstion[]> {
-    return this.http
-      .get<ApiResponse<Permisstion[]>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`
-      )
-      .pipe(map(res => res.result || []));
-  }
-
-  savePermissions(permissions: Permisstion[]) {
-    return this.http.post<ApiResponse<Permisstion[]>>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`,
-      permissions
-    );
-  }
-
   getRoleList() {
     return this.http
       .get<ApiResponse<RoleItem[]>>(`${this._apiUrl}role/list`)
