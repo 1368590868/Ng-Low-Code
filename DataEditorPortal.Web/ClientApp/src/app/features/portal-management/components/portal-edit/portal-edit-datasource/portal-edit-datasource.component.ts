@@ -52,11 +52,11 @@ export class PortalEditDatasourceComponent implements OnInit {
   dbOrderOptions: { label: string; value: number }[] = [
     {
       label: 'ASC',
-      value: 0
+      value: 1
     },
     {
       label: 'DESC',
-      value: 1
+      value: 0
     }
   ];
 
