@@ -16,7 +16,7 @@ import {
 })
 export class RolePermissionService {
   public _apiUrl: string;
-  public currentPortalItem = 'usermanagement';
+  public currentPortalItem = 'user-management';
   constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
   }

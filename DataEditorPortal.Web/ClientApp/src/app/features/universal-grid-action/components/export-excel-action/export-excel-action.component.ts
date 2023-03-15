@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { catchError, EMPTY, tap } from 'rxjs';
-import { SystemLogService, UserService } from 'src/app/shared';
+import { SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { ExportForm, ExportParam } from '../../models/export';
 import { UniversalGridService } from '../../services/universal-grid.service';
@@ -36,7 +36,6 @@ export class ExportExcelActionComponent
 
   constructor(
     private gridService: UniversalGridService,
-    private userService: UserService,
     private systemLogService: SystemLogService
   ) {
     super();
@@ -88,7 +87,7 @@ export class ExportExcelActionComponent
 
       this.systemLogService.addSiteVisitLog({
         action: 'Export Data',
-        section: this.userService.routerName,
+        section: this.gridService.currentPortalItem,
         params: JSON.stringify(param)
       });
 

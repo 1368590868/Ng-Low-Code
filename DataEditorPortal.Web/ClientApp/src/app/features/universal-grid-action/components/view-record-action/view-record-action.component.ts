@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GridColumn } from 'src/app/features/portal-management/models/portal-item';
 import { DataFormatService } from 'src/app/features/universal-grid/services/data-format.service';
-import { SystemLogService, UserService } from 'src/app/shared';
+import { SystemLogService } from 'src/app/shared';
 import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UniversalGridService } from '../../services/universal-grid.service';
@@ -26,7 +26,6 @@ export class ViewRecordActionComponent
   constructor(
     private universalGridService: UniversalGridService,
     private dataFormatService: DataFormatService,
-    private userService: UserService,
     private systemLogService: SystemLogService
   ) {
     super();
@@ -37,7 +36,7 @@ export class ViewRecordActionComponent
   ngOnInit(): void {
     this.systemLogService.addSiteVisitLog({
       action: 'View Detail',
-      section: this.userService.routerName,
+      section: this.universalGridService.currentPortalItem,
       params: JSON.stringify(this.selectedRecords[0])
     });
     this.universalGridService.getTableColumns().subscribe(res => {

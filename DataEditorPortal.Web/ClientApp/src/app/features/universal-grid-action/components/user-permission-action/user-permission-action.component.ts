@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TreeNode } from 'primeng/api';
-import { NotifyService, SystemLogService, UserService } from 'src/app/shared';
+import { NotifyService, SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UserPemissions } from '../../models/user-manager';
 import { UserManagerService } from '../../services/user-manager.service';
@@ -20,7 +20,6 @@ export class UserPermissionActionComponent
   constructor(
     private userManagerService: UserManagerService,
     private notifyService: NotifyService,
-    private userService: UserService,
     private systemLogService: SystemLogService
   ) {
     super();
@@ -76,7 +75,7 @@ export class UserPermissionActionComponent
       });
     this.systemLogService.addSiteVisitLog({
       action: 'Update User Permissions',
-      section: this.userService.routerName,
+      section: this.userManagerService.currentPortalItem,
       params: JSON.stringify({
         permissionSelect,
         userId: this.selectedRecords[0][this.recordKey]
