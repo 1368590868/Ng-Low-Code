@@ -3,7 +3,6 @@ using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -17,11 +16,10 @@ namespace DataEditorPortal.Web.Services
         string UseOrderBy(string query, List<SortParam> sortParams = null);
         string UseFilters(string query, List<FilterParam> filterParams = null);
         string UseSearches(string query, List<SearchParam> filterParams = null);
-        object GetTypedValue(object value, DataRow schema);
-        Type GetValueType(DataRow schema);
-        void AddDbParameter(DbCommand cmd, string name, object value);
+        string GetFilterType(DataRow schema);
         string ParameterName(string name);
         object GetJsonElementValue(JsonElement jsonElement);
+        object TransformValue(object value, DataRow schema);
 
         // universal grid
         string GenerateSqlTextForList(DataSourceConfig config);
@@ -181,43 +179,18 @@ namespace DataEditorPortal.Web.Services
                 : query.Replace("##SEARCHES##", " 1=1");
         }
 
-        public object GetTypedValue(object value, DataRow schema)
+        public virtual string GetFilterType(DataRow schema)
         {
-            if (value == System.DBNull.Value) return string.Empty;
-
-            if (GetValueType(schema) == typeof(DateTime))
-                return Convert.ToDateTime(value);
-
-            if (GetValueType(schema) == typeof(int))
-                return Convert.ToInt32(value);
-
-            if (GetValueType(schema) == typeof(double))
-                return Convert.ToDouble(value);
-
-            if (GetValueType(schema) == typeof(bool))
-                return Convert.ToBoolean(value);
-
-            if (GetValueType(schema) == typeof(Guid))
-                return new Guid((byte[])value);
-
-            if (GetValueType(schema) == typeof(decimal))
-                return Convert.ToDecimal(value);
-
-            return value.ToString();
-        }
-
-        public abstract Type GetValueType(DataRow schema);
-
-        public virtual void AddDbParameter(DbCommand cmd, string name, object valueObj)
-        {
-            var param = cmd.CreateParameter();
-            param.ParameterName = name;
-
-            var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(valueObj));
-
-            param.Value = GetJsonElementValue(jsonElement);
-
-            cmd.Parameters.Add(param);
+            var type = (Type)schema["DataType"];
+            if (type == typeof(int) || type == typeof(long) || type == typeof(short) ||
+                    type == typeof(float) || type == typeof(decimal) || type == typeof(double) ||
+                    type == typeof(TimeSpan))
+                return "numeric";
+            if (type == typeof(DateTime))
+                return "date";
+            if (type == typeof(bool))
+                return "boolean";
+            return "text";
         }
 
         public virtual object GetJsonElementValue(JsonElement jsonElement)
@@ -255,6 +228,11 @@ namespace DataEditorPortal.Web.Services
         public virtual string ParameterName(string name)
         {
             return string.Format("P_{0}", name);
+        }
+
+        public virtual object TransformValue(object value, DataRow schema)
+        {
+            return value;
         }
 
         #endregion

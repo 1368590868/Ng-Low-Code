@@ -4,8 +4,6 @@ using DataEditorPortal.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Text.Json;
 
 namespace DataEditorPortal.Web.Services
@@ -13,7 +11,7 @@ namespace DataEditorPortal.Web.Services
     public interface IEventLogService
     {
         void AddPageRequestLog(EventLogModel model);
-        void AddDdCommandLog(DbCommand cmd, string category, string section, string result = "");
+        void AddDbQueryLog(string category, string section, string details, object param = null, string result = "");
     }
 
     public class EventLogService : IEventLogService
@@ -58,7 +56,7 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public void AddDdCommandLog(DbCommand cmd, string category, string section, string result = "")
+        public void AddDbQueryLog(string category, string section, string details, object param = null, string result = "")
         {
             try
             {
@@ -66,21 +64,15 @@ namespace DataEditorPortal.Web.Services
                 if (_httpContextAccessor.HttpContext.User != null && _httpContextAccessor.HttpContext.User.Identity != null)
                     username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
 
-                Dictionary<string, string> parameters = new Dictionary<string, string>();
-                foreach (DbParameter item in cmd.Parameters)
-                {
-                    parameters[item.ParameterName] = item.Value?.ToString();
-                }
-
                 _depDbContext.Add(new EventLog()
                 {
                     Category = category,
                     EventSection = section.Replace("-", "_").ToUpper(),
-                    EventName = "Database Command",
+                    EventName = "Database Query",
                     EventTime = DateTime.UtcNow,
                     Username = username,
-                    Details = cmd.CommandText,
-                    Params = JsonSerializer.Serialize(parameters),
+                    Details = details,
+                    Params = param != null ? JsonSerializer.Serialize(param) : "",
                     Result = result
                 });
                 _depDbContext.SaveChanges();

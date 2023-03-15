@@ -1,6 +1,4 @@
 ﻿using DataEditorPortal.Web.Models.UniversalGrid;
-using System;
-using System.Data;
 using System.Linq;
 using System.Text.Json;
 
@@ -145,21 +143,6 @@ namespace DataEditorPortal.Web.Services
 
             return result;
         }
-
-        public override Type GetValueType(DataRow schema)
-        {
-            var sqlDbType = (SqlDbType)schema["ProviderType"];
-            if (sqlDbType == SqlDbType.Date) return typeof(DateTime);
-            if (sqlDbType == SqlDbType.DateTime || sqlDbType == SqlDbType.DateTime2 || sqlDbType == SqlDbType.SmallDateTime)
-                return typeof(DateTime);
-            if (sqlDbType == SqlDbType.Float || sqlDbType == SqlDbType.Decimal || sqlDbType == SqlDbType.Money)
-                return typeof(decimal);
-            if (sqlDbType == SqlDbType.Bit)
-                return typeof(bool);
-            else
-                return typeof(string);
-        }
-
 
         protected override string EscapeColumnName(string columnName)
         {

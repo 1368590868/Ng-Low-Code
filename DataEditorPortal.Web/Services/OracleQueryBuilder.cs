@@ -150,30 +150,41 @@ namespace DataEditorPortal.Web.Services
             return result;
         }
 
-        public override Type GetValueType(DataRow schema)
+        public override string GetFilterType(DataRow schema)
         {
+            var type = (Type)schema["DataType"];
             var dbType = (OracleDbType)schema["ProviderType"];
-            if (dbType == OracleDbType.Date || dbType == OracleDbType.TimeStamp || dbType == OracleDbType.TimeStampLTZ || dbType == OracleDbType.TimeStampTZ)
-                return typeof(DateTime);
+            if (dbType == OracleDbType.Boolean || (dbType == OracleDbType.Int16 && (short)schema["NumericPrecision"] == 1 && (short)schema["NumericScale"] == 0))
+                type = typeof(bool);
 
-            if (dbType == OracleDbType.IntervalYM)
-                return typeof(int);
+            if (type == typeof(int) || type == typeof(long) || type == typeof(short) ||
+                type == typeof(float) || type == typeof(decimal) || type == typeof(double) ||
+                type == typeof(TimeSpan))
+                return "numeric";
+            if (type == typeof(DateTime))
+                return "date";
+            if (type == typeof(bool))
+                return "boolean";
+            return "text";
+        }
 
-            if (dbType == OracleDbType.IntervalDS)
-                return typeof(double);
+        public override object TransformValue(object value, DataRow schema)
+        {
+            if (value == null || value == DBNull.Value) return value;
+
+            var dbType = (OracleDbType)schema["ProviderType"];
+            var type = value.GetType();
 
             if (dbType == OracleDbType.Boolean || (dbType == OracleDbType.Int16 && (short)schema["NumericPrecision"] == 1 && (short)schema["NumericScale"] == 0))
-                return typeof(bool);
+                return Convert.ToInt16(value) == 1;
 
             if (dbType == OracleDbType.Raw && (int)schema["ColumnSize"] == 16)
-                return typeof(Guid);
+                return new Guid((byte[])value);
 
-            if (dbType == OracleDbType.Int16 || dbType == OracleDbType.Int32 || dbType == OracleDbType.Int64 ||
-                dbType == OracleDbType.Decimal || dbType == OracleDbType.BinaryFloat || dbType == OracleDbType.Double ||
-                dbType == OracleDbType.BinaryDouble)
-                return typeof(decimal);
+            if (type == typeof(TimeSpan))
+                return ((TimeSpan)value).TotalSeconds / 3600;
 
-            return typeof(string);
+            return value;
         }
 
         protected override string EscapeColumnName(string columnName)
