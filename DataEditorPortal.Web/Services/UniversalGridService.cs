@@ -547,7 +547,7 @@ namespace DataEditorPortal.Web.Services
                 var trans = con.BeginTransaction();
 
                 // add query parameters
-                var param = GenerateDynamicParameter(model.AsEnumerable().Where(x => columns.Contains(x.Key)));
+                var param = GenerateDynamicParameter(model.AsEnumerable());
 
                 // excute command
                 try
@@ -633,7 +633,7 @@ namespace DataEditorPortal.Web.Services
                 var trans = con.BeginTransaction();
 
                 // add query parameters
-                var paramKeyValues = model.AsEnumerable().Where(x => columns.Contains(x.Key)).ToList();
+                var paramKeyValues = model.AsEnumerable().ToList();
                 // always provide Id column parameter
                 paramKeyValues.Add(new KeyValuePair<string, object>(dataSourceConfig.IdColumn, id));
                 var param = GenerateDynamicParameter(paramKeyValues);

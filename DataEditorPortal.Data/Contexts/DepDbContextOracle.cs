@@ -27,6 +27,14 @@ namespace DataEditorPortal.Data.Contexts
             modelBuilder.Entity<DemoTable>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("sys_guid()");
+                entity.Property(e => e.Total).HasColumnType("DECIMAL(18,2)");
+            });
+
+            modelBuilder.Entity<UniversalGridConfiguration>(entity =>
+            {
+                entity.Property(e => e.ColumnsConfig).HasColumnType("CLOB");
+                entity.Property(e => e.SearchConfig).HasColumnType("CLOB");
+                entity.Property(e => e.DetailConfig).HasColumnType("CLOB");
             });
         }
     }
