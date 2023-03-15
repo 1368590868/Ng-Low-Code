@@ -129,7 +129,7 @@ namespace DataEditorPortal.Web.Services
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
             var columnsConfig = JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
 
-            var result = new List<dynamic>();
+            var result = new List<object>();
             var columnConfig = columnsConfig.FirstOrDefault(x => x.field == column);
             if (columnConfig != null && columnConfig.filterType == "enums")
             {
@@ -142,7 +142,11 @@ namespace DataEditorPortal.Web.Services
 
                     try
                     {
-                        result = con.Query(query).Where(x => x != null && x != DBNull.Value).ToList();
+                        result = con.Query(query)
+                            .Select(x => ((IDictionary<string, object>)x)[columnConfig.field])
+                            .Where(x => x != null && x != DBNull.Value)
+                            .ToList();
+
                         _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, query, null);
                     }
                     catch (Exception ex)
@@ -486,7 +490,7 @@ namespace DataEditorPortal.Web.Services
 
             return formLayout.FormFields
                 // filter the auto calculated fields.
-                .Where(x => x.computedConfig == null || x.computedConfig.name == null || !string.IsNullOrEmpty(x.computedConfig.queryText))
+                .Where(x => x.computedConfig == null || (!x.computedConfig.name.HasValue && string.IsNullOrEmpty(x.computedConfig.queryText)))
                 .ToList();
         }
 
