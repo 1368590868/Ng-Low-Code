@@ -1,5 +1,6 @@
 ﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common.License;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -37,6 +38,7 @@ namespace DataEditorPortal.Web.Controllers
         [HttpGet]
         [Route("settings")]
         [AllowAnonymous]
+        [NoLicenseCheck]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public dynamic GetSettings()
         {
@@ -98,6 +100,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("menus")]
+        [NoLicenseCheck]
         public dynamic GetMenus()
         {
             var username = AppUser.ParseUsername(User.Identity.Name).Username;
