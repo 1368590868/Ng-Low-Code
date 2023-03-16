@@ -1,79 +1,130 @@
 <div class="layout-content p-2">
   <p-card>
-    <ng-template pTemplate="title">Setting </ng-template>
+    <ng-template pTemplate="title">Settings </ng-template>
     <ng-template pTemplate="subtitle"> Setting Infomation </ng-template>
     <p-divider styleClass="mt-0"></p-divider>
-    <div class="w-6 pt-3">
-      <p class="mb-2">Site Logo</p>
-      <div class="flex align-items-start justify-content-between mb-3">
-        <div class="flex align-items-center">
-          <img
-            *ngIf="this.siteLogo"
-            [src]="this.siteLogo"
-            [style]="{ maxHeight: '3.5rem' }" />
-          <!-- Upload Button -->
-          <p-button
-            tabindex="0"
-            *ngIf="!this.siteLogo; else removeButton"
-            label="Upload"
-            icon="pi pi-plus"
-            class="ml-auto relative padding-0"
-            styleClass="p-button-outlined">
-            <input
-              #file
-              (change)="picChange($event)"
-              type="file"
-              accept="image/*"
-              [style]="{ height: '60px' }"
-              class="opacity-0 cursor-pointer absolute left-0" />
-            <span class="p-ink"> </span>
-          </p-button>
+    <div class="w-full pb-1" style="margin-top: -1rem">
+      <p-tabView>
+        <p-tabPanel header="Settings for Header">
+          <div class="w-6 mb-3">
+            <p class="mb-2">Site Logo</p>
+            <div class="flex align-items-start justify-content-between mb-3">
+              <div class="flex align-items-center">
+                <img
+                  *ngIf="this.siteLogo"
+                  [src]="this.siteLogo"
+                  [style]="{ maxHeight: '3.5rem' }" />
+                <!-- Upload Button -->
+                <p-button
+                  tabindex="0"
+                  *ngIf="!this.siteLogo; else removeButton"
+                  label="Upload"
+                  icon="pi pi-plus"
+                  class="ml-auto relative padding-0"
+                  styleClass="p-button-outlined">
+                  <input
+                    #file
+                    (change)="picChange($event)"
+                    type="file"
+                    accept="image/*"
+                    [style]="{ height: '60px' }"
+                    class="opacity-0 cursor-pointer absolute left-0" />
+                  <span class="p-ink"> </span>
+                </p-button>
 
-          <!-- Remove Button -->
-          <ng-template #removeButton>
-            <button
-              (click)="removePic()"
-              pButton
-              pRipple
-              type="button"
-              label="Remove"
-              class="p-button-text p-button-danger p-button-sm ml-3">
-              <span class="p-button-icon p-button-icon-left pi pi-trash"></span>
-            </button>
-          </ng-template>
+                <!-- Remove Button -->
+                <ng-template #removeButton>
+                  <button
+                    (click)="removePic()"
+                    pButton
+                    pRipple
+                    type="button"
+                    label="Remove"
+                    class="p-button-text p-button-danger p-button-sm ml-3">
+                    <span
+                      class="p-button-icon p-button-icon-left pi pi-trash"></span>
+                  </button>
+                </ng-template>
 
-          <!-- Tips -->
-          <span *ngIf="!this.siteLogo && picTips">
-            <p class="text-300 text-pink-600 mt-2">* No image</p>
-          </span>
-        </div>
-      </div>
-      <p class="mb-2">Site Title</p>
-      <div>
-        <input
-          class="w-full"
-          pInputText
-          [required]="true"
-          [formControl]="this.formControlSiteName"
-          placeholder="Enter a value" />
-      </div>
+                <!-- Tips -->
+                <span *ngIf="!this.siteLogo && picTips">
+                  <p class="text-300 text-pink-600 mt-2">* No image</p>
+                </span>
+              </div>
+            </div>
+            <p class="mb-2">Site Title</p>
+            <div>
+              <input
+                class="w-full"
+                pInputText
+                [required]="true"
+                [formControl]="this.formControlSiteName"
+                placeholder="Enter a value" />
+            </div>
+          </div>
+          <div class="flex align-items-center w-6 mt-8">
+            <p-button
+              label="Cancle"
+              icon="pi pi-times"
+              class="ml-auto"
+              styleClass="p-button-outlined"
+              (onClick)="onCancle()"></p-button>
+            <p-button
+              label="Save"
+              icon="pi pi-save"
+              [style]="{ 'margin-left': '.5em' }"
+              [loading]="isLoading"
+              [disabled]="isLoading"
+              (onClick)="onSave()"></p-button>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="Settings for About">
+          <div class="w-full mb-4">
+            <p class="mb-2">Site About</p>
+            <div>
+              <p-editor [formControl]="formControlAboutEditor"></p-editor>
+            </div>
+          </div>
+          <div class="flex align-items-center w-full mt-8">
+            <p-button
+              label="Cancle"
+              icon="pi pi-times"
+              class="ml-auto"
+              styleClass="p-button-outlined"
+              (onClick)="onCancle()"></p-button>
+            <p-button
+              label="Save"
+              icon="pi pi-save"
+              [style]="{ 'margin-left': '.5em' }"
+              [loading]="isLoading"
+              [disabled]="isLoading"
+              (onClick)="onSaveAbout()"></p-button>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="Settings for Contact">
+          <div class="w-full mb-4">
+            <p class="mb-2">Site Contact</p>
+            <div>
+              <p-editor [formControl]="formControlContactEditor"></p-editor>
+            </div>
+          </div>
+          <div class="flex align-items-center w-full mt-8">
+            <p-button
+              label="Cancle"
+              icon="pi pi-times"
+              class="ml-auto"
+              styleClass="p-button-outlined"
+              (onClick)="onCancle()"></p-button>
+            <p-button
+              label="Save"
+              icon="pi pi-save"
+              [style]="{ 'margin-left': '.5em' }"
+              [loading]="isLoading"
+              [disabled]="isLoading"
+              (onClick)="onSaveContact()"></p-button>
+          </div>
+        </p-tabPanel>
+      </p-tabView>
     </div>
-    <ng-template pTemplate="footer">
-      <div class="flex align-items-center w-6">
-        <p-button
-          label="Cancle"
-          icon="pi pi-times"
-          class="ml-auto"
-          styleClass="p-button-outlined"
-          (onClick)="onCancle()"></p-button>
-        <p-button
-          label="Save"
-          icon="pi pi-save"
-          [style]="{ 'margin-left': '.5em' }"
-          [loading]="isLoading"
-          [disabled]="isLoading"
-          (onClick)="onSave()"></p-button>
-      </div>
-    </ng-template>
   </p-card>
 </div>

@@ -15,6 +15,8 @@ export class SiteSettingsComponent implements OnInit {
 
   public siteLogo = '';
   public formControlSiteName = new FormControl('');
+  public formControlAboutEditor = new FormControl('');
+  public formControlContactEditor = new FormControl('');
 
   constructor(
     public configDataService: ConfigDataService,
@@ -33,6 +35,10 @@ export class SiteSettingsComponent implements OnInit {
         })
       )
       .subscribe();
+    this.configDataService.getHTMLData().subscribe(res => {
+      this.formControlAboutEditor.setValue(res?.aboutHtml || '');
+      this.formControlContactEditor.setValue(res?.contactHtml || '');
+    });
   }
   picChange(event: Event) {
     const files = (event.target as HTMLInputElement).files || {};
@@ -102,6 +108,41 @@ export class SiteSettingsComponent implements OnInit {
         )
         .subscribe(() => (this.isLoading = false));
     }
+  }
+
+  onSaveAbout() {
+    if (!this.formControlAboutEditor.value) {
+      this.notifyService.notifyWarning('', 'Please input content');
+      return;
+    }
+    this.configDataService
+      .saveHTMLData({
+        pageName: 'about',
+        html: this.formControlAboutEditor.value
+      })
+      .subscribe(res => {
+        if (!res.isError) {
+          this.notifyService.notifySuccess('Success', 'Save Success');
+        }
+      });
+  }
+
+  onSaveContact() {
+    if (!this.formControlContactEditor.value) {
+      this.notifyService.notifyWarning('', 'Please input content');
+      return;
+    }
+    console.log(this.formControlContactEditor.value);
+    this.configDataService
+      .saveHTMLData({
+        pageName: 'contact',
+        html: this.formControlContactEditor.value
+      })
+      .subscribe(res => {
+        if (!res.isError) {
+          this.notifyService.notifySuccess('Success', 'Save Success');
+        }
+      });
   }
   onCancle() {
     history.back();
