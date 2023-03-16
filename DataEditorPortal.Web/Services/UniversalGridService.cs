@@ -633,10 +633,11 @@ namespace DataEditorPortal.Web.Services
                 var trans = con.BeginTransaction();
 
                 // add query parameters
-                var paramKeyValues = model.AsEnumerable().ToList();
-                // always provide Id column parameter
-                paramKeyValues.Add(new KeyValuePair<string, object>(dataSourceConfig.IdColumn, id));
-                var param = GenerateDynamicParameter(paramKeyValues);
+                if (model.ContainsKey(dataSourceConfig.IdColumn))
+                    model[dataSourceConfig.IdColumn] = id;
+                else
+                    model.Add(dataSourceConfig.IdColumn, id);
+                var param = GenerateDynamicParameter(model.AsEnumerable());
 
                 // excute command
                 try
