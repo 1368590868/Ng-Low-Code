@@ -18,6 +18,10 @@ namespace DataEditorPortal.Web.Common
 
     public class LicenseService : ILicenseService
     {
+        /// <summary>
+        /// Public key (Base64 string) to validate the license signature.
+        /// See LicenseGenerator Project for more detail.
+        /// </summary>
         private readonly string _publicKey = "PFJTQUtleVZhbHVlPjxNb2R1bHVzPnRZbWRDOU5jRGhtQTBWSlE4QWpjcllRVWp1bU54WXZFNVRzOU84VENBMEdYaEhqeEFuZ0RxdkY5SUxobUg3U3ErZEQvSUgraVlBQitJZ0UvTmxMOS83OWxEcjljN3d4SS9PZXAyc3BHTExYelVwN1pxWElwMjZmS3dYWEpmVGJhdHFwUldkYUp1ZGNIc0lCMHZFREV3cUNEZ3NVYVFGUVppdU1yOTBNMlVDVT08L01vZHVsdXM+PEV4cG9uZW50PkFRQUI8L0V4cG9uZW50PjwvUlNBS2V5VmFsdWU+";
         private string _license;
         private readonly IServiceProvider _serviceProvider;
