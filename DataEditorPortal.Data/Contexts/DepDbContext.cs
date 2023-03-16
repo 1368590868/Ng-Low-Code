@@ -10,6 +10,7 @@ namespace DataEditorPortal.Data.Contexts
         }
 
         public virtual DbSet<SiteSetting> SiteSettings { get; set; }
+        public virtual DbSet<SiteContent> SiteContents { get; set; }
 
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserPermission> UserPermissions { get; set; }

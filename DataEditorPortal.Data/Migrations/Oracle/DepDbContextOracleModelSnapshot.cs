@@ -191,6 +191,26 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.ToTable("LOOKUPS");
                 });
 
+            modelBuilder.Entity("DataEditorPortal.Data.Models.SiteContent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("RAW(16)")
+                        .HasColumnName("ID");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("CLOB")
+                        .HasColumnName("CONTENT");
+
+                    b.Property<string>("ContentName")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("CONTENT_NAME");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SITE_CONTENTS");
+                });
+
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteMenu", b =>
                 {
                     b.Property<Guid>("Id")

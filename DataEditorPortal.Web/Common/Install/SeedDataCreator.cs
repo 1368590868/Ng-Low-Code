@@ -754,6 +754,28 @@ namespace DataEditorPortal.Web.Common.Install
 
             #endregion
 
+            #region Site Content
+
+            var contents = new List<SiteContent>(){
+                new SiteContent()
+                {
+                    ContentName = "about",
+                    Content = "About Data Editor Portal"
+                },
+                new SiteContent()
+                {
+                    ContentName = "contact",
+                    Content = "Contact Data Editor Portal"
+                },
+            };
+
+            foreach (var item in contents)
+            {
+                _depDbContext.SiteContents.Add(item);
+            }
+
+            #endregion
+
             _depDbContext.SaveChanges();
         }
     }
