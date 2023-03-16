@@ -10,11 +10,12 @@ namespace DataEditorPortal.Web.Services
 
         #region Ultilities
 
-        protected override string GenerateCriteriaClause(FilterParam item, string whereClause = null)
+        protected override string GenerateCriteriaClause(FilterParam item)
         {
             string result = string.Empty;
 
             string field = item.field;
+            string whereClause = item.whereClause;
 
             var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(item.value));
 

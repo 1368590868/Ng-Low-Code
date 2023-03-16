@@ -25,17 +25,12 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string matchMode { get; set; }
         public string filterType { get; set; }
         public object value { get; set; }
+        public string whereClause { get; set; }
     }
 
     public class SortParam
     {
         public string field { get; set; }
         public int order { get; set; }
-        public string dBFieldExpression { get; set; }
-    }
-
-    public class SearchParam : FilterParam
-    {
-        public string whereClause { get; set; }
     }
 }

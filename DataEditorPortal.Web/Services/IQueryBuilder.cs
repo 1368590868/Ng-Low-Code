@@ -15,7 +15,7 @@ namespace DataEditorPortal.Web.Services
         string UsePagination(string query, int startIndex, int indexCount, List<SortParam> sortParams);
         string UseOrderBy(string query, List<SortParam> sortParams = null);
         string UseFilters(string query, List<FilterParam> filterParams = null);
-        string UseSearches(string query, List<SearchParam> filterParams = null);
+        string UseSearches(string query, List<FilterParam> filterParams = null);
         string GetFilterType(DataRow schema);
         string ParameterName(string name);
         object GetJsonElementValue(JsonElement jsonElement);
@@ -61,7 +61,7 @@ namespace DataEditorPortal.Web.Services
             return string.Join(" AND ", filters);
         }
 
-        protected abstract string GenerateCriteriaClause(FilterParam item, string whereClause = null);
+        protected abstract string GenerateCriteriaClause(FilterParam item);
 
         protected virtual string GenerateOrderClause(List<SortParam> sortParams)
         {
@@ -70,14 +70,7 @@ namespace DataEditorPortal.Web.Services
             {
                 foreach (var item in sortParams)
                 {
-
                     string field = item.field;
-                    if (item.dBFieldExpression != null)
-                    {
-                        field = item.dBFieldExpression;
-                    }
-
-
                     if (item.order == 1)
                     {
                         orders.Add($"{EscapeColumnName(field)} ASC ");
@@ -158,9 +151,9 @@ namespace DataEditorPortal.Web.Services
                 : query.Replace("##FILTERS##", " 1=1 ");
         }
 
-        public virtual string UseSearches(string query, List<SearchParam> filterParams = null)
+        public virtual string UseSearches(string query, List<FilterParam> filterParams = null)
         {
-            if (filterParams == null) filterParams = new List<SearchParam>();
+            if (filterParams == null) filterParams = new List<FilterParam>();
 
             List<string> filters = new List<string>();
 
@@ -168,7 +161,7 @@ namespace DataEditorPortal.Web.Services
             {
                 if (!string.IsNullOrEmpty(item.value.ToString()))
                 {
-                    var criteriaStr = GenerateCriteriaClause(item, item.whereClause);
+                    var criteriaStr = GenerateCriteriaClause(item);
                     if (!string.IsNullOrEmpty(criteriaStr))
                         filters.Add(criteriaStr);
                 }

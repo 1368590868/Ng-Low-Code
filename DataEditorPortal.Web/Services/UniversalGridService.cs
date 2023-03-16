@@ -181,19 +181,19 @@ namespace DataEditorPortal.Web.Services
 
             // convert search criteria to where clause
             var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
-            var searchRules = new List<SearchParam>();
+            var searchRules = new List<FilterParam>();
             if (param.Searches != null)
             {
                 searchRules = param.Searches
                     .Where(x => x.Value != null)
                     .Select(x =>
                     {
-                        SearchParam param = null;
+                        FilterParam param = null;
 
                         var fieldConfig = searchConfig.FirstOrDefault(s => s.key == x.Key);
                         if (fieldConfig != null && fieldConfig.searchRule != null)
                         {
-                            param = new SearchParam
+                            param = new FilterParam
                             {
                                 field = fieldConfig.searchRule.field,
                                 matchMode = fieldConfig.searchRule.matchMode,
