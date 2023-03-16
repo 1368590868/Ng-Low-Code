@@ -55,7 +55,6 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class SearchFieldFilterRule
     {
-        public string dBFieldExpression { get; set; } // Database, SearchField
         public string field { get; set; }
         public string matchMode { get; set; }
         public string whereClause { get; set; }

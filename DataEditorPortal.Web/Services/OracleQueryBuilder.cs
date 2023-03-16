@@ -18,10 +18,6 @@ namespace DataEditorPortal.Web.Services
             string result = string.Empty;
 
             string field = item.field;
-            if (item.dBFieldExpression != null)
-            {
-                field = item.dBFieldExpression;
-            }
 
             var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(item.value));
 

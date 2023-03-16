@@ -197,7 +197,6 @@ namespace DataEditorPortal.Web.Services
                             {
                                 field = fieldConfig.searchRule.field,
                                 matchMode = fieldConfig.searchRule.matchMode,
-                                dBFieldExpression = fieldConfig.searchRule.dBFieldExpression,
                                 value = x.Value,
                                 whereClause = fieldConfig.searchRule.whereClause
                             };
