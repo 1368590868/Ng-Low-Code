@@ -49,7 +49,7 @@ namespace DataEditorPortal.Web.Common
 
         public bool IsExpired(string license)
         {
-            if (!IsValid(license)) return false;
+            if (!IsValid(license)) return true;
 
             var RegExLineEnd = new Regex("\\r?\\n");
             license = RegExLineEnd.Replace(license, "\r\n");

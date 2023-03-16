@@ -144,6 +144,9 @@ namespace DataEditorPortal.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            // Enable Log files
+            loggerFactory.AddFile(Configuration.GetSection("Logging"));
+
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetService<DepDbContext>();
@@ -155,9 +158,6 @@ namespace DataEditorPortal.Web
                     seedDataCreator.Create();
                 }
             }
-
-            // Enable Log files
-            loggerFactory.AddFile(Configuration.GetSection("Logging"));
 
             if (env.IsDevelopment())
             {

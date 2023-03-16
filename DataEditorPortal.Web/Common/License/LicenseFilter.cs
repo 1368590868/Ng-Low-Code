@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Hosting;
 using System;
 
 namespace DataEditorPortal.Web.Common.License
@@ -8,13 +10,17 @@ namespace DataEditorPortal.Web.Common.License
     public class LicenseActionFilter : IActionFilter
     {
         private readonly ILicenseService _licenseService;
-        public LicenseActionFilter(ILicenseService licenseService)
+        private readonly IWebHostEnvironment _env;
+        public LicenseActionFilter(ILicenseService licenseService, IWebHostEnvironment env)
         {
             _licenseService = licenseService;
+            _env = env;
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
+            if (_env.IsDevelopment()) return;
+
             var endpoint = context.HttpContext.GetEndpoint();
             if (endpoint?.Metadata?.GetMetadata<NoLicenseCheckAttribute>() is object) return;
 

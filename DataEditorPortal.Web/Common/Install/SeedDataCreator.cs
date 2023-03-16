@@ -3,8 +3,10 @@ using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 
@@ -19,12 +21,17 @@ namespace DataEditorPortal.Web.Common.Install
     public class SeedDataCreator : ISeedDataCreator
     {
         private readonly DepDbContext _depDbContext;
-        private IConfiguration _configuration { get; }
+        private IConfiguration _configuration;
+        private readonly ILogger<SeedDataCreator> _logger;
 
-        public SeedDataCreator(DepDbContext depDbContext, IConfiguration configuration)
+        public SeedDataCreator(
+            DepDbContext depDbContext,
+            IConfiguration configuration,
+            ILogger<SeedDataCreator> logger)
         {
             _depDbContext = depDbContext;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public bool IsInstalled()
@@ -728,8 +735,24 @@ namespace DataEditorPortal.Web.Common.Install
 
             #endregion
 
-            var setting = new SiteSetting() { Installed = true, SiteName = "Data Editor Portal" };
+            #region Site settings and license
+
+            var licensePath = Path.Combine(Environment.CurrentDirectory, "license.dat");
+            _logger.LogInformation("License File Path is: " + licensePath);
+
+            var license = "";
+            if (File.Exists(licensePath))
+                license = File.ReadAllText(licensePath);
+
+            var setting = new SiteSetting()
+            {
+                Installed = true,
+                SiteName = "Data Editor Portal",
+                License = license
+            };
             _depDbContext.Add(setting);
+
+            #endregion
 
             _depDbContext.SaveChanges();
         }
