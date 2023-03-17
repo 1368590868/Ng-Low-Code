@@ -6,8 +6,7 @@ import { Subject, takeUntil } from 'rxjs';
 import {
   NgxFormlyService,
   SearchParam,
-  SystemLogService,
-  UserService
+  SystemLogService
 } from 'src/app/shared';
 import { GridTableService } from '../../services/grid-table.service';
 
@@ -30,8 +29,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private gridTableService: GridTableService,
     private ngxFormlyService: NgxFormlyService,
-    private systemLogService: SystemLogService,
-    private userService: UserService
+    private systemLogService: SystemLogService
   ) {}
 
   ngOnInit(): void {
@@ -103,7 +101,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     if (this.form.valid) {
       this.systemLogService.addSiteVisitLog({
         action: 'Search',
-        section: this.userService.routerName,
+        section: this.gridTableService.currentPortalItem,
         params: JSON.stringify(model)
       });
       this.gridTableService.searchClicked$.next(model);

@@ -22,6 +22,8 @@ import { TableModule } from 'primeng/table';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MenuModule } from 'primeng/menu';
 import { PaginatorModule } from 'primeng/paginator';
+import { TabViewModule } from 'primeng/tabview';
+import { EditorModule } from 'primeng/editor';
 
 import {
   HeaderComponent,
@@ -82,7 +84,9 @@ export * from './components';
     TableModule,
     SkeletonModule,
     MenuModule,
-    PaginatorModule
+    PaginatorModule,
+    TabViewModule,
+    EditorModule
   ],
   exports: [
     HeaderComponent,

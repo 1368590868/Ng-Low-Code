@@ -1,12 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable, Subject } from 'rxjs';
-import {
-  ApiResponse,
-  GridParam,
-  NotifyService,
-  SearchParam
-} from 'src/app/shared';
+import { ApiResponse, GridParam, SearchParam } from 'src/app/shared';
 import {
   GridColumn,
   GridConfig,
@@ -22,11 +17,7 @@ export class GridTableService {
   public currentPortalItem = '';
 
   public _apiUrl: string;
-  constructor(
-    private http: HttpClient,
-    private notifyService: NotifyService,
-    @Inject('API_URL') apiUrl: string
-  ) {
+  constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
   }
 

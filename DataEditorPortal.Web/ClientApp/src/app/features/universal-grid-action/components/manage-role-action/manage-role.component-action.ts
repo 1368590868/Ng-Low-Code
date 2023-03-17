@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { TreeNode } from 'primeng/api';
-import { NotifyService, SystemLogService, UserService } from 'src/app/shared';
+import { NotifyService, SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import {
   ManageRoleForm,
@@ -122,8 +122,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
   constructor(
     private notifyService: NotifyService,
     private rolePermissionService: RolePermissionService,
-    private systemLogService: SystemLogService,
-    private userService: UserService
+    private systemLogService: SystemLogService
   ) {
     super();
   }
@@ -191,7 +190,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
         this.model.roleId === '<new_role>' ? 'createRole' : 'updateRole';
       this.systemLogService.addSiteVisitLog({
         action: this.model.roleId === '<new_role>' ? 'Add Role' : 'Update Role',
-        section: this.userService.routerName,
+        section: this.rolePermissionService.currentPortalItem,
         params: JSON.stringify({
           ...model,
           permissions: permissionSelect as RolePermissions[]

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NotifyService, SystemLogService, UserService } from 'src/app/shared';
+import { NotifyService, SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UniversalGridService } from '../../services/universal-grid.service';
 
@@ -15,8 +15,7 @@ export class RemoveActionComponent
   constructor(
     private gridService: UniversalGridService,
     private notifyService: NotifyService,
-    private systemLogService: SystemLogService,
-    private userService: UserService
+    private systemLogService: SystemLogService
   ) {
     super();
   }
@@ -27,7 +26,7 @@ export class RemoveActionComponent
   onSave(): void {
     this.systemLogService.addSiteVisitLog({
       action: 'Remove',
-      section: this.userService.routerName,
+      section: this.gridService.currentPortalItem,
       params: JSON.stringify(this.selectedRecords)
     });
     this.gridService

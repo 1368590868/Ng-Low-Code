@@ -22,11 +22,6 @@ export class PermissionRouterGuard implements CanActivate {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    if (route.params['name']) {
-      this.userService.routerName = route.params['name']
-        .toUpperCase()
-        .replace('-', '_');
-    }
     if (!this.userService.USER.isAdmin) {
       if (route.params['name']) {
         const routerParam =

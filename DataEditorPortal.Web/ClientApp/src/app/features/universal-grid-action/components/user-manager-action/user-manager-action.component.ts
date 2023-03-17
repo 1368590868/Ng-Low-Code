@@ -314,7 +314,7 @@ export class UserManagerActionComponent
       const apiName = this.isAddForm ? 'createUser' : 'updateUser';
       this.systemLogService.addSiteVisitLog({
         action: this.isAddForm ? 'Add User' : 'Update User',
-        section: this.userService.routerName,
+        section: this.userManagerService.currentPortalItem,
         params: JSON.stringify(model)
       });
       this.userManagerService[apiName](

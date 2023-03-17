@@ -5,8 +5,7 @@ import { tap } from 'rxjs';
 import {
   NgxFormlyService,
   NotifyService,
-  SystemLogService,
-  UserService
+  SystemLogService
 } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { EditFormData } from '../../models/edit';
@@ -34,8 +33,7 @@ export class EditRecordActionComponent
     private gridService: UniversalGridService,
     private notifyService: NotifyService,
     private ngxFormlyService: NgxFormlyService,
-    private systemLogService: SystemLogService,
-    private userService: UserService
+    private systemLogService: SystemLogService
   ) {
     super();
   }
@@ -120,7 +118,7 @@ export class EditRecordActionComponent
       if (this.isAddForm) {
         this.systemLogService.addSiteVisitLog({
           action: 'Add New',
-          section: this.userService.routerName,
+          section: this.gridService.currentPortalItem,
           params: JSON.stringify(model)
         });
 
@@ -139,7 +137,7 @@ export class EditRecordActionComponent
         const dataKey = this.selectedRecords[0][this.recordKey];
         this.systemLogService.addSiteVisitLog({
           action: 'Update',
-          section: this.userService.routerName,
+          section: this.gridService.currentPortalItem,
           params: JSON.stringify(model)
         });
         this.gridService.updateGridData(dataKey, this.model).subscribe(res => {
