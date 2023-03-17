@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text.Json;
@@ -152,8 +153,28 @@ namespace DataEditorPortal.Web.Controllers
 
                 using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                 {
+                    DataTable schema;
+                    using (var dr = con.ExecuteReader(query.Item1, query.Item2))
+                    {
+                        schema = dr.GetSchemaTable();
+                    }
+
                     con.ConnectionString = lookup.DataSourceConnection.ConnectionString;
-                    result = con.Query<DropdownOptionsItem>(query.Item1, query.Item2).ToList();
+                    var data = con.Query(query.Item1, query.Item2).ToList();
+                    data.ForEach(item =>
+                    {
+                        var values = ((IDictionary<string, object>)item).Select(x => x.Value).ToList();
+                        var option = new DropdownOptionsItem();
+                        for (var index = 0; index < values.Count; index++)
+                        {
+                            var value = values[index];
+                            if (index == 0) option.Label = _queryBuilder.TransformValue(value, schema.Rows[index]);
+                            if (index == 1) option.Value = _queryBuilder.TransformValue(value, schema.Rows[index]);
+                            if (index == 2) option.Value1 = _queryBuilder.TransformValue(value, schema.Rows[index]);
+                            if (index == 3) option.Value2 = _queryBuilder.TransformValue(value, schema.Rows[index]);
+                        }
+                        result.Add(option);
+                    });
                 }
             }
 

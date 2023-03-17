@@ -147,6 +147,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
                     SITE_NAME = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     SITE_LOGO = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    LICENSE = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     INSTALLED = table.Column<bool>(type: "NUMBER(1)", nullable: false)
                 },
                 constraints: table =>
@@ -209,9 +210,9 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     CURRENT_STEP = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     CONFIG_COMPLETED = table.Column<bool>(type: "NUMBER(1)", nullable: false),
                     DATA_SOURCE_CONFIG = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    COLUMNS_CONFIG = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    SEARCH_CONFIG = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    DETAIL_CONFIG = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    COLUMNS_CONFIG = table.Column<string>(type: "CLOB", nullable: true),
+                    SEARCH_CONFIG = table.Column<string>(type: "CLOB", nullable: true),
+                    DETAIL_CONFIG = table.Column<string>(type: "CLOB", nullable: true),
                     CUSTOMACTION_CONFIG = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     CREATED_BY = table.Column<Guid>(type: "RAW(16)", nullable: false),
                     CREATED_DATE = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),

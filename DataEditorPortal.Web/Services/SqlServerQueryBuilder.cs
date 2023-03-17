@@ -1,5 +1,4 @@
 ﻿using DataEditorPortal.Web.Models.UniversalGrid;
-using System.Linq;
 using System.Text.Json;
 
 namespace DataEditorPortal.Web.Services
@@ -10,138 +9,110 @@ namespace DataEditorPortal.Web.Services
 
         #region Ultilities
 
-        protected override string GenerateCriteriaClause(FilterParam item, string whereClause = null)
+        protected override string GenerateCriteriaClause(FilterParam item)
         {
-            string result = string.Empty;
+            string field = EscapeColumnName(item.field);
+            string parameter = $"{ParameterPrefix}{ParameterName(field)}_{item.index}";
 
-            string field = item.field;
-            if (item.dBFieldExpression != null)
+            string clause = string.Empty;
+            if (!string.IsNullOrEmpty(item.whereClause))
             {
-                field = item.dBFieldExpression;
+                clause = item.whereClause.Replace("##VALUE##", parameter);
             }
-
-            var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(item.value));
-
-            if (jsonElement.ValueKind == JsonValueKind.True || jsonElement.ValueKind == JsonValueKind.False)
+            else
             {
-                var value = jsonElement.GetBoolean();
-                if (whereClause != null)
-                    result = whereClause.Replace("##VALUE##", (value ? 1 : 0).ToString());
-                else
-                    result = $"[{field}] = {(value ? 1 : 0)}";
-            }
-            else if (jsonElement.ValueKind == JsonValueKind.Number)
-            {
-                var value = jsonElement.GetDecimal();
-                if (whereClause != null)
-                    result = whereClause.Replace("##VALUE##", value.ToString());
-                else
+                var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(item.value));
+
+                if (jsonElement.ValueKind == JsonValueKind.True || jsonElement.ValueKind == JsonValueKind.False)
+                {
+                    clause = $"{field} = {parameter}";
+                }
+                else if (jsonElement.ValueKind == JsonValueKind.Number)
+                {
                     switch (item.matchMode)
                     {
                         case "gt":
-                            result = $"[{field}] > {value}";
+                            clause = $"{field} > {parameter}";
                             break;
 
                         case "lt":
-                            result = $"[{field}] < {value}";
+                            clause = $"{field} < {parameter}";
                             break;
 
                         case "gte":
-                            result = $"[{field}] >= {value}";
+                            clause = $"{field} >= {parameter}";
                             break;
 
                         case "lte":
-                            result = $"[{field}] <= {value}";
+                            clause = $"{field} <= {parameter}";
                             break;
 
                         case "equals":
-                            result = $"[{field}] = {value}";
+                            clause = $"{field} = {parameter}";
                             break;
 
                         case "notEquals":
-                            result = $"[{field}] <> {value}";
+                            clause = $"{field} <> {parameter}";
                             break;
 
                         default:
                             break;
                     }
-            }
-            else if (jsonElement.ValueKind == JsonValueKind.Array)
-            {
-                if (jsonElement.GetArrayLength() > 0)
-                {
-                    var inStr = "";
-                    jsonElement.EnumerateArray().ToList().ForEach(value =>
-                    {
-                        if (value.ValueKind == JsonValueKind.Number)
-                        {
-                            inStr += $",'{value.GetDecimal()}'";
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(value.GetString()))
-                                inStr += $",'{value.GetString().Replace("'", "''")}'";
-                        }
-                    });
-                    if (whereClause != null)
-                        result = whereClause.Replace("##VALUE##", inStr.Substring(1));
-                    else
-                        result = $"[{field}] IN ({inStr.Substring(1)})";
                 }
-            }
-            else if (jsonElement.ValueKind == JsonValueKind.String)
-            {
-                var value = jsonElement.GetString().Replace("'", "''");
-                if (whereClause != null)
-                    result = whereClause.Replace("##VALUE##", value.ToString());
-                else
+                else if (jsonElement.ValueKind == JsonValueKind.Array)
+                {
+                    clause = $"{field} IN {parameter}";
+                }
+                else if (jsonElement.ValueKind == JsonValueKind.String)
+                {
                     switch (item.matchMode)
                     {
                         case "startsWith":
-                            result = $"[{field}] like '{value}%'";
+                            clause = $"{field} LIKE {parameter} + '%'";
                             break;
 
                         case "contains":
-                            result = $"[{field}] like '%{value}%'";
+                            clause = $"{field} LIKE '%' + {parameter} + '%'";
                             break;
 
                         case "notContains":
-                            result = $"[{field}] not like '%{value}%'";
+                            clause = $"{field} NOT LIKE '%' + {parameter} + '%'";
                             break;
 
                         case "endsWith":
-                            result = $"[{field}] like '%{value}'";
+                            clause = $"{field} LIKE '%' + {parameter}";
                             break;
 
                         case "equals":
-                            result = $"[{field}] = '{value}'";
+                            clause = $"{field} = {parameter}";
                             break;
 
                         case "notEquals":
-                            result = $"[{field}] <> '{value}'";
+                            clause = $"{field} <> {parameter}";
                             break;
 
                         case "dateIs":
-                            result = $"[{field}] = '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                            clause = $"{field} = {parameter}";
                             break;
 
                         case "dateIsNot":
-                            result = $"[{field}] <> '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                            clause = $"{field} <> {parameter}";
                             break;
 
                         case "dateBefore":
-                            result = $"[{field}] < '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                            clause = $"{field} < {parameter}";
                             break;
 
                         case "dateAfter":
-                            result = $"[{field}] > '{jsonElement.GetDateTime():yyyy/MM/dd}'";
+                            clause = $"{field} > {parameter}";
                             break;
                         default:
                             break;
                     }
+                }
             }
 
-            return result;
+            return clause;
         }
 
         protected override string EscapeColumnName(string columnName)

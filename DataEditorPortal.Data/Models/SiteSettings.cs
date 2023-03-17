@@ -14,6 +14,10 @@ namespace DataEditorPortal.Data.Models
         public string SiteName { get; set; }
         [Column("SITE_LOGO")]
         public string SiteLogo { get; set; }
+
+        [Column("LICENSE")]
+        public string License { get; set; }
+
         [Column("INSTALLED")]
         public bool Installed { get; set; }
     }
