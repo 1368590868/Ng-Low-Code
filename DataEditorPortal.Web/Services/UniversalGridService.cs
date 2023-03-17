@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -29,7 +28,8 @@ namespace DataEditorPortal.Web.Services
         List<FormFieldConfig> GetGridDetailConfig(string name, string type);
 
         GridData GetGridData(string name, GridParam param);
-        GridData QueryGridData(DbConnection con, string queryText, string gridName, bool writeLog = false);
+        List<FilterParam> ProcessFilterParam(List<FilterParam> filters, List<FilterParam> filtersApplied);
+        GridData QueryGridData(DbConnection con, string queryText, object queryParams, string gridName, bool writeLog = false);
         MemoryStream ExportExcel(string name, ExportParam param);
 
         IDictionary<string, object> GetGridDataDetail(string name, string id);
@@ -177,6 +177,7 @@ namespace DataEditorPortal.Web.Services
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            var filtersApplied = ProcessFilterParam(dataSourceConfig.Filters, new List<FilterParam>());
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
 
             // convert search criteria to where clause
@@ -205,9 +206,11 @@ namespace DataEditorPortal.Web.Services
                     })
                     .ToList();
             }
+            filtersApplied = ProcessFilterParam(searchRules, filtersApplied);
             queryText = _queryBuilder.UseSearches(queryText, searchRules);
 
             // convert grid filter to where clause
+            filtersApplied = ProcessFilterParam(param.Filters, filtersApplied);
             queryText = _queryBuilder.UseFilters(queryText, param.Filters);
 
             // set default sorts
@@ -231,19 +234,35 @@ namespace DataEditorPortal.Web.Services
 
             #endregion
 
+            var keyValues = filtersApplied.Select(x => new KeyValuePair<string, object>($"{x.field}_{x.index}", x.value));
+            var queryParams = _queryBuilder.GenerateDynamicParameter(keyValues);
+
             // run sql query text
             var output = new GridData();
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
 
-                output = QueryGridData(con, queryText, name);
+                output = QueryGridData(con, queryText, queryParams, name);
             }
 
             return output;
         }
 
-        public GridData QueryGridData(DbConnection con, string queryText, string gridName, bool writeLog = true)
+        public List<FilterParam> ProcessFilterParam(List<FilterParam> filters, List<FilterParam> filtersApplied)
+        {
+            if (filtersApplied == null) filtersApplied = new List<FilterParam>();
+
+            foreach (var filter in filters)
+            {
+                filter.index = filtersApplied.Count(x => x.field == x.field);
+                filtersApplied.Add(filter);
+            };
+
+            return filtersApplied;
+        }
+
+        public GridData QueryGridData(DbConnection con, string queryText, object queryParams, string gridName, bool writeLog = true)
         {
             var output = new GridData();
             try
@@ -251,12 +270,12 @@ namespace DataEditorPortal.Web.Services
                 con.Open();
 
                 DataTable schema;
-                using (var dr = con.ExecuteReader(queryText))
+                using (var dr = con.ExecuteReader(queryText, queryParams))
                 {
                     schema = dr.GetSchemaTable();
                 }
 
-                var data = con.Query<dynamic>(queryText).ToList();
+                var data = con.Query(queryText, queryParams).ToList();
                 data.ForEach(item =>
                 {
                     var row = (IDictionary<string, object>)item;
@@ -279,12 +298,12 @@ namespace DataEditorPortal.Web.Services
                 }
 
                 if (writeLog)
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, gridName, queryText);
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, gridName, queryText, queryParams);
             }
             catch (Exception ex)
             {
                 if (writeLog)
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, gridName, queryText, null, ex.Message);
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, gridName, queryText, queryParams, ex.Message);
                 _logger.LogError(ex.Message, ex);
                 throw new DepException("An Error in the query has occurred: " + ex.Message);
             }
@@ -409,7 +428,7 @@ namespace DataEditorPortal.Web.Services
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
 
                 // always provide Id column parameter
-                var param = GenerateDynamicParameter(new Dictionary<string, object>() { { dataSourceConfig.IdColumn, id } });
+                var param = _queryBuilder.GenerateDynamicParameter(new Dictionary<string, object>() { { dataSourceConfig.IdColumn, id } });
 
                 try
                 {
@@ -546,7 +565,7 @@ namespace DataEditorPortal.Web.Services
                 var trans = con.BeginTransaction();
 
                 // add query parameters
-                var param = GenerateDynamicParameter(model.AsEnumerable());
+                var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
 
                 // excute command
                 try
@@ -636,7 +655,7 @@ namespace DataEditorPortal.Web.Services
                     model[dataSourceConfig.IdColumn] = id;
                 else
                     model.Add(dataSourceConfig.IdColumn, id);
-                var param = GenerateDynamicParameter(model.AsEnumerable());
+                var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
 
                 // excute command
                 try
@@ -690,7 +709,7 @@ namespace DataEditorPortal.Web.Services
 
                 try
                 {
-                    var param = GenerateDynamicParameter(
+                    var param = _queryBuilder.GenerateDynamicParameter(
                         new List<KeyValuePair<string, object>>() {
                             new KeyValuePair<string, object>(dataSourceConfig.IdColumn, ids)
                         }
@@ -772,27 +791,6 @@ namespace DataEditorPortal.Web.Services
             if (model.Keys.Contains(key)) model[key] = value;
             else
                 model.Add(key, value);
-        }
-
-        #endregion
-
-        #region private method
-
-        private object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues)
-        {
-            var dict = new Dictionary<string, object>();
-            foreach (var item in keyValues)
-            {
-                var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(item.Value));
-                dict.Add(_queryBuilder.ParameterName(item.Key), _queryBuilder.GetJsonElementValue(jsonElement));
-            }
-
-            dynamic param = dict.Aggregate(
-                new ExpandoObject() as IDictionary<string, object>,
-                (a, p) => { a.Add(p); return a; }
-            );
-
-            return (object)param;
         }
 
         #endregion

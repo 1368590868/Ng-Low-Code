@@ -64,9 +64,11 @@ namespace DataEditorPortal.Web.Controllers
             }
 
             var output = new GridData();
+            var keyValues = param.Filters.Select(x => new KeyValuePair<string, object>(x.field, x.value));
+            var queryParams = _queryBuilder.GenerateDynamicParameter(keyValues);
             using (var con = _depDbContext.Database.GetDbConnection())
             {
-                output = _universalGridService.QueryGridData(con, queryText, "event-logs", false);
+                output = _universalGridService.QueryGridData(con, queryText, queryParams, "event-logs", false);
             }
 
             return output;

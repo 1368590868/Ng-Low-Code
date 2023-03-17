@@ -26,6 +26,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string filterType { get; set; }
         public object value { get; set; }
         public string whereClause { get; set; }
+        public int index { get; set; }
     }
 
     public class SortParam

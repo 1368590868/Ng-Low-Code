@@ -377,7 +377,8 @@ namespace DataEditorPortal.Web.Common.Install
                             },
                             searchRule = new SearchFieldFilterRule
                             {
-                                whereClause = $"ID IN (SELECT USER_ID FROM {Constants.DEFAULT_SCHEMA}.USER_PERMISSIONS WHERE PERMISSION_GRANT_ID IN (##VALUE##))"
+                                field = "ROLES",
+                                whereClause = $"ID IN (SELECT USER_ID FROM {Constants.DEFAULT_SCHEMA}.USER_PERMISSIONS WHERE PERMISSION_GRANT_ID IN ##VALUE##)"
                             }
                         },
                         new SearchFieldConfig {

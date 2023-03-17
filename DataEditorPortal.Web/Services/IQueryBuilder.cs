@@ -3,6 +3,7 @@ using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -20,6 +21,7 @@ namespace DataEditorPortal.Web.Services
         string ParameterName(string name);
         object GetJsonElementValue(JsonElement jsonElement);
         object TransformValue(object value, DataRow schema);
+        object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues);
 
         // universal grid
         string GenerateSqlTextForList(DataSourceConfig config);
@@ -169,7 +171,7 @@ namespace DataEditorPortal.Web.Services
 
             return filters.Any()
                 ? query.Replace("##SEARCHES##", $" ({string.Join(" AND ", filters)}) ")
-                : query.Replace("##SEARCHES##", " 1=1");
+                : query.Replace("##SEARCHES##", " 1=1 ");
         }
 
         public virtual string GetFilterType(DataRow schema)
@@ -226,6 +228,23 @@ namespace DataEditorPortal.Web.Services
         public virtual object TransformValue(object value, DataRow schema)
         {
             return value;
+        }
+
+        public virtual object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues)
+        {
+            var dict = new Dictionary<string, object>();
+            foreach (var item in keyValues)
+            {
+                var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(item.Value));
+                dict.Add(ParameterName(item.Key), GetJsonElementValue(jsonElement));
+            }
+
+            dynamic param = dict.Aggregate(
+                new ExpandoObject() as IDictionary<string, object>,
+                (a, p) => { a.Add(p); return a; }
+            );
+
+            return (object)param;
         }
 
         #endregion
