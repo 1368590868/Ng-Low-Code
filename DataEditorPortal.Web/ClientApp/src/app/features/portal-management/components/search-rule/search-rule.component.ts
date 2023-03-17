@@ -43,7 +43,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
 
   helperMessage =
     '-- Enter the where clause, which will be used to filter data. \r\n' +
-    '-- Use ##VALUE## to reference the field value. \r\n' +
+    '-- Use ##VALUE## to reference current field value. \r\n' +
     '-- E.g. \r\n' +
     '--      FIRST_NAME = ##VALUE## \r\n' +
     "--      FIRST_NAME LIKE ##VALUE## + '%'";
