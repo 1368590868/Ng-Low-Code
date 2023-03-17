@@ -22,7 +22,7 @@ namespace DataEditorPortal.Web.Services
         object GetJsonElementValue(JsonElement jsonElement);
         object TransformValue(object value, DataRow schema);
         object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues);
-
+        string ReplaceQueryParamters(string queryText);
         // universal grid
         string GenerateSqlTextForList(DataSourceConfig config);
         string GenerateSqlTextForDetail(DataSourceConfig config);

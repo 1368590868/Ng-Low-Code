@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -172,7 +173,7 @@ namespace DataEditorPortal.Web
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSpaStaticFiles();
+            app.UseSpaStaticFiles(new StaticFileOptions() { HttpsCompression = HttpsCompressionMode.Compress });
 
             app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions()
             {

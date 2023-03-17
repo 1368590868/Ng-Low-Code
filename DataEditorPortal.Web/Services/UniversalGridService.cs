@@ -13,9 +13,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -585,6 +587,8 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
+            AfterSavedAsync("AfterUpdating", formLayout.AfterSaved, model);
+
             return true;
         }
 
@@ -674,6 +678,8 @@ namespace DataEditorPortal.Web.Services
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
+
+            AfterSavedAsync("AfterUpdating", formLayout.AfterSaved, model);
 
             return true;
         }
@@ -791,6 +797,61 @@ namespace DataEditorPortal.Web.Services
             if (model.Keys.Contains(key)) model[key] = value;
             else
                 model.Add(key, value);
+        }
+
+        #endregion
+
+
+        #region Event
+
+        private async void AfterSavedAsync(string name, FormEventConfig eventConfig, Dictionary<string, object> model)
+        {
+            await Task.Run(() =>
+            {
+                if (eventConfig == null || string.IsNullOrEmpty(eventConfig.Script)) return;
+
+                if (eventConfig.EventType == FormEventType.QueryText || eventConfig.EventType == FormEventType.QueryStoredProcedure)
+                {
+                    try
+                    {
+                        using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                        {
+                            var queryText = _queryBuilder.ReplaceQueryParamters(eventConfig.Script);
+                            var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
+                            con.Execute(queryText, param);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.Message, ex);
+                    }
+                }
+
+                if (eventConfig.EventType == FormEventType.Python)
+                {
+                    var process = new Process();
+                    process.StartInfo.WorkingDirectory = "";
+                    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    process.StartInfo.FileName = "cmd.exe";
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.CreateNoWindow = true;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardInput = true;
+                    process.Start();
+
+                    using (StreamWriter sw = process.StandardInput)
+                    {
+                        if (sw.BaseStream.CanWrite)
+                        {
+                            var cmds = eventConfig.Script.Split(new string[] { "\r", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var cmd in cmds)
+                            {
+                                sw.WriteLine(cmd);
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         #endregion

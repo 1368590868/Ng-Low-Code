@@ -107,10 +107,23 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string CustomFormName { get; set; }
         public List<FormFieldConfig> FormFields { get; set; } = new List<FormFieldConfig>();
         public string QueryText { get; set; }
+        public FormEventConfig AfterSaved { get; set; }
     }
 
     public class CustomAction
     {
         public string Name { get; set; }
+    }
+
+    public enum FormEventType
+    {
+        QueryText, QueryStoredProcedure, Python, Javascript
+    }
+
+    public class FormEventConfig
+    {
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public FormEventType EventType { get; set; }
+        public string Script { get; set; }
     }
 }
