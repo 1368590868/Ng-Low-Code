@@ -83,13 +83,10 @@ export class ConfigDataService {
       );
   }
 
-  getHTMLData() {
-    return of({
-      aboutHtml:
-        '<h3>About WOTS</h3><p><br></p><p>The Work Order Tracking System (WOTS) was originally created for CenterPoint Energy (CNP) GIS employees to track the work order flow, but now it is widely used by GIS, Work Order Management (WOM), Operation, Engineering, Compliance, and Leadership to track Gas, Electric, Major Underground and Landbase requests, work orders and data corrections submitted for digitizing into GIS. Requests are primarily submitted by internal company employees as work orders to digitize. CNP and Contract personnel use the application for data entry, QC, problem resolution, work assignment, progress tracking and reporting.</p><p><strong>Supported internet browsers for WOTS are Microsoft Edge and Google Chrome. Do not use Internet Explorer to access this site.</strong></p><p><img src="http://localhost:4200/assets/Images/ie.png"><img src="http://localhost:4200/assets/Images/chrome.png"></p>',
-      contactHtml:
-        '<h3>Contact</h3><p>For technical support, website issues, user access</p><p><strong>GIS Support Desk&nbsp;</strong><a href="mailto:gissupportdesk@centerpointenergy.com" rel="noopener noreferrer" target="_blank">gissupportdesk@centerpointenergy.com</a></p><p>For electric and landbase workorder, data correction and facilities related support</p><p><strong>Deepa Hukeri&nbsp;</strong><a href="mailto:deepalaxmi.hukeri@centerpointenergy.com" rel="noopener noreferrer" target="_blank">deepalaxmi.hukeri@centerpointenergy.com</a></p><p>For gas and landbase workorder, data correction and facilities related support</p><p><strong>Christoper Huff&nbsp;</strong><a href="mailto:Christoper.Huff@centerpointenergy.com" rel="noopener noreferrer" target="_blank">Christoper.Huff@centerpointenergy.com</a></p><p><strong>Belinda Walker&nbsp;</strong><a href="mailto:Belinda.Walker@centerpointenergy.com" rel="noopener noreferrer" target="_blank">Belinda.Walker@centerpointenergy.com</a></p>'
-    });
+  getHTMLData(pageName: string) {
+    return this.http
+      .get<ApiResponse<string>>(`${this._apiUrl}site/content/${pageName}`)
+      .pipe(map(res => res.result ?? ''));
   }
 
   saveData(data: SiteSettings) {
@@ -101,8 +98,8 @@ export class ConfigDataService {
 
   saveHTMLData(data: SettingsDocument) {
     return this.http.post<ApiResponse<SettingsDocument>>(
-      `${this._apiUrl}site/settingsPage`,
-      data
+      `${this._apiUrl}site/content/${data.pageName}`,
+      { content: data.html }
     );
   }
 }

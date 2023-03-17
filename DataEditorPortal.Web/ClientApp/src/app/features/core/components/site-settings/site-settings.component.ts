@@ -35,9 +35,11 @@ export class SiteSettingsComponent implements OnInit {
         })
       )
       .subscribe();
-    this.configDataService.getHTMLData().subscribe(res => {
-      this.formControlAboutEditor.setValue(res?.aboutHtml || '');
-      this.formControlContactEditor.setValue(res?.contactHtml || '');
+    this.configDataService.getHTMLData('about').subscribe(res => {
+      this.formControlAboutEditor.setValue(res);
+    });
+    this.configDataService.getHTMLData('contact').subscribe(res => {
+      this.formControlContactEditor.setValue(res);
     });
   }
   picChange(event: Event) {
