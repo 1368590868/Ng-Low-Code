@@ -12,7 +12,7 @@ namespace DataEditorPortal.Web.Services
     {
         void AddPageRequestLog(EventLogModel model);
         void AddDbQueryLog(string category, string section, string details, object param = null, string result = "");
-        void AddEventLog(string category, string section, string eventName, string details, object param = null, string result = "");
+        void AddEventLog(EventLogModel eventLog);
     }
 
     public class EventLogService : IEventLogService
@@ -84,24 +84,20 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public void AddEventLog(string category, string section, string eventName, string details, object param = null, string result = "")
+        public void AddEventLog(EventLogModel eventLog)
         {
             try
             {
-                var username = string.Empty;
-                if (_httpContextAccessor.HttpContext.User != null && _httpContextAccessor.HttpContext.User.Identity != null)
-                    username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
-
                 _depDbContext.Add(new EventLog()
                 {
-                    Category = category,
-                    EventSection = section.Replace("-", "_").ToUpper(),
-                    EventName = eventName,
+                    Category = eventLog.Category,
+                    EventSection = eventLog.Section.Replace("-", "_").ToUpper(),
+                    EventName = eventLog.Action,
                     EventTime = DateTime.UtcNow,
-                    Username = username,
-                    Details = details,
-                    Params = param != null ? JsonSerializer.Serialize(param) : "",
-                    Result = result
+                    Username = eventLog.Username,
+                    Details = eventLog.Details,
+                    Params = eventLog.Params,
+                    Result = eventLog.Result
                 });
                 _depDbContext.SaveChanges();
             }

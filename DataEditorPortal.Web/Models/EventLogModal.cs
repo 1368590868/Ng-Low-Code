@@ -7,6 +7,8 @@
         public string Section { get; set; }
         public string Details { get; set; }
         public string Params { get; set; }
+        public string Username { get; set; }
+        public string Result { get; set; }
     }
 
     public static class EventLogCategory

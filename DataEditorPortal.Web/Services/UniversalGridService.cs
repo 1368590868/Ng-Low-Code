@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Dapper;
 using DataEditorPortal.Data.Contexts;
-using DataEditorPortal.Data.Models;
 using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
@@ -18,7 +17,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -577,6 +575,16 @@ namespace DataEditorPortal.Web.Services
                     trans.Commit();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
+
+                    // run after saved event handler
+                    AfterSaved(new EventActionModel()
+                    {
+                        EventName = "After Inserting",
+                        EventSection = config.Name,
+                        EventConfig = formLayout.AfterSaved,
+                        Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
+                        ConnectionString = config.DataSourceConnection.ConnectionString
+                    }, model);
                 }
                 catch (Exception ex)
                 {
@@ -587,8 +595,6 @@ namespace DataEditorPortal.Web.Services
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
-
-            Task.Run(() => AfterSaved("AfterInserting", config, formLayout.AfterSaved, model));
 
             return true;
         }
@@ -669,6 +675,16 @@ namespace DataEditorPortal.Web.Services
                     trans.Commit();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, $"{affected} rows affected.");
+
+                    // run after saved event
+                    AfterSaved(new EventActionModel()
+                    {
+                        EventName = "After Updating",
+                        EventSection = config.Name,
+                        EventConfig = formLayout.AfterSaved,
+                        Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
+                        ConnectionString = config.DataSourceConnection.ConnectionString
+                    }, model);
                 }
                 catch (Exception ex)
                 {
@@ -679,8 +695,6 @@ namespace DataEditorPortal.Web.Services
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
-
-            Task.Run(() => AfterSaved("AfterUpdating", config, formLayout.AfterSaved, model));
 
             return true;
         }
@@ -708,6 +722,12 @@ namespace DataEditorPortal.Web.Services
                 QueryText = detailConfig.DeletingForm?.QueryText
             });
 
+            var param = _queryBuilder.GenerateDynamicParameter(
+                        new List<KeyValuePair<string, object>>() {
+                            new KeyValuePair<string, object>(dataSourceConfig.IdColumn, ids)
+                        }
+                    );
+
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
@@ -716,25 +736,30 @@ namespace DataEditorPortal.Web.Services
 
                 try
                 {
-                    var param = _queryBuilder.GenerateDynamicParameter(
-                        new List<KeyValuePair<string, object>>() {
-                            new KeyValuePair<string, object>(dataSourceConfig.IdColumn, ids)
-                        }
-                    );
-
-                    con.Execute(queryText, param, trans);
+                    var affected = con.Execute(queryText, param, trans);
                     trans.Commit();
+
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
+
+                    // run after saved event
+                    AfterSaved(new EventActionModel()
+                    {
+                        EventName = "After Deleting",
+                        EventSection = config.Name,
+                        EventConfig = detailConfig.DeletingForm.AfterSaved,
+                        Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
+                        ConnectionString = config.DataSourceConnection.ConnectionString
+                    }, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
                 }
                 catch (Exception ex)
                 {
                     trans.Rollback();
 
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
-
-            Task.Run(() => AfterSaved("AfterDeleting", config, detailConfig.DeletingForm.AfterSaved, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } }));
 
             return true;
         }
@@ -807,61 +832,89 @@ namespace DataEditorPortal.Web.Services
 
         #region Event
 
-        private void AfterSaved(string name, UniversalGridConfiguration config, FormEventConfig eventConfig, Dictionary<string, object> model)
+        private void AfterSaved(EventActionModel actionConfig, Dictionary<string, object> model)
         {
+            var eventConfig = actionConfig.EventConfig;
+
             if (eventConfig == null || string.IsNullOrEmpty(eventConfig.Script)) return;
 
-            if (eventConfig.EventType == FormEventType.QueryText || eventConfig.EventType == FormEventType.QueryStoredProcedure)
+            try
             {
-                var commandType = eventConfig.EventType == FormEventType.QueryText ? CommandType.Text : CommandType.StoredProcedure;
-                var queryText = _queryBuilder.ReplaceQueryParamters(eventConfig.Script);
-                var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
-
-                try
+                if (eventConfig.EventType == FormEventType.QueryText || eventConfig.EventType == FormEventType.QueryStoredProcedure)
                 {
+                    var commandType = eventConfig.EventType == FormEventType.QueryText ? CommandType.Text : CommandType.StoredProcedure;
+                    var queryText = _queryBuilder.ReplaceQueryParamters(eventConfig.Script);
+                    var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
+
                     using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                     {
-                        con.ConnectionString = config.DataSourceConnection.ConnectionString;
+                        con.ConnectionString = actionConfig.ConnectionString;
 
                         con.Execute(queryText, param, null, null, commandType);
                     }
-                    _eventLogService.AddEventLog(EventLogCategory.INFO, config.Name, name, queryText, param);
-                }
-                catch (Exception ex)
-                {
-                    _eventLogService.AddEventLog(EventLogCategory.Error, config.Name, name, queryText, param);
-                    _logger.LogError(ex.Message, ex);
-                }
-            }
 
-            if (eventConfig.EventType == FormEventType.CommandLine)
-            {
-                var process = new Process();
-                process.StartInfo.WorkingDirectory = "";
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardInput = true;
-                process.Start();
-
-                using (StreamWriter sw = process.StandardInput)
-                {
-                    if (sw.BaseStream.CanWrite)
+                    _eventLogService.AddEventLog(new EventLogModel()
                     {
-                        var cmds = eventConfig.Script.Split(new string[] { "\r", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (var cmd in cmds)
+                        Category = EventLogCategory.INFO,
+                        Section = actionConfig.EventSection,
+                        Action = actionConfig.EventName,
+                        Username = actionConfig.Username,
+                        Details = queryText,
+                        Params = param != null ? JsonSerializer.Serialize(param) : ""
+                    });
+                }
+
+                if (eventConfig.EventType == FormEventType.CommandLine)
+                {
+                    var process = new Process();
+                    process.StartInfo.WorkingDirectory = "";
+                    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    process.StartInfo.FileName = "cmd.exe";
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.CreateNoWindow = true;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardInput = true;
+                    process.Start();
+
+                    using (StreamWriter sw = process.StandardInput)
+                    {
+                        if (sw.BaseStream.CanWrite)
                         {
-                            sw.WriteLine(cmd);
+                            var cmds = eventConfig.Script.Split(new string[] { "\r", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var cmd in cmds)
+                            {
+                                sw.WriteLine(cmd);
+                            }
                         }
                     }
+
+                    _eventLogService.AddEventLog(new EventLogModel()
+                    {
+                        Category = EventLogCategory.INFO,
+                        Section = actionConfig.EventSection,
+                        Action = actionConfig.EventName,
+                        Username = actionConfig.Username,
+                        Details = eventConfig.Script
+                    });
+
                 }
-
-                _eventLogService.AddEventLog(EventLogCategory.INFO, config.Name, name, eventConfig.Script);
             }
-        }
+            catch (Exception ex)
+            {
+                _eventLogService.AddEventLog(new EventLogModel()
+                {
+                    Category = EventLogCategory.Error,
+                    Section = actionConfig.EventSection,
+                    Action = actionConfig.EventName,
+                    Username = actionConfig.Username,
+                    Details = JsonSerializer.Serialize(eventConfig),
+                    Params = JsonSerializer.Serialize(model),
+                    Result = ex.Message
+                });
+                _logger.LogError(ex.Message, ex);
+            }
 
-        #endregion
+            #endregion
+        }
     }
 }
