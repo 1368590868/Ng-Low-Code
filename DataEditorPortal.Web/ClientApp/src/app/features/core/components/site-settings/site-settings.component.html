@@ -5,8 +5,8 @@
     <p-divider styleClass="mt-0"></p-divider>
     <div class="w-full pb-1" style="margin-top: -1rem">
       <p-tabView>
-        <p-tabPanel header="Settings for Header">
-          <div class="w-6 mb-3">
+        <p-tabPanel header="Settings for Site">
+          <div class="w-6 mb-3 mt-3">
             <p class="mb-2">Site Logo</p>
             <div class="flex align-items-start justify-content-between mb-3">
               <div class="flex align-items-center">
@@ -62,63 +62,42 @@
                 placeholder="Enter a value" />
             </div>
           </div>
-          <div class="flex align-items-center w-6 mt-8">
-            <p-button
-              label="Cancle"
-              icon="pi pi-times"
-              class="ml-auto"
-              styleClass="p-button-outlined"
-              (onClick)="onCancle()"></p-button>
+          <div class="flex align-items-center w-6 mt-4">
             <p-button
               label="Save"
               icon="pi pi-save"
-              [style]="{ 'margin-left': '.5em' }"
               [loading]="isLoading"
               [disabled]="isLoading"
               (onClick)="onSave()"></p-button>
           </div>
         </p-tabPanel>
-        <p-tabPanel header="Settings for About">
-          <div class="w-full mb-4">
+        <p-tabPanel header="Content for About">
+          <div class="w-full mb-4 mt-3">
             <p class="mb-2">Site About</p>
             <div>
               <p-editor [formControl]="formControlAboutEditor"></p-editor>
             </div>
           </div>
-          <div class="flex align-items-center w-full mt-8">
-            <p-button
-              label="Cancle"
-              icon="pi pi-times"
-              class="ml-auto"
-              styleClass="p-button-outlined"
-              (onClick)="onCancle()"></p-button>
+          <div class="flex align-items-center w-full mt-4">
             <p-button
               label="Save"
               icon="pi pi-save"
-              [style]="{ 'margin-left': '.5em' }"
               [loading]="isLoading"
               [disabled]="isLoading"
               (onClick)="onSaveAbout()"></p-button>
           </div>
         </p-tabPanel>
-        <p-tabPanel header="Settings for Contact">
-          <div class="w-full mb-4">
+        <p-tabPanel header="Content for Contact">
+          <div class="w-full mb-4 mt-3">
             <p class="mb-2">Site Contact</p>
             <div>
               <p-editor [formControl]="formControlContactEditor"></p-editor>
             </div>
           </div>
-          <div class="flex align-items-center w-full mt-8">
-            <p-button
-              label="Cancle"
-              icon="pi pi-times"
-              class="ml-auto"
-              styleClass="p-button-outlined"
-              (onClick)="onCancle()"></p-button>
+          <div class="flex align-items-center w-full mt-4">
             <p-button
               label="Save"
               icon="pi pi-save"
-              [style]="{ 'margin-left': '.5em' }"
               [loading]="isLoading"
               [disabled]="isLoading"
               (onClick)="onSaveContact()"></p-button>

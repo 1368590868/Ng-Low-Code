@@ -1,5 +1,8 @@
-﻿using DataEditorPortal.Data.Contexts;
+﻿using AutoWrapper.Wrappers;
+using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common;
+using DataEditorPortal.Web.Common.License;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -21,22 +24,26 @@ namespace DataEditorPortal.Web.Controllers
         private readonly DepDbContext _depDbContext;
         private readonly IConfiguration _config;
         private readonly IUserService _userService;
+        private readonly ILicenseService _licenseService;
 
         public SiteController(
             ILogger<SiteController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
-            IUserService userService)
+            IUserService userService,
+            ILicenseService licenseService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _config = config;
             _userService = userService;
+            _licenseService = licenseService;
         }
 
         [HttpGet]
         [Route("settings")]
         [AllowAnonymous]
+        [NoLicenseCheck]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public dynamic GetSettings()
         {
@@ -98,6 +105,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("menus")]
+        [NoLicenseCheck]
         public dynamic GetMenus()
         {
             var username = AppUser.ParseUsername(User.Identity.Name).Username;
@@ -167,6 +175,61 @@ namespace DataEditorPortal.Web.Controllers
                 .Where(x => x.type != "Folder" || x.items != null);
 
             return root;
+        }
+
+        [HttpGet]
+        [Route("content/{contentName}")]
+        [AllowAnonymous]
+        [NoLicenseCheck]
+        public string GetSiteContent(string contentName)
+        {
+            var item = _depDbContext.SiteContents.FirstOrDefault(x => x.ContentName == contentName);
+            if (item == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            return item.Content;
+        }
+
+        [HttpPost]
+        [Route("content/{contentName}")]
+        public bool UpdateSiteContent(string contentName, [FromBody] SiteContent siteContent)
+        {
+            var item = _depDbContext.SiteContents.FirstOrDefault(x => x.ContentName == contentName);
+            if (item == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            item.Content = siteContent.Content;
+            _depDbContext.SaveChanges();
+
+            return true;
+        }
+
+        [HttpGet]
+        [Route("license")]
+        [NoLicenseCheck]
+        public string GetSiteLicense(string contentName)
+        {
+            return _licenseService.GetLicense();
+        }
+
+        [HttpPost]
+        [NoLicenseCheck]
+        [Route("license")]
+        public bool UpdateSiteLicense([FromBody] SiteSetting setting)
+        {
+            var item = _depDbContext.SiteContents.FirstOrDefault();
+            if (item == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            _licenseService.SetLicense(setting.License);
+
+            return true;
         }
     }
 }

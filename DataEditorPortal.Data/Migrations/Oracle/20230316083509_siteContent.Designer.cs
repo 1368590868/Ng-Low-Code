@@ -10,8 +10,8 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace DataEditorPortal.Data.Migrations.Oracle
 {
     [DbContext(typeof(DepDbContextOracle))]
-    [Migration("20230310095721_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20230316083509_siteContent")]
+    partial class siteContent
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -111,7 +111,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnName("NUMBER");
 
                     b.Property<decimal>("Total")
-                        .HasColumnType("DECIMAL(18, 2)")
+                        .HasColumnType("DECIMAL(18,2)")
                         .HasColumnName("TOTAL");
 
                     b.Property<string>("Vendor")
@@ -191,6 +191,26 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.HasIndex("DataSourceConnectionId");
 
                     b.ToTable("LOOKUPS");
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.SiteContent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("RAW(16)")
+                        .HasColumnName("ID");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("CLOB")
+                        .HasColumnName("CONTENT");
+
+                    b.Property<string>("ContentName")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("CONTENT_NAME");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SITE_CONTENTS");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteMenu", b =>
@@ -331,6 +351,10 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnType("NUMBER(1)")
                         .HasColumnName("INSTALLED");
 
+                    b.Property<string>("License")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("LICENSE");
+
                     b.Property<string>("SiteLogo")
                         .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("SITE_LOGO");
@@ -352,7 +376,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnName("ID");
 
                     b.Property<string>("ColumnsConfig")
-                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnType("CLOB")
                         .HasColumnName("COLUMNS_CONFIG");
 
                     b.Property<bool>("ConfigCompleted")
@@ -384,7 +408,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnName("DATA_SOURCE_CONNECTION_ID");
 
                     b.Property<string>("DetailConfig")
-                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnType("CLOB")
                         .HasColumnName("DETAIL_CONFIG");
 
                     b.Property<string>("Name")
@@ -392,7 +416,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnName("NAME");
 
                     b.Property<string>("SearchConfig")
-                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnType("CLOB")
                         .HasColumnName("SEARCH_CONFIG");
 
                     b.HasKey("Id");

@@ -2,11 +2,13 @@ using AutoWrapper;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Common.Install;
+using DataEditorPortal.Web.Common.License;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -103,6 +105,7 @@ namespace DataEditorPortal.Web
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IEventLogService, EventLogService>();
+            services.AddSingleton<ILicenseService, LicenseService>();
 
             #endregion
 
@@ -123,7 +126,11 @@ namespace DataEditorPortal.Web
 
             services.AddAutoMapper(typeof(Startup));
 
-            services.AddControllersWithViews().AddJsonOptions(options =>
+            services.AddControllersWithViews(configure =>
+            {
+                configure.Filters.Add<LicenseActionFilter>();
+            })
+            .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new IsoDateTimeConverter());
             });
@@ -138,6 +145,9 @@ namespace DataEditorPortal.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            // Enable Log files
+            loggerFactory.AddFile(Configuration.GetSection("Logging"));
+
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetService<DepDbContext>();
@@ -149,9 +159,6 @@ namespace DataEditorPortal.Web
                     seedDataCreator.Create();
                 }
             }
-
-            // Enable Log files
-            loggerFactory.AddFile(Configuration.GetSection("Logging"));
 
             if (env.IsDevelopment())
             {
@@ -166,7 +173,7 @@ namespace DataEditorPortal.Web
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSpaStaticFiles();
+            app.UseSpaStaticFiles(new StaticFileOptions() { HttpsCompression = HttpsCompressionMode.Compress });
 
             app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions()
             {

@@ -3,6 +3,7 @@ using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -15,12 +16,13 @@ namespace DataEditorPortal.Web.Services
         string UsePagination(string query, int startIndex, int indexCount, List<SortParam> sortParams);
         string UseOrderBy(string query, List<SortParam> sortParams = null);
         string UseFilters(string query, List<FilterParam> filterParams = null);
-        string UseSearches(string query, List<SearchParam> filterParams = null);
+        string UseSearches(string query, List<FilterParam> filterParams = null);
         string GetFilterType(DataRow schema);
         string ParameterName(string name);
         object GetJsonElementValue(JsonElement jsonElement);
         object TransformValue(object value, DataRow schema);
-
+        object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues);
+        string ReplaceQueryParamters(string queryText);
         // universal grid
         string GenerateSqlTextForList(DataSourceConfig config);
         string GenerateSqlTextForDetail(DataSourceConfig config);
@@ -61,7 +63,7 @@ namespace DataEditorPortal.Web.Services
             return string.Join(" AND ", filters);
         }
 
-        protected abstract string GenerateCriteriaClause(FilterParam item, string whereClause = null);
+        protected abstract string GenerateCriteriaClause(FilterParam item);
 
         protected virtual string GenerateOrderClause(List<SortParam> sortParams)
         {
@@ -70,14 +72,7 @@ namespace DataEditorPortal.Web.Services
             {
                 foreach (var item in sortParams)
                 {
-
                     string field = item.field;
-                    if (item.dBFieldExpression != null)
-                    {
-                        field = item.dBFieldExpression;
-                    }
-
-
                     if (item.order == 1)
                     {
                         orders.Add($"{EscapeColumnName(field)} ASC ");
@@ -158,9 +153,9 @@ namespace DataEditorPortal.Web.Services
                 : query.Replace("##FILTERS##", " 1=1 ");
         }
 
-        public virtual string UseSearches(string query, List<SearchParam> filterParams = null)
+        public virtual string UseSearches(string query, List<FilterParam> filterParams = null)
         {
-            if (filterParams == null) filterParams = new List<SearchParam>();
+            if (filterParams == null) filterParams = new List<FilterParam>();
 
             List<string> filters = new List<string>();
 
@@ -168,7 +163,7 @@ namespace DataEditorPortal.Web.Services
             {
                 if (!string.IsNullOrEmpty(item.value.ToString()))
                 {
-                    var criteriaStr = GenerateCriteriaClause(item, item.whereClause);
+                    var criteriaStr = GenerateCriteriaClause(item);
                     if (!string.IsNullOrEmpty(criteriaStr))
                         filters.Add(criteriaStr);
                 }
@@ -176,7 +171,7 @@ namespace DataEditorPortal.Web.Services
 
             return filters.Any()
                 ? query.Replace("##SEARCHES##", $" ({string.Join(" AND ", filters)}) ")
-                : query.Replace("##SEARCHES##", " 1=1");
+                : query.Replace("##SEARCHES##", " 1=1 ");
         }
 
         public virtual string GetFilterType(DataRow schema)
@@ -233,6 +228,23 @@ namespace DataEditorPortal.Web.Services
         public virtual object TransformValue(object value, DataRow schema)
         {
             return value;
+        }
+
+        public virtual object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues)
+        {
+            var dict = new Dictionary<string, object>();
+            foreach (var item in keyValues)
+            {
+                var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(item.Value));
+                dict.Add(ParameterName(item.Key), GetJsonElementValue(jsonElement));
+            }
+
+            dynamic param = dict.Aggregate(
+                new ExpandoObject() as IDictionary<string, object>,
+                (a, p) => { a.Add(p); return a; }
+            );
+
+            return (object)param;
         }
 
         #endregion

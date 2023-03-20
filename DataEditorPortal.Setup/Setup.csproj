@@ -17,7 +17,13 @@
 
   <Target Name="PublishWeb" AfterTargets="ComputeFilesToPublish">
       <Exec Command="dotnet publish &quot;$(SolutionDir)\DataEditorPortal.Web\DataEditorPortal.Web.csproj&quot; --configuration Release /p:PublishProfile=Production --output &quot;$(ProjectDir)\web&quot;" />
-
+      
+      <Exec Command="dotnet build &quot;$(SolutionDir)LicenseGenerator\LicenseGenerator.csproj&quot; --configuration Release"></Exec>
+      <Exec Command="LicenseGenerator.exe /free-trial" WorkingDirectory="$(SolutionDir)LicenseGenerator/bin/Release/net5.0" ConsoleToMsBuild="true" >
+          <Output TaskParameter="ConsoleOutput" ItemName="license"/>
+      </Exec>
+      <WriteLinesToFile File="web\license.dat" Lines="@(license)" Overwrite="true" Encoding="ASCII"/>
+      
       <ItemGroup>
           <WebFiles Include="web\**" />
           <ResolvedFileToPublish Include="@(WebFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
@@ -28,7 +34,7 @@
       </ItemGroup>
   </Target>
 
-    <Target Name="CleanPublishWeb" AfterTargets="Publish">
-        <RemoveDir Directories="web" />
-    </Target>
+  <Target Name="CleanPublishWeb" AfterTargets="Publish">
+      <RemoveDir Directories="web" />
+  </Target>
 </Project>

@@ -4,14 +4,16 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20230316061839_syncDb")]
+    partial class syncDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -189,26 +191,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.HasIndex("DataSourceConnectionId");
 
                     b.ToTable("LOOKUPS");
-                });
-
-            modelBuilder.Entity("DataEditorPortal.Data.Models.SiteContent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ID");
-
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("CONTENT");
-
-                    b.Property<string>("ContentName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("CONTENT_NAME");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SITE_CONTENTS");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteMenu", b =>

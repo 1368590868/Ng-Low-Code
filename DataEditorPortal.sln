@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataEditorPortal.ExcelExpor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Setup", "DataEditorPortal.Setup\Setup.csproj", "{68BC8666-64C0-4710-8B0A-DBA17ACD78A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicenseGenerator", "LicenseGenerator\LicenseGenerator.csproj", "{B0F6A85A-6644-44B5-81C1-41513677B5FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{68BC8666-64C0-4710-8B0A-DBA17ACD78A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68BC8666-64C0-4710-8B0A-DBA17ACD78A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68BC8666-64C0-4710-8B0A-DBA17ACD78A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0F6A85A-6644-44B5-81C1-41513677B5FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0F6A85A-6644-44B5-81C1-41513677B5FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0F6A85A-6644-44B5-81C1-41513677B5FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0F6A85A-6644-44B5-81C1-41513677B5FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
