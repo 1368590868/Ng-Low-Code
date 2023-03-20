@@ -153,13 +153,14 @@ namespace DataEditorPortal.Web.Controllers
 
                 using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                 {
+                    con.ConnectionString = lookup.DataSourceConnection.ConnectionString;
+
                     DataTable schema;
                     using (var dr = con.ExecuteReader(query.Item1, query.Item2))
                     {
                         schema = dr.GetSchemaTable();
                     }
 
-                    con.ConnectionString = lookup.DataSourceConnection.ConnectionString;
                     var data = con.Query(query.Item1, query.Item2).ToList();
                     data.ForEach(item =>
                     {

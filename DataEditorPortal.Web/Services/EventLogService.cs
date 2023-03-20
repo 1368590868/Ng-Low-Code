@@ -12,6 +12,7 @@ namespace DataEditorPortal.Web.Services
     {
         void AddPageRequestLog(EventLogModel model);
         void AddDbQueryLog(string category, string section, string details, object param = null, string result = "");
+        void AddEventLog(string category, string section, string eventName, string details, object param = null, string result = "");
     }
 
     public class EventLogService : IEventLogService
@@ -69,6 +70,33 @@ namespace DataEditorPortal.Web.Services
                     Category = category,
                     EventSection = section.Replace("-", "_").ToUpper(),
                     EventName = "Database Query",
+                    EventTime = DateTime.UtcNow,
+                    Username = username,
+                    Details = details,
+                    Params = param != null ? JsonSerializer.Serialize(param) : "",
+                    Result = result
+                });
+                _depDbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+            }
+        }
+
+        public void AddEventLog(string category, string section, string eventName, string details, object param = null, string result = "")
+        {
+            try
+            {
+                var username = string.Empty;
+                if (_httpContextAccessor.HttpContext.User != null && _httpContextAccessor.HttpContext.User.Identity != null)
+                    username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
+
+                _depDbContext.Add(new EventLog()
+                {
+                    Category = category,
+                    EventSection = section.Replace("-", "_").ToUpper(),
+                    EventName = eventName,
                     EventTime = DateTime.UtcNow,
                     Username = username,
                     Details = details,

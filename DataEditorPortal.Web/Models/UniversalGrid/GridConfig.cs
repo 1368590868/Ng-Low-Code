@@ -117,7 +117,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public enum FormEventType
     {
-        QueryText, QueryStoredProcedure, Python, Javascript
+        QueryText, QueryStoredProcedure, CommandLine, Javascript
     }
 
     public class FormEventConfig

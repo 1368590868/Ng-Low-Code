@@ -211,9 +211,14 @@ namespace DataEditorPortal.Web.Controllers
         [HttpGet]
         [Route("license")]
         [NoLicenseCheck]
-        public string GetSiteLicense(string contentName)
+        public dynamic GetSiteLicense()
         {
-            return _licenseService.GetLicense();
+            var license = _licenseService.GetLicense();
+            return new
+            {
+                license = license,
+                isExpired = _licenseService.IsExpired(license)
+            };
         }
 
         [HttpPost]

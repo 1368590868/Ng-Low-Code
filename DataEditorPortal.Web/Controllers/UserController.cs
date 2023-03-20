@@ -1,6 +1,7 @@
 ﻿using AutoWrapper.Wrappers;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common.License;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -36,6 +37,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [NoLicenseCheck]
         [Route("getLoggedInUser")]
         public AppUser GetLoggedInUser()
         {

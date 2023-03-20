@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Dapper;
 using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.Data.Models;
 using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
@@ -587,7 +588,7 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
-            AfterSavedAsync("AfterUpdating", formLayout.AfterSaved, model);
+            Task.Run(() => AfterSaved("AfterInserting", config, formLayout.AfterSaved, model));
 
             return true;
         }
@@ -679,7 +680,7 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
-            AfterSavedAsync("AfterUpdating", formLayout.AfterSaved, model);
+            Task.Run(() => AfterSaved("AfterUpdating", config, formLayout.AfterSaved, model));
 
             return true;
         }
@@ -732,6 +733,8 @@ namespace DataEditorPortal.Web.Services
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
+
+            Task.Run(() => AfterSaved("AfterDeleting", config, detailConfig.DeletingForm.AfterSaved, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } }));
 
             return true;
         }
@@ -804,54 +807,59 @@ namespace DataEditorPortal.Web.Services
 
         #region Event
 
-        private async void AfterSavedAsync(string name, FormEventConfig eventConfig, Dictionary<string, object> model)
+        private void AfterSaved(string name, UniversalGridConfiguration config, FormEventConfig eventConfig, Dictionary<string, object> model)
         {
-            await Task.Run(() =>
+            if (eventConfig == null || string.IsNullOrEmpty(eventConfig.Script)) return;
+
+            if (eventConfig.EventType == FormEventType.QueryText || eventConfig.EventType == FormEventType.QueryStoredProcedure)
             {
-                if (eventConfig == null || string.IsNullOrEmpty(eventConfig.Script)) return;
+                var commandType = eventConfig.EventType == FormEventType.QueryText ? CommandType.Text : CommandType.StoredProcedure;
+                var queryText = _queryBuilder.ReplaceQueryParamters(eventConfig.Script);
+                var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
 
-                if (eventConfig.EventType == FormEventType.QueryText || eventConfig.EventType == FormEventType.QueryStoredProcedure)
+                try
                 {
-                    try
+                    using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                     {
-                        using (var con = _serviceProvider.GetRequiredService<DbConnection>())
-                        {
-                            var queryText = _queryBuilder.ReplaceQueryParamters(eventConfig.Script);
-                            var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
-                            con.Execute(queryText, param);
-                        }
+                        con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
+                        con.Execute(queryText, param, null, null, commandType);
                     }
-                    catch (Exception ex)
+                    _eventLogService.AddEventLog(EventLogCategory.INFO, config.Name, name, queryText, param);
+                }
+                catch (Exception ex)
+                {
+                    _eventLogService.AddEventLog(EventLogCategory.Error, config.Name, name, queryText, param);
+                    _logger.LogError(ex.Message, ex);
+                }
+            }
+
+            if (eventConfig.EventType == FormEventType.CommandLine)
+            {
+                var process = new Process();
+                process.StartInfo.WorkingDirectory = "";
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardInput = true;
+                process.Start();
+
+                using (StreamWriter sw = process.StandardInput)
+                {
+                    if (sw.BaseStream.CanWrite)
                     {
-                        _logger.LogError(ex.Message, ex);
+                        var cmds = eventConfig.Script.Split(new string[] { "\r", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var cmd in cmds)
+                        {
+                            sw.WriteLine(cmd);
+                        }
                     }
                 }
 
-                if (eventConfig.EventType == FormEventType.Python)
-                {
-                    var process = new Process();
-                    process.StartInfo.WorkingDirectory = "";
-                    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    process.StartInfo.FileName = "cmd.exe";
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.CreateNoWindow = true;
-                    process.StartInfo.RedirectStandardOutput = true;
-                    process.StartInfo.RedirectStandardInput = true;
-                    process.Start();
-
-                    using (StreamWriter sw = process.StandardInput)
-                    {
-                        if (sw.BaseStream.CanWrite)
-                        {
-                            var cmds = eventConfig.Script.Split(new string[] { "\r", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                            foreach (var cmd in cmds)
-                            {
-                                sw.WriteLine(cmd);
-                            }
-                        }
-                    }
-                }
-            });
+                _eventLogService.AddEventLog(EventLogCategory.INFO, config.Name, name, eventConfig.Script);
+            }
         }
 
         #endregion

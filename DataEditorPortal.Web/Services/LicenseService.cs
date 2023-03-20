@@ -82,11 +82,14 @@ namespace DataEditorPortal.Web.Common
             if (!IsValid(license))
                 throw new DepException("The license provided is not valid.");
 
-            var depDbContext = _serviceProvider.GetRequiredService<DepDbContext>();
-            var siteSetting = depDbContext.SiteSettings.FirstOrDefault();
-            siteSetting.License = license;
-            depDbContext.SaveChanges();
-            depDbContext.DisposeAsync();
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var depDbContext = scope.ServiceProvider.GetRequiredService<DepDbContext>();
+                var siteSetting = depDbContext.SiteSettings.FirstOrDefault();
+                siteSetting.License = license;
+                depDbContext.SaveChanges();
+                depDbContext.DisposeAsync();
+            }
 
             _license = license;
         }
