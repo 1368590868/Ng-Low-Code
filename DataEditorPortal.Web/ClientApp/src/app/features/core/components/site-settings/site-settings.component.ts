@@ -12,11 +12,14 @@ export class SiteSettingsComponent implements OnInit {
   @ViewChild('file') file!: HTMLInputElement;
   public picTips = false;
   public isLoading = false;
+  public siteLicense = '';
+  public visible = false;
 
   public siteLogo = '';
   public formControlSiteName = new FormControl('');
   public formControlAboutEditor = new FormControl('');
   public formControlContactEditor = new FormControl('');
+  public formControlLicense = new FormControl('');
 
   constructor(
     public configDataService: ConfigDataService,
@@ -24,22 +27,31 @@ export class SiteSettingsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.configDataService
-      .getSiteSettings()
-      .pipe(
-        tap(res => {
-          if (!res.isError && res.result) {
-            this.siteLogo = res.result.siteLogo || '';
-            this.formControlSiteName.setValue(res.result.siteName);
-          }
-        })
-      )
-      .subscribe();
-    this.configDataService.getHTMLData('about').subscribe(res => {
-      this.formControlAboutEditor.setValue(res);
-    });
-    this.configDataService.getHTMLData('contact').subscribe(res => {
-      this.formControlContactEditor.setValue(res);
+    if (!this.configDataService.licenseExpired) {
+      this.configDataService
+        .getSiteSettings()
+        .pipe(
+          tap(res => {
+            if (!res.isError && res.result) {
+              this.siteLogo = res.result.siteLogo || '';
+              this.formControlSiteName.setValue(res.result.siteName);
+            }
+          })
+        )
+        .subscribe();
+      this.configDataService.getHTMLData('about').subscribe(res => {
+        this.formControlAboutEditor.setValue(res);
+      });
+      this.configDataService.getHTMLData('contact').subscribe(res => {
+        this.formControlContactEditor.setValue(res);
+      });
+    }
+
+    this.configDataService.getLicense().subscribe(res => {
+      if (res.isExpired) {
+        this.configDataService.licenseExpired = true;
+      }
+      this.siteLicense = res.license;
     });
   }
   picChange(event: Event) {
@@ -134,7 +146,6 @@ export class SiteSettingsComponent implements OnInit {
       this.notifyService.notifyWarning('', 'Please input content');
       return;
     }
-    console.log(this.formControlContactEditor.value);
     this.configDataService
       .saveHTMLData({
         pageName: 'contact',
@@ -146,7 +157,28 @@ export class SiteSettingsComponent implements OnInit {
         }
       });
   }
-  onCancle() {
-    history.back();
+
+  onSaveLicense() {
+    if (!this.formControlLicense.valid) {
+      this.formControlLicense.markAsDirty();
+      return;
+    }
+    if (!this.formControlLicense.value) {
+      return;
+    }
+    this.configDataService
+      .saveLicense(this.formControlLicense.value)
+      .subscribe(res => {
+        if (!res.isError) {
+          this.notifyService.notifySuccess('Success', 'Save Success');
+          this.configDataService.licenseExpiredChange$.next(false);
+          this.onCancel();
+        }
+      });
+  }
+
+  onCancel() {
+    this.formControlLicense.reset();
+    this.visible = false;
   }
 }

@@ -5,7 +5,9 @@
     <p-divider styleClass="mt-0"></p-divider>
     <div class="w-full pb-1" style="margin-top: -1rem">
       <p-tabView>
-        <p-tabPanel header="Settings for Site">
+        <p-tabPanel
+          header="Settings for Site"
+          *ngIf="!configDataService.licenseExpired">
           <div class="w-6 mb-3 mt-3">
             <p class="mb-2">Site Logo</p>
             <div class="flex align-items-start justify-content-between mb-3">
@@ -71,7 +73,9 @@
               (onClick)="onSave()"></p-button>
           </div>
         </p-tabPanel>
-        <p-tabPanel header="Content for About">
+        <p-tabPanel
+          header="Content for About"
+          *ngIf="!configDataService.licenseExpired">
           <div class="w-full mb-4 mt-3">
             <p class="mb-2">Site About</p>
             <div>
@@ -87,7 +91,9 @@
               (onClick)="onSaveAbout()"></p-button>
           </div>
         </p-tabPanel>
-        <p-tabPanel header="Content for Contact">
+        <p-tabPanel
+          header="Content for Contact"
+          *ngIf="!configDataService.licenseExpired">
           <div class="w-full mb-4 mt-3">
             <p class="mb-2">Site Contact</p>
             <div>
@@ -103,7 +109,67 @@
               (onClick)="onSaveContact()"></p-button>
           </div>
         </p-tabPanel>
+        <p-tabPanel header="Settings for License">
+          {{ configDataService.licenseExpired }}
+          <div class="w-6 mb-4 mt-3">
+            <p class="mb-2">
+              {{
+                configDataService.licenseExpired
+                  ? 'Your license has expired, please contact the administrator'
+                  : 'Your current license'
+              }}
+            </p>
+            <div>
+              <textarea
+                class="w-full text-color"
+                pInputTextarea
+                rows="10"
+                [value]="siteLicense"
+                disabled="true"></textarea>
+            </div>
+          </div>
+          <div class="flex align-items-center w-full mt-4">
+            <p-button
+              *ngIf="configDataService.licenseExpired"
+              label="License Key"
+              icon="pi pi-key"
+              (onClick)="visible = true"></p-button>
+          </div>
+        </p-tabPanel>
       </p-tabView>
     </div>
   </p-card>
 </div>
+
+<p-dialog
+  header="License Key"
+  [(visible)]="visible"
+  *ngIf="visible"
+  [style]="{ width: '40rem' }"
+  [modal]="true"
+  [dismissableMask]="true"
+  contentStyleClass="border-top-1 surface-border pt-3"
+  appendTo="body">
+  <div class="w-full mb-4">
+    <p class="mb-2">Site License</p>
+    <div>
+      <textarea
+        class="w-full"
+        pInputTextarea
+        rows="10"
+        [required]="true"
+        [formControl]="formControlLicense"></textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button
+      icon="pi pi-times"
+      (onClick)="onCancel()"
+      label="Cancle"
+      styleClass="p-button-text"></p-button>
+    <p-button
+      icon="pi pi-check"
+      (onClick)="onSaveLicense()"
+      label="Save License"></p-button>
+  </ng-template>
+</p-dialog>
