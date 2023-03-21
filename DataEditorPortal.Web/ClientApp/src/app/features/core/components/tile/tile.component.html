@@ -1,6 +1,9 @@
 <div
   class="flex justify-content-center pt-8 bg-gray-300"
-  style="min-height: calc(100% - 7rem)">
+  [style]="{
+    minHeight:
+      homeMenus.length > 0 ? 'calc(100% - 7rem)' : 'calc(100% - 4.25rem)'
+  }">
   <div
     class="w-10 flex align-content-start flex-wrap"
     *ngIf="homeMenus.length > 0; else emptyMessage">
@@ -31,10 +34,12 @@
   <ng-template #emptyMessage>
     <div
       *ngIf="loading"
-      class="flex flex-column justify-content-center align-items-center"
-      style="margin-top: -8rem">
-      <h3 class="text-8xl">404</h3>
-      <span class="text-5xl">Your permissions do not access the content</span>
+      class="flex flex-column justify-content-center align-items-center">
+      <!-- <h3 class="text-8xl">No Pages</h3> -->
+      <span class="text-5xl text-center"
+        >You don't have any pages to access. <br />Please contact
+        administrator.</span
+      >
     </div>
   </ng-template>
 </div>
