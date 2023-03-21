@@ -28,7 +28,7 @@ namespace DataEditorPortal.Web.Common.License
 
             if (_licenseService.IsExpired(license))
             {
-                //context.HttpContext.Response.StatusCode = 420;
+                context.HttpContext.Response.StatusCode = 440;
                 context.Result = new JsonResult(new { licenseIsNotValid = !_licenseService.IsValid(license), licenseIsExpired = true });
             }
         }
