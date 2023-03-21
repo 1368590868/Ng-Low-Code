@@ -69,6 +69,7 @@ import {
   FormLayoutDeleteComponent
 } from './components';
 import { MonacoEditorConfig } from './monaco-editor-config';
+import { EventConfigComponent } from './components/portal-edit/portal-edit-form/form-layout/event-config/event-config.component';
 
 @NgModule({
   declarations: [
@@ -96,7 +97,8 @@ import { MonacoEditorConfig } from './monaco-editor-config';
     FormlyFieldComputedValueEditorComponent,
     AdvancedQueryDialogComponent,
     DbConnectionDialogComponent,
-    FormLayoutDeleteComponent
+    FormLayoutDeleteComponent,
+    EventConfigComponent
   ],
   imports: [
     CommonModule,
