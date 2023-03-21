@@ -27,6 +27,23 @@
       (onMoveAllToTarget)="onMoveToTarget($event)"
       (onMoveAllToSource)="onMoveToSource($event)"
       (onTargetSelect)="onTargetSelect($event)">
+      <ng-template pTemplate="targetHeader">
+        <div
+          class="p-picklist-title flex align-items-center justify-content-between">
+          <span>Selected Fields</span>
+          <p-menu
+            #addNewMenu
+            [popup]="true"
+            [model]="addCustomSearchModels"
+            appendTo="body"
+            styleClass="mt-2"
+            [style]="{ width: 'auto', minWidth: '12.5833rem' }"></p-menu>
+          <p-button
+            label="Add Custom Column"
+            styleClass="p-button-sm p-button-text"
+            (onClick)="addNewMenu.toggle($event)"></p-button>
+        </div>
+      </ng-template>
       <ng-template let-column pTemplate="item">
         <div *ngIf="!column.selected" class="">[{{ column.key }}]</div>
         <app-form-designer-view

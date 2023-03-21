@@ -8,6 +8,7 @@ import {
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions } from '@ngx-formly/core';
+import { MenuItem } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
 import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
@@ -40,6 +41,37 @@ export class PortalEditSearchComponent implements OnInit {
   allSelectedFields: { key: string; type: string }[] = [];
   @ViewChildren(FormDesignerViewComponent)
   formDesignerViews!: FormDesignerViewComponent[];
+
+  addCustomSearchModels: MenuItem[] = [
+    {
+      label: 'Text Field',
+      icon: 'pi pi-fw pi-bars',
+      command: () => {
+        this.onAddCustomColumn('text');
+      }
+    },
+    {
+      label: 'Numeric Field',
+      icon: 'pi pi-fw pi-percentage',
+      command: () => {
+        this.onAddCustomColumn('numeric');
+      }
+    },
+    {
+      label: 'Boolean Field',
+      icon: 'pi pi-fw pi-check-square',
+      command: () => {
+        this.onAddCustomColumn('boolean');
+      }
+    },
+    {
+      label: 'Date Field',
+      icon: 'pi pi-fw pi-calendar',
+      command: () => {
+        this.onAddCustomColumn('date');
+      }
+    }
+  ];
 
   constructor(
     private router: Router,
@@ -188,5 +220,31 @@ export class PortalEditSearchComponent implements OnInit {
     this.router.navigate(['../columns'], {
       relativeTo: this.activatedRoute
     });
+  }
+
+  onAddCustomColumn(filterType: string) {
+    const count = this.targetColumns.filter(
+      x => x.key.indexOf('CUSTOM_SEARCH_') === 0
+    ).length;
+
+    const result = this.controls.filter(c => c.filterType === filterType);
+    const key = `CUSTOM_SEARCH_${count + 1}`;
+
+    this.targetColumns = [
+      {
+        key: key,
+        type: result[0].value,
+        props: {
+          label: key
+        },
+        filterType: filterType,
+        searchRule: {
+          field: key,
+          whereClause: `${key} = ##VALUE##`
+        },
+        selected: true
+      },
+      ...this.targetColumns
+    ];
   }
 }

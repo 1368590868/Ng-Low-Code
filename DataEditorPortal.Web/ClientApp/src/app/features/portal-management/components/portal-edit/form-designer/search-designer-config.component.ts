@@ -80,6 +80,9 @@ export class SearchDesignerConfigComponent
           type: 'searchRuleEditor',
           props: {
             options: []
+          },
+          expressions: {
+            'props.advancedModeOnly': `field.parent.parent.model.key.indexOf('CUSTOM_SEARCH_') === 0`
           }
         }
       ]
