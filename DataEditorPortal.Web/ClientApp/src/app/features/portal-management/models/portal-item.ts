@@ -98,8 +98,8 @@ export interface GirdDetailConfig {
 }
 
 export interface GridEventConfig {
-  EventType: string;
-  Script: string;
+  eventType: string;
+  script: string;
 }
 
 export interface GridFormConfig {
@@ -108,10 +108,8 @@ export interface GridFormConfig {
   customFormName?: string;
   formFields?: GridFormField[];
   queryText?: string;
-  OnValidate?: GridEventConfig;
-  AfterInsert?: GridEventConfig;
-  AfterUpdate?: GridEventConfig;
-  AfterDelete?: GridEventConfig;
+  onValidate?: GridEventConfig;
+  afterSaved?: GridEventConfig;
 }
 
 export interface GridCustomAction {
