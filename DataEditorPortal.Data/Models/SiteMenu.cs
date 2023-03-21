@@ -17,6 +17,8 @@ namespace DataEditorPortal.Data.Models
         public string Label { get; set; }
         [Column("DESCRIPTION")]
         public string Description { get; set; }
+        [Column("HELP_URL")]
+        public string HelpUrl { get; set; }
         [Column("ICON")]
         public string Icon { get; set; }
         [Column("TYPE")]

@@ -11,6 +11,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
         public string Caption { get; set; }
         public string Description { get; set; }
+        public string HelpUrl { get; set; }
         public string DataKey { get; set; }
         public int PageSize { get; set; } = 100;
 

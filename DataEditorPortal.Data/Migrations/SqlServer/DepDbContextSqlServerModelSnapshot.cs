@@ -222,6 +222,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DESCRIPTION");
 
+                    b.Property<string>("HelpUrl")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("HELP_URL");
+
                     b.Property<string>("Icon")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("ICON");

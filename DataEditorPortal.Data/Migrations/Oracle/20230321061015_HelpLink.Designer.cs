@@ -3,15 +3,17 @@ using System;
 using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 
 namespace DataEditorPortal.Data.Migrations.Oracle
 {
     [DbContext(typeof(DepDbContextOracle))]
-    partial class DepDbContextOracleModelSnapshot : ModelSnapshot
+    [Migration("20230321061015_HelpLink")]
+    partial class HelpLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

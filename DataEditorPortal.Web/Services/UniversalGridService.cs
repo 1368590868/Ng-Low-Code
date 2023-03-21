@@ -85,6 +85,7 @@ namespace DataEditorPortal.Web.Services
                 Name = config.Name,
                 DataKey = dataSourceConfig.IdColumn,
                 Description = item.Description,
+                HelpUrl = item.HelpUrl,
                 Caption = item.Label,
                 CustomActions = new List<CustomAction>(),
                 PageSize = dataSourceConfig.PageSize
