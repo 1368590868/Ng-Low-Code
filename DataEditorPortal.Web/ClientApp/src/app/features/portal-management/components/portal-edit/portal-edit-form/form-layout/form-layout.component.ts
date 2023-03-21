@@ -53,15 +53,11 @@ export class FormLayoutComponent {
       this.formControlQueryText.setValue(this._formConfig.queryText);
     }
 
-    if (this._formConfig.OnValidate) {
-      this.formControlOnValidateConfig.setValue(this._formConfig.OnValidate);
+    if (this._formConfig.onValidate) {
+      this.formControlOnValidateConfig.setValue(this._formConfig.onValidate);
     }
-    if (this._formConfig.AfterInsert || this._formConfig.AfterUpdate) {
-      this.formControlAfterConfig.setValue(
-        this._type === 'ADD'
-          ? this._formConfig.AfterInsert
-          : this._formConfig.AfterUpdate
-      );
+    if (this._formConfig.afterSaved) {
+      this.formControlOnAfterSavedConfig.setValue(this._formConfig.afterSaved);
     }
 
     if (val.formFields) {
@@ -99,7 +95,7 @@ export class FormLayoutComponent {
   // showFetchQuery = false;
   formControlQueryText = new FormControl();
   formControlOnValidateConfig = new FormControl();
-  formControlAfterConfig = new FormControl();
+  formControlOnAfterSavedConfig = new FormControl();
 
   constructor(
     private notifyService: NotifyService,
@@ -249,12 +245,9 @@ export class FormLayoutComponent {
     if (!data.useCustomForm) data.formFields = this.targetColumns;
     if (data.queryText === this.helperMessage) data.queryText = undefined;
 
-    data.OnValidate = this.formControlOnValidateConfig.value;
-    if (this._type === 'ADD') {
-      data.AfterInsert = this.formControlAfterConfig.value;
-    } else {
-      data.AfterUpdate = this.formControlAfterConfig.value;
-    }
+    data.onValidate = this.formControlOnValidateConfig.value;
+    data.afterSaved = this.formControlOnAfterSavedConfig.value;
+
     return data;
   }
 
