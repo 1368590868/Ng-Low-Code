@@ -105,13 +105,17 @@ namespace DataEditorPortal.Web.Controllers
             return _portalItemService.ExistName(name, id);
         }
 
-        #region Folder
+        #region Simple Menu
 
         [HttpPost]
-        [Route("folder/create")]
-        public Guid CreateFolder([FromBody] PortalItemData model)
+        [Route("menu-item/create")]
+        public Guid CreateMenuItem([FromBody] PortalItemData model)
         {
             model.Name = _portalItemService.GetCodeName(model.Label);
+
+            if (model.Type == "Folder")
+                model.ParentId = null;
+
             model.Order = _depDbContext.SiteMenus
                     .Where(x => x.ParentId == model.ParentId)
                     .OrderByDescending(x => x.Order)
@@ -120,18 +124,27 @@ namespace DataEditorPortal.Web.Controllers
 
             var siteMenu = _mapper.Map<SiteMenu>(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
-            siteMenu.ParentId = null;
-            siteMenu.Type = "Folder";
-
             _depDbContext.SiteMenus.Add(siteMenu);
+
+            if (siteMenu.Type == "External")
+            {
+                var permission = new SitePermission()
+                {
+                    Category = $"External Link: { model.Label }",
+                    PermissionName = $"View_{ model.Name.Replace("-", "_") }".ToUpper(),
+                    PermissionDescription = $"View { model.Label }"
+                };
+                _depDbContext.Add(permission);
+            }
+
             _depDbContext.SaveChanges();
 
             return siteMenu.Id;
         }
 
         [HttpPut]
-        [Route("folder/{id}/update")]
-        public Guid UpdateFolder(Guid id, [FromBody] PortalItemData model)
+        [Route("menu-item/{id}/update")]
+        public Guid UpdateMenuItem(Guid id, [FromBody] PortalItemData model)
         {
             model.Name = _portalItemService.GetCodeName(model.Label);
 
@@ -140,6 +153,10 @@ namespace DataEditorPortal.Web.Controllers
             {
                 throw new ApiException("Not Found", 404);
             }
+
+            model.Type = siteMenu.Type;
+            if (model.Type == "Folder")
+                model.ParentId = null;
 
             if (siteMenu.ParentId != model.ParentId)
             {
@@ -151,17 +168,20 @@ namespace DataEditorPortal.Web.Controllers
                     .FirstOrDefault() + 1;
             }
 
-            if (siteMenu.Type == "System")
+            if (siteMenu.Type == "External")
             {
-                _mapper.Map(model, siteMenu);
-                siteMenu.Type = "System";
+                // update permissions
+                var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"External Link: { siteMenu.Label }").ToList();
+
+                permissions.ForEach(p =>
+                {
+                    p.Category = p.Category.Replace(siteMenu.Label, model.Label);
+                    p.PermissionName = p.PermissionName.Replace(siteMenu.Name.Replace("-", "_").ToUpper(), model.Name.Replace("-", "_").ToUpper());
+                    p.PermissionDescription = p.PermissionDescription.Replace(siteMenu.Label, model.Label);
+                });
             }
-            else
-            {
-                _mapper.Map(model, siteMenu);
-                siteMenu.ParentId = null;
-                siteMenu.Type = "Folder";
-            }
+
+            _mapper.Map(model, siteMenu);
 
             _depDbContext.SaveChanges();
 
