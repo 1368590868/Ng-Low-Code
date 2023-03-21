@@ -53,6 +53,13 @@ export class FormLayoutComponent {
       this.formControlQueryText.setValue(this._formConfig.queryText);
     }
 
+    if (this._formConfig.onValidate) {
+      this.formControlOnValidateConfig.setValue(this._formConfig.onValidate);
+    }
+    if (this._formConfig.afterSaved) {
+      this.formControlOnAfterSavedConfig.setValue(this._formConfig.afterSaved);
+    }
+
     if (val.formFields) {
       this.targetColumns = val.formFields.map<GridFormField>(x => {
         return {
@@ -87,6 +94,8 @@ export class FormLayoutComponent {
   showQuery = false;
   // showFetchQuery = false;
   formControlQueryText = new FormControl();
+  formControlOnValidateConfig = new FormControl();
+  formControlOnAfterSavedConfig = new FormControl();
 
   constructor(
     private notifyService: NotifyService,
@@ -235,6 +244,10 @@ export class FormLayoutComponent {
     const data = JSON.parse(JSON.stringify(this._formConfig)) as GridFormConfig;
     if (!data.useCustomForm) data.formFields = this.targetColumns;
     if (data.queryText === this.helperMessage) data.queryText = undefined;
+
+    data.onValidate = this.formControlOnValidateConfig.value;
+    data.afterSaved = this.formControlOnAfterSavedConfig.value;
+
     return data;
   }
 

@@ -72,12 +72,64 @@ export class AddPortalDialogComponent {
       }
     },
     {
+      className: 'w-full',
+      fieldGroup: [
+        {
+          key: 'parentId',
+          type: 'select',
+          props: {
+            label: 'Parent Folder',
+            placeholder: 'Please Select',
+            required: true,
+            showClear: false
+          },
+          hooks: {
+            onInit: field => {
+              this.portalItemService.getPortalList().subscribe(res => {
+                if (field.props) {
+                  const options = res
+                    .filter(x => x.data?.['type'] === 'Folder')
+                    .map(x => {
+                      return {
+                        label: `- ${x.data?.['label']}`,
+                        value: x.data?.['id']
+                      };
+                    });
+                  options.splice(0, 0, {
+                    label: 'Root',
+                    value: '<root>'
+                  });
+
+                  field.props.options = options;
+
+                  // reset the dropdown value, if the options come after the model value, dropdown may has no options selected
+                  if (this.model && !this.model['parentId'])
+                    this.model = { ...this.model, parentId: '<root>' };
+                  else this.model = { ...this.model };
+                }
+              });
+            }
+          }
+        },
+        {
+          key: 'link',
+          type: 'input',
+          props: {
+            label: 'External Url',
+            placeholder: 'External Url',
+            required: true
+          }
+        }
+      ],
+      expressions: { hide: `field.parent.model.type !== 'External'` }
+    },
+    {
       key: 'description',
       type: 'textarea',
       className: 'w-full',
       props: {
         label: 'Description',
-        placeholder: 'description'
+        placeholder: 'Description'
       }
     }
   ];
@@ -91,6 +143,8 @@ export class AddPortalDialogComponent {
     this.isLoading = false;
     this.visible = true;
     this.buttonDisabled = false;
+
+    this.options.resetModel?.();
   }
 
   onCancel() {
@@ -104,9 +158,11 @@ export class AddPortalDialogComponent {
   onFormSubmit(model: { [name: string]: unknown }) {
     if (this.form.valid) {
       this.isLoading = true;
+      if (model['parentId'] === '<root>') model['parentId'] = null;
+
       if (model['id']) {
         this.portalItemService
-          .updateRootFolder(model['id'] as string, model)
+          .updateMenuItem(model['id'] as string, model)
           .subscribe(res => {
             if (!res.isError && res.result) {
               this.notifyService.notifySuccess(
@@ -120,7 +176,7 @@ export class AddPortalDialogComponent {
             }
           });
       } else {
-        this.portalItemService.createRootFolder(model).subscribe(res => {
+        this.portalItemService.createMenuItem(model).subscribe(res => {
           if (!res.isError && res.result) {
             this.notifyService.notifySuccess(
               'Success',

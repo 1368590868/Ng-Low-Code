@@ -337,6 +337,6 @@ export class FormlyFieldIconSelectComponent extends FieldType<
     }));
   }
   onFilter() {
-    this.dropdown.scroller.setContentPosition(null);
+    this.dropdown.scroller?.setContentPosition(null);
   }
 }

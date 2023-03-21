@@ -24,6 +24,7 @@ import { MenuModule } from 'primeng/menu';
 import { PaginatorModule } from 'primeng/paginator';
 import { TabViewModule } from 'primeng/tabview';
 import { EditorModule } from 'primeng/editor';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 import {
   HeaderComponent,
@@ -86,7 +87,8 @@ export * from './components';
     MenuModule,
     PaginatorModule,
     TabViewModule,
-    EditorModule
+    EditorModule,
+    InputTextareaModule
   ],
   exports: [
     HeaderComponent,

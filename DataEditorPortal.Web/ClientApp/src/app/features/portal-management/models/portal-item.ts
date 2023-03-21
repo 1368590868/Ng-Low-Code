@@ -97,12 +97,19 @@ export interface GirdDetailConfig {
   infoForm?: GridFormConfig;
 }
 
+export interface GridEventConfig {
+  eventType: string;
+  script: string;
+}
+
 export interface GridFormConfig {
   sameAsAdd?: boolean;
   useCustomForm?: boolean;
   customFormName?: string;
   formFields?: GridFormField[];
   queryText?: string;
+  onValidate?: GridEventConfig;
+  afterSaved?: GridEventConfig;
 }
 
 export interface GridCustomAction {

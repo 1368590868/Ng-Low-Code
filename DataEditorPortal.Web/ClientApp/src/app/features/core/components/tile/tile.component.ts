@@ -25,10 +25,12 @@ export class TileComponent implements OnInit {
             .map(menu => {
               return {
                 ...menu,
-                url:
+                routerLink:
                   menu.type === 'Portal Item'
                     ? `/portal-item/${menu.name.toLowerCase()}`
-                    : menu.link
+                    : menu.type !== 'External'
+                    ? menu.link
+                    : undefined
               };
             });
           this.loading = true;

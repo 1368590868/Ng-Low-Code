@@ -36,6 +36,9 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   }
   _options: any[] = [];
 
+  @Input()
+  advancedModeOnly = false;
+
   visible = false;
   dialogStyle: any = {
     minWidth: '40rem'
@@ -43,7 +46,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
 
   helperMessage =
     '-- Enter the where clause, which will be used to filter data. \r\n' +
-    '-- Use ##VALUE## to reference the field value. \r\n' +
+    '-- Use ##VALUE## to reference current field value. \r\n' +
     '-- E.g. \r\n' +
     '--      FIRST_NAME = ##VALUE## \r\n' +
     "--      FIRST_NAME LIKE ##VALUE## + '%'";
@@ -161,6 +164,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
       [formControl]="formControl"
       [formlyAttributes]="field"
       [options]="props.options"
+      [advancedModeOnly]="props.advancedModeOnly"
       (onChange)="
         props.change && props.change(field, $event)
       "></app-search-rule>
@@ -168,5 +172,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldSearchRuleEditorComponent extends FieldType<
-  FieldTypeConfig<FormlyFieldProps & { options: any[] }>
+  FieldTypeConfig<
+    FormlyFieldProps & { options: any[]; advancedModeOnly: boolean }
+  >
 > {}

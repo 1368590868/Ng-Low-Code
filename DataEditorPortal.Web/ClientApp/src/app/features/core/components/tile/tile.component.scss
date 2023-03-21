@@ -5,6 +5,8 @@
   position: relative;
   overflow: hidden;
   border-radius: var(--border-radius);
+  text-decoration: none;
+  color: var(--text-color);
 
   & > div {
     display: -webkit-box;
@@ -30,4 +32,8 @@
       bottom: 0rem;
     }
   }
+}
+
+a.tile-block::after {
+  background-color: var(--cyan-500);
 }

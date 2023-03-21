@@ -24,6 +24,17 @@ export class PortalListComponent implements OnInit {
       command: () => {
         this.addDialog.header = 'Create Folder';
         this.addDialog.okText = 'Create Folder';
+        this.addDialog.model = { type: 'Folder' };
+        this.addDialog.showDialog();
+      }
+    },
+    {
+      label: 'Create External Link',
+      icon: 'pi pi-fw pi-external-link',
+      command: () => {
+        this.addDialog.header = 'Create External Link';
+        this.addDialog.okText = 'Create';
+        this.addDialog.model = { type: 'External', parentId: '<root>' };
         this.addDialog.showDialog();
       }
     },
@@ -100,7 +111,7 @@ export class PortalListComponent implements OnInit {
           }
         });
       }
-    } else if (row['type'] === 'System') {
+    } else if (row['type'] === 'System' || row['type'] === 'External') {
       items.push({
         label: 'Edit',
         icon: 'pi pi-fw pi-pencil',
@@ -114,6 +125,18 @@ export class PortalListComponent implements OnInit {
       });
     } else {
       items.push({
+        label: 'Edit Folder',
+        icon: 'pi pi-fw pi-pencil',
+        command: () => {
+          // edit folder
+          this.addDialog.header = 'Update Folder details';
+          this.addDialog.okText = 'Update Folder';
+          this.addDialog.model = { ...row };
+          this.addDialog.showDialog();
+        }
+      });
+
+      items.push({
         label: 'New Portal Item',
         icon: 'pi pi-fw pi-plus',
         command: () => {
@@ -124,14 +147,14 @@ export class PortalListComponent implements OnInit {
           });
         }
       });
+
       items.push({
-        label: 'Edit Folder',
-        icon: 'pi pi-fw pi-pencil',
+        label: 'New External Link',
+        icon: 'pi pi-fw pi-external-link',
         command: () => {
-          // edit folder
-          this.addDialog.header = 'Update Folder details';
-          this.addDialog.okText = 'Update Folder';
-          this.addDialog.model = { ...row };
+          this.addDialog.header = 'Create External Link';
+          this.addDialog.okText = 'Create';
+          this.addDialog.model = { type: 'External', parentId: row['id'] };
           this.addDialog.showDialog();
         }
       });

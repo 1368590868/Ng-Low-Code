@@ -7,13 +7,14 @@
     appendTo="body"
     placeholder="Please Select"
     [options]="_options"></p-dropdown>
-  <p-message
-    *ngIf="whereClause"
-    severity="info"
-    text="Use Query Text"
-    styleClass="mr-1"></p-message>
+  <div *ngIf="whereClause" (click)="showDialog()" style="cursor: pointer">
+    <p-message
+      severity="info"
+      text="Use Query Text"
+      styleClass="mr-1"></p-message>
+  </div>
   <p-button
-    *ngIf="whereClause"
+    *ngIf="whereClause && !advancedModeOnly"
     styleClass="p-button-text p-button-rounded remove-btn"
     icon="pi pi-times-circle"
     (onClick)="whereClause = undefined"></p-button>
@@ -40,7 +41,7 @@
         <i
           class="pi pi-question-circle ml-3 text-lg"
           [pTooltip]="
-            'Enter the where clause to filter the data. Use ##VALUE## to reference the value of field.'
+            'Enter the where clause to filter the data. Use ##VALUE## to reference the value of current field.'
           "></i>
       </label>
       <ngx-monaco-editor

@@ -105,7 +105,16 @@ export class PortalEditBasicComponent implements OnInit {
       className: 'w-full',
       props: {
         label: 'Description',
-        placeholder: 'description'
+        placeholder: 'Description'
+      }
+    },
+    {
+      key: 'helpUrl',
+      type: 'input',
+      className: 'w-full',
+      props: {
+        label: 'Help Url',
+        placeholder: 'Help Url'
       }
     }
   ];

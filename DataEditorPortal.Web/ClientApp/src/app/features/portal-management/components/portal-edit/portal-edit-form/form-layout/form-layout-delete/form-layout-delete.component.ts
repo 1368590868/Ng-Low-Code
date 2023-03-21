@@ -25,6 +25,13 @@ export class FormLayoutDeleteComponent {
     } else {
       this.formControlQueryText.setValue(this._formConfig.queryText);
     }
+
+    if (this._formConfig.onValidate) {
+      this.formControlOnValidateConfig.setValue(this._formConfig.onValidate);
+    }
+    if (this._formConfig.afterSaved) {
+      this.formControlOnAfterSavedConfig.setValue(this._formConfig.afterSaved);
+    }
   }
 
   @Input() queryTextRequired = false;
@@ -32,6 +39,8 @@ export class FormLayoutDeleteComponent {
 
   showQuery = false;
   formControlQueryText = new FormControl();
+  formControlOnValidateConfig = new FormControl();
+  formControlOnAfterSavedConfig = new FormControl();
 
   constructor(
     private notifyService: NotifyService,
@@ -95,6 +104,9 @@ export class FormLayoutDeleteComponent {
   getValue(): GridFormConfig {
     const data = JSON.parse(JSON.stringify(this._formConfig)) as GridFormConfig;
     if (data.queryText === this.helperMessage) data.queryText = undefined;
+    data.onValidate = this.formControlOnValidateConfig.value;
+    data.afterSaved = this.formControlOnAfterSavedConfig.value;
+
     return data;
   }
 }

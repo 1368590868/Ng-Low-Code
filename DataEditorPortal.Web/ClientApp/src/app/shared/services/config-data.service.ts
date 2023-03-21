@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { map, Observable, of, Subject, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { map, Observable, Subject, tap } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 import { SiteMenu } from '../models/menu';
 
@@ -29,11 +30,25 @@ export class ConfigDataService {
     webHeaderDescription: '',
     webHeaderMessage: ''
   };
+  public licenseExpired = false;
 
   public menuChange$ = new Subject();
+  public licenseExpiredChange$ = new Subject<boolean>();
 
-  constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
+  constructor(
+    private http: HttpClient,
+    @Inject('API_URL') apiUrl: string,
+    private router: Router
+  ) {
     this._apiUrl = apiUrl;
+    this.licenseExpiredChange$.subscribe(val => {
+      if (this.router.url !== '/site-settings') {
+        if (val) {
+          this.router.navigate(['/site-settings']);
+        }
+      }
+      this.licenseExpired = val;
+    });
   }
 
   getSiteVersion() {
@@ -101,5 +116,19 @@ export class ConfigDataService {
       `${this._apiUrl}site/content/${data.pageName}`,
       { content: data.html }
     );
+  }
+
+  getLicense() {
+    return this.http
+      .get<ApiResponse<{ isExpired: boolean; license: string }>>(
+        `${this._apiUrl}site/license`
+      )
+      .pipe(map(res => res.result ?? { isExpired: false, license: '' }));
+  }
+
+  saveLicense(license: string) {
+    return this.http.post<ApiResponse<string>>(`${this._apiUrl}site/license`, {
+      license
+    });
   }
 }

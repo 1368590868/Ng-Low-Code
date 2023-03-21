@@ -6,5 +6,9 @@
     .ql-editor {
       min-height: 320px;
     }
+    .p-disabled,
+    .p-component:disabled {
+      opacity: 1;
+    }
   }
 }
