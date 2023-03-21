@@ -75,19 +75,19 @@ export class PortalItemService {
       .pipe(map(x => x.result || []));
   }
 
-  createRootFolder(data: PortalItemData): Observable<ApiResponse<string>> {
+  createMenuItem(data: PortalItemData): Observable<ApiResponse<string>> {
     return this.http.post<ApiResponse<string>>(
-      `${this._apiUrl}portal-item/folder/create`,
+      `${this._apiUrl}portal-item/menu-item/create`,
       data
     );
   }
 
-  updateRootFolder(
+  updateMenuItem(
     id: string,
     data: PortalItemData
   ): Observable<ApiResponse<string>> {
     return this.http.put<ApiResponse<string>>(
-      `${this._apiUrl}portal-item/folder/${id}/update`,
+      `${this._apiUrl}portal-item/menu-item/${id}/update`,
       data
     );
   }
