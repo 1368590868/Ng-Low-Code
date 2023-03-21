@@ -1,0 +1,28 @@
+<div class="mt-3">
+  <p-dropdown
+    [formControl]="formControlType"
+    styleClass="w-15rem"
+    appendTo="body"
+    [showClear]="true"
+    placeholder="Please Select"
+    [options]="typeOptions"></p-dropdown>
+
+  <div class="mt-3">
+    <ngx-monaco-editor
+      *ngIf="!isJs"
+      [formControl]="formControlText"
+      (onInit)="onMonacoEditorInit($event)"
+      [style]="{ height: '20rem' }"
+      class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
+      [options]="{}"></ngx-monaco-editor>
+
+    <p-dropdown
+      *ngIf="isJs"
+      [formControl]="formControlText"
+      styleClass="w-15rem"
+      appendTo="body"
+      [showClear]="true"
+      placeholder="Please Select"
+      [options]="jsOptions"></p-dropdown>
+  </div>
+</div>
