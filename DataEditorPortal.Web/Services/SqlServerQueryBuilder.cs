@@ -12,7 +12,7 @@ namespace DataEditorPortal.Web.Services
         protected override string GenerateCriteriaClause(FilterParam item)
         {
             string field = EscapeColumnName(item.field);
-            string parameter = $"{ParameterPrefix}{ParameterName(field)}_{item.index}";
+            string parameter = $"{ParameterPrefix}{ParameterName(item.field)}_{item.index}";
 
             string clause = string.Empty;
             if (!string.IsNullOrEmpty(item.whereClause))
