@@ -27,7 +27,20 @@
       (onSort)="onSort($event)"
       (onStateSave)="onStateSave($event)">
       <ng-template pTemplate="caption">
-        <h3 class="mb-4">{{ tableConfig.caption }}</h3>
+        <div class="mb-4">
+          <h3>
+            {{ tableConfig.caption }}
+            <a
+              class="ml-3 text-primary"
+              [href]="tableConfig.helpUrl"
+              target="_blank"
+              *ngIf="tableConfig.helpUrl"
+              ><i class="pi pi-external-link"></i
+            ></a>
+          </h3>
+          <p class="mt-1 p-card-subtitle">{{ tableConfig.description }}</p>
+        </div>
+
         <div class="table-header flex align-items-center">
           <div class="flex flex-wrap mr-2">
             <ng-template

@@ -20,6 +20,7 @@ export interface GridConfig {
   customDeleteFormName?: string;
   customActions?: GridActionOption[];
   pageSize?: number;
+  helpUrl?: string;
 }
 
 export interface GridColumn {
