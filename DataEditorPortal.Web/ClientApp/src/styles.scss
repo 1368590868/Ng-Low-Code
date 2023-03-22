@@ -82,6 +82,12 @@ formly-form {
   transform: none !important;
   .p-dialog-footer {
     padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    button {
+      margin-right: 0;
+    }
+    p-button + p-button {
+      margin-left: 0.5rem;
+    }
   }
 }
 
@@ -114,12 +120,6 @@ formly-form {
   max-width: 20rem;
 }
 
-.p-button-icon-only {
-  .pi.p-button-icon {
-    font-size: 1.25rem;
-  }
-}
-
 .p-column-filter-overlay {
   min-width: 15rem;
 }
@@ -127,9 +127,14 @@ formly-form {
 .p-checkbox {
   width: 1.571rem;
   height: 1.571rem;
+  .p-checkbox-box {
+    width: 1.571rem;
+    height: 1.571rem;
+  }
 }
 
-.p-checkbox .p-checkbox-box {
-  width: 1.571rem;
-  height: 1.571rem;
+.p-inputnumber {
+  .p-inputnumber-button {
+    line-height: 1;
+  }
 }

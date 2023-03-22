@@ -25,9 +25,10 @@
       [virtualScrollDelay]="0"
       (onFilter)="onFilter($event)"
       (onSort)="onSort($event)"
-      (onStateSave)="onStateSave($event)">
+      (onStateSave)="onStateSave($event)"
+      [tableStyle]="{ tableLayout: 'fixed' }">
       <ng-template pTemplate="caption">
-        <div class="mb-4">
+        <div class="mb-3">
           <h3>
             {{ tableConfig.caption }}
             <a
@@ -123,13 +124,12 @@
 
       <ng-template pTemplate="body" let-data let-columns="columns">
         <tr [pSelectableRow]="data">
-          <td
-            style="width: 2.875rem !important; max-width: 2.875rem !important">
+          <td>
             <p-tableCheckbox
               [value]="data"
               (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
           </td>
-          <td style="width: 5rem !important; max-width: 5rem !important">
+          <td>
             <div class="row-actions flex">
               <ng-template
                 class="flex"
@@ -172,7 +172,7 @@
       </ng-template>
       <ng-template pTemplate="emptymessage" let-columns>
         <tr>
-          <td class="text-center" [attr.colspan]="columns.length + 2">
+          <td class="text-lg" [attr.colspan]="columns.length + 2">
             {{
               this.firstLoadDone
                 ? 'No data were found for your search.'

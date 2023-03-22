@@ -144,7 +144,7 @@ export class TableComponent implements OnInit, OnDestroy {
         label: '',
         icon: 'pi pi-info-circle',
         class: 'flex',
-        buttonStyleClass: 'p-button-lg p-button-rounded p-button-text'
+        buttonStyleClass: 'p-button-text'
       };
       if (this.tableConfig.customViewFormName) {
         actions.push({
@@ -162,7 +162,7 @@ export class TableComponent implements OnInit, OnDestroy {
         label: '',
         icon: 'pi pi-file-edit',
         class: 'flex',
-        buttonStyleClass: 'p-button-lg p-button-rounded p-button-text'
+        buttonStyleClass: ' p-button-text'
       };
       if (this.tableConfig.customEditFormName) {
         actions.push({
