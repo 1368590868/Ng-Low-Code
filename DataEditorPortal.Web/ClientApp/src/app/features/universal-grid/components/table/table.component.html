@@ -28,39 +28,47 @@
       (onStateSave)="onStateSave($event)"
       [tableStyle]="{ tableLayout: 'fixed' }">
       <ng-template pTemplate="caption">
-        <div class="mb-3">
-          <h3>
-            {{ tableConfig.caption }}
-            <a
-              class="ml-3 text-primary"
-              [href]="tableConfig.helpUrl"
-              target="_blank"
-              *ngIf="tableConfig.helpUrl"
-              ><i class="pi pi-external-link"></i
-            ></a>
-          </h3>
-          <p class="mt-1 p-card-subtitle">{{ tableConfig.description }}</p>
-        </div>
+        <div
+          class="flex"
+          [class]="headerSize === 'normal' ? 'flex-column' : ''">
+          <div class="my-2 mr-4">
+            <h3>
+              {{ tableConfig.caption }}
+              <a
+                class="ml-3 text-primary"
+                [href]="tableConfig.helpUrl"
+                target="_blank"
+                *ngIf="tableConfig.helpUrl"
+                ><i class="pi pi-external-link"></i
+              ></a>
+            </h3>
+            <p
+              *ngIf="tableConfig.description && headerSize === 'normal'"
+              class="mt-1 p-card-subtitle">
+              {{ tableConfig.description }}
+            </p>
+          </div>
 
-        <div class="table-header flex align-items-center">
-          <div class="flex flex-wrap mr-2">
-            <ng-template
-              appUniversalGridAction
-              [actions]="tableActions"
-              [selectedRecords]="selectedRecords"
-              [recordKey]="tableConfig.dataKey"
-              [fetchDataParam]="fetchDataParam"
-              (savedEvent)="refresh()"></ng-template>
+          <div class="table-header flex align-items-center">
+            <div class="flex flex-wrap mr-2">
+              <ng-template
+                appUniversalGridAction
+                [actions]="tableActions"
+                [selectedRecords]="selectedRecords"
+                [recordKey]="tableConfig.dataKey"
+                [fetchDataParam]="fetchDataParam"
+                (savedEvent)="refresh()"></ng-template>
+            </div>
+            <div class="flex-none mr-2 ml-auto">
+              <strong *ngIf="selectedRecords.length > 0"
+                >{{ selectedRecords.length }} row(s) selected</strong
+              >
+            </div>
+            <p-button
+              icon="pi pi-refresh text-lg"
+              styleClass="p-button-rounded p-button-outlined"
+              (onClick)="resetAndRefresh()"></p-button>
           </div>
-          <div class="flex-none mr-2 ml-auto">
-            <strong *ngIf="selectedRecords.length > 0"
-              >{{ selectedRecords.length }} row(s) selected</strong
-            >
-          </div>
-          <p-button
-            icon="pi pi-refresh text-lg"
-            styleClass="p-button-rounded p-button-outlined"
-            (onClick)="resetAndRefresh()"></p-button>
         </div>
       </ng-template>
 

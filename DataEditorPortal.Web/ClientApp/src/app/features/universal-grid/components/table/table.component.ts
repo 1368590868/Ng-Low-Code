@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { finalize, forkJoin, Subject, takeUntil, tap } from 'rxjs';
 import {
@@ -18,6 +18,9 @@ import { DataFormatService } from '../../services/data-format.service';
   styleUrls: ['./table.component.scss']
 })
 export class TableComponent implements OnInit, OnDestroy {
+  @Input()
+  headerSize: 'compact' | 'normal' = 'normal';
+
   destroy$ = new Subject();
 
   records: GridData[] = [];

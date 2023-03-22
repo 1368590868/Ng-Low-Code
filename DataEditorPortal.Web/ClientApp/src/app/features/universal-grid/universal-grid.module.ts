@@ -16,6 +16,7 @@ import { UniversalGridRoutingModule } from './universal-grid-routing.module';
 import { SplitAreaComponent } from './pages/split-area/split-area.component';
 import { SearchComponent } from './components/search/search.component';
 import { TableComponent } from './components/table/table.component';
+import { LinkedTableComponent } from './components/linked-table/linked-table.component';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
@@ -40,7 +41,12 @@ import { PaginatorModule } from 'primeng/paginator';
 import { SharedModule } from 'src/app/shared';
 
 @NgModule({
-  declarations: [SplitAreaComponent, SearchComponent, TableComponent],
+  declarations: [
+    SplitAreaComponent,
+    SearchComponent,
+    TableComponent,
+    LinkedTableComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,
