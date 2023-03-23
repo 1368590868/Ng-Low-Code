@@ -30,9 +30,9 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
   language = 'sql';
 
   typeOptions = [
-    { label: 'QueryText', value: 'QueryText' },
-    { label: 'CommandLine', value: 'CommandLine' },
-    { label: 'QueryStoredProcedure', value: 'QueryStoredProcedure' },
+    { label: 'Query Text', value: 'QueryText' },
+    { label: 'Command Line', value: 'CommandLine' },
+    { label: 'Query Stored Procedure', value: 'QueryStoredProcedure' },
     { label: 'Javascript', value: 'Javascript' }
   ];
 
