@@ -18,8 +18,8 @@ import {
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { EditFormData } from '../../models/edit';
 import {
-  AddUserActionHandler,
-  EditUserActionHandler,
+  TrueOnValidateActionHandler,
+  FalseOnAfterActionHandler,
   EventActionHandlerService
 } from '../../services/event-action-handler.service';
 import { UniversalGridService } from '../../services/universal-grid.service';
@@ -30,8 +30,8 @@ import { UniversalGridService } from '../../services/universal-grid.service';
   styleUrls: ['./edit-record-action.component.scss'],
   providers: [
     EventActionHandlerService,
-    AddUserActionHandler,
-    EditUserActionHandler
+    TrueOnValidateActionHandler,
+    FalseOnAfterActionHandler
   ]
 })
 export class EditRecordActionComponent
@@ -48,11 +48,11 @@ export class EditRecordActionComponent
   eventActionHandler = {
     onValidate: {
       eventType: 'Javascript',
-      script: 'Add User'
+      script: 'True OnValidate'
     },
     afterSaved: {
       eventType: 'Javascript',
-      script: 'Edit User'
+      script: 'False OnAfter'
     }
   };
 
@@ -148,29 +148,6 @@ export class EditRecordActionComponent
       .subscribe();
   }
 
-  afterSaved() {
-    // AfterSaved | Javascript Execute
-    if (this.eventActionHandler.afterSaved.eventType === 'Javascript') {
-      this.EVENT_ACTION_CONFIG.forEach(action => {
-        if (action.name === this.eventActionHandler.afterSaved.script) {
-          const result = this.injector.get(action.handler);
-          result.excuteAction().subscribe((res: boolean) => {
-            if (res) {
-              this.notifyService.notifySuccess(
-                'Success',
-                'Save Successfully Completed.'
-              );
-              this.savedEvent.emit();
-            } else {
-              this.notifyService.notifyError('Error', 'AfterSaved Error');
-              this.errorEvent.emit();
-            }
-          });
-        }
-      });
-    }
-  }
-
   submitSave(model: EditFormData) {
     if (this.isAddForm) {
       this.systemLogService.addSiteVisitLog({
@@ -181,7 +158,12 @@ export class EditRecordActionComponent
 
       this.gridService.addGridData(model).subscribe(res => {
         if (!res.isError && res.result) {
-          this.afterSaved();
+          this.notifyService.notifySuccess(
+            'Success',
+            'Save Successfully Completed.'
+          );
+          this.savedEvent.emit();
+          this.sendEventActionHandler(model, 'afterSaved');
         } else {
           this.errorEvent.emit();
         }
@@ -195,7 +177,12 @@ export class EditRecordActionComponent
       });
       this.gridService.updateGridData(dataKey, this.model).subscribe(res => {
         if (!res.isError && res.result) {
-          this.afterSaved();
+          this.notifyService.notifySuccess(
+            'Success',
+            'Save Successfully Completed.'
+          );
+          this.savedEvent.emit();
+          this.sendEventActionHandler(model, 'afterSaved');
         } else {
           this.errorEvent.emit();
         }
@@ -203,26 +190,35 @@ export class EditRecordActionComponent
     }
   }
 
+  sendEventActionHandler(
+    model: EditFormData,
+    eventActionHandler: 'onValidate' | 'afterSaved'
+  ) {
+    if (
+      this.eventActionHandler[eventActionHandler].eventType === 'Javascript'
+    ) {
+      const action = this.EVENT_ACTION_CONFIG.find(
+        x => x.name === this.eventActionHandler[eventActionHandler].script
+      );
+      const result = this.injector.get(action?.handler);
+      result.excuteAction().subscribe((res: boolean) => {
+        if (res) {
+          eventActionHandler === 'onValidate' && this.submitSave(model);
+        } else {
+          eventActionHandler === 'onValidate' && this.errorEvent.emit();
+        }
+      });
+    } else {
+      if (eventActionHandler === 'onValidate') {
+        this.submitSave(model);
+      }
+    }
+  }
+
   onFormSubmit(model: EditFormData) {
     if (this.form.valid) {
       // OnValidate| Javascript Execute
-      if (this.eventActionHandler.onValidate.eventType === 'Javascript') {
-        this.EVENT_ACTION_CONFIG.forEach(action => {
-          if (action.name === this.eventActionHandler.onValidate.script) {
-            const result = this.injector.get(action.handler);
-            result.excuteAction().subscribe((res: boolean) => {
-              if (res) {
-                this.submitSave(model);
-              } else {
-                this.notifyService.notifyError('Error', 'OnValidation Error');
-                this.errorEvent.emit();
-              }
-            });
-          }
-        });
-      } else {
-        this.submitSave(model);
-      }
+      this.sendEventActionHandler(model, 'onValidate');
     } else {
       this.errorEvent.emit();
     }

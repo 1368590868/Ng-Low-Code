@@ -43,8 +43,8 @@ import { UserRoleActionComponent } from './components/user-role-action/user-role
 import { UserPermissionActionComponent } from './components/user-permission-action/user-permission-action.component';
 import { SharedModule } from 'src/app/shared';
 import {
-  AddUserActionHandler,
-  EditUserActionHandler
+  TrueOnValidateActionHandler,
+  FalseOnAfterActionHandler
 } from './services/event-action-handler.service';
 
 const GRID_ACTION_CONFIG = [
@@ -187,12 +187,12 @@ const GRID_ACTION_CONFIG = [
 ];
 const EVENT_ACTION_CONFIG = [
   {
-    name: 'Add User',
-    handler: AddUserActionHandler
+    name: 'True OnValidate',
+    handler: TrueOnValidateActionHandler
   },
   {
-    name: 'Edit User',
-    handler: EditUserActionHandler
+    name: 'False OnAfter',
+    handler: FalseOnAfterActionHandler
   }
 ];
 
