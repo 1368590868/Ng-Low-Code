@@ -1,4 +1,12 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  Inject,
+  Injector,
+  Input,
+  OnInit,
+  Type,
+  ViewChild
+} from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { tap } from 'rxjs';
@@ -9,12 +17,22 @@ import {
 } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { EditFormData } from '../../models/edit';
+import {
+  AddUserActionHandler,
+  EditUserActionHandler,
+  EventActionHandlerService
+} from '../../services/event-action-handler.service';
 import { UniversalGridService } from '../../services/universal-grid.service';
 
 @Component({
   selector: 'app-edit-record-action',
   templateUrl: './edit-record-action.component.html',
-  styleUrls: ['./edit-record-action.component.scss']
+  styleUrls: ['./edit-record-action.component.scss'],
+  providers: [
+    EventActionHandlerService,
+    AddUserActionHandler,
+    EditUserActionHandler
+  ]
 })
 export class EditRecordActionComponent
   extends GridActionDirective
@@ -27,13 +45,30 @@ export class EditRecordActionComponent
   model = {};
   fields!: FormlyFieldConfig[];
 
+  eventActionHandler = {
+    onValidate: {
+      eventType: 'Javascript',
+      script: 'Add User'
+    },
+    afterSaved: {
+      eventType: 'Javascript',
+      script: 'Edit User'
+    }
+  };
+
   @ViewChild('editForm') editForm!: NgForm;
 
   constructor(
     private gridService: UniversalGridService,
     private notifyService: NotifyService,
     private ngxFormlyService: NgxFormlyService,
-    private systemLogService: SystemLogService
+    private systemLogService: SystemLogService,
+    private injector: Injector,
+    @Inject('EVENT_ACTION_CONFIG')
+    private EVENT_ACTION_CONFIG: {
+      name: string;
+      handler: Type<EventActionHandlerService>;
+    }[]
   ) {
     super();
   }
@@ -113,44 +148,80 @@ export class EditRecordActionComponent
       .subscribe();
   }
 
+  afterSaved() {
+    // AfterSaved | Javascript Execute
+    if (this.eventActionHandler.afterSaved.eventType === 'Javascript') {
+      this.EVENT_ACTION_CONFIG.forEach(action => {
+        if (action.name === this.eventActionHandler.afterSaved.script) {
+          const result = this.injector.get(action.handler);
+          result.excuteAction().subscribe((res: boolean) => {
+            if (res) {
+              this.notifyService.notifySuccess(
+                'Success',
+                'Save Successfully Completed.'
+              );
+              this.savedEvent.emit();
+            } else {
+              this.notifyService.notifyError('Error', 'AfterSaved Error');
+              this.errorEvent.emit();
+            }
+          });
+        }
+      });
+    }
+  }
+
+  submitSave(model: EditFormData) {
+    if (this.isAddForm) {
+      this.systemLogService.addSiteVisitLog({
+        action: 'Add New',
+        section: this.gridService.currentPortalItem,
+        params: JSON.stringify(model)
+      });
+
+      this.gridService.addGridData(model).subscribe(res => {
+        if (!res.isError && res.result) {
+          this.afterSaved();
+        } else {
+          this.errorEvent.emit();
+        }
+      });
+    } else {
+      const dataKey = this.selectedRecords[0][this.recordKey];
+      this.systemLogService.addSiteVisitLog({
+        action: 'Update',
+        section: this.gridService.currentPortalItem,
+        params: JSON.stringify(model)
+      });
+      this.gridService.updateGridData(dataKey, this.model).subscribe(res => {
+        if (!res.isError && res.result) {
+          this.afterSaved();
+        } else {
+          this.errorEvent.emit();
+        }
+      });
+    }
+  }
+
   onFormSubmit(model: EditFormData) {
     if (this.form.valid) {
-      if (this.isAddForm) {
-        this.systemLogService.addSiteVisitLog({
-          action: 'Add New',
-          section: this.gridService.currentPortalItem,
-          params: JSON.stringify(model)
-        });
-
-        this.gridService.addGridData(model).subscribe(res => {
-          if (!res.isError && res.result) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Save Successfully Completed.'
-            );
-            this.savedEvent.emit();
-          } else {
-            this.errorEvent.emit();
+      // OnValidate| Javascript Execute
+      if (this.eventActionHandler.onValidate.eventType === 'Javascript') {
+        this.EVENT_ACTION_CONFIG.forEach(action => {
+          if (action.name === this.eventActionHandler.onValidate.script) {
+            const result = this.injector.get(action.handler);
+            result.excuteAction().subscribe((res: boolean) => {
+              if (res) {
+                this.submitSave(model);
+              } else {
+                this.notifyService.notifyError('Error', 'OnValidation Error');
+                this.errorEvent.emit();
+              }
+            });
           }
         });
       } else {
-        const dataKey = this.selectedRecords[0][this.recordKey];
-        this.systemLogService.addSiteVisitLog({
-          action: 'Update',
-          section: this.gridService.currentPortalItem,
-          params: JSON.stringify(model)
-        });
-        this.gridService.updateGridData(dataKey, this.model).subscribe(res => {
-          if (!res.isError && res.result) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Save Successfully Completed.'
-            );
-            this.savedEvent.emit();
-          } else {
-            this.errorEvent.emit();
-          }
-        });
+        this.submitSave(model);
       }
     } else {
       this.errorEvent.emit();

@@ -1,9 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Type } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import {
   ControlValueAccessor,
   FormControl,
   NG_VALUE_ACCESSOR
 } from '@angular/forms';
+import { EventActionHandlerService } from 'src/app/features/universal-grid-action/services/event-action-handler.service';
 
 @Component({
   selector: 'app-event-config',
@@ -24,13 +26,7 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
   onTouch?: any;
   disabled = false;
   isJs = false;
-  jsOptions = [
-    { label: 'Add User', value: 'AddUser' },
-    { label: 'Edit User', value: 'EditUser' },
-    { label: 'Manage Roles', value: 'ManageRoles' },
-    { label: 'Edit User Roles', value: 'EditUserRoles' },
-    { label: 'Edit User Permissions', value: 'EditUserPermissions' }
-  ];
+  jsOptions: { label: string; value: string }[] = [];
 
   typeOptions = [
     { label: 'QueryText', value: 'QueryText' },
@@ -61,6 +57,19 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
     '-- Enter the query text . \r\n\r\n' +
     '-- E.g. \r\n' +
     '-- SELECT Max(AMOUNT) FROM DEMO_TABLE';
+
+  constructor(
+    @Inject('EVENT_ACTION_CONFIG')
+    private EVENT_ACTION_CONFIG: {
+      name: string;
+      handler: Type<EventActionHandlerService>;
+    }[]
+  ) {
+    this.jsOptions = this.EVENT_ACTION_CONFIG.map(item => ({
+      label: item.name,
+      value: item.name
+    }));
+  }
 
   ngOnInit(): void {
     this.formControlType.valueChanges.subscribe(val => {
