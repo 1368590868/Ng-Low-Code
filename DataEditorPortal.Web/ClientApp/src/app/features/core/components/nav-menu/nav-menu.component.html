@@ -1,4 +1,6 @@
-<div class="nav-menu w-full" *ngIf="this.userService.isLogin">
-  <p-menubar [model]="menuItems" styleClass="border-none pr-4 pl-6">
-  </p-menubar>
+<div
+  class="nav-menu w-full"
+  *ngIf="this.userService.isLogin"
+  [@transformMenu]="configDataService.sidebarCollapsed ? 'left3' : 'left1'">
+  <p-menubar [model]="menuItems" styleClass="border-none pr-3"> </p-menubar>
 </div>

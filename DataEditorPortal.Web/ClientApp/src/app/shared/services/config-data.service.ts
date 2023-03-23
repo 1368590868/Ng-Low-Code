@@ -30,6 +30,7 @@ export class ConfigDataService {
     webHeaderDescription: '',
     webHeaderMessage: ''
   };
+  public sidebarCollapsed = false;
   public licenseExpired = false;
 
   public menuChange$ = new Subject();
