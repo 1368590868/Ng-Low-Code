@@ -27,6 +27,7 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
   disabled = false;
   isJs = false;
   jsOptions: { label: string; value: string }[] = [];
+  language = 'sql';
 
   typeOptions = [
     { label: 'QueryText', value: 'QueryText' },
@@ -73,6 +74,16 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
 
   ngOnInit(): void {
     this.formControlType.valueChanges.subscribe(val => {
+      if (val === 'CommandLine') {
+        this.language = 'bat';
+        this.helperMessage = 'rem Enter the command line . ';
+        this.formControlText.setValue(this.helperMessage);
+      } else {
+        this.language = 'sql';
+        this.helperMessage = '-- Enter the query text . ';
+        this.formControlText.setValue(this.helperMessage);
+      }
+
       if (val === 'Javascript') {
         this.isJs = true;
       } else {

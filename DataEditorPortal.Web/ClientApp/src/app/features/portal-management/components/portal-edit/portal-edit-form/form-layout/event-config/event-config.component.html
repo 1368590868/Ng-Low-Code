@@ -4,7 +4,6 @@
     styleClass="w-15rem"
     appendTo="body"
     [showClear]="true"
-    placeholder="Please Select"
     [options]="typeOptions"></p-dropdown>
 
   <div class="mt-3">
@@ -14,7 +13,7 @@
       (onInit)="onMonacoEditorInit($event)"
       [style]="{ height: '20rem' }"
       class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
-      [options]="{}"></ngx-monaco-editor>
+      [options]="{ language,lineNumbers: 'off' }"></ngx-monaco-editor>
 
     <p-dropdown
       *ngIf="isJs"
