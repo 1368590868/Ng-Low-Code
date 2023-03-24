@@ -190,7 +190,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
         this.model.roleId === '<new_role>' ? 'createRole' : 'updateRole';
       this.systemLogService.addSiteVisitLog({
         action: this.model.roleId === '<new_role>' ? 'Add Role' : 'Update Role',
-        section: this.rolePermissionService.currentPortalItem,
+        section: this.rolePermissionService.section,
         params: JSON.stringify({
           ...model,
           permissions: permissionSelect as RolePermissions[]

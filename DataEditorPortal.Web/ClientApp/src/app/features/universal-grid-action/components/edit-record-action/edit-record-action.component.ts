@@ -17,22 +17,13 @@ import {
 } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { EditFormData } from '../../models/edit';
-import {
-  TrueOnValidateActionHandler,
-  FalseOnAfterActionHandler,
-  EventActionHandlerService
-} from '../../services/event-action-handler.service';
+import { EventActionHandlerService } from '../../services/event-action-handler.service';
 import { UniversalGridService } from '../../services/universal-grid.service';
 
 @Component({
   selector: 'app-edit-record-action',
   templateUrl: './edit-record-action.component.html',
-  styleUrls: ['./edit-record-action.component.scss'],
-  providers: [
-    EventActionHandlerService,
-    TrueOnValidateActionHandler,
-    FalseOnAfterActionHandler
-  ]
+  styleUrls: ['./edit-record-action.component.scss']
 })
 export class EditRecordActionComponent
   extends GridActionDirective
@@ -48,11 +39,11 @@ export class EditRecordActionComponent
   eventActionHandler = {
     onValidate: {
       eventType: 'Javascript',
-      script: 'True OnValidate'
+      script: 'On Validate Demo'
     },
     afterSaved: {
       eventType: 'Javascript',
-      script: 'False OnAfter'
+      script: 'On After Saved Demo'
     }
   };
 
@@ -77,7 +68,7 @@ export class EditRecordActionComponent
     if (!this.isAddForm) {
       const dataKey = this.selectedRecords[0][this.recordKey];
       this.gridService
-        .getDetailData(dataKey)
+        .getDetailData(this.gridName, dataKey)
         .pipe(
           tap(result => {
             Object.keys(result).forEach(key => {
@@ -97,7 +88,7 @@ export class EditRecordActionComponent
 
   getFormConfig() {
     this.gridService
-      .getDetailConfig(this.isAddForm ? 'ADD' : 'UPDATE')
+      .getDetailConfig(this.gridName, this.isAddForm ? 'ADD' : 'UPDATE')
       .pipe(
         tap(result => {
           // fetch lookups
@@ -152,18 +143,22 @@ export class EditRecordActionComponent
     if (this.isAddForm) {
       this.systemLogService.addSiteVisitLog({
         action: 'Add New',
-        section: this.gridService.currentPortalItem,
+        section: this.gridName,
         params: JSON.stringify(model)
       });
 
-      this.gridService.addGridData(model).subscribe(res => {
+      this.gridService.addGridData(this.gridName, model).subscribe(res => {
         if (!res.isError && res.result) {
           this.notifyService.notifySuccess(
             'Success',
             'Save Successfully Completed.'
           );
+
+          // run after saved event if configured.
+          const handler = this.getEventActionHandler('afterSaved');
+          if (handler) handler.excuteAction().subscribe();
+
           this.savedEvent.emit();
-          this.sendEventActionHandler(model, 'afterSaved');
         } else {
           this.errorEvent.emit();
         }
@@ -172,53 +167,53 @@ export class EditRecordActionComponent
       const dataKey = this.selectedRecords[0][this.recordKey];
       this.systemLogService.addSiteVisitLog({
         action: 'Update',
-        section: this.gridService.currentPortalItem,
+        section: this.gridName,
         params: JSON.stringify(model)
       });
-      this.gridService.updateGridData(dataKey, this.model).subscribe(res => {
-        if (!res.isError && res.result) {
-          this.notifyService.notifySuccess(
-            'Success',
-            'Save Successfully Completed.'
-          );
-          this.savedEvent.emit();
-          this.sendEventActionHandler(model, 'afterSaved');
-        } else {
-          this.errorEvent.emit();
-        }
-      });
+      this.gridService
+        .updateGridData(this.gridName, dataKey, this.model)
+        .subscribe(res => {
+          if (!res.isError && res.result) {
+            this.notifyService.notifySuccess(
+              'Success',
+              'Save Successfully Completed.'
+            );
+
+            // run after saved event if configured.
+            const handler = this.getEventActionHandler('afterSaved');
+            if (handler) handler.excuteAction().subscribe();
+
+            this.savedEvent.emit();
+          } else {
+            this.errorEvent.emit();
+          }
+        });
     }
   }
 
-  sendEventActionHandler(
-    model: EditFormData,
-    eventActionHandler: 'onValidate' | 'afterSaved'
-  ) {
-    if (
-      this.eventActionHandler[eventActionHandler].eventType === 'Javascript'
-    ) {
+  getEventActionHandler(eventActionHandler: 'onValidate' | 'afterSaved') {
+    const eventConfig = this.eventActionHandler[eventActionHandler];
+    if (eventConfig.eventType === 'Javascript') {
       const action = this.EVENT_ACTION_CONFIG.find(
-        x => x.name === this.eventActionHandler[eventActionHandler].script
+        x => x.name === eventConfig.script
       );
-      const result = this.injector.get(action?.handler);
-      result.excuteAction().subscribe((res: boolean) => {
-        if (res) {
-          eventActionHandler === 'onValidate' && this.submitSave(model);
-        } else {
-          eventActionHandler === 'onValidate' && this.errorEvent.emit();
-        }
-      });
-    } else {
-      if (eventActionHandler === 'onValidate') {
-        this.submitSave(model);
-      }
+      if (action) return this.injector.get(action?.handler);
     }
+    return null;
   }
 
   onFormSubmit(model: EditFormData) {
     if (this.form.valid) {
-      // OnValidate| Javascript Execute
-      this.sendEventActionHandler(model, 'onValidate');
+      // run on validate event if configured
+      const handler = this.getEventActionHandler('onValidate');
+      if (handler) {
+        handler.excuteAction().subscribe((res: boolean) => {
+          if (res) this.submitSave(model);
+          else this.errorEvent.emit();
+        });
+      } else {
+        this.submitSave(model);
+      }
     } else {
       this.errorEvent.emit();
     }

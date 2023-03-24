@@ -20,7 +20,8 @@ import { DataFormatService } from '../../services/data-format.service';
 export class TableComponent implements OnInit, OnDestroy {
   @Input()
   headerSize: 'compact' | 'normal' = 'normal';
-
+  @Input()
+  gridName!: string;
   destroy$ = new Subject();
 
   records: GridData[] = [];
@@ -33,7 +34,7 @@ export class TableComponent implements OnInit, OnDestroy {
   sortMeta?: any;
   multiSortMeta?: any;
 
-  loading = true;
+  loading = false;
   @ViewChild('dataTable') table!: Table;
 
   cols: GridColumn[] = [];
@@ -64,13 +65,13 @@ export class TableComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // this.reset();
-    this.stateKey = `universal-grid-state-${this.gridTableService.currentPortalItem}`;
+    this.stateKey = `universal-grid-state-${this.gridName}`;
 
     forkJoin([
       // get grid config
-      this.gridTableService.getTableConfig(),
+      this.gridTableService.getTableConfig(this.gridName),
       // get grid column
-      this.gridTableService.getTableColumns()
+      this.gridTableService.getTableColumns(this.gridName)
     ]).subscribe(result => {
       this.tableConfig = result[0];
       if (this.tableConfig.pageSize && this.tableConfig.pageSize >= 10) {
@@ -89,7 +90,7 @@ export class TableComponent implements OnInit, OnDestroy {
       this.cols.forEach(col => {
         if (col.field && col.filterType === 'enums') {
           this.gridTableService
-            .getTableColumnFilterOptions(col.field)
+            .getTableColumnFilterOptions(this.gridName, col.field)
             .subscribe(val => {
               col.filterOptions = val;
             });
@@ -117,11 +118,8 @@ export class TableComponent implements OnInit, OnDestroy {
 
   getPermission(name: string) {
     return (
-      this.userService.USER.permissions![
-        name +
-          this.gridTableService.currentPortalItem
-            .toUpperCase()
-            .replace('-', '_')
+      this.userService.USER.permissions?.[
+        name + this.gridName.toUpperCase().replace('-', '_')
       ] ?? false
     );
   }
@@ -233,7 +231,7 @@ export class TableComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.fetchDataParam = this.getFetchParam();
     this.gridTableService
-      .getTableData(this.fetchDataParam)
+      .getTableData(this.gridName, this.fetchDataParam)
       .pipe(
         tap(res => {
           this.records = res.data;

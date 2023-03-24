@@ -16,7 +16,7 @@ import {
 })
 export class UserManagerService {
   public _apiUrl: string;
-  public currentPortalItem = 'user-management';
+  public section = 'user-management';
   constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
   }

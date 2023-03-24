@@ -26,11 +26,14 @@ export class RemoveActionComponent
   onSave(): void {
     this.systemLogService.addSiteVisitLog({
       action: 'Remove',
-      section: this.gridService.currentPortalItem,
+      section: this.gridName,
       params: JSON.stringify(this.selectedRecords)
     });
     this.gridService
-      .deleteGridData(this.selectedRecords.map((x: any) => x[this.recordKey]))
+      .deleteGridData(
+        this.gridName,
+        this.selectedRecords.map((x: any) => x[this.recordKey])
+      )
       .subscribe(res => {
         if (!res.isError && res.result) {
           this.notifyService.notifySuccess(

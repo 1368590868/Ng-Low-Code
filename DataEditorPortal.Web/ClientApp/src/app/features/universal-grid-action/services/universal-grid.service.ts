@@ -10,8 +10,6 @@ import { ExportParam } from '../models/export';
   providedIn: 'root'
 })
 export class UniversalGridService {
-  public currentPortalItem = 'usermanagement';
-
   public _apiUrl: string;
   constructor(
     private http: HttpClient,
@@ -21,59 +19,69 @@ export class UniversalGridService {
     this._apiUrl = apiUrl;
   }
 
-  getDetailConfig(type: 'ADD' | 'UPDATE'): Observable<EditFormField[]> {
+  getDetailConfig(
+    name: string,
+    type: 'ADD' | 'UPDATE'
+  ): Observable<EditFormField[]> {
     return this.http
       .get<ApiResponse<EditFormField[]>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`,
+        `${this._apiUrl}UniversalGrid/${name}/config/detail`,
         { params: { type } }
       )
       .pipe(map(res => res.result || []));
   }
 
-  getDetailData(id: string): Observable<EditFormData> {
+  getDetailData(name: string, id: string): Observable<EditFormData> {
     return this.http
       .get<ApiResponse<EditFormData>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/${id}`
+        `${this._apiUrl}UniversalGrid/${name}/data/${id}`
       )
       .pipe(map(res => res.result || {}));
   }
 
-  addGridData(data: EditFormData): Observable<ApiResponse<boolean>> {
+  addGridData(
+    name: string,
+    data: EditFormData
+  ): Observable<ApiResponse<boolean>> {
     return this.http.put<ApiResponse<boolean>>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/create`,
+      `${this._apiUrl}UniversalGrid/${name}/data/create`,
       data
     );
   }
 
   updateGridData(
+    name: string,
     id: string,
     data: EditFormData
   ): Observable<ApiResponse<boolean>> {
     return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/${id}/update`,
+      `${this._apiUrl}UniversalGrid/${name}/data/${id}/update`,
       data
     );
   }
 
-  deleteGridData(ids: string[]): Observable<ApiResponse<boolean>> {
+  deleteGridData(
+    name: string,
+    ids: string[]
+  ): Observable<ApiResponse<boolean>> {
     return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/batch-delete`,
+      `${this._apiUrl}UniversalGrid/${name}/data/batch-delete`,
       { ids }
     );
   }
 
-  exportGridData(param: ExportParam): Observable<Blob> {
+  exportGridData(name: string, param: ExportParam): Observable<Blob> {
     return this.http.post(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/export`,
+      `${this._apiUrl}UniversalGrid/${name}/data/export`,
       param,
       { responseType: 'blob' }
     );
   }
 
-  getTableColumns(): Observable<GridColumn[]> {
+  getTableColumns(name: string): Observable<GridColumn[]> {
     return this.http
       .get<ApiResponse<GridColumn[]>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/columns`
+        `${this._apiUrl}UniversalGrid/${name}/config/columns`
       )
       .pipe(map(res => res.result || []));
   }

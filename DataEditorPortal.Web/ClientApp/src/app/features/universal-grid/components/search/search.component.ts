@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
@@ -16,6 +16,8 @@ import { GridTableService } from '../../services/grid-table.service';
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit, OnDestroy {
+  @Input()
+  gridName!: string;
   destroy$ = new Subject();
 
   form = new FormGroup({});
@@ -33,62 +35,57 @@ export class SearchComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // subscribe route change to get search config
-    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(param => {
-      if (param && param['name']) {
-        // get search config
-        this.gridTableService.getSearchConfig().subscribe(result => {
-          // this.options.resetModel?.();
-          this.model = {};
+    // get search config
+    this.gridTableService.getSearchConfig(this.gridName).subscribe(result => {
+      // this.options.resetModel?.();
+      this.model = {};
 
-          // fetch lookups
-          const fields = result as FormlyFieldConfig[];
-          fields
-            .filter(
-              // advanced setting: options from lookup
-              x =>
-                typeof x.type === 'string' &&
-                ['select', 'multiSelect'].indexOf(x.type) >= 0 &&
-                x.props &&
-                x.props['optionsLookup']
-            )
-            .forEach(f => {
-              if (f.props) {
-                f.props.placeholder = 'Please Select';
-                if (!f.props.options) f.props.options = [];
+      // fetch lookups
+      const fields = result as FormlyFieldConfig[];
+      fields
+        .filter(
+          // advanced setting: options from lookup
+          x =>
+            typeof x.type === 'string' &&
+            ['select', 'multiSelect'].indexOf(x.type) >= 0 &&
+            x.props &&
+            x.props['optionsLookup']
+        )
+        .forEach(f => {
+          if (f.props) {
+            f.props.placeholder = 'Please Select';
+            if (!f.props.options) f.props.options = [];
 
-                if (Array.isArray(f.props['optionsLookup'])) {
-                  f.props.options = f.props['optionsLookup'];
-                } else {
-                  f.hooks = {
-                    onInit: field => {
-                      if (
-                        field.props &&
-                        field.props['dependOnFields'] &&
-                        field.props['dependOnFields'].length > 0
-                      ) {
-                        this.ngxFormlyService.initDependOnFields(field);
-                      } else {
-                        this.ngxFormlyService.initFieldOptions(field);
-                      }
-                    }
-                  };
+            if (Array.isArray(f.props['optionsLookup'])) {
+              f.props.options = f.props['optionsLookup'];
+            } else {
+              f.hooks = {
+                onInit: field => {
+                  if (
+                    field.props &&
+                    field.props['dependOnFields'] &&
+                    field.props['dependOnFields'].length > 0
+                  ) {
+                    this.ngxFormlyService.initDependOnFields(field);
+                  } else {
+                    this.ngxFormlyService.initFieldOptions(field);
+                  }
                 }
-              }
-            });
-
-          // set triStateCheckbox
-          fields
-            .filter(x => x.type == 'checkbox')
-            .forEach(f => {
-              f.type = 'triStateCheckbox';
-              f.defaultValue = null;
-              if (f.props) f.props['hideLabel'] = true;
-            });
-
-          this.fields = fields;
+              };
+            }
+          }
         });
-      }
+
+      // set triStateCheckbox
+      fields
+        .filter(x => x.type == 'checkbox')
+        .forEach(f => {
+          f.type = 'triStateCheckbox';
+          f.defaultValue = null;
+          if (f.props) f.props['hideLabel'] = true;
+        });
+
+      this.fields = fields;
     });
   }
 
@@ -101,7 +98,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     if (this.form.valid) {
       this.systemLogService.addSiteVisitLog({
         action: 'Search',
-        section: this.gridTableService.currentPortalItem,
+        section: this.gridName,
         params: JSON.stringify(model)
       });
       this.gridTableService.searchClicked$.next(model);

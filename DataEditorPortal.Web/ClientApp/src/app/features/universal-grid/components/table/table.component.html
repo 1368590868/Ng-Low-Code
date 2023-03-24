@@ -57,6 +57,7 @@
                 [selectedRecords]="selectedRecords"
                 [recordKey]="tableConfig.dataKey"
                 [fetchDataParam]="fetchDataParam"
+                [gridName]="gridName"
                 (savedEvent)="refresh()"></ng-template>
             </div>
             <div class="flex-none mr-2 ml-auto">
@@ -145,6 +146,7 @@
                 [actions]="rowActions"
                 [recordKey]="tableConfig.dataKey"
                 [selectedRecords]="[data]"
+                [gridName]="gridName"
                 (savedEvent)="refresh()"></ng-template>
             </div>
           </td>

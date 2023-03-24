@@ -17,12 +17,16 @@
     <div class="search-area w-full">
       <app-search
         @fadeInOut
-        *ngIf="!configDataService.sidebarCollapsed"></app-search>
+        *ngIf="!configDataService.sidebarCollapsed && currentPortalItem"
+        [gridName]="currentPortalItem"></app-search>
     </div>
   </ng-template>
   <ng-template pTemplate>
     <div class="table-area w-full">
-      <app-table *ngIf="currentPortalItem"></app-table>
+      <app-table
+        @fadeInOut
+        *ngIf="currentPortalItem"
+        [gridName]="currentPortalItem"></app-table>
     </div>
   </ng-template>
 </p-splitter>

@@ -25,7 +25,7 @@ import { ConfigDataService } from 'src/app/shared';
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0 }),
-        animate('200ms 300ms', style({ opacity: 1 }))
+        animate('200ms 100ms', style({ opacity: 1 }))
       ]),
       transition(':leave', [animate('100ms', style({ opacity: 0 }))])
     ]),
@@ -41,7 +41,7 @@ import { ConfigDataService } from 'src/app/shared';
       ]),
       transition('hide => show', [
         style({ opacity: 0 }),
-        animate('200ms 300ms', style({ opacity: 1 }))
+        animate('200ms 100ms', style({ opacity: 1 }))
       ])
     ])
   ]
@@ -81,8 +81,6 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
     // subscribe route change to update currentPortalItem
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe((param: any) => {
       if (param && param.name) {
-        this.gridTableService.currentPortalItem = param.name;
-
         this.currentPortalItem = '';
         this.changeDetectorRef.detectChanges();
         this.currentPortalItem = param.name;

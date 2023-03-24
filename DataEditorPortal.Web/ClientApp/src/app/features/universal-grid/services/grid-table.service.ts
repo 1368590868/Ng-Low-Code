@@ -14,50 +14,49 @@ import {
 })
 export class GridTableService {
   public searchClicked$ = new Subject<SearchParam>();
-  public currentPortalItem = '';
 
   public _apiUrl: string;
   constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
   }
 
-  getTableConfig(): Observable<GridConfig> {
+  getTableConfig(name: string): Observable<GridConfig> {
     return this.http
       .get<ApiResponse<GridConfig>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/grid-config`
+        `${this._apiUrl}UniversalGrid/${name}/grid-config`
       )
       .pipe(map(res => res.result || { dataKey: 'Id' }));
   }
 
-  getTableColumns(): Observable<GridColumn[]> {
+  getTableColumns(name: string): Observable<GridColumn[]> {
     return this.http
       .get<ApiResponse<GridColumn[]>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/columns`
+        `${this._apiUrl}UniversalGrid/${name}/config/columns`
       )
       .pipe(map(res => res.result || []));
   }
 
-  getTableColumnFilterOptions(column: string): Observable<any[]> {
+  getTableColumnFilterOptions(name: string, column: string): Observable<any[]> {
     return this.http
       .get<ApiResponse<any[]>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/column/filter-options?column=${column}`
+        `${this._apiUrl}UniversalGrid/${name}/config/column/filter-options?column=${column}`
       )
       .pipe(map(res => res.result || []));
   }
 
-  getTableData(tableParams: GridParam): Observable<GridResult> {
+  getTableData(name: string, tableParams: GridParam): Observable<GridResult> {
     return this.http
       .post<ApiResponse<GridResult>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data`,
+        `${this._apiUrl}UniversalGrid/${name}/data`,
         tableParams
       )
       .pipe(map(res => res.result || { data: [], total: 0 }));
   }
 
-  getSearchConfig(): Observable<GridSearchConfig[]> {
+  getSearchConfig(name: string): Observable<GridSearchConfig[]> {
     return this.http
       .get<ApiResponse<GridSearchConfig[]>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/search`
+        `${this._apiUrl}UniversalGrid/${name}/config/search`
       )
       .pipe(map(res => res.result || []));
   }

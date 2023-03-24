@@ -43,8 +43,8 @@ import { UserRoleActionComponent } from './components/user-role-action/user-role
 import { UserPermissionActionComponent } from './components/user-permission-action/user-permission-action.component';
 import { SharedModule } from 'src/app/shared';
 import {
-  TrueOnValidateActionHandler,
-  FalseOnAfterActionHandler
+  OnValidateDemoActionHandler,
+  OnAfterSavedDemoActionHandler
 } from './services/event-action-handler.service';
 
 const GRID_ACTION_CONFIG = [
@@ -187,12 +187,12 @@ const GRID_ACTION_CONFIG = [
 ];
 const EVENT_ACTION_CONFIG = [
   {
-    name: 'True OnValidate',
-    handler: TrueOnValidateActionHandler
+    name: 'On Validate Demo',
+    handler: OnValidateDemoActionHandler
   },
   {
-    name: 'False OnAfter',
-    handler: FalseOnAfterActionHandler
+    name: 'On After Saved Demo',
+    handler: OnAfterSavedDemoActionHandler
   }
 ];
 
@@ -249,7 +249,8 @@ const EVENT_ACTION_CONFIG = [
     {
       provide: 'EVENT_ACTION_CONFIG',
       useValue: EVENT_ACTION_CONFIG
-    }
+    },
+    EVENT_ACTION_CONFIG.map(x => x.handler)
   ]
 })
 export class UniversalGridActionModule {}
