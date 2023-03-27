@@ -25,7 +25,7 @@ export class UniversalGridService {
   ): Observable<EditFormField[]> {
     return this.http
       .get<ApiResponse<EditFormField[]>>(
-        `${this._apiUrl}UniversalGrid/${name}/config/detail`,
+        `${this._apiUrl}universal-grid/${name}/config/detail`,
         { params: { type } }
       )
       .pipe(map(res => res.result || []));
@@ -34,7 +34,7 @@ export class UniversalGridService {
   getDetailData(name: string, id: string): Observable<EditFormData> {
     return this.http
       .get<ApiResponse<EditFormData>>(
-        `${this._apiUrl}UniversalGrid/${name}/data/${id}`
+        `${this._apiUrl}universal-grid/${name}/data/${id}`
       )
       .pipe(map(res => res.result || {}));
   }
@@ -44,7 +44,7 @@ export class UniversalGridService {
     data: EditFormData
   ): Observable<ApiResponse<boolean>> {
     return this.http.put<ApiResponse<boolean>>(
-      `${this._apiUrl}UniversalGrid/${name}/data/create`,
+      `${this._apiUrl}universal-grid/${name}/data/create`,
       data
     );
   }
@@ -55,7 +55,7 @@ export class UniversalGridService {
     data: EditFormData
   ): Observable<ApiResponse<boolean>> {
     return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}UniversalGrid/${name}/data/${id}/update`,
+      `${this._apiUrl}universal-grid/${name}/data/${id}/update`,
       data
     );
   }
@@ -65,14 +65,14 @@ export class UniversalGridService {
     ids: string[]
   ): Observable<ApiResponse<boolean>> {
     return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}UniversalGrid/${name}/data/batch-delete`,
+      `${this._apiUrl}universal-grid/${name}/data/batch-delete`,
       { ids }
     );
   }
 
   exportGridData(name: string, param: ExportParam): Observable<Blob> {
     return this.http.post(
-      `${this._apiUrl}UniversalGrid/${name}/data/export`,
+      `${this._apiUrl}universal-grid/${name}/data/export`,
       param,
       { responseType: 'blob' }
     );
@@ -81,7 +81,7 @@ export class UniversalGridService {
   getTableColumns(name: string): Observable<GridColumn[]> {
     return this.http
       .get<ApiResponse<GridColumn[]>>(
-        `${this._apiUrl}UniversalGrid/${name}/config/columns`
+        `${this._apiUrl}universal-grid/${name}/config/columns`
       )
       .pipe(map(res => res.result || []));
   }

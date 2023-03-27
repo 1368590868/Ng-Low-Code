@@ -21,7 +21,7 @@ export class GridTableService {
   getTableConfig(name: string): Observable<GridConfig> {
     return this.http
       .get<ApiResponse<GridConfig>>(
-        `${this._apiUrl}UniversalGrid/${name}/grid-config`
+        `${this._apiUrl}universal-grid/${name}/grid-config`
       )
       .pipe(map(res => res.result || { dataKey: 'Id' }));
   }
@@ -29,7 +29,7 @@ export class GridTableService {
   getTableColumns(name: string): Observable<GridColumn[]> {
     return this.http
       .get<ApiResponse<GridColumn[]>>(
-        `${this._apiUrl}UniversalGrid/${name}/config/columns`
+        `${this._apiUrl}universal-grid/${name}/config/columns`
       )
       .pipe(map(res => res.result || []));
   }
@@ -37,7 +37,7 @@ export class GridTableService {
   getTableColumnFilterOptions(name: string, column: string): Observable<any[]> {
     return this.http
       .get<ApiResponse<any[]>>(
-        `${this._apiUrl}UniversalGrid/${name}/config/column/filter-options?column=${column}`
+        `${this._apiUrl}universal-grid/${name}/config/column/filter-options?column=${column}`
       )
       .pipe(map(res => res.result || []));
   }
@@ -45,7 +45,7 @@ export class GridTableService {
   getTableData(name: string, tableParams: GridParam): Observable<GridResult> {
     return this.http
       .post<ApiResponse<GridResult>>(
-        `${this._apiUrl}UniversalGrid/${name}/data`,
+        `${this._apiUrl}universal-grid/${name}/data`,
         tableParams
       )
       .pipe(map(res => res.result || { data: [], total: 0 }));
@@ -54,7 +54,7 @@ export class GridTableService {
   getSearchConfig(name: string): Observable<GridSearchConfig[]> {
     return this.http
       .get<ApiResponse<GridSearchConfig[]>>(
-        `${this._apiUrl}UniversalGrid/${name}/config/search`
+        `${this._apiUrl}universal-grid/${name}/config/search`
       )
       .pipe(map(res => res.result || []));
   }
