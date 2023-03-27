@@ -25,6 +25,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { TabViewModule } from 'primeng/tabview';
 import { EditorModule } from 'primeng/editor';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { FileUploadModule } from 'primeng/fileupload';
 
 import {
   HeaderComponent,
@@ -40,10 +41,13 @@ import {
   DataDictionaryComponent,
   AddDictionaryDialogComponent,
   SystemLogComponent,
-  SystemLogDialogComponent
+  SystemLogDialogComponent,
+  FileUploadComponent
 } from './components';
 
 import { SharedModule } from 'src/app/shared';
+import { FormlyFieldFileUploadEditorComponent } from './components/file-upload/file-upload.component';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 export * from './components';
 
@@ -62,14 +66,25 @@ export * from './components';
     DataDictionaryComponent,
     AddDictionaryDialogComponent,
     SystemLogComponent,
-    SystemLogDialogComponent
+    SystemLogDialogComponent,
+    FileUploadComponent,
+    FormlyFieldFileUploadEditorComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
-    FormlyModule,
+    FormlyModule.forRoot({
+      types: [
+        {
+          name: 'fileUploadEditor',
+          component: FormlyFieldFileUploadEditorComponent,
+          wrappers: ['form-field']
+        }
+      ]
+    }),
+
     SharedModule,
     ButtonModule,
     ToastModule,
@@ -88,7 +103,9 @@ export * from './components';
     PaginatorModule,
     TabViewModule,
     EditorModule,
-    InputTextareaModule
+    InputTextareaModule,
+    FileUploadModule,
+    ProgressBarModule
   ],
   exports: [
     HeaderComponent,

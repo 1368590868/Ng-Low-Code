@@ -1,0 +1,78 @@
+<p-table
+  styleClass="mb-3"
+  [value]="newAttachments"
+  *ngIf="newAttachments.length > 0">
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width: 40%">Name</th>
+      <th style="width: 40%">Comment</th>
+      <th style="width: 20%"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-file>
+    <tr>
+      <td [class]="file.isDeleted ? 'line-through' : null">
+        {{ file.fileName }}
+      </td>
+      <td [class]="file.isDeleted ? 'line-through' : null">
+        {{ file.fileId }}
+      </td>
+      <td>
+        <button
+          *ngIf="!file?.isDeleted"
+          pButton
+          pRipple
+          type="button"
+          class="p-button-text p-button-sm w-auto"
+          (click)="tempAttachmentDownload(file)">
+          <span class="p-button-icon p-button-icon-left pi pi-download"></span>
+        </button>
+        <button
+          *ngIf="file?.isDeleted"
+          pButton
+          pRipple
+          type="button"
+          class="p-button-text p-button-sm w-auto"
+          (click)="tempAttachmentRestore(file)">
+          <span class="p-button-icon p-button-icon-left pi pi-refresh"></span>
+        </button>
+        <button
+          *ngIf="!file?.isDeleted"
+          pButton
+          pRipple
+          type="button"
+          class="p-button-text p-button-danger p-button-sm ml-3 w-auto"
+          (click)="tempAttachmentDelete(file)">
+          <span class="p-button-icon p-button-icon-left pi pi-trash"></span>
+        </button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<div class="flex">
+  <p-fileUpload
+    #AttachmentsRef
+    name="files"
+    [url]="apiUrl + 'site/upload-temp-file'"
+    [multiple]="true"
+    [auto]="true"
+    [maxFileSize]="maxFileSize"
+    (onProgress)="onFileUploadProgress($event)"
+    mode="basic"
+    chooseLabel="Browse"
+    [accept]="accept"
+    (onUpload)="onUpload($event)"
+    (onError)="onUploadError($event, AttachmentsRef)">
+  </p-fileUpload>
+  <p-progressBar
+    *ngIf="progress > 0 && progress < 100"
+    [value]="progress"
+    class="w-15rem ml-2"
+    styleClass="h-full"></p-progressBar>
+</div>
+
+<p-confirmDialog
+  [style]="{ width: '40rem' }"
+  [baseZIndex]="10000"
+  rejectButtonStyleClass="p-button-text"></p-confirmDialog>
