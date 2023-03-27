@@ -10,10 +10,10 @@
       [resizableColumns]="true"
       columnResizeMode="expand"
       [reorderableColumns]="true"
-      selectionMode="multiple"
+      [selectionMode]="selectionMode"
       [lazy]="true"
       [value]="records"
-      [(selection)]="selectedRecords"
+      [(selection)]="selection"
       [dataKey]="tableConfig.dataKey"
       [rowHover]="true"
       [loading]="loading"
@@ -26,7 +26,8 @@
       (onFilter)="onFilter($event)"
       (onSort)="onSort($event)"
       (onStateSave)="onStateSave($event)"
-      [tableStyle]="{ tableLayout: 'fixed' }">
+      [tableStyle]="{ tableLayout: 'fixed' }"
+      (onRowSelect)="onRowSelect($event)">
       <ng-template pTemplate="caption">
         <div
           class="flex"
@@ -76,6 +77,7 @@
       <ng-template pTemplate="header" let-columns>
         <tr>
           <th
+            *ngIf="selectionMode === 'multiple'"
             style="width: 2.875rem !important; max-width: 2.875rem !important">
             <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
           </th>
@@ -133,7 +135,7 @@
 
       <ng-template pTemplate="body" let-data let-columns="columns">
         <tr [pSelectableRow]="data">
-          <td>
+          <td *ngIf="selectionMode === 'multiple'">
             <p-tableCheckbox
               [value]="data"
               (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>

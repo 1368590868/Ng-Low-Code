@@ -193,7 +193,7 @@ export class EditRecordActionComponent
 
   getEventActionHandler(eventActionHandler: 'onValidate' | 'afterSaved') {
     const eventConfig = this.eventActionHandler[eventActionHandler];
-    if (eventConfig.eventType === 'Javascript') {
+    if (eventConfig && eventConfig.eventType === 'Javascript') {
       const action = this.EVENT_ACTION_CONFIG.find(
         x => x.name === eventConfig.script
       );

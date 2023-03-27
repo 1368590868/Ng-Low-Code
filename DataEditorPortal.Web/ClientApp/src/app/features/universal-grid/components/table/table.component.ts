@@ -1,4 +1,12 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { finalize, forkJoin, Subject, takeUntil, tap } from 'rxjs';
 import {
@@ -18,14 +26,26 @@ import { DataFormatService } from '../../services/data-format.service';
   styleUrls: ['./table.component.scss']
 })
 export class TableComponent implements OnInit, OnDestroy {
-  @Input()
-  headerSize: 'compact' | 'normal' = 'normal';
-  @Input()
-  gridName!: string;
+  @Input() headerSize: 'compact' | 'normal' = 'normal';
+  @Input() gridName!: string;
+  @Input() selectionMode = 'multiple';
+  @Output() rowSelect = new EventEmitter<any>();
   destroy$ = new Subject();
 
   records: GridData[] = [];
   totalRecords = 0;
+
+  _selection: any;
+  set selection(value: any) {
+    this._selection = value;
+    if (Array.isArray(value)) this.selectedRecords = [...value];
+    else {
+      this.selectedRecords = value ? [value] : [];
+    }
+  }
+  get selection() {
+    return this._selection;
+  }
   selectedRecords: GridData[] = [];
 
   searchModel?: SearchParam;
@@ -287,8 +307,12 @@ export class TableComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
 
+  onRowSelect(event: any) {
+    this.rowSelect.emit(event);
+  }
+
   refresh() {
-    this.selectedRecords = [];
+    this.selection = [];
     this.table.saveState();
     this.fetchData();
   }
@@ -306,7 +330,7 @@ export class TableComponent implements OnInit, OnDestroy {
     this.sortMeta = null;
     this.multiSortMeta = null;
     this.first = 0;
-    this.selectedRecords = [];
+    this.selection = [];
   }
 
   onStateSave(state: TableState) {

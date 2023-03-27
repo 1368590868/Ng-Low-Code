@@ -9,9 +9,7 @@ import {
   GridSearchConfig
 } from '../models/grid-types';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class GridTableService {
   public searchClicked$ = new Subject<SearchParam>();
 
