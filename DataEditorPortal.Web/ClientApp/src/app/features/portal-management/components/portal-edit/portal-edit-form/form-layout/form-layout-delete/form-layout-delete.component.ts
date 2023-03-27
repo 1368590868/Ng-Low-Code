@@ -100,7 +100,7 @@ export class FormLayoutDeleteComponent {
       }
     }
     if (
-      this.formControlOnValidateConfig.value &&
+      this.formControlOnValidateConfig.value?.eventType &&
       !this.formControlOnValidateConfig.value.script
     ) {
       this.notifyService.notifyWarning(
@@ -110,7 +110,7 @@ export class FormLayoutDeleteComponent {
       return false;
     }
     if (
-      this.formControlOnAfterSavedConfig.value &&
+      this.formControlOnAfterSavedConfig.value?.eventType &&
       !this.formControlOnAfterSavedConfig.value.script
     ) {
       this.notifyService.notifyWarning(
@@ -126,8 +126,13 @@ export class FormLayoutDeleteComponent {
   getValue(): GridFormConfig {
     const data = JSON.parse(JSON.stringify(this._formConfig)) as GridFormConfig;
     if (data.queryText === this.helperMessage) data.queryText = undefined;
-    data.onValidate = this.formControlOnValidateConfig.value;
-    data.afterSaved = this.formControlOnAfterSavedConfig.value;
+
+    data.onValidate = !this.formControlOnValidateConfig.value?.eventType
+      ? undefined
+      : this.formControlOnValidateConfig.value;
+    data.afterSaved = !this.formControlOnAfterSavedConfig.value?.eventType
+      ? undefined
+      : this.formControlOnAfterSavedConfig.value;
 
     return data;
   }

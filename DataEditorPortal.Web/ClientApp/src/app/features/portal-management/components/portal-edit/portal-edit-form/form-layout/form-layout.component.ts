@@ -213,7 +213,7 @@ export class FormLayoutComponent {
           return false;
         }
         if (
-          this.formControlOnValidateConfig.value &&
+          this.formControlOnValidateConfig.value?.eventType &&
           !this.formControlOnValidateConfig.value.script
         ) {
           this.notifyService.notifyWarning(
@@ -223,7 +223,7 @@ export class FormLayoutComponent {
           return false;
         }
         if (
-          this.formControlOnAfterSavedConfig.value &&
+          this.formControlOnAfterSavedConfig.value?.eventType &&
           !this.formControlOnAfterSavedConfig.value.script
         ) {
           this.notifyService.notifyWarning(
@@ -256,7 +256,7 @@ export class FormLayoutComponent {
           return false;
         }
         if (
-          this.formControlOnValidateConfig.value &&
+          this.formControlOnValidateConfig.value?.eventType &&
           !this.formControlOnValidateConfig.value.script
         ) {
           this.notifyService.notifyWarning(
@@ -266,7 +266,7 @@ export class FormLayoutComponent {
           return false;
         }
         if (
-          this.formControlOnAfterSavedConfig.value &&
+          this.formControlOnAfterSavedConfig.value?.eventType &&
           !this.formControlOnAfterSavedConfig.value.script
         ) {
           this.notifyService.notifyWarning(
@@ -286,11 +286,11 @@ export class FormLayoutComponent {
     if (!data.useCustomForm) data.formFields = this.targetColumns;
     if (data.queryText === this.helperMessage) data.queryText = undefined;
 
-    data.onValidate = !this.formControlOnValidateConfig.value
-      ? { eventType: '', script: '' }
+    data.onValidate = !this.formControlOnValidateConfig.value?.eventType
+      ? undefined
       : this.formControlOnValidateConfig.value;
-    data.afterSaved = !this.formControlOnAfterSavedConfig.value
-      ? { eventType: '', script: '' }
+    data.afterSaved = !this.formControlOnAfterSavedConfig.value?.eventType
+      ? undefined
       : this.formControlOnAfterSavedConfig.value;
 
     return data;

@@ -112,13 +112,22 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
       });
     });
     this.formControlText.valueChanges.subscribe(() => {
-      this.onChange?.({
-        eventType: this.formControlType.value,
-        script:
-          this.formControlText.value === this.helperMessage
-            ? null
-            : this.formControlText.value
-      });
+      if (
+        this.formControlText.value === this.helperMessage ||
+        !this.formControlText.value
+      ) {
+        this.onChange?.({
+          eventType: this.formControlType.value
+        });
+      } else {
+        this.onChange?.({
+          eventType: this.formControlType.value,
+          script:
+            this.formControlText.value === this.helperMessage
+              ? null
+              : this.formControlText.value
+        });
+      }
     });
   }
 
@@ -136,5 +145,9 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
         this.formControlText.setValue(this.helperMessage, { emitEvent: false });
       }
     });
+  }
+
+  onClear() {
+    this.formControlText.setValue(undefined);
   }
 }
