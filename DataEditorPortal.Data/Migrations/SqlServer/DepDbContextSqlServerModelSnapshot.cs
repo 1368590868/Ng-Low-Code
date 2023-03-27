@@ -427,6 +427,45 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.ToTable("UNIVERSAL_GRID_CONFIGURATIONS");
                 });
 
+            modelBuilder.Entity("DataEditorPortal.Data.Models.UploadedFile", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("ID");
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("COMMENTS");
+
+                    b.Property<string>("ContentType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CONTENT_TYPE");
+
+                    b.Property<byte[]>("FileBytes")
+                        .HasColumnType("varbinary(max)")
+                        .HasColumnName("FILE_BYTES");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("FILE_NAME");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("FILE_PATH");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("STATUS");
+
+                    b.Property<int>("StorageType")
+                        .HasColumnType("int")
+                        .HasColumnName("STORAGE_TYPE");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UPLOADED_FILE");
+                });
+
             modelBuilder.Entity("DataEditorPortal.Data.Models.User", b =>
                 {
                     b.Property<Guid>("Id")

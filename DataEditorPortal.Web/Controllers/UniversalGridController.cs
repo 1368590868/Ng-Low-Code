@@ -14,7 +14,7 @@ namespace DataEditorPortal.Web.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("/api/[controller]")]
+    [Route("/api/universal-grid")]
     public class UniversalGridController : ControllerBase
     {
         private readonly ILogger<UniversalGridController> _logger;

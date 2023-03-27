@@ -6,4 +6,17 @@
         Published,
         UnPublished
     }
+
+    public enum UploadedFileStatus
+    {
+        New,
+        Current,
+        Deleted
+    }
+
+    public enum FileStorageType
+    {
+        FileSystem,
+        SqlBinary
+    }
 }

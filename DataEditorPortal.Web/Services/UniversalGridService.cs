@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Dapper;
+using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
@@ -542,8 +543,13 @@ namespace DataEditorPortal.Web.Services
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
-
                 con.Open();
+                var trans = con.BeginTransaction();
+
+                #region prepair values and params
+
+                // process file upload, store json string
+                ProcessFileUploadFileds(formLayout.FormFields, model);
 
                 // calculate the computed field values
                 AssignComputedValues(formLayout.FormFields, model, con);
@@ -563,16 +569,19 @@ namespace DataEditorPortal.Web.Services
                     QueryText = formLayout.QueryText
                 });
 
-                // generate the insert command
-                var trans = con.BeginTransaction();
-
                 // add query parameters
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
+
+                #endregion
 
                 // excute command
                 try
                 {
                     var affected = con.Execute(queryText, param, trans);
+
+                    // process file upload
+                    SaveUploadedFiles(config.Name, formLayout.FormFields, model);
+
                     trans.Commit();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
@@ -637,8 +646,13 @@ namespace DataEditorPortal.Web.Services
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
-
                 con.Open();
+                var trans = con.BeginTransaction();
+
+                #region prepair values and paramsters
+
+                // process file upload, store json string
+                ProcessFileUploadFileds(formLayout.FormFields, model);
 
                 // calculate the computed field values
                 AssignComputedValues(formLayout.FormFields, model, con);
@@ -659,9 +673,6 @@ namespace DataEditorPortal.Web.Services
                     QueryText = formLayout.QueryText
                 });
 
-                // generate the update command
-                var trans = con.BeginTransaction();
-
                 // add query parameters
                 if (model.ContainsKey(dataSourceConfig.IdColumn))
                     model[dataSourceConfig.IdColumn] = id;
@@ -669,10 +680,16 @@ namespace DataEditorPortal.Web.Services
                     model.Add(dataSourceConfig.IdColumn, id);
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
 
+                #endregion
+
                 // excute command
                 try
                 {
                     var affected = con.Execute(queryText, param, trans);
+
+                    // process file upload
+                    SaveUploadedFiles(config.Name, formLayout.FormFields, model);
+
                     trans.Commit();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, $"{affected} rows affected.");
@@ -830,9 +847,6 @@ namespace DataEditorPortal.Web.Services
 
         #endregion
 
-
-        #region Event
-
         private void AfterSaved(EventActionModel actionConfig, Dictionary<string, object> model)
         {
             var eventConfig = actionConfig.EventConfig;
@@ -914,8 +928,55 @@ namespace DataEditorPortal.Web.Services
                 });
                 _logger.LogError(ex.Message, ex);
             }
+        }
 
-            #endregion
+        private IFileStorageService GetFileStorageService(FileStorageType type)
+        {
+            switch (type)
+            {
+                case FileStorageType.FileSystem:
+                    return _serviceProvider.GetRequiredService<PhsicalFileStorageService>();
+                case FileStorageType.SqlBinary:
+                    return _serviceProvider.GetRequiredService<BinaryFileStorageService>();
+                default:
+                    return _serviceProvider.GetRequiredService<PhsicalFileStorageService>();
+            }
+        }
+
+        private void ProcessFileUploadFileds(List<FormFieldConfig> formFields, Dictionary<string, object> model)
+        {
+            var fileUploadFields = formFields.Where(x => x.type == "fileUpload").ToList();
+            foreach (var field in fileUploadFields)
+            {
+                if (model.ContainsKey(field.key))
+                {
+                    var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                    var jsonElement = (JsonElement)model[field.key];
+                    if (jsonElement.ValueKind == JsonValueKind.Array)
+                        model[field.key] = JsonSerializer.Serialize(model[field.key], jsonOptions);
+                    else
+                        model[field.key] = "[]";
+                }
+            }
+        }
+
+        private void SaveUploadedFiles(string gridName, List<FormFieldConfig> formFields, Dictionary<string, object> model)
+        {
+            var fileUploadFields = formFields.Where(x => x.type == "fileUpload").ToList();
+            foreach (var field in fileUploadFields)
+            {
+                if (model.ContainsKey(field.key))
+                {
+                    var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                    // model[field.key] will not be null, it will always has value, after ProcessFileUploadFileds
+                    var uploadedFiles = JsonSerializer.Deserialize<List<UploadedFileModel>>(model[field.key].ToString(), jsonOptions);
+                    var storageType = ((JsonElement)field.props).GetProperty("storageType").ToString();
+                    FileStorageType storageTypeEnum = FileStorageType.FileSystem;
+                    Enum.TryParse(storageType, out storageTypeEnum);
+                    var fileStorageService = GetFileStorageService(storageTypeEnum);
+                    fileStorageService.SaveFiles(uploadedFiles, gridName);
+                }
+            }
         }
     }
 }

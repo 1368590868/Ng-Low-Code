@@ -41,6 +41,11 @@ namespace DataEditorPortal.Data.Contexts
             {
                 entity.Property(e => e.Content).HasColumnType("CLOB");
             });
+
+            modelBuilder.Entity<UploadedFile>(entity =>
+            {
+                entity.Property(e => e.FileBytes).HasColumnType("BLOB");
+            });
         }
     }
 }

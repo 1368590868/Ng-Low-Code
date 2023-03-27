@@ -109,6 +109,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public List<FormFieldConfig> FormFields { get; set; } = new List<FormFieldConfig>();
         public string QueryText { get; set; }
         public FormEventConfig AfterSaved { get; set; }
+        public FormEventConfig OnValidate { get; set; }
     }
 
     public class CustomAction
