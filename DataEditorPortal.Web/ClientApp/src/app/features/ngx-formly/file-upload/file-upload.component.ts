@@ -141,7 +141,7 @@ export class FileUploadComponent implements ControlValueAccessor {
     [maxFileSize]="props.maxFileSize"></app-file-upload>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldFileUploadEditorComponent extends FieldType<
+export class FormlyFieldFileUploadComponent extends FieldType<
   FieldTypeConfig<
     FormlyFieldProps & { options: any[]; accept: string; maxFileSize: number }
   >
