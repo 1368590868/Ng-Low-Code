@@ -54,6 +54,11 @@ export const FROM_DESIGNER_CONTROLS: {
     label: 'Input Number',
     value: 'inputNumber',
     filterType: 'numeric'
+  },
+  {
+    label: 'File Upload',
+    value: 'fileUpload',
+    filterType: 'text'
   }
 ];
 
@@ -179,7 +184,7 @@ export class FormDesignerConfigComponent {
             placeholder: 'Enter placeholder'
           },
           expressions: {
-            hide: `['checkbox', 'radio', 'checkboxList'].indexOf(field.parent.parent.model.type) >= 0`
+            hide: `['checkbox', 'radio', 'checkboxList' , 'fileUpload'].indexOf(field.parent.parent.model.type) >= 0`
           }
         },
         // props for select, mutiSelect, checkboxList, radio
@@ -262,6 +267,31 @@ export class FormDesignerConfigComponent {
           ],
           expressions: {
             hide: `'datepicker' !== field.parent.parent.model.type`
+          }
+        },
+        // props for file upload
+        {
+          fieldGroup: [
+            {
+              key: 'accept',
+              type: 'input',
+              props: {
+                label: 'Accept',
+                placeholder:
+                  'Pattern to restrict the allowed file types such as "image/*".'
+              }
+            },
+            {
+              key: 'maxFileSize',
+              type: 'inputNumber',
+              props: {
+                label: 'MaxFileSize',
+                placeholder: 'Maximum file size allowed in bytes.'
+              }
+            }
+          ],
+          expressions: {
+            hide: `'fileUpload' !== field.parent.parent.model.type`
           }
         },
         {
