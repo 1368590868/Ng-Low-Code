@@ -28,6 +28,8 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
   isJs = false;
   jsOptions: { label: string; value: string }[] = [];
   language = 'sql';
+  scriptText = null;
+  @Input() labelName = 'On Validate';
 
   typeOptions = [
     { label: 'Query Text', value: 'QueryText' },
@@ -37,8 +39,8 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
   ];
 
   writeValue(value: any): void {
-    this.formControlText.setValue(value?.Script ?? this.helperMessage);
-    this.formControlType.setValue(value?.EventType);
+    this.scriptText = value?.script ?? null;
+    this.formControlType.setValue(value?.eventType);
     this.value = value;
   }
   registerOnChange(fn: any): void {
@@ -77,22 +79,33 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
       if (val === 'CommandLine') {
         this.language = 'bat';
         this.helperMessage = 'rem Enter the command line . ';
-        this.formControlText.setValue(this.helperMessage);
-      } else {
+        this.formControlText.setValue(this.scriptText ?? this.helperMessage);
+      } else if (val !== 'Javascript') {
         this.language = 'sql';
         this.helperMessage = '-- Enter the query text . ';
-        this.formControlText.setValue(this.helperMessage);
+        this.formControlText.setValue(this.scriptText ?? this.helperMessage);
       }
 
+      const isJsText = this.jsOptions.find(x => this.scriptText === x.value);
+
       if (val === 'Javascript') {
+        this.formControlText.setValue(this.scriptText, { emitEvent: false });
+        if (!isJsText) {
+          this.formControlText.setValue(null, { emitEvent: false });
+        }
         this.isJs = true;
       } else {
+        if (isJsText) {
+          this.formControlText.setValue(this.helperMessage, {
+            emitEvent: false
+          });
+        }
         this.isJs = false;
       }
 
       this.onChange?.({
-        EventType: this.formControlType.value,
-        Script:
+        eventType: this.formControlType.value,
+        script:
           this.formControlText.value === this.helperMessage
             ? null
             : this.formControlText.value
@@ -100,8 +113,8 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
     });
     this.formControlText.valueChanges.subscribe(() => {
       this.onChange?.({
-        EventType: this.formControlType.value,
-        Script:
+        eventType: this.formControlType.value,
+        script:
           this.formControlText.value === this.helperMessage
             ? null
             : this.formControlText.value

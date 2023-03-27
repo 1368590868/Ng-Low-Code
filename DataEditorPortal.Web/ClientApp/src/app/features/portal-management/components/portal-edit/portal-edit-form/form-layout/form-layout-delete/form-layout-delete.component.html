@@ -38,9 +38,18 @@
     class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
     [options]="{}"></ngx-monaco-editor>
 </div>
-<p-divider> On Validate </p-divider>
+<p-divider>
+  <p-button
+    label="Event Settings"
+    [icon]="showOnValidate ? 'pi pi-minus' : 'pi pi-plus'"
+    styleClass="p-button-text p-button-sm"
+    (onClick)="showOnValidate = !showOnValidate"></p-button>
+</p-divider>
 <app-event-config
+  *ngIf="showOnValidate"
   [formControl]="formControlOnValidateConfig"></app-event-config>
-<p-divider> On After Saved </p-divider>
+<p class="mt-6"></p>
 <app-event-config
+  *ngIf="showOnValidate"
+  labelName="On After Saved"
   [formControl]="formControlOnAfterSavedConfig"></app-event-config>

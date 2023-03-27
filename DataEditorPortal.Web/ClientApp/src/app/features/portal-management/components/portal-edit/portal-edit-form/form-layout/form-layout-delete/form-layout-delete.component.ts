@@ -14,6 +14,7 @@ export class FormLayoutDeleteComponent {
     '-- E.g. \r\n\r\n' + '-- DELETE DEMO_TABLE WHERE ID IN ##ID##';
 
   _formConfig: GridFormConfig = {};
+  showOnValidate = false;
   @Input() type!: string;
   @Input()
   set config(val: GridFormConfig) {
@@ -98,6 +99,27 @@ export class FormLayoutDeleteComponent {
         }
       }
     }
+    if (
+      this.formControlOnValidateConfig.value &&
+      !this.formControlOnValidateConfig.value.script
+    ) {
+      this.notifyService.notifyWarning(
+        'Warning',
+        'Please input script for Delete On Validate.'
+      );
+      return false;
+    }
+    if (
+      this.formControlOnAfterSavedConfig.value &&
+      !this.formControlOnAfterSavedConfig.value.script
+    ) {
+      this.notifyService.notifyWarning(
+        'Warning',
+        'Please input script for On Delete After Saved.'
+      );
+      return false;
+    }
+
     return true;
   }
 

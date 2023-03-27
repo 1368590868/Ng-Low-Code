@@ -92,6 +92,7 @@ export class FormLayoutComponent {
   customActions: { label: string | undefined; value: string }[] = [];
 
   showQuery = false;
+  showOnValidate = false;
   // showFetchQuery = false;
   formControlQueryText = new FormControl();
   formControlOnValidateConfig = new FormControl();
@@ -211,6 +212,26 @@ export class FormLayoutComponent {
           );
           return false;
         }
+        if (
+          this.formControlOnValidateConfig.value &&
+          !this.formControlOnValidateConfig.value.script
+        ) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Please input script for Add On Validate.'
+          );
+          return false;
+        }
+        if (
+          this.formControlOnAfterSavedConfig.value &&
+          !this.formControlOnAfterSavedConfig.value.script
+        ) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Please input script for Add On After Saved.'
+          );
+          return false;
+        }
       }
       if (this._type === 'UPDATE') {
         if (
@@ -234,6 +255,26 @@ export class FormLayoutComponent {
           );
           return false;
         }
+        if (
+          this.formControlOnValidateConfig.value &&
+          !this.formControlOnValidateConfig.value.script
+        ) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Please input script for Update On Validate.'
+          );
+          return false;
+        }
+        if (
+          this.formControlOnAfterSavedConfig.value &&
+          !this.formControlOnAfterSavedConfig.value.script
+        ) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Please input script for Update On After Saved.'
+          );
+          return false;
+        }
       }
     }
 
@@ -245,8 +286,12 @@ export class FormLayoutComponent {
     if (!data.useCustomForm) data.formFields = this.targetColumns;
     if (data.queryText === this.helperMessage) data.queryText = undefined;
 
-    data.onValidate = this.formControlOnValidateConfig.value;
-    data.afterSaved = this.formControlOnAfterSavedConfig.value;
+    data.onValidate = !this.formControlOnValidateConfig.value
+      ? { eventType: '', script: '' }
+      : this.formControlOnValidateConfig.value;
+    data.afterSaved = !this.formControlOnAfterSavedConfig.value
+      ? { eventType: '', script: '' }
+      : this.formControlOnAfterSavedConfig.value;
 
     return data;
   }
