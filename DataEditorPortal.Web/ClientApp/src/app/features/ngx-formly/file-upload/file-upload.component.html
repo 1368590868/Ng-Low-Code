@@ -11,43 +11,40 @@
   </ng-template>
   <ng-template pTemplate="body" let-file>
     <tr>
-      <td [class]="file.isDeleted ? 'line-through' : null">
-        {{ file.fileName }}
+      <td [class]="file.status === 'Deleted' ? 'line-through' : null">
+        <span *ngIf="file.status === 'Deleted'; else download">{{
+          file.fileName
+        }}</span>
+        <ng-template #download>
+          <a
+            class="cursor-pointer text-primary"
+            (click)="tempAttachmentDownload(file)">
+            {{ file.fileName }}
+          </a>
+        </ng-template>
       </td>
-      <td [class]="file.isDeleted ? 'line-through' : null">
+      <td [class]="file.status === 'Deleted' ? 'line-through' : null">
         {{ file.fileId }}
       </td>
       <td>
-        <div class="flex justify-content-between">
-          <button
-            *ngIf="!file?.isDeleted"
-            pButton
-            pRipple
-            type="button"
-            class="p-button-text p-button-sm w-auto"
-            (click)="tempAttachmentDownload(file)">
-            <span
-              class="p-button-icon p-button-icon-left pi pi-download"></span>
-          </button>
-          <button
-            *ngIf="file?.isDeleted"
-            pButton
-            pRipple
-            type="button"
-            class="p-button-text p-button-sm w-auto"
-            (click)="tempAttachmentRestore(file)">
-            <span class="p-button-icon p-button-icon-left pi pi-refresh"></span>
-          </button>
-          <button
-            *ngIf="!file?.isDeleted"
-            pButton
-            pRipple
-            type="button"
-            class="p-button-text p-button-danger p-button-sm w-auto"
-            (click)="tempAttachmentDelete(file)">
-            <span class="p-button-icon p-button-icon-left pi pi-trash"></span>
-          </button>
-        </div>
+        <button
+          *ngIf="file.status === 'Deleted'"
+          pButton
+          pRipple
+          type="button"
+          class="p-button-text p-button-sm w-auto"
+          (click)="tempAttachmentRestore(file)">
+          <span class="p-button-icon p-button-icon-left pi pi-refresh"></span>
+        </button>
+        <button
+          *ngIf="file.status !== 'Deleted'"
+          pButton
+          pRipple
+          type="button"
+          class="p-button-text p-button-danger p-button-sm w-auto"
+          (click)="tempAttachmentDelete(file)">
+          <span class="p-button-icon p-button-icon-left pi pi-trash"></span>
+        </button>
       </td>
     </tr>
   </ng-template>
@@ -55,16 +52,18 @@
 
 <div class="flex">
   <p-fileUpload
+    *ngIf="(!multiple && newAttachments.length <= 0) || multiple"
     #AttachmentsRef
     styleClass="p-button-outlined"
     name="files"
     [url]="apiUrl + 'attachment/upload-temp-file'"
-    [multiple]="true"
+    [multiple]="multiple"
     [auto]="true"
     [maxFileSize]="maxFileSize"
+    [fileLimit]="fileLimit"
     (onProgress)="onFileUploadProgress($event)"
     mode="basic"
-    chooseLabel="Browse"
+    [chooseLabel]="chooseLabel"
     [accept]="accept"
     [disabled]="progress > 0 && progress < 100"
     (onUpload)="onUpload($event)"

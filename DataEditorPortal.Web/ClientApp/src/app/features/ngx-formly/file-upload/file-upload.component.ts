@@ -31,6 +31,9 @@ import { NotifyService } from 'src/app/shared';
 export class FileUploadComponent implements ControlValueAccessor {
   @Input() accept = '.dwg,.dxf,.dgn,.pdf,.ppt,.docx,.doc,.xlsx,.xls,image/*';
   @Input() maxFileSize = 10000;
+  @Input() chooseLabel = 'Browse';
+  @Input() multiple = false;
+  @Input() fileLimit: any = null;
   newAttachments: any[] = [];
   progress = 0;
 
@@ -71,6 +74,13 @@ export class FileUploadComponent implements ControlValueAccessor {
 
   onUpload(event: any) {
     if (event?.originalEvent?.body?.result) {
+      if (
+        this.fileLimit &&
+        event.originalEvent.body.result.length > this.fileLimit
+      ) {
+        this.notifyService.notifyError('Error', 'File Limit Exceeded');
+        return;
+      }
       for (const file of event.originalEvent.body.result) {
         this.newAttachments.push(file);
       }
@@ -90,7 +100,10 @@ export class FileUploadComponent implements ControlValueAccessor {
   }
 
   tempAttachmentDownload(data: any) {
-    const url = window.URL.createObjectURL(data);
+    const url =
+      data.status === 'New'
+        ? `${this.apiUrl}attachment/download-temp-file/${data.fileId}/${data.fileName}`
+        : `${this.apiUrl}attachment/download-file/${data.fileId}/${data.fileName}`;
     const a = document.createElement('a');
 
     a.href = url;
@@ -107,12 +120,24 @@ export class FileUploadComponent implements ControlValueAccessor {
       icon: 'pi pi-info-circle',
 
       accept: () => {
-        this.newAttachments.find((x: any) => x.name === data.name).isDeleted =
-          true;
-        this.notifyService.notifySuccess(
-          'Success',
-          'File Deleted Successfully'
-        );
+        console.log(data);
+        if (data.status === 'New') {
+          this.newAttachments = this.newAttachments.filter(
+            (x: any) => x.fileId !== data.fileId
+          );
+          this.notifyService.notifySuccess(
+            'Success',
+            'File Deleted Successfully'
+          );
+        } else {
+          this.newAttachments.find(
+            (x: any) => x.fileId === data.fileId
+          ).status = 'Deleted';
+          this.notifyService.notifySuccess(
+            'Success',
+            'File Deleted Successfully'
+          );
+        }
       }
     });
   }
@@ -124,8 +149,8 @@ export class FileUploadComponent implements ControlValueAccessor {
       icon: 'pi pi-info-circle',
 
       accept: () => {
-        this.newAttachments.find((x: any) => x.name === data.name).isDeleted =
-          false;
+        this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
+          'Current';
         this.notifyService.notifySuccess(
           'Success',
           'File Restored Successfully'
@@ -141,11 +166,21 @@ export class FileUploadComponent implements ControlValueAccessor {
     [formControl]="formControl"
     [formlyAttributes]="field"
     [accept]="props.accept"
-    [maxFileSize]="props.maxFileSize"></app-file-upload>`,
+    [maxFileSize]="props.maxFileSize"
+    [chooseLabel]="props.chooseLabel || 'Browse'"
+    [multiple]="props.multiple"
+    [fileLimit]="props.fileLimit"></app-file-upload>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldFileUploadComponent extends FieldType<
   FieldTypeConfig<
-    FormlyFieldProps & { options: any[]; accept: string; maxFileSize: number }
+    FormlyFieldProps & {
+      options: any[];
+      accept: string;
+      maxFileSize: number;
+      chooseLabel: string;
+      multiple: boolean;
+      fileLimit: number;
+    }
   >
 > {}

@@ -288,6 +288,33 @@ export class FormDesignerConfigComponent {
                 label: 'Max File Size',
                 placeholder: 'Maximum file size allowed in bytes.'
               }
+            },
+            {
+              key: 'fileLimit',
+              type: 'inputNumber',
+              props: {
+                label: 'File Limit',
+                placeholder: 'Maximum number of files that can be uploaded.'
+              }
+            },
+            {
+              key: 'chooseLabel',
+              type: 'input',
+              props: {
+                label: 'Choose Label',
+                placeholder:
+                  'Label of the choose button. Defaults to global value in i18n translation configuration.'
+              }
+            },
+            {
+              key: 'multiple',
+              type: 'checkbox',
+              defaultValue: false,
+              props: {
+                label: 'Multiple',
+                placeholder:
+                  'Used to select multiple files at once from file dialog.'
+              }
             }
           ],
           expressions: {
