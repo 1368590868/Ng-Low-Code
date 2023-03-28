@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiResponse, NotifyService } from 'src/app/shared';
 import { GridColumn } from '../../portal-management/models/portal-item';
-import { EditFormData, EditFormField } from '../models/edit';
+import { EditFormData, EditFormField, FormEventConfig } from '../models/edit';
 import { ExportParam } from '../models/export';
 
 @Injectable({
@@ -19,16 +19,28 @@ export class UniversalGridService {
     this._apiUrl = apiUrl;
   }
 
-  getDetailConfig(
+  getFormConfig(
     name: string,
     type: 'ADD' | 'UPDATE'
   ): Observable<EditFormField[]> {
     return this.http
       .get<ApiResponse<EditFormField[]>>(
-        `${this._apiUrl}universal-grid/${name}/config/detail`,
+        `${this._apiUrl}universal-grid/${name}/config/form`,
         { params: { type } }
       )
       .pipe(map(res => res.result || []));
+  }
+
+  getEventConfig(
+    name: string,
+    type: 'ADD' | 'UPDATE' | 'DELETE'
+  ): Observable<FormEventConfig> {
+    return this.http
+      .get<ApiResponse<FormEventConfig>>(
+        `${this._apiUrl}universal-grid/${name}/config/event`,
+        { params: { type } }
+      )
+      .pipe(map(res => res.result || {}));
   }
 
   getDetailData(name: string, id: string): Observable<EditFormData> {

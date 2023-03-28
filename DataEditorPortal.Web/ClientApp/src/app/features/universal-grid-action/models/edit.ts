@@ -8,3 +8,12 @@ export interface EditFormField {
 export interface EditFormData {
   [name: string]: any;
 }
+
+export interface FormEventMeta {
+  eventType?: string;
+  script?: string;
+}
+export interface FormEventConfig {
+  afterSaved?: FormEventMeta;
+  onValidate?: FormEventMeta;
+}
