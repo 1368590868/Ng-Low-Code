@@ -107,6 +107,7 @@ export class FileUploadComponent implements ControlValueAccessor {
     const a = document.createElement('a');
 
     a.href = url;
+    a.target = '_black';
     const fileName = data.name;
     a.download = fileName;
     a.click();

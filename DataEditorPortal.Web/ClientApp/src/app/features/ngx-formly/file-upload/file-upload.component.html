@@ -5,8 +5,8 @@
   <ng-template pTemplate="header">
     <tr>
       <th style="width: 40%">Name</th>
-      <th style="width: 40%">Comment</th>
-      <th style="width: 20%"></th>
+      <th>Comment</th>
+      <th style="width: 50px"></th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-file>
@@ -26,25 +26,23 @@
       <td [class]="file.status === 'Deleted' ? 'line-through' : null">
         {{ file.fileId }}
       </td>
-      <td>
+      <td class="text-right">
         <button
           *ngIf="file.status === 'Deleted'"
           pButton
           pRipple
+          icon="pi pi-refresh"
           type="button"
-          class="p-button-text p-button-sm w-auto"
-          (click)="tempAttachmentRestore(file)">
-          <span class="p-button-icon p-button-icon-left pi pi-refresh"></span>
-        </button>
+          class="p-button-text p-button-sm p-button-rounded"
+          (click)="tempAttachmentRestore(file)"></button>
         <button
           *ngIf="file.status !== 'Deleted'"
           pButton
           pRipple
+          icon="pi pi-trash"
           type="button"
-          class="p-button-text p-button-danger p-button-sm w-auto"
-          (click)="tempAttachmentDelete(file)">
-          <span class="p-button-icon p-button-icon-left pi pi-trash"></span>
-        </button>
+          class="p-button-text p-button-danger p-button-sm p-button-rounded"
+          (click)="tempAttachmentDelete(file)"></button>
       </td>
     </tr>
   </ng-template>
