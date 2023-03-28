@@ -60,10 +60,17 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{name}/config/detail")]
-        public List<FormFieldConfig> GridDetail(string name, [FromQuery] string type)
+        [Route("{name}/config/form")]
+        public List<FormFieldConfig> GridFormConfig(string name, [FromQuery] string type)
         {
-            return _universalGridService.GetGridDetailConfig(name, type);
+            return _universalGridService.GetGridFormConfig(name, type);
+        }
+
+        [HttpGet]
+        [Route("{name}/config/event")]
+        public GridFormLayout GridEventConfig(string name, [FromQuery] string type)
+        {
+            return _universalGridService.GetFormEventConfig(name, type);
         }
 
         [HttpPost]
@@ -78,6 +85,13 @@ namespace DataEditorPortal.Web.Controllers
         public IDictionary<string, object> FetchDataDetail(string name, string id)
         {
             return _universalGridService.GetGridDataDetail(name, id);
+        }
+
+        [HttpPost]
+        [Route("{name}/data/{type}/validate/{id?}")]
+        public bool ValidateData(string name, string type, string id, [FromBody] Dictionary<string, object> model)
+        {
+            return _universalGridService.OnValidateGridData(name, type, id, model);
         }
 
         [HttpPut]
