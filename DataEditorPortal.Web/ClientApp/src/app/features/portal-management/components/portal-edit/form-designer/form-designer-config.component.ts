@@ -273,6 +273,20 @@ export class FormDesignerConfigComponent {
         {
           fieldGroup: [
             {
+              key: 'storageType',
+              type: 'select',
+              defaultValue: 'FileSystem',
+              props: {
+                label: 'Storage Provider',
+                showClear: false,
+                options: [
+                  { label: 'File System', value: 'FileSystem' },
+                  { label: 'Sql Binary', value: 'SqlBinary' }
+                ],
+                required: true
+              }
+            },
+            {
               key: 'accept',
               type: 'input',
               props: {
