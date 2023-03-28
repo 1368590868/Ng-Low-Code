@@ -638,7 +638,6 @@ namespace DataEditorPortal.Web.Services
             }
 
             var formLayout = detailConfig.AddingForm;
-
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
@@ -648,7 +647,7 @@ namespace DataEditorPortal.Web.Services
                 #region prepair values and params
 
                 // process file upload, store json string
-                ProcessFileUploadFileds(formLayout.FormFields, model);
+                var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
 
                 // calculate the computed field values
                 AssignComputedValues(formLayout.FormFields, model, con);
@@ -679,7 +678,7 @@ namespace DataEditorPortal.Web.Services
                     var affected = con.Execute(queryText, param, trans);
 
                     // process file upload
-                    SaveUploadedFiles(config.Name, formLayout.FormFields, model);
+                    SaveUploadedFiles(config.Name, uploadedFieldsMeta);
 
                     trans.Commit();
 
@@ -751,7 +750,7 @@ namespace DataEditorPortal.Web.Services
                 #region prepair values and paramsters
 
                 // process file upload, store json string
-                ProcessFileUploadFileds(formLayout.FormFields, model);
+                var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
 
                 // calculate the computed field values
                 AssignComputedValues(formLayout.FormFields, model, con);
@@ -787,7 +786,7 @@ namespace DataEditorPortal.Web.Services
                     var affected = con.Execute(queryText, param, trans);
 
                     // process file upload
-                    SaveUploadedFiles(config.Name, formLayout.FormFields, model);
+                    SaveUploadedFiles(config.Name, uploadedFieldsMeta);
 
                     trans.Commit();
 
@@ -1042,8 +1041,9 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        private void ProcessFileUploadFileds(List<FormFieldConfig> formFields, Dictionary<string, object> model)
+        private Dictionary<string, List<UploadedFileModel>> ProcessFileUploadFileds(List<FormFieldConfig> formFields, Dictionary<string, object> model)
         {
+            var result = new Dictionary<string, List<UploadedFileModel>>();
             var fileUploadFields = formFields.Where(x => x.type == "fileUpload").ToList();
             foreach (var field in fileUploadFields)
             {
@@ -1051,30 +1051,30 @@ namespace DataEditorPortal.Web.Services
                 {
                     var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
                     var jsonElement = (JsonElement)model[field.key];
-                    if (jsonElement.ValueKind == JsonValueKind.Array)
-                        model[field.key] = JsonSerializer.Serialize(model[field.key], jsonOptions);
+                    if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
+                    {
+                        var valueStr = jsonElement.ToString();
+                        model[field.key] = valueStr.Replace("\"status\":\"New\"", "\"status\":\"Current\"");
+
+                        var storageType = ((JsonElement)field.props).GetProperty("storageType").ToString();
+                        result.Add(storageType, JsonSerializer.Deserialize<List<UploadedFileModel>>(valueStr, jsonOptions));
+                    }
                     else
                         model[field.key] = "[]";
                 }
             }
+            return result;
         }
 
-        private void SaveUploadedFiles(string gridName, List<FormFieldConfig> formFields, Dictionary<string, object> model)
+        private void SaveUploadedFiles(string gridName, Dictionary<string, List<UploadedFileModel>> uploadedFiledsMeta)
         {
-            var fileUploadFields = formFields.Where(x => x.type == "fileUpload").ToList();
-            foreach (var field in fileUploadFields)
+            foreach (var meta in uploadedFiledsMeta)
             {
-                if (model.ContainsKey(field.key))
-                {
-                    var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                    // model[field.key] will not be null, it will always has value, after ProcessFileUploadFileds
-                    var uploadedFiles = JsonSerializer.Deserialize<List<UploadedFileModel>>(model[field.key].ToString(), jsonOptions);
-                    var storageType = ((JsonElement)field.props).GetProperty("storageType").ToString();
-                    FileStorageType storageTypeEnum = FileStorageType.FileSystem;
-                    Enum.TryParse(storageType, out storageTypeEnum);
-                    var fileStorageService = GetFileStorageService(storageTypeEnum);
-                    fileStorageService.SaveFiles(uploadedFiles, gridName);
-                }
+                var storageType = meta.Key;
+                FileStorageType storageTypeEnum = FileStorageType.FileSystem;
+                Enum.TryParse(storageType, out storageTypeEnum);
+                var fileStorageService = GetFileStorageService(storageTypeEnum);
+                fileStorageService.SaveFiles(meta.Value, gridName);
             }
         }
     }
