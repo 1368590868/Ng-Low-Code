@@ -285,7 +285,7 @@ export class FormDesignerConfigComponent {
               key: 'maxFileSize',
               type: 'inputNumber',
               props: {
-                label: 'MaxFileSize',
+                label: 'Max File Size',
                 placeholder: 'Maximum file size allowed in bytes.'
               }
             }

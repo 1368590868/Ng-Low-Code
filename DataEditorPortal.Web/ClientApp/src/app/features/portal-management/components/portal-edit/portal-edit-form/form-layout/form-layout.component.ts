@@ -218,7 +218,7 @@ export class FormLayoutComponent {
         ) {
           this.notifyService.notifyWarning(
             'Warning',
-            'Please input script for Add On Validate.'
+            'Please complete On Validate settings for Adding.'
           );
           return false;
         }
@@ -228,7 +228,7 @@ export class FormLayoutComponent {
         ) {
           this.notifyService.notifyWarning(
             'Warning',
-            'Please input script for Add On After Saved.'
+            'Please complete On After Saved settings for Adding.'
           );
           return false;
         }
@@ -261,7 +261,7 @@ export class FormLayoutComponent {
         ) {
           this.notifyService.notifyWarning(
             'Warning',
-            'Please input script for Update On Validate.'
+            'Please complete On Validate settings for Updating.'
           );
           return false;
         }
@@ -271,7 +271,7 @@ export class FormLayoutComponent {
         ) {
           this.notifyService.notifyWarning(
             'Warning',
-            'Please input script for Update On After Saved.'
+            'Please complete On After Saved settings for Updating.'
           );
           return false;
         }

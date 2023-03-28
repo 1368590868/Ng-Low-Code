@@ -105,7 +105,7 @@ export class FormLayoutDeleteComponent {
     ) {
       this.notifyService.notifyWarning(
         'Warning',
-        'Please input script for Delete On Validate.'
+        'Please complete On Validate settings for Deleting.'
       );
       return false;
     }
@@ -115,7 +115,7 @@ export class FormLayoutDeleteComponent {
     ) {
       this.notifyService.notifyWarning(
         'Warning',
-        'Please input script for On Delete After Saved.'
+        'Please complete On After Saved settings for Deleting.'
       );
       return false;
     }
