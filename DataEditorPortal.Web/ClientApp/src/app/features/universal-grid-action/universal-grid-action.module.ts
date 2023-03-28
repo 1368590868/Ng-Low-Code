@@ -44,7 +44,8 @@ import { UserPermissionActionComponent } from './components/user-permission-acti
 import { SharedModule } from 'src/app/shared';
 import {
   OnValidateDemoActionHandler,
-  OnAfterSavedDemoActionHandler
+  OnAfterSavedDemoActionHandler,
+  AsyncQueryTextActionHandler
 } from './services/event-action-handler.service';
 
 const GRID_ACTION_CONFIG = [
@@ -250,7 +251,8 @@ const EVENT_ACTION_CONFIG = [
       provide: 'EVENT_ACTION_CONFIG',
       useValue: EVENT_ACTION_CONFIG
     },
-    EVENT_ACTION_CONFIG.map(x => x.handler)
+    EVENT_ACTION_CONFIG.map(x => x.handler),
+    AsyncQueryTextActionHandler
   ]
 })
 export class UniversalGridActionModule {}
