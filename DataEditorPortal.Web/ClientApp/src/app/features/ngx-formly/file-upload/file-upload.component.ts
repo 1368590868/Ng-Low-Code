@@ -42,6 +42,9 @@ export class FileUploadComponent implements ControlValueAccessor {
 
   @Input()
   set value(val: any) {
+    if (typeof val === 'string') {
+      val = JSON.parse(val);
+    }
     this.newAttachments = val ?? [];
   }
 
