@@ -115,49 +115,21 @@ export class FileUploadComponent implements ControlValueAccessor {
   }
 
   tempAttachmentDelete(data: any) {
-    this.confirmationService.confirm({
-      message: 'Are you sure that you want to remove ' + data.name + '?',
-      header: 'Delete File',
-      icon: 'pi pi-info-circle',
-
-      accept: () => {
-        console.log(data);
-        if (data.status === 'New') {
-          this.newAttachments = this.newAttachments.filter(
-            (x: any) => x.fileId !== data.fileId
-          );
-          this.notifyService.notifySuccess(
-            'Success',
-            'File Deleted Successfully'
-          );
-        } else {
-          this.newAttachments.find(
-            (x: any) => x.fileId === data.fileId
-          ).status = 'Deleted';
-          this.notifyService.notifySuccess(
-            'Success',
-            'File Deleted Successfully'
-          );
-        }
-      }
-    });
+    if (data.status === 'New') {
+      this.newAttachments = this.newAttachments.filter(
+        (x: any) => x.fileId !== data.fileId
+      );
+    } else {
+      this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
+        'Deleted';
+    }
+    this.onChange(this.newAttachments);
   }
 
   tempAttachmentRestore(data: any) {
-    this.confirmationService.confirm({
-      message: 'Are you sure that you want to restored ' + data.name + '?',
-      header: 'Restored File',
-      icon: 'pi pi-info-circle',
-
-      accept: () => {
-        this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
-          'Current';
-        this.notifyService.notifySuccess(
-          'Success',
-          'File Restored Successfully'
-        );
-      }
-    });
+    this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
+      'Current';
+    this.onChange(this.newAttachments);
   }
 }
 
