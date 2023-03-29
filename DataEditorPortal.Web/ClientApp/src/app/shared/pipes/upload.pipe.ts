@@ -20,7 +20,7 @@ export class UploadPipe implements PipeTransform {
     return value.map((item: UploadType) => {
       if (item.status !== 'Deleted') {
         const url = `${this._apiUrl}attachment/download-file/${item.fileId}/${item.fileName}`;
-        const html = `<a href=${url} target="_blank">${item.fileName}</a>`;
+        const html = `<a href=${url} target="_blank" class="no-underline cursor-pointer text-primary">${item.fileName}</a>`;
         console.log(html);
         return html;
       }
