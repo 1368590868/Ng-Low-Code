@@ -105,7 +105,12 @@ namespace DataEditorPortal.Web.Controllers
                     return File(stream, "application/octet-stream", fileName);
                 }
             }
-            return null;
+            return new ContentResult
+            {
+                Content = "<h1 style='text-align:center'>File Not Found</h1><script>setTimeout(function(){window.close()}, 2000)</script>",
+                ContentType = "text/html",
+                StatusCode = 404
+            };
         }
 
         [HttpGet]
@@ -115,7 +120,12 @@ namespace DataEditorPortal.Web.Controllers
         {
             var uploadedFile = _depDbContext.UploadedFiles.FirstOrDefault(x => x.Id == fileId);
             if (uploadedFile == null)
-                return null;
+                return new ContentResult
+                {
+                    Content = "<h1 style='text-align:center'>File Not Found</h1><script>setTimeout(function(){window.close()}, 2000)</script>",
+                    ContentType = "text/html",
+                    StatusCode = 404
+                };
 
             var fileStorageService = GetFileStorageService(uploadedFile.StorageType);
             var stream = fileStorageService.GetFileStream(uploadedFile.Id);
