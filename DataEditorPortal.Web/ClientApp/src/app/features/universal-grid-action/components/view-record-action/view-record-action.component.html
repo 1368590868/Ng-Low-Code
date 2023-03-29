@@ -36,7 +36,9 @@
             | number : (viewData.format === '' ? undefined : viewData.format)
         }}</ng-template>
         <ng-template #upload
-          ><span [innerHTML]="viewData.value | upload"></span>
+          ><div
+            [innerHTML]="viewData.value | upload"
+            class="flex flex-column"></div>
         </ng-template>
         <ng-template #normal>{{ viewData.value }}</ng-template>
         <span
