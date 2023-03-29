@@ -351,9 +351,6 @@ export class FormDesignerConfigComponent {
           wrappers: ['divider'],
           props: {
             label: 'Validator'
-          },
-          expressions: {
-            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         },
         {
@@ -361,12 +358,12 @@ export class FormDesignerConfigComponent {
           type: 'validatorEditor',
           props: {
             label: ''
-          },
-          expressions: {
-            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         }
-      ]
+      ],
+      expressions: {
+        hide: `'fileUpload' === field.parent.model.type`
+      }
     },
     {
       fieldGroup: [
@@ -374,9 +371,6 @@ export class FormDesignerConfigComponent {
           wrappers: ['divider'],
           props: {
             label: 'Computed Value'
-          },
-          expressions: {
-            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         },
         {
@@ -384,12 +378,12 @@ export class FormDesignerConfigComponent {
           type: 'computedValueEditor',
           props: {
             label: ''
-          },
-          expressions: {
-            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         }
-      ]
+      ],
+      expressions: {
+        hide: `'fileUpload' === field.parent.model.type`
+      }
     }
   ];
 

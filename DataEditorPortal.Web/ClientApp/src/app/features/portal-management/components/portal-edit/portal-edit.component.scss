@@ -1,4 +1,33 @@
+@mixin flex-column-grow-1 {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 :host {
+  .layout-content {
+    min-height: calc(100vh - 7rem);
+    @include flex-column-grow-1;
+
+    ::ng-deep {
+      router-outlet + * {
+        @include flex-column-grow-1;
+        p-card {
+          @include flex-column-grow-1;
+          .p-card {
+            @include flex-column-grow-1;
+            .p-card-body {
+              @include flex-column-grow-1;
+              .p-card-footer {
+                margin-top: auto;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   ::ng-deep {
     .p-steps .p-steps-item .p-menuitem-link:not(.p-disabled):focus {
       box-shadow: none;
