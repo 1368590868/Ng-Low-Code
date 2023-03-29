@@ -13,19 +13,28 @@ export class UploadPipe implements PipeTransform {
   constructor(@Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
   }
-  transform(value: UploadType[]): string[] {
-    if (!value) return [];
-    if (typeof value === 'string') value = JSON.parse(value);
+  transform(value: string, isShowAll = false): string {
+    let parseVal: UploadType[] = [];
+    if (!value) return '';
+    if (typeof value === 'string') parseVal = JSON.parse(value);
 
-    return value.map((item: UploadType) => {
-      if (item.status !== 'Deleted') {
+    const filterArray = parseVal.filter(item => item?.status !== 'Deleted');
+    const result = filterArray
+      .map(item => {
         const url = `${this._apiUrl}attachment/download-file/${item.fileId}/${item.fileName}`;
         const html = `<a href=${url} target="_blank" class="no-underline cursor-pointer text-primary">${item.fileName}</a>`;
-        console.log(html);
         return html;
-      }
+      })
+      .join('|');
 
-      return '';
-    });
+    if (isShowAll) {
+      if (filterArray.length > 0) return result.split('|').join('');
+      else return '';
+    } else {
+      console.log(result);
+      if (filterArray.length === 1) return result;
+      if (filterArray.length > 1) return `${filterArray.length} attachments`;
+      else return '';
+    }
   }
 }
