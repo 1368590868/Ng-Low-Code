@@ -109,6 +109,10 @@ export class PortalEditColumnsComponent implements OnInit {
               {
                 label: 'Enums',
                 value: 'enums'
+              },
+              {
+                label: 'Upload',
+                value: 'upload'
               }
             ]
           }
