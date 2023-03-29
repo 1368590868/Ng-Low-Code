@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormlyModule } from '@ngx-formly/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { FormlyFormFieldModule } from '@ngx-formly/primeng/form-field';
 import { FormlySelectModule } from '@ngx-formly/core/select';
 import { FormlyFieldMultiSelectComponent } from './multiselect.type';
 
@@ -13,8 +12,6 @@ import { FormlyFieldMultiSelectComponent } from './multiselect.type';
     CommonModule,
     ReactiveFormsModule,
     MultiSelectModule,
-
-    FormlyFormFieldModule,
     FormlyModule.forChild({
       types: [
         {

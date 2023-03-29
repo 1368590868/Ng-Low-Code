@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 import { MonacoEditorModule } from 'ngx-monaco-editor';
-
-import { FormlyFormFieldModule } from '@ngx-formly/primeng/form-field';
 import { FormlyFieldMonacoEditorComponent } from './monaco-editor.type';
 
 @NgModule({
@@ -13,7 +11,6 @@ import { FormlyFieldMonacoEditorComponent } from './monaco-editor.type';
     CommonModule,
     ReactiveFormsModule,
     MonacoEditorModule,
-    FormlyFormFieldModule,
     FormlyModule.forChild({
       types: [
         {

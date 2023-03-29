@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormlyModule } from '@ngx-formly/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CalendarModule } from 'primeng/calendar';
-import { FormlyFormFieldModule } from '@ngx-formly/primeng/form-field';
 import { FormlyFieldDatepickerComponent } from './datepicker.type';
 
 @NgModule({
@@ -12,8 +11,6 @@ import { FormlyFieldDatepickerComponent } from './datepicker.type';
     CommonModule,
     ReactiveFormsModule,
     CalendarModule,
-
-    FormlyFormFieldModule,
     FormlyModule.forChild({
       types: [
         {
