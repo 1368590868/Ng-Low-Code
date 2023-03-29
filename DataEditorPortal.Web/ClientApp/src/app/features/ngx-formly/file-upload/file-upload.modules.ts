@@ -7,13 +7,11 @@ import { FormlyFieldFileUploadComponent } from './file-upload.component';
 import { FileUploadModule } from 'primeng/fileupload';
 import { FileUploadComponent } from './file-upload.component';
 import { TableModule } from 'primeng/table';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 @NgModule({
   declarations: [FileUploadComponent, FormlyFieldFileUploadComponent],
   imports: [
     TableModule,
     CommonModule,
-    ConfirmDialogModule,
     ReactiveFormsModule,
     FileUploadModule,
     FormlyFormFieldModule,
