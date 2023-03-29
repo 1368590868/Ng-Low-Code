@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
-import { FormlyFormFieldModule } from '@ngx-formly/primeng/form-field';
 import { FormlyFieldFileUploadComponent } from './file-upload.component';
 import { FileUploadModule } from 'primeng/fileupload';
 import { FileUploadComponent } from './file-upload.component';
@@ -16,7 +15,6 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     ReactiveFormsModule,
     FileUploadModule,
-    FormlyFormFieldModule,
     InputTextModule,
     FormsModule,
     FormlyModule.forChild({

@@ -76,7 +76,8 @@ export class FileUploadComponent implements ControlValueAccessor {
     if (event?.originalEvent?.body?.result) {
       if (
         this.fileLimit &&
-        event.originalEvent.body.result.length > this.fileLimit
+        this.newAttachments.length + event.originalEvent.body.result.length >
+          this.fileLimit
       ) {
         this.notifyService.notifyError('Error', 'File Limit Exceeded');
         return;
