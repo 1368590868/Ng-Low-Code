@@ -84,7 +84,7 @@ export class FileUploadComponent implements ControlValueAccessor {
       for (const file of event.originalEvent.body.result) {
         this.newAttachments.push(file);
       }
-      this.onChange(this.newAttachments ?? []);
+      this.onChange(JSON.stringify(this.newAttachments ?? []));
     }
   }
 
@@ -123,13 +123,13 @@ export class FileUploadComponent implements ControlValueAccessor {
       this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
         'Deleted';
     }
-    this.onChange(this.newAttachments);
+    this.onChange(JSON.stringify(this.newAttachments));
   }
 
   tempAttachmentRestore(data: any) {
     this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
       'Current';
-    this.onChange(this.newAttachments);
+    this.onChange(JSON.stringify(this.newAttachments));
   }
 }
 
