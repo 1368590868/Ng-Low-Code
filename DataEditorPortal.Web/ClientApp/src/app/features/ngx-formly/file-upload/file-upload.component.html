@@ -24,7 +24,16 @@
         </ng-template>
       </td>
       <td [class]="file.status === 'Deleted' ? 'line-through' : null">
-        {{ file.fileId }}
+        <ng-container *ngIf="file.status === 'Deleted'; else edit">
+          {{ file.comments }}
+        </ng-container>
+        <ng-template #edit>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="file.comments"
+            (ngModelChange)="onEditComments()" />
+        </ng-template>
       </td>
       <td class="text-right">
         <button

@@ -31,7 +31,6 @@ export class UploadPipe implements PipeTransform {
       if (filterArray.length > 0) return result.split('|').join('');
       else return '';
     } else {
-      console.log(result);
       if (filterArray.length === 1) return result;
       if (filterArray.length > 1) return `${filterArray.length} attachments`;
       else return '';

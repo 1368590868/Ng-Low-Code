@@ -7,6 +7,8 @@ import { FormlyFieldFileUploadComponent } from './file-upload.component';
 import { FileUploadModule } from 'primeng/fileupload';
 import { FileUploadComponent } from './file-upload.component';
 import { TableModule } from 'primeng/table';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
 @NgModule({
   declarations: [FileUploadComponent, FormlyFieldFileUploadComponent],
   imports: [
@@ -15,6 +17,8 @@ import { TableModule } from 'primeng/table';
     ReactiveFormsModule,
     FileUploadModule,
     FormlyFormFieldModule,
+    InputTextModule,
+    FormsModule,
     FormlyModule.forChild({
       types: [
         {

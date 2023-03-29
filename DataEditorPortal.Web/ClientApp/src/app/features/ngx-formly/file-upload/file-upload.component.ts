@@ -99,6 +99,10 @@ export class FileUploadComponent implements ControlValueAccessor {
     );
   }
 
+  onEditComments() {
+    this.onChange(JSON.stringify(this.newAttachments));
+  }
+
   tempAttachmentDownload(data: any) {
     const url =
       data.status === 'New'
