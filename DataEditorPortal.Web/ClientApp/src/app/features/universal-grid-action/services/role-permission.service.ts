@@ -4,8 +4,6 @@ import { TreeNode } from 'primeng/api';
 import { map, Observable } from 'rxjs';
 import { ApiResponse } from 'src/app/shared';
 import {
-  Role,
-  Permisstion,
   updateRole,
   ManageRoleForm,
   RoleItem
@@ -15,8 +13,8 @@ import {
   providedIn: 'root'
 })
 export class RolePermissionService {
+  public section = 'user-management';
   public _apiUrl: string;
-  public currentPortalItem = 'user-management';
   constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
   }

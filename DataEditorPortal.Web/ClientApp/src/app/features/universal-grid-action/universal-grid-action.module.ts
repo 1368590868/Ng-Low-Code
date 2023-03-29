@@ -42,6 +42,11 @@ import { ManageRoleActionComponent } from './components/manage-role-action/manag
 import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
 import { UserPermissionActionComponent } from './components/user-permission-action/user-permission-action.component';
 import { SharedModule } from 'src/app/shared';
+import {
+  OnValidateDemoActionHandler,
+  OnAfterSavedDemoActionHandler,
+  AsyncQueryTextActionHandler
+} from './services/event-action-handler.service';
 
 const GRID_ACTION_CONFIG = [
   {
@@ -181,6 +186,16 @@ const GRID_ACTION_CONFIG = [
     }
   }
 ];
+const EVENT_ACTION_CONFIG = [
+  {
+    name: 'On Validate Demo',
+    handler: OnValidateDemoActionHandler
+  },
+  {
+    name: 'On After Saved Demo',
+    handler: OnAfterSavedDemoActionHandler
+  }
+];
 
 @NgModule({
   declarations: [
@@ -231,7 +246,13 @@ const GRID_ACTION_CONFIG = [
     {
       provide: 'GRID_ACTION_CONFIG',
       useValue: GRID_ACTION_CONFIG
-    }
+    },
+    {
+      provide: 'EVENT_ACTION_CONFIG',
+      useValue: EVENT_ACTION_CONFIG
+    },
+    EVENT_ACTION_CONFIG.map(x => x.handler),
+    AsyncQueryTextActionHandler
   ]
 })
 export class UniversalGridActionModule {}

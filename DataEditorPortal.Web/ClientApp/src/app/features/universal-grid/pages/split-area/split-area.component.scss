@@ -20,8 +20,7 @@
   .expand-btn {
     position: absolute;
     right: 0.75rem;
-    top: 2rem;
-    transition: transform var(--transition-duration);
+    top: 1.25rem;
     z-index: 20;
     .p-button-rounded {
       width: 2rem;
@@ -34,14 +33,10 @@
       padding: 0.5rem 0rem 0.25rem;
     }
     .expand-btn {
-      right: -2.875rem;
-      top: 0.75rem;
+      top: -2.375rem;
+      z-index: 99999;
+      right: -2.5rem;
       transform: rotate(180deg);
-      .p-button-rounded {
-        width: 1.5rem;
-        height: 1.5rem;
-        padding: 0.5rem 0;
-      }
     }
   }
 

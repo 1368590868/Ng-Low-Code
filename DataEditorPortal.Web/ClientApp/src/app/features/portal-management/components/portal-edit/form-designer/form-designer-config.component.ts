@@ -54,6 +54,11 @@ export const FROM_DESIGNER_CONTROLS: {
     label: 'Input Number',
     value: 'inputNumber',
     filterType: 'numeric'
+  },
+  {
+    label: 'File Upload',
+    value: 'fileUpload',
+    filterType: 'text'
   }
 ];
 
@@ -179,7 +184,7 @@ export class FormDesignerConfigComponent {
             placeholder: 'Enter placeholder'
           },
           expressions: {
-            hide: `['checkbox', 'radio', 'checkboxList'].indexOf(field.parent.parent.model.type) >= 0`
+            hide: `['checkbox', 'radio', 'checkboxList' , 'fileUpload'].indexOf(field.parent.parent.model.type) >= 0`
           }
         },
         // props for select, mutiSelect, checkboxList, radio
@@ -264,6 +269,72 @@ export class FormDesignerConfigComponent {
             hide: `'datepicker' !== field.parent.parent.model.type`
           }
         },
+        // props for file upload
+        {
+          fieldGroup: [
+            {
+              key: 'storageType',
+              type: 'select',
+              defaultValue: 'FileSystem',
+              props: {
+                label: 'Storage Provider',
+                showClear: false,
+                options: [
+                  { label: 'File System', value: 'FileSystem' },
+                  { label: 'Sql Binary', value: 'SqlBinary' }
+                ],
+                required: true
+              }
+            },
+            {
+              key: 'accept',
+              type: 'input',
+              props: {
+                label: 'Accept',
+                placeholder:
+                  'Pattern to restrict the allowed file types such as "image/*".'
+              }
+            },
+            {
+              key: 'maxFileSize',
+              type: 'inputNumber',
+              props: {
+                label: 'Max File Size',
+                placeholder: 'Maximum file size allowed in bytes.'
+              }
+            },
+            {
+              key: 'fileLimit',
+              type: 'inputNumber',
+              props: {
+                label: 'File Limit',
+                placeholder: 'Maximum number of files that can be uploaded.'
+              }
+            },
+            {
+              key: 'chooseLabel',
+              type: 'input',
+              props: {
+                label: 'Choose Label',
+                placeholder:
+                  'Label of the choose button. Defaults to global value in i18n translation configuration.'
+              }
+            },
+            {
+              key: 'multiple',
+              type: 'checkbox',
+              defaultValue: false,
+              props: {
+                label: 'Multiple',
+                placeholder:
+                  'Used to select multiple files at once from file dialog.'
+              }
+            }
+          ],
+          expressions: {
+            hide: `'fileUpload' !== field.parent.parent.model.type`
+          }
+        },
         {
           key: 'required',
           type: 'checkbox',
@@ -280,6 +351,9 @@ export class FormDesignerConfigComponent {
           wrappers: ['divider'],
           props: {
             label: 'Validator'
+          },
+          expressions: {
+            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         },
         {
@@ -287,6 +361,9 @@ export class FormDesignerConfigComponent {
           type: 'validatorEditor',
           props: {
             label: ''
+          },
+          expressions: {
+            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         }
       ]
@@ -297,6 +374,9 @@ export class FormDesignerConfigComponent {
           wrappers: ['divider'],
           props: {
             label: 'Computed Value'
+          },
+          expressions: {
+            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         },
         {
@@ -304,6 +384,9 @@ export class FormDesignerConfigComponent {
           type: 'computedValueEditor',
           props: {
             label: ''
+          },
+          expressions: {
+            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         }
       ]

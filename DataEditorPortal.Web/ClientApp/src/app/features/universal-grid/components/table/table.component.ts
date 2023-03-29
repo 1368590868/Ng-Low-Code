@@ -1,4 +1,12 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { finalize, forkJoin, Subject, takeUntil, tap } from 'rxjs';
 import {
@@ -18,10 +26,26 @@ import { DataFormatService } from '../../services/data-format.service';
   styleUrls: ['./table.component.scss']
 })
 export class TableComponent implements OnInit, OnDestroy {
+  @Input() headerSize: 'compact' | 'normal' = 'normal';
+  @Input() gridName!: string;
+  @Input() selectionMode = 'multiple';
+  @Output() rowSelect = new EventEmitter<any>();
   destroy$ = new Subject();
 
   records: GridData[] = [];
   totalRecords = 0;
+
+  _selection: any;
+  set selection(value: any) {
+    this._selection = value;
+    if (Array.isArray(value)) this.selectedRecords = [...value];
+    else {
+      this.selectedRecords = value ? [value] : [];
+    }
+  }
+  get selection() {
+    return this._selection;
+  }
   selectedRecords: GridData[] = [];
 
   searchModel?: SearchParam;
@@ -30,7 +54,7 @@ export class TableComponent implements OnInit, OnDestroy {
   sortMeta?: any;
   multiSortMeta?: any;
 
-  loading = true;
+  loading = false;
   @ViewChild('dataTable') table!: Table;
 
   cols: GridColumn[] = [];
@@ -61,13 +85,13 @@ export class TableComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // this.reset();
-    this.stateKey = `universal-grid-state-${this.gridTableService.currentPortalItem}`;
+    this.stateKey = `universal-grid-state-${this.gridName}`;
 
     forkJoin([
       // get grid config
-      this.gridTableService.getTableConfig(),
+      this.gridTableService.getTableConfig(this.gridName),
       // get grid column
-      this.gridTableService.getTableColumns()
+      this.gridTableService.getTableColumns(this.gridName)
     ]).subscribe(result => {
       this.tableConfig = result[0];
       if (this.tableConfig.pageSize && this.tableConfig.pageSize >= 10) {
@@ -86,7 +110,7 @@ export class TableComponent implements OnInit, OnDestroy {
       this.cols.forEach(col => {
         if (col.field && col.filterType === 'enums') {
           this.gridTableService
-            .getTableColumnFilterOptions(col.field)
+            .getTableColumnFilterOptions(this.gridName, col.field)
             .subscribe(val => {
               col.filterOptions = val;
             });
@@ -114,11 +138,8 @@ export class TableComponent implements OnInit, OnDestroy {
 
   getPermission(name: string) {
     return (
-      this.userService.USER.permissions![
-        name +
-          this.gridTableService.currentPortalItem
-            .toUpperCase()
-            .replace('-', '_')
+      this.userService.USER.permissions?.[
+        name + this.gridName.toUpperCase().replace('-', '_')
       ] ?? false
     );
   }
@@ -144,7 +165,7 @@ export class TableComponent implements OnInit, OnDestroy {
         label: '',
         icon: 'pi pi-info-circle',
         class: 'flex',
-        buttonStyleClass: 'p-button-lg p-button-rounded p-button-text'
+        buttonStyleClass: 'p-button-text'
       };
       if (this.tableConfig.customViewFormName) {
         actions.push({
@@ -162,7 +183,7 @@ export class TableComponent implements OnInit, OnDestroy {
         label: '',
         icon: 'pi pi-file-edit',
         class: 'flex',
-        buttonStyleClass: 'p-button-lg p-button-rounded p-button-text'
+        buttonStyleClass: ' p-button-text'
       };
       if (this.tableConfig.customEditFormName) {
         actions.push({
@@ -230,7 +251,7 @@ export class TableComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.fetchDataParam = this.getFetchParam();
     this.gridTableService
-      .getTableData(this.fetchDataParam)
+      .getTableData(this.gridName, this.fetchDataParam)
       .pipe(
         tap(res => {
           this.records = res.data;
@@ -286,8 +307,12 @@ export class TableComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
 
+  onRowSelect(event: any) {
+    this.rowSelect.emit(event);
+  }
+
   refresh() {
-    this.selectedRecords = [];
+    this.selection = [];
     this.table.saveState();
     this.fetchData();
   }
@@ -305,7 +330,7 @@ export class TableComponent implements OnInit, OnDestroy {
     this.sortMeta = null;
     this.multiSortMeta = null;
     this.first = 0;
-    this.selectedRecords = [];
+    this.selection = [];
   }
 
   onStateSave(state: TableState) {

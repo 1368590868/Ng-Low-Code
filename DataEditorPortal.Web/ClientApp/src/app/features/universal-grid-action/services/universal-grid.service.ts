@@ -3,15 +3,13 @@ import { Inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiResponse, NotifyService } from 'src/app/shared';
 import { GridColumn } from '../../portal-management/models/portal-item';
-import { EditFormData, EditFormField } from '../models/edit';
+import { EditFormData, EditFormField, FormEventConfig } from '../models/edit';
 import { ExportParam } from '../models/export';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UniversalGridService {
-  public currentPortalItem = 'usermanagement';
-
   public _apiUrl: string;
   constructor(
     private http: HttpClient,
@@ -21,59 +19,81 @@ export class UniversalGridService {
     this._apiUrl = apiUrl;
   }
 
-  getDetailConfig(type: 'ADD' | 'UPDATE'): Observable<EditFormField[]> {
+  getFormConfig(
+    name: string,
+    type: 'ADD' | 'UPDATE'
+  ): Observable<EditFormField[]> {
     return this.http
       .get<ApiResponse<EditFormField[]>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/detail`,
+        `${this._apiUrl}universal-grid/${name}/config/form`,
         { params: { type } }
       )
       .pipe(map(res => res.result || []));
   }
 
-  getDetailData(id: string): Observable<EditFormData> {
+  getEventConfig(
+    name: string,
+    type: 'ADD' | 'UPDATE' | 'DELETE'
+  ): Observable<FormEventConfig> {
     return this.http
-      .get<ApiResponse<EditFormData>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/${id}`
+      .get<ApiResponse<FormEventConfig>>(
+        `${this._apiUrl}universal-grid/${name}/config/event`,
+        { params: { type } }
       )
       .pipe(map(res => res.result || {}));
   }
 
-  addGridData(data: EditFormData): Observable<ApiResponse<boolean>> {
+  getDetailData(name: string, id: string): Observable<EditFormData> {
+    return this.http
+      .get<ApiResponse<EditFormData>>(
+        `${this._apiUrl}universal-grid/${name}/data/${id}`
+      )
+      .pipe(map(res => res.result || {}));
+  }
+
+  addGridData(
+    name: string,
+    data: EditFormData
+  ): Observable<ApiResponse<boolean>> {
     return this.http.put<ApiResponse<boolean>>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/create`,
+      `${this._apiUrl}universal-grid/${name}/data/create`,
       data
     );
   }
 
   updateGridData(
+    name: string,
     id: string,
     data: EditFormData
   ): Observable<ApiResponse<boolean>> {
     return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/${id}/update`,
+      `${this._apiUrl}universal-grid/${name}/data/${id}/update`,
       data
     );
   }
 
-  deleteGridData(ids: string[]): Observable<ApiResponse<boolean>> {
+  deleteGridData(
+    name: string,
+    ids: string[]
+  ): Observable<ApiResponse<boolean>> {
     return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/batch-delete`,
+      `${this._apiUrl}universal-grid/${name}/data/batch-delete`,
       { ids }
     );
   }
 
-  exportGridData(param: ExportParam): Observable<Blob> {
+  exportGridData(name: string, param: ExportParam): Observable<Blob> {
     return this.http.post(
-      `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/data/export`,
+      `${this._apiUrl}universal-grid/${name}/data/export`,
       param,
       { responseType: 'blob' }
     );
   }
 
-  getTableColumns(): Observable<GridColumn[]> {
+  getTableColumns(name: string): Observable<GridColumn[]> {
     return this.http
       .get<ApiResponse<GridColumn[]>>(
-        `${this._apiUrl}UniversalGrid/${this.currentPortalItem}/config/columns`
+        `${this._apiUrl}universal-grid/${name}/config/columns`
       )
       .pipe(map(res => res.result || []));
   }

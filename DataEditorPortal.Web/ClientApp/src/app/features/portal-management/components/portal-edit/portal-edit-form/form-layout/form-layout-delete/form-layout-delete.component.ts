@@ -14,6 +14,7 @@ export class FormLayoutDeleteComponent {
     '-- E.g. \r\n\r\n' + '-- DELETE DEMO_TABLE WHERE ID IN ##ID##';
 
   _formConfig: GridFormConfig = {};
+  showOnValidate = false;
   @Input() type!: string;
   @Input()
   set config(val: GridFormConfig) {
@@ -98,14 +99,40 @@ export class FormLayoutDeleteComponent {
         }
       }
     }
+    if (
+      this.formControlOnValidateConfig.value?.eventType &&
+      !this.formControlOnValidateConfig.value.script
+    ) {
+      this.notifyService.notifyWarning(
+        'Warning',
+        'Please complete On Validate settings for Deleting.'
+      );
+      return false;
+    }
+    if (
+      this.formControlOnAfterSavedConfig.value?.eventType &&
+      !this.formControlOnAfterSavedConfig.value.script
+    ) {
+      this.notifyService.notifyWarning(
+        'Warning',
+        'Please complete On After Saved settings for Deleting.'
+      );
+      return false;
+    }
+
     return true;
   }
 
   getValue(): GridFormConfig {
     const data = JSON.parse(JSON.stringify(this._formConfig)) as GridFormConfig;
     if (data.queryText === this.helperMessage) data.queryText = undefined;
-    data.onValidate = this.formControlOnValidateConfig.value;
-    data.afterSaved = this.formControlOnAfterSavedConfig.value;
+
+    data.onValidate = !this.formControlOnValidateConfig.value?.eventType
+      ? undefined
+      : this.formControlOnValidateConfig.value;
+    data.afterSaved = !this.formControlOnAfterSavedConfig.value?.eventType
+      ? undefined
+      : this.formControlOnAfterSavedConfig.value;
 
     return data;
   }

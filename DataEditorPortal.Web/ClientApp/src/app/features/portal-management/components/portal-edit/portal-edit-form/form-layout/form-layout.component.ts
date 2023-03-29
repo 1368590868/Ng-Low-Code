@@ -92,6 +92,7 @@ export class FormLayoutComponent {
   customActions: { label: string | undefined; value: string }[] = [];
 
   showQuery = false;
+  showOnValidate = false;
   // showFetchQuery = false;
   formControlQueryText = new FormControl();
   formControlOnValidateConfig = new FormControl();
@@ -211,6 +212,26 @@ export class FormLayoutComponent {
           );
           return false;
         }
+        if (
+          this.formControlOnValidateConfig.value?.eventType &&
+          !this.formControlOnValidateConfig.value.script
+        ) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Please complete On Validate settings for Adding.'
+          );
+          return false;
+        }
+        if (
+          this.formControlOnAfterSavedConfig.value?.eventType &&
+          !this.formControlOnAfterSavedConfig.value.script
+        ) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Please complete On After Saved settings for Adding.'
+          );
+          return false;
+        }
       }
       if (this._type === 'UPDATE') {
         if (
@@ -234,6 +255,26 @@ export class FormLayoutComponent {
           );
           return false;
         }
+        if (
+          this.formControlOnValidateConfig.value?.eventType &&
+          !this.formControlOnValidateConfig.value.script
+        ) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Please complete On Validate settings for Updating.'
+          );
+          return false;
+        }
+        if (
+          this.formControlOnAfterSavedConfig.value?.eventType &&
+          !this.formControlOnAfterSavedConfig.value.script
+        ) {
+          this.notifyService.notifyWarning(
+            'Warning',
+            'Please complete On After Saved settings for Updating.'
+          );
+          return false;
+        }
       }
     }
 
@@ -245,8 +286,12 @@ export class FormLayoutComponent {
     if (!data.useCustomForm) data.formFields = this.targetColumns;
     if (data.queryText === this.helperMessage) data.queryText = undefined;
 
-    data.onValidate = this.formControlOnValidateConfig.value;
-    data.afterSaved = this.formControlOnAfterSavedConfig.value;
+    data.onValidate = !this.formControlOnValidateConfig.value?.eventType
+      ? undefined
+      : this.formControlOnValidateConfig.value;
+    data.afterSaved = !this.formControlOnAfterSavedConfig.value?.eventType
+      ? undefined
+      : this.formControlOnAfterSavedConfig.value;
 
     return data;
   }

@@ -36,10 +36,10 @@ export class ViewRecordActionComponent
   ngOnInit(): void {
     this.systemLogService.addSiteVisitLog({
       action: 'View Detail',
-      section: this.universalGridService.currentPortalItem,
+      section: this.gridName,
       params: JSON.stringify(this.selectedRecords[0])
     });
-    this.universalGridService.getTableColumns().subscribe(res => {
+    this.universalGridService.getTableColumns(this.gridName).subscribe(res => {
       if (this.selectedRecords[0] !== undefined) {
         const key = Object.keys(this.selectedRecords[0])
           .filter(key => key != 'RowNumber')

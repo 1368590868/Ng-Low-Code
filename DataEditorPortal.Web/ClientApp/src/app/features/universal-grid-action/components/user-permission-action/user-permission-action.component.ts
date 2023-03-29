@@ -75,7 +75,7 @@ export class UserPermissionActionComponent
       });
     this.systemLogService.addSiteVisitLog({
       action: 'Update User Permissions',
-      section: this.userManagerService.currentPortalItem,
+      section: this.userManagerService.section,
       params: JSON.stringify({
         permissionSelect,
         userId: this.selectedRecords[0][this.recordKey]

@@ -59,6 +59,8 @@ body {
   position: relative;
   overflow: hidden;
   height: 100%;
+  box-shadow: 0 0px 2px -1px rgb(0 0 0 / 20%), 0 0px 2px 0 rgb(0 0 0 / 14%),
+    0 0px 3px 0 rgb(0 0 0 / 12%);
 }
 
 /* ngx formly style */
@@ -82,6 +84,12 @@ formly-form {
   transform: none !important;
   .p-dialog-footer {
     padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    button {
+      margin-right: 0;
+    }
+    p-button + p-button {
+      margin-left: 0.5rem;
+    }
   }
 }
 
@@ -114,9 +122,13 @@ formly-form {
   max-width: 20rem;
 }
 
-.p-button-icon-only {
-  .pi.p-button-icon {
-    font-size: 1.25rem;
+.p-datatable {
+  .p-datatable-tbody > tr > td {
+    padding: 0.625rem;
+    text-overflow: ellipsis;
+  }
+  .p-datatable-thead > tr > th {
+    padding: 0.625rem;
   }
 }
 
@@ -127,9 +139,14 @@ formly-form {
 .p-checkbox {
   width: 1.571rem;
   height: 1.571rem;
+  .p-checkbox-box {
+    width: 1.571rem;
+    height: 1.571rem;
+  }
 }
 
-.p-checkbox .p-checkbox-box {
-  width: 1.571rem;
-  height: 1.571rem;
+.p-inputnumber {
+  .p-inputnumber-button {
+    line-height: 1;
+  }
 }

@@ -1,23 +1,19 @@
 <div class="mt-3">
-  <p-dropdown
-    [formControl]="formControlType"
-    styleClass="w-15rem"
-    appendTo="body"
-    [showClear]="true"
-    placeholder="Please Select"
-    [options]="typeOptions"></p-dropdown>
-
-  <div class="mt-3">
-    <ngx-monaco-editor
-      *ngIf="!isJs"
-      [formControl]="formControlText"
-      (onInit)="onMonacoEditorInit($event)"
-      [style]="{ height: '20rem' }"
-      class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
-      [options]="{}"></ngx-monaco-editor>
-
+  <div class="inline-block">
+    <p class="line-height-3">{{ labelName }}</p>
     <p-dropdown
-      *ngIf="isJs"
+      [formControl]="formControlType"
+      styleClass="w-15rem"
+      appendTo="body"
+      [showClear]="true"
+      placeholder="Please Select"
+      (onClear)="onClear()"
+      [options]="typeOptions"></p-dropdown>
+  </div>
+
+  <div *ngIf="isJs" class="inline-block ml-7">
+    <p class="line-height-3">Select One Action Handler</p>
+    <p-dropdown
       [formControl]="formControlText"
       styleClass="w-15rem"
       appendTo="body"
@@ -25,4 +21,12 @@
       placeholder="Please Select"
       [options]="jsOptions"></p-dropdown>
   </div>
+
+  <ngx-monaco-editor
+    *ngIf="!isJs && formControlType.value"
+    [formControl]="formControlText"
+    (onInit)="onMonacoEditorInit($event)"
+    [style]="{ height: '20rem' }"
+    class="pt-3 mt-3 border-round monaco-editor-wrapper overflow-hidden"
+    [options]="{ language,lineNumbers: 'off' }"></ngx-monaco-editor>
 </div>

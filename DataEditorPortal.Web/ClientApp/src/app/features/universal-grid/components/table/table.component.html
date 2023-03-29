@@ -10,10 +10,10 @@
       [resizableColumns]="true"
       columnResizeMode="expand"
       [reorderableColumns]="true"
-      selectionMode="multiple"
+      [selectionMode]="selectionMode"
       [lazy]="true"
       [value]="records"
-      [(selection)]="selectedRecords"
+      [(selection)]="selection"
       [dataKey]="tableConfig.dataKey"
       [rowHover]="true"
       [loading]="loading"
@@ -25,47 +25,59 @@
       [virtualScrollDelay]="0"
       (onFilter)="onFilter($event)"
       (onSort)="onSort($event)"
-      (onStateSave)="onStateSave($event)">
+      (onStateSave)="onStateSave($event)"
+      [tableStyle]="{ tableLayout: 'fixed' }"
+      (onRowSelect)="onRowSelect($event)">
       <ng-template pTemplate="caption">
-        <div class="mb-4">
-          <h3>
-            {{ tableConfig.caption }}
-            <a
-              class="ml-3 text-primary"
-              [href]="tableConfig.helpUrl"
-              target="_blank"
-              *ngIf="tableConfig.helpUrl"
-              ><i class="pi pi-external-link"></i
-            ></a>
-          </h3>
-          <p class="mt-1 p-card-subtitle">{{ tableConfig.description }}</p>
-        </div>
+        <div
+          class="flex"
+          [class]="headerSize === 'normal' ? 'flex-column' : ''">
+          <div [class]="headerSize === 'normal' ? 'mt-2 mb-3' : 'my-2 mr-4'">
+            <h3>
+              {{ tableConfig.caption }}
+              <a
+                class="ml-3 text-primary"
+                [href]="tableConfig.helpUrl"
+                target="_blank"
+                *ngIf="tableConfig.helpUrl"
+                ><i class="pi pi-external-link"></i
+              ></a>
+            </h3>
+            <p
+              *ngIf="tableConfig.description && headerSize === 'normal'"
+              class="my-1 p-card-subtitle">
+              {{ tableConfig.description }}
+            </p>
+          </div>
 
-        <div class="table-header flex align-items-center">
-          <div class="flex flex-wrap mr-2">
-            <ng-template
-              appUniversalGridAction
-              [actions]="tableActions"
-              [selectedRecords]="selectedRecords"
-              [recordKey]="tableConfig.dataKey"
-              [fetchDataParam]="fetchDataParam"
-              (savedEvent)="refresh()"></ng-template>
+          <div class="table-header flex align-items-center">
+            <div class="flex flex-wrap mr-2">
+              <ng-template
+                appUniversalGridAction
+                [actions]="tableActions"
+                [selectedRecords]="selectedRecords"
+                [recordKey]="tableConfig.dataKey"
+                [fetchDataParam]="fetchDataParam"
+                [gridName]="gridName"
+                (savedEvent)="refresh()"></ng-template>
+            </div>
+            <div class="flex-none mr-2 ml-auto">
+              <strong *ngIf="selectedRecords.length > 0"
+                >{{ selectedRecords.length }} row(s) selected</strong
+              >
+            </div>
+            <p-button
+              icon="pi pi-refresh text-lg"
+              styleClass="p-button-rounded p-button-outlined"
+              (onClick)="resetAndRefresh()"></p-button>
           </div>
-          <div class="flex-none mr-2 ml-auto">
-            <strong *ngIf="selectedRecords.length > 0"
-              >{{ selectedRecords.length }} row(s) selected</strong
-            >
-          </div>
-          <p-button
-            icon="pi pi-refresh text-lg"
-            styleClass="p-button-rounded p-button-outlined"
-            (onClick)="resetAndRefresh()"></p-button>
         </div>
       </ng-template>
 
       <ng-template pTemplate="header" let-columns>
         <tr>
           <th
+            *ngIf="selectionMode === 'multiple'"
             style="width: 2.875rem !important; max-width: 2.875rem !important">
             <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
           </th>
@@ -123,13 +135,12 @@
 
       <ng-template pTemplate="body" let-data let-columns="columns">
         <tr [pSelectableRow]="data">
-          <td
-            style="width: 2.875rem !important; max-width: 2.875rem !important">
+          <td *ngIf="selectionMode === 'multiple'">
             <p-tableCheckbox
               [value]="data"
               (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
           </td>
-          <td style="width: 5rem !important; max-width: 5rem !important">
+          <td>
             <div class="row-actions flex">
               <ng-template
                 class="flex"
@@ -137,6 +148,7 @@
                 [actions]="rowActions"
                 [recordKey]="tableConfig.dataKey"
                 [selectedRecords]="[data]"
+                [gridName]="gridName"
                 (savedEvent)="refresh()"></ng-template>
             </div>
           </td>
@@ -172,7 +184,7 @@
       </ng-template>
       <ng-template pTemplate="emptymessage" let-columns>
         <tr>
-          <td class="text-center" [attr.colspan]="columns.length + 2">
+          <td class="text-lg" [attr.colspan]="columns.length + 2">
             {{
               this.firstLoadDone
                 ? 'No data were found for your search.'

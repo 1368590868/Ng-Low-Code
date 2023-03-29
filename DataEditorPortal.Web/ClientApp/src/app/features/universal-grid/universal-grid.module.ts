@@ -16,7 +16,12 @@ import { UniversalGridRoutingModule } from './universal-grid-routing.module';
 import { SplitAreaComponent } from './pages/split-area/split-area.component';
 import { SearchComponent } from './components/search/search.component';
 import { TableComponent } from './components/table/table.component';
+import { LinkedTableComponent } from './components/linked-table/linked-table.component';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
+import { DataFormatService } from './services/data-format.service';
+import { GridTableService } from './services/grid-table.service';
+import { SharedModule } from 'src/app/shared';
+
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
 import { ToastModule } from 'primeng/toast';
@@ -35,12 +40,15 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
-import { DataFormatService } from './services/data-format.service';
 import { PaginatorModule } from 'primeng/paginator';
-import { SharedModule } from 'src/app/shared';
 
 @NgModule({
-  declarations: [SplitAreaComponent, SearchComponent, TableComponent],
+  declarations: [
+    SplitAreaComponent,
+    SearchComponent,
+    TableComponent,
+    LinkedTableComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -70,6 +78,7 @@ import { SharedModule } from 'src/app/shared';
     PaginatorModule
   ],
   providers: [
+    GridTableService,
     DataFormatService,
     DatePipe,
     DecimalPipe,

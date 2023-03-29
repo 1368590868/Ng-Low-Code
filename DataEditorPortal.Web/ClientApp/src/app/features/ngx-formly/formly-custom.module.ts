@@ -13,6 +13,7 @@ import { FormlyMonacoEditorModule } from './monacoEditor';
 import { FormlyTriStateCheckBoxModule } from './triStateCheckbox';
 import { DateValidatorModule } from './datevalidator';
 import { UniversalRegexpModule } from './universalregexp';
+import { FormlyFileUploadModule } from './file-upload/file-upload.modules';
 
 @NgModule({
   imports: [
@@ -29,7 +30,8 @@ import { UniversalRegexpModule } from './universalregexp';
     FormlyMonacoEditorModule,
     FormlyTriStateCheckBoxModule,
     DateValidatorModule,
-    UniversalRegexpModule
+    UniversalRegexpModule,
+    FormlyFileUploadModule
   ]
 })
 export class FormlyCustomTypeModule {}

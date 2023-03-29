@@ -1,12 +1,27 @@
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger
+} from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ConfigDataService, UserService, SiteMenu } from 'src/app/shared';
 
 @Component({
   selector: 'app-nav-menu',
   templateUrl: './nav-menu.component.html',
-  styleUrls: ['./nav-menu.component.scss']
+  styleUrls: ['./nav-menu.component.scss'],
+  animations: [
+    trigger('transformMenu', [
+      state('left1', style({ paddingLeft: '1rem' })),
+      state('left3', style({ paddingLeft: '3rem' })),
+      transition('left3 => left1', [animate('200ms')]),
+      transition('left1 => left3', [animate('200ms 300ms')])
+    ])
+  ]
 })
 export class NavMenuComponent implements OnInit {
   public menuItems: MenuItem[] = [];
@@ -14,7 +29,7 @@ export class NavMenuComponent implements OnInit {
 
   constructor(
     public userService: UserService,
-    private configDataService: ConfigDataService,
+    public configDataService: ConfigDataService,
     private router: Router
   ) {}
 

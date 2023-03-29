@@ -62,9 +62,9 @@ export class ExportExcelActionComponent
 
     this.model = {
       ...this.model,
-      fileName: `Export-${
-        this.gridService.currentPortalItem
-      }-${new Date().toLocaleDateString('en-US')}`
+      fileName: `Export-${this.gridName}-${new Date().toLocaleDateString(
+        'en-US'
+      )}`
     };
 
     this.loadedEvent.emit();
@@ -87,12 +87,12 @@ export class ExportExcelActionComponent
 
       this.systemLogService.addSiteVisitLog({
         action: 'Export Data',
-        section: this.gridService.currentPortalItem,
+        section: this.gridName,
         params: JSON.stringify(param)
       });
 
       this.gridService
-        .exportGridData(param)
+        .exportGridData(this.gridName, param)
         .pipe(
           catchError(() => {
             this.errorEvent.emit();

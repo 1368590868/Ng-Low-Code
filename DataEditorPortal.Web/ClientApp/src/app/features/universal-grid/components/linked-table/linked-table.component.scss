@@ -1,0 +1,10 @@
+:host {
+  ::ng-deep {
+    .p-splitter-vertical {
+      background-color: transparent;
+      .p-splitter-gutter {
+        margin: 0.25rem 0;
+      }
+    }
+  }
+}

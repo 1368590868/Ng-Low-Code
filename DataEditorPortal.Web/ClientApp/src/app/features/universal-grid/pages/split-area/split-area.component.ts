@@ -5,10 +5,17 @@ import {
   OnInit,
   ViewChild
 } from '@angular/core';
-import { trigger, style, animate, transition } from '@angular/animations';
+import {
+  trigger,
+  style,
+  animate,
+  transition,
+  state
+} from '@angular/animations';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { GridTableService } from '../../services/grid-table.service';
+import { ConfigDataService } from 'src/app/shared';
 
 @Component({
   selector: 'app-split-area',
@@ -18,9 +25,24 @@ import { GridTableService } from '../../services/grid-table.service';
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0 }),
-        animate('200ms 300ms', style({ opacity: 1 }))
+        animate('200ms 100ms', style({ opacity: 1 }))
       ]),
       transition(':leave', [animate('100ms', style({ opacity: 0 }))])
+    ]),
+    trigger('fadeInOutButton', [
+      state('hide', style({ opacity: 1 })),
+      state('show', style({ opacity: 1 })),
+      transition('show => hide', [
+        style({ opacity: 0, transform: 'rotate(180deg) translateX(50px)' }),
+        animate(
+          '200ms 300ms',
+          style({ opacity: 1, transform: 'rotate(180deg)' })
+        )
+      ]),
+      transition('hide => show', [
+        style({ opacity: 0 }),
+        animate('200ms 100ms', style({ opacity: 1 }))
+      ])
     ])
   ]
 })
@@ -28,7 +50,6 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
   @ViewChild('splitter') splitterRef: any;
 
   currentPortalItem = '';
-  showPanel = true;
   panelSizesPrev = [20, 80];
   stateKey = 'universal-grid-splitter';
   stateStorage = 'session';
@@ -38,7 +59,8 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private gridTableService: GridTableService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    public configDataService: ConfigDataService
   ) {}
 
   ngOnInit() {
@@ -52,15 +74,13 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
     if (stateString) {
       const panelSizes = JSON.parse(stateString);
       if (panelSizes[0] === 0) {
-        this.showPanel = false;
+        this.configDataService.sidebarCollapsed = true;
       }
     }
 
     // subscribe route change to update currentPortalItem
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe((param: any) => {
       if (param && param.name) {
-        this.gridTableService.currentPortalItem = param.name;
-
         this.currentPortalItem = '';
         this.changeDetectorRef.detectChanges();
         this.currentPortalItem = param.name;
@@ -75,17 +95,17 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
   }
 
   onToggle() {
-    if (this.showPanel) {
+    if (!this.configDataService.sidebarCollapsed) {
       this.panelSizesPrev = this.splitterRef._panelSizes;
       this.getStorage().setItem(
         `${this.stateKey}-prev`,
         JSON.stringify(this.panelSizesPrev)
       );
       this.splitterRef._panelSizes = [0, 100];
-      this.showPanel = false;
+      this.configDataService.sidebarCollapsed = true;
     } else {
       this.splitterRef._panelSizes = this.panelSizesPrev;
-      this.showPanel = true;
+      this.configDataService.sidebarCollapsed = false;
     }
     this.splitterRef.saveState();
     this.splitterRef.restoreState();
@@ -109,7 +129,7 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
     if (sizes[0] < 20) {
       this.splitterRef._panelSizes = this.panelSizesPrev;
     }
-    this.showPanel = true;
+    this.configDataService.sidebarCollapsed = false;
     this.splitterRef.saveState();
     this.splitterRef.restoreState();
   }

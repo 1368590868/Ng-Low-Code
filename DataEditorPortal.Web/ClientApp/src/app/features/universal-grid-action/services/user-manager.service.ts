@@ -6,9 +6,7 @@ import {
   ManageRoleForm,
   UpdateRole,
   UserData,
-  UserPemissions,
-  UserManagerForm,
-  UserManagerResponse
+  UserPemissions
 } from '../models/user-manager';
 
 @Injectable({
@@ -16,16 +14,9 @@ import {
 })
 export class UserManagerService {
   public _apiUrl: string;
-  public currentPortalItem = 'user-management';
+  public section = 'user-management';
   constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
-  }
-
-  saveUserManager(formData: UserManagerForm): Observable<UserManagerResponse> {
-    return this.http.post(
-      `${this._apiUrl}UniversalGrid/usermanagement/config/columns`,
-      formData
-    );
   }
 
   createUser(data: ManageRoleForm) {

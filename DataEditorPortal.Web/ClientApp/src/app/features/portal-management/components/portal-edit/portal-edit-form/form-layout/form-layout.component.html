@@ -39,7 +39,7 @@
         targetHeader="Selected Fields"
         [dragdrop]="true"
         [responsive]="true"
-        [sourceStyle]="{ height: '31.2143rem' }"
+        [sourceStyle]="{ height: '32.1542rem' }"
         [targetStyle]="{ height: '36.5714rem' }"
         filterBy="name"
         sourceFilterPlaceholder="Search by name"
@@ -132,8 +132,19 @@
       [options]="{}"></ngx-monaco-editor>
   </div> -->
   <!-- For UPDATE -->
+  <p-divider>
+    <p-button
+      label="Event Settings"
+      [icon]="showOnValidate ? 'pi pi-minus' : 'pi pi-plus'"
+      styleClass="p-button-text p-button-sm"
+      (onClick)="showOnValidate = !showOnValidate"></p-button>
+  </p-divider>
   <app-event-config
+    *ngIf="showOnValidate"
     [formControl]="formControlOnValidateConfig"></app-event-config>
+  <p class="mt-3"></p>
   <app-event-config
+    *ngIf="showOnValidate"
+    labelName="On After Saved"
     [formControl]="formControlOnAfterSavedConfig"></app-event-config>
 </div>

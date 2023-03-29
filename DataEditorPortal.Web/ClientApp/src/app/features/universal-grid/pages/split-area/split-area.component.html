@@ -1,25 +1,32 @@
 <p-splitter
   [panelSizes]="[20, 80]"
   styleClass="split-area border-none"
-  [class.hide-panel]="!showPanel"
+  [class.hide-panel]="configDataService.sidebarCollapsed"
   [stateKey]="stateKey"
   [stateStorage]="stateStorage"
   (onResizeEnd)="onResizeEnd($event)"
   #splitter>
   <ng-template pTemplate>
     <p-button
+      [@fadeInOutButton]="!configDataService.sidebarCollapsed ? 'show' : 'hide'"
       icon="pi pi-arrow-left"
       class="expand-btn"
-      styleClass="p-button-rounded p-button-text"
+      styleClass="p-button-rounded"
       (onClick)="onToggle()">
     </p-button>
     <div class="search-area w-full">
-      <app-search @fadeInOut *ngIf="showPanel"></app-search>
+      <app-search
+        @fadeInOut
+        *ngIf="!configDataService.sidebarCollapsed && currentPortalItem"
+        [gridName]="currentPortalItem"></app-search>
     </div>
   </ng-template>
   <ng-template pTemplate>
     <div class="table-area w-full">
-      <app-table *ngIf="currentPortalItem"></app-table>
+      <app-table
+        @fadeInOut
+        *ngIf="currentPortalItem"
+        [gridName]="currentPortalItem"></app-table>
     </div>
   </ng-template>
 </p-splitter>

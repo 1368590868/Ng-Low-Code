@@ -1,9 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Type } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import {
   ControlValueAccessor,
   FormControl,
   NG_VALUE_ACCESSOR
 } from '@angular/forms';
+import { EventActionHandlerService } from 'src/app/features/universal-grid-action/services/event-action-handler.service';
 
 @Component({
   selector: 'app-event-config',
@@ -24,24 +26,21 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
   onTouch?: any;
   disabled = false;
   isJs = false;
-  jsOptions = [
-    { label: 'Add User', value: 'AddUser' },
-    { label: 'Edit User', value: 'EditUser' },
-    { label: 'Manage Roles', value: 'ManageRoles' },
-    { label: 'Edit User Roles', value: 'EditUserRoles' },
-    { label: 'Edit User Permissions', value: 'EditUserPermissions' }
-  ];
+  jsOptions: { label: string; value: string }[] = [];
+  language = 'sql';
+  scriptText = null;
+  @Input() labelName = 'On Validate';
 
   typeOptions = [
-    { label: 'QueryText', value: 'QueryText' },
-    { label: 'CommandLine', value: 'CommandLine' },
-    { label: 'QueryStoredProcedure', value: 'QueryStoredProcedure' },
+    { label: 'Query Text', value: 'QueryText' },
+    { label: 'Command Line', value: 'CommandLine' },
+    { label: 'Query Stored Procedure', value: 'QueryStoredProcedure' },
     { label: 'Javascript', value: 'Javascript' }
   ];
 
   writeValue(value: any): void {
-    this.formControlText.setValue(value?.Script ?? this.helperMessage);
-    this.formControlType.setValue(value?.EventType);
+    this.scriptText = value?.script ?? null;
+    this.formControlType.setValue(value?.eventType);
     this.value = value;
   }
   registerOnChange(fn: any): void {
@@ -62,30 +61,73 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
     '-- E.g. \r\n' +
     '-- SELECT Max(AMOUNT) FROM DEMO_TABLE';
 
+  constructor(
+    @Inject('EVENT_ACTION_CONFIG')
+    private EVENT_ACTION_CONFIG: {
+      name: string;
+      handler: Type<EventActionHandlerService>;
+    }[]
+  ) {
+    this.jsOptions = this.EVENT_ACTION_CONFIG.map(item => ({
+      label: item.name,
+      value: item.name
+    }));
+  }
+
   ngOnInit(): void {
     this.formControlType.valueChanges.subscribe(val => {
+      if (val === 'CommandLine') {
+        this.language = 'bat';
+        this.helperMessage = 'rem Enter the command line . ';
+        this.formControlText.setValue(this.scriptText ?? this.helperMessage);
+      } else if (val !== 'Javascript') {
+        this.language = 'sql';
+        this.helperMessage = '-- Enter the query text . ';
+        this.formControlText.setValue(this.scriptText ?? this.helperMessage);
+      }
+
+      const isJsText = this.jsOptions.find(x => this.scriptText === x.value);
+
       if (val === 'Javascript') {
+        this.formControlText.setValue(this.scriptText, { emitEvent: false });
+        if (!isJsText) {
+          this.formControlText.setValue(null, { emitEvent: false });
+        }
         this.isJs = true;
       } else {
+        if (isJsText) {
+          this.formControlText.setValue(this.helperMessage, {
+            emitEvent: false
+          });
+        }
         this.isJs = false;
       }
 
       this.onChange?.({
-        EventType: this.formControlType.value,
-        Script:
+        eventType: this.formControlType.value,
+        script:
           this.formControlText.value === this.helperMessage
             ? null
             : this.formControlText.value
       });
     });
     this.formControlText.valueChanges.subscribe(() => {
-      this.onChange?.({
-        EventType: this.formControlType.value,
-        Script:
-          this.formControlText.value === this.helperMessage
-            ? null
-            : this.formControlText.value
-      });
+      if (
+        this.formControlText.value === this.helperMessage ||
+        !this.formControlText.value
+      ) {
+        this.onChange?.({
+          eventType: this.formControlType.value
+        });
+      } else {
+        this.onChange?.({
+          eventType: this.formControlType.value,
+          script:
+            this.formControlText.value === this.helperMessage
+              ? null
+              : this.formControlText.value
+        });
+      }
     });
   }
 
@@ -103,5 +145,9 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
         this.formControlText.setValue(this.helperMessage, { emitEvent: false });
       }
     });
+  }
+
+  onClear() {
+    this.formControlText.setValue(undefined);
   }
 }

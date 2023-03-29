@@ -44,6 +44,7 @@ import {
 } from './components';
 
 import { SharedModule } from 'src/app/shared';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 export * from './components';
 
@@ -70,6 +71,7 @@ export * from './components';
     HttpClientModule,
     ReactiveFormsModule,
     FormlyModule,
+
     SharedModule,
     ButtonModule,
     ToastModule,
@@ -88,7 +90,8 @@ export * from './components';
     PaginatorModule,
     TabViewModule,
     EditorModule,
-    InputTextareaModule
+    InputTextareaModule,
+    ProgressBarModule
   ],
   exports: [
     HeaderComponent,

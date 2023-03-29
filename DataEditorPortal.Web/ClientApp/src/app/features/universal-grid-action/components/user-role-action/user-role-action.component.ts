@@ -35,7 +35,7 @@ export class UserRoleActionComponent
   onSave(): void {
     this.systemLogService.addSiteVisitLog({
       action: 'Update User Role',
-      section: this.userManagerService.currentPortalItem,
+      section: this.userManagerService.section,
       params: JSON.stringify({
         permissions: this.selectedRecords,
         userId: this.selectedRecords[0][this.recordKey]

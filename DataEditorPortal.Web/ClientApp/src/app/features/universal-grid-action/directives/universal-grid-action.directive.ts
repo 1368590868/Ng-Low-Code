@@ -24,8 +24,9 @@ export class UniversalGridActionDirective
   implements DoCheck, OnChanges, OnDestroy
 {
   @Input() actions: GridActionOption[] = [];
+  @Input() gridName!: string;
   @Input() selectedRecords: any[] = [];
-  @Input() recordKey = 'ID';
+  @Input() recordKey!: string;
   @Input() fetchDataParam: any;
 
   @Output() savedEvent = new EventEmitter<void>();
@@ -39,14 +40,7 @@ export class UniversalGridActionDirective
     private viewContainerRef: ViewContainerRef,
     private gridService: UniversalGridService,
     @Inject('GRID_ACTION_CONFIG') private config: GridActionConfig[]
-  ) {
-    // subscribe route change to update currentPortalItem
-    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((param: any) => {
-      if (param && param.name) {
-        this.gridService.currentPortalItem = param.name;
-      }
-    });
-  }
+  ) {}
 
   ngOnDestroy() {
     this.destroy$.next(null);
@@ -101,21 +95,21 @@ export class UniversalGridActionDirective
               ActionWrapperComponent
             );
 
-          const tableParams = {
-            selectedRecords: this.selectedRecords,
-            recordKey: this.recordKey,
-            fetchDataParam: this.fetchDataParam
-          };
           // assign wrapper config;
           const wrapperProps = {};
           if (actionCfg.wrapper) Object.assign(wrapperProps, actionCfg.wrapper);
           if (x.wrapper) Object.assign(wrapperProps, x.wrapper);
-          Object.assign(wrapperProps, tableParams);
           if (wrapperRef instanceof ComponentRef) {
             Object.assign(wrapperRef.instance, wrapperProps);
           }
 
           // assign action config;
+          const tableParams = {
+            gridName: this.gridName,
+            selectedRecords: this.selectedRecords,
+            recordKey: this.recordKey,
+            fetchDataParam: this.fetchDataParam
+          };
           const config = { ...actionCfg };
           if (!config.props) config.props = {};
           if (x.props) Object.assign(config.props, x.props);
