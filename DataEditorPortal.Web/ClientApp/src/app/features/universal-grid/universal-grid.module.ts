@@ -41,6 +41,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorModule } from 'primeng/paginator';
+import { SidebarModule } from 'primeng/sidebar';
 
 @NgModule({
   declarations: [
@@ -75,7 +76,8 @@ import { PaginatorModule } from 'primeng/paginator';
     SplitButtonModule,
     RippleModule,
     ButtonModule,
-    PaginatorModule
+    PaginatorModule,
+    SidebarModule
   ],
   providers: [
     GridTableService,

@@ -36,11 +36,11 @@
             <h3>
               {{ tableConfig.caption }}
               <a
-                class="ml-3 text-primary"
-                [href]="tableConfig.helpUrl"
-                target="_blank"
+                class="ml-3 text-primary absolute"
+                style="right: 0.72rem"
+                (click)="openHelpUrl(tableConfig.helpUrl)"
                 *ngIf="tableConfig.helpUrl"
-                ><i class="pi pi-external-link"></i
+                ><i class="pi text-lg pi-external-link cursor-pointer"></i
               ></a>
             </h3>
             <p
@@ -217,3 +217,13 @@
     [showCurrentPageReport]="true"
     [showPageLinks]="true"></p-paginator>
 </div>
+
+<p-sidebar
+  *ngIf="visible"
+  [(visible)]="visible"
+  position="right"
+  [baseZIndex]="10000"
+  [modal]="false"
+  class="sidebar">
+  <iframe [src]="helpUrl" class="w-full h-full" frameborder="0"></iframe>
+</p-sidebar>

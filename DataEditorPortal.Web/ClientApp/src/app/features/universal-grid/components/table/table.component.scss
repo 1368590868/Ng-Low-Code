@@ -48,3 +48,18 @@
     }
   }
 }
+
+.sidebar {
+  ::ng-deep {
+    .p-sidebar {
+      width: 45%;
+    }
+    .p-sidebar-content {
+      padding: 0;
+      height: 100%;
+    }
+    .p-sidebar-footer {
+      display: none;
+    }
+  }
+}
