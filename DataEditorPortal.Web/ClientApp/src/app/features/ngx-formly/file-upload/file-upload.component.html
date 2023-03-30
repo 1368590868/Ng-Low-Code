@@ -59,16 +59,17 @@
 
 <div class="flex">
   <p-fileUpload
-    *ngIf="(!multiple && newAttachments.length <= 0) || multiple"
+    *ngIf="newAttachments.length < this.fileLimit"
     #AttachmentsRef
     styleClass="p-button-outlined"
     name="files"
     [url]="apiUrl + 'attachment/upload-temp-file'"
     [multiple]="multiple"
-    [auto]="true"
+    [auto]="false"
     [maxFileSize]="maxFileSize"
     [fileLimit]="fileLimit"
     (onProgress)="onFileUploadProgress($event)"
+    (onSelect)="onFileUploadSelect($event, AttachmentsRef)"
     mode="basic"
     [chooseLabel]="chooseLabel"
     [accept]="accept"
