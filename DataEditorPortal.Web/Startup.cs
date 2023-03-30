@@ -107,6 +107,8 @@ namespace DataEditorPortal.Web
             services.AddScoped<IEventLogService, EventLogService>();
             services.AddSingleton<ILicenseService, LicenseService>();
 
+            services.AddScoped<PhsicalFileStorageService>();
+            services.AddScoped<BinaryFileStorageService>();
             #endregion
 
             services.AddCors(options =>

@@ -12,6 +12,7 @@ import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
 import { PermissionDirective } from './directive/permission.directive';
 import { BooleanTextPipe } from './pipes/boolean-text.pipe';
+import { UploadPipe } from './pipes/upload.pipe';
 
 export { AuthRouterGuard } from './guards/auth-router.guard';
 export { PermissionRouterGuard } from './guards/permission-router.guard';
@@ -30,9 +31,9 @@ export * from './models/universal.type';
 export { SystemLogData } from '../shared/models/system-log';
 
 @NgModule({
-  declarations: [PermissionDirective, BooleanTextPipe],
+  declarations: [PermissionDirective, BooleanTextPipe, UploadPipe],
   imports: [CommonModule, FormsModule, HttpClientModule, FormlyModule],
-  exports: [PermissionDirective, BooleanTextPipe],
+  exports: [PermissionDirective, BooleanTextPipe, UploadPipe],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

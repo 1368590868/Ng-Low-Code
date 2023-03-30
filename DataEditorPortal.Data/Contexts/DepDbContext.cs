@@ -23,6 +23,7 @@ namespace DataEditorPortal.Data.Contexts
         public virtual DbSet<DataDictionary> DataDictionaries { get; set; }
         public virtual DbSet<DataSourceConnection> DataSourceConnections { get; set; }
         public virtual DbSet<EventLog> EventLogs { get; set; }
+        public virtual DbSet<UploadedFile> UploadedFiles { get; set; }
 
         public virtual DbSet<UniversalGridConfiguration> UniversalGridConfigurations { get; set; }
 

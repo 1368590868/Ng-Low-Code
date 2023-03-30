@@ -95,7 +95,8 @@
               *ngIf="
                 col.filterType &&
                 col.filterType !== 'none' &&
-                col.filterType !== 'enums'
+                col.filterType !== 'enums' &&
+                col.filterType !== 'upload'
               "
               style="vertical-align: middle"
               [type]="col.filterType"
@@ -153,7 +154,9 @@
             </div>
           </td>
 
-          <td *ngFor="let col of columns" [title]="data[col.field] || ''">
+          <td
+            *ngFor="let col of columns"
+            [title]="col.filterType !== 'upload' ? data[col.field] || '' : ''">
             <ng-container
               *ngIf="!col.template"
               [ngTemplateOutlet]="
@@ -163,6 +166,8 @@
                   ? numeric
                   : col.filterType === 'boolean'
                   ? boolean
+                  : col.filterType === 'upload'
+                  ? upload
                   : normal
               "></ng-container>
             <ng-template #boolean>{{ data[col.field] | boolean }}</ng-template>
@@ -174,6 +179,9 @@
               data[col.field]
                 | number : (col.format === '' ? undefined : col.format)
             }}</ng-template>
+            <ng-template #upload
+              ><span [innerHTML]="data[col.field] | upload"></span
+            ></ng-template>
             <ng-template #normal>{{ data[col.field] }}</ng-template>
             <span
               *ngIf="col.template"

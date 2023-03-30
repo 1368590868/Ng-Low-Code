@@ -112,6 +112,10 @@ export class PortalEditColumnsComponent
               {
                 label: 'Enums',
                 value: 'enums'
+              },
+              {
+                label: 'Upload',
+                value: 'upload'
               }
             ]
           }

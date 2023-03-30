@@ -4,7 +4,6 @@ import { FormlyModule } from '@ngx-formly/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlySelectModule } from '@ngx-formly/core/select';
 import { TriStateCheckboxModule } from 'primeng/tristatecheckbox';
-import { FormlyFormFieldModule } from '@ngx-formly/primeng/form-field';
 import { FormlyFieldTriStateCheckBoxComponent } from './triStateCheckbox.type';
 
 @NgModule({
@@ -13,8 +12,6 @@ import { FormlyFieldTriStateCheckBoxComponent } from './triStateCheckbox.type';
     CommonModule,
     ReactiveFormsModule,
     TriStateCheckboxModule,
-
-    FormlyFormFieldModule,
     FormlySelectModule,
     FormlyModule.forChild({
       types: [

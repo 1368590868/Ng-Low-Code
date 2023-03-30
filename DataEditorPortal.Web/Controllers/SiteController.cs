@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -39,6 +40,8 @@ namespace DataEditorPortal.Web.Controllers
             _userService = userService;
             _licenseService = licenseService;
         }
+
+        #region site settings
 
         [HttpGet]
         [Route("settings")]
@@ -102,6 +105,8 @@ namespace DataEditorPortal.Web.Controllers
                 date
             };
         }
+
+        #endregion
 
         [HttpPost]
         [Route("menus")]
@@ -177,6 +182,8 @@ namespace DataEditorPortal.Web.Controllers
             return root;
         }
 
+        #region site content
+
         [HttpGet]
         [Route("content/{contentName}")]
         [AllowAnonymous]
@@ -208,6 +215,10 @@ namespace DataEditorPortal.Web.Controllers
             return true;
         }
 
+        #endregion
+
+        #region license
+
         [HttpGet]
         [Route("license")]
         [NoLicenseCheck]
@@ -236,5 +247,7 @@ namespace DataEditorPortal.Web.Controllers
 
             return true;
         }
+
+        #endregion
     }
 }

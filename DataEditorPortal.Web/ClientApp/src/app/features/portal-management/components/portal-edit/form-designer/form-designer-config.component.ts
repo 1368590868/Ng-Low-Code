@@ -177,6 +177,14 @@ export class FormDesignerConfigComponent {
           }
         },
         {
+          key: 'description',
+          type: 'input',
+          props: {
+            label: 'Description',
+            placeholder: 'Enter control description'
+          }
+        },
+        {
           key: 'placeholder',
           type: 'input',
           props: {
@@ -291,6 +299,8 @@ export class FormDesignerConfigComponent {
               type: 'input',
               props: {
                 label: 'Accept',
+                description:
+                  'Pattern to restrict the allowed file types such as "image/*".',
                 placeholder:
                   'Pattern to restrict the allowed file types such as "image/*".'
               }
@@ -306,8 +316,10 @@ export class FormDesignerConfigComponent {
             {
               key: 'fileLimit',
               type: 'inputNumber',
+              defaultValue: 1,
               props: {
                 label: 'File Limit',
+                description: 'Maximum number of files that can be uploaded.',
                 placeholder: 'Maximum number of files that can be uploaded.'
               }
             },
@@ -316,6 +328,8 @@ export class FormDesignerConfigComponent {
               type: 'input',
               props: {
                 label: 'Choose Label',
+                description:
+                  'Label of the choose button. Defaults to global value in i18n translation configuration.',
                 placeholder:
                   'Label of the choose button. Defaults to global value in i18n translation configuration.'
               }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Dapper;
+using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
@@ -26,7 +27,8 @@ namespace DataEditorPortal.Web.Services
         List<GridColConfig> GetGridColumnsConfig(string name);
         List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column);
         List<SearchFieldConfig> GetGridSearchConfig(string name);
-        List<FormFieldConfig> GetGridDetailConfig(string name, string type);
+        List<FormFieldConfig> GetGridFormConfig(string name, string type);
+        GridFormLayout GetFormEventConfig(string name, string type);
 
         GridData GetGridData(string name, GridParam param);
         List<FilterParam> ProcessFilterParam(List<FilterParam> filters, List<FilterParam> filtersApplied);
@@ -34,6 +36,7 @@ namespace DataEditorPortal.Web.Services
         MemoryStream ExportExcel(string name, ExportParam param);
 
         IDictionary<string, object> GetGridDataDetail(string name, string id);
+        bool OnValidateGridData(string name, string type, string id, Dictionary<string, object> model);
         bool UpdateGridData(string name, string id, Dictionary<string, object> model);
         bool AddGridData(string name, Dictionary<string, object> model);
         bool DeleteGridData(string name, string[] ids);
@@ -67,7 +70,7 @@ namespace DataEditorPortal.Web.Services
             _eventLogService = eventLogService;
         }
 
-        #region Grid cofnig, columns config, search config and list data
+        #region Grid cofnig, columns config, search config and detail form config
 
         public GridConfig GetGridConfig(string name)
         {
@@ -123,53 +126,96 @@ namespace DataEditorPortal.Web.Services
             return JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
         }
 
-        public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column)
+        public List<SearchFieldConfig> GetGridSearchConfig(string name)
         {
-            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
-            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-            var columnsConfig = JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
+            if (string.IsNullOrEmpty(config.SearchConfig)) config.SearchConfig = "[]";
 
-            var result = new List<object>();
-            var columnConfig = columnsConfig.FirstOrDefault(x => x.field == column);
-            if (columnConfig != null && columnConfig.filterType == "enums")
+            var result = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
+
+            result.ForEach(x => x.searchRule = null);
+
+            return result;
+        }
+
+        public List<FormFieldConfig> GetGridFormConfig(string name, string type)
+        {
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+
+            if (string.IsNullOrEmpty(config.DetailConfig)) throw new DepException("Grid Detail Config can not be empty.");
+
+            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+
+            #region validation
+            if (type == "ADD")
             {
-                dataSourceConfig.Columns = new List<string>() { columnConfig.field };
-                var query = _queryBuilder.GenerateSqlTextForColumnFilterOption(dataSourceConfig);
-
-                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                if (detailConfig.AddingForm != null && detailConfig.AddingForm.UseCustomForm)
                 {
-                    con.ConnectionString = config.DataSourceConnection.ConnectionString;
-
-                    try
-                    {
-                        result = con.Query(query)
-                            .Select(x => ((IDictionary<string, object>)x)[columnConfig.field])
-                            .Where(x => x != null && x != DBNull.Value)
-                            .ToList();
-
-                        _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, query, null);
-                    }
-                    catch (Exception ex)
-                    {
-                        _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, query, null, ex.Message);
-                        throw new DepException("An Error in the query has occurred: " + ex.Message);
-                    }
-                    finally
-                    {
-                        con.Close();
-                    }
+                    throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
                 }
-
+                if (detailConfig.AddingForm == null || detailConfig.AddingForm.FormFields.Count == 0)
+                {
+                    throw new DepException("No adding form configured for this portal item. Please go Portal Management to complete the configuration.");
+                }
+                if (detailConfig.AddingForm.UseCustomForm)
+                {
+                    throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+                }
             }
+            if (type == "UPDATE")
+            {
+                if (detailConfig.UpdatingForm != null && detailConfig.UpdatingForm.UseCustomForm)
+                {
+                    throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+                }
+                if (detailConfig.UpdatingForm == null || (!detailConfig.UpdatingForm.UseAddingFormLayout && detailConfig.UpdatingForm.FormFields.Count == 0))
+                {
+                    throw new DepException("No Updating form configured for this portal item. Please go Portal Management to complete the configuration.");
+                }
+                if (detailConfig.UpdatingForm.UseAddingFormLayout &&
+                    (detailConfig.AddingForm == null || detailConfig.AddingForm.UseCustomForm || detailConfig.AddingForm.FormFields.Count == 0))
+                {
+                    throw new DepException("Updating form is configured to use the same configuration of adding form, but no adding form configured. Please go Portal Management to complete the configuration.");
+                }
+            }
+            #endregion
 
-            return result
-                .Select(x => new DropdownOptionsItem { Label = x, Value = x })
-                .OrderBy(x => x.Label)
+            var formLayout = type == "ADD" ? detailConfig.AddingForm : detailConfig.UpdatingForm;
+            if (formLayout.UseAddingFormLayout)
+                formLayout.FormFields = detailConfig.AddingForm.FormFields;
+
+            return formLayout.FormFields
+                // filter the auto calculated fields.
+                .Where(x => x.computedConfig == null || (!x.computedConfig.name.HasValue && string.IsNullOrEmpty(x.computedConfig.queryText)))
                 .ToList();
         }
 
+        public GridFormLayout GetFormEventConfig(string name, string type)
+        {
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+
+            if (string.IsNullOrEmpty(config.DetailConfig)) throw new DepException("Grid Detail Config can not be empty.");
+
+            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+
+            type = type.ToLower();
+            var formLayout = type == "add" ? detailConfig.AddingForm : type == "update" ? detailConfig.UpdatingForm : type == "delete" ? detailConfig.DeletingForm : null;
+
+            // do not send query text to front end.
+            if (formLayout.OnValidate != null && formLayout.OnValidate.EventType != FormEventType.Javascript) formLayout.OnValidate.Script = null;
+            // if event config is not javascript, do not send to front end.
+            if (formLayout.AfterSaved != null && formLayout.AfterSaved.EventType != FormEventType.Javascript) formLayout.AfterSaved = null;
+
+            return new GridFormLayout() { OnValidate = formLayout.OnValidate, AfterSaved = formLayout.AfterSaved };
+        }
+
+        #endregion
+
+        #region Grid List data
         public GridData GetGridData(string name, GridParam param)
         {
             var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
@@ -317,20 +363,6 @@ namespace DataEditorPortal.Web.Services
             return output;
         }
 
-        public List<SearchFieldConfig> GetGridSearchConfig(string name)
-        {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
-
-            if (string.IsNullOrEmpty(config.SearchConfig)) config.SearchConfig = "[]";
-
-            var result = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
-
-            result.ForEach(x => x.searchRule = null);
-
-            return result;
-        }
-
         public MemoryStream ExportExcel(string name, ExportParam param)
         {
             var columns = GetGridColumnsConfig(name).Where(x => x.type == "DataBaseField").ToList();
@@ -398,6 +430,53 @@ namespace DataEditorPortal.Web.Services
             return stream;
         }
 
+        public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column)
+        {
+            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            var columnsConfig = JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
+
+            var result = new List<object>();
+            var columnConfig = columnsConfig.FirstOrDefault(x => x.field == column);
+            if (columnConfig != null && columnConfig.filterType == "enums")
+            {
+                dataSourceConfig.Columns = new List<string>() { columnConfig.field };
+                var query = _queryBuilder.GenerateSqlTextForColumnFilterOption(dataSourceConfig);
+
+                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                {
+                    con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
+                    try
+                    {
+                        result = con.Query(query)
+                            .Select(x => ((IDictionary<string, object>)x)[columnConfig.field])
+                            .Where(x => x != null && x != DBNull.Value)
+                            .ToList();
+
+                        _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, query, null);
+                    }
+                    catch (Exception ex)
+                    {
+                        _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, query, null, ex.Message);
+                        throw new DepException("An Error in the query has occurred: " + ex.Message);
+                    }
+                    finally
+                    {
+                        con.Close();
+                    }
+                }
+
+            }
+
+            return result
+                .Select(x => new DropdownOptionsItem { Label = x, Value = x })
+                .OrderBy(x => x.Label)
+                .ToList();
+        }
+
         private object FormatExportedValue(GridColConfig column, object value)
         {
             if (value == null) return "";
@@ -413,7 +492,7 @@ namespace DataEditorPortal.Web.Services
 
         #endregion
 
-        #region Grid detail and config, add, update and remove
+        #region Grid detail, add, update and remove
 
         public IDictionary<string, object> GetGridDataDetail(string name, string id)
         {
@@ -461,57 +540,78 @@ namespace DataEditorPortal.Web.Services
             return result;
         }
 
-        public List<FormFieldConfig> GetGridDetailConfig(string name, string type)
+        public bool OnValidateGridData(string name, string type, string id, Dictionary<string, object> model)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
-            if (string.IsNullOrEmpty(config.DetailConfig)) throw new DepException("Grid Detail Config can not be empty.");
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
 
+            // get detail config
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
 
-            #region validation
-            if (type == "ADD")
+            type = type.ToLower();
+            var formLayout = type == "add" ? detailConfig.AddingForm : type == "update" ? detailConfig.UpdatingForm : type == "delete" ? detailConfig.DeletingForm : null;
+            if (formLayout == null || formLayout.OnValidate == null)
             {
-                if (detailConfig.AddingForm != null && detailConfig.AddingForm.UseCustomForm)
+                throw new DepException($"No {type} form configured for this portal item. Please go Portal Management to complete the configuration.");
+            }
+            if (formLayout != null && formLayout.UseCustomForm)
+            {
+                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
+
+            if (formLayout.OnValidate.EventType == FormEventType.Javascript || formLayout.OnValidate.EventType == FormEventType.CommandLine)
+                return true;
+
+            var result = false;
+
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+            {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+                con.Open();
+
+                #region prepair values and paramsters
+
+                // calculate the computed field values
+                AssignComputedValues(formLayout.FormFields, model, con);
+
+                // generate the query text
+                var queryText = _queryBuilder.ReplaceQueryParamters(formLayout.OnValidate.Script);
+
+                // add query parameters
+                if (model.ContainsKey(dataSourceConfig.IdColumn))
+                    model[dataSourceConfig.IdColumn] = id;
+                else
+                    model.Add(dataSourceConfig.IdColumn, id);
+                var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
+
+                #endregion
+
+                // excute command
+                try
                 {
-                    throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+                    var commandType = formLayout.OnValidate.EventType == FormEventType.QueryText ? CommandType.Text : CommandType.StoredProcedure;
+                    var data = con.ExecuteScalar(queryText, param, null, null, commandType);
+                    if (data != DBNull.Value && data != null)
+                    {
+                        var temp = 0;
+                        int.TryParse(data.ToString(), out temp);
+                        result = temp == 1;
+                    }
+
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, result.ToString());
                 }
-                if (detailConfig.AddingForm == null || detailConfig.AddingForm.FormFields.Count == 0)
+                catch (Exception ex)
                 {
-                    throw new DepException("No adding form configured for this portal item. Please go Portal Management to complete the configuration.");
-                }
-                if (detailConfig.AddingForm.UseCustomForm)
-                {
-                    throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
+                    _logger.LogError(ex.Message, ex);
+                    throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
-            if (type == "UPDATE")
-            {
-                if (detailConfig.UpdatingForm != null && detailConfig.UpdatingForm.UseCustomForm)
-                {
-                    throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
-                }
-                if (detailConfig.UpdatingForm == null || (!detailConfig.UpdatingForm.UseAddingFormLayout && detailConfig.UpdatingForm.FormFields.Count == 0))
-                {
-                    throw new DepException("No Updating form configured for this portal item. Please go Portal Management to complete the configuration.");
-                }
-                if (detailConfig.UpdatingForm.UseAddingFormLayout &&
-                    (detailConfig.AddingForm == null || detailConfig.AddingForm.UseCustomForm || detailConfig.AddingForm.FormFields.Count == 0))
-                {
-                    throw new DepException("Updating form is configured to use the same configuration of adding form, but no adding form configured. Please go Portal Management to complete the configuration.");
-                }
-            }
-            #endregion
 
-            var formLayout = type == "ADD" ? detailConfig.AddingForm : detailConfig.UpdatingForm;
-            if (formLayout.UseAddingFormLayout)
-                formLayout.FormFields = detailConfig.AddingForm.FormFields;
-
-            return formLayout.FormFields
-                // filter the auto calculated fields.
-                .Where(x => x.computedConfig == null || (!x.computedConfig.name.HasValue && string.IsNullOrEmpty(x.computedConfig.queryText)))
-                .ToList();
+            return result;
         }
 
         public bool AddGridData(string name, Dictionary<string, object> model)
@@ -538,12 +638,16 @@ namespace DataEditorPortal.Web.Services
             }
 
             var formLayout = detailConfig.AddingForm;
-
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
-
                 con.Open();
+                var trans = con.BeginTransaction();
+
+                #region prepair values and params
+
+                // process file upload, store json string
+                var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
 
                 // calculate the computed field values
                 AssignComputedValues(formLayout.FormFields, model, con);
@@ -563,16 +667,19 @@ namespace DataEditorPortal.Web.Services
                     QueryText = formLayout.QueryText
                 });
 
-                // generate the insert command
-                var trans = con.BeginTransaction();
-
                 // add query parameters
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
+
+                #endregion
 
                 // excute command
                 try
                 {
                     var affected = con.Execute(queryText, param, trans);
+
+                    // process file upload
+                    SaveUploadedFiles(config.Name, uploadedFieldsMeta);
+
                     trans.Commit();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
@@ -637,8 +744,13 @@ namespace DataEditorPortal.Web.Services
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
-
                 con.Open();
+                var trans = con.BeginTransaction();
+
+                #region prepair values and paramsters
+
+                // process file upload, store json string
+                var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
 
                 // calculate the computed field values
                 AssignComputedValues(formLayout.FormFields, model, con);
@@ -659,9 +771,6 @@ namespace DataEditorPortal.Web.Services
                     QueryText = formLayout.QueryText
                 });
 
-                // generate the update command
-                var trans = con.BeginTransaction();
-
                 // add query parameters
                 if (model.ContainsKey(dataSourceConfig.IdColumn))
                     model[dataSourceConfig.IdColumn] = id;
@@ -669,13 +778,19 @@ namespace DataEditorPortal.Web.Services
                     model.Add(dataSourceConfig.IdColumn, id);
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
 
+                #endregion
+
                 // excute command
                 try
                 {
                     var affected = con.Execute(queryText, param, trans);
+
+                    // process file upload
+                    SaveUploadedFiles(config.Name, uploadedFieldsMeta);
+
                     trans.Commit();
 
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, $"{affected} rows affected.");
+                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
 
                     // run after saved event
                     AfterSaved(new EventActionModel()
@@ -830,9 +945,6 @@ namespace DataEditorPortal.Web.Services
 
         #endregion
 
-
-        #region Event
-
         private void AfterSaved(EventActionModel actionConfig, Dictionary<string, object> model)
         {
             var eventConfig = actionConfig.EventConfig;
@@ -914,8 +1026,56 @@ namespace DataEditorPortal.Web.Services
                 });
                 _logger.LogError(ex.Message, ex);
             }
+        }
 
-            #endregion
+        private IFileStorageService GetFileStorageService(FileStorageType type)
+        {
+            switch (type)
+            {
+                case FileStorageType.FileSystem:
+                    return _serviceProvider.GetRequiredService<PhsicalFileStorageService>();
+                case FileStorageType.SqlBinary:
+                    return _serviceProvider.GetRequiredService<BinaryFileStorageService>();
+                default:
+                    return _serviceProvider.GetRequiredService<PhsicalFileStorageService>();
+            }
+        }
+
+        private Dictionary<string, List<UploadedFileModel>> ProcessFileUploadFileds(List<FormFieldConfig> formFields, Dictionary<string, object> model)
+        {
+            var result = new Dictionary<string, List<UploadedFileModel>>();
+            var fileUploadFields = formFields.Where(x => x.type == "fileUpload").ToList();
+            foreach (var field in fileUploadFields)
+            {
+                if (model.ContainsKey(field.key))
+                {
+                    var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                    var jsonElement = (JsonElement)model[field.key];
+                    if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
+                    {
+                        var valueStr = jsonElement.ToString();
+                        model[field.key] = valueStr.Replace("\"status\":\"New\"", "\"status\":\"Current\"");
+
+                        var storageType = ((JsonElement)field.props).GetProperty("storageType").ToString();
+                        result.Add(storageType, JsonSerializer.Deserialize<List<UploadedFileModel>>(valueStr, jsonOptions));
+                    }
+                    else
+                        model[field.key] = "[]";
+                }
+            }
+            return result;
+        }
+
+        private void SaveUploadedFiles(string gridName, Dictionary<string, List<UploadedFileModel>> uploadedFiledsMeta)
+        {
+            foreach (var meta in uploadedFiledsMeta)
+            {
+                var storageType = meta.Key;
+                FileStorageType storageTypeEnum = FileStorageType.FileSystem;
+                Enum.TryParse(storageType, out storageTypeEnum);
+                var fileStorageService = GetFileStorageService(storageTypeEnum);
+                fileStorageService.SaveFiles(meta.Value, gridName);
+            }
         }
     }
 }
