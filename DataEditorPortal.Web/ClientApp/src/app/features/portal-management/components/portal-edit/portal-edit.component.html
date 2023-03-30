@@ -4,10 +4,10 @@
       {{ portalItemService.currentPortalItemCaption }}
     </h2>
     <p-steps
-      [model]="items"
-      [readonly]="
-        !portalItemService.currentPortalItemConfigCompleted
-      "></p-steps>
+      [readonly]="!portalItemService.currentPortalItemConfigCompleted"
+      [model]="items"></p-steps>
   </div>
-  <router-outlet></router-outlet>
+  <router-outlet
+    (activate)="onActivate($event)"
+    (deactivate)="onDeactivate()"></router-outlet>
 </div>

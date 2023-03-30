@@ -1,18 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
+import { PortalEditStepDirective } from '../portal-edit.component';
 
 @Component({
   selector: 'app-portal-edit-basic',
   templateUrl: './portal-edit-basic.component.html',
   styleUrls: ['./portal-edit-basic.component.scss']
 })
-export class PortalEditBasicComponent implements OnInit {
+export class PortalEditBasicComponent
+  extends PortalEditStepDirective
+  implements OnInit
+{
   @ViewChild('editForm') editForm!: NgForm;
 
   isLoading = true;
@@ -124,7 +128,9 @@ export class PortalEditBasicComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
     private notifyService: NotifyService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     // load basic information
@@ -208,35 +214,31 @@ export class PortalEditBasicComponent implements OnInit {
   }
 
   saveSucess(id?: string) {
-    let next: unknown[] = [];
     if (this.isSavingAndNext) {
       if (id) {
-        next = [
-          `../../edit/${this.portalItemService.currentPortalItemId}/datasource`
-        ];
+        // it is adding, redirect to edit.
         this.portalItemService.saveCurrentStep('datasource');
+        const next = `../../edit/${this.portalItemService.currentPortalItemId}/datasource`;
+        this.router.navigate([next], {
+          relativeTo: this.activatedRoute
+        });
       } else {
-        next = ['../datasource'];
+        // it is edting, go to next
+        this.saveNextEvent.emit();
       }
     }
     if (this.isSavingAndExit) {
-      this.notifyService.notifySuccess(
-        'Success',
-        'Save Draft Successfully Completed.'
-      );
-      next = id ? ['../../list'] : ['../../../list'];
+      if (id) {
+        this.router.navigate(['../../list'], {
+          relativeTo: this.activatedRoute
+        });
+      } else {
+        this.saveDraftEvent.emit();
+      }
     }
-    this.router.navigate(next, {
-      relativeTo: this.activatedRoute
-    });
   }
 
-  onBack() {
-    const next = this.portalItemService.currentPortalItemId
-      ? ['../../../list']
-      : ['../../list'];
-    this.router.navigate(next, {
-      relativeTo: this.activatedRoute
-    });
-  }
+  // onBack() {
+  //   this.backEvent.emit();
+  // }
 }
