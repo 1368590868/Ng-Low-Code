@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
-import { FormLayoutDeleteComponent, PortalEditStepDirective } from '../..';
+import { FormLayoutDeleteComponent } from '../..';
 import {
   GridFormConfig,
   DataSourceTableColumn,
@@ -9,6 +9,7 @@ import {
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { FormLayoutComponent } from './form-layout/form-layout.component';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 
 @Component({
   selector: 'app-portal-edit-form',

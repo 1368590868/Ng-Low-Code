@@ -12,7 +12,7 @@ import {
   DataSourceTableColumn
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import { PortalEditStepDirective } from '../portal-edit.component';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import { AdvancedQueryModel } from './advanced-query-dialog/advanced-query-dialog.component';
 
 interface DataSourceFilterControls {

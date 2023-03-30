@@ -2,8 +2,8 @@ import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { distinctUntilChanged, startWith, tap } from 'rxjs';
-import { GridFormField } from '../../../models/portal-item';
-import { PortalItemService } from '../../../services/portal-item.service';
+import { GridFormField } from '../../models/portal-item';
+import { PortalItemService } from '../../services/portal-item.service';
 
 export const FROM_DESIGNER_CONTROLS: {
   label: string;

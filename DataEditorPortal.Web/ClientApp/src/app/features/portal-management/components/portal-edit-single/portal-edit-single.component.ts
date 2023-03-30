@@ -1,32 +1,17 @@
-import {
-  Component,
-  Directive,
-  EventEmitter,
-  OnDestroy,
-  OnInit,
-  Output
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { switchMap, of, Subject, takeUntil } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { PortalItemService } from '../../services/portal-item.service';
-
-@Directive({
-  selector: '[appPortalEditStep]'
-})
-export class PortalEditStepDirective {
-  @Output() saveNextEvent = new EventEmitter();
-  @Output() saveDraftEvent = new EventEmitter();
-  @Output() backEvent = new EventEmitter();
-}
+import { PortalEditStepDirective } from '../../directives/portal-edit-step.directive';
 
 @Component({
-  selector: 'app-portal-edit',
-  templateUrl: './portal-edit.component.html',
-  styleUrls: ['./portal-edit.component.scss']
+  selector: 'app-portal-edit-single',
+  templateUrl: './portal-edit-single.component.html',
+  styleUrls: ['./portal-edit-single.component.scss']
 })
-export class PortalEditComponent implements OnInit, OnDestroy {
+export class PortalEditSingleComponent implements OnInit, OnDestroy {
   items!: MenuItem[];
 
   activatedIndex = 0;

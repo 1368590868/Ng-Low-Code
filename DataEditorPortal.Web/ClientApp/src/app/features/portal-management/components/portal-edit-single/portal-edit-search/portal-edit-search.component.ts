@@ -13,8 +13,8 @@ import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { GridFormField, GridSearchField } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import { FormDesignerViewComponent } from '../form-designer/form-designer-view.component';
-import { PortalEditStepDirective } from '../portal-edit.component';
+import { FormDesignerViewComponent } from '../../form-designer/form-designer-view.component';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 
 @Component({
   selector: 'app-portal-edit-search',

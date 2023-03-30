@@ -43,7 +43,7 @@ export class PortalListComponent implements OnInit {
       icon: 'pi pi-fw pi-desktop',
       command: () => {
         this.portalItemService.currentPortalItemParentFolder = undefined;
-        this.router.navigate([`../add`], {
+        this.router.navigate([`../single`], {
           relativeTo: this.activatedRoute
         });
       }
@@ -96,7 +96,7 @@ export class PortalListComponent implements OnInit {
         icon: 'pi pi-fw pi-pencil',
         command: () => {
           // edit portal item
-          this.router.navigate([`../edit/${row['id']}`], {
+          this.router.navigate([`../single/${row['id']}`], {
             relativeTo: this.activatedRoute
           });
         }
@@ -137,19 +137,19 @@ export class PortalListComponent implements OnInit {
       });
 
       items.push({
-        label: 'New Portal Item',
+        label: 'Create Portal Item',
         icon: 'pi pi-fw pi-plus',
         command: () => {
           // new portal item
           this.portalItemService.currentPortalItemParentFolder = row['id'];
-          this.router.navigate([`../add`], {
+          this.router.navigate([`../single`], {
             relativeTo: this.activatedRoute
           });
         }
       });
 
       items.push({
-        label: 'New External Link',
+        label: 'Create External Link',
         icon: 'pi pi-fw pi-external-link',
         command: () => {
           this.addDialog.header = 'Create External Link';
