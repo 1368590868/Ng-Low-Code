@@ -45,7 +45,7 @@ export class PortalEditFormComponent
   }
 
   ngOnInit(): void {
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.portalItemService.itemId) {
       forkJoin([
         this.portalItemService.getGridFormConfig(),
         this.portalItemService.getDataSourceTableColumnsByPortalId(),
@@ -88,7 +88,7 @@ export class PortalEditFormComponent
       infoForm: {}
     };
 
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.portalItemService.itemId) {
       this.portalItemService
         .saveGridFormConfig(data)
         .pipe(
@@ -106,10 +106,10 @@ export class PortalEditFormComponent
   }
 
   saveSucess() {
-    if (this.isSavingAndNext && this.portalItemService.currentPortalItemId) {
+    if (this.isSavingAndNext && this.portalItemService.itemId) {
       this.portalItemService.saveCurrentStep('basic');
       this.portalItemService
-        .publish(this.portalItemService.currentPortalItemId)
+        .publish(this.portalItemService.itemId)
         .subscribe(res => {
           if (!res.isError) {
             this.notifyService.notifySuccess(

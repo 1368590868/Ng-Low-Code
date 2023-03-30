@@ -1,6 +1,5 @@
 export * from './portal-list';
-export * from './portal-edit-single';
-export * from './portal-edit-linked';
+export * from './portal-edit';
 export * from './option-dialog/option-dialog.component';
 export * from './custom-actions/custom-actions.component';
 export * from './search-rule/search-rule.component';

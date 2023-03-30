@@ -153,7 +153,7 @@ export class PortalEditColumnsComponent
   }
 
   ngOnInit(): void {
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.portalItemService.itemId) {
       forkJoin([
         this.portalItemService.getGridColumnsConfig(),
         this.portalItemService.getDataSourceTableColumnsByPortalId()
@@ -243,7 +243,7 @@ export class PortalEditColumnsComponent
 
   saveGridColumnsConfig() {
     this.isSaving = true;
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.portalItemService.itemId) {
       const data = JSON.parse(JSON.stringify(this.targetColumns));
       data.forEach((x: GridColumn) => {
         if (x.template === this.helperMessage) {

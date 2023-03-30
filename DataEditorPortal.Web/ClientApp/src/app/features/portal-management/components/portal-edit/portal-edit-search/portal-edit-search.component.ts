@@ -85,7 +85,7 @@ export class PortalEditSearchComponent
   }
 
   ngOnInit(): void {
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.portalItemService.itemId) {
       forkJoin([
         this.portalItemService.getGridSearchConfig(),
         this.portalItemService.getDataSourceTableColumnsByPortalId()
@@ -172,7 +172,7 @@ export class PortalEditSearchComponent
 
   saveGridSearchConfig() {
     this.isSaving = true;
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.portalItemService.itemId) {
       this.portalItemService
         .saveGridSearchConfig(this.targetColumns)
         .pipe(

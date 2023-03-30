@@ -99,7 +99,7 @@ export class PortalEditDatasourceComponent
     );
 
     // get protal item datasource config
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.portalItemService.itemId) {
       forkJoin([
         this.portalItemService.getDataSourceConfig(),
         // load database tables
@@ -302,7 +302,7 @@ export class PortalEditDatasourceComponent
   saveDatasourceConfig() {
     const save = () => {
       this.isSaving = true;
-      if (this.portalItemService.currentPortalItemId) {
+      if (this.portalItemService.itemId) {
         const data: DataSourceConfig = {
           dataSourceConnectionId: this.datasourceConfig.dataSourceConnectionId,
           pageSize: this.pageSize,
@@ -331,8 +331,7 @@ export class PortalEditDatasourceComponent
               if (res && !res.isError) {
                 if (this.dataSourceChanged()) {
                   // if user changed the tableSchema or tableName, user need to continue config column, search, form
-                  this.portalItemService.currentPortalItemConfigCompleted =
-                    false;
+                  this.portalItemService.configCompleted = false;
                 }
                 this.saveSucess();
               }

@@ -22,10 +22,11 @@ import {
 export class PortalItemService {
   public _apiUrl: string;
 
-  public currentPortalItemId?: string;
-  public currentPortalItemParentFolder?: string;
-  public currentPortalItemConfigCompleted?: boolean;
-  public currentPortalItemCaption?: string;
+  public itemId?: string;
+  public parentFolder?: string;
+  public configCompleted?: boolean;
+  public itemCaption?: string;
+  public itemType?: string;
 
   constructor(
     private http: HttpClient,
@@ -55,7 +56,7 @@ export class PortalItemService {
   getCurrentStep(): Observable<string> {
     return this.http
       .get<ApiResponse<string>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/current-step`
+        `${this._apiUrl}portal-item/${this.itemId}/current-step`
       )
       .pipe(map(x => x.result || 'basic'));
   }
@@ -63,7 +64,7 @@ export class PortalItemService {
   saveCurrentStep(step: string) {
     return this.http
       .post<ApiResponse<string>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/current-step?step=${step}`,
+        `${this._apiUrl}portal-item/${this.itemId}/current-step?step=${step}`,
         null
       )
       .subscribe();
@@ -142,7 +143,7 @@ export class PortalItemService {
   getPortalDetails(): Observable<PortalItemData> {
     return this.http
       .get<ApiResponse<PortalItemData>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/details`
+        `${this._apiUrl}portal-item/${this.itemId}/details`
       )
       .pipe(map(x => x.result || {}));
   }
@@ -159,7 +160,7 @@ export class PortalItemService {
   ): Observable<ApiResponse<PortalItemData>> {
     return this.http
       .put<ApiResponse<PortalItemData>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/update`,
+        `${this._apiUrl}portal-item/${this.itemId}/update`,
         data
       )
       .pipe(tap(() => this.refreshMenu()));
@@ -232,7 +233,7 @@ export class PortalItemService {
   getDataSourceTableColumnsByPortalId(): Observable<DataSourceTableColumn[]> {
     return this.http
       .get<ApiResponse<DataSourceTableColumn[]>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/datasource/columns`
+        `${this._apiUrl}portal-item/${this.itemId}/datasource/columns`
       )
       .pipe(map(x => x.result || []));
   }
@@ -240,7 +241,7 @@ export class PortalItemService {
   getDataSourceConfig(): Observable<DataSourceConfig> {
     return this.http
       .get<ApiResponse<DataSourceConfig>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/datasource`
+        `${this._apiUrl}portal-item/${this.itemId}/datasource`
       )
       .pipe(
         map(
@@ -257,7 +258,7 @@ export class PortalItemService {
   saveDataSourceConfig(data: DataSourceConfig) {
     return this.http
       .post<ApiResponse<boolean>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/datasource`,
+        `${this._apiUrl}portal-item/${this.itemId}/datasource`,
         data
       )
       .pipe(tap(() => this.refreshMenu()));
@@ -266,14 +267,14 @@ export class PortalItemService {
   getGridColumnsConfig(): Observable<GridColumn[]> {
     return this.http
       .get<ApiResponse<GridColumn[]>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-columns`
+        `${this._apiUrl}portal-item/${this.itemId}/grid-columns`
       )
       .pipe(map(x => x.result || []));
   }
 
   saveGridColumnsConfig(data: GridColumn[]) {
     return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-columns`,
+      `${this._apiUrl}portal-item/${this.itemId}/grid-columns`,
       data
     );
   }
@@ -281,14 +282,14 @@ export class PortalItemService {
   getGridSearchConfig(): Observable<GridSearchField[]> {
     return this.http
       .get<ApiResponse<GridSearchField[]>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-search`
+        `${this._apiUrl}portal-item/${this.itemId}/grid-search`
       )
       .pipe(map(x => x.result || []));
   }
 
   saveGridSearchConfig(data: GridSearchField[]) {
     return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-search`,
+      `${this._apiUrl}portal-item/${this.itemId}/grid-search`,
       data
     );
   }
@@ -296,7 +297,7 @@ export class PortalItemService {
   getGridFormConfig(): Observable<GirdDetailConfig> {
     return this.http
       .get<ApiResponse<GirdDetailConfig>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`
+        `${this._apiUrl}portal-item/${this.itemId}/grid-form`
       )
       .pipe(map(x => x.result || {}));
   }
@@ -304,7 +305,7 @@ export class PortalItemService {
   saveGridFormConfig(data: GirdDetailConfig) {
     return this.http
       .post<ApiResponse<boolean>>(
-        `${this._apiUrl}portal-item/${this.currentPortalItemId}/grid-form`,
+        `${this._apiUrl}portal-item/${this.itemId}/grid-form`,
         data
       )
       .pipe(tap(() => this.refreshMenu()));

@@ -2,20 +2,21 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { PortalListComponent } from './components/portal-list/portal-list.component';
 import {
-  PortalEditSingleComponent,
+  PortalEditComponent,
   PortalEditBasicComponent,
   PortalEditDatasourceComponent,
   PortalEditColumnsComponent,
   PortalEditSearchComponent,
-  PortalEditFormComponent,
-  PortalEditLinkedComponent
+  PortalEditFormComponent
 } from './components';
 
 const routes: Routes = [
   { path: 'list', component: PortalListComponent },
+  // route for adding & editing single table page.
   {
     path: 'edit-single/:id',
-    component: PortalEditSingleComponent,
+    component: PortalEditComponent,
+    data: { type: 'single' },
     children: [
       { path: 'basic', component: PortalEditBasicComponent },
       { path: 'datasource', component: PortalEditDatasourceComponent },
@@ -26,12 +27,15 @@ const routes: Routes = [
   },
   {
     path: 'add-single',
-    component: PortalEditSingleComponent,
+    data: { type: 'single' },
+    component: PortalEditComponent,
     children: [{ path: 'basic', component: PortalEditBasicComponent }]
   },
+  // route for adding & editing linked table page
   {
     path: 'edit-linked/:id',
-    component: PortalEditLinkedComponent,
+    component: PortalEditComponent,
+    data: { type: 'linked' },
     children: [
       { path: 'basic', component: PortalEditBasicComponent },
       { path: 'datasource', component: PortalEditDatasourceComponent },
@@ -40,8 +44,36 @@ const routes: Routes = [
   },
   {
     path: 'add-linked',
-    component: PortalEditLinkedComponent,
+    data: { type: 'linked' },
+    component: PortalEditComponent,
     children: [{ path: 'basic', component: PortalEditBasicComponent }]
+  },
+  // route for adding & editing children table of linked table page.
+  {
+    path: 'edit-linked/:parentId/datasource/add',
+    component: PortalEditComponent,
+    data: { type: 'linked-single' },
+    children: [
+      {
+        path: 'basic',
+        component: PortalEditBasicComponent
+      }
+    ]
+  },
+  {
+    path: 'edit-linked/:parentId/datasource/edit/:id',
+    component: PortalEditComponent,
+    data: { type: 'linked-single' },
+    children: [
+      {
+        path: 'basic',
+        component: PortalEditBasicComponent
+      },
+      { path: 'datasource', component: PortalEditDatasourceComponent },
+      { path: 'columns', component: PortalEditColumnsComponent },
+      { path: 'search', component: PortalEditSearchComponent },
+      { path: 'form', component: PortalEditFormComponent }
+    ]
   }
 ];
 

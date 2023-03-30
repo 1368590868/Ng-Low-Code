@@ -43,7 +43,7 @@ import { UniversalGridActionModule } from 'src/app/features/universal-grid-actio
 import {
   PortalListComponent,
   AddPortalDialogComponent,
-  PortalEditSingleComponent,
+  PortalEditComponent,
   PortalEditBasicComponent,
   PortalEditDatasourceComponent,
   PortalEditColumnsComponent,
@@ -67,7 +67,6 @@ import {
   AdvancedQueryDialogComponent,
   DbConnectionDialogComponent,
   FormLayoutDeleteComponent,
-  PortalEditLinkedComponent,
   EventConfigComponent
 } from './components';
 import { MonacoEditorConfig } from './monaco-editor-config';
@@ -77,7 +76,7 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
   declarations: [
     PortalListComponent,
     AddPortalDialogComponent,
-    PortalEditSingleComponent,
+    PortalEditComponent,
     PortalEditStepDirective,
     PortalEditBasicComponent,
     PortalEditDatasourceComponent,
@@ -101,8 +100,7 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
     AdvancedQueryDialogComponent,
     DbConnectionDialogComponent,
     FormLayoutDeleteComponent,
-    EventConfigComponent,
-    PortalEditLinkedComponent
+    EventConfigComponent
   ],
   imports: [
     CommonModule,

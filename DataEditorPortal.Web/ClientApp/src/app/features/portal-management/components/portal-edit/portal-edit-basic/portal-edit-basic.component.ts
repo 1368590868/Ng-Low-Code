@@ -44,7 +44,7 @@ export class PortalEditBasicComponent
           expression: (c: AbstractControl) => {
             return new Promise((resolve, reject) => {
               this.portalItemService
-                .nameExists(c.value, this.portalItemService.currentPortalItemId)
+                .nameExists(c.value, this.portalItemService.itemId)
                 .subscribe(res =>
                   !res.isError ? resolve(!res.result) : reject(res.message)
                 );
@@ -134,7 +134,7 @@ export class PortalEditBasicComponent
 
   ngOnInit(): void {
     // load basic information
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.portalItemService.itemId) {
       this.portalItemService.getPortalDetails().subscribe(res => {
         if (!res['parentId']) res['parentId'] = '<root>';
         this.model = res;
@@ -147,7 +147,7 @@ export class PortalEditBasicComponent
     } else {
       this.model = {
         ...this.model,
-        parentId: this.portalItemService.currentPortalItemParentFolder
+        parentId: this.portalItemService.parentFolder
       };
       this.isLoading = false;
     }
@@ -160,13 +160,13 @@ export class PortalEditBasicComponent
       if (data['parentId'] === '<root>') data['parentId'] = null;
 
       this.isSaving = true;
-      if (this.portalItemService.currentPortalItemId) {
+      if (this.portalItemService.itemId) {
         this.portalItemService
           .updatePortalDetails(data)
           .pipe(
             tap(res => {
               if (res && !res.isError) {
-                this.portalItemService.currentPortalItemCaption = data['label'];
+                this.portalItemService.itemCaption = data['label'];
                 this.saveSucess();
               }
 
@@ -182,8 +182,8 @@ export class PortalEditBasicComponent
           .pipe(
             tap(res => {
               if (res && !res.isError) {
-                this.portalItemService.currentPortalItemId = res.result;
-                this.portalItemService.currentPortalItemCaption = data['label'];
+                this.portalItemService.itemId = res.result;
+                this.portalItemService.itemCaption = data['label'];
                 this.saveSucess(res.result);
               }
               this.isSaving = false;
@@ -218,7 +218,7 @@ export class PortalEditBasicComponent
       if (id) {
         // it is adding, redirect to edit.
         this.portalItemService.saveCurrentStep('datasource');
-        const next = `../../edit-single/${this.portalItemService.currentPortalItemId}/datasource`;
+        const next = `../../edit-single/${this.portalItemService.itemId}/datasource`;
         this.router.navigate([next], {
           relativeTo: this.activatedRoute
         });
