@@ -218,7 +218,7 @@ export class PortalEditBasicComponent
       if (id) {
         // it is adding, redirect to edit.
         this.portalItemService.saveCurrentStep('datasource');
-        const next = `../../edit/${this.portalItemService.currentPortalItemId}/datasource`;
+        const next = `../../edit-single/${this.portalItemService.currentPortalItemId}/datasource`;
         this.router.navigate([next], {
           relativeTo: this.activatedRoute
         });

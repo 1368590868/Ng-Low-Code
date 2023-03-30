@@ -14,7 +14,7 @@ import {
 const routes: Routes = [
   { path: 'list', component: PortalListComponent },
   {
-    path: 'single/:id',
+    path: 'edit-single/:id',
     component: PortalEditSingleComponent,
     children: [
       { path: 'basic', component: PortalEditBasicComponent },
@@ -25,12 +25,12 @@ const routes: Routes = [
     ]
   },
   {
-    path: 'single',
+    path: 'add-single',
     component: PortalEditSingleComponent,
     children: [{ path: 'basic', component: PortalEditBasicComponent }]
   },
   {
-    path: 'linked/:id',
+    path: 'edit-linked/:id',
     component: PortalEditLinkedComponent,
     children: [
       { path: 'basic', component: PortalEditBasicComponent },
@@ -39,7 +39,7 @@ const routes: Routes = [
     ]
   },
   {
-    path: 'linked',
+    path: 'add-linked',
     component: PortalEditLinkedComponent,
     children: [{ path: 'basic', component: PortalEditBasicComponent }]
   }
