@@ -1,5 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { FormLayoutDeleteComponent } from '../..';
@@ -10,13 +9,17 @@ import {
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { FormLayoutComponent } from './form-layout/form-layout.component';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 
 @Component({
   selector: 'app-portal-edit-form',
   templateUrl: './portal-edit-form.component.html',
   styleUrls: ['./portal-edit-form.component.scss']
 })
-export class PortalEditFormComponent implements OnInit {
+export class PortalEditFormComponent
+  extends PortalEditStepDirective
+  implements OnInit
+{
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
@@ -35,12 +38,11 @@ export class PortalEditFormComponent implements OnInit {
   dataSourceIsQueryText = false;
 
   constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef,
     private portalItemService: PortalItemService,
     private notifyService: NotifyService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     if (this.portalItemService.currentPortalItemId) {
@@ -115,9 +117,7 @@ export class PortalEditFormComponent implements OnInit {
               'Save & Publish Successfully Completed.'
             );
 
-            this.router.navigate(['../../../list'], {
-              relativeTo: this.activatedRoute
-            });
+            this.saveNextEvent.emit();
           } else {
             this.isSavingAndNext = false;
             this.isSaving = false;
@@ -125,13 +125,7 @@ export class PortalEditFormComponent implements OnInit {
         });
     }
     if (this.isSavingAndExit) {
-      this.notifyService.notifySuccess(
-        'Success',
-        'Save Draft Successfully Completed.'
-      );
-      this.router.navigate(['../../../list'], {
-        relativeTo: this.activatedRoute
-      });
+      this.saveDraftEvent.emit();
     }
   }
 
@@ -148,8 +142,6 @@ export class PortalEditFormComponent implements OnInit {
   }
 
   onBack() {
-    this.router.navigate(['../search'], {
-      relativeTo: this.activatedRoute
-    });
+    this.backEvent.emit();
   }
 }

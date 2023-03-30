@@ -1,19 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { PickList } from 'primeng/picklist';
 import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { DataSourceTableColumn, GridColumn } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 
 @Component({
   selector: 'app-portal-edit-columns',
   templateUrl: './portal-edit-columns.component.html',
   styleUrls: ['./portal-edit-columns.component.scss']
 })
-export class PortalEditColumnsComponent implements OnInit {
+export class PortalEditColumnsComponent
+  extends PortalEditStepDirective
+  implements OnInit
+{
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
@@ -143,11 +146,11 @@ export class PortalEditColumnsComponent implements OnInit {
   ];
 
   constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
     private notifyService: NotifyService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     if (this.portalItemService.currentPortalItemId) {
@@ -265,20 +268,12 @@ export class PortalEditColumnsComponent implements OnInit {
   }
 
   saveSucess() {
-    let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      next = ['../search'];
+      this.saveNextEvent.emit();
     }
     if (this.isSavingAndExit) {
-      this.notifyService.notifySuccess(
-        'Success',
-        'Save Draft Successfully Completed.'
-      );
-      next = ['../../../list'];
+      this.saveDraftEvent.emit();
     }
-    this.router.navigate(next, {
-      relativeTo: this.activatedRoute
-    });
   }
 
   onSaveAndNext() {
@@ -294,9 +289,7 @@ export class PortalEditColumnsComponent implements OnInit {
   }
 
   onBack() {
-    this.router.navigate(['../datasource'], {
-      relativeTo: this.activatedRoute
-    });
+    this.backEvent.emit();
   }
 
   onAddTemplateColumn() {

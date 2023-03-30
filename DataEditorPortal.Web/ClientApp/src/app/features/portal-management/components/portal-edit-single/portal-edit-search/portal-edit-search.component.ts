@@ -6,7 +6,6 @@ import {
   ViewChildren
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions } from '@ngx-formly/core';
 import { MenuItem } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
@@ -14,14 +13,18 @@ import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { GridFormField, GridSearchField } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import { FormDesignerViewComponent } from '../form-designer/form-designer-view.component';
+import { FormDesignerViewComponent } from '../../form-designer/form-designer-view.component';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 
 @Component({
   selector: 'app-portal-edit-search',
   templateUrl: './portal-edit-search.component.html',
   styleUrls: ['./portal-edit-search.component.scss']
 })
-export class PortalEditSearchComponent implements OnInit {
+export class PortalEditSearchComponent
+  extends PortalEditStepDirective
+  implements OnInit
+{
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
@@ -74,12 +77,12 @@ export class PortalEditSearchComponent implements OnInit {
   ];
 
   constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
     private notifyService: NotifyService,
     @Inject('FROM_DESIGNER_CONTROLS') private controls: any[]
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     if (this.portalItemService.currentPortalItemId) {
@@ -188,20 +191,12 @@ export class PortalEditSearchComponent implements OnInit {
   }
 
   saveSucess() {
-    let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      next = ['../form'];
+      this.saveNextEvent.emit();
     }
     if (this.isSavingAndExit) {
-      this.notifyService.notifySuccess(
-        'Success',
-        'Save Draft Successfully Completed.'
-      );
-      next = ['../../../list'];
+      this.saveDraftEvent.emit();
     }
-    this.router.navigate(next, {
-      relativeTo: this.activatedRoute
-    });
   }
 
   onSaveAndNext() {
@@ -217,9 +212,7 @@ export class PortalEditSearchComponent implements OnInit {
   }
 
   onBack() {
-    this.router.navigate(['../columns'], {
-      relativeTo: this.activatedRoute
-    });
+    this.backEvent.emit();
   }
 
   onAddCustomColumn(filterType: string) {

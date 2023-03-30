@@ -14,7 +14,7 @@ import {
 } from 'src/app/features/portal-management/models/portal-item';
 import { GridActionConfig } from 'src/app/features/universal-grid-action';
 import { NotifyService } from 'src/app/shared';
-import { FormDesignerViewComponent } from '../../form-designer/form-designer-view.component';
+import { FormDesignerViewComponent } from '../../../form-designer/form-designer-view.component';
 
 @Component({
   selector: 'app-form-layout',

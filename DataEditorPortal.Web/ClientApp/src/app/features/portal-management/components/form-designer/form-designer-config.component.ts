@@ -2,8 +2,8 @@ import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { distinctUntilChanged, startWith, tap } from 'rxjs';
-import { GridFormField } from '../../../models/portal-item';
-import { PortalItemService } from '../../../services/portal-item.service';
+import { GridFormField } from '../../models/portal-item';
+import { PortalItemService } from '../../services/portal-item.service';
 
 export const FROM_DESIGNER_CONTROLS: {
   label: string;
@@ -365,9 +365,6 @@ export class FormDesignerConfigComponent {
           wrappers: ['divider'],
           props: {
             label: 'Validator'
-          },
-          expressions: {
-            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         },
         {
@@ -375,12 +372,12 @@ export class FormDesignerConfigComponent {
           type: 'validatorEditor',
           props: {
             label: ''
-          },
-          expressions: {
-            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         }
-      ]
+      ],
+      expressions: {
+        hide: `'fileUpload' === field.parent.model.type`
+      }
     },
     {
       fieldGroup: [
@@ -388,9 +385,6 @@ export class FormDesignerConfigComponent {
           wrappers: ['divider'],
           props: {
             label: 'Computed Value'
-          },
-          expressions: {
-            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         },
         {
@@ -398,12 +392,12 @@ export class FormDesignerConfigComponent {
           type: 'computedValueEditor',
           props: {
             label: ''
-          },
-          expressions: {
-            hide: `'fileUpload' === field.parent.parent.model.type`
           }
         }
-      ]
+      ],
+      expressions: {
+        hide: `'fileUpload' === field.parent.model.type`
+      }
     }
   ];
 
