@@ -9,9 +9,13 @@ import { FormGroup } from '@angular/forms';
 import { FormlyFormOptions } from '@ngx-formly/core';
 import { MenuItem } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
-import { forkJoin, tap } from 'rxjs';
+import { forkJoin, of, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
-import { GridFormField, GridSearchField } from '../../../models/portal-item';
+import {
+  DataSourceTableColumn,
+  GridFormField,
+  GridSearchField
+} from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { FormDesignerViewComponent } from '../../form-designer/form-designer-view.component';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
@@ -76,6 +80,13 @@ export class PortalEditSearchComponent
     }
   ];
 
+  get itemType() {
+    return this.portalItemService.itemType;
+  }
+  get itemId() {
+    return this.portalItemService.itemId;
+  }
+
   constructor(
     private portalItemService: PortalItemService,
     private notifyService: NotifyService,
@@ -85,10 +96,12 @@ export class PortalEditSearchComponent
   }
 
   ngOnInit(): void {
-    if (this.portalItemService.itemId) {
+    if (this.itemId) {
       forkJoin([
         this.portalItemService.getGridSearchConfig(),
-        this.portalItemService.getDataSourceTableColumnsByPortalId()
+        this.itemType === 'linked'
+          ? of<DataSourceTableColumn[]>([])
+          : this.portalItemService.getDataSourceTableColumnsByPortalId()
       ]).subscribe(res => {
         this.isLoading = false;
         this.targetColumns = res[0].map<GridSearchField>(x => {

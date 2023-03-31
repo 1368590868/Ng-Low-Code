@@ -7,10 +7,13 @@ import {
   PortalEditDatasourceComponent,
   PortalEditColumnsComponent,
   PortalEditSearchComponent,
-  PortalEditFormComponent
+  PortalEditFormComponent,
+  PortalEditLinkComponent,
+  PortalEditLinkTableComponent
 } from './components';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'list', pathMatch: 'full' },
   { path: 'list', component: PortalListComponent },
   // route for adding & editing single table page.
   {
@@ -38,7 +41,7 @@ const routes: Routes = [
     data: { type: 'linked' },
     children: [
       { path: 'basic', component: PortalEditBasicComponent },
-      { path: 'datasource', component: PortalEditDatasourceComponent },
+      { path: 'datasource', component: PortalEditLinkComponent },
       { path: 'search', component: PortalEditSearchComponent }
     ]
   },
@@ -53,22 +56,14 @@ const routes: Routes = [
     path: 'edit-linked/:parentId/datasource/add',
     component: PortalEditComponent,
     data: { type: 'linked-single' },
-    children: [
-      {
-        path: 'basic',
-        component: PortalEditBasicComponent
-      }
-    ]
+    children: [{ path: 'basic', component: PortalEditLinkTableComponent }]
   },
   {
     path: 'edit-linked/:parentId/datasource/edit/:id',
     component: PortalEditComponent,
     data: { type: 'linked-single' },
     children: [
-      {
-        path: 'basic',
-        component: PortalEditBasicComponent
-      },
+      { path: 'basic', component: PortalEditLinkTableComponent },
       { path: 'datasource', component: PortalEditDatasourceComponent },
       { path: 'columns', component: PortalEditColumnsComponent },
       { path: 'search', component: PortalEditSearchComponent },

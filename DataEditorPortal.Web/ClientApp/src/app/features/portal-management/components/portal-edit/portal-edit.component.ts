@@ -14,7 +14,7 @@ import { PortalEditStepDirective } from '../../directives/portal-edit-step.direc
 export class PortalEditComponent implements OnInit, OnDestroy {
   steps!: MenuItem[];
 
-  activatedIndex = 0;
+  activatedIndex = -1;
   destroy$ = new Subject();
 
   set itemType(val: string | undefined) {
@@ -41,11 +41,17 @@ export class PortalEditComponent implements OnInit, OnDestroy {
   get configCompleted() {
     return this.portalItemService.configCompleted;
   }
+  set parentId(val: string | undefined) {
+    this.portalItemService.parentFolder = val;
+  }
+  get parentId() {
+    return this.portalItemService.parentFolder;
+  }
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    public portalItemService: PortalItemService,
+    private portalItemService: PortalItemService,
     private notifyService: NotifyService
   ) {}
 
@@ -62,16 +68,12 @@ export class PortalEditComponent implements OnInit, OnDestroy {
 
     // get item id from route
     this.activatedRoute.paramMap
-      .pipe(
-        takeUntil(this.destroy$),
-        switchMap((params: ParamMap) => {
-          return of(params.get('id') || '');
-        })
-      )
-      .subscribe(id => {
-        if (id) {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params: ParamMap) => {
+        if (params.get('id')) {
           // it is edit, get item details
-          this.itemId = id;
+          this.itemId = params.get('id') || '';
+          this.parentId = params.get('parentId') || '';
           this.portalItemService.getPortalDetails().subscribe(res => {
             this.configCompleted = res['configCompleted'];
             this.itemCaption = res['label'];
@@ -90,6 +92,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
           });
         } else {
           // it is add
+          this.itemId = undefined;
           this.configCompleted = false;
           this.itemCaption = undefined;
           this.activatedIndex = 0;
@@ -182,11 +185,28 @@ export class PortalEditComponent implements OnInit, OnDestroy {
 
     if (componentRef instanceof PortalEditStepDirective) {
       const child = componentRef as PortalEditStepDirective;
+      child.isLastStep = this.activatedIndex + 1 === this.steps.length;
       // save and next
       child.saveNextEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
+        // publish if current is the last step
+        if (this.activatedIndex + 1 == this.steps.length) {
+          this.portalItemService.saveCurrentStep('basic');
+          this.portalItemService
+            .publish(this.itemId as string)
+            .subscribe(res => {
+              if (!res.isError) {
+                this.notifyService.notifySuccess(
+                  'Success',
+                  'Save & Publish Successfully Completed.'
+                );
+              }
+            });
+        }
+
         let next = '';
-        if (this.activatedIndex + 1 >= this.steps.length) next = '../../list';
-        else next = this.steps[this.activatedIndex + 1].routerLink;
+        if (this.activatedIndex + 1 >= this.steps.length) {
+          next = '../../';
+        } else next = this.steps[this.activatedIndex + 1].routerLink;
         this.router.navigate([next], {
           relativeTo: this.activatedRoute
         });
@@ -198,7 +218,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
           'Success',
           'Save Draft Successfully Completed.'
         );
-        const next = this.itemId ? '../../list' : '../list';
+        const next = this.itemId ? '../../' : '../';
         this.router.navigate([next], {
           relativeTo: this.activatedRoute
         });
@@ -207,7 +227,8 @@ export class PortalEditComponent implements OnInit, OnDestroy {
       // back
       child.backEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
         let next = '';
-        next = this.steps[this.activatedIndex - 1].routerLink;
+        if (this.activatedIndex - 1 <= 0) next = this.itemId ? '../../' : '../';
+        else next = this.steps[this.activatedIndex - 1].routerLink;
         this.router.navigate([next], {
           relativeTo: this.activatedRoute
         });

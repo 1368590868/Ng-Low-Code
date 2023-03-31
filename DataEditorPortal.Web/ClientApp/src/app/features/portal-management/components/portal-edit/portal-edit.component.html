@@ -3,11 +3,10 @@
     <h2 class="mb-4" *ngIf="itemCaption">
       {{ itemCaption }}
     </h2>
-    <p-steps
-      [readonly]="!portalItemService.configCompleted"
-      [model]="steps"></p-steps>
+    <p-steps [readonly]="!configCompleted" [model]="steps"></p-steps>
   </div>
   <router-outlet
+    *ngIf="activatedIndex >= 0"
     (activate)="onActivate($event)"
     (deactivate)="onDeactivate()"></router-outlet>
 </div>

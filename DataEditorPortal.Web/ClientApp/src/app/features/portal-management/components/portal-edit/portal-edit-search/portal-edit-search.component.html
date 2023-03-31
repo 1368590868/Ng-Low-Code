@@ -91,9 +91,10 @@
         (onClick)="onSaveAndExit()"
         [loading]="isSaving && isSavingAndExit"></p-button>
       <p-button
-        label="Save & Next"
-        icon="pi pi-angle-right"
+        [label]="isLastStep ? 'Save & Publish' : 'Save & Next'"
+        [icon]="isLastStep ? 'pi pi-check' : 'pi pi-angle-right'"
         iconPos="right"
+        [styleClass]="isLastStep ? 'p-button-success' : ''"
         [style]="{ 'margin-left': '.5em' }"
         [disabled]="isLoading || isSaving"
         (onClick)="onSaveAndNext()"

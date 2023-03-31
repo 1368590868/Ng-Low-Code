@@ -1,19 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { NgForm, FormGroup, AbstractControl } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import { PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 
 @Component({
-  selector: 'app-portal-edit-basic',
-  templateUrl: './portal-edit-basic.component.html',
-  styleUrls: ['./portal-edit-basic.component.scss']
+  selector: 'app-portal-edit-link-table',
+  templateUrl: './portal-edit-link-table.component.html',
+  styleUrls: ['./portal-edit-link-table.component.scss']
 })
-export class PortalEditBasicComponent
+export class PortalEditLinkTableComponent
   extends PortalEditStepDirective
   implements OnInit
 {
@@ -57,53 +57,6 @@ export class PortalEditBasicComponent
       }
     },
     {
-      key: 'icon',
-      type: 'iconSelect',
-      props: {
-        label: 'Icon',
-        placeholder: 'Icon',
-        required: true
-      }
-    },
-    {
-      key: 'parentId',
-      type: 'select',
-      className: 'w-full',
-      props: {
-        label: 'Parent Folder',
-        placeholder: 'Please Select',
-        required: true,
-        showClear: false
-      },
-      hooks: {
-        onInit: field => {
-          this.portalItemService.getPortalList().subscribe(res => {
-            if (field.props) {
-              const options = res
-                .filter(x => x.data?.['type'] === 'Folder')
-                .map(x => {
-                  return {
-                    label: `- ${x.data?.['label']}`,
-                    value: x.data?.['id']
-                  };
-                });
-              options.splice(0, 0, {
-                label: 'Root',
-                value: '<root>'
-              });
-
-              field.props.options = options;
-
-              // reset the dropdown value, if the options come after the model value, dropdown may has no options selected
-              if (this.model && !this.model['parentId'])
-                this.model = { ...this.model, parentId: '<root>' };
-              else this.model = { ...this.model };
-            }
-          });
-        }
-      }
-    },
-    {
       key: 'helpUrl',
       type: 'input',
       className: 'w-full',
@@ -141,10 +94,10 @@ export class PortalEditBasicComponent
   get itemCaption() {
     return this.portalItemService.itemCaption;
   }
-  set parentFolder(val: string | undefined) {
+  set parentId(val: string | undefined) {
     this.portalItemService.parentFolder = val;
   }
-  get parentFolder() {
+  get parentId() {
     return this.portalItemService.parentFolder;
   }
 
@@ -161,7 +114,6 @@ export class PortalEditBasicComponent
     // load basic information
     if (this.itemId) {
       this.portalItemService.getPortalDetails().subscribe(res => {
-        if (!res['parentId']) res['parentId'] = '<root>';
         this.model = res;
 
         // enable buttons after data loaded.
@@ -170,10 +122,6 @@ export class PortalEditBasicComponent
 
       this.portalItemService.saveCurrentStep('basic');
     } else {
-      this.model = {
-        ...this.model,
-        parentId: this.parentFolder
-      };
       this.isLoading = false;
     }
   }
@@ -183,9 +131,7 @@ export class PortalEditBasicComponent
       // save & next
       const data = { ...model };
       data['itemType'] = this.itemType;
-      if (data['parentId'] === '<root>') data['parentId'] = null;
-
-      this.isSaving = true;
+      data['parentId'] = this.parentId;
       if (this.itemId) {
         this.portalItemService
           .updatePortalDetails(data)
@@ -244,10 +190,7 @@ export class PortalEditBasicComponent
       if (id) {
         // it is adding, redirect to edit.
         this.portalItemService.saveCurrentStep('datasource');
-        const next =
-          this.itemType == 'single'
-            ? `../../edit-single/${this.itemId}/datasource`
-            : `../../edit-linked/${this.itemId}/datasource`;
+        const next = `../../edit/${this.itemId}/datasource`;
         this.router.navigate([next], {
           relativeTo: this.activatedRoute
         });

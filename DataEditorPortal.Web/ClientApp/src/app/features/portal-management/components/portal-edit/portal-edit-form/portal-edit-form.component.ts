@@ -106,23 +106,8 @@ export class PortalEditFormComponent
   }
 
   saveSucess() {
-    if (this.isSavingAndNext && this.portalItemService.itemId) {
-      this.portalItemService.saveCurrentStep('basic');
-      this.portalItemService
-        .publish(this.portalItemService.itemId)
-        .subscribe(res => {
-          if (!res.isError) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Save & Publish Successfully Completed.'
-            );
-
-            this.saveNextEvent.emit();
-          } else {
-            this.isSavingAndNext = false;
-            this.isSaving = false;
-          }
-        });
+    if (this.isSavingAndNext) {
+      this.saveNextEvent.emit();
     }
     if (this.isSavingAndExit) {
       this.saveDraftEvent.emit();

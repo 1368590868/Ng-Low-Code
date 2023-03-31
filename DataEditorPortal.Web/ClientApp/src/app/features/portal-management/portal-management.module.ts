@@ -67,7 +67,9 @@ import {
   AdvancedQueryDialogComponent,
   DbConnectionDialogComponent,
   FormLayoutDeleteComponent,
-  EventConfigComponent
+  EventConfigComponent,
+  PortalEditLinkComponent,
+  PortalEditLinkTableComponent
 } from './components';
 import { MonacoEditorConfig } from './monaco-editor-config';
 import { PortalEditStepDirective } from './directives/portal-edit-step.directive';
@@ -100,7 +102,9 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
     AdvancedQueryDialogComponent,
     DbConnectionDialogComponent,
     FormLayoutDeleteComponent,
-    EventConfigComponent
+    EventConfigComponent,
+    PortalEditLinkComponent,
+    PortalEditLinkTableComponent
   ],
   imports: [
     CommonModule,
