@@ -12,6 +12,8 @@ namespace DataEditorPortal.Data.Models
         public Guid Id { get; set; }
         [Column("NAME")]
         public string Name { get; set; }
+        [Column("ITEM_TYPE")]
+        public string ItemType { get; set; }
         [Column("CURRENT_STEP")]
         public string CurrentStep { get; set; }
         [Column("CONFIG_COMPLETED")]

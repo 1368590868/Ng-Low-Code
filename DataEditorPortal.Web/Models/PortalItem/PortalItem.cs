@@ -25,5 +25,6 @@ namespace DataEditorPortal.Web.Models.PortalItem
         public PortalItemStatus Status { get; set; }
         public bool? ConfigCompleted { get; set; }
         public string CurrentStep { get; set; }
+        public string ItemType { get; set; }
     }
 }

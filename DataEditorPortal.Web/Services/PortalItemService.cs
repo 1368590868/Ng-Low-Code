@@ -121,6 +121,7 @@ namespace DataEditorPortal.Web.Services
             // create universal grid configuration
             var item = new UniversalGridConfiguration();
             item.Name = siteMenu.Name;
+            item.ItemType = model.ItemType;
             item.CreatedBy = userId;
             item.CreatedDate = DateTime.UtcNow;
 

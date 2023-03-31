@@ -60,7 +60,8 @@ namespace DataEditorPortal.Web.Controllers
                         select new
                         {
                             menu = m,
-                            configCompleted = mp != null ? mp.ConfigCompleted : (bool?)null
+                            configCompleted = mp != null ? mp.ConfigCompleted : (bool?)null,
+                            itemType = mp != null ? mp.ItemType : null
                         };
 
             var menus = query.ToList();
@@ -82,6 +83,7 @@ namespace DataEditorPortal.Web.Controllers
                                     Data = _mapper.Map<PortalItemData>(m.menu)
                                 };
                                 item.Data.ConfigCompleted = m.configCompleted;
+                                item.Data.ItemType = x.itemType;
                                 return item;
                             })
                             .ToList();
@@ -92,6 +94,7 @@ namespace DataEditorPortal.Web.Controllers
                         Children = children.Any() ? children : null
                     };
                     item.Data.ConfigCompleted = x.configCompleted;
+                    item.Data.ItemType = x.itemType;
                     return item;
                 });
 
@@ -340,6 +343,7 @@ namespace DataEditorPortal.Web.Controllers
             var result = _mapper.Map<PortalItemData>(siteMenu);
             result.CurrentStep = item.CurrentStep;
             result.ConfigCompleted = item.ConfigCompleted;
+            result.ItemType = item.ItemType;
 
             return result;
         }
