@@ -19,6 +19,7 @@ import { TableState } from 'primeng/api';
 import { GridParam, SearchParam, UserService } from 'src/app/shared';
 import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 import { DataFormatService } from '../../services/data-format.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-table',
@@ -53,6 +54,8 @@ export class TableComponent implements OnInit, OnDestroy {
   filters?: any;
   sortMeta?: any;
   multiSortMeta?: any;
+  visible = false;
+  helpUrl?: SafeResourceUrl;
 
   loading = false;
   @ViewChild('dataTable') table!: Table;
@@ -78,7 +81,8 @@ export class TableComponent implements OnInit, OnDestroy {
   constructor(
     private gridTableService: GridTableService,
     private dataFormatService: DataFormatService,
-    private userService: UserService
+    private userService: UserService,
+    private domSanitizer: DomSanitizer
   ) {
     this.formatters = this.dataFormatService.getFormatters();
   }
@@ -142,6 +146,11 @@ export class TableComponent implements OnInit, OnDestroy {
         name + this.gridName.toUpperCase().replace('-', '_')
       ] ?? false
     );
+  }
+
+  openHelpUrl(url: string) {
+    this.visible = true;
+    this.helpUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   setAllows() {
