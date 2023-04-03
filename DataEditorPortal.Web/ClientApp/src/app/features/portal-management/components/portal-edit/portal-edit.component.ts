@@ -73,7 +73,6 @@ export class PortalEditComponent implements OnInit, OnDestroy {
         if (params.get('id')) {
           // it is edit, get item details
           this.itemId = params.get('id') || '';
-          this.parentId = params.get('parentId') || '';
           this.portalItemService.getPortalDetails().subscribe(res => {
             this.configCompleted = res['configCompleted'];
             this.itemCaption = res['label'];
@@ -100,6 +99,9 @@ export class PortalEditComponent implements OnInit, OnDestroy {
             relativeTo: this.activatedRoute,
             replaceUrl: true
           });
+        }
+        if (params.get('parentId')) {
+          this.parentId = params.get('parentId') || '';
         }
       });
 

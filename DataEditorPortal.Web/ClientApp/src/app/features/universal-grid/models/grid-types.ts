@@ -41,3 +41,8 @@ export interface GridSearchConfig {
   type: string;
   props: { [name: string]: string };
 }
+
+export interface LinkedGridConfig {
+  primaryTableName: string;
+  secondaryTableName: string;
+}

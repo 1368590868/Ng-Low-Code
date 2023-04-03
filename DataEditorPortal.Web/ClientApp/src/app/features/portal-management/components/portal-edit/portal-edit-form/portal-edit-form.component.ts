@@ -37,6 +37,13 @@ export class PortalEditFormComponent
 
   dataSourceIsQueryText = false;
 
+  set itemType(val: string | undefined) {
+    this.portalItemService.itemType = val;
+  }
+  get itemType() {
+    return this.portalItemService.itemType;
+  }
+
   constructor(
     private portalItemService: PortalItemService,
     private notifyService: NotifyService
@@ -56,7 +63,19 @@ export class PortalEditFormComponent
         this.deleteFormConfig = res[0].deletingForm || {};
         this.updatingFormConfig = res[0].updatingForm || { sameAsAdd: true };
         this.infoFormConfig = res[0].infoForm || {};
-        this.dbColumns = res[1];
+
+        // if itemType is 'linked-single', we should always add linkedTableField to the source dbColumns
+        this.dbColumns = res[1].concat([
+          {
+            filterType: 'linkedTableField',
+            columnName: 'LINKED_TABLE_FIELD',
+            isKey: false,
+            isAutoIncrement: false,
+            isIdentity: false,
+            isUnique: false,
+            allowDBNull: true
+          }
+        ]);
 
         this.dataSourceIsQueryText = !!res[2].queryText;
       });

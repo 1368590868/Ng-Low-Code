@@ -59,6 +59,11 @@ export const FROM_DESIGNER_CONTROLS: {
     label: 'File Upload',
     value: 'fileUpload',
     filterType: 'text'
+  },
+  {
+    label: 'Linked Table Data Editor',
+    value: 'linkedTableDataEditor',
+    filterType: 'linkedTableField'
   }
 ];
 
