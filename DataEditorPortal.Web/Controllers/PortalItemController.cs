@@ -57,6 +57,7 @@ namespace DataEditorPortal.Web.Controllers
             var query = from m in _depDbContext.SiteMenus
                         join p in _depDbContext.UniversalGridConfigurations on m.Name equals p.Name into mps
                         from mp in mps.DefaultIfEmpty()
+                        where m.Type != "Sub Portal Item"
                         select new
                         {
                             menu = m,

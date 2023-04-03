@@ -121,7 +121,7 @@ namespace DataEditorPortal.Web.Controllers
             var menus = (from m in _depDbContext.SiteMenus
                          join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name into us
                          from u in us.DefaultIfEmpty()
-                         where u == null || u.ConfigCompleted
+                         where m.Type != "Sub Portal Item" && (u == null || u.ConfigCompleted)
                          select m).ToList();
 
             var root = menus

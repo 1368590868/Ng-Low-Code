@@ -114,8 +114,7 @@ namespace DataEditorPortal.Web.Services
             // create site menu
             var siteMenu = _mapper.Map<SiteMenu>(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
-            siteMenu.Type = "Portal Item";
-
+            siteMenu.Type = model.ItemType == "linked-single" ? "Sub Portal Item" : "Portal Item";
             _depDbContext.SiteMenus.Add(siteMenu);
 
             // create universal grid configuration
@@ -124,22 +123,24 @@ namespace DataEditorPortal.Web.Services
             item.ItemType = model.ItemType;
             item.CreatedBy = userId;
             item.CreatedDate = DateTime.UtcNow;
-
             _depDbContext.UniversalGridConfigurations.Add(item);
 
-            // create permissions
-            var types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
-            types.ForEach(t =>
+            if (siteMenu.Type == "Portal Item")
             {
-                var permission = new SitePermission()
+                // create permissions
+                var types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
+                types.ForEach(t =>
                 {
-                    Id = Guid.NewGuid(),
-                    Category = $"Portal Item: { model.Label }",
-                    PermissionName = $"{t}_{ model.Name.Replace("-", "_") }".ToUpper(),
-                    PermissionDescription = $"{t} { model.Label }"
-                };
-                _depDbContext.Add(permission);
-            });
+                    var permission = new SitePermission()
+                    {
+                        Id = Guid.NewGuid(),
+                        Category = $"Portal Item: { model.Label }",
+                        PermissionName = $"{t}_{ model.Name.Replace("-", "_") }".ToUpper(),
+                        PermissionDescription = $"{t} { model.Label }"
+                    };
+                    _depDbContext.Add(permission);
+                });
+            }
 
             _depDbContext.SaveChanges();
 
@@ -148,7 +149,7 @@ namespace DataEditorPortal.Web.Services
 
         public Guid Update(Guid id, PortalItemData model)
         {
-            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type == "Portal Item");
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
                 throw new ApiException("Not Found", 404);
@@ -156,15 +157,18 @@ namespace DataEditorPortal.Web.Services
 
             model.Name = GetCodeName(model.Label);
 
-            // update permissions
-            var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"Portal Item: { siteMenu.Label }").ToList();
-
-            permissions.ForEach(p =>
+            if (siteMenu.Type == "Portal Item")
             {
-                p.Category = p.Category.Replace(siteMenu.Label, model.Label);
-                p.PermissionName = p.PermissionName.Replace(siteMenu.Name.Replace("-", "_").ToUpper(), model.Name.Replace("-", "_").ToUpper());
-                p.PermissionDescription = p.PermissionDescription.Replace(siteMenu.Label, model.Label);
-            });
+                // update permissions
+                var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"Portal Item: { siteMenu.Label }").ToList();
+
+                permissions.ForEach(p =>
+                {
+                    p.Category = p.Category.Replace(siteMenu.Label, model.Label);
+                    p.PermissionName = p.PermissionName.Replace(siteMenu.Name.Replace("-", "_").ToUpper(), model.Name.Replace("-", "_").ToUpper());
+                    p.PermissionDescription = p.PermissionDescription.Replace(siteMenu.Label, model.Label);
+                });
+            }
 
             var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             item.Name = model.Name;
@@ -180,7 +184,7 @@ namespace DataEditorPortal.Web.Services
             }
             _mapper.Map(model, siteMenu);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
-            siteMenu.Type = "Portal Item";
+            siteMenu.Type = model.ItemType == "linked-single" ? "Sub Portal Item" : "Portal Item";
 
             _depDbContext.SaveChanges();
             return siteMenu.Id;
