@@ -136,5 +136,33 @@ namespace DataEditorPortal.Web.Controllers
 
             return File(fs, "application/ms-excel", exportParam.FileName);
         }
+
+        [HttpGet]
+        [Route("{name}/linked/grid-config")]
+        public dynamic GetLinkedGridConfig(string name)
+        {
+            return _universalGridService.GetLinkedGridConfig(name);
+        }
+
+        [HttpGet]
+        [Route("{name}/linked/grid-data-ids")]
+        public dynamic GetDataIdsByLinkedId(string table1Name, [FromQuery] string table2Id)
+        {
+            return _universalGridService.GetDataIdsByLinkedId(table1Name, table2Id);
+        }
+
+        [HttpPost]
+        [Route("{name}/linked-table-editor/table-data")]
+        public GridData GetLinkedTableDataForFieldControl(string table1Name, [FromQuery] string table2Id, Dictionary<string, object> searchParam)
+        {
+            return _universalGridService.GetLinkedTableDataForFieldControl(table1Name, table2Id, searchParam);
+        }
+
+        [HttpPost]
+        [Route("{name}/linked-table-editor/table-column")]
+        public List<GridColConfig> GetLinkedTableColumnForFieldControl(string table1Name)
+        {
+            return _universalGridService.GetLinkedTableColumnForFieldControl(table1Name);
+        }
     }
 }

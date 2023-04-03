@@ -40,6 +40,12 @@ namespace DataEditorPortal.Web.Services
         bool UpdateGridData(string name, string id, Dictionary<string, object> model);
         bool AddGridData(string name, Dictionary<string, object> model);
         bool DeleteGridData(string name, string[] ids);
+
+        // linked table api
+        dynamic GetLinkedGridConfig(string name);
+        GridData GetLinkedTableDataForFieldControl(string table1Name, string table1Id, Dictionary<string, object> searches);
+        IEnumerable<object> GetDataIdsByLinkedId(string table1Name, string table2Id);
+        List<GridColConfig> GetLinkedTableColumnForFieldControl(string tableName);
     }
 
     public class UniversalGridService : IUniversalGridService
@@ -224,7 +230,17 @@ namespace DataEditorPortal.Web.Services
             #region compose the query text
 
             // get query text for list data from grid config.
-            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            var dataSourceConfig = new DataSourceConfig();
+            if (config.ItemType == GridItemType.LINKED)
+            {
+                var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig);
+                dataSourceConfig = linkedDataSourceConfig.LinkedTable;
+            }
+            else
+            {
+                dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            }
+
             var filtersApplied = ProcessFilterParam(dataSourceConfig.Filters, new List<FilterParam>());
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
 
@@ -943,8 +959,6 @@ namespace DataEditorPortal.Web.Services
                 model.Add(key, value);
         }
 
-        #endregion
-
         private void AfterSaved(EventActionModel actionConfig, Dictionary<string, object> model)
         {
             var eventConfig = actionConfig.EventConfig;
@@ -1028,6 +1042,10 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
+        #endregion
+
+        #region File upload API
+
         private IFileStorageService GetFileStorageService(FileStorageType type)
         {
             switch (type)
@@ -1077,5 +1095,138 @@ namespace DataEditorPortal.Web.Services
                 fileStorageService.SaveFiles(meta.Value, gridName);
             }
         }
+
+        #endregion
+
+        #region Linked Data API
+
+        public GridData GetLinkedTableDataForFieldControl(string table1Name, string table1Id, Dictionary<string, object> searches)
+        {
+            // get table1 Menu
+            var table1Menu = (from u in _depDbContext.UniversalGridConfigurations
+                              join m in _depDbContext.SiteMenus.Include(x => x.Parent) on u.Name equals m.Name
+                              where u.ItemType == GridItemType.LINKED_SINGLE && u.Name == table1Name
+                              select m).FirstOrDefault();
+
+            // get main configration
+            var mainConfiguration = (from u in _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection)
+                                     join m in _depDbContext.SiteMenus on u.Name equals m.Name
+                                     where m.Id == table1Menu.Parent.Id
+                                     select u).FirstOrDefault();
+
+            // get saved table2 id from linked table
+            var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(mainConfiguration.DataSourceConfig);
+            var filters = new List<FilterParam>() {
+                new FilterParam() {
+                    field =  linkedDataSourceConfig.PrimaryTable.Id == table1Menu.Id
+                        ? linkedDataSourceConfig.PrimaryTable.MapToLinkedTableField
+                        : linkedDataSourceConfig.SecondaryTable.MapToLinkedTableField,
+                    value = table1Id,
+                    matchMode = "equals"
+                }
+            };
+            var table2IdFieldName = linkedDataSourceConfig.PrimaryTable.Id == table1Menu.Id
+                ? linkedDataSourceConfig.SecondaryTable.MapToLinkedTableField
+                : linkedDataSourceConfig.PrimaryTable.MapToLinkedTableField;
+            var linkedData = GetGridData(mainConfiguration.Name, new GridParam() { IndexCount = -1, Filters = filters });
+            var savedTable2Ids = linkedData.Data.Select(x => x[table2IdFieldName]);
+
+            // get table2 config
+            var table2Config = (from u in _depDbContext.UniversalGridConfigurations
+                                join m in _depDbContext.SiteMenus on u.Name equals m.Name
+                                where u.ItemType == GridItemType.LINKED_SINGLE && m.ParentId == table1Menu.Parent.Id && u.Name != table1Name
+                                select u).FirstOrDefault();
+
+            // get table2 data by current search
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(table2Config.DataSourceConfig);
+            var table2Data = GetGridData(table2Config.Name, new GridParam() { IndexCount = 50, StartIndex = 0, Searches = searches });
+
+            // set linked status for table2 data
+            table2Data.Data.ForEach(data =>
+            {
+                var idKey = data[dataSourceConfig.IdColumn];
+                data.Add("LINKED_STATUS", savedTable2Ids.Any(id => id == idKey));
+            });
+
+            return table2Data;
+        }
+
+        public List<GridColConfig> GetLinkedTableColumnForFieldControl(string tableName)
+        {
+            // get table Menu
+            var tableMenu = (from u in _depDbContext.UniversalGridConfigurations
+                             join m in _depDbContext.SiteMenus.Include(x => x.Parent) on u.Name equals m.Name
+                             where u.ItemType == GridItemType.LINKED_SINGLE && u.Name == tableName
+                             select m).FirstOrDefault();
+
+            // get main configration
+            var mainConfiguration = (from u in _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection)
+                                     join m in _depDbContext.SiteMenus on u.Name equals m.Name
+                                     where m.Id == tableMenu.Parent.Id
+                                     select u).FirstOrDefault();
+
+            // get saved table2 id from linked table
+            var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(mainConfiguration.DataSourceConfig);
+            var columnsForLinkedField = linkedDataSourceConfig.PrimaryTable.Id == tableMenu.Id ? linkedDataSourceConfig.PrimaryTable.ColumnsForLinkedField : linkedDataSourceConfig.SecondaryTable.ColumnsForLinkedField;
+            var columns = GetGridColumnsConfig(tableMenu.Name);
+
+            return columns.Where(c => columnsForLinkedField.Contains(c.field)).ToList();
+        }
+        public IEnumerable<object> GetDataIdsByLinkedId(string table1Name, string table2Id)
+        {
+            // get table1 Menu
+            var table1Menu = (from u in _depDbContext.UniversalGridConfigurations
+                              join m in _depDbContext.SiteMenus.Include(x => x.Parent) on u.Name equals m.Name
+                              where u.ItemType == GridItemType.LINKED_SINGLE && u.Name == table1Name
+                              select m).FirstOrDefault();
+
+            // get main configration
+            var mainConfiguration = (from u in _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection)
+                                     join m in _depDbContext.SiteMenus on u.Name equals m.Name
+                                     where m.Id == table1Menu.Parent.Id
+                                     select u).FirstOrDefault();
+
+            // get saved table2 id from linked table
+            var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(mainConfiguration.DataSourceConfig);
+            var filters = new List<FilterParam>() {
+                new FilterParam() {
+                    field =  linkedDataSourceConfig.PrimaryTable.Id == table1Menu.Id
+                        ? linkedDataSourceConfig.SecondaryTable.MapToLinkedTableField
+                        : linkedDataSourceConfig.PrimaryTable.MapToLinkedTableField,
+                    value = table2Id,
+                    matchMode = "equals"
+                }
+            };
+            var table1IdFieldName = linkedDataSourceConfig.PrimaryTable.Id == table1Menu.Id
+                ? linkedDataSourceConfig.PrimaryTable.MapToLinkedTableField
+                : linkedDataSourceConfig.SecondaryTable.MapToLinkedTableField;
+            var linkedData = GetGridData(mainConfiguration.Name, new GridParam() { IndexCount = -1, Filters = filters });
+            var savedTable1Ids = linkedData.Data.Select(x => x[table1IdFieldName]);
+
+            return savedTable1Ids;
+        }
+
+        public dynamic GetLinkedGridConfig(string name)
+        {
+            var item = _depDbContext.SiteMenus.Where(x => x.Name == name).FirstOrDefault();
+            if (item == null) throw new DepException($"Portal Item with name:{name} deosn't exists");
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig);
+            var primary = _depDbContext.SiteMenus.Where(x => x.ParentId == item.Id && x.Id == dataSourceConfig.PrimaryTable.Id).FirstOrDefault();
+            var secondary = _depDbContext.SiteMenus.Where(x => x.ParentId == item.Id && x.Id == dataSourceConfig.SecondaryTable.Id).FirstOrDefault();
+
+            return new
+            {
+                PrimaryTableName = primary != null ? primary.Name : null,
+                SecondaryTableName = secondary != null ? secondary.Name : null
+            };
+        }
+
+        #endregion
+
     }
 }

@@ -40,6 +40,8 @@ namespace DataEditorPortal.Web.Services
         bool SaveGridFormConfig(Guid id, DetailConfig model);
         List<CustomAction> GetCustomActions(Guid id);
         bool SaveCustomActions(Guid id, List<CustomAction> model);
+        LinkedDataSourceConfig GetLinkedDataSourceConfig(Guid id);
+        bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model);
     }
 
     public class PortalItemService : IPortalItemService
@@ -507,6 +509,41 @@ namespace DataEditorPortal.Web.Services
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
             config.CustomActionConfig = JsonSerializer.Serialize(model);
+
+            _depDbContext.SaveChanges();
+
+            return true;
+        }
+
+        // linked table 
+        public LinkedDataSourceConfig GetLinkedDataSourceConfig(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            return !string.IsNullOrEmpty(config.DataSourceConfig) ? JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig) : new LinkedDataSourceConfig();
+        }
+
+        public bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            config.DataSourceConfig = JsonSerializer.Serialize(model);
+            config.DataSourceConnectionId = model.LinkedTable.DataSourceConnectionId;
+            siteMenu.Status = Data.Common.PortalItemStatus.Draft;
 
             _depDbContext.SaveChanges();
 

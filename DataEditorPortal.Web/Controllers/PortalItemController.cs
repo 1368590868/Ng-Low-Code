@@ -574,5 +574,22 @@ namespace DataEditorPortal.Web.Controllers
 
         #endregion
 
+        #region Linked Datasource
+
+        [HttpGet]
+        [Route("{id}/linked-datasource")]
+        public LinkedDataSourceConfig GetLinkedDataSourceConfig(Guid id)
+        {
+            return _portalItemService.GetLinkedDataSourceConfig(id);
+        }
+
+        [HttpPost]
+        [Route("{id}/linked-datasource")]
+        public bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model)
+        {
+            return _portalItemService.SaveLinkedDataSourceConfig(id, model);
+        }
+
+        #endregion
     }
 }

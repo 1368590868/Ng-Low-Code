@@ -128,4 +128,19 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public FormEventType EventType { get; set; }
         public string Script { get; set; }
     }
+
+    public class LinkedDataSourceConfig
+    {
+        public LinkedTableConfig PrimaryTable { get; set; }
+        public LinkedTableConfig SecondaryTable { get; set; }
+
+        public DataSourceConfig LinkedTable { get; set; }
+    }
+
+    public class LinkedTableConfig
+    {
+        public Guid Id { get; set; }
+        public List<string> ColumnsForLinkedField { get; set; }
+        public string MapToLinkedTableField { get; set; }
+    }
 }
