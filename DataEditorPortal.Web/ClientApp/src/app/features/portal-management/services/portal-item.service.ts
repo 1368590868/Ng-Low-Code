@@ -12,6 +12,7 @@ import {
   GridColumn,
   GridCustomAction,
   GridSearchField,
+  LinkedDataSourceConfig,
   PortalItem,
   PortalItemData
 } from '../models/portal-item';
@@ -70,30 +71,21 @@ export class PortalItemService {
       .subscribe();
   }
 
-  getLinkedData(id: string): Observable<any> {
-    return of({
+  getLinkedDatasource(id: string) {
+    return of<ApiResponse<LinkedDataSourceConfig>>({
       result: {
         primaryTable: {
-          id: '58C218AA-21F7-43D3-A75C-5F26834A5342'
+          id: '58C218AA-21F7-43D3-A75C-5F26834A5342',
+          columnsForLinkedField: ['FirstName', 'Number']
         },
-        secondaryTable: null,
-        linkedTable: {}
+        secondaryTable: null
       },
-      linkedTableConfig: {
-        columnsForLinkedField: [
-          { label: 'Name', value: 'name' },
-          { label: 'First Name', value: 'firstName' },
-          { label: 'Number', value: 'number' }
-        ]
-      }
+      isError: false,
+      message: ''
     });
   }
 
-  saveLinkedData(data: {
-    primaryTable: any;
-    secondaryTable: any;
-    linkedTableConfig: any;
-  }) {
+  saveLinkedDatasource(data: LinkedDataSourceConfig) {
     return this.http.post<ApiResponse<string>>(
       `${this._apiUrl}portal-item/${this.itemId}/linked-datasource`,
       data

@@ -4,6 +4,10 @@ import { PortalItemService } from '../../../services/portal-item.service';
 import { NotifyService } from 'src/app/shared';
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
+import {
+  LinkedDataSourceConfig,
+  LinkedTableConfig
+} from '../../../models/portal-item';
 @Component({
   selector: 'app-portal-edit-link',
   templateUrl: './portal-edit-link.component.html',
@@ -25,11 +29,11 @@ export class PortalEditLinkComponent
     return this.portalItemService.itemId;
   }
 
-  tableConfig!: { primaryTable: any; secondaryTable: any; linkedTable: any };
-  primaryTable: any[] = [];
-  secondaryTable: any[] = [];
-  selectedColumns: any[] = [];
-  columnsForLinkedOptions: any[] = [];
+  dataSourceConfig!: LinkedDataSourceConfig;
+  primaryTable: LinkedTableConfig[] = [];
+  secondaryTable: LinkedTableConfig[] = [];
+  secondarySelected: string[] = [];
+  primarySelected: string[] = [];
 
   constructor(
     private portalItemService: PortalItemService,
@@ -43,37 +47,39 @@ export class PortalEditLinkComponent
   ngOnInit(): void {
     this.portalItemService.saveCurrentStep('datasource');
     this.portalItemService
-      .getLinkedData(this.itemId as string)
+      .getLinkedDatasource(this.itemId as string)
       .subscribe(res => {
-        this.tableConfig = res.result;
-        this.columnsForLinkedOptions =
-          res.linkedTableConfig.columnsForLinkedField || [];
-        this.isLoading = false;
+        if (!res.isError) {
+          const { result } = res;
+          this.dataSourceConfig = result || {};
+          this.isLoading = false;
 
-        if (res && res.result.primaryTable?.id) {
-          this.portalItemService
-            .getPortalDetails(res.result.primaryTable.id)
-            .subscribe(item => {
-              if (item['name']) {
+          this.primarySelected =
+            this.dataSourceConfig.primaryTable?.columnsForLinkedField || [];
+          this.secondarySelected =
+            this.dataSourceConfig.secondaryTable?.columnsForLinkedField || [];
+
+          if (result?.primaryTable?.id != null) {
+            this.portalItemService
+              .getPortalDetails(result.primaryTable.id)
+              .subscribe(item => {
                 this.primaryTable = [item];
-              }
-            });
-        }
+              });
+          }
 
-        if (res && res.result.secondaryTable?.id) {
-          this.portalItemService
-            .getPortalDetails(res.result.secondaryTable.id)
-            .subscribe(item => {
-              if (item['name']) {
+          if (result?.secondaryTable?.id != null) {
+            this.portalItemService
+              .getPortalDetails(result.secondaryTable.id)
+              .subscribe(item => {
                 this.secondaryTable = [item];
-              }
-            });
+              });
+          }
         }
       });
   }
 
   onAddSecondaryTable() {
-    if (this.tableConfig.primaryTable == null) {
+    if (this.dataSourceConfig.primaryTable == null) {
       this.notifyService.notifyWarning(
         'Warning',
         'Please select primary table first.'
@@ -87,7 +93,8 @@ export class PortalEditLinkComponent
     if (
       this.primaryTable.length === 0 ||
       this.secondaryTable.length === 0 ||
-      this.selectedColumns.length === 0
+      this.primarySelected.length === 0 ||
+      this.secondarySelected.length === 0
     ) {
       this.notifyService.notifyWarning('Warning', 'Please Check Your Data.');
       return false;
@@ -99,10 +106,9 @@ export class PortalEditLinkComponent
     this.isSavingAndNext = true;
     if (this.valid()) {
       this.portalItemService
-        .saveLinkedData({
-          primaryTable: this.primaryTable,
-          secondaryTable: this.secondaryTable,
-          linkedTableConfig: this.selectedColumns
+        .saveLinkedDatasource({
+          primaryTable: { columnsForLinkedField: this.primarySelected },
+          secondaryTable: { columnsForLinkedField: this.secondarySelected }
         })
         .subscribe(res => {
           if (!res.isError) {
