@@ -115,3 +115,15 @@ export interface GridFormConfig {
 export interface GridCustomAction {
   name?: string;
 }
+
+export interface LinkedTableConfig {
+  id?: string;
+  columnsForLinkedField?: string[];
+  mapToLinkedTableField?: string;
+}
+
+export interface LinkedDataSourceConfig {
+  primaryTable?: LinkedTableConfig | null;
+  secondaryTable?: LinkedTableConfig | null;
+  linkedTable?: DataSourceConfig;
+}
