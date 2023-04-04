@@ -245,7 +245,8 @@ namespace DataEditorPortal.Web.Services
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
 
             // convert search criteria to where clause
-            var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
+            var searchConfigStr = !string.IsNullOrEmpty(config.SearchConfig) ? config.SearchConfig : "[]";
+            var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(searchConfigStr);
             var searchRules = new List<FilterParam>();
             if (param.Searches != null)
             {
