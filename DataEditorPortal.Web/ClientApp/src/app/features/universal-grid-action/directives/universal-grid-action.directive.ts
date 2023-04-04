@@ -95,24 +95,29 @@ export class UniversalGridActionDirective
               ActionWrapperComponent
             );
 
+          // create a copy of actionCfg
+          const config = JSON.parse(
+            JSON.stringify(actionCfg)
+          ) as GridActionConfig;
+          config.component = actionCfg.component;
+
           // assign wrapper config;
           const wrapperProps = {};
-          if (actionCfg.wrapper) Object.assign(wrapperProps, actionCfg.wrapper);
+          if (config.wrapper) Object.assign(wrapperProps, config.wrapper);
           if (x.wrapper) Object.assign(wrapperProps, x.wrapper);
           if (wrapperRef instanceof ComponentRef) {
             Object.assign(wrapperRef.instance, wrapperProps);
           }
 
           // assign action config;
+          if (!config.props) config.props = {};
+          if (x.props) Object.assign(config.props, x.props);
           const tableParams = {
             gridName: this.gridName,
             selectedRecords: this.selectedRecords,
             recordKey: this.recordKey,
             fetchDataParam: this.fetchDataParam
           };
-          const config = { ...actionCfg };
-          if (!config.props) config.props = {};
-          if (x.props) Object.assign(config.props, x.props);
           Object.assign(config.props, tableParams);
           wrapperRef.instance.actionConfig = config;
 
