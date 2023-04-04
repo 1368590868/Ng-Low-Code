@@ -39,7 +39,7 @@ export interface DataSourceConfig {
   filters?: DataSourceFilter[];
   sortBy?: DataSourceSortBy[];
   queryText?: string;
-  pageSize: number;
+  pageSize?: number;
 }
 
 export interface DataSourceFilter {
