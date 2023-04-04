@@ -21,7 +21,7 @@
       </ng-template>
       <ng-template pTemplate="body" let-primary>
         <tr>
-          <td>{{ primary.name }}</td>
+          <td>{{ primary.label }}</td>
           <td>{{ primary.description }}</td>
           <td>
             <p-tag
@@ -80,7 +80,7 @@
       styleClass="p-datatable-striped ml-4">
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 25%">Name</th>
+          <th style="width: 25%">Label</th>
           <th>Description</th>
           <th style="width: 25%">Status</th>
           <th style="width: 50px"></th>
@@ -88,7 +88,7 @@
       </ng-template>
       <ng-template pTemplate="body" let-secondary>
         <tr>
-          <td>{{ secondary.name }}</td>
+          <td>{{ secondary.label }}</td>
           <td>{{ secondary.description }}</td>
           <td>
             <p-tag
@@ -115,7 +115,7 @@
     </p-table>
     <div
       class="flex flex-column mb-2 ml-4 mt-2"
-      *ngIf="dataSourceConfig.secondaryTable !== null">
+      *ngIf="dataSourceConfig?.secondaryTable !== null">
       <label for="columnsForLinkedField" class="mb-1">Columns For Linked</label>
       <div class="flex align-items-center">
         <p-multiSelect
