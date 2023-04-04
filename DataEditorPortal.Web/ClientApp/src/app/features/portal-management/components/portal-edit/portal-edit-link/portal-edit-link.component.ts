@@ -107,8 +107,14 @@ export class PortalEditLinkComponent
     if (this.valid()) {
       this.portalItemService
         .saveLinkedDatasource({
-          primaryTable: { columnsForLinkedField: this.primarySelected },
-          secondaryTable: { columnsForLinkedField: this.secondarySelected }
+          primaryTable: {
+            id: this.dataSourceConfig.primaryTable?.id,
+            columnsForLinkedField: this.primarySelected
+          },
+          secondaryTable: {
+            id: this.dataSourceConfig.secondaryTable?.id,
+            columnsForLinkedField: this.secondarySelected
+          }
         })
         .subscribe(res => {
           if (!res.isError) {
