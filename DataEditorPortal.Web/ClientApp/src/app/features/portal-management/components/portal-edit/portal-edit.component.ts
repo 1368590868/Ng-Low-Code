@@ -74,22 +74,24 @@ export class PortalEditComponent implements OnInit, OnDestroy {
           // it is edit, get item details
           this.itemId = params.get('id') || '';
           this.parentId = params.get('parentId') || '';
-          this.portalItemService.getPortalDetails().subscribe(res => {
-            this.configCompleted = res['configCompleted'];
-            this.itemCaption = res['label'];
-            const next = res['currentStep'] || 'basic';
+          this.portalItemService
+            .getPortalDetails(this.itemId)
+            .subscribe(res => {
+              this.configCompleted = res['configCompleted'];
+              this.itemCaption = res['label'];
+              const next = res['currentStep'] || 'basic';
 
-            // set activated index
-            this.activatedIndex = this.steps.findIndex(
-              x => x.routerLink === next
-            );
+              // set activated index
+              this.activatedIndex = this.steps.findIndex(
+                x => x.routerLink === next
+              );
 
-            // navigate to the step that saved last time
-            this.router.navigate([next], {
-              relativeTo: this.activatedRoute,
-              replaceUrl: true
+              // navigate to the step that saved last time
+              this.router.navigate([next], {
+                relativeTo: this.activatedRoute,
+                replaceUrl: true
+              });
             });
-          });
         } else {
           // it is add
           this.itemId = undefined;

@@ -160,7 +160,7 @@ export class PortalEditBasicComponent
   ngOnInit(): void {
     // load basic information
     if (this.itemId) {
-      this.portalItemService.getPortalDetails().subscribe(res => {
+      this.portalItemService.getPortalDetails(this.itemId).subscribe(res => {
         if (!res['parentId']) res['parentId'] = '<root>';
         this.model = res;
 

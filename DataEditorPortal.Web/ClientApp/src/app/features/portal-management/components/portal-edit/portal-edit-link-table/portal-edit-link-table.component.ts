@@ -113,7 +113,7 @@ export class PortalEditLinkTableComponent
   ngOnInit(): void {
     // load basic information
     if (this.itemId) {
-      this.portalItemService.getPortalDetails().subscribe(res => {
+      this.portalItemService.getPortalDetails(this.itemId).subscribe(res => {
         this.model = res;
 
         // enable buttons after data loaded.

@@ -3,14 +3,122 @@
   <ng-template pTemplate="subtitle">
     Create or update settings of the linked table.
   </ng-template>
-  <p-divider styleClass="mt-0"></p-divider>
-  <div class="w-6 pt-3">
-    <a [routerLink]="'./add'">Add primary table</a><br />
-    <a [routerLink]="'./edit/58C218AA-21F7-43D3-A75C-5F26834A5342'"
-      >Update primary table</a
-    ><br />
-    <a>Add secondary table</a><br />
-    <a>Add secondary table</a><br />
+
+  <p-divider styleClass="w-6">Primary Table</p-divider>
+  <div class="w-6 mb-2">
+    <p-table
+      *ngIf="primaryTable.length > 0"
+      [value]="primaryTable"
+      [rowHover]="true"
+      styleClass="p-datatable-striped ml-4">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 25%">Name</th>
+          <th>Description</th>
+          <th style="width: 25%">Status</th>
+          <th style="width: 50px"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-primary>
+        <tr>
+          <td>{{ primary.name }}</td>
+          <td>{{ primary.description }}</td>
+          <td>
+            <p-tag
+              *ngIf="primary.status === 0"
+              icon="pi pi-file-edit"
+              severity="warning"
+              value="Draft"></p-tag>
+            <p-tag
+              *ngIf="primary.status === 1"
+              icon="pi pi-check"
+              severity="success"
+              value="Published"></p-tag>
+          </td>
+          <td>
+            <button
+              type="button"
+              pButton
+              label="Edit"
+              [routerLink]="'./edit/' + primary.id"
+              class="p-button-rounded p-button-text"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <p-button
+      *ngIf="primaryTable.length === 0"
+      label="Add"
+      icon="pi pi-plus"
+      class="mt-1 ml-4"
+      styleClass="p-button-text p-button-sm"
+      [routerLink]="'./add'"></p-button>
+  </div>
+  <p-divider styleClass="w-6">Secondary Table</p-divider>
+  <div class="w-6 mb-2">
+    <p-table
+      *ngIf="secondaryTable.length > 0"
+      [value]="secondaryTable"
+      [rowHover]="true"
+      styleClass="p-datatable-striped ml-4">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 25%">Name</th>
+          <th>Description</th>
+          <th style="width: 25%">Status</th>
+          <th style="width: 50px"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-secondary>
+        <tr>
+          <td>{{ secondary.name }}</td>
+          <td>{{ secondary.description }}</td>
+          <td>
+            <p-tag
+              *ngIf="secondary.status === 0"
+              icon="pi pi-file-edit"
+              severity="warning"
+              value="Draft"></p-tag>
+            <p-tag
+              *ngIf="secondary.status === 1"
+              icon="pi pi-check"
+              severity="success"
+              value="Published"></p-tag>
+          </td>
+          <td>
+            <button
+              type="button"
+              pButton
+              label="Edit"
+              [routerLink]="'./edit/' + secondary.linkedId"
+              class="p-button-rounded p-button-text"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <p-button
+      *ngIf="secondaryTable.length === 0"
+      label="Add"
+      icon="pi pi-plus"
+      class="mt-1 ml-4"
+      styleClass="p-button-text p-button-sm"
+      (onClick)="onAddSecondaryTable()">
+    </p-button>
+  </div>
+  <div class="flex flex-column mb-2 ml-4">
+    <label for="columnsForLinkedField" class="mb-1">Columns For Linked</label>
+    <div class="flex align-items-center">
+      <p-multiSelect
+        [showToggleAll]="false"
+        appendTo="body"
+        placeholder="Place Select One Column"
+        [filter]="false"
+        [showHeader]="false"
+        display="chip"
+        [(ngModel)]="selectedColumns"
+        [options]="columnsForLinkedOptions">
+      </p-multiSelect>
+    </div>
   </div>
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">

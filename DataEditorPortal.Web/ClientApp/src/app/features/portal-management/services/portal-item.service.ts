@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { PrimeNGConfig } from 'primeng/api';
-import { map, Observable, tap } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 import { ApiResponse, ConfigDataService, NotifyService } from 'src/app/shared';
 import {
   DataSourceConfig,
@@ -68,6 +68,36 @@ export class PortalItemService {
         null
       )
       .subscribe();
+  }
+
+  getLinkedData(id: string): Observable<any> {
+    return of({
+      result: {
+        primaryTable: {
+          id: '58C218AA-21F7-43D3-A75C-5F26834A5342'
+        },
+        secondaryTable: null,
+        linkedTable: {}
+      },
+      linkedTableConfig: {
+        columnsForLinkedField: [
+          { label: 'Name', value: 'name' },
+          { label: 'First Name', value: 'firstName' },
+          { label: 'Number', value: 'number' }
+        ]
+      }
+    });
+  }
+
+  saveLinkedData(data: {
+    primaryTable: any;
+    secondaryTable: any;
+    linkedTableConfig: any;
+  }) {
+    return this.http.post<ApiResponse<string>>(
+      `${this._apiUrl}portal-item/${this.itemId}/linked-datasource`,
+      data
+    );
   }
 
   getPortalList(): Observable<PortalItem[]> {
@@ -140,10 +170,10 @@ export class PortalItemService {
     );
   }
 
-  getPortalDetails(): Observable<PortalItemData> {
+  getPortalDetails(id: string): Observable<PortalItemData> {
     return this.http
       .get<ApiResponse<PortalItemData>>(
-        `${this._apiUrl}portal-item/${this.itemId}/details`
+        `${this._apiUrl}portal-item/${id}/details`
       )
       .pipe(map(x => x.result || {}));
   }
