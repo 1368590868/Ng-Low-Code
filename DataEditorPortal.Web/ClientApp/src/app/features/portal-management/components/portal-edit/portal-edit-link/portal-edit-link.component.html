@@ -3,8 +3,8 @@
   <ng-template pTemplate="subtitle">
     Create or update settings of the linked table.
   </ng-template>
-
-  <p-divider styleClass="w-6">Primary Table</p-divider>
+  <p-divider styleClass="mt-0"></p-divider>
+  <p-divider styleClass="w-6 mt-5">Primary Table</p-divider>
   <div class="w-6 mb-2">
     <p-table
       *ngIf="primaryTable.length > 0"
@@ -15,7 +15,7 @@
         <tr>
           <th style="width: 25%">Label</th>
           <th>Description</th>
-          <th style="width: 25%">Status</th>
+          <th style="width: 120px">Status</th>
           <th style="width: 50px"></th>
         </tr>
       </ng-template>
@@ -34,6 +34,11 @@
               icon="pi pi-check"
               severity="success"
               value="Published"></p-tag>
+            <p-tag
+              *ngIf="primary.status === 2"
+              icon="pi pi-check"
+              severity="warning"
+              value="Unpublished"></p-tag>
           </td>
           <td>
             <button
@@ -41,7 +46,7 @@
               pButton
               label="Edit"
               [routerLink]="'./edit/' + primary.id"
-              class="p-button-rounded p-button-text"></button>
+              class="p-button-text"></button>
           </td>
         </tr>
       </ng-template>
@@ -71,7 +76,7 @@
       styleClass="p-button-text p-button-sm"
       [routerLink]="'./add'"></p-button>
   </div>
-  <p-divider styleClass="w-6">Secondary Table</p-divider>
+  <p-divider styleClass="w-6 mt-6">Secondary Table</p-divider>
   <div class="w-6 mb-2">
     <p-table
       *ngIf="secondaryTable.length > 0"
@@ -82,7 +87,7 @@
         <tr>
           <th style="width: 25%">Label</th>
           <th>Description</th>
-          <th style="width: 25%">Status</th>
+          <th style="width: 120px">Status</th>
           <th style="width: 50px"></th>
         </tr>
       </ng-template>
@@ -101,6 +106,11 @@
               icon="pi pi-check"
               severity="success"
               value="Published"></p-tag>
+            <p-tag
+              *ngIf="secondary.status === 2"
+              icon="pi pi-check"
+              severity="warning"
+              value="Unpublished"></p-tag>
           </td>
           <td>
             <button
@@ -108,7 +118,7 @@
               pButton
               label="Edit"
               [routerLink]="'./edit/' + secondary.id"
-              class="p-button-rounded p-button-text"></button>
+              class="p-button-text"></button>
           </td>
         </tr>
       </ng-template>
