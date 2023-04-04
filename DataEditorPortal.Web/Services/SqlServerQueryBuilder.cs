@@ -1,4 +1,6 @@
 ﻿using DataEditorPortal.Web.Models.UniversalGrid;
+using System;
+using System.Linq;
 using System.Text.Json;
 
 namespace DataEditorPortal.Web.Services
@@ -118,6 +120,35 @@ namespace DataEditorPortal.Web.Services
         protected override string EscapeColumnName(string columnName)
         {
             return string.Format("[{0}]", columnName);
+        }
+
+        #endregion
+
+        #region Universal Grid
+        public override string GenerateSqlTextForInsert(DataSourceConfig config)
+        {
+            if (!string.IsNullOrEmpty(config.QueryText))
+            {
+                return ReplaceQueryParamters(config.QueryText);
+            }
+            else
+            {
+                if (config.Columns.Count <= 0) throw new Exception("Columns can not be empty during generating insert script.");
+
+                var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
+
+                var columns = string.Join(",", config.Columns.Select(x => EscapeColumnName(x)));
+
+                var param = string.Join(",", config.Columns.Select(x => $"{ParameterPrefix}{ParameterName(x)}"));
+
+                var queryText = $@"
+                    DECLARE @InsertedIDResults TABLE (ID NVARCHAR(40)); 
+                    INSERT INTO {source} ({columns}) OUTPUT INSERTED.{config.IdColumn} INTO @InsertedIDResults VALUES ({param});
+                    SET @RETURNED_ID = (SELECT TOP 1 ID FROM @InsertedIDResults);
+                ";
+
+                return queryText;
+            }
         }
 
         #endregion

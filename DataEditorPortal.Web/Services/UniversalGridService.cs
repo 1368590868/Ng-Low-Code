@@ -678,6 +678,7 @@ namespace DataEditorPortal.Web.Services
                 // generate the query text
                 var queryText = _queryBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
                 {
+                    IdColumn = dataSourceConfig.IdColumn,
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
                     Columns = columns,
@@ -692,7 +693,11 @@ namespace DataEditorPortal.Web.Services
                 // excute command
                 try
                 {
-                    var affected = con.Execute(queryText, param, trans);
+                    var dynamicParameters = new DynamicParameters(param);
+                    dynamicParameters.Add("RETURNED_ID", dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
+
+                    var affected = con.Execute(queryText, dynamicParameters, trans);
+                    var returnId = dynamicParameters.Get<string>("RETURNED_ID");
 
                     // process file upload
                     SaveUploadedFiles(config.Name, uploadedFieldsMeta);

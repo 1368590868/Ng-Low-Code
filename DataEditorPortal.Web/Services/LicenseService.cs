@@ -33,6 +33,8 @@ namespace DataEditorPortal.Web.Common
 
         public bool IsValid(string license)
         {
+            if (string.IsNullOrEmpty(license)) return false;
+
             RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
             rsa.FromXmlString(Encoding.ASCII.GetString(Convert.FromBase64String(_publicKey)));
 
