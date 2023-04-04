@@ -13,7 +13,7 @@
       styleClass="p-datatable-striped ml-4">
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 25%">Name</th>
+          <th style="width: 25%">Label</th>
           <th>Description</th>
           <th style="width: 25%">Status</th>
           <th style="width: 50px"></th>
@@ -48,7 +48,7 @@
     </p-table>
     <div
       class="flex flex-column mb-2 ml-4 mt-2"
-      *ngIf="dataSourceConfig.primaryTable !== null">
+      *ngIf="dataSourceConfig?.primaryTable !== null">
       <label for="columnsForLinkedField" class="mb-1">Columns For Linked</label>
       <div class="flex align-items-center">
         <p-multiSelect
@@ -107,7 +107,7 @@
               type="button"
               pButton
               label="Edit"
-              [routerLink]="'./edit/' + secondary.linkedId"
+              [routerLink]="'./edit/' + secondary.id"
               class="p-button-rounded p-button-text"></button>
           </td>
         </tr>
