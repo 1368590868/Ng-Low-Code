@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { FormlyFieldLinkedTableDataEditorComponent } from './linked-table.type';
+import { FormlyFieldLinkDataEditorComponent } from './link-data-editor.type';
 
 @NgModule({
-  declarations: [FormlyFieldLinkedTableDataEditorComponent],
+  declarations: [FormlyFieldLinkDataEditorComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -14,12 +14,12 @@ import { FormlyFieldLinkedTableDataEditorComponent } from './linked-table.type';
     FormlyModule.forChild({
       types: [
         {
-          name: 'linkedTableDataEditor',
-          component: FormlyFieldLinkedTableDataEditorComponent,
+          name: 'linkDataEditor',
+          component: FormlyFieldLinkDataEditorComponent,
           wrappers: ['form-field']
         }
       ]
     })
   ]
 })
-export class FormlyLinkedTableDataEditorModule {}
+export class FormlyLinkDataEditorModule {}

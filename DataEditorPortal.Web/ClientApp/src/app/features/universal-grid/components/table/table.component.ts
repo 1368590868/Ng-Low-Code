@@ -356,4 +356,31 @@ export class TableComponent implements OnInit, OnDestroy {
     const expression = evalStringExpression(template, ['RowData', 'Pipes']);
     return evalExpression(expression, data, [data, this.formatters]);
   }
+
+  // linked features
+  clearHighlighted() {
+    this.records = this.records.map(data => {
+      data['linked_highlighted'] = '';
+      return data;
+    });
+  }
+
+  highlightLinkedData(table2Id: string) {
+    this.selection = [];
+    this.gridTableService
+      .getHighlightLinkedData(this.gridName, table2Id)
+      .pipe(
+        tap(res => {
+          this.records = this.records.map(data => {
+            data['linked_highlighted'] = res.find(
+              x => data[this.tableConfig.dataKey] === x
+            )
+              ? 'highlighted'
+              : '';
+            return data;
+          });
+        })
+      )
+      .subscribe();
+  }
 }

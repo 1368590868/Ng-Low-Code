@@ -15,7 +15,7 @@ import { DateValidatorModule } from './datevalidator';
 import { UniversalRegexpModule } from './universalregexp';
 import { FormlyFileUploadModule } from './file-upload/file-upload.modules';
 import { FormlyFormFieldModule } from './form-field/form-field.module';
-import { FormlyLinkedTableDataEditorModule } from './linkedTable';
+import { FormlyLinkDataEditorModule } from './link-data-editor';
 
 @NgModule({
   imports: [
@@ -35,7 +35,7 @@ import { FormlyLinkedTableDataEditorModule } from './linkedTable';
     UniversalRegexpModule,
     FormlyFileUploadModule,
     FormlyFormFieldModule,
-    FormlyLinkedTableDataEditorModule
+    FormlyLinkDataEditorModule
   ]
 })
 export class FormlyCustomTypeModule {}

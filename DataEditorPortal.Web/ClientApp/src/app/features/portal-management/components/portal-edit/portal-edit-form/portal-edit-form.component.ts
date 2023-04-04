@@ -67,8 +67,8 @@ export class PortalEditFormComponent
         // if itemType is 'linked-single', we should always add linkedTableField to the source dbColumns
         this.dbColumns = res[1].concat([
           {
-            filterType: 'linkedTableField',
-            columnName: 'LINKED_TABLE_FIELD',
+            filterType: 'linkDataField',
+            columnName: 'LINK_DATA_FIELD',
             isKey: false,
             isAutoIncrement: false,
             isIdentity: false,

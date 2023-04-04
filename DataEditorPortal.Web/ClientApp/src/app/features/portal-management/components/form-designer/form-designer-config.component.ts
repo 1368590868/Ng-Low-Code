@@ -61,9 +61,9 @@ export const FROM_DESIGNER_CONTROLS: {
     filterType: 'text'
   },
   {
-    label: 'Linked Table Data Editor',
-    value: 'linkedTableDataEditor',
-    filterType: 'linkedTableField'
+    label: 'Link Data Editor',
+    value: 'linkDataEditor',
+    filterType: 'linkDataField'
   }
 ];
 

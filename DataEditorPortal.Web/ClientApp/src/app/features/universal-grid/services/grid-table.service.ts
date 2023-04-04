@@ -39,6 +39,18 @@ export class GridTableService {
       );
   }
 
+  getHighlightLinkedData(
+    table1Name: string,
+    table2Id: string
+  ): Observable<any[]> {
+    return this.http
+      .get<ApiResponse<any[]>>(
+        `${this._apiUrl}universal-grid/${table1Name}/linked/grid-data-ids`,
+        { params: { table2Id } }
+      )
+      .pipe(map(res => res.result || []));
+  }
+
   getTableColumns(name: string): Observable<GridColumn[]> {
     return this.http
       .get<ApiResponse<GridColumn[]>>(

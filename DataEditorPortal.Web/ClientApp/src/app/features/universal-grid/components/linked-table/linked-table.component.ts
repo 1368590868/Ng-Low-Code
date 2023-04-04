@@ -10,8 +10,8 @@ import { TableComponent } from '../table/table.component';
 export class LinkedTableComponent implements OnInit {
   @Input() gridName!: string;
 
-  @ViewChild('masterTable') masterTable!: TableComponent;
-  @ViewChild('slaveTable') slaveTable!: TableComponent;
+  @ViewChild('primaryTable') primaryTable!: TableComponent;
+  @ViewChild('secondaryTable') secondaryTable!: TableComponent;
   primaryTableName!: string;
   secondaryTableName!: string;
 
@@ -24,15 +24,19 @@ export class LinkedTableComponent implements OnInit {
     });
   }
 
-  onMasterRowSelect(event: any) {
-    console.log(event);
+  onPrimaryRowSelect(event: any) {
     // mark linked data highlighted
-    // this.slaveTable.fetchData();
+    this.primaryTable.clearHighlighted();
+    this.secondaryTable.highlightLinkedData(
+      event.data[this.primaryTable.tableConfig.dataKey]
+    );
   }
 
-  onSlaveRowSelect(event: any) {
-    console.log(event);
+  onSecondaryRowSelect(event: any) {
     // mark linked data highlighted
-    // this.masterTable.fetchData();
+    this.secondaryTable.clearHighlighted();
+    this.primaryTable.highlightLinkedData(
+      event.data[this.secondaryTable.tableConfig.dataKey]
+    );
   }
 }
