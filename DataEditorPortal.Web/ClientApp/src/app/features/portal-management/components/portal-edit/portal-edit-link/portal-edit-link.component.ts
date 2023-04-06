@@ -10,7 +10,7 @@ import {
   DataSourceTable,
   DataSourceTableColumn,
   LinkedDataSourceConfig,
-  LinkedTableConfig
+  LinkedSingleConfig
 } from '../../../models/portal-item';
 import { FormControl } from '@angular/forms';
 import { AdvancedQueryModel } from '..';
@@ -36,8 +36,8 @@ export class PortalEditLinkComponent
   }
 
   dataSourceConfig!: LinkedDataSourceConfig;
-  primaryTable: any[] = [];
-  secondaryTable: any[] = [];
+  primaryTableConfig!: LinkedSingleConfig;
+  secondaryTableConfig!: LinkedSingleConfig;
   secondarySelected: string[] = [];
   primarySelected: string[] = [];
 
@@ -105,17 +105,17 @@ export class PortalEditLinkComponent
 
           if (result?.primaryTable?.id != null) {
             this.portalItemService
-              .getPortalDetails(result.primaryTable.id)
+              .getLinkedSingleTableConfig(result.primaryTable.id)
               .subscribe(item => {
-                this.primaryTable = [item];
+                this.primaryTableConfig = item;
               });
           }
 
           if (result?.secondaryTable?.id != null) {
             this.portalItemService
-              .getPortalDetails(result.secondaryTable.id)
+              .getLinkedSingleTableConfig(result.secondaryTable.id)
               .subscribe(item => {
-                this.secondaryTable = [item];
+                this.secondaryTableConfig = item;
               });
           }
 
@@ -161,8 +161,8 @@ export class PortalEditLinkComponent
 
   valid() {
     if (
-      this.primaryTable.length === 0 ||
-      this.secondaryTable.length === 0 ||
+      this.primaryTableConfig.details.length === 0 ||
+      this.secondaryTableConfig.details.length === 0 ||
       this.primarySelected.length === 0 ||
       this.secondarySelected.length === 0 ||
       this.dsConfig.dataSourceConnectionId == null ||

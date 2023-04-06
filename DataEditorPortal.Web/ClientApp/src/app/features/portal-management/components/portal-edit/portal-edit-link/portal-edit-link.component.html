@@ -101,9 +101,12 @@
     ">
     <p-divider styleClass="w-6 mt-4">Primary Table</p-divider>
     <div class="w-6 mb-2">
-      <ng-container *ngIf="primaryTable.length > 0">
+      <ng-container
+        *ngIf="
+          primaryTableConfig?.details && primaryTableConfig.details.length > 0
+        ">
         <p-table
-          [value]="primaryTable"
+          [value]="primaryTableConfig.details"
           [rowHover]="true"
           styleClass="p-datatable-striped ml-4">
           <ng-template pTemplate="header">
@@ -154,7 +157,7 @@
             <div class="flex align-items-center">
               <input
                 pInputText
-                [value]="primaryTable[0].idColumn"
+                [value]="primaryTableConfig.idColumn"
                 [disabled]="true"
                 [style]="{ minWidth: '20rem' }" />
             </div>
@@ -190,14 +193,16 @@
               [showHeader]="false"
               display="chip"
               [(ngModel)]="primarySelected"
-              [options]="['Name', 'FirstName', 'Number']">
+              [options]="primaryTableConfig.columns">
             </p-multiSelect>
           </div>
         </div>
       </ng-container>
 
       <p-button
-        *ngIf="primaryTable.length === 0"
+        *ngIf="
+          primaryTableConfig?.details && primaryTableConfig.details.length === 0
+        "
         label="Add"
         icon="pi pi-plus"
         class="mt-1 ml-4"
@@ -206,9 +211,13 @@
     </div>
     <p-divider styleClass="w-6 mt-4">Secondary Table</p-divider>
     <div class="w-6 mb-2">
-      <ng-container *ngIf="secondaryTable.length > 0">
+      <ng-container
+        *ngIf="
+          secondaryTableConfig?.details &&
+          secondaryTableConfig.details.length > 0
+        ">
         <p-table
-          [value]="secondaryTable"
+          [value]="secondaryTableConfig.details"
           [rowHover]="true"
           styleClass="p-datatable-striped ml-4">
           <ng-template pTemplate="header">
@@ -259,7 +268,7 @@
             <div class="flex align-items-center">
               <input
                 pInputText
-                [value]="secondaryTable[0].idColumn"
+                [value]="secondaryTableConfig.idColumn"
                 [disabled]="true"
                 [style]="{ minWidth: '20rem' }" />
             </div>
@@ -296,12 +305,12 @@
               [showHeader]="false"
               display="chip"
               [(ngModel)]="secondarySelected"
-              [options]="['Name', 'FirstName', 'Number']">
+              [options]="secondaryTableConfig.columns">
             </p-multiSelect>
           </div>
         </div>
         <p-button
-          *ngIf="secondaryTable.length === 0"
+          *ngIf="secondaryTableConfig.details.length === 0"
           label="Add"
           icon="pi pi-plus"
           class="mt-1 ml-4"

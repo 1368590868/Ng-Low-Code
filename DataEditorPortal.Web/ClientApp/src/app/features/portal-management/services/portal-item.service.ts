@@ -13,6 +13,7 @@ import {
   GridCustomAction,
   GridSearchField,
   LinkedDataSourceConfig,
+  LinkedSingleConfig,
   PortalItem,
   PortalItemData
 } from '../models/portal-item';
@@ -86,10 +87,10 @@ export class PortalItemService {
 
   getLinkedSingleTableConfig(id: string) {
     return this.http
-      .get<ApiResponse<any>>(
+      .get<ApiResponse<LinkedSingleConfig>>(
         `${this._apiUrl}portal-item/${id}/linked-single-config`
       )
-      .pipe(map(x => x.result || {}));
+      .pipe(map(x => x.result || { details: [], columns: [] }));
   }
 
   getPortalList(): Observable<PortalItem[]> {
