@@ -59,6 +59,22 @@ export class PortalEditLinkComponent
   }
 
   ngOnInit(): void {
+    this.formControlDbTable.valueChanges.subscribe(value => {
+      if (value) {
+        const [tableSchema, tableName] = value.split('.');
+        this.dsConfig.tableName = tableName;
+        this.dsConfig.tableSchema = tableSchema;
+      } else {
+        this.dsConfig.tableName = '';
+        this.dsConfig.tableSchema = '';
+      }
+    });
+    this.formControlIdColumn.valueChanges.subscribe(
+      value => (this.dsConfig.idColumn = value)
+    );
+    this.formControlConnection.valueChanges.subscribe(
+      value => (this.dsConfig.dataSourceConnectionId = value)
+    );
     this.portalItemService.saveCurrentStep('datasource');
     this.portalItemService
       .getLinkedDatasource(this.itemId as string)
@@ -135,7 +151,9 @@ export class PortalEditLinkComponent
       this.primaryTable.length === 0 ||
       this.secondaryTable.length === 0 ||
       this.primarySelected.length === 0 ||
-      this.secondarySelected.length === 0
+      this.secondarySelected.length === 0 ||
+      this.dsConfig.dataSourceConnectionId == null ||
+      this.dsConfig.idColumn == null
     ) {
       this.notifyService.notifyWarning('Warning', 'Please Check Your Data.');
       return false;
