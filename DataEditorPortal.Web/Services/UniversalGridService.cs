@@ -666,6 +666,13 @@ namespace DataEditorPortal.Web.Services
                 // process file upload, store json string
                 var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
 
+                LinkDataModel linkDataMeta = null;
+                if (config.ItemType == GridItemType.LINKED_SINGLE)
+                {
+                    // process link data field, get meta data and clear value in model
+                    linkDataMeta = ProcessLinkDataField(model);
+                }
+
                 // calculate the computed field values
                 AssignComputedValues(formLayout.FormFields, model, con);
 
@@ -697,10 +704,16 @@ namespace DataEditorPortal.Web.Services
                     dynamicParameters.Add("RETURNED_ID", dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
 
                     var affected = con.Execute(queryText, dynamicParameters, trans);
-                    var returnId = dynamicParameters.Get<string>("RETURNED_ID");
+                    var returnedId = dynamicParameters.Get<string>("RETURNED_ID");
 
                     // process file upload
                     SaveUploadedFiles(config.Name, uploadedFieldsMeta);
+
+                    if (linkDataMeta != null)
+                    {
+                        // update linked data
+                        UpdateLinkData(config.Name, linkDataMeta, returnedId);
+                    }
 
                     trans.Commit();
 
@@ -1230,6 +1243,97 @@ namespace DataEditorPortal.Web.Services
                 PrimaryTableName = primary != null ? primary.Name : null,
                 SecondaryTableName = secondary != null ? secondary.Name : null
             };
+        }
+
+        private LinkDataModel ProcessLinkDataField(Dictionary<string, object> model)
+        {
+            LinkDataModel result = null;
+            if (model.ContainsKey(Constants.LINK_DATA_FIELD_NAME) && model[Constants.LINK_DATA_FIELD_NAME] != null)
+            {
+                var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                var jsonElement = (JsonElement)model[Constants.LINK_DATA_FIELD_NAME];
+                if (jsonElement.ValueKind == JsonValueKind.Object || jsonElement.ValueKind == JsonValueKind.String)
+                {
+                    var valueStr = jsonElement.ToString();
+                    result = JsonSerializer.Deserialize<LinkDataModel>(valueStr, jsonOptions);
+                    model[Constants.LINK_DATA_FIELD_NAME] = null;
+                }
+            }
+            return result;
+        }
+
+        private void UpdateLinkData(string table1PortalItemName, LinkDataModel model, object table1Id)
+        {
+            if (!model.IdsOfTable2ForAdd.Any() && !model.IdsOfRelationTableForRemove.Any()) return;
+
+            // get main configration
+            var query = (
+                from u in _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection)
+                join mp in _depDbContext.SiteMenus on u.Name equals mp.Name
+                join mc in _depDbContext.SiteMenus on mp.Id equals mc.ParentId
+                where mc.Name == table1PortalItemName
+                select new { u, mc.Id }
+            ).FirstOrDefault();
+
+            var mainConfiguration = query.u;
+            var table1PortalItemId = query.Id;
+
+            var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(mainConfiguration.DataSourceConfig);
+
+            var table1Field = linkedDataSourceConfig.PrimaryTable.Id == table1PortalItemId
+                ? linkedDataSourceConfig.PrimaryTable.MapToLinkedTableField
+                : linkedDataSourceConfig.SecondaryTable.MapToLinkedTableField;
+            var table2Field = linkedDataSourceConfig.PrimaryTable.Id == table1PortalItemId
+                ? linkedDataSourceConfig.SecondaryTable.MapToLinkedTableField
+                : linkedDataSourceConfig.PrimaryTable.MapToLinkedTableField;
+
+            var columns = new List<string>() { table1Field, table2Field };
+
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+            {
+                con.ConnectionString = mainConfiguration.DataSourceConnection.ConnectionString;
+                //var trans = con.BeginTransaction();
+
+                try
+                {
+                    if (model.IdsOfTable2ForAdd.Any())
+                    {
+                        linkedDataSourceConfig.LinkedTable.Columns = columns;
+                        var sql = _queryBuilder.GenerateSqlTextForInsert(linkedDataSourceConfig.LinkedTable);
+
+                        var param = new List<object>();
+                        foreach (var table2Id in model.IdsOfTable2ForAdd)
+                        {
+                            var value = new List<KeyValuePair<string, object>>();
+                            value.Add(new KeyValuePair<string, object>(table1Field, table1Id));
+                            value.Add(new KeyValuePair<string, object>(table2Field, table2Id));
+                            var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
+                            dynamicParameters.Add("RETURNED_ID", dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
+
+                            param.Add(dynamicParameters);
+                        }
+
+                        con.Execute(sql, param);
+                    }
+
+                    if (model.IdsOfRelationTableForRemove.Any())
+                    {
+                        var deleteSql = _queryBuilder.GenerateSqlTextForDelete(linkedDataSourceConfig.LinkedTable);
+                        var deleteParam = _queryBuilder.GenerateDynamicParameter(
+                            new List<KeyValuePair<string, object>>() {
+                        new KeyValuePair<string, object>(linkedDataSourceConfig.LinkedTable.IdColumn, model.IdsOfRelationTableForRemove)
+                            });
+                        con.Execute(deleteSql, deleteParam);
+                    }
+                    //trans.Commit();
+                }
+                catch (Exception ex)
+                {
+                    //trans.Rollback();
+                    _logger.LogError(ex.Message, ex);
+                    throw ex;
+                }
+            }
         }
 
         #endregion

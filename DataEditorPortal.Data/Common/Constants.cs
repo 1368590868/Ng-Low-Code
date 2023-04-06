@@ -3,10 +3,7 @@
     public static class Constants
     {
         public static readonly string DEFAULT_SCHEMA = "DATA_EDITOR_PORTAL";
-
-        public static readonly string SINGLE = "DATA_EDITOR_PORTAL";
-        public static readonly string LINKED = "DATA_EDITOR_PORTAL";
-        public static readonly string LINKED_SINGLE = "DATA_EDITOR_PORTAL";
+        public static readonly string LINK_DATA_FIELD_NAME = "LINK_DATA_FIELD";
     }
 
     public static class GridItemType
