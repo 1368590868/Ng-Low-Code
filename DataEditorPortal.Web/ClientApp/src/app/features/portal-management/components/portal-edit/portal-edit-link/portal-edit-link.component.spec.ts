@@ -8,9 +8,8 @@ describe('PortalEditLinkComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PortalEditLinkComponent ]
-    })
-    .compileComponents();
+      declarations: [PortalEditLinkComponent]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(PortalEditLinkComponent);
     component = fixture.componentInstance;

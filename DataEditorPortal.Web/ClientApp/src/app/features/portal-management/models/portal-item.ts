@@ -127,3 +127,17 @@ export interface LinkedDataSourceConfig {
   secondaryTable?: LinkedTableConfig | null;
   linkedTable?: DataSourceConfig;
 }
+
+export interface LinkedSingleConfigDetails {
+  id?: string;
+  name?: string;
+  status?: number;
+  itemType?: string;
+  description: string | null;
+}
+
+export interface LinkedSingleConfig {
+  columns: string[];
+  details: LinkedSingleConfigDetails[];
+  idColumn?: string;
+}
