@@ -8,10 +8,11 @@
     <p-pickList
       #pickList
       class="flex-grow-1 mr-3"
+      [class.isLinkedItem]="isLinkedItem"
       [source]="sourceColumns"
       [target]="targetColumns"
       sourceHeader="Available Fields"
-      targetHeader="Selected Fields"
+      targetHeader="Search Fields"
       [dragdrop]="true"
       [responsive]="true"
       [sourceStyle]="{ height: '32.1542rem' }"
@@ -29,7 +30,7 @@
       <ng-template pTemplate="targetHeader">
         <div
           class="p-picklist-title flex align-items-center justify-content-between">
-          <span>Selected Fields</span>
+          <span>Search Fields</span>
           <p-menu
             #addNewMenu
             [popup]="true"
@@ -48,6 +49,12 @@
         <app-form-designer-view
           *ngIf="column.selected"
           [config]="column"></app-form-designer-view>
+        <p-button
+          *ngIf="column.key.indexOf('CUSTOM_SEARCH_') === 0"
+          icon="pi pi-trash"
+          class="remove-btn"
+          styleClass="p-button-text p-button-rounded"
+          (onClick)="onRemoveCustomColumn($event, column)"></p-button>
       </ng-template>
       <ng-template pTemplate="emptymessagetarget">
         <div class="w-full relative" *ngIf="!isLoading">
@@ -68,7 +75,7 @@
         </div>
         <ng-template #emptyMessage>
           <div class="pt-4">
-            Please select one row in <b>Selected Fields</b> panel to configure.
+            Please select one row in <b>Search Fields</b> panel to configure.
           </div>
         </ng-template>
       </div>

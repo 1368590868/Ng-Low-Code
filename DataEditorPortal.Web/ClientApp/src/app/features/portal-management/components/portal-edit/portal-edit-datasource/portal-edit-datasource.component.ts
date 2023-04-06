@@ -297,7 +297,7 @@ export class PortalEditDatasourceComponent
     }, true);
 
     return (
-      this.formControlConnection.valid &&
+      (this.dbConnectionDisabled || this.formControlConnection.valid) &&
       (this.datasourceConfig.queryText || this.formControlDbTable.valid) &&
       this.formControlIdColumn.valid &&
       filterValid

@@ -80,11 +80,11 @@ export class PortalEditSearchComponent
     }
   ];
 
-  get itemType() {
-    return this.portalItemService.itemType;
-  }
   get itemId() {
     return this.portalItemService.itemId;
+  }
+  get isLinkedItem() {
+    return this.portalItemService.itemType === 'linked';
   }
 
   constructor(
@@ -99,7 +99,7 @@ export class PortalEditSearchComponent
     if (this.itemId) {
       forkJoin([
         this.portalItemService.getGridSearchConfig(),
-        this.itemType === 'linked'
+        this.isLinkedItem
           ? of<DataSourceTableColumn[]>([])
           : this.portalItemService.getDataSourceTableColumnsByPortalId()
       ]).subscribe(res => {
@@ -229,13 +229,13 @@ export class PortalEditSearchComponent
   }
 
   onAddCustomColumn(filterType: string) {
-    const count = this.targetColumns.filter(
-      x => x.key.indexOf('CUSTOM_SEARCH_') === 0
-    ).length;
-
+    let index = 1;
+    for (index = 1; index <= 100; index++) {
+      if (!this.targetColumns.find(x => x.key === `CUSTOM_SEARCH_${index}`))
+        break;
+    }
+    const key = `CUSTOM_SEARCH_${index}`;
     const result = this.controls.filter(c => c.filterType === filterType);
-    const key = `CUSTOM_SEARCH_${count + 1}`;
-
     this.targetColumns = [
       {
         key: key,
@@ -252,5 +252,17 @@ export class PortalEditSearchComponent
       },
       ...this.targetColumns
     ];
+  }
+
+  onRemoveCustomColumn(event: MouseEvent, field: GridSearchField) {
+    event.stopPropagation();
+    const index = this.targetColumns.findIndex(x => x.key === field.key);
+    console.log(index);
+    if (index >= 0) {
+      this.targetColumns.splice(index, 1);
+      if (field.key === this.model.key) {
+        this.model = {};
+      }
+    }
   }
 }
