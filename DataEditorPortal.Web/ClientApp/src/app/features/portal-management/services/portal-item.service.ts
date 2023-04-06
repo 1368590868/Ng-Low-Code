@@ -84,6 +84,14 @@ export class PortalItemService {
     );
   }
 
+  getLinkedSingleTableConfig(id: string) {
+    return this.http
+      .get<ApiResponse<any>>(
+        `${this._apiUrl}portal-item/${id}/linked-single-config`
+      )
+      .pipe(map(x => x.result || {}));
+  }
+
   getPortalList(): Observable<PortalItem[]> {
     return this.http
       .get<ApiResponse<PortalItem[]>>(`${this._apiUrl}portal-item/list`)
