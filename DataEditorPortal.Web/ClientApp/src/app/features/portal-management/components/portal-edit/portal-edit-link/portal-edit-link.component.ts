@@ -42,12 +42,19 @@ export class PortalEditLinkComponent
   primarySelected: string[] = [];
 
   dbConnections: { label: string; value: string }[] = [];
-  dsConfig!: DataSourceConfig;
+  dsConfig: DataSourceConfig = {
+    dataSourceConnectionId: '',
+    tableName: '',
+    tableSchema: '',
+    idColumn: ''
+  };
   dbTables: DataSourceTable[] = [];
   dbTableColumns: DataSourceTableColumn[] = [];
   formControlConnection: FormControl = new FormControl();
   formControlDbTable: FormControl = new FormControl();
   formControlIdColumn: FormControl = new FormControl();
+  formControlPrimaryMap: FormControl = new FormControl();
+  formControlSecondaryMap: FormControl = new FormControl();
 
   constructor(
     private portalItemService: PortalItemService,
@@ -75,6 +82,7 @@ export class PortalEditLinkComponent
     this.formControlConnection.valueChanges.subscribe(
       value => (this.dsConfig.dataSourceConnectionId = value)
     );
+
     this.portalItemService.saveCurrentStep('datasource');
     this.portalItemService
       .getLinkedDatasource(this.itemId as string)
@@ -88,6 +96,12 @@ export class PortalEditLinkComponent
             this.dataSourceConfig.primaryTable?.columnsForLinkedField || [];
           this.secondarySelected =
             this.dataSourceConfig.secondaryTable?.columnsForLinkedField || [];
+          this.formControlPrimaryMap.setValue(
+            this.dataSourceConfig.primaryTable?.mapToLinkedTableField
+          );
+          this.formControlSecondaryMap.setValue(
+            this.dataSourceConfig.secondaryTable?.mapToLinkedTableField
+          );
 
           if (result?.primaryTable?.id != null) {
             this.portalItemService
@@ -120,7 +134,6 @@ export class PortalEditLinkComponent
         return { label: x.name, value: x.id || '' };
       });
       // check if current selected connections exists, if not exist, use the first
-      console.log(this.dsConfig);
       if (
         !connections.find(x => x.id === this.dsConfig?.dataSourceConnectionId)
       ) {
@@ -153,7 +166,9 @@ export class PortalEditLinkComponent
       this.primarySelected.length === 0 ||
       this.secondarySelected.length === 0 ||
       this.dsConfig.dataSourceConnectionId == null ||
-      this.dsConfig.idColumn == null
+      this.dsConfig.idColumn == null ||
+      this.formControlPrimaryMap.value == null ||
+      this.formControlSecondaryMap.value == null
     ) {
       this.notifyService.notifyWarning('Warning', 'Please Check Your Data.');
       return false;
@@ -179,11 +194,13 @@ export class PortalEditLinkComponent
         .saveLinkedDatasource({
           primaryTable: {
             id: this.dataSourceConfig.primaryTable?.id,
-            columnsForLinkedField: this.primarySelected
+            columnsForLinkedField: this.primarySelected,
+            mapToLinkedTableField: this.formControlPrimaryMap.value
           },
           secondaryTable: {
             id: this.dataSourceConfig.secondaryTable?.id,
-            columnsForLinkedField: this.secondarySelected
+            columnsForLinkedField: this.secondarySelected,
+            mapToLinkedTableField: this.formControlSecondaryMap.value
           },
           linkedTable: data
         })

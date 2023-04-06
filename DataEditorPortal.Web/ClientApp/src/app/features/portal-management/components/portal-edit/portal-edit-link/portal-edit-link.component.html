@@ -4,154 +4,8 @@
     Create or update settings of the linked table.
   </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
-  <p-divider styleClass="w-6 mt-5">Primary Table</p-divider>
-  <div class="w-6 mb-2">
-    <p-table
-      *ngIf="primaryTable.length > 0"
-      [value]="primaryTable"
-      [rowHover]="true"
-      styleClass="p-datatable-striped ml-4">
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 25%">Label</th>
-          <th>Description</th>
-          <th style="width: 10rem">Status</th>
-          <th style="width: 4.16rem"></th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-primary>
-        <tr>
-          <td>{{ primary.label }}</td>
-          <td>{{ primary.description }}</td>
-          <td>
-            <p-tag
-              *ngIf="primary.status === 0"
-              icon="pi pi-file-edit"
-              severity="warning"
-              value="Draft"></p-tag>
-            <p-tag
-              *ngIf="primary.status === 1"
-              icon="pi pi-check"
-              severity="success"
-              value="Published"></p-tag>
-            <p-tag
-              *ngIf="primary.status === 2"
-              icon="pi pi-check"
-              severity="warning"
-              value="Unpublished"></p-tag>
-          </td>
-          <td>
-            <button
-              type="button"
-              pButton
-              label="Edit"
-              [routerLink]="'./edit/' + primary.id"
-              class="p-button-text"></button>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-    <div
-      class="flex flex-column mb-2 ml-4 mt-2"
-      *ngIf="dataSourceConfig?.primaryTable !== null">
-      <label for="columnsForLinkedField" class="mb-1">Columns For Linked</label>
-      <div class="flex align-items-center">
-        <p-multiSelect
-          [showToggleAll]="false"
-          appendTo="body"
-          placeholder="Place Select One Column"
-          [filter]="false"
-          [showHeader]="false"
-          display="chip"
-          [(ngModel)]="primarySelected"
-          [options]="['Name', 'FirstName', 'Number']">
-        </p-multiSelect>
-      </div>
-    </div>
-    <p-button
-      *ngIf="primaryTable.length === 0"
-      label="Add"
-      icon="pi pi-plus"
-      class="mt-1 ml-4"
-      styleClass="p-button-text p-button-sm"
-      [routerLink]="'./add'"></p-button>
-  </div>
-  <p-divider styleClass="w-6 mt-6">Secondary Table</p-divider>
-  <div class="w-6 mb-2">
-    <p-table
-      *ngIf="secondaryTable.length > 0"
-      [value]="secondaryTable"
-      [rowHover]="true"
-      styleClass="p-datatable-striped ml-4">
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 25%">Label</th>
-          <th>Description</th>
-          <th style="width: 10rem">Status</th>
-          <th style="width: 4.16rem"></th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-secondary>
-        <tr>
-          <td>{{ secondary.label }}</td>
-          <td>{{ secondary.description }}</td>
-          <td>
-            <p-tag
-              *ngIf="secondary.status === 0"
-              icon="pi pi-file-edit"
-              severity="warning"
-              value="Draft"></p-tag>
-            <p-tag
-              *ngIf="secondary.status === 1"
-              icon="pi pi-check"
-              severity="success"
-              value="Published"></p-tag>
-            <p-tag
-              *ngIf="secondary.status === 2"
-              icon="pi pi-check"
-              severity="warning"
-              value="Unpublished"></p-tag>
-          </td>
-          <td>
-            <button
-              type="button"
-              pButton
-              label="Edit"
-              [routerLink]="'./edit/' + secondary.id"
-              class="p-button-text"></button>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-    <div
-      class="flex flex-column mb-2 ml-4 mt-2"
-      *ngIf="dataSourceConfig?.secondaryTable !== null">
-      <label for="columnsForLinkedField" class="mb-1">Columns For Linked</label>
-      <div class="flex align-items-center">
-        <p-multiSelect
-          [showToggleAll]="false"
-          appendTo="body"
-          placeholder="Place Select One Column"
-          [filter]="false"
-          [showHeader]="false"
-          display="chip"
-          [(ngModel)]="secondarySelected"
-          [options]="['Name', 'FirstName', 'Number']">
-        </p-multiSelect>
-      </div>
-    </div>
-    <p-button
-      *ngIf="secondaryTable.length === 0"
-      label="Add"
-      icon="pi pi-plus"
-      class="mt-1 ml-4"
-      styleClass="p-button-text p-button-sm"
-      (onClick)="onAddSecondaryTable()">
-    </p-button>
-  </div>
-
   <!-- datasource connect -->
-  <p-divider styleClass="w-6 mt-6">Data Source</p-divider>
+  <p-divider styleClass="w-6 mt-5">Link Source</p-divider>
   <div class="w-6 ml-4">
     <div class="flex flex-column mb-3">
       <label for="" class="mb-1">Database Connection</label>
@@ -239,6 +93,203 @@
       </div>
     </div>
   </div>
+
+  <!-- Table  -->
+  <div
+    *ngIf="
+      dsConfig?.dataSourceConnectionId !== null && dsConfig?.idColumn !== null
+    ">
+    <p-divider styleClass="w-6 mt-5">Primary Table</p-divider>
+    <div class="w-6 mb-2">
+      <p-table
+        *ngIf="primaryTable.length > 0"
+        [value]="primaryTable"
+        [rowHover]="true"
+        styleClass="p-datatable-striped ml-4">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 25%">Label</th>
+            <th>Description</th>
+            <th style="width: 10rem">Status</th>
+            <th style="width: 4.16rem"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-primary>
+          <tr>
+            <td>{{ primary.label }}</td>
+            <td>{{ primary.description }}</td>
+            <td>
+              <p-tag
+                *ngIf="primary.status === 0"
+                icon="pi pi-file-edit"
+                severity="warning"
+                value="Draft"></p-tag>
+              <p-tag
+                *ngIf="primary.status === 1"
+                icon="pi pi-check"
+                severity="success"
+                value="Published"></p-tag>
+              <p-tag
+                *ngIf="primary.status === 2"
+                icon="pi pi-check"
+                severity="warning"
+                value="Unpublished"></p-tag>
+            </td>
+            <td>
+              <button
+                type="button"
+                pButton
+                label="Edit"
+                [routerLink]="'./edit/' + primary.id"
+                class="p-button-text"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div class="flex align-items-center">
+        <div
+          class="flex flex-column mb-2 ml-4 mr-4 mt-2"
+          *ngIf="dataSourceConfig?.primaryTable !== null">
+          <label for="columnsForLinkedField" class="mb-1"
+            >Columns For Linked</label
+          >
+          <div class="flex align-items-center">
+            <p-multiSelect
+              [style]="{ width: '20rem' }"
+              [showToggleAll]="false"
+              appendTo="body"
+              placeholder="Place Select One Column"
+              [filter]="false"
+              [showHeader]="false"
+              display="chip"
+              [(ngModel)]="primarySelected"
+              [options]="['Name', 'FirstName', 'Number']">
+            </p-multiSelect>
+          </div>
+        </div>
+        <div class="flex align-items-center">
+          <div class="flex flex-column mb-2">
+            <label for="idColumn" class="mb-1">Map To Linked Table</label>
+            <div class="flex align-items-center">
+              <p-dropdown
+                [required]="true"
+                [formControl]="formControlPrimaryMap"
+                [options]="dbTableColumns"
+                placeholder="Please Select"
+                [style]="{ minWidth: '20rem' }"
+                optionLabel="columnName"
+                optionValue="columnName"
+                appendTo="body"></p-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p-button
+        *ngIf="primaryTable.length === 0"
+        label="Add"
+        icon="pi pi-plus"
+        class="mt-1 ml-4"
+        styleClass="p-button-text p-button-sm"
+        [routerLink]="'./add'"></p-button>
+    </div>
+    <p-divider styleClass="w-6 mt-5">Secondary Table</p-divider>
+    <div class="w-6 mb-2">
+      <p-table
+        *ngIf="secondaryTable.length > 0"
+        [value]="secondaryTable"
+        [rowHover]="true"
+        styleClass="p-datatable-striped ml-4">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 25%">Label</th>
+            <th>Description</th>
+            <th style="width: 10rem">Status</th>
+            <th style="width: 4.16rem"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-secondary>
+          <tr>
+            <td>{{ secondary.label }}</td>
+            <td>{{ secondary.description }}</td>
+            <td>
+              <p-tag
+                *ngIf="secondary.status === 0"
+                icon="pi pi-file-edit"
+                severity="warning"
+                value="Draft"></p-tag>
+              <p-tag
+                *ngIf="secondary.status === 1"
+                icon="pi pi-check"
+                severity="success"
+                value="Published"></p-tag>
+              <p-tag
+                *ngIf="secondary.status === 2"
+                icon="pi pi-check"
+                severity="warning"
+                value="Unpublished"></p-tag>
+            </td>
+            <td>
+              <button
+                type="button"
+                pButton
+                label="Edit"
+                [routerLink]="'./edit/' + secondary.id"
+                class="p-button-text"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <div class="flex align-items-center">
+        <div
+          class="flex flex-column mb-2 ml-4 mr-4 mt-2"
+          *ngIf="dataSourceConfig?.primaryTable !== null">
+          <label for="columnsForLinkedField" class="mb-1"
+            >Columns For Linked</label
+          >
+          <div class="flex align-items-center">
+            <p-multiSelect
+              [style]="{ width: '20rem' }"
+              [showToggleAll]="false"
+              appendTo="body"
+              placeholder="Place Select One Column"
+              [filter]="false"
+              [showHeader]="false"
+              display="chip"
+              [(ngModel)]="secondarySelected"
+              [options]="['Name', 'FirstName', 'Number']">
+            </p-multiSelect>
+          </div>
+        </div>
+        <div class="flex align-items-center">
+          <div class="flex flex-column mb-2">
+            <label for="idColumn" class="mb-1">Map To Linked Table</label>
+            <div class="flex align-items-center">
+              <p-dropdown
+                [required]="true"
+                [formControl]="formControlSecondaryMap"
+                [options]="dbTableColumns"
+                placeholder="Please Select"
+                [style]="{ minWidth: '20rem' }"
+                optionLabel="columnName"
+                optionValue="columnName"
+                appendTo="body"></p-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p-button
+        *ngIf="secondaryTable.length === 0"
+        label="Add"
+        icon="pi pi-plus"
+        class="mt-1 ml-4"
+        styleClass="p-button-text p-button-sm"
+        (onClick)="onAddSecondaryTable()">
+      </p-button>
+    </div>
+  </div>
+
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
       <p-button

@@ -72,26 +72,9 @@ export class PortalItemService {
   }
 
   getLinkedDatasource(id: string) {
-    // return this.http.get<ApiResponse<LinkedDataSourceConfig>>(
-    //   `${this._apiUrl}portal-item/${id}/linked-datasource`
-    // );
-    return of<ApiResponse<LinkedDataSourceConfig>>({
-      result: {
-        primaryTable: {
-          id: '58C218AA-21F7-43D3-A75C-5F26834A5342',
-          columnsForLinkedField: ['FirstName', 'Number']
-        },
-        secondaryTable: null,
-        linkedTable: {
-          dataSourceConnectionId: '4deff6db-d3d6-447f-b3de-ce2d8b242e36',
-          idColumn: 'NAME',
-          tableName: 'LINKED_TABLE_DEMO',
-          tableSchema: 'DATA_EDITOR_PORTAL'
-        }
-      },
-      isError: false,
-      message: ''
-    });
+    return this.http.get<ApiResponse<LinkedDataSourceConfig>>(
+      `${this._apiUrl}portal-item/${id}/linked-datasource`
+    );
   }
 
   saveLinkedDatasource(data: LinkedDataSourceConfig) {
