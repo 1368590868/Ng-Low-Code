@@ -71,6 +71,10 @@ export class PortalEditDatasourceComponent
   formControlDbTable: FormControl = new FormControl();
   formControlIdColumn: FormControl = new FormControl();
 
+  get dbConnectionDisabled() {
+    return this.portalItemService.itemType === 'linked-single';
+  }
+
   constructor(
     private portalItemService: PortalItemService,
     private primeNGConfig: PrimeNGConfig,
@@ -97,6 +101,7 @@ export class PortalEditDatasourceComponent
     this.formControlConnection.valueChanges.subscribe(
       value => (this.datasourceConfig.dataSourceConnectionId = value)
     );
+    if (this.dbConnectionDisabled) this.formControlConnection.disable();
 
     // get protal item datasource config
     if (this.portalItemService.itemId) {

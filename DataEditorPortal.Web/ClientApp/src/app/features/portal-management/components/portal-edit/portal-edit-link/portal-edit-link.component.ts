@@ -36,8 +36,8 @@ export class PortalEditLinkComponent
   }
 
   dataSourceConfig!: LinkedDataSourceConfig;
-  primaryTable: LinkedTableConfig[] = [];
-  secondaryTable: LinkedTableConfig[] = [];
+  primaryTable: any[] = [];
+  secondaryTable: any[] = [];
   secondarySelected: string[] = [];
   primarySelected: string[] = [];
 
