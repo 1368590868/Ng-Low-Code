@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoWrapper.Wrappers;
+using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Common;
@@ -305,7 +306,28 @@ namespace DataEditorPortal.Web.Services
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
-            return !string.IsNullOrEmpty(config.DataSourceConfig) ? JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig) : new DataSourceConfig();
+            if (!string.IsNullOrEmpty(config.DataSourceConfig))
+            {
+                return JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            }
+            else
+            {
+                var defaultConfig = new DataSourceConfig();
+                if (config.ItemType == GridItemType.LINKED_SINGLE)
+                {
+                    // get main configration
+                    var datasourceConnectionId = (
+                        from u in _depDbContext.UniversalGridConfigurations
+                        join mp in _depDbContext.SiteMenus on u.Name equals mp.Name
+                        join mc in _depDbContext.SiteMenus on mp.Id equals mc.ParentId
+                        where mc.Id == config.Id
+                        select u.DataSourceConnectionId
+                    ).FirstOrDefault();
+                    if (datasourceConnectionId.HasValue)
+                        defaultConfig.DataSourceConnectionId = datasourceConnectionId.Value;
+                }
+                return defaultConfig;
+            }
         }
 
         public bool SaveDataSourceConfig(Guid id, DataSourceConfig model)

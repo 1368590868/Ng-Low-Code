@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Text.Json;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -588,6 +589,35 @@ namespace DataEditorPortal.Web.Controllers
         public bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model)
         {
             return _portalItemService.SaveLinkedDataSourceConfig(id, model);
+        }
+
+        [HttpGet]
+        [Route("{id}/linked-single-config")]
+        public dynamic GetLinkedSingleTableConfig(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (item == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            var details = _mapper.Map<PortalItemData>(siteMenu);
+            details.CurrentStep = item.CurrentStep;
+            details.ConfigCompleted = item.ConfigCompleted;
+            details.ItemType = item.ItemType;
+
+            var datasource = JsonSerializer.Deserialize<DataSourceConfig>(!string.IsNullOrEmpty(item.DataSourceConfig) ? item.DataSourceConfig : "{}");
+            var columns = JsonSerializer.Deserialize<List<GridColConfig>>(!string.IsNullOrEmpty(item.ColumnsConfig) ? item.ColumnsConfig : "[]"); ;
+
+            return new
+            {
+                details = new object[] { details },
+                idColumn = datasource.IdColumn,
+                columns = columns.Select(x => x.field)
+            };
         }
 
         #endregion
