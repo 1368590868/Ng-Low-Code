@@ -52,6 +52,9 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
     {
         // search rule
         public SearchFieldFilterRule searchRule { get; set; }
+
+        // for linked table search
+        public SearchFieldFilterRule searchRule1 { get; set; }
     }
 
     public class SearchFieldFilterRule

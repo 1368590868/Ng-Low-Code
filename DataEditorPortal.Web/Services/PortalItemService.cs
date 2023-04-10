@@ -454,12 +454,24 @@ namespace DataEditorPortal.Web.Services
             // save search to primary table and secondary table if current table is linked
             if (config.ItemType == GridItemType.LINKED)
             {
+                var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig);
+
                 var query = from m in _depDbContext.SiteMenus
                             join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name
                             where m.ParentId == siteMenu.Id
-                            select u;
+                            select new { m.Id, u };
                 var list = query.ToList();
-                list.ForEach(u => u.SearchConfig = config.SearchConfig);
+                list.ForEach(mu =>
+                {
+                    var isPrimary = linkedDataSourceConfig.PrimaryTable.Id == mu.Id;
+                    var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
+                    searchConfig.ForEach(x =>
+                    {
+                        if (!isPrimary) x.searchRule = x.searchRule1;
+                        x.searchRule1 = null;
+                    });
+                    mu.u.SearchConfig = JsonSerializer.Serialize(searchConfig);
+                });
             }
 
             _depDbContext.SaveChanges();
