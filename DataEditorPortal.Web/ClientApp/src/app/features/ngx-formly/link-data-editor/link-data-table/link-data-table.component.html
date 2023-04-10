@@ -1,0 +1,78 @@
+<p-table
+  #dataTable
+  *ngIf="columnsConfig.length > 0"
+  class="data-table"
+  styleClass="p-datatable-striped"
+  [columns]="columnsConfig"
+  [scrollable]="true"
+  scrollHeight="20rem"
+  [resizableColumns]="true"
+  columnResizeMode="expand"
+  selectionMode="multiple"
+  [value]="dataSource"
+  [(selection)]="selection"
+  dataKey="ID"
+  (onRowSelect)="onRowSelect($event)"
+  (onRowUnselect)="onRowUnselect($event)"
+  (onHeaderCheckboxToggle)="onRowAllSelect($event)"
+  [rowHover]="true">
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <th>
+        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+      </th>
+      <th
+        *ngFor="let col of columns"
+        pResizableColumn
+        [style.width]="col.width">
+        <span style="vertical-align: middle">{{ col.header }}</span>
+      </th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-data let-columns="columns">
+    <tr [pSelectableRow]="data">
+      <td>
+        <p-tableCheckbox
+          [value]="data"
+          (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
+      </td>
+      <td
+        *ngFor="let col of columns"
+        [title]="col.filterType !== 'upload' ? data[col.field] || '' : ''">
+        <ng-container
+          *ngIf="!col.template"
+          [ngTemplateOutlet]="
+            col.filterType === 'date'
+              ? date
+              : col.filterType === 'numeric'
+              ? numeric
+              : col.filterType === 'boolean'
+              ? boolean
+              : col.filterType === 'upload'
+              ? upload
+              : normal
+          "></ng-container>
+        <ng-template #boolean>{{ data[col.field] | boolean }}</ng-template>
+        <ng-template #date>{{
+          data[col.field] | date : (col.format === '' ? undefined : col.format)
+        }}</ng-template>
+        <ng-template #numeric>{{
+          data[col.field]
+            | number : (col.format === '' ? undefined : col.format)
+        }}</ng-template>
+        <ng-template #upload
+          ><span [innerHTML]="data[col.field] | upload"></span
+        ></ng-template>
+        <ng-template #normal>{{ data[col.field] }}</ng-template>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage" let-columns>
+    <tr>
+      <td class="text-lg" [attr.colspan]="columns.length + 2">
+        {{ 'No data were found.' }}
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

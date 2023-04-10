@@ -133,6 +133,17 @@ export class EditRecordActionComponent
               (x: any) => x.validatorConfig && Array.isArray(x.validatorConfig)
             )
             .forEach(x => this.ngxFormlyService.initValidators(x));
+
+          fields
+            .filter(f => f.type === 'linkDataEditor')
+            .forEach(x => {
+              if (x.props) {
+                x.props['tableName'] = this.gridName;
+                x.props['searchParams'] = this.fetchDataParam;
+                x.props['table1Id'] = this.dataKey;
+              }
+            });
+
           this.fields = fields;
           if (fields.length > 0) this.loadedEvent.emit();
         })
