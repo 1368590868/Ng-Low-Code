@@ -29,7 +29,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   ]
 })
 export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
-  @Input() tableName!: string;
+  @Input() table1Name!: string;
   @Input() searchParams: any = {};
   @Input() table1Id?: string;
   columnsConfig: ColumnsConfig[] = [];
@@ -115,11 +115,11 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   }
 
   ngOnInit(): void {
-    if (this.tableName !== '') {
+    if (this.table1Name !== '') {
       forkJoin([
-        this.linkDataTableService.getTableConfig(this.tableName),
+        this.linkDataTableService.getTableConfig(this.table1Name),
         this.linkDataTableService.getTableData(
-          this.tableName,
+          this.table1Name,
           this.searchParams
         )
       ]).subscribe(([tableConfig, dataSource]) => {

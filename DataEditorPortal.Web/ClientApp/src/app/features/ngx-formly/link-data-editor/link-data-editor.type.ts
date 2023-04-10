@@ -19,10 +19,8 @@ export interface TableConfig {
 }
 
 interface LinkDataEditorProps extends FormlyFieldProps {
-  tableName?: string;
+  table1Name?: string;
   searchParams?: any;
-  columnsConfig: ColumnsConfig[];
-  dataSource: any[];
   table1Id?: string;
 }
 
@@ -30,7 +28,7 @@ interface LinkDataEditorProps extends FormlyFieldProps {
   selector: 'app-formly-field-link-data-editor',
   template: `<app-link-data-table
     [searchParams]="props.searchParams || {}"
-    [tableName]="props.tableName || ''"
+    [table1Name]="props.table1Name || ''"
     [formControl]="formControl"
     [formlyAttributes]="field"
     [table1Id]="props.table1Id"></app-link-data-table> `,

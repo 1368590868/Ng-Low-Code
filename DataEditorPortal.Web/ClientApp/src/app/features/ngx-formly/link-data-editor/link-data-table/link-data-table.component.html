@@ -11,7 +11,7 @@
   selectionMode="multiple"
   [value]="dataSource"
   [(selection)]="selection"
-  dataKey="ID"
+  [dataKey]="dataKey"
   (onRowSelect)="onRowSelect($event)"
   (onRowUnselect)="onRowUnselect($event)"
   (onHeaderCheckboxToggle)="onRowAllSelect($event)"
