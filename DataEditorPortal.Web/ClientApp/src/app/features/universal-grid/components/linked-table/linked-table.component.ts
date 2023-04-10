@@ -31,6 +31,9 @@ export class LinkedTableComponent implements OnInit {
       event.data[this.primaryTable.tableConfig.dataKey]
     );
   }
+  onPrimaryRowUnselect() {
+    this.secondaryTable.clearHighlighted();
+  }
 
   onSecondaryRowSelect(event: any) {
     // mark linked data highlighted
@@ -38,5 +41,8 @@ export class LinkedTableComponent implements OnInit {
     this.primaryTable.highlightLinkedData(
       event.data[this.secondaryTable.tableConfig.dataKey]
     );
+  }
+  onSecondaryRowUnselect() {
+    this.primaryTable.clearHighlighted();
   }
 }

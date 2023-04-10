@@ -31,6 +31,9 @@ export class TableComponent implements OnInit, OnDestroy {
   @Input() gridName!: string;
   @Input() selectionMode = 'multiple';
   @Output() rowSelect = new EventEmitter<any>();
+  @Output() rowUnselect = new EventEmitter<any>();
+  @Output() resetData = new EventEmitter<any>();
+
   destroy$ = new Subject();
 
   records: GridData[] = [];
@@ -267,6 +270,7 @@ export class TableComponent implements OnInit, OnDestroy {
           this.totalRecords = res.total;
           this.firstLoadDone = true;
         }),
+        tap(() => this.highlightLinkedData(this.table2Id)),
         finalize(() => {
           this.loading = false;
         })
@@ -319,9 +323,13 @@ export class TableComponent implements OnInit, OnDestroy {
   onRowSelect(event: any) {
     this.rowSelect.emit(event);
   }
+  onRowUnselect(event: any) {
+    this.rowUnselect.emit(event);
+  }
 
   refresh() {
     this.selection = [];
+    this.resetData.emit();
     this.table.saveState();
     this.fetchData();
   }
@@ -340,6 +348,7 @@ export class TableComponent implements OnInit, OnDestroy {
     this.multiSortMeta = null;
     this.first = 0;
     this.selection = [];
+    this.resetData.emit();
   }
 
   onStateSave(state: TableState) {
@@ -358,7 +367,9 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   // linked features
+  table2Id?: any;
   clearHighlighted() {
+    this.table2Id = undefined;
     this.records = this.records.map(data => {
       data['linked_highlighted'] = '';
       return data;
@@ -366,21 +377,24 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   highlightLinkedData(table2Id: string) {
+    this.table2Id = table2Id;
     this.selection = [];
-    this.gridTableService
-      .getHighlightLinkedData(this.gridName, table2Id)
-      .pipe(
-        tap(res => {
-          this.records = this.records.map(data => {
-            data['linked_highlighted'] = res.find(
-              x => data[this.tableConfig.dataKey] === x
-            )
-              ? 'highlighted'
-              : '';
-            return data;
-          });
-        })
-      )
-      .subscribe();
+    if (table2Id) {
+      this.gridTableService
+        .getHighlightLinkedData(this.gridName, table2Id)
+        .pipe(
+          tap(res => {
+            this.records = this.records.map(data => {
+              data['linked_highlighted'] = res.find(
+                x => data[this.tableConfig.dataKey] === x
+              )
+                ? 'highlighted'
+                : '';
+              return data;
+            });
+          })
+        )
+        .subscribe();
+    }
   }
 }

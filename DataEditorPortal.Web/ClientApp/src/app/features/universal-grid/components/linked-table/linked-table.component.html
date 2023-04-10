@@ -7,7 +7,9 @@
       headerSize="compact"
       [gridName]="primaryTableName"
       selectionMode="single"
-      (rowSelect)="onPrimaryRowSelect($event)"></app-table>
+      (rowSelect)="onPrimaryRowSelect($event)"
+      (rowUnselect)="onPrimaryRowUnselect()"
+      (resetData)="onPrimaryRowUnselect()"></app-table>
   </ng-template>
   <ng-template pTemplate>
     <app-table
@@ -17,6 +19,8 @@
       headerSize="compact"
       [gridName]="secondaryTableName"
       selectionMode="single"
-      (rowSelect)="onSecondaryRowSelect($event)"></app-table>
+      (rowSelect)="onSecondaryRowSelect($event)"
+      (rowUnselect)="onSecondaryRowUnselect()"
+      (resetData)="onSecondaryRowUnselect()"></app-table>
   </ng-template>
 </p-splitter>
