@@ -451,6 +451,17 @@ namespace DataEditorPortal.Web.Services
             config.SearchConfig = JsonSerializer.Serialize(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
 
+            // save search to primary table and secondary table if current table is linked
+            if (config.ItemType == GridItemType.LINKED)
+            {
+                var query = from m in _depDbContext.SiteMenus
+                            join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name
+                            where m.ParentId == siteMenu.Id
+                            select u;
+                var list = query.ToList();
+                list.ForEach(u => u.SearchConfig = config.SearchConfig);
+            }
+
             _depDbContext.SaveChanges();
 
             return true;
