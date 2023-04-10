@@ -159,10 +159,10 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPost]
-        [Route("{table1Name}/linked-table-editor/table-column")]
-        public List<GridColConfig> GetLinkedTableColumnForFieldControl(string table1Name)
+        [Route("{table1Name}/linked-table-editor/table-config")]
+        public dynamic GetLinkedTableConfigForFieldControl(string table1Name)
         {
-            return _universalGridService.GetLinkedTableColumnForFieldControl(table1Name);
+            return _universalGridService.GetLinkedTableConfigForFieldControl(table1Name);
         }
     }
 }

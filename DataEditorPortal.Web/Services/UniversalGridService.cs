@@ -44,7 +44,7 @@ namespace DataEditorPortal.Web.Services
         // linked table api
         dynamic GetLinkedGridConfig(string name);
         GridData GetLinkedTableDataForFieldControl(string table1Name, Dictionary<string, object> searches);
-        List<GridColConfig> GetLinkedTableColumnForFieldControl(string tableName);
+        dynamic GetLinkedTableConfigForFieldControl(string tableName);
         IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id);
 
     }
@@ -671,11 +671,11 @@ namespace DataEditorPortal.Web.Services
                 // process file upload, store json string
                 var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
 
-                LinkDataModel linkDataMeta = null;
+                List<RelationDataModel> relationData = null;
                 if (config.ItemType == GridItemType.LINKED_SINGLE)
                 {
                     // process link data field, get meta data and clear value in model
-                    linkDataMeta = ProcessLinkDataField(model);
+                    relationData = ProcessLinkDataField(model);
                 }
 
                 // calculate the computed field values
@@ -714,10 +714,10 @@ namespace DataEditorPortal.Web.Services
                     // process file upload
                     SaveUploadedFiles(config.Name, uploadedFieldsMeta);
 
-                    if (linkDataMeta != null)
+                    if (relationData != null)
                     {
                         // update linked data
-                        UpdateLinkData(config.Name, linkDataMeta, returnedId);
+                        UpdateLinkData(config.Name, returnedId, relationData);
                     }
 
                     trans.Commit();
@@ -792,6 +792,13 @@ namespace DataEditorPortal.Web.Services
                 // process file upload, store json string
                 var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
 
+                List<RelationDataModel> relationData = null;
+                if (config.ItemType == GridItemType.LINKED_SINGLE)
+                {
+                    // process link data field, get meta data and clear value in model
+                    relationData = ProcessLinkDataField(model);
+                }
+
                 // calculate the computed field values
                 AssignComputedValues(formLayout.FormFields, model, con);
 
@@ -827,6 +834,12 @@ namespace DataEditorPortal.Web.Services
 
                     // process file upload
                     SaveUploadedFiles(config.Name, uploadedFieldsMeta);
+
+                    if (relationData != null)
+                    {
+                        // update linked data
+                        UpdateLinkData(config.Name, id, relationData);
+                    }
 
                     trans.Commit();
 
@@ -1130,7 +1143,7 @@ namespace DataEditorPortal.Web.Services
 
             return GetGridData(linkedTableInfo.Table2Name, new GridParam() { IndexCount = 50, StartIndex = 0, Searches = searches });
         }
-        public List<GridColConfig> GetLinkedTableColumnForFieldControl(string table1Name)
+        public dynamic GetLinkedTableConfigForFieldControl(string table1Name)
         {
             // get table2 info
             var linkedTableInfo = GetLinkedTableInfo(table1Name);
@@ -1141,7 +1154,11 @@ namespace DataEditorPortal.Web.Services
                 : linkedDataSourceConfig.SecondaryTable.ColumnsForLinkedField;
             var columns = GetGridColumnsConfig(linkedTableInfo.Table2Name);
 
-            return columns.Where(c => columnsForLinkedField.Contains(c.field)).ToList();
+            return new
+            {
+                columns = columns.Where(c => columnsForLinkedField.Contains(c.field)).ToList(),
+                dataKey = linkedTableInfo.IdColumn
+            };
         }
 
         public IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id)
@@ -1217,7 +1234,7 @@ namespace DataEditorPortal.Web.Services
 
             return result;
         }
-        private LinkDataModel GetLinkDataModelForForm(string table1Name, string table1Id)
+        private List<RelationDataModel> GetLinkDataModelForForm(string table1Name, string table1Id)
         {
             var linkedTableInfo = GetLinkedTableInfo(table1Name);
 
@@ -1241,37 +1258,34 @@ namespace DataEditorPortal.Web.Services
                 }).ToList();
             }
 
-            return new LinkDataModel()
-            {
-                RelationData = relationData
-            };
+            return relationData;
         }
-        private LinkDataModel ProcessLinkDataField(Dictionary<string, object> model)
+        private List<RelationDataModel> ProcessLinkDataField(Dictionary<string, object> model)
         {
-            LinkDataModel result = null;
+            List<RelationDataModel> result = null;
             if (model.ContainsKey(Constants.LINK_DATA_FIELD_NAME) && model[Constants.LINK_DATA_FIELD_NAME] != null)
             {
                 var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
                 var jsonElement = (JsonElement)model[Constants.LINK_DATA_FIELD_NAME];
-                if (jsonElement.ValueKind == JsonValueKind.Object || jsonElement.ValueKind == JsonValueKind.String)
+                if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
                 {
                     var valueStr = jsonElement.ToString();
-                    result = JsonSerializer.Deserialize<LinkDataModel>(valueStr, jsonOptions);
+                    result = JsonSerializer.Deserialize<List<RelationDataModel>>(valueStr, jsonOptions);
                     model[Constants.LINK_DATA_FIELD_NAME] = null;
                 }
             }
             return result;
         }
-        private void UpdateLinkData(string table1PortalItemName, LinkDataModel model, object table1Id)
+        private void UpdateLinkData(string table1Name, string table1Id, List<RelationDataModel> inputModel)
         {
-            if (!model.IdsOfTable2ForAdd.Any() && !model.IdsOfRelationTableForRemove.Any()) return;
+            var existingModel = GetLinkDataModelForForm(table1Name, table1Id);
 
             // get main configration
             var query = (
                 from u in _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection)
                 join mp in _depDbContext.SiteMenus on u.Name equals mp.Name
                 join mc in _depDbContext.SiteMenus on mp.Id equals mc.ParentId
-                where mc.Name == table1PortalItemName
+                where mc.Name == table1Name
                 select new { u, mc.Id }
             ).FirstOrDefault();
 
@@ -1296,13 +1310,16 @@ namespace DataEditorPortal.Web.Services
 
                 try
                 {
-                    if (model.IdsOfTable2ForAdd.Any())
+                    var toAdd = inputModel
+                        .Where(input => existingModel.All(existing => !(existing.Table1Id == input.Table1Id && existing.Table2Id == input.Table2Id)))
+                        .Select(x => x.Table2Id);
+                    if (toAdd.Any())
                     {
                         linkedDataSourceConfig.LinkedTable.Columns = columns;
                         var sql = _queryBuilder.GenerateSqlTextForInsert(linkedDataSourceConfig.LinkedTable);
 
                         var param = new List<object>();
-                        foreach (var table2Id in model.IdsOfTable2ForAdd)
+                        foreach (var table2Id in toAdd)
                         {
                             var value = new List<KeyValuePair<string, object>>();
                             value.Add(new KeyValuePair<string, object>(table1Field, table1Id));
@@ -1316,12 +1333,15 @@ namespace DataEditorPortal.Web.Services
                         con.Execute(sql, param);
                     }
 
-                    if (model.IdsOfRelationTableForRemove.Any())
+                    var toDelete = existingModel
+                        .Where(existing => inputModel.All(input => !(input.Table1Id == existing.Table1Id && input.Table2Id == existing.Table2Id)))
+                        .Select(x => x.Id);
+                    if (toDelete.Any())
                     {
                         var deleteSql = _queryBuilder.GenerateSqlTextForDelete(linkedDataSourceConfig.LinkedTable);
                         var deleteParam = _queryBuilder.GenerateDynamicParameter(
                             new List<KeyValuePair<string, object>>() {
-                        new KeyValuePair<string, object>(linkedDataSourceConfig.LinkedTable.IdColumn, model.IdsOfRelationTableForRemove)
+                        new KeyValuePair<string, object>(linkedDataSourceConfig.LinkedTable.IdColumn, toDelete)
                             });
                         con.Execute(deleteSql, deleteParam);
                     }
