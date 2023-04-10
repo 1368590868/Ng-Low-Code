@@ -378,8 +378,8 @@ export class TableComponent implements OnInit, OnDestroy {
 
   highlightLinkedData(table2Id: string) {
     this.table2Id = table2Id;
-    this.selection = [];
     if (table2Id) {
+      this.selection = [];
       this.gridTableService
         .getHighlightLinkedData(this.gridName, table2Id)
         .pipe(
