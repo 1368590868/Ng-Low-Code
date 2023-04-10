@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { distinctUntilChanged, startWith, tap } from 'rxjs';
-import { FormDesignerConfigComponent } from './form-designer-config.component';
+import { FormDesignerDirective } from '../../directives/form-designer.directive';
 
 @Component({
   selector: 'app-search-designer-config',
@@ -17,10 +17,15 @@ import { FormDesignerConfigComponent } from './form-designer-config.component';
   `
 })
 export class SearchDesignerConfigComponent
-  extends FormDesignerConfigComponent
+  extends FormDesignerDirective
   implements OnInit
 {
+  @Input() useTwoSearchRule = false;
+
   ngOnInit(): void {
+    this.options.formState.hideValidation = true;
+    this.options.formState.hideDefaultValue = true;
+    this.options.formState.hideComputedValue = true;
     // modify type change logic.
     const type = this.fields.find(x => x.key === 'type');
     if (type) {
@@ -39,6 +44,15 @@ export class SearchDesignerConfigComponent
                       field.parent?.model
                     );
                 }
+                if (this.useTwoSearchRule) {
+                  const searchRule1Field = field.parent?.get?.('searchRule1');
+                  if (searchRule1Field && searchRule1Field.props) {
+                    searchRule1Field.props.options =
+                      this.portalItemService.getFilterMatchModeOptions(
+                        field.parent?.model
+                      );
+                  }
+                }
               })
             )
             .subscribe();
@@ -46,33 +60,13 @@ export class SearchDesignerConfigComponent
       };
     }
 
-    // remove required
-    const props = this.fields.find(x => x.key === 'props');
-    if (props && props.fieldGroup) {
-      const required = props.fieldGroup?.find(x => x.key === 'required');
-      if (required) required.hide = true;
-    }
-    // remove default value
-    const defaultValue = this.fields.find(x => x.key === 'defaultValue');
-    if (defaultValue) defaultValue.hide = true;
-    // remove validator
-    const validatorIndex = this.fields.findIndex(
-      x => x.fieldGroup && x.fieldGroup.find(f => f.key === 'validatorConfig')
-    );
-    if (validatorIndex) this.fields.splice(validatorIndex, 1);
-    // remove computed
-    const computedIndex = this.fields.findIndex(
-      x => x.fieldGroup && x.fieldGroup.find(f => f.key === 'computedConfig')
-    );
-    if (computedIndex) this.fields.splice(computedIndex, 1);
-
     // add search rule editor.
     this.fields.push({
       fieldGroup: [
         {
           wrappers: ['divider'],
           props: {
-            label: 'Search Rule'
+            label: this.useTwoSearchRule ? 'Primary Search Rule' : 'Search Rule'
           }
         },
         {
@@ -80,12 +74,30 @@ export class SearchDesignerConfigComponent
           type: 'searchRuleEditor',
           props: {
             options: []
-          },
-          expressions: {
-            'props.advancedModeOnly': `field.parent.parent.model.key.indexOf('CUSTOM_SEARCH_') === 0`
           }
         }
       ]
     });
+
+    if (this.useTwoSearchRule) {
+      // add search rule editor.
+      this.fields.push({
+        fieldGroup: [
+          {
+            wrappers: ['divider'],
+            props: {
+              label: 'Secondary Search Rule'
+            }
+          },
+          {
+            key: 'searchRule1',
+            type: 'searchRuleEditor',
+            props: {
+              options: []
+            }
+          }
+        ]
+      });
+    }
   }
 }

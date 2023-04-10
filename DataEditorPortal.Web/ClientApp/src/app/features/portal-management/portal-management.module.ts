@@ -58,7 +58,6 @@ import {
   FormlyFieldValidatorEditorComponent,
   FormDesignerViewComponent,
   FormDesignerConfigComponent,
-  FROM_DESIGNER_CONTROLS,
   SearchDesignerConfigComponent,
   ValidatorEditorComponent,
   ComputedValueEditorComponent,
@@ -71,6 +70,7 @@ import {
   PortalEditLinkComponent,
   PortalEditLinkTableComponent
 } from './components';
+import { FROM_DESIGNER_CONTROLS } from './directives/form-designer.directive';
 import { MonacoEditorConfig } from './monaco-editor-config';
 import { PortalEditStepDirective } from './directives/portal-edit-step.directive';
 
