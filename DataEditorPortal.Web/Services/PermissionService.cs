@@ -32,7 +32,7 @@ namespace DataEditorPortal.Web.Services
         {
             #region get the menu structure in tree view
 
-            var menus = (from m in _depDbContext.SiteMenus where m.Type != "System" select m).ToList();
+            var menus = (from m in _depDbContext.SiteMenus where m.Type != "System" && m.Type != "Sub Portal item" select m).ToList();
 
             var permissionNodes = menus
                 .Where(x => x.ParentId == null)

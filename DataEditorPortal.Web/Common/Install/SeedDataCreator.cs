@@ -315,6 +315,7 @@ namespace DataEditorPortal.Web.Common.Install
                 Name = "user-management",
                 ConfigCompleted = true,
                 DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
+                ItemType = GridItemType.SINGLE,
 
                 DataSourceConfig = JsonSerializer.Serialize(new DataSourceConfig
                 {
@@ -488,6 +489,7 @@ namespace DataEditorPortal.Web.Common.Install
                 Name = "demo-item",
                 ConfigCompleted = true,
                 DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
+                ItemType = GridItemType.SINGLE,
 
                 DataSourceConfig = JsonSerializer.Serialize(new DataSourceConfig
                 {

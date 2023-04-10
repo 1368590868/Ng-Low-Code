@@ -209,7 +209,7 @@ namespace DataEditorPortal.Web.Services
                     return date;
                 }
                 Guid guid;
-                if (Guid.TryParse(jsonElement.ToString(), out guid))
+                if (new Regex("[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}").IsMatch(jsonElement.ToString()) && Guid.TryParse(jsonElement.ToString(), out guid))
                 {
                     return guid.ToByteArray();
                 }
@@ -283,28 +283,7 @@ namespace DataEditorPortal.Web.Services
             return $@"SELECT * FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} = {ParameterPrefix}{ParameterName(config.IdColumn)}";
         }
 
-        public virtual string GenerateSqlTextForInsert(DataSourceConfig config)
-        {
-            if (!string.IsNullOrEmpty(config.QueryText))
-            {
-                // advanced datasource, ingore other setting.
-                return ReplaceQueryParamters(config.QueryText);
-            }
-            else
-            {
-                if (config.Columns.Count <= 0) throw new Exception("Columns can not be empty during generating insert script.");
-
-                var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
-
-                var columns = string.Join(",", config.Columns.Select(x => EscapeColumnName(x)));
-
-                var param = string.Join(",", config.Columns.Select(x => $"{ParameterPrefix}{ParameterName(x)}"));
-
-                var queryText = $@"INSERT INTO {source} ({columns}) VALUES ({param})";
-
-                return queryText;
-            }
-        }
+        public abstract string GenerateSqlTextForInsert(DataSourceConfig config);
 
         public virtual string GenerateSqlTextForUpdate(DataSourceConfig config)
         {

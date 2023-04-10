@@ -117,13 +117,13 @@ namespace DataEditorPortal.Web.Controllers
             var isAdmin = _userService.IsAdmin(username);
             var userPermissions = _userService.GetUserPermissions().Keys;
 
-            //var menus = _depDbContext.SiteMenus.ToList();
-            var menus = (from m in _depDbContext.SiteMenus
-                         join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name into us
-                         from u in us.DefaultIfEmpty()
-                         where u == null || u.ConfigCompleted
-                         select m).ToList();
+            var list = (from m in _depDbContext.SiteMenus
+                        join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name into us
+                        from u in us.DefaultIfEmpty()
+                        where m.Type != "Sub Portal Item" && (u == null || u.ConfigCompleted)
+                        select new { m, itemType = u != null ? u.ItemType : null }).ToList();
 
+            var menus = list.Select(x => x.m);
             var root = menus
                 .Where(x =>
                 {
@@ -161,7 +161,8 @@ namespace DataEditorPortal.Web.Controllers
                                 description = m.Description,
                                 type = m.Type,
                                 link = m.Link,
-                                status = m.Status
+                                status = m.Status,
+                                itemType = list.Where(x => x.m.Id == m.Id).Select(x => x.itemType).FirstOrDefault()
                             });
 
                     return new
@@ -174,7 +175,8 @@ namespace DataEditorPortal.Web.Controllers
                         items = items.Any() ? items : null,
                         type = x.Type,
                         link = x.Link,
-                        status = x.Status
+                        status = x.Status,
+                        itemType = list.Where(l => l.m.Id == x.Id).Select(l => l.itemType).FirstOrDefault()
                     };
                 })
                 .Where(x => x.type != "Folder" || x.items != null);

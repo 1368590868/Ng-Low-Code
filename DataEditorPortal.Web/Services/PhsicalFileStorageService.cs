@@ -42,6 +42,7 @@ namespace DataEditorPortal.Web.Services
                     entity.FileName = uploadedFile.FileName;
                     entity.FilePath = destFilePath;
                     entity.StorageType = Data.Common.FileStorageType.FileSystem;
+                    entity.Comments = uploadedFile.Comments;
                     _depDbContext.UploadedFiles.Add(entity);
 
                     tempFiles.Add(tempFilePath);

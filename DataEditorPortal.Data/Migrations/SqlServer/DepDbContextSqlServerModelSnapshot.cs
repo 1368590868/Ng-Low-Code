@@ -412,6 +412,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DETAIL_CONFIG");
 
+                    b.Property<string>("ItemType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ITEM_TYPE");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("NAME");

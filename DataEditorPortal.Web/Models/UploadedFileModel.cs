@@ -9,7 +9,7 @@ namespace DataEditorPortal.Web.Models
     {
         public string FileName { get; set; }
         public string FileId { get; set; }
-        //public string FileUrl { get; set; }
+        public string Comments { get; set; }
         public string ContentType { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public UploadedFileStatus Status { get; set; }

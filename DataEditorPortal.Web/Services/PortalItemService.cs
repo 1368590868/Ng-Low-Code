@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoWrapper.Wrappers;
+using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Common;
@@ -40,6 +41,8 @@ namespace DataEditorPortal.Web.Services
         bool SaveGridFormConfig(Guid id, DetailConfig model);
         List<CustomAction> GetCustomActions(Guid id);
         bool SaveCustomActions(Guid id, List<CustomAction> model);
+        LinkedDataSourceConfig GetLinkedDataSourceConfig(Guid id);
+        bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model);
     }
 
     public class PortalItemService : IPortalItemService
@@ -114,31 +117,33 @@ namespace DataEditorPortal.Web.Services
             // create site menu
             var siteMenu = _mapper.Map<SiteMenu>(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
-            siteMenu.Type = "Portal Item";
-
+            siteMenu.Type = model.ItemType == "linked-single" ? "Sub Portal Item" : "Portal Item";
             _depDbContext.SiteMenus.Add(siteMenu);
 
             // create universal grid configuration
             var item = new UniversalGridConfiguration();
             item.Name = siteMenu.Name;
+            item.ItemType = model.ItemType;
             item.CreatedBy = userId;
             item.CreatedDate = DateTime.UtcNow;
-
             _depDbContext.UniversalGridConfigurations.Add(item);
 
-            // create permissions
-            var types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
-            types.ForEach(t =>
+            if (siteMenu.Type == "Portal Item")
             {
-                var permission = new SitePermission()
+                // create permissions
+                var types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
+                types.ForEach(t =>
                 {
-                    Id = Guid.NewGuid(),
-                    Category = $"Portal Item: { model.Label }",
-                    PermissionName = $"{t}_{ model.Name.Replace("-", "_") }".ToUpper(),
-                    PermissionDescription = $"{t} { model.Label }"
-                };
-                _depDbContext.Add(permission);
-            });
+                    var permission = new SitePermission()
+                    {
+                        Id = Guid.NewGuid(),
+                        Category = $"Portal Item: { model.Label }",
+                        PermissionName = $"{t}_{ model.Name.Replace("-", "_") }".ToUpper(),
+                        PermissionDescription = $"{t} { model.Label }"
+                    };
+                    _depDbContext.Add(permission);
+                });
+            }
 
             _depDbContext.SaveChanges();
 
@@ -147,7 +152,7 @@ namespace DataEditorPortal.Web.Services
 
         public Guid Update(Guid id, PortalItemData model)
         {
-            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type == "Portal Item");
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
                 throw new ApiException("Not Found", 404);
@@ -155,15 +160,18 @@ namespace DataEditorPortal.Web.Services
 
             model.Name = GetCodeName(model.Label);
 
-            // update permissions
-            var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"Portal Item: { siteMenu.Label }").ToList();
-
-            permissions.ForEach(p =>
+            if (siteMenu.Type == "Portal Item")
             {
-                p.Category = p.Category.Replace(siteMenu.Label, model.Label);
-                p.PermissionName = p.PermissionName.Replace(siteMenu.Name.Replace("-", "_").ToUpper(), model.Name.Replace("-", "_").ToUpper());
-                p.PermissionDescription = p.PermissionDescription.Replace(siteMenu.Label, model.Label);
-            });
+                // update permissions
+                var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"Portal Item: { siteMenu.Label }").ToList();
+
+                permissions.ForEach(p =>
+                {
+                    p.Category = p.Category.Replace(siteMenu.Label, model.Label);
+                    p.PermissionName = p.PermissionName.Replace(siteMenu.Name.Replace("-", "_").ToUpper(), model.Name.Replace("-", "_").ToUpper());
+                    p.PermissionDescription = p.PermissionDescription.Replace(siteMenu.Label, model.Label);
+                });
+            }
 
             var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             item.Name = model.Name;
@@ -179,7 +187,7 @@ namespace DataEditorPortal.Web.Services
             }
             _mapper.Map(model, siteMenu);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
-            siteMenu.Type = "Portal Item";
+            siteMenu.Type = model.ItemType == "linked-single" ? "Sub Portal Item" : "Portal Item";
 
             _depDbContext.SaveChanges();
             return siteMenu.Id;
@@ -298,7 +306,28 @@ namespace DataEditorPortal.Web.Services
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
-            return !string.IsNullOrEmpty(config.DataSourceConfig) ? JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig) : new DataSourceConfig();
+            if (!string.IsNullOrEmpty(config.DataSourceConfig))
+            {
+                return JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            }
+            else
+            {
+                var defaultConfig = new DataSourceConfig();
+                if (config.ItemType == GridItemType.LINKED_SINGLE)
+                {
+                    // get main configration
+                    var datasourceConnectionId = (
+                        from u in _depDbContext.UniversalGridConfigurations
+                        join mp in _depDbContext.SiteMenus on u.Name equals mp.Name
+                        join mc in _depDbContext.SiteMenus on mp.Id equals mc.ParentId
+                        where mc.Id == config.Id
+                        select u.DataSourceConnectionId
+                    ).FirstOrDefault();
+                    if (datasourceConnectionId.HasValue)
+                        defaultConfig.DataSourceConnectionId = datasourceConnectionId.Value;
+                }
+                return defaultConfig;
+            }
         }
 
         public bool SaveDataSourceConfig(Guid id, DataSourceConfig model)
@@ -422,6 +451,17 @@ namespace DataEditorPortal.Web.Services
             config.SearchConfig = JsonSerializer.Serialize(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
 
+            // save search to primary table and secondary table if current table is linked
+            if (config.ItemType == GridItemType.LINKED)
+            {
+                var query = from m in _depDbContext.SiteMenus
+                            join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name
+                            where m.ParentId == siteMenu.Id
+                            select u;
+                var list = query.ToList();
+                list.ForEach(u => u.SearchConfig = config.SearchConfig);
+            }
+
             _depDbContext.SaveChanges();
 
             return true;
@@ -502,6 +542,41 @@ namespace DataEditorPortal.Web.Services
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
             config.CustomActionConfig = JsonSerializer.Serialize(model);
+
+            _depDbContext.SaveChanges();
+
+            return true;
+        }
+
+        // linked table 
+        public LinkedDataSourceConfig GetLinkedDataSourceConfig(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            return !string.IsNullOrEmpty(config.DataSourceConfig) ? JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig) : new LinkedDataSourceConfig();
+        }
+
+        public bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            config.DataSourceConfig = JsonSerializer.Serialize(model);
+            config.DataSourceConnectionId = model.LinkedTable.DataSourceConnectionId;
+            siteMenu.Status = Data.Common.PortalItemStatus.Draft;
 
             _depDbContext.SaveChanges();
 

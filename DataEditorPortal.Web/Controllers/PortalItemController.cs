@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Text.Json;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -57,10 +58,12 @@ namespace DataEditorPortal.Web.Controllers
             var query = from m in _depDbContext.SiteMenus
                         join p in _depDbContext.UniversalGridConfigurations on m.Name equals p.Name into mps
                         from mp in mps.DefaultIfEmpty()
+                        where m.Type != "Sub Portal Item"
                         select new
                         {
                             menu = m,
-                            configCompleted = mp != null ? mp.ConfigCompleted : (bool?)null
+                            configCompleted = mp != null ? mp.ConfigCompleted : (bool?)null,
+                            itemType = mp != null ? mp.ItemType : null
                         };
 
             var menus = query.ToList();
@@ -82,6 +85,7 @@ namespace DataEditorPortal.Web.Controllers
                                     Data = _mapper.Map<PortalItemData>(m.menu)
                                 };
                                 item.Data.ConfigCompleted = m.configCompleted;
+                                item.Data.ItemType = x.itemType;
                                 return item;
                             })
                             .ToList();
@@ -92,6 +96,7 @@ namespace DataEditorPortal.Web.Controllers
                         Children = children.Any() ? children : null
                     };
                     item.Data.ConfigCompleted = x.configCompleted;
+                    item.Data.ItemType = x.itemType;
                     return item;
                 });
 
@@ -340,6 +345,7 @@ namespace DataEditorPortal.Web.Controllers
             var result = _mapper.Map<PortalItemData>(siteMenu);
             result.CurrentStep = item.CurrentStep;
             result.ConfigCompleted = item.ConfigCompleted;
+            result.ItemType = item.ItemType;
 
             return result;
         }
@@ -569,5 +575,51 @@ namespace DataEditorPortal.Web.Controllers
 
         #endregion
 
+        #region Linked Datasource
+
+        [HttpGet]
+        [Route("{id}/linked-datasource")]
+        public LinkedDataSourceConfig GetLinkedDataSourceConfig(Guid id)
+        {
+            return _portalItemService.GetLinkedDataSourceConfig(id);
+        }
+
+        [HttpPost]
+        [Route("{id}/linked-datasource")]
+        public bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model)
+        {
+            return _portalItemService.SaveLinkedDataSourceConfig(id, model);
+        }
+
+        [HttpGet]
+        [Route("{id}/linked-single-config")]
+        public dynamic GetLinkedSingleTableConfig(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (item == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            var details = _mapper.Map<PortalItemData>(siteMenu);
+            details.CurrentStep = item.CurrentStep;
+            details.ConfigCompleted = item.ConfigCompleted;
+            details.ItemType = item.ItemType;
+
+            var datasource = JsonSerializer.Deserialize<DataSourceConfig>(!string.IsNullOrEmpty(item.DataSourceConfig) ? item.DataSourceConfig : "{}");
+            var columns = JsonSerializer.Deserialize<List<GridColConfig>>(!string.IsNullOrEmpty(item.ColumnsConfig) ? item.ColumnsConfig : "[]"); ;
+
+            return new
+            {
+                details = new object[] { details },
+                idColumn = datasource.IdColumn,
+                columns = columns.Select(x => x.field)
+            };
+        }
+
+        #endregion
     }
 }

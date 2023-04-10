@@ -40,6 +40,13 @@ namespace DataEditorPortal.Web.Services
         bool UpdateGridData(string name, string id, Dictionary<string, object> model);
         bool AddGridData(string name, Dictionary<string, object> model);
         bool DeleteGridData(string name, string[] ids);
+
+        // linked table api
+        dynamic GetLinkedGridConfig(string name);
+        GridData GetLinkedTableDataForFieldControl(string table1Name, Dictionary<string, object> searches);
+        dynamic GetLinkedTableConfigForFieldControl(string tableName);
+        IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id);
+
     }
 
     public class UniversalGridService : IUniversalGridService
@@ -224,12 +231,23 @@ namespace DataEditorPortal.Web.Services
             #region compose the query text
 
             // get query text for list data from grid config.
-            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            var dataSourceConfig = new DataSourceConfig();
+            if (config.ItemType == GridItemType.LINKED)
+            {
+                var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig);
+                dataSourceConfig = linkedDataSourceConfig.LinkedTable;
+            }
+            else
+            {
+                dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            }
+
             var filtersApplied = ProcessFilterParam(dataSourceConfig.Filters, new List<FilterParam>());
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
 
             // convert search criteria to where clause
-            var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
+            var searchConfigStr = !string.IsNullOrEmpty(config.SearchConfig) ? config.SearchConfig : "[]";
+            var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(searchConfigStr);
             var searchRules = new List<FilterParam>();
             if (param.Searches != null)
             {
@@ -252,6 +270,7 @@ namespace DataEditorPortal.Web.Services
                         }
                         return param;
                     })
+                    .Where(x => x != null)
                     .ToList();
             }
             filtersApplied = ProcessFilterParam(searchRules, filtersApplied);
@@ -354,10 +373,6 @@ namespace DataEditorPortal.Web.Services
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, gridName, queryText, queryParams, ex.Message);
                 _logger.LogError(ex.Message, ex);
                 throw new DepException("An Error in the query has occurred: " + ex.Message);
-            }
-            finally
-            {
-                con.Close();
             }
 
             return output;
@@ -537,7 +552,14 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
-            return result;
+            if (config.ItemType == GridItemType.LINKED_SINGLE)
+            {
+                var list = result.AsList();
+                list.Add(new KeyValuePair<string, object>(Constants.LINK_DATA_FIELD_NAME, GetLinkDataModelForForm(config.Name, id)));
+                return list.ToDictionary(x => x.Key, x => x.Value);
+            }
+            else
+                return result;
         }
 
         public bool OnValidateGridData(string name, string type, string id, Dictionary<string, object> model)
@@ -649,6 +671,13 @@ namespace DataEditorPortal.Web.Services
                 // process file upload, store json string
                 var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
 
+                List<RelationDataModel> relationData = null;
+                if (config.ItemType == GridItemType.LINKED_SINGLE)
+                {
+                    // process link data field, get meta data and clear value in model
+                    relationData = ProcessLinkDataField(model);
+                }
+
                 // calculate the computed field values
                 AssignComputedValues(formLayout.FormFields, model, con);
 
@@ -661,6 +690,7 @@ namespace DataEditorPortal.Web.Services
                 // generate the query text
                 var queryText = _queryBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
                 {
+                    IdColumn = dataSourceConfig.IdColumn,
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
                     Columns = columns,
@@ -675,10 +705,20 @@ namespace DataEditorPortal.Web.Services
                 // excute command
                 try
                 {
-                    var affected = con.Execute(queryText, param, trans);
+                    var dynamicParameters = new DynamicParameters(param);
+                    dynamicParameters.Add("RETURNED_ID", dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
+
+                    var affected = con.Execute(queryText, dynamicParameters, trans);
+                    var returnedId = dynamicParameters.Get<string>("RETURNED_ID");
 
                     // process file upload
                     SaveUploadedFiles(config.Name, uploadedFieldsMeta);
+
+                    if (relationData != null)
+                    {
+                        // update linked data
+                        UpdateLinkData(config.Name, returnedId, relationData);
+                    }
 
                     trans.Commit();
 
@@ -752,6 +792,13 @@ namespace DataEditorPortal.Web.Services
                 // process file upload, store json string
                 var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
 
+                List<RelationDataModel> relationData = null;
+                if (config.ItemType == GridItemType.LINKED_SINGLE)
+                {
+                    // process link data field, get meta data and clear value in model
+                    relationData = ProcessLinkDataField(model);
+                }
+
                 // calculate the computed field values
                 AssignComputedValues(formLayout.FormFields, model, con);
 
@@ -787,6 +834,12 @@ namespace DataEditorPortal.Web.Services
 
                     // process file upload
                     SaveUploadedFiles(config.Name, uploadedFieldsMeta);
+
+                    if (relationData != null)
+                    {
+                        // update linked data
+                        UpdateLinkData(config.Name, id, relationData);
+                    }
 
                     trans.Commit();
 
@@ -943,8 +996,6 @@ namespace DataEditorPortal.Web.Services
                 model.Add(key, value);
         }
 
-        #endregion
-
         private void AfterSaved(EventActionModel actionConfig, Dictionary<string, object> model)
         {
             var eventConfig = actionConfig.EventConfig;
@@ -1028,6 +1079,10 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
+        #endregion
+
+        #region File upload API
+
         private IFileStorageService GetFileStorageService(FileStorageType type)
         {
             switch (type)
@@ -1077,5 +1132,243 @@ namespace DataEditorPortal.Web.Services
                 fileStorageService.SaveFiles(meta.Value, gridName);
             }
         }
+
+        #endregion
+
+        #region Linked Data API
+
+        public GridData GetLinkedTableDataForFieldControl(string table1Name, Dictionary<string, object> searches)
+        {
+            var linkedTableInfo = GetLinkedTableInfo(table1Name);
+
+            return GetGridData(linkedTableInfo.Table2Name, new GridParam() { IndexCount = 50, StartIndex = 0, Searches = searches });
+        }
+        public dynamic GetLinkedTableConfigForFieldControl(string table1Name)
+        {
+            // get table2 info
+            var linkedTableInfo = GetLinkedTableInfo(table1Name);
+
+            var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(linkedTableInfo.DataSourceConfig);
+            var columnsForLinkedField = linkedDataSourceConfig.PrimaryTable.Id == linkedTableInfo.Table2Id
+                ? linkedDataSourceConfig.PrimaryTable.ColumnsForLinkedField
+                : linkedDataSourceConfig.SecondaryTable.ColumnsForLinkedField;
+            var columns = GetGridColumnsConfig(linkedTableInfo.Table2Name);
+
+            return new
+            {
+                columns = columns.Where(c => columnsForLinkedField.Contains(c.field)).ToList(),
+                dataKey = linkedTableInfo.IdColumn
+            };
+        }
+
+        public IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id)
+        {
+            var linkedTableInfo = GetLinkedTableInfo(table1Name);
+
+            var filters = new List<FilterParam>() {
+                new FilterParam() {
+                    field = linkedTableInfo.Table2MappingField,
+                    value = table2Id,
+                    matchMode = "equals"
+                }
+            };
+
+            var linkedData = GetGridData(linkedTableInfo.Name, new GridParam() { IndexCount = -1, Filters = filters });
+            var savedTable1Ids = linkedData.Data.Select(x => x[linkedTableInfo.Table1MappingField]);
+
+            return savedTable1Ids;
+        }
+        public dynamic GetLinkedGridConfig(string name)
+        {
+            var item = _depDbContext.SiteMenus.Where(x => x.Name == name).FirstOrDefault();
+            if (item == null) throw new DepException($"Portal Item with name:{name} deosn't exists");
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig);
+            var primary = _depDbContext.SiteMenus.Where(x => x.ParentId == item.Id && x.Id == dataSourceConfig.PrimaryTable.Id).FirstOrDefault();
+            var secondary = _depDbContext.SiteMenus.Where(x => x.ParentId == item.Id && x.Id == dataSourceConfig.SecondaryTable.Id).FirstOrDefault();
+
+            return new
+            {
+                PrimaryTableName = primary != null ? primary.Name : null,
+                SecondaryTableName = secondary != null ? secondary.Name : null
+            };
+        }
+
+        private LinkedTableInfo GetLinkedTableInfo(string table1Name)
+        {
+            var queryTables = from u in _depDbContext.UniversalGridConfigurations
+                              join m in _depDbContext.SiteMenus on u.Name equals m.Name
+                              select new { m, u };
+
+            var queryTable1 = queryTables.Where(t => t.m.Name == table1Name && t.u.ItemType == GridItemType.LINKED_SINGLE);
+
+            var queryTable2 = from t in queryTables
+                              join t1 in queryTable1 on t.m.ParentId equals t1.m.ParentId
+                              where t.u.ItemType == GridItemType.LINKED_SINGLE && t.u.Name != table1Name
+                              select t;
+
+            var resultQuery = from t2 in queryTable2
+                              join tMain in queryTables on t2.m.ParentId equals tMain.m.Id
+                              select new LinkedTableInfo
+                              {
+                                  Table2Name = t2.m.Name,
+                                  Table2Id = t2.m.Id,
+                                  Id = tMain.m.Id,
+                                  Name = tMain.m.Name,
+                                  DataSourceConfig = tMain.u.DataSourceConfig
+                              };
+            var result = resultQuery.FirstOrDefault();
+
+            var config = JsonSerializer.Deserialize<LinkedDataSourceConfig>(result.DataSourceConfig);
+            result.IdColumn = config.LinkedTable.IdColumn;
+            result.Table1MappingField = config.PrimaryTable.Id == result.Table2Id
+                ? config.SecondaryTable.MapToLinkedTableField
+                : config.PrimaryTable.MapToLinkedTableField;
+            result.Table2MappingField = config.PrimaryTable.Id == result.Table2Id
+                ? config.PrimaryTable.MapToLinkedTableField
+                : config.SecondaryTable.MapToLinkedTableField;
+
+            return result;
+        }
+        private List<RelationDataModel> GetLinkDataModelForForm(string table1Name, string table1Id)
+        {
+            var linkedTableInfo = GetLinkedTableInfo(table1Name);
+
+            List<RelationDataModel> relationData = new List<RelationDataModel>();
+            if (!string.IsNullOrEmpty(table1Id))
+            {
+                var filters = new List<FilterParam>() {
+                    new FilterParam() {
+                        field = linkedTableInfo.Table1MappingField,
+                        value = table1Id,
+                        matchMode = "equals"
+                    }
+                };
+
+                var linkedData = GetGridData(linkedTableInfo.Name, new GridParam() { IndexCount = -1, Filters = filters });
+                relationData = linkedData.Data.Select(x => new RelationDataModel()
+                {
+                    Id = x[linkedTableInfo.IdColumn].ToString(),
+                    Table1Id = table1Id,
+                    Table2Id = x[linkedTableInfo.Table2MappingField].ToString()
+                }).ToList();
+            }
+
+            return relationData;
+        }
+        private List<RelationDataModel> ProcessLinkDataField(Dictionary<string, object> model)
+        {
+            List<RelationDataModel> result = null;
+            if (model.ContainsKey(Constants.LINK_DATA_FIELD_NAME) && model[Constants.LINK_DATA_FIELD_NAME] != null)
+            {
+                var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                var jsonElement = (JsonElement)model[Constants.LINK_DATA_FIELD_NAME];
+                if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
+                {
+                    var valueStr = jsonElement.ToString();
+                    result = JsonSerializer.Deserialize<List<RelationDataModel>>(valueStr, jsonOptions);
+                    model[Constants.LINK_DATA_FIELD_NAME] = null;
+                }
+            }
+            return result;
+        }
+        private void UpdateLinkData(string table1Name, string table1Id, List<RelationDataModel> inputModel)
+        {
+            var existingModel = GetLinkDataModelForForm(table1Name, table1Id);
+
+            // get main configration
+            var query = (
+                from u in _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection)
+                join mp in _depDbContext.SiteMenus on u.Name equals mp.Name
+                join mc in _depDbContext.SiteMenus on mp.Id equals mc.ParentId
+                where mc.Name == table1Name
+                select new { u, mc.Id }
+            ).FirstOrDefault();
+
+            var mainConfiguration = query.u;
+            var table1PortalItemId = query.Id;
+
+            var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(mainConfiguration.DataSourceConfig);
+
+            var table1Field = linkedDataSourceConfig.PrimaryTable.Id == table1PortalItemId
+                ? linkedDataSourceConfig.PrimaryTable.MapToLinkedTableField
+                : linkedDataSourceConfig.SecondaryTable.MapToLinkedTableField;
+            var table2Field = linkedDataSourceConfig.PrimaryTable.Id == table1PortalItemId
+                ? linkedDataSourceConfig.SecondaryTable.MapToLinkedTableField
+                : linkedDataSourceConfig.PrimaryTable.MapToLinkedTableField;
+
+            var columns = new List<string>() { table1Field, table2Field };
+
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+            {
+                con.ConnectionString = mainConfiguration.DataSourceConnection.ConnectionString;
+                //var trans = con.BeginTransaction();
+
+                try
+                {
+                    var toAdd = inputModel
+                        .Where(input => existingModel.All(existing => !(existing.Table1Id == input.Table1Id && existing.Table2Id == input.Table2Id)))
+                        .Select(x => x.Table2Id);
+                    if (toAdd.Any())
+                    {
+                        linkedDataSourceConfig.LinkedTable.Columns = columns;
+                        var sql = _queryBuilder.GenerateSqlTextForInsert(linkedDataSourceConfig.LinkedTable);
+
+                        var param = new List<object>();
+                        foreach (var table2Id in toAdd)
+                        {
+                            var value = new List<KeyValuePair<string, object>>();
+                            value.Add(new KeyValuePair<string, object>(table1Field, table1Id));
+                            value.Add(new KeyValuePair<string, object>(table2Field, table2Id));
+                            var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
+                            dynamicParameters.Add("RETURNED_ID", dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
+
+                            param.Add(dynamicParameters);
+                        }
+
+                        con.Execute(sql, param);
+                    }
+
+                    var toDelete = existingModel
+                        .Where(existing => inputModel.All(input => !(input.Table1Id == existing.Table1Id && input.Table2Id == existing.Table2Id)))
+                        .Select(x => x.Id);
+                    if (toDelete.Any())
+                    {
+                        var deleteSql = _queryBuilder.GenerateSqlTextForDelete(linkedDataSourceConfig.LinkedTable);
+                        var deleteParam = _queryBuilder.GenerateDynamicParameter(
+                            new List<KeyValuePair<string, object>>() {
+                        new KeyValuePair<string, object>(linkedDataSourceConfig.LinkedTable.IdColumn, toDelete)
+                            });
+                        con.Execute(deleteSql, deleteParam);
+                    }
+                    //trans.Commit();
+                }
+                catch (Exception ex)
+                {
+                    //trans.Rollback();
+                    _logger.LogError(ex.Message, ex);
+                    throw ex;
+                }
+            }
+        }
+
+        #endregion
+
+    }
+
+    class LinkedTableInfo
+    {
+        public string Table2Name { get; set; }
+        public Guid Table2Id { get; set; }
+        public string Name { get; set; }
+        public Guid Id { get; set; }
+        public string IdColumn { get; set; }
+        public string DataSourceConfig { get; set; }
+        public string Table2MappingField { get; set; }
+        public string Table1MappingField { get; set; }
     }
 }
