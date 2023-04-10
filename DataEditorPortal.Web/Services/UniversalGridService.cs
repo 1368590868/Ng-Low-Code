@@ -906,6 +906,9 @@ namespace DataEditorPortal.Web.Services
                 try
                 {
                     var affected = con.Execute(queryText, param, trans);
+
+                    RemoveLinkedData(config.Name, ids);
+
                     trans.Commit();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
@@ -1157,7 +1160,7 @@ namespace DataEditorPortal.Web.Services
             return new
             {
                 columns = columns.Where(c => columnsForLinkedField.Contains(c.field)).ToList(),
-                dataKey = linkedTableInfo.IdColumn
+                dataKey = linkedTableInfo.LinkedTable.IdColumn
             };
         }
 
@@ -1200,7 +1203,7 @@ namespace DataEditorPortal.Web.Services
 
         private LinkedTableInfo GetLinkedTableInfo(string table1Name)
         {
-            var queryTables = from u in _depDbContext.UniversalGridConfigurations
+            var queryTables = from u in _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection)
                               join m in _depDbContext.SiteMenus on u.Name equals m.Name
                               select new { m, u };
 
@@ -1219,12 +1222,13 @@ namespace DataEditorPortal.Web.Services
                                   Table2Id = t2.m.Id,
                                   Id = tMain.m.Id,
                                   Name = tMain.m.Name,
+                                  ConnectionString = tMain.u.DataSourceConnection.ConnectionString,
                                   DataSourceConfig = tMain.u.DataSourceConfig
                               };
             var result = resultQuery.FirstOrDefault();
 
             var config = JsonSerializer.Deserialize<LinkedDataSourceConfig>(result.DataSourceConfig);
-            result.IdColumn = config.LinkedTable.IdColumn;
+            result.LinkedTable = config.LinkedTable;
             result.Table1MappingField = config.PrimaryTable.Id == result.Table2Id
                 ? config.SecondaryTable.MapToLinkedTableField
                 : config.PrimaryTable.MapToLinkedTableField;
@@ -1252,7 +1256,7 @@ namespace DataEditorPortal.Web.Services
                 var linkedData = GetGridData(linkedTableInfo.Name, new GridParam() { IndexCount = -1, Filters = filters });
                 relationData = linkedData.Data.Select(x => new RelationDataModel()
                 {
-                    Id = x[linkedTableInfo.IdColumn].ToString(),
+                    Id = x[linkedTableInfo.LinkedTable.IdColumn].ToString(),
                     Table1Id = table1Id,
                     Table2Id = x[linkedTableInfo.Table2MappingField].ToString()
                 }).ToList();
@@ -1280,32 +1284,13 @@ namespace DataEditorPortal.Web.Services
         {
             var existingModel = GetLinkDataModelForForm(table1Name, table1Id);
 
-            // get main configration
-            var query = (
-                from u in _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection)
-                join mp in _depDbContext.SiteMenus on u.Name equals mp.Name
-                join mc in _depDbContext.SiteMenus on mp.Id equals mc.ParentId
-                where mc.Name == table1Name
-                select new { u, mc.Id }
-            ).FirstOrDefault();
+            var linkedTableInfo = GetLinkedTableInfo(table1Name);
 
-            var mainConfiguration = query.u;
-            var table1PortalItemId = query.Id;
-
-            var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(mainConfiguration.DataSourceConfig);
-
-            var table1Field = linkedDataSourceConfig.PrimaryTable.Id == table1PortalItemId
-                ? linkedDataSourceConfig.PrimaryTable.MapToLinkedTableField
-                : linkedDataSourceConfig.SecondaryTable.MapToLinkedTableField;
-            var table2Field = linkedDataSourceConfig.PrimaryTable.Id == table1PortalItemId
-                ? linkedDataSourceConfig.SecondaryTable.MapToLinkedTableField
-                : linkedDataSourceConfig.PrimaryTable.MapToLinkedTableField;
-
-            var columns = new List<string>() { table1Field, table2Field };
+            var columns = new List<string>() { linkedTableInfo.Table1MappingField, linkedTableInfo.Table2MappingField };
 
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
-                con.ConnectionString = mainConfiguration.DataSourceConnection.ConnectionString;
+                con.ConnectionString = linkedTableInfo.ConnectionString;
                 //var trans = con.BeginTransaction();
 
                 try
@@ -1315,15 +1300,15 @@ namespace DataEditorPortal.Web.Services
                         .Select(x => x.Table2Id);
                     if (toAdd.Any())
                     {
-                        linkedDataSourceConfig.LinkedTable.Columns = columns;
-                        var sql = _queryBuilder.GenerateSqlTextForInsert(linkedDataSourceConfig.LinkedTable);
+                        linkedTableInfo.LinkedTable.Columns = columns;
+                        var sql = _queryBuilder.GenerateSqlTextForInsert(linkedTableInfo.LinkedTable);
 
                         var param = new List<object>();
                         foreach (var table2Id in toAdd)
                         {
                             var value = new List<KeyValuePair<string, object>>();
-                            value.Add(new KeyValuePair<string, object>(table1Field, table1Id));
-                            value.Add(new KeyValuePair<string, object>(table2Field, table2Id));
+                            value.Add(new KeyValuePair<string, object>(linkedTableInfo.Table1MappingField, table1Id));
+                            value.Add(new KeyValuePair<string, object>(linkedTableInfo.Table2MappingField, table2Id));
                             var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
                             dynamicParameters.Add("RETURNED_ID", dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
 
@@ -1338,10 +1323,10 @@ namespace DataEditorPortal.Web.Services
                         .Select(x => x.Id);
                     if (toDelete.Any())
                     {
-                        var deleteSql = _queryBuilder.GenerateSqlTextForDelete(linkedDataSourceConfig.LinkedTable);
+                        var deleteSql = _queryBuilder.GenerateSqlTextForDelete(linkedTableInfo.LinkedTable);
                         var deleteParam = _queryBuilder.GenerateDynamicParameter(
                             new List<KeyValuePair<string, object>>() {
-                        new KeyValuePair<string, object>(linkedDataSourceConfig.LinkedTable.IdColumn, toDelete)
+                        new KeyValuePair<string, object>(linkedTableInfo.LinkedTable.IdColumn, toDelete)
                             });
                         con.Execute(deleteSql, deleteParam);
                     }
@@ -1351,7 +1336,45 @@ namespace DataEditorPortal.Web.Services
                 {
                     //trans.Rollback();
                     _logger.LogError(ex.Message, ex);
-                    throw ex;
+                    throw;
+                }
+            }
+        }
+        private void RemoveLinkedData(string table1Name, string[] table1Ids)
+        {
+            var linkedTableInfo = GetLinkedTableInfo(table1Name);
+
+            List<RelationDataModel> relationData = new List<RelationDataModel>();
+            if (table1Ids.Any())
+            {
+                var filters = new List<FilterParam>() {
+                    new FilterParam() {
+                        field = linkedTableInfo.Table1MappingField,
+                        value = table1Ids,
+                        matchMode = "in"
+                    }
+                };
+                var linkedData = GetGridData(linkedTableInfo.Name, new GridParam() { IndexCount = -1, Filters = filters });
+                var ids = linkedData.Data.Select(x => x[linkedTableInfo.LinkedTable.IdColumn].ToString()).ToList();
+
+                var queryText = _queryBuilder.GenerateSqlTextForDelete(linkedTableInfo.LinkedTable);
+                var param = _queryBuilder.GenerateDynamicParameter(
+                        new List<KeyValuePair<string, object>>() {
+                            new KeyValuePair<string, object>(linkedTableInfo.LinkedTable.IdColumn, ids)
+                            }
+                        );
+                try
+                {
+                    using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                    {
+                        con.ConnectionString = linkedTableInfo.ConnectionString;
+                        con.Open();
+                        con.Execute(queryText, param);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, ex);
                 }
             }
         }
@@ -1366,7 +1389,9 @@ namespace DataEditorPortal.Web.Services
         public Guid Table2Id { get; set; }
         public string Name { get; set; }
         public Guid Id { get; set; }
-        public string IdColumn { get; set; }
+
+        public string ConnectionString { get; set; }
+        public DataSourceConfig LinkedTable { get; set; }
         public string DataSourceConfig { get; set; }
         public string Table2MappingField { get; set; }
         public string Table1MappingField { get; set; }
