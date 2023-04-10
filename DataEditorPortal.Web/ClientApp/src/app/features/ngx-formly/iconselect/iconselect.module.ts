@@ -5,7 +5,6 @@ import { FormlyModule } from '@ngx-formly/core';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormlySelectModule as FormlyCoreSelectModule } from '@ngx-formly/core/select';
 
-import { FormlyFormFieldModule } from '@ngx-formly/primeng/form-field';
 import { FormlyFieldIconSelectComponent } from './iconselect.type';
 
 @NgModule({
@@ -14,8 +13,6 @@ import { FormlyFieldIconSelectComponent } from './iconselect.type';
     CommonModule,
     ReactiveFormsModule,
     DropdownModule,
-
-    FormlyFormFieldModule,
     FormlyCoreSelectModule,
     FormlyModule.forChild({
       types: [

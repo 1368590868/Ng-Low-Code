@@ -6,7 +6,8 @@ import {
   GridColumn,
   GridConfig,
   GridResult,
-  GridSearchConfig
+  GridSearchConfig,
+  LinkedGridConfig
 } from '../models/grid-types';
 
 @Injectable()
@@ -24,6 +25,30 @@ export class GridTableService {
         `${this._apiUrl}universal-grid/${name}/grid-config`
       )
       .pipe(map(res => res.result || { dataKey: 'Id' }));
+  }
+
+  getLinkedTableConfig(name: string): Observable<LinkedGridConfig> {
+    return this.http
+      .get<ApiResponse<LinkedGridConfig>>(
+        `${this._apiUrl}universal-grid/${name}/linked/grid-config`
+      )
+      .pipe(
+        map(
+          res => res.result || { primaryTableName: '', secondaryTableName: '' }
+        )
+      );
+  }
+
+  getHighlightLinkedData(
+    table1Name: string,
+    table2Id: string
+  ): Observable<any[]> {
+    return this.http
+      .get<ApiResponse<any[]>>(
+        `${this._apiUrl}universal-grid/${table1Name}/linked/grid-data-ids`,
+        { params: { table2Id } }
+      )
+      .pipe(map(res => res.result || []));
   }
 
   getTableColumns(name: string): Observable<GridColumn[]> {

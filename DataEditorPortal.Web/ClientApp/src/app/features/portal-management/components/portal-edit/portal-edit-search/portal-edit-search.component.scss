@@ -52,8 +52,32 @@
     }
   }
 
-  .remove-btn {
-    width: 2rem !important;
-    height: 2rem !important;
+  .isLinkedItem {
+    .p-picklist-source-wrapper,
+    .p-picklist-buttons {
+      display: none;
+    }
+  }
+
+  .p-picklist .p-picklist-list .p-picklist-item {
+    max-width: 450px;
+    margin: 0 auto;
+    .remove-btn {
+      opacity: 0;
+      transition: opacity var(--transition-duration);
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 9999;
+      .p-button.p-button-icon-only {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+    &:hover {
+      .remove-btn {
+        opacity: 1;
+      }
+    }
   }
 }

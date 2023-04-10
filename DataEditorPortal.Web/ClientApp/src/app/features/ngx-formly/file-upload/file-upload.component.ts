@@ -72,15 +72,20 @@ export class FileUploadComponent implements ControlValueAccessor {
     this.apiUrl = apiUrl;
   }
 
+  onFileUploadSelect(event: any, AttachmentsRef: any) {
+    if (
+      event.currentFiles.length + this.newAttachments.length >
+      this.fileLimit
+    ) {
+      this.notifyService.notifyError('Error', 'File Limit Exceeded');
+      AttachmentsRef.clear();
+    } else {
+      AttachmentsRef.upload();
+    }
+  }
+
   onUpload(event: any) {
     if (event?.originalEvent?.body?.result) {
-      if (
-        this.fileLimit &&
-        event.originalEvent.body.result.length > this.fileLimit
-      ) {
-        this.notifyService.notifyError('Error', 'File Limit Exceeded');
-        return;
-      }
       for (const file of event.originalEvent.body.result) {
         this.newAttachments.push(file);
       }
@@ -97,6 +102,10 @@ export class FileUploadComponent implements ControlValueAccessor {
     this.progress = Math.round(
       (event.originalEvent.loaded * 100) / event.originalEvent.total
     );
+  }
+
+  onEditComments() {
+    this.onChange(JSON.stringify(this.newAttachments));
   }
 
   tempAttachmentDownload(data: any) {

@@ -1,4 +1,5 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { GridTableService } from '../../services/grid-table.service';
 import { TableComponent } from '../table/table.component';
 
 @Component({
@@ -6,21 +7,36 @@ import { TableComponent } from '../table/table.component';
   templateUrl: './linked-table.component.html',
   styleUrls: ['./linked-table.component.scss']
 })
-export class LinkedTableComponent {
+export class LinkedTableComponent implements OnInit {
   @Input() gridName!: string;
 
-  @ViewChild('masterTable') masterTable!: TableComponent;
-  @ViewChild('slaveTable') slaveTable!: TableComponent;
+  @ViewChild('primaryTable') primaryTable!: TableComponent;
+  @ViewChild('secondaryTable') secondaryTable!: TableComponent;
+  primaryTableName!: string;
+  secondaryTableName!: string;
 
-  onMasterRowSelect(event: any) {
-    console.log(event);
-    // mark linked data highlighted
-    // this.slaveTable.fetchData();
+  constructor(private gridTableService: GridTableService) {}
+
+  ngOnInit(): void {
+    this.gridTableService.getLinkedTableConfig(this.gridName).subscribe(res => {
+      this.primaryTableName = res.primaryTableName;
+      this.secondaryTableName = res.secondaryTableName;
+    });
   }
 
-  onSlaveRowSelect(event: any) {
-    console.log(event);
+  onPrimaryRowSelect(event: any) {
     // mark linked data highlighted
-    // this.masterTable.fetchData();
+    this.primaryTable.clearHighlighted();
+    this.secondaryTable.highlightLinkedData(
+      event.data[this.primaryTable.tableConfig.dataKey]
+    );
+  }
+
+  onSecondaryRowSelect(event: any) {
+    // mark linked data highlighted
+    this.secondaryTable.clearHighlighted();
+    this.primaryTable.highlightLinkedData(
+      event.data[this.secondaryTable.tableConfig.dataKey]
+    );
   }
 }

@@ -6,22 +6,29 @@ import {
   ViewChildren
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions } from '@ngx-formly/core';
 import { MenuItem } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
-import { forkJoin, tap } from 'rxjs';
+import { forkJoin, of, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
-import { GridFormField, GridSearchField } from '../../../models/portal-item';
+import {
+  DataSourceTableColumn,
+  GridFormField,
+  GridSearchField
+} from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import { FormDesignerViewComponent } from '../form-designer/form-designer-view.component';
+import { FormDesignerViewComponent } from '../../form-designer/form-designer-view.component';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 
 @Component({
   selector: 'app-portal-edit-search',
   templateUrl: './portal-edit-search.component.html',
   styleUrls: ['./portal-edit-search.component.scss']
 })
-export class PortalEditSearchComponent implements OnInit {
+export class PortalEditSearchComponent
+  extends PortalEditStepDirective
+  implements OnInit
+{
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
@@ -73,19 +80,28 @@ export class PortalEditSearchComponent implements OnInit {
     }
   ];
 
+  get itemId() {
+    return this.portalItemService.itemId;
+  }
+  get isLinkedItem() {
+    return this.portalItemService.itemType === 'linked';
+  }
+
   constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
     private notifyService: NotifyService,
     @Inject('FROM_DESIGNER_CONTROLS') private controls: any[]
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.itemId) {
       forkJoin([
         this.portalItemService.getGridSearchConfig(),
-        this.portalItemService.getDataSourceTableColumnsByPortalId()
+        this.isLinkedItem
+          ? of<DataSourceTableColumn[]>([])
+          : this.portalItemService.getDataSourceTableColumnsByPortalId()
       ]).subscribe(res => {
         this.isLoading = false;
         this.targetColumns = res[0].map<GridSearchField>(x => {
@@ -169,7 +185,7 @@ export class PortalEditSearchComponent implements OnInit {
 
   saveGridSearchConfig() {
     this.isSaving = true;
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.portalItemService.itemId) {
       this.portalItemService
         .saveGridSearchConfig(this.targetColumns)
         .pipe(
@@ -188,20 +204,12 @@ export class PortalEditSearchComponent implements OnInit {
   }
 
   saveSucess() {
-    let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      next = ['../form'];
+      this.saveNextEvent.emit();
     }
     if (this.isSavingAndExit) {
-      this.notifyService.notifySuccess(
-        'Success',
-        'Save Draft Successfully Completed.'
-      );
-      next = ['../../../list'];
+      this.saveDraftEvent.emit();
     }
-    this.router.navigate(next, {
-      relativeTo: this.activatedRoute
-    });
   }
 
   onSaveAndNext() {
@@ -217,19 +225,17 @@ export class PortalEditSearchComponent implements OnInit {
   }
 
   onBack() {
-    this.router.navigate(['../columns'], {
-      relativeTo: this.activatedRoute
-    });
+    this.backEvent.emit();
   }
 
   onAddCustomColumn(filterType: string) {
-    const count = this.targetColumns.filter(
-      x => x.key.indexOf('CUSTOM_SEARCH_') === 0
-    ).length;
-
+    let index = 1;
+    for (index = 1; index <= 100; index++) {
+      if (!this.targetColumns.find(x => x.key === `CUSTOM_SEARCH_${index}`))
+        break;
+    }
+    const key = `CUSTOM_SEARCH_${index}`;
     const result = this.controls.filter(c => c.filterType === filterType);
-    const key = `CUSTOM_SEARCH_${count + 1}`;
-
     this.targetColumns = [
       {
         key: key,
@@ -246,5 +252,17 @@ export class PortalEditSearchComponent implements OnInit {
       },
       ...this.targetColumns
     ];
+  }
+
+  onRemoveCustomColumn(event: MouseEvent, field: GridSearchField) {
+    event.stopPropagation();
+    const index = this.targetColumns.findIndex(x => x.key === field.key);
+    console.log(index);
+    if (index >= 0) {
+      this.targetColumns.splice(index, 1);
+      if (field.key === this.model.key) {
+        this.model = {};
+      }
+    }
   }
 }

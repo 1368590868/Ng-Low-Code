@@ -41,7 +41,7 @@ const routes: Routes = [
     canActivate: [AuthRouterGuard, PermissionRouterGuard]
   },
   {
-    path: 'portal-item/:name',
+    path: 'portal-item',
     loadChildren: () =>
       import('./features/universal-grid/universal-grid.module').then(
         m => m.UniversalGridModule

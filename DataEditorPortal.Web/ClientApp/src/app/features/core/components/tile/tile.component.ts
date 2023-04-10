@@ -27,7 +27,7 @@ export class TileComponent implements OnInit {
                 ...menu,
                 routerLink:
                   menu.type === 'Portal Item'
-                    ? `/portal-item/${menu.name.toLowerCase()}`
+                    ? `/portal-item/${menu.itemType}/${menu.name.toLowerCase()}`
                     : menu.type !== 'External'
                     ? menu.link
                     : undefined

@@ -36,11 +36,11 @@
             <h3>
               {{ tableConfig.caption }}
               <a
-                class="ml-3 text-primary"
-                [href]="tableConfig.helpUrl"
-                target="_blank"
+                class="ml-3 text-primary absolute"
+                style="right: 0.72rem"
+                (click)="openHelpUrl(tableConfig.helpUrl)"
                 *ngIf="tableConfig.helpUrl"
-                ><i class="pi pi-external-link"></i
+                ><i class="pi text-lg pi-external-link cursor-pointer"></i
               ></a>
             </h3>
             <p
@@ -95,7 +95,8 @@
               *ngIf="
                 col.filterType &&
                 col.filterType !== 'none' &&
-                col.filterType !== 'enums'
+                col.filterType !== 'enums' &&
+                col.filterType !== 'upload'
               "
               style="vertical-align: middle"
               [type]="col.filterType"
@@ -134,7 +135,7 @@
       </ng-template>
 
       <ng-template pTemplate="body" let-data let-columns="columns">
-        <tr [pSelectableRow]="data">
+        <tr [pSelectableRow]="data" [class]="data['linked_highlighted']">
           <td *ngIf="selectionMode === 'multiple'">
             <p-tableCheckbox
               [value]="data"
@@ -153,7 +154,9 @@
             </div>
           </td>
 
-          <td *ngFor="let col of columns" [title]="data[col.field] || ''">
+          <td
+            *ngFor="let col of columns"
+            [title]="col.filterType !== 'upload' ? data[col.field] || '' : ''">
             <ng-container
               *ngIf="!col.template"
               [ngTemplateOutlet]="
@@ -163,6 +166,8 @@
                   ? numeric
                   : col.filterType === 'boolean'
                   ? boolean
+                  : col.filterType === 'upload'
+                  ? upload
                   : normal
               "></ng-container>
             <ng-template #boolean>{{ data[col.field] | boolean }}</ng-template>
@@ -174,6 +179,9 @@
               data[col.field]
                 | number : (col.format === '' ? undefined : col.format)
             }}</ng-template>
+            <ng-template #upload
+              ><span [innerHTML]="data[col.field] | upload"></span
+            ></ng-template>
             <ng-template #normal>{{ data[col.field] }}</ng-template>
             <span
               *ngIf="col.template"
@@ -209,3 +217,13 @@
     [showCurrentPageReport]="true"
     [showPageLinks]="true"></p-paginator>
 </div>
+
+<p-sidebar
+  *ngIf="visible"
+  [(visible)]="visible"
+  position="right"
+  [baseZIndex]="10000"
+  [modal]="false"
+  class="sidebar">
+  <iframe [src]="helpUrl" class="w-full h-full" frameborder="0"></iframe>
+</p-sidebar>

@@ -1,20 +1,22 @@
 <p-splitter #splitter layout="vertical" class="h-full">
   <ng-template pTemplate>
     <app-table
-      #masterTable
+      *ngIf="primaryTableName"
+      #primaryTable
       class="flex-grow-1"
       headerSize="compact"
-      gridName="demo-item"
+      [gridName]="primaryTableName"
       selectionMode="single"
-      (rowSelect)="onMasterRowSelect($event)"></app-table>
+      (rowSelect)="onPrimaryRowSelect($event)"></app-table>
   </ng-template>
   <ng-template pTemplate>
     <app-table
-      #slaveTable
+      *ngIf="secondaryTableName"
+      #secondaryTable
       class="flex-grow-1"
       headerSize="compact"
-      gridName="test-demo-1"
+      [gridName]="secondaryTableName"
       selectionMode="single"
-      (rowSelect)="onSlaveRowSelect($event)"></app-table>
+      (rowSelect)="onSecondaryRowSelect($event)"></app-table>
   </ng-template>
 </p-splitter>

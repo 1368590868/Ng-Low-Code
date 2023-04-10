@@ -66,16 +66,20 @@ import {
   FormLayoutComponent,
   AdvancedQueryDialogComponent,
   DbConnectionDialogComponent,
-  FormLayoutDeleteComponent
+  FormLayoutDeleteComponent,
+  EventConfigComponent,
+  PortalEditLinkComponent,
+  PortalEditLinkTableComponent
 } from './components';
 import { MonacoEditorConfig } from './monaco-editor-config';
-import { EventConfigComponent } from './components/portal-edit/portal-edit-form/form-layout/event-config/event-config.component';
+import { PortalEditStepDirective } from './directives/portal-edit-step.directive';
 
 @NgModule({
   declarations: [
     PortalListComponent,
     AddPortalDialogComponent,
     PortalEditComponent,
+    PortalEditStepDirective,
     PortalEditBasicComponent,
     PortalEditDatasourceComponent,
     PortalEditColumnsComponent,
@@ -98,7 +102,9 @@ import { EventConfigComponent } from './components/portal-edit/portal-edit-form/
     AdvancedQueryDialogComponent,
     DbConnectionDialogComponent,
     FormLayoutDeleteComponent,
-    EventConfigComponent
+    EventConfigComponent,
+    PortalEditLinkComponent,
+    PortalEditLinkTableComponent
   ],
   imports: [
     CommonModule,

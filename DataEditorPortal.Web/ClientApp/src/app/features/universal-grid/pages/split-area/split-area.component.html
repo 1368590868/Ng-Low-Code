@@ -8,6 +8,8 @@
   #splitter>
   <ng-template pTemplate>
     <p-button
+      @fadeInOut
+      *ngIf="gridName"
       [@fadeInOutButton]="!configDataService.sidebarCollapsed ? 'show' : 'hide'"
       icon="pi pi-arrow-left"
       class="expand-btn"
@@ -17,16 +19,20 @@
     <div class="search-area w-full">
       <app-search
         @fadeInOut
-        *ngIf="!configDataService.sidebarCollapsed && currentPortalItem"
-        [gridName]="currentPortalItem"></app-search>
+        *ngIf="!configDataService.sidebarCollapsed && gridName"
+        [gridName]="gridName"></app-search>
     </div>
   </ng-template>
   <ng-template pTemplate>
     <div class="table-area w-full">
       <app-table
         @fadeInOut
-        *ngIf="currentPortalItem"
-        [gridName]="currentPortalItem"></app-table>
+        *ngIf="itemType === 'single' && gridName"
+        [gridName]="gridName"></app-table>
+      <app-linked-table
+        @fadeInOut
+        *ngIf="itemType === 'linked' && gridName"
+        [gridName]="gridName"></app-linked-table>
     </div>
   </ng-template>
 </p-splitter>

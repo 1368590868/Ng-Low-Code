@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 import { InputMaskModule } from 'primeng/inputmask';
-
-import { FormlyFormFieldModule } from '@ngx-formly/primeng/form-field';
 import { FormlyFieldInputMaskComponent } from './input-mask.type';
 
 @NgModule({
@@ -13,8 +11,6 @@ import { FormlyFieldInputMaskComponent } from './input-mask.type';
     CommonModule,
     ReactiveFormsModule,
     InputMaskModule,
-
-    FormlyFormFieldModule,
     FormlyModule.forChild({
       types: [
         {

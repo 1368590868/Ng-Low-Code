@@ -14,6 +14,8 @@ import { FormlyTriStateCheckBoxModule } from './triStateCheckbox';
 import { DateValidatorModule } from './datevalidator';
 import { UniversalRegexpModule } from './universalregexp';
 import { FormlyFileUploadModule } from './file-upload/file-upload.modules';
+import { FormlyFormFieldModule } from './form-field/form-field.module';
+import { FormlyLinkDataEditorModule } from './link-data-editor';
 
 @NgModule({
   imports: [
@@ -31,7 +33,9 @@ import { FormlyFileUploadModule } from './file-upload/file-upload.modules';
     FormlyTriStateCheckBoxModule,
     DateValidatorModule,
     UniversalRegexpModule,
-    FormlyFileUploadModule
+    FormlyFileUploadModule,
+    FormlyFormFieldModule,
+    FormlyLinkDataEditorModule
   ]
 })
 export class FormlyCustomTypeModule {}

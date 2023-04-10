@@ -63,7 +63,9 @@ export class NavMenuComponent implements OnInit {
       };
     }
     if (menu.type === 'Portal Item') {
-      menu.routerLink = `/portal-item/${menu.name.toLowerCase()}`;
+      menu.routerLink = `/portal-item/${
+        menu.itemType
+      }/${menu.name.toLowerCase()}`;
     } else if (menu.type === 'External') {
       menu.url = menu.link;
     } else menu.routerLink = menu.link;

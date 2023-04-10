@@ -1,13 +1,12 @@
 <div class="layout-content py-3 px-3">
   <div class="p-card p-4 mb-3 shadow-1">
-    <h2 class="mb-4" *ngIf="portalItemService.currentPortalItemCaption">
-      {{ portalItemService.currentPortalItemCaption }}
+    <h2 class="mb-4" *ngIf="itemCaption">
+      {{ itemCaption }}
     </h2>
-    <p-steps
-      [model]="items"
-      [readonly]="
-        !portalItemService.currentPortalItemConfigCompleted
-      "></p-steps>
+    <p-steps [readonly]="!configCompleted" [model]="steps"></p-steps>
   </div>
-  <router-outlet></router-outlet>
+  <router-outlet
+    *ngIf="activatedIndex >= 0"
+    (activate)="onActivate($event)"
+    (deactivate)="onDeactivate()"></router-outlet>
 </div>

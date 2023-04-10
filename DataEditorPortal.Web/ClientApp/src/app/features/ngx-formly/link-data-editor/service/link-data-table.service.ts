@@ -1,0 +1,33 @@
+import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
+import { map } from 'rxjs';
+import { ApiResponse } from 'src/app/shared';
+import { TableConfig } from '../link-data-editor.type';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LinkDataTableService {
+  public _apiUrl: string;
+  constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
+    this._apiUrl = apiUrl;
+  }
+
+  getTableConfig(name: string) {
+    return this.http
+      .post<ApiResponse<TableConfig>>(
+        `${this._apiUrl}universal-grid/${name}/linked-table-editor/table-config`,
+        null
+      )
+      .pipe(map(res => res.result || { columns: [], dataKey: '' }));
+  }
+
+  getTableData(name: string, searchParams: any) {
+    return this.http
+      .post<ApiResponse<any>>(
+        `${this._apiUrl}universal-grid/${name}/linked-table-editor/table-data`,
+        searchParams
+      )
+      .pipe(map(res => res.result?.data || []));
+  }
+}

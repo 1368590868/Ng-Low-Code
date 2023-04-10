@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { GridFormField } from '../../../models/portal-item';
+import { GridFormField } from '../../models/portal-item';
 
 @Component({
   selector: 'app-form-designer-view',

@@ -7,14 +7,19 @@ import {
   PortalEditDatasourceComponent,
   PortalEditColumnsComponent,
   PortalEditSearchComponent,
-  PortalEditFormComponent
-} from './components/portal-edit';
+  PortalEditFormComponent,
+  PortalEditLinkComponent,
+  PortalEditLinkTableComponent
+} from './components';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'list', pathMatch: 'full' },
   { path: 'list', component: PortalListComponent },
+  // route for adding & editing single table page.
   {
-    path: 'edit/:id',
+    path: 'edit-single/:id',
     component: PortalEditComponent,
+    data: { type: 'single' },
     children: [
       { path: 'basic', component: PortalEditBasicComponent },
       { path: 'datasource', component: PortalEditDatasourceComponent },
@@ -24,9 +29,46 @@ const routes: Routes = [
     ]
   },
   {
-    path: 'add',
+    path: 'add-single',
+    data: { type: 'single' },
     component: PortalEditComponent,
     children: [{ path: 'basic', component: PortalEditBasicComponent }]
+  },
+  // route for adding & editing linked table page
+  {
+    path: 'edit-linked/:id',
+    component: PortalEditComponent,
+    data: { type: 'linked' },
+    children: [
+      { path: 'basic', component: PortalEditBasicComponent },
+      { path: 'datasource', component: PortalEditLinkComponent },
+      { path: 'search', component: PortalEditSearchComponent }
+    ]
+  },
+  {
+    path: 'add-linked',
+    data: { type: 'linked' },
+    component: PortalEditComponent,
+    children: [{ path: 'basic', component: PortalEditBasicComponent }]
+  },
+  // route for adding & editing children table of linked table page.
+  {
+    path: 'edit-linked/:parentId/datasource/add',
+    component: PortalEditComponent,
+    data: { type: 'linked-single' },
+    children: [{ path: 'basic', component: PortalEditLinkTableComponent }]
+  },
+  {
+    path: 'edit-linked/:parentId/datasource/edit/:id',
+    component: PortalEditComponent,
+    data: { type: 'linked-single' },
+    children: [
+      { path: 'basic', component: PortalEditLinkTableComponent },
+      { path: 'datasource', component: PortalEditDatasourceComponent },
+      { path: 'columns', component: PortalEditColumnsComponent },
+      { path: 'search', component: PortalEditSearchComponent },
+      { path: 'form', component: PortalEditFormComponent }
+    ]
   }
 ];
 

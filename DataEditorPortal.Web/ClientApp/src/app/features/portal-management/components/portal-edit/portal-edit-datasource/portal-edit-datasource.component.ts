@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Form, FormControl } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 import { ConfirmationService, PrimeNGConfig } from 'primeng/api';
 import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
@@ -13,6 +12,7 @@ import {
   DataSourceTableColumn
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import { AdvancedQueryModel } from './advanced-query-dialog/advanced-query-dialog.component';
 
 interface DataSourceFilterControls {
@@ -29,7 +29,10 @@ interface DataSourceFilterControls {
   styleUrls: ['./portal-edit-datasource.component.scss'],
   providers: [ConfirmationService]
 })
-export class PortalEditDatasourceComponent implements OnInit {
+export class PortalEditDatasourceComponent
+  extends PortalEditStepDirective
+  implements OnInit
+{
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
@@ -68,14 +71,18 @@ export class PortalEditDatasourceComponent implements OnInit {
   formControlDbTable: FormControl = new FormControl();
   formControlIdColumn: FormControl = new FormControl();
 
+  get dbConnectionDisabled() {
+    return this.portalItemService.itemType === 'linked-single';
+  }
+
   constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
     private primeNGConfig: PrimeNGConfig,
     private notifyService: NotifyService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.formControlDbTable.valueChanges.subscribe(value => {
@@ -94,9 +101,10 @@ export class PortalEditDatasourceComponent implements OnInit {
     this.formControlConnection.valueChanges.subscribe(
       value => (this.datasourceConfig.dataSourceConnectionId = value)
     );
+    if (this.dbConnectionDisabled) this.formControlConnection.disable();
 
     // get protal item datasource config
-    if (this.portalItemService.currentPortalItemId) {
+    if (this.portalItemService.itemId) {
       forkJoin([
         this.portalItemService.getDataSourceConfig(),
         // load database tables
@@ -289,7 +297,7 @@ export class PortalEditDatasourceComponent implements OnInit {
     }, true);
 
     return (
-      this.formControlConnection.valid &&
+      (this.dbConnectionDisabled || this.formControlConnection.valid) &&
       (this.datasourceConfig.queryText || this.formControlDbTable.valid) &&
       this.formControlIdColumn.valid &&
       filterValid
@@ -299,7 +307,7 @@ export class PortalEditDatasourceComponent implements OnInit {
   saveDatasourceConfig() {
     const save = () => {
       this.isSaving = true;
-      if (this.portalItemService.currentPortalItemId) {
+      if (this.portalItemService.itemId) {
         const data: DataSourceConfig = {
           dataSourceConnectionId: this.datasourceConfig.dataSourceConnectionId,
           pageSize: this.pageSize,
@@ -328,8 +336,7 @@ export class PortalEditDatasourceComponent implements OnInit {
               if (res && !res.isError) {
                 if (this.dataSourceChanged()) {
                   // if user changed the tableSchema or tableName, user need to continue config column, search, form
-                  this.portalItemService.currentPortalItemConfigCompleted =
-                    false;
+                  this.portalItemService.configCompleted = false;
                 }
                 this.saveSucess();
               }
@@ -370,20 +377,12 @@ export class PortalEditDatasourceComponent implements OnInit {
   }
 
   saveSucess() {
-    let next: unknown[] = [];
     if (this.isSavingAndNext) {
-      next = ['../columns'];
+      this.saveNextEvent.emit();
     }
     if (this.isSavingAndExit) {
-      this.notifyService.notifySuccess(
-        'Success',
-        'Save Draft Successfully Completed.'
-      );
-      next = ['../../../list'];
+      this.saveDraftEvent.emit();
     }
-    this.router.navigate(next, {
-      relativeTo: this.activatedRoute
-    });
   }
 
   onSaveAndNext() {
@@ -401,9 +400,7 @@ export class PortalEditDatasourceComponent implements OnInit {
   }
 
   onBack() {
-    this.router.navigate(['../basic'], {
-      relativeTo: this.activatedRoute
-    });
+    this.backEvent.emit();
   }
 
   onAddFilter() {

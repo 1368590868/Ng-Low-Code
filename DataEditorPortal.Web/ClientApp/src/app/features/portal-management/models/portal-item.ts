@@ -39,7 +39,7 @@ export interface DataSourceConfig {
   filters?: DataSourceFilter[];
   sortBy?: DataSourceSortBy[];
   queryText?: string;
-  pageSize: number;
+  pageSize?: number;
 }
 
 export interface DataSourceFilter {
@@ -114,4 +114,30 @@ export interface GridFormConfig {
 
 export interface GridCustomAction {
   name?: string;
+}
+
+export interface LinkedTableConfig {
+  id?: string;
+  columnsForLinkedField?: string[];
+  mapToLinkedTableField?: string;
+}
+
+export interface LinkedDataSourceConfig {
+  primaryTable?: LinkedTableConfig | null;
+  secondaryTable?: LinkedTableConfig | null;
+  linkedTable?: DataSourceConfig;
+}
+
+export interface LinkedSingleConfigDetails {
+  id?: string;
+  name?: string;
+  status?: number;
+  itemType?: string;
+  description: string | null;
+}
+
+export interface LinkedSingleConfig {
+  columns: string[];
+  details: LinkedSingleConfigDetails[];
+  idColumn?: string;
 }

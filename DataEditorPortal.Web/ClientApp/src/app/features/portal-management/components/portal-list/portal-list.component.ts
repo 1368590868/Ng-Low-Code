@@ -39,11 +39,21 @@ export class PortalListComponent implements OnInit {
       }
     },
     {
-      label: 'Create Portal Item',
+      label: 'Create Table Page',
       icon: 'pi pi-fw pi-desktop',
       command: () => {
-        this.portalItemService.currentPortalItemParentFolder = undefined;
-        this.router.navigate([`../add`], {
+        this.portalItemService.parentFolder = undefined;
+        this.router.navigate([`../add-single`], {
+          relativeTo: this.activatedRoute
+        });
+      }
+    },
+    {
+      label: 'Create Linked Table Page',
+      icon: 'pi pi-fw pi-server',
+      command: () => {
+        this.portalItemService.parentFolder = undefined;
+        this.router.navigate([`../add-linked`], {
           relativeTo: this.activatedRoute
         });
       }
@@ -91,12 +101,17 @@ export class PortalListComponent implements OnInit {
 
     const items: MenuItem[] = [];
     if (row['type'] === 'Portal Item') {
+      const editLabel =
+        row['itemType'] == 'linked'
+          ? 'Edit Linked Table Page'
+          : 'Edit Table Page';
       items.push({
-        label: row['configCompleted'] ? 'Edit Portal Item' : 'Continue Editing',
+        label: row['configCompleted'] ? editLabel : 'Continue Editing',
         icon: 'pi pi-fw pi-pencil',
         command: () => {
-          // edit portal item
-          this.router.navigate([`../edit/${row['id']}`], {
+          const editRoute =
+            row['itemType'] == 'linked' ? 'edit-linked' : 'edit-single';
+          this.router.navigate([`../${editRoute}/${row['id']}`], {
             relativeTo: this.activatedRoute
           });
         }
@@ -125,24 +140,24 @@ export class PortalListComponent implements OnInit {
       });
     } else {
       items.push({
-        label: 'Edit Folder',
-        icon: 'pi pi-fw pi-pencil',
+        label: 'New Table page',
+        icon: 'pi pi-fw pi-desktop',
         command: () => {
-          // edit folder
-          this.addDialog.header = 'Update Folder details';
-          this.addDialog.okText = 'Update Folder';
-          this.addDialog.model = { ...row };
-          this.addDialog.showDialog();
+          // new portal item
+          this.portalItemService.parentFolder = row['id'];
+          this.router.navigate([`../add-single`], {
+            relativeTo: this.activatedRoute
+          });
         }
       });
 
       items.push({
-        label: 'New Portal Item',
-        icon: 'pi pi-fw pi-plus',
+        label: 'New Linked Table Page',
+        icon: 'pi pi-fw pi-server',
         command: () => {
           // new portal item
-          this.portalItemService.currentPortalItemParentFolder = row['id'];
-          this.router.navigate([`../add`], {
+          this.portalItemService.parentFolder = row['id'];
+          this.router.navigate([`../add-linked`], {
             relativeTo: this.activatedRoute
           });
         }
@@ -155,6 +170,21 @@ export class PortalListComponent implements OnInit {
           this.addDialog.header = 'Create External Link';
           this.addDialog.okText = 'Create';
           this.addDialog.model = { type: 'External', parentId: row['id'] };
+          this.addDialog.showDialog();
+        }
+      });
+
+      items.push({
+        separator: true
+      });
+      items.push({
+        label: 'Edit Folder',
+        icon: 'pi pi-fw pi-pencil',
+        command: () => {
+          // edit folder
+          this.addDialog.header = 'Update Folder details';
+          this.addDialog.okText = 'Update Folder';
+          this.addDialog.model = { ...row };
           this.addDialog.showDialog();
         }
       });

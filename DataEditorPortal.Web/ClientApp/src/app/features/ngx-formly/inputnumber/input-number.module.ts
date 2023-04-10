@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 import { InputNumberModule } from 'primeng/inputnumber';
-
-import { FormlyFormFieldModule } from '@ngx-formly/primeng/form-field';
 import { FormlyFieldInputNumberComponent } from './input-number.type';
 
 @NgModule({
@@ -13,8 +11,6 @@ import { FormlyFieldInputNumberComponent } from './input-number.type';
     CommonModule,
     ReactiveFormsModule,
     InputNumberModule,
-
-    FormlyFormFieldModule,
     FormlyModule.forChild({
       types: [
         {

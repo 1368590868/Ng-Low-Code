@@ -75,6 +75,12 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
   }
 
   ngOnInit(): void {
+    if (this.labelName === 'On Validate') {
+      this.typeOptions = this.typeOptions.filter(
+        x => x.value !== 'CommandLine'
+      );
+    }
+
     this.formControlType.valueChanges.subscribe(val => {
       if (val === 'CommandLine') {
         this.language = 'bat';
