@@ -236,7 +236,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
       // back
       child.backEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
         let next = '';
-        if (this.activatedIndex - 1 <= 0) next = this.itemId ? '../../' : '../';
+        if (this.activatedIndex - 1 < 0) next = this.itemId ? '../../' : '../';
         else next = this.steps[this.activatedIndex - 1].routerLink;
         this.router.navigate([next], {
           relativeTo: this.activatedRoute

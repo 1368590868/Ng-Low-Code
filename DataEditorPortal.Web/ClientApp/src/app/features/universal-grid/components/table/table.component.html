@@ -63,7 +63,10 @@
                 (savedEvent)="refresh()"></ng-template>
             </div>
             <div class="flex-none mr-2 ml-auto">
-              <strong *ngIf="selectedRecords.length > 0"
+              <strong
+                *ngIf="
+                  selectedRecords.length > 0 && selectionMode === 'multiple'
+                "
                 >{{ selectedRecords.length }} row(s) selected</strong
               >
             </div>
