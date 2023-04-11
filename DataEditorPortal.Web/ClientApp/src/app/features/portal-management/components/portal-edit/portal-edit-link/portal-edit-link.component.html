@@ -200,9 +200,7 @@
       </ng-container>
 
       <p-button
-        *ngIf="
-          primaryTableConfig?.details && primaryTableConfig.details.length === 0
-        "
+        *ngIf="!primaryTableConfig?.details"
         label="Add"
         icon="pi pi-plus"
         class="mt-1 ml-4"
@@ -309,15 +307,15 @@
             </p-multiSelect>
           </div>
         </div>
-        <p-button
-          *ngIf="secondaryTableConfig.details.length === 0"
-          label="Add"
-          icon="pi pi-plus"
-          class="mt-1 ml-4"
-          styleClass="p-button-text p-button-sm"
-          (onClick)="onAddSecondaryTable()">
-        </p-button>
       </ng-container>
+      <p-button
+        *ngIf="!secondaryTableConfig?.details"
+        label="Add"
+        icon="pi pi-plus"
+        class="mt-1 ml-4"
+        styleClass="p-button-text p-button-sm"
+        (onClick)="onAddSecondaryTable()">
+      </p-button>
     </div>
   </div>
 
