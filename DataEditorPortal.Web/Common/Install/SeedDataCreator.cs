@@ -78,7 +78,7 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "User Management",
                     Icon = "pi pi-user",
                     Type = "System",
-                    Link = "/portal-item/user-management",
+                    Link = "/portal-item/single/user-management",
                     ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
                     Order = 1,
                     Status = PortalItemStatus.Published

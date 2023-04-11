@@ -132,6 +132,7 @@ namespace DataEditorPortal.Web.Controllers
         [AutoWrapIgnore]
         public IActionResult ExportData(string name, [FromBody] ExportParam exportParam)
         {
+            exportParam.IndexCount = 0;
             var fs = _universalGridService.ExportExcel(name, exportParam);
 
             return File(fs, "application/ms-excel", exportParam.FileName);

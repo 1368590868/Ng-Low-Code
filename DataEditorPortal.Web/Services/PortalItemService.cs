@@ -572,7 +572,18 @@ namespace DataEditorPortal.Web.Services
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
-            return !string.IsNullOrEmpty(config.DataSourceConfig) ? JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig) : new LinkedDataSourceConfig();
+            if (string.IsNullOrEmpty(config.DataSourceConfig))
+            {
+                var result = new LinkedDataSourceConfig();
+                var ids = _depDbContext.SiteMenus.Where(x => x.ParentId == siteMenu.Id).OrderBy(x => x.Order).Select(x => x.Id).ToList();
+                if (ids.Count >= 1)
+                    result.PrimaryTable = new LinkedTableConfig() { Id = ids[0] };
+                if (ids.Count >= 2)
+                    result.SecondaryTable = new LinkedTableConfig() { Id = ids[1] };
+                return result;
+            }
+            else
+                return JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig);
         }
 
         public bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model)
