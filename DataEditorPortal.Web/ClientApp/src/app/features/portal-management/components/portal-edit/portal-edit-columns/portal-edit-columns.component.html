@@ -39,9 +39,14 @@
       <ng-template let-column pTemplate="item">
         <div *ngIf="!column.selected" class="">[{{ column.field }}]</div>
         <div *ngIf="column.selected" class="flex align-items-center">
-          <div class="w-10rem">[{{ column.field }}]</div>
-          <div class="w-20rem" *ngIf="column.header">
-            Header:
+          <div
+            [title]="column.field"
+            class="w-15rem mr-3 overflow-hidden text-overflow-ellipsis">
+            [{{ column.field }}]
+          </div>
+          <div
+            class="w-20rem mr-3 overflow-hidden text-overflow-ellipsis"
+            *ngIf="column.header">
             <p-tag>{{ column.header }}</p-tag>
           </div>
           <div
