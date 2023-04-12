@@ -43,6 +43,8 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   innerValue: any[] = [];
 
+  sortMeta!: any;
+
   @Input()
   set value(val: any[]) {
     this.innerValue = val || [];
@@ -112,6 +114,27 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   onRowCheckBoxClick(event: MouseEvent) {
     event.stopPropagation();
+  }
+
+  fetchData() {
+    this.linkDataTableService
+      .getTableData(
+        this.table1Name,
+        this.searchParams,
+        this.sortMeta ? [this.sortMeta] : undefined
+      )
+      .subscribe(dataSource => {
+        this.dataSource = dataSource || [];
+        this.selection = dataSource.filter((item: any) =>
+          this.innerValue.find((x: any) => x.table2Id === item[this.dataKey])
+        );
+        this.cdr.detectChanges();
+      });
+  }
+
+  onSort(sortMeta: any) {
+    this.sortMeta = sortMeta;
+    this.fetchData();
   }
 
   ngOnInit(): void {
