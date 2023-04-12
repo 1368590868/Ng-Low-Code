@@ -161,8 +161,8 @@ export class PortalEditLinkComponent
 
   valid() {
     if (
-      this.primaryTableConfig.details.length === 0 ||
-      this.secondaryTableConfig.details.length === 0 ||
+      !this.primaryTableConfig?.details ||
+      !this.secondaryTableConfig?.details ||
       this.primarySelected.length === 0 ||
       this.secondarySelected.length === 0 ||
       this.dsConfig.dataSourceConnectionId == null ||

@@ -16,7 +16,11 @@ export class UploadPipe implements PipeTransform {
   transform(value: string, isShowAll = false): string {
     let parseVal: UploadType[] = [];
     if (!value) return '';
-    if (typeof value === 'string') parseVal = JSON.parse(value);
+    try {
+      if (typeof value === 'string') parseVal = JSON.parse(value);
+    } catch (e) {
+      parseVal = [];
+    }
 
     const filterArray = parseVal.filter(item => item?.status !== 'Deleted');
     const result = filterArray
