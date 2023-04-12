@@ -113,37 +113,34 @@
             <tr>
               <th style="width: 25%">Label</th>
               <th>Description</th>
-              <th style="width: 10rem">Status</th>
-              <th style="width: 4.16rem"></th>
+              <th style="width: 13rem"></th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-primary>
             <tr>
-              <td>{{ primary.label }}</td>
-              <td>{{ primary.description }}</td>
               <td>
-                <p-tag
-                  *ngIf="primary.status === 0"
-                  icon="pi pi-file-edit"
-                  severity="warning"
-                  value="Draft"></p-tag>
-                <p-tag
-                  *ngIf="primary.status === 1"
-                  icon="pi pi-check"
-                  severity="success"
-                  value="Published"></p-tag>
-                <p-tag
-                  *ngIf="primary.status === 2"
-                  icon="pi pi-check"
-                  severity="warning"
-                  value="Unpublished"></p-tag>
+                {{ primary.label }}
+                <i
+                  *ngIf="primary?.configCompleted === false"
+                  class="pi pi-exclamation-circle ml-3 text-lg"
+                  style="color: var(--yellow-600)"
+                  pTooltip="You have't completed all configurations"></i>
               </td>
+              <td>{{ primary.description }}</td>
               <td>
                 <button
                   type="button"
                   pButton
-                  label="Edit"
+                  [label]="
+                    primary?.configCompleted === false ? 'Configure' : 'Edit'
+                  "
                   [routerLink]="'./edit/' + primary.id"
+                  class="p-button-text"></button>
+                <button
+                  type="button"
+                  pButton
+                  label="Action"
+                  (click)="onShowAction(primary.id)"
                   class="p-button-text"></button>
               </td>
             </tr>
@@ -222,37 +219,35 @@
             <tr>
               <th style="width: 25%">Label</th>
               <th>Description</th>
-              <th style="width: 10rem">Status</th>
-              <th style="width: 4.16rem"></th>
+              <th style="width: 13rem"></th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-secondary>
             <tr>
-              <td>{{ secondary.label }}</td>
-              <td>{{ secondary.description }}</td>
               <td>
-                <p-tag
-                  *ngIf="secondary.status === 0"
-                  icon="pi pi-file-edit"
-                  severity="warning"
-                  value="Draft"></p-tag>
-                <p-tag
-                  *ngIf="secondary.status === 1"
-                  icon="pi pi-check"
-                  severity="success"
-                  value="Published"></p-tag>
-                <p-tag
-                  *ngIf="secondary.status === 2"
-                  icon="pi pi-check"
-                  severity="warning"
-                  value="Unpublished"></p-tag>
+                {{ secondary.label }}
+                <i
+                  *ngIf="secondary?.configCompleted === false"
+                  class="pi pi-exclamation-circle ml-3 text-lg"
+                  style="color: var(--yellow-600)"
+                  pTooltip="You have't completed all configurations"></i>
               </td>
+              <td>{{ secondary.description }}</td>
               <td>
                 <button
                   type="button"
                   pButton
-                  label="Edit"
+                  [label]="
+                    secondary?.configCompleted === false ? 'Configure' : 'Edit'
+                  "
                   [routerLink]="'./edit/' + secondary.id"
+                  class="p-button-text"></button>
+
+                <button
+                  type="button"
+                  pButton
+                  label="Action"
+                  (click)="onShowAction(secondary.id)"
                   class="p-button-text"></button>
               </td>
             </tr>
@@ -346,3 +341,5 @@
     </div>
   </ng-template>
 </p-card>
+
+<app-custom-actions #customActions></app-custom-actions>

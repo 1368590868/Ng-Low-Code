@@ -134,6 +134,7 @@ export interface LinkedSingleConfigDetails {
   status?: number;
   itemType?: string;
   description: string | null;
+  configCompleted?: boolean;
 }
 
 export interface LinkedSingleConfig {
