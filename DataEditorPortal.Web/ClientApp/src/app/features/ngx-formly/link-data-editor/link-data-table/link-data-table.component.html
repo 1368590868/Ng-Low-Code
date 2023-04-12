@@ -78,9 +78,9 @@
     </tr>
   </ng-template>
   <ng-template pTemplate="emptymessage" let-columns>
-    <tr>
+    <tr style="height: 16rem">
       <td class="text-lg" [attr.colspan]="columns.length + 2">
-        {{ 'No data were found.' }}
+        <div class="pl-3">{{ 'No data were found.' }}</div>
       </td>
     </tr>
   </ng-template>
