@@ -116,6 +116,7 @@ export class ComputedValueEditorComponent
         },
         { emitEvent: false }
       );
+      this.hasAdvanceData = false;
     }
   }
 
@@ -166,14 +167,14 @@ export class ComputedValueEditorComponent
 
   onSendData() {
     const name = this.form.get('nameFormControl')!.value ?? null;
-    let data: { type?: string; name?: string; queryText?: string } = {};
+    let data: { type?: string; name?: string; queryText?: string } | undefined;
     if (this.hasAdvanceData) {
       data = {
         type: this.form.get('typeFormControl')?.value,
         queryText: this.form.get('queryTextFormControl')?.value
       };
     } else {
-      data = { name };
+      data = name ? { name } : undefined;
     }
     this.innerValue = data;
     this.onChange?.(data);

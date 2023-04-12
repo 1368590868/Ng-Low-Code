@@ -65,17 +65,19 @@ export class PortalEditFormComponent
         this.infoFormConfig = res[0].infoForm || {};
 
         // if itemType is 'linked-single', we should always add linkedTableField to the source dbColumns
-        this.dbColumns = res[1].concat([
-          {
-            filterType: 'linkDataField',
-            columnName: 'LINK_DATA_FIELD',
-            isKey: false,
-            isAutoIncrement: false,
-            isIdentity: false,
-            isUnique: false,
-            allowDBNull: true
-          }
-        ]);
+        if (this.itemType === 'linked-single') {
+          this.dbColumns = res[1].concat([
+            {
+              filterType: 'linkDataField',
+              columnName: 'LINK_DATA_FIELD',
+              isKey: false,
+              isAutoIncrement: false,
+              isIdentity: false,
+              isUnique: false,
+              allowDBNull: true
+            }
+          ]);
+        }
 
         this.dataSourceIsQueryText = !!res[2].queryText;
       });

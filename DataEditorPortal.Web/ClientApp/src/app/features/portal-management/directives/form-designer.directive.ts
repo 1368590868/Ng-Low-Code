@@ -136,6 +136,27 @@ export class FormDesignerDirective {
       }
     },
     {
+      fieldGroup: [
+        {
+          wrappers: ['divider'],
+          props: {
+            label: 'Computed Value'
+          },
+          hide: true
+        },
+        {
+          key: 'computedConfig',
+          type: 'computedValueEditor',
+          props: {
+            label: 'Computed Value'
+          }
+        }
+      ],
+      expressions: {
+        hide: `formState.hideComputedValue || 'fileUpload' === field.parent.model.type`
+      }
+    },
+    {
       wrappers: ['divider'],
       props: {
         label: 'Properties'
@@ -357,26 +378,6 @@ export class FormDesignerDirective {
       ],
       expressions: {
         hide: `formState.hideValidation || 'fileUpload' === field.parent.model.type`
-      }
-    },
-    {
-      fieldGroup: [
-        {
-          wrappers: ['divider'],
-          props: {
-            label: 'Computed Value'
-          }
-        },
-        {
-          key: 'computedConfig',
-          type: 'computedValueEditor',
-          props: {
-            label: ''
-          }
-        }
-      ],
-      expressions: {
-        hide: `formState.hideComputedValue || 'fileUpload' === field.parent.model.type`
       }
     }
   ];
