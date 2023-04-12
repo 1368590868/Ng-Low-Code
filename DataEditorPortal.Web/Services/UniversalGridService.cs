@@ -1256,9 +1256,9 @@ namespace DataEditorPortal.Web.Services
                 var linkedData = GetGridData(linkedTableInfo.Name, new GridParam() { IndexCount = -1, Filters = filters });
                 relationData = linkedData.Data.Select(x => new RelationDataModel()
                 {
-                    Id = x[linkedTableInfo.LinkedTable.IdColumn].ToString(),
+                    Id = x[linkedTableInfo.LinkedTable.IdColumn],
                     Table1Id = table1Id,
-                    Table2Id = x[linkedTableInfo.Table2MappingField].ToString()
+                    Table2Id = x[linkedTableInfo.Table2MappingField]
                 }).ToList();
             }
 

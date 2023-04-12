@@ -472,6 +472,8 @@ namespace DataEditorPortal.Web.Services
                     });
                     mu.u.SearchConfig = JsonSerializer.Serialize(searchConfig);
                 });
+
+                config.ConfigCompleted = true;
             }
 
             _depDbContext.SaveChanges();

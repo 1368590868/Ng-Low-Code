@@ -122,7 +122,7 @@ namespace DataEditorPortal.Web.Controllers
             var ids = model.RootElement
                 .GetProperty("ids")
                 .EnumerateArray()
-                .Select(x => x.GetString())
+                .Select(x => x.GetRawText())
                 .ToArray();
             return _universalGridService.DeleteGridData(name, ids);
         }

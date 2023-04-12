@@ -85,7 +85,7 @@ namespace DataEditorPortal.Web.Controllers
                                     Data = _mapper.Map<PortalItemData>(m.menu)
                                 };
                                 item.Data.ConfigCompleted = m.configCompleted;
-                                item.Data.ItemType = x.itemType;
+                                item.Data.ItemType = m.itemType;
                                 return item;
                             })
                             .ToList();
