@@ -43,7 +43,7 @@ namespace DataEditorPortal.Web.Services
 
         // linked table api
         dynamic GetLinkedGridConfig(string name);
-        GridData GetLinkedTableDataForFieldControl(string table1Name, Dictionary<string, object> searches);
+        GridData GetLinkedTableDataForFieldControl(string table1Name, GridParam param);
         dynamic GetLinkedTableConfigForFieldControl(string tableName);
         IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id);
 
@@ -1141,11 +1141,11 @@ namespace DataEditorPortal.Web.Services
 
         #region Linked Data API
 
-        public GridData GetLinkedTableDataForFieldControl(string table1Name, Dictionary<string, object> searches)
+        public GridData GetLinkedTableDataForFieldControl(string table1Name, GridParam gridParam)
         {
             var linkedTableInfo = GetLinkedTableInfo(table1Name);
-
-            return GetGridData(linkedTableInfo.Table2Name, new GridParam() { IndexCount = 50, StartIndex = 0, Searches = searches });
+            gridParam.IndexCount = 0;
+            return GetGridData(linkedTableInfo.Table2Name, gridParam);
         }
         public dynamic GetLinkedTableConfigForFieldControl(string table1Name)
         {
