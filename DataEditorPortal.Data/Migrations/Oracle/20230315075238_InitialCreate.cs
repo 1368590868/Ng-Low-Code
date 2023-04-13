@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 
 namespace DataEditorPortal.Data.Migrations.Oracle
 {
@@ -146,7 +146,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
                     SITE_NAME = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    SITE_LOGO = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    SITE_LOGO = table.Column<string>(type: "CLOB", nullable: true),
                     LICENSE = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     INSTALLED = table.Column<bool>(type: "NUMBER(1)", nullable: false)
                 },

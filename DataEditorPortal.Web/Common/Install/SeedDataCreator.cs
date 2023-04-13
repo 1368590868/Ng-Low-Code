@@ -780,6 +780,852 @@ namespace DataEditorPortal.Web.Common.Install
             #endregion
 
             _depDbContext.SaveChanges();
+
+            // LPA Demo
+            #region LPA DEMO
+
+            // LPA Demo
+            #region LPA DEMO
+
+            var lpaMenus = new List<SiteMenu>(){
+                new SiteMenu()
+                {
+                    Id = new Guid("863C0321-F5BE-4145-B182-9F229DDBD792"),
+                    Name = "lpa-site",
+                    Label = "LPA Site",
+                    Icon = "pi pi-sitemap",
+                    Type = "Portal Item",
+                    Link = "",
+                    ParentId = new Guid("41D85A79-9E84-4AB8-AF96-08DAF9CD4412"),
+                    Order = 1,
+                    Status = PortalItemStatus.Published
+                },
+                new SiteMenu()
+                {
+                    Id = new Guid("060B81FF-EBBB-4FA8-BCD5-00568860153F"),
+                    Name = "site-lpa-s",
+                    Label = "Site LPA(s)",
+                    Icon = "pi pi-table",
+                    Type = "Sub Portal Item",
+                    Link = "",
+                    ParentId = new Guid("863C0321-F5BE-4145-B182-9F229DDBD792"),
+                    Order = 0,
+                    Status = PortalItemStatus.Published
+                },
+                new SiteMenu()
+                {
+                    Id = new Guid("9CAB7319-5295-46F0-8879-F58F434C0397"),
+                    Name = "remediation-activities",
+                    Label = "Remediation Activities",
+                    Icon = "pi pi-table",
+                    Type = "Sub Portal Item",
+                    Link = "",
+                    ParentId = new Guid("863C0321-F5BE-4145-B182-9F229DDBD792"),
+                    Order = 1,
+                    Status = PortalItemStatus.Published
+                }
+            };
+            foreach (var item in lpaMenus)
+            {
+                var entity = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == item.Id);
+                if (entity != null) _depDbContext.SiteMenus.Update(item);
+                else _depDbContext.SiteMenus.Add(item);
+            }
+
+            var lpaSite = new UniversalGridConfiguration()
+            {
+                Id = Guid.NewGuid(),
+                Name = "lpa-site",
+                ConfigCompleted = true,
+                DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
+                ItemType = GridItemType.LINKED,
+
+                DataSourceConfig = JsonSerializer.Serialize(new LinkedDataSourceConfig
+                {
+                    LinkedTable = new DataSourceConfig()
+                    {
+                        DataSourceConnectionId = Guid.Parse("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
+                        TableName = "LPASITE_RELATION",
+                        TableSchema = Constants.DEFAULT_SCHEMA,
+                        IdColumn = "OBJECTID"
+                    },
+                    PrimaryTable = new LinkedTableConfig()
+                    {
+                        Id = new Guid("060B81FF-EBBB-4FA8-BCD5-00568860153F"),
+                        ColumnsForLinkedField = new List<string>() { "LPANAME", "TYPE", "LPASTATUS", "DISCOVERYDATE", "REMEDIATIONPROPOSEDDATE", "COMMENTS" },
+                        MapToLinkedTableField = "LEFTID"
+                    },
+                    SecondaryTable = new LinkedTableConfig()
+                    {
+                        Id = new Guid("9CAB7319-5295-46F0-8879-F58F434C0397"),
+                        ColumnsForLinkedField = new List<string>() { "TYPE", "LPAACTIVITYSTATUS", "REMEDIATIONPROPOSEDDATE", "COMMENTS" },
+                        MapToLinkedTableField = "RIGHTID"
+                    }
+                }),
+
+                SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
+                    new SearchFieldConfig {
+                        key = "DOT_OPERATOR_NAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "DOT Operator",
+                            placeholder = "Select Operator..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "DOT_OPERATOR_NAME",
+                            matchMode = "equals"
+                        },
+                        searchRule1 = new SearchFieldFilterRule
+                        {
+                            field = "DOT_OPERATOR_NAME",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "DIVISION_NAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Division",
+                            placeholder = "Select Division..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "DIVISION_NAME",
+                            matchMode = "equals"
+                        },
+                        searchRule1 = new SearchFieldFilterRule
+                        {
+                            field = "DIVISION_NAME",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "AREA_NAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Area",
+                            placeholder = "Select Area..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "AREA_NAME",
+                            matchMode = "equals"
+                        },
+                        searchRule1 = new SearchFieldFilterRule
+                        {
+                            field = "AREA_NAME",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "LOCATION",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Location",
+                            placeholder = "Select Location..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "LOCATION",
+                            matchMode = "equals"
+                        },
+                        searchRule1 = new SearchFieldFilterRule
+                        {
+                            field = "LOCATION",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "SITENAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Site Name",
+                            placeholder = "Select Site Name..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "SITENAME",
+                            matchMode = "equals"
+                        },
+                        searchRule1 = new SearchFieldFilterRule
+                        {
+                            field = "SITENAME",
+                            matchMode = "equals"
+                        }
+                    }
+                })
+            };
+            _depDbContext.UniversalGridConfigurations.Add(lpaSite);
+            var siteLpas = new UniversalGridConfiguration()
+            {
+                Id = new Guid("D13087B3-F5DD-466D-AAFC-C73582C31473"),
+                Name = "site-lpa-s",
+                ConfigCompleted = true,
+                DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
+                ItemType = GridItemType.LINKED_SINGLE,
+
+                DataSourceConfig = JsonSerializer.Serialize(new DataSourceConfig
+                {
+                    DataSourceConnectionId = Guid.Parse("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
+                    QueryText = "SELECT * FROM DATA_EDITOR_PORTAL.LPASITE l \nLEFT JOIN DATA_EDITOR_PORTAL.GFORM_SITE_HIERARCHY_MV gshm ON l.BOUNDARYGLOBALID = gshm.HIERARCHY_GLOBALID \nWHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##",
+                    IdColumn = "OBJECTID",
+                    SortBy = new List<SortParam>() { new SortParam { field = "LPANAME", order = 1 } }
+                }),
+
+                ColumnsConfig = JsonSerializer.Serialize(new GridColConfig[] {
+                    new GridColConfig { type = "DataBaseField", field = "LOCATION", header = "Location", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "SITENAME", header = "Site Name", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "LPANAME", header = "LPA Name", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "TYPE", header = "LPA Type", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "LPASTATUS", header = "LPA Status", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DISCOVERYDATE", header = "Discovery Date", width = "250px", filterType = "date", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "D40CRITERIA", header = "D40 Criteria", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "ASSESSEDBY", header = "Assesed By", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "REQREMEDIATIONDATE", header = "Required Remed. Date", width = "250px", filterType = "date", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "REMEDIATIONPROPOSEDDATE", header = "Remed. Proposed Date", width = "250px", filterType = "date", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "REMEDIATIONACTUALDATE", header = "Remed. Actual Date", width = "250px", filterType = "date", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "COMMENTS", header = "Comments", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "STATUS", header = "Status", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "CREATIONUSER", header = "Creation User", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "LASTUSER", header = "Last User", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATEMODIFIED", header = "Date Modified", width = "250px", filterType = "date", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATECREATED", header = "Date Created", width = "250px", filterType = "date", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "GLOBALID", header = "GLOBALID", width = "250px", filterType = "text", sortable = true }
+                }),
+
+                SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
+                    new SearchFieldConfig {
+                        key = "DOT_OPERATOR_NAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "DOT Operator",
+                            placeholder = "Select Operator..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "DOT_OPERATOR_NAME",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "DIVISION_NAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Division",
+                            placeholder = "Select Division..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "DIVISION_NAME",
+                            matchMode = "equals"
+                        }
+                    },
+                    //new SearchFieldConfig {
+                    //    key = "ROLES",
+                    //    type = "multiSelect",
+                    //    filterType = "text",
+                    //    props = new {
+                    //        label = "Roles",
+                    //        placeholder = "Please select",
+                    //        optionsLookup = "727052BA-0033-42C9-A39C-06A103E4B021"
+                    //    },
+                    //    searchRule = new SearchFieldFilterRule
+                    //    {
+                    //        field = "ROLES",
+                    //        whereClause = $"ID IN (SELECT USER_ID FROM {Constants.DEFAULT_SCHEMA}.USER_PERMISSIONS WHERE PERMISSION_GRANT_ID IN ##VALUE##)"
+                    //    }
+                    //},
+                    new SearchFieldConfig {
+                        key = "AREA_NAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Area",
+                            placeholder = "Select Area..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "AREA_NAME",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "LOCATION",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Location",
+                            placeholder = "Select Location..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "LOCATION",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "SITENAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Site Name",
+                            placeholder = "Select Site Name..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "SITENAME",
+                            matchMode = "equals"
+                        }
+                    }
+                }),
+
+                DetailConfig = JsonSerializer.Serialize(new DetailConfig
+                {
+                    AddingForm = new GridFormLayout
+                    {
+                        FormFields = new List<FormFieldConfig>() {
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "LPANAME",
+                                type = "input",
+                                props = new
+                                {
+                                    label = "LPA Name"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "TYPE",
+                                type = "select",
+                                props = new
+                                {
+                                    label = "LPA Type",
+                                    optionsLookup = new object[]
+                                    {
+                                        new { label = "< .850mV Off Criteria", value = "< .850mV Off Criteria" },
+                                        new { label = "< .850mV Off Criteria and < 100mV Shift Criteria", value = "< .850mV Off Criteria and < 100mV Shift Criteria" },
+                                        new { label = "< 100mV Shift Criteria", value = "< 100mV Shift Criteria" }
+                                    }
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "LPASTATUS",
+                                type = "select",
+                                props = new
+                                {
+                                    label = "LPA Status",
+                                    optionsLookup = new object[]
+                                    {
+                                        new { label = "Not Remediated", value = "Not Remediated" },
+                                        new { label = "Remediated", value = "Remediated" }
+                                    }
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "date",
+                                key = "DISCOVERYDATE",
+                                type = "datepicker",
+                                props = new
+                                {
+                                    label = "Discovery Date"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "D40CRITERIA",
+                                type = "select",
+                                props = new
+                                {
+                                    label = "D40 Criteria",
+                                    optionsLookup = new object[]
+                                    {
+                                        new { label = "D.40 Criteria 1 (6 Months)", value = "D.40 Criteria 1 (6 Months)" },
+                                        new { label = "D.40 Criteria 2 (12 Months not to exceed 15 Months)", value = "D.40 Criteria 2 (12 Months not to exceed 15 Months)" }
+                                    }
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "ASSESSEDBY",
+                                type = "select",
+                                props = new
+                                {
+                                    label = "Assesed By",
+                                    optionsLookup = new object[]
+                                    {
+                                        new { label = "Allee, Jim", value = "Allee, Jim" },
+                                        new { label = "Allen, Douglas", value = "Allen, Douglas" },
+                                        new { label = "Anderson, George", value = "Anderson, George" }
+                                    }
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "date",
+                                key = "REQREMEDIATIONDATE",
+                                type = "datepicker",
+                                props = new
+                                {
+                                    label = "Required Remed. Date"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "date",
+                                key = "REMEDIATIONPROPOSEDDATE",
+                                type = "datepicker",
+                                props = new
+                                {
+                                    label = "Remed. Proposed Date"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "date",
+                                key = "REMEDIATIONACTUALDATE",
+                                type = "datepicker",
+                                props = new
+                                {
+                                    label = "Remed. Actual Date"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "COMMENTS",
+                                type = "textarea",
+                                props = new
+                                {
+                                    label = "Comments"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "linkDataField",
+                                key = "LINK_DATA_FIELD",
+                                type = "linkDataEditor",
+                                props = new
+                                {
+                                    label = "Remediation Activies"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "date",
+                                key = "DATECREATED",
+                                type = "datepicker",
+                                props = new
+                                {
+                                    label = "DATECREATED"
+                                },
+                                computedConfig = new ComputedConfig()
+                                {
+                                    name = ComputedValueName.CurrentDateTime
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "date",
+                                key = "DATEMODIFIED",
+                                type = "datepicker",
+                                props = new
+                                {
+                                    label = "DATEMODIFIED"
+                                },
+                                computedConfig = new ComputedConfig()
+                                {
+                                    name = ComputedValueName.CurrentDateTime
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "BOUNDARYGLOBALID",
+                                type = "input",
+                                props = new
+                                {
+                                    label = "BOUNDARYGLOBALID"
+                                },
+                                computedConfig = new ComputedConfig()
+                                {
+                                    type = System.Data.CommandType.Text,
+                                    queryText = "SELECT gshm.HIERARCHY_GLOBALID FROM DATA_EDITOR_PORTAL.GFORM_SITE_HIERARCHY_MV gshm WHERE rownum = 1"
+                                }
+                            },
+                        },
+                        QueryText = "INSERT INTO DATA_EDITOR_PORTAL.LPASITE \n(LPANAME,\u0022TYPE\u0022,LPASTATUS,DISCOVERYDATE,D40CRITERIA,ASSESSEDBY,REQREMEDIATIONDATE,REMEDIATIONPROPOSEDDATE,REMEDIATIONACTUALDATE,COMMENTS,DATECREATED,BOUNDARYGLOBALID) \nVALUES (##LPANAME##,##TYPE##,##LPASTATUS##,##DISCOVERYDATE##,##D40CRITERIA##,##ASSESSEDBY##,##REQREMEDIATIONDATE##,##REMEDIATIONPROPOSEDDATE##,##REMEDIATIONACTUALDATE##,##COMMENTS##,##DATECREATED##,##BOUNDARYGLOBALID##)\nRETURNING OBJECTID INTO ##RETURNED_ID##"
+                    },
+                    UpdatingForm = new GridFormLayout
+                    {
+                        UseAddingFormLayout = true,
+                        QueryText = "UPDATE DATA_EDITOR_PORTAL.LPASITE SET LPANAME=##LPANAME##,\u0022TYPE\u0022=##TYPE##,LPASTATUS=##LPASTATUS##,DISCOVERYDATE=##DISCOVERYDATE##,D40CRITERIA=##D40CRITERIA##,ASSESSEDBY=##ASSESSEDBY##,REQREMEDIATIONDATE=##REQREMEDIATIONDATE##,REMEDIATIONPROPOSEDDATE=##REMEDIATIONPROPOSEDDATE##,REMEDIATIONACTUALDATE=##REMEDIATIONACTUALDATE##,COMMENTS=##COMMENTS##,DATEMODIFIED=##DATEMODIFIED## WHERE OBJECTID=##OBJECTID##"
+                    },
+                    DeletingForm = new GridFormLayout
+                    {
+                        UseAddingFormLayout = true,
+                        QueryText = "DELETE FROM DATA_EDITOR_PORTAL.LPASITE WHERE OBJECTID IN ##OBJECTID##"
+                    }
+                }),
+            };
+            _depDbContext.UniversalGridConfigurations.Add(siteLpas);
+            var remediationActivities = new UniversalGridConfiguration()
+            {
+                Id = new Guid("8797B3BB-E6C5-4E54-83C2-88D78E8AAA05"),
+                Name = "remediation-activities",
+                ConfigCompleted = true,
+                DataSourceConnectionId = new Guid("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
+                ItemType = GridItemType.LINKED_SINGLE,
+
+                DataSourceConfig = JsonSerializer.Serialize(new DataSourceConfig
+                {
+                    DataSourceConnectionId = Guid.Parse("4DEFF6DB-D3D6-447F-B3DE-CE2D8B242E36"),
+                    QueryText = "SELECT * FROM DATA_EDITOR_PORTAL.LPAREMEDIATIONACTSITE l \nLEFT JOIN DATA_EDITOR_PORTAL.GFORM_SITE_HIERARCHY_MV gshm ON l.BOUNDARYGLOBALID = gshm.HIERARCHY_GLOBALID \nWHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##",
+                    IdColumn = "OBJECTID",
+                    PageSize = 100,
+                    SortBy = new List<SortParam>() { new SortParam { field = "SITENAME", order = 1 } }
+                }),
+
+                ColumnsConfig = JsonSerializer.Serialize(new GridColConfig[] {
+                    new GridColConfig { type = "DataBaseField", field = "LOCATION", header = "Location", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "SITENAME", header = "Site Name", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "TYPE", header = "Activity Type", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "LPAACTIVITYSTATUS", header = "Activity Status", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "ASSIGNEDTO", header = "Assigned To", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "REMEDIATIONPROPOSEDDATE", header = "Remed. Proposed Date", width = "250px", filterType = "date", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "REMEDIATIONACTUALDATE", header = "Remed. Actual Date", width = "250px", filterType = "date", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "COMMENTS", header = "Comments", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "STATUS", header = "Status", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "CREATIONUSER", header = "Creation User", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "LASTUSER", header = "Last User", width = "250px", filterType = "text", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATEMODIFIED", header = "Date Modified", width = "250px", filterType = "date", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATECREATED", header = "Date Created", width = "250px", filterType = "date", sortable = true },
+                    new GridColConfig { type = "DataBaseField", field = "GLOBALID", header = "GLOBALID", width = "250px", filterType = "text", sortable = true }
+                }),
+
+                SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
+                    new SearchFieldConfig {
+                        key = "DOT_OPERATOR_NAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "DOT Operator",
+                            placeholder = "Select Operator..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "DOT_OPERATOR_NAME",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "DIVISION_NAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Division",
+                            placeholder = "Select Division..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "DIVISION_NAME",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "AREA_NAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Area",
+                            placeholder = "Select Area..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "AREA_NAME",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "LOCATION",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Location",
+                            placeholder = "Select Location..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "LOCATION",
+                            matchMode = "equals"
+                        }
+                    },
+                    new SearchFieldConfig {
+                        key = "SITENAME",
+                        type = "select",
+                        filterType = "text",
+                        props = new {
+                            label = "Site Name",
+                            placeholder = "Select Site Name..."
+                        },
+                        searchRule = new SearchFieldFilterRule
+                        {
+                            field = "SITENAME",
+                            matchMode = "equals"
+                        }
+                    }
+                }),
+
+                DetailConfig = JsonSerializer.Serialize(new DetailConfig
+                {
+                    AddingForm = new GridFormLayout
+                    {
+                        FormFields = new List<FormFieldConfig>() {
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "TYPE",
+                                type = "select",
+                                props = new
+                                {
+                                    label = "Activity Type",
+                                    optionsLookup = new object[]
+                                    {
+                                        new { label = "Armor Plate", value = "Armor Plate" },
+                                        new { label = "Clock Spring", value = "Clock Spring" },
+                                        new { label = "Force Screw Type Leak Clamp", value = "Force Screw Type Leak Clamp" },
+                                        new { label = "Grinding", value = "Grinding" },
+                                        new { label = "Manufactured Repair Sleeve", value = "Manufactured Repair Sleeve" }
+                                    }
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "LPAACTIVITYSTATUS",
+                                type = "select",
+                                props = new
+                                {
+                                    label = "Activity Status",
+                                    optionsLookup = new object[]
+                                    {
+                                        new { label = "Not Remediated", value = "Not Remediated" },
+                                        new { label = "Remediated", value = "Remediated" }
+                                    }
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "ASSIGNEDTO",
+                                type = "select",
+                                props = new
+                                {
+                                    label = "Assigned To",
+                                    optionsLookup = new object[]
+                                    {
+                                        new { label = "Allee, Jim", value = "Allee, Jim" },
+                                        new { label = "Allen, Douglas", value = "Allen, Douglas" },
+                                        new { label = "Anderson, George", value = "Anderson, George" }
+                                    }
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "date",
+                                key = "REMEDIATIONPROPOSEDDATE",
+                                type = "datepicker",
+                                props = new
+                                {
+                                    label = "Remed. Proposed Date"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "date",
+                                key = "REMEDIATIONACTUALDATE",
+                                type = "datepicker",
+                                props = new
+                                {
+                                    label = "Remed. Actual Date"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "COMMENTS",
+                                type = "textarea",
+                                props = new
+                                {
+                                    label = "Comments"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "linkDataField",
+                                key = "LINK_DATA_FIELD",
+                                type = "linkDataEditor",
+                                props = new
+                                {
+                                    label = "Remediation Activies"
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "date",
+                                key = "DATECREATED",
+                                type = "datepicker",
+                                props = new
+                                {
+                                    label = "DATECREATED"
+                                },
+                                computedConfig = new ComputedConfig()
+                                {
+                                    name = ComputedValueName.CurrentDateTime
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "date",
+                                key = "DATEMODIFIED",
+                                type = "datepicker",
+                                props = new
+                                {
+                                    label = "DATEMODIFIED"
+                                },
+                                computedConfig = new ComputedConfig()
+                                {
+                                    name = ComputedValueName.CurrentDateTime
+                                }
+                            },
+                            new FormFieldConfig()
+                            {
+                                filterType = "text",
+                                key = "BOUNDARYGLOBALID",
+                                type = "input",
+                                props = new
+                                {
+                                    label = "BOUNDARYGLOBALID"
+                                },
+                                computedConfig = new ComputedConfig()
+                                {
+                                    type = System.Data.CommandType.Text,
+                                    queryText = "SELECT gshm.HIERARCHY_GLOBALID FROM DATA_EDITOR_PORTAL.GFORM_SITE_HIERARCHY_MV gshm WHERE rownum = 1"
+                                }
+                            },
+                        },
+                        QueryText = "INSERT INTO DATA_EDITOR_PORTAL.LPAREMEDIATIONACTSITE (\u0022TYPE\u0022,LPAACTIVITYSTATUS,ASSIGNEDTO,REMEDIATIONPROPOSEDDATE,REMEDIATIONACTUALDATE,COMMENTS,DATECREATED,BOUNDARYGLOBALID) \nVALUES (##TYPE##,##LPAACTIVITYSTATUS##,##ASSIGNEDTO##,##REMEDIATIONPROPOSEDDATE##,##REMEDIATIONACTUALDATE##,##COMMENTS##,##DATECREATED##,##BOUNDARYGLOBALID##)\nRETURNING OBJECTID INTO ##RETURNED_ID##"
+                    },
+                    UpdatingForm = new GridFormLayout
+                    {
+                        UseAddingFormLayout = true,
+                        QueryText = "UPDATE DATA_EDITOR_PORTAL.LPAREMEDIATIONACTSITE SET \u0022TYPE\u0022=##TYPE##,LPAACTIVITYSTATUS=##LPAACTIVITYSTATUS##,ASSIGNEDTO=##ASSIGNEDTO##,REMEDIATIONPROPOSEDDATE=##REMEDIATIONPROPOSEDDATE##,REMEDIATIONACTUALDATE=##REMEDIATIONACTUALDATE##,COMMENTS=##COMMENTS##,DATEMODIFIED=##DATEMODIFIED## WHERE OBJECTID = ##OBJECTID##"
+                    },
+                    DeletingForm = new GridFormLayout
+                    {
+                        UseAddingFormLayout = true,
+                        QueryText = "DELETE FROM DATA_EDITOR_PORTAL.LPAREMEDIATIONACTSITE WHERE OBJECTID IN ##OBJECTID##"
+                    }
+                })
+            };
+            _depDbContext.UniversalGridConfigurations.Add(remediationActivities);
+
+            var lpaPermissions = new List<SitePermission>() {
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: Site LPA(s)",
+                    PermissionName = $"VIEW_SITE_LPA_S".ToUpper(),
+                    PermissionDescription = $"View Site LPA(s)"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: Site LPA(s)",
+                    PermissionName = $"ADD_SITE_LPA_S".ToUpper(),
+                    PermissionDescription = $"Add Site LPA(s)"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: Site LPA(s)",
+                    PermissionName = $"EDIT_SITE_LPA_S".ToUpper(),
+                    PermissionDescription = $"Edit Site LPA(s)"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: Site LPA(s)",
+                    PermissionName = $"DELETE_SITE_LPA_S".ToUpper(),
+                    PermissionDescription = $"Delete Site LPA(s)"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: Site LPA(s))",
+                    PermissionName = $"EXPORT_SITE_LPA_S".ToUpper(),
+                    PermissionDescription = $"Export Site LPA(s)"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: Remediation Activities",
+                    PermissionName = $"VIEW_REMEDIATION_ACTIVITIES".ToUpper(),
+                    PermissionDescription = $"View Remediation Activities"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: Remediation Activities",
+                    PermissionName = $"ADD_REMEDIATION_ACTIVITIES".ToUpper(),
+                    PermissionDescription = $"Add Remediation Activities"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: Remediation Activities",
+                    PermissionName = $"EDIT_REMEDIATION_ACTIVITIES".ToUpper(),
+                    PermissionDescription = $"Edit Remediation Activities"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: Remediation Activities",
+                    PermissionName = $"DELETE_REMEDIATION_ACTIVITIES".ToUpper(),
+                    PermissionDescription = $"Delete Remediation Activities"
+                },
+                new SitePermission()
+                {
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: Remediation Activities",
+                    PermissionName = $"EXPORT_REMEDIATION_ACTIVITIES".ToUpper(),
+                    PermissionDescription = $"Export Remediation Activities"
+                }
+            };
+            foreach (var item in lpaPermissions)
+            {
+                _depDbContext.SitePermissions.Add(item);
+            }
+
+            _depDbContext.SaveChanges();
+
+            #endregion
+
+            #endregion
         }
     }
 }

@@ -51,6 +51,20 @@ namespace DataEditorPortal.Data.Contexts
             {
                 entity.Property(e => e.FileBytes).HasColumnType("BLOB");
             });
+
+            // LPA Demo
+            modelBuilder.Entity<LPASITE>(entity =>
+            {
+                OraclePropertyBuilderExtensions.UseIdentityColumn(entity.Property(e => e.OBJECTID));
+            });
+            modelBuilder.Entity<LPAREMEDIATIONACTSITE>(entity =>
+            {
+                OraclePropertyBuilderExtensions.UseIdentityColumn(entity.Property(e => e.OBJECTID));
+            });
+            modelBuilder.Entity<LPASITE_RELATION>(entity =>
+            {
+                OraclePropertyBuilderExtensions.UseIdentityColumn(entity.Property(e => e.OBJECTID));
+            });
         }
     }
 }

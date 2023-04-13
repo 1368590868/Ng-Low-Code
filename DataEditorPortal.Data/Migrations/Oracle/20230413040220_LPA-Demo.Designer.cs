@@ -10,8 +10,8 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace DataEditorPortal.Data.Migrations.Oracle
 {
     [DbContext(typeof(DepDbContextOracle))]
-    [Migration("20230411061644_siteLogo")]
-    partial class siteLogo
+    [Migration("20230413040220_LPA-Demo")]
+    partial class LPADemo
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -165,6 +165,184 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.HasKey("Id");
 
                     b.ToTable("EVENT_LOGS");
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.GFORM_SITE_HIERARCHY_MV", b =>
+                {
+                    b.Property<string>("HIERARCHY_GLOBALID")
+                        .HasColumnType("NVARCHAR2(450)");
+
+                    b.Property<string>("AREA_NAME")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("DIVISION_NAME")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("DOT_OPERATOR_NAME")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("LOCATION")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("SITENAME")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("SITETYPE")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.HasKey("HIERARCHY_GLOBALID");
+
+                    b.ToTable("GFORM_SITE_HIERARCHY_MV");
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.LPAREMEDIATIONACTSITE", b =>
+                {
+                    b.Property<int>("OBJECTID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("NUMBER(10)")
+                        .HasAnnotation("Oracle:IdentityIncrement", 1)
+                        .HasAnnotation("Oracle:IdentitySeed", 1)
+                        .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ASSIGNEDTO")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("BOUNDARYGLOBALID")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("COMMENTS")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("CREATIONUSER")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<DateTime?>("DATECREATED")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<DateTime?>("DATEMODIFIED")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<string>("EVENTID")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("FEATUREGLOBALID")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("GLOBALID")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("LASTUSER")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("LPAACTIVITYSTATUS")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<DateTime?>("REMEDIATIONACTUALDATE")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<DateTime?>("REMEDIATIONPROPOSEDDATE")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<string>("STATUS")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("TYPE")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.HasKey("OBJECTID");
+
+                    b.ToTable("LPAREMEDIATIONACTSITE");
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.LPASITE", b =>
+                {
+                    b.Property<int>("OBJECTID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("NUMBER(10)")
+                        .HasAnnotation("Oracle:IdentityIncrement", 1)
+                        .HasAnnotation("Oracle:IdentitySeed", 1)
+                        .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ASSESSEDBY")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("BOUNDARYGLOBALID")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("COMMENTS")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("CREATIONUSER")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("D40CRITERIA")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<DateTime?>("DATECREATED")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<DateTime?>("DATEMODIFIED")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<DateTime?>("DISCOVERYDATE")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<string>("EVENTID")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("FEATUREGLOBALID")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("GLOBALID")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("LASTUSER")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("LPANAME")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("LPASTATUS")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<DateTime?>("REMEDIATIONACTUALDATE")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<DateTime?>("REMEDIATIONPROPOSEDDATE")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<DateTime?>("REQREMEDIATIONDATE")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<string>("STATUS")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("TYPE")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.HasKey("OBJECTID");
+
+                    b.ToTable("LPASITE");
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.LPASITE_RELATION", b =>
+                {
+                    b.Property<int>("OBJECTID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("NUMBER(10)")
+                        .HasAnnotation("Oracle:IdentityIncrement", 1)
+                        .HasAnnotation("Oracle:IdentitySeed", 1)
+                        .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("LEFTID")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.Property<int>("RIGHTID")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.HasKey("OBJECTID");
+
+                    b.ToTable("LPASITE_RELATION");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.Lookup", b =>

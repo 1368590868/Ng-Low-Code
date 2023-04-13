@@ -706,10 +706,11 @@ namespace DataEditorPortal.Web.Services
                 try
                 {
                     var dynamicParameters = new DynamicParameters(param);
-                    dynamicParameters.Add("RETURNED_ID", dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
+                    var paramReturnId = _queryBuilder.ParameterName("RETURNED_ID");
+                    dynamicParameters.Add(paramReturnId, dbType: null, direction: ParameterDirection.Output, size: 40);
 
                     var affected = con.Execute(queryText, dynamicParameters, trans);
-                    var returnedId = dynamicParameters.Get<string>("RETURNED_ID");
+                    var returnedId = dynamicParameters.Get<object>(paramReturnId);
 
                     // process file upload
                     SaveUploadedFiles(config.Name, uploadedFieldsMeta);
@@ -1238,12 +1239,12 @@ namespace DataEditorPortal.Web.Services
 
             return result;
         }
-        private List<RelationDataModel> GetLinkDataModelForForm(string table1Name, string table1Id)
+        private List<RelationDataModel> GetLinkDataModelForForm(string table1Name, object table1Id)
         {
             var linkedTableInfo = GetLinkedTableInfo(table1Name);
 
             List<RelationDataModel> relationData = new List<RelationDataModel>();
-            if (!string.IsNullOrEmpty(table1Id))
+            if (table1Id != null)
             {
                 var filters = new List<FilterParam>() {
                     new FilterParam() {
@@ -1280,7 +1281,7 @@ namespace DataEditorPortal.Web.Services
             }
             return result;
         }
-        private void UpdateLinkData(string table1Name, string table1Id, List<RelationDataModel> inputModel)
+        private void UpdateLinkData(string table1Name, object table1Id, List<RelationDataModel> inputModel)
         {
             var existingModel = GetLinkDataModelForForm(table1Name, table1Id);
 
@@ -1310,7 +1311,8 @@ namespace DataEditorPortal.Web.Services
                             value.Add(new KeyValuePair<string, object>(linkedTableInfo.Table1MappingField, table1Id));
                             value.Add(new KeyValuePair<string, object>(linkedTableInfo.Table2MappingField, table2Id));
                             var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
-                            dynamicParameters.Add("RETURNED_ID", dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
+                            var paramReturnId = _queryBuilder.ParameterName("RETURNED_ID");
+                            dynamicParameters.Add(paramReturnId, dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
 
                             param.Add(dynamicParameters);
                         }
