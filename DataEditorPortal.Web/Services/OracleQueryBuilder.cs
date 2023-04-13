@@ -180,7 +180,7 @@ namespace DataEditorPortal.Web.Services
 
                 var param = string.Join(",", config.Columns.Select(x => $"{ParameterPrefix}{ParameterName(x)}"));
 
-                var queryText = $@"INSERT INTO {source} ({columns}) VALUES ({param}) RETURNING {config.IdColumn} INTO {ParameterPrefix}{ParameterName("RETURNED_ID")}";
+                var queryText = $@"INSERT INTO {source} ({columns}) VALUES ({param}) RETURNING {config.IdColumn} INTO {ParameterPrefix}{ParameterName($"RETURNED_{config.IdColumn}")}";
 
                 return queryText;
             }

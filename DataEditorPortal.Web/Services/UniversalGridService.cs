@@ -706,7 +706,7 @@ namespace DataEditorPortal.Web.Services
                 try
                 {
                     var dynamicParameters = new DynamicParameters(param);
-                    var paramReturnId = _queryBuilder.ParameterName("RETURNED_ID");
+                    var paramReturnId = _queryBuilder.ParameterName($"RETURNED_{dataSourceConfig.IdColumn}");
                     dynamicParameters.Add(paramReturnId, dbType: null, direction: ParameterDirection.Output, size: 40);
 
                     var affected = con.Execute(queryText, dynamicParameters, trans);
@@ -1311,7 +1311,7 @@ namespace DataEditorPortal.Web.Services
                             value.Add(new KeyValuePair<string, object>(linkedTableInfo.Table1MappingField, table1Id));
                             value.Add(new KeyValuePair<string, object>(linkedTableInfo.Table2MappingField, table2Id));
                             var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
-                            var paramReturnId = _queryBuilder.ParameterName("RETURNED_ID");
+                            var paramReturnId = _queryBuilder.ParameterName($"RETURNED_{linkedTableInfo.LinkedTable.IdColumn}");
                             dynamicParameters.Add(paramReturnId, dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
 
                             param.Add(dynamicParameters);
