@@ -664,7 +664,6 @@ namespace DataEditorPortal.Web.Services
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
                 con.Open();
-                var trans = con.BeginTransaction();
 
                 #region prepair values and params
 
@@ -703,6 +702,7 @@ namespace DataEditorPortal.Web.Services
                 #endregion
 
                 // excute command
+                var trans = con.BeginTransaction();
                 try
                 {
                     var dynamicParameters = new DynamicParameters(param);
@@ -786,7 +786,6 @@ namespace DataEditorPortal.Web.Services
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
                 con.Open();
-                var trans = con.BeginTransaction();
 
                 #region prepair values and paramsters
 
@@ -829,6 +828,7 @@ namespace DataEditorPortal.Web.Services
                 #endregion
 
                 // excute command
+                var trans = con.BeginTransaction();
                 try
                 {
                     var affected = con.Execute(queryText, param, trans);
