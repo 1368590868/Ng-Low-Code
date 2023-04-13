@@ -25,7 +25,11 @@ export class AdvancedDialogComponent implements ControlValueAccessor {
   form!: FormGroup;
   visible = false;
   hasAdvanceData = false;
-  @Input() value: any;
+  @Input()
+  set value(val: any) {
+    this.innerValue = val;
+    this.initForm(val ?? {});
+  }
   typeOptions: { label: string; value: string }[] = [
     { label: 'Text', value: 'Text' },
     { label: 'Stored Procedure', value: 'StoredProcedure' }
@@ -53,6 +57,7 @@ export class AdvancedDialogComponent implements ControlValueAccessor {
   }
 
   writeValue(value: any): void {
+    console.log(value);
     this.value = value;
   }
   registerOnChange(fn: any): void {

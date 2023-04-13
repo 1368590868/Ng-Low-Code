@@ -125,7 +125,7 @@ export class PortalEditLinkComponent
           }
 
           if (result?.linkedTable) {
-            this.advancedValue = result.linkedTable?.autoAddDatabase;
+            this.advancedValue = result.linkedTable?.queryToGetId;
             this.dsConfig = result.linkedTable;
           }
         }
@@ -193,7 +193,8 @@ export class PortalEditLinkComponent
     if (this.valid()) {
       const data: DataSourceConfig = {
         dataSourceConnectionId: this.dsConfig.dataSourceConnectionId,
-        idColumn: this.dsConfig.idColumn
+        idColumn: this.dsConfig.idColumn,
+        queryToGetId: this.advancedValue
       };
       if (!this.dsConfig.queryText) {
         data.tableName = this.dsConfig.tableName;
