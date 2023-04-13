@@ -43,6 +43,8 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   innerValue: any[] = [];
 
+  sortMeta!: any;
+
   @Input()
   set value(val: any[]) {
     this.innerValue = val || [];
@@ -74,10 +76,15 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
     const { checked } = event;
     if (checked) {
       this.dataSource.forEach((item: any) => {
-        this.innerValue.push({
-          table1Id: this.table1Id,
-          table2Id: item[this.dataKey]
-        });
+        const repeat = this.innerValue.find(
+          (x: any) => x.table2Id === item[this.dataKey]
+        );
+        if (!repeat) {
+          this.innerValue.push({
+            table1Id: this.table1Id,
+            table2Id: item[this.dataKey]
+          });
+        }
       });
     } else {
       this.dataSource.forEach((item: any) => {
@@ -88,6 +95,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
         this.innerValue.splice(removeIds, 1);
       });
     }
+    console.log(this.innerValue);
     this.onChange(this.innerValue);
   }
 
@@ -112,6 +120,27 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   onRowCheckBoxClick(event: MouseEvent) {
     event.stopPropagation();
+  }
+
+  fetchData() {
+    this.linkDataTableService
+      .getTableData(
+        this.table1Name,
+        this.searchParams,
+        this.sortMeta ? [this.sortMeta] : undefined
+      )
+      .subscribe(dataSource => {
+        this.dataSource = dataSource || [];
+        this.selection = dataSource.filter((item: any) =>
+          this.innerValue.find((x: any) => x.table2Id === item[this.dataKey])
+        );
+        this.cdr.detectChanges();
+      });
+  }
+
+  onSort(sortMeta: any) {
+    this.sortMeta = sortMeta;
+    this.fetchData();
   }
 
   ngOnInit(): void {

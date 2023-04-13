@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { NotifyService } from 'src/app/shared';
@@ -14,6 +14,8 @@ import {
 } from '../../../models/portal-item';
 import { FormControl } from '@angular/forms';
 import { AdvancedQueryModel } from '..';
+import { CustomActionsComponent } from '../..';
+import { AdvancedDialogComponent } from './advanced-dialog/advanced-dialog.component';
 @Component({
   selector: 'app-portal-edit-link',
   templateUrl: './portal-edit-link.component.html',
@@ -23,10 +25,13 @@ export class PortalEditLinkComponent
   extends PortalEditStepDirective
   implements OnInit
 {
+  @ViewChild('customActions') customActions!: CustomActionsComponent;
+  @ViewChild('advancedDialog') advancedDialog!: AdvancedDialogComponent;
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
   isSavingAndExit = false;
+  advancedValue?: { queryText: string; type: string };
 
   set itemId(val: string | undefined) {
     this.portalItemService.itemId = val;
@@ -120,6 +125,7 @@ export class PortalEditLinkComponent
           }
 
           if (result?.linkedTable) {
+            this.advancedValue = result.linkedTable?.queryToGetId;
             this.dsConfig = result.linkedTable;
           }
         }
@@ -146,6 +152,11 @@ export class PortalEditLinkComponent
 
       this.getDbTables();
     });
+  }
+
+  onShowAction(id: string) {
+    this.customActions.portalItemId = id;
+    this.customActions.showDialog();
   }
 
   onAddSecondaryTable() {
@@ -182,7 +193,8 @@ export class PortalEditLinkComponent
     if (this.valid()) {
       const data: DataSourceConfig = {
         dataSourceConnectionId: this.dsConfig.dataSourceConnectionId,
-        idColumn: this.dsConfig.idColumn
+        idColumn: this.dsConfig.idColumn,
+        queryToGetId: this.advancedValue
       };
       if (!this.dsConfig.queryText) {
         data.tableName = this.dsConfig.tableName;
