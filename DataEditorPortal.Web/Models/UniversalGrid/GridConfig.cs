@@ -88,6 +88,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string TableName { get; set; }
         public string TableSchema { get; set; }
         public string IdColumn { get; set; }
+        public ComputedConfig QueryToGetId { get; set; }
         public int PageSize { get; set; } = 100;
         public List<string> Columns { get; set; } = new List<string>();
         public List<SortParam> SortBy { get; set; } = new List<SortParam>();

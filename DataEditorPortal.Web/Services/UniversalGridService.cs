@@ -1304,20 +1304,24 @@ namespace DataEditorPortal.Web.Services
                         linkedTableInfo.LinkedTable.Columns = columns;
                         var sql = _queryBuilder.GenerateSqlTextForInsert(linkedTableInfo.LinkedTable);
 
-                        var param = new List<object>();
                         foreach (var table2Id in toAdd)
                         {
                             var value = new List<KeyValuePair<string, object>>();
+                            // if queryToGetId configured, get id first.
+                            var queryToGetId = linkedTableInfo.LinkedTable.QueryToGetId;
+                            if (queryToGetId != null && !string.IsNullOrEmpty(queryToGetId.queryText))
+                            {
+                                var idValue = con.ExecuteScalar(queryToGetId.queryText, null, null, null, queryToGetId.type);
+                                value.Add(new KeyValuePair<string, object>(linkedTableInfo.LinkedTable.IdColumn, idValue));
+                            }
                             value.Add(new KeyValuePair<string, object>(linkedTableInfo.Table1MappingField, table1Id));
                             value.Add(new KeyValuePair<string, object>(linkedTableInfo.Table2MappingField, table2Id));
                             var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
                             var paramReturnId = _queryBuilder.ParameterName($"RETURNED_{linkedTableInfo.LinkedTable.IdColumn}");
                             dynamicParameters.Add(paramReturnId, dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
 
-                            param.Add(dynamicParameters);
+                            con.Execute(sql, dynamicParameters);
                         }
-
-                        con.Execute(sql, param);
                     }
 
                     var toDelete = existingModel
