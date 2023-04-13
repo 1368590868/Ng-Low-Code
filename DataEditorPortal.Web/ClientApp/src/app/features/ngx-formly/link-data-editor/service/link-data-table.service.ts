@@ -22,14 +22,11 @@ export class LinkDataTableService {
       .pipe(map(res => res.result || { columns: [], dataKey: '' }));
   }
 
-  getTableData(name: string, searchParams: any, sorts: any = undefined) {
+  getTableData(name: string, tableParams: any) {
     return this.http
       .post<ApiResponse<any>>(
         `${this._apiUrl}universal-grid/${name}/linked-table-editor/table-data`,
-        {
-          searchParams,
-          sorts
-        }
+        tableParams
       )
       .pipe(map(res => res.result?.data || []));
   }
