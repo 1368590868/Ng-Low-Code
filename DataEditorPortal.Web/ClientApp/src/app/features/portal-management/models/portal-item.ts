@@ -40,6 +40,7 @@ export interface DataSourceConfig {
   sortBy?: DataSourceSortBy[];
   queryText?: string;
   pageSize?: number;
+  autoAddDatabase?: { type: string; queryText: string };
 }
 
 export interface DataSourceFilter {

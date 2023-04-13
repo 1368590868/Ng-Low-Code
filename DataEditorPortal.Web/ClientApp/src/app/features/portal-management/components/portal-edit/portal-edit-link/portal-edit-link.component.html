@@ -76,19 +76,46 @@
         [queryText]="dsConfig.queryText"
         (queryChange)="queryChange($event)"></app-advanced-query-dialog>
     </div>
-    <div class="flex align-items-center">
-      <div class="flex flex-column mb-2 mr-4">
-        <label for="idColumn" class="mb-1">Id Column</label>
+    <div class="flex align-items-center mt-3">
+      <div class="flex align-items-center">
+        <div class="flex flex-column mb-2 mr-4">
+          <label for="idColumn" class="mb-1">Id Column</label>
+          <div class="flex align-items-center">
+            <p-dropdown
+              [required]="true"
+              [formControl]="formControlIdColumn"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-column mb-2 ml-4">
+        <label class="mb-4"> </label>
         <div class="flex align-items-center">
-          <p-dropdown
-            [required]="true"
-            [formControl]="formControlIdColumn"
-            [options]="dbTableColumns"
-            placeholder="Please Select"
-            [style]="{ minWidth: '20rem' }"
-            optionLabel="columnName"
-            optionValue="columnName"
-            appendTo="body"></p-dropdown>
+          <p-message
+            severity="info"
+            [text]="
+              advancedValue
+                ? 'Query Text'
+                : 'Automatically Obtained From The Database'
+            "
+            styleClass="mr-1"></p-message>
+          <p-button
+            *ngIf="advancedValue"
+            styleClass="p-button-text p-button-rounded remove-btn"
+            icon="pi pi-times-circle"
+            (onClick)="advancedDialog.onRemove()"></p-button>
+
+          <p-button
+            class="ml-1"
+            title="Advanced Configuration"
+            styleClass="p-button-text p-button-rounded"
+            icon="pi pi-ellipsis-v"
+            (onClick)="advancedDialog.showDialog()"></p-button>
         </div>
       </div>
     </div>
@@ -343,3 +370,6 @@
 </p-card>
 
 <app-custom-actions #customActions></app-custom-actions>
+<app-advanced-dialog
+  #advancedDialog
+  [(ngModel)]="advancedValue"></app-advanced-dialog>

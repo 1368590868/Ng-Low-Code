@@ -15,6 +15,7 @@ import {
 import { FormControl } from '@angular/forms';
 import { AdvancedQueryModel } from '..';
 import { CustomActionsComponent } from '../..';
+import { AdvancedDialogComponent } from './advanced-dialog/advanced-dialog.component';
 @Component({
   selector: 'app-portal-edit-link',
   templateUrl: './portal-edit-link.component.html',
@@ -25,10 +26,12 @@ export class PortalEditLinkComponent
   implements OnInit
 {
   @ViewChild('customActions') customActions!: CustomActionsComponent;
+  @ViewChild('advancedDialog') advancedDialog!: AdvancedDialogComponent;
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
   isSavingAndExit = false;
+  advancedValue?: { queryText: string; type: string };
 
   set itemId(val: string | undefined) {
     this.portalItemService.itemId = val;
@@ -122,6 +125,7 @@ export class PortalEditLinkComponent
           }
 
           if (result?.linkedTable) {
+            this.advancedValue = result.linkedTable?.autoAddDatabase;
             this.dsConfig = result.linkedTable;
           }
         }

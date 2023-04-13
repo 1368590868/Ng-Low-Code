@@ -9,3 +9,4 @@ export * from './computed-value-editor/computed-value-editor.component';
 export * from './form-designer/form-designer-view.component';
 export * from './form-designer/form-designer-config.component';
 export * from './form-designer/search-designer-config.component';
+export * from './portal-edit/portal-edit-link/advanced-dialog/advanced-dialog.component';
