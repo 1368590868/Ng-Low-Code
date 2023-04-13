@@ -76,10 +76,15 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
     const { checked } = event;
     if (checked) {
       this.dataSource.forEach((item: any) => {
-        this.innerValue.push({
-          table1Id: this.table1Id,
-          table2Id: item[this.dataKey]
-        });
+        const repeat = this.innerValue.find(
+          (x: any) => x.table2Id === item[this.dataKey]
+        );
+        if (!repeat) {
+          this.innerValue.push({
+            table1Id: this.table1Id,
+            table2Id: item[this.dataKey]
+          });
+        }
       });
     } else {
       this.dataSource.forEach((item: any) => {
@@ -90,6 +95,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
         this.innerValue.splice(removeIds, 1);
       });
     }
+    console.log(this.innerValue);
     this.onChange(this.innerValue);
   }
 
