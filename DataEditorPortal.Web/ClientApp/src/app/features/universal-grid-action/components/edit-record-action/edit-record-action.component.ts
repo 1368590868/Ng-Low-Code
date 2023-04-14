@@ -37,6 +37,7 @@ export class EditRecordActionComponent
   implements OnInit
 {
   @Input() isAddForm = false;
+  @Input() layout: 'vertical' | 'horizontal' = 'horizontal';
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
@@ -141,6 +142,14 @@ export class EditRecordActionComponent
                 x.props['table1Name'] = this.gridName;
                 x.props['searchParams'] = this.fetchDataParam?.searches;
                 x.props['table1Id'] = this.dataKey;
+              }
+            });
+
+          fields
+            .filter(f => f.type === 'checkbox')
+            .forEach(x => {
+              if (x.props) {
+                x.props['hideLabel'] = this.layout === 'vertical';
               }
             });
 
@@ -254,6 +263,7 @@ export class EditRecordActionComponent
         this.submitSave(model);
       }
     } else {
+      this.fields.forEach(x => x.formControl?.markAsDirty());
       this.errorEvent.emit();
     }
   }

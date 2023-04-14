@@ -28,7 +28,6 @@ export class ExportExcelActionComponent
       props: {
         label: 'File Name',
         placeholder: 'File Name',
-        description: 'Description',
         required: true
       }
     }
@@ -49,7 +48,6 @@ export class ExportExcelActionComponent
         defaultValue: 'Selection',
         props: {
           label: 'Export Option',
-          description: 'Description',
           required: true,
 
           options: [
