@@ -596,17 +596,17 @@ namespace DataEditorPortal.Web.Services
 
                 #region prepair values and paramsters
 
-                // calculate the computed field values
-                AssignComputedValues(formLayout.FormFields, model, con);
-
-                // generate the query text
-                var queryText = _queryBuilder.ReplaceQueryParamters(formLayout.OnValidate.Script);
-
-                // add query parameters
+                // add Id parameters
                 if (model.ContainsKey(dataSourceConfig.IdColumn))
                     model[dataSourceConfig.IdColumn] = id;
                 else
                     model.Add(dataSourceConfig.IdColumn, id);
+
+                // calculate the computed field values
+                AssignComputedValues(formLayout.FormFields, model, con);
+
+                // generate the query text and parameter
+                var queryText = _queryBuilder.ReplaceQueryParamters(formLayout.OnValidate.Script);
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
 
                 #endregion
@@ -686,7 +686,7 @@ namespace DataEditorPortal.Web.Services
                     .Where(x => model.Keys.Contains(x) && model[x] != null)
                     .ToList();
 
-                // generate the query text
+                // generate the query text and parameters
                 var queryText = _queryBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
                 {
                     IdColumn = dataSourceConfig.IdColumn,
@@ -695,8 +695,6 @@ namespace DataEditorPortal.Web.Services
                     Columns = columns,
                     QueryText = formLayout.QueryText
                 });
-
-                // add query parameters
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
 
                 #endregion
@@ -951,16 +949,16 @@ namespace DataEditorPortal.Web.Services
                     {
                         if (!string.IsNullOrEmpty(field.computedConfig.queryText))
                         {
-                            var queryText = field.computedConfig.queryText;
+                            var query = _queryBuilder.ProcessQueryWithParamters(field.computedConfig.queryText, model);
                             try
                             {
-                                var value = con.ExecuteScalar(queryText, null, null, null, field.computedConfig.type);
+                                var value = con.ExecuteScalar(query.Item1, query.Item2, null, null, field.computedConfig.type);
                                 SetModelValue(model, field.key, value);
-                                _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, "Get Computed Value", queryText);
+                                _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, "Get Computed Value", query.Item1, query.Item2);
                             }
                             catch (Exception ex)
                             {
-                                _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, "Get Computed Value", queryText, null, ex.Message);
+                                _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, "Get Computed Value", query.Item1, query.Item2, ex.Message);
                                 _logger.LogError(ex.Message, ex);
                                 throw new DepException($"An Error has occurred when calculate computed value for field: {field.key}. Error: {ex.Message}");
                             }
