@@ -40,6 +40,7 @@ export interface DataSourceConfig {
   sortBy?: DataSourceSortBy[];
   queryText?: string;
   pageSize?: number;
+  queryToGetId?: { type: string; queryText: string };
 }
 
 export interface DataSourceFilter {
@@ -134,6 +135,7 @@ export interface LinkedSingleConfigDetails {
   status?: number;
   itemType?: string;
   description: string | null;
+  configCompleted?: boolean;
 }
 
 export interface LinkedSingleConfig {

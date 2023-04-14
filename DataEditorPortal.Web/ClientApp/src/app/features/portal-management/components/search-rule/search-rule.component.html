@@ -1,4 +1,11 @@
 <div class="flex align-items-center">
+  <input
+    *ngIf="!whereClause"
+    class="mr-1 flex-grow-1"
+    pInputText
+    [formControl]="formControlField"
+    (blur)="onFormControlFieldBlur()"
+    [required]="true" />
   <p-dropdown
     *ngIf="!whereClause"
     [formControl]="formControlMatchMode"
@@ -14,7 +21,7 @@
       styleClass="mr-1"></p-message>
   </div>
   <p-button
-    *ngIf="whereClause && !advancedModeOnly"
+    *ngIf="whereClause"
     styleClass="p-button-text p-button-rounded remove-btn"
     icon="pi pi-times-circle"
     (onClick)="whereClause = undefined"></p-button>

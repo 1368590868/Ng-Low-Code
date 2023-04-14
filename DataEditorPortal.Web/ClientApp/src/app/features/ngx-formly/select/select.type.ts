@@ -21,6 +21,7 @@ export interface FormlySelectFieldConfig
   selector: 'app-formly-field-primeng-select',
   template: `
     <p-dropdown
+      [filter]="true"
       [placeholder]="props.placeholder || ''"
       [options]="(props.options | formlySelectOptions : field | async) || []"
       [formControl]="formControl"

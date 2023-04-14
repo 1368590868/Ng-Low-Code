@@ -187,9 +187,12 @@ export class PortalEditComponent implements OnInit, OnDestroy {
       );
     });
 
+    const isLinkedSingle = this.itemType === 'linked-single';
+
     if (componentRef instanceof PortalEditStepDirective) {
       const child = componentRef as PortalEditStepDirective;
-      child.isLastStep = this.activatedIndex + 1 === this.steps.length;
+      child.isLastStep =
+        this.activatedIndex + 1 === this.steps.length && !isLinkedSingle;
       // save and next
       child.saveNextEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
         // publish if current is the last step
@@ -198,7 +201,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
           this.portalItemService
             .publish(this.itemId as string)
             .subscribe(res => {
-              if (!res.isError) {
+              if (!res.isError && !isLinkedSingle) {
                 this.notifyService.notifySuccess(
                   'Success',
                   'Save & Publish Successfully Completed.'
@@ -218,10 +221,12 @@ export class PortalEditComponent implements OnInit, OnDestroy {
 
       // save draft and exit
       child.saveDraftEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
-        this.notifyService.notifySuccess(
-          'Success',
-          'Save Draft Successfully Completed.'
-        );
+        if (!isLinkedSingle) {
+          this.notifyService.notifySuccess(
+            'Success',
+            'Save Draft Successfully Completed.'
+          );
+        }
         const next = this.itemId ? '../../' : '../';
         this.router.navigate([next], {
           relativeTo: this.activatedRoute
@@ -231,7 +236,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
       // back
       child.backEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
         let next = '';
-        if (this.activatedIndex - 1 <= 0) next = this.itemId ? '../../' : '../';
+        if (this.activatedIndex - 1 < 0) next = this.itemId ? '../../' : '../';
         else next = this.steps[this.activatedIndex - 1].routerLink;
         this.router.navigate([next], {
           relativeTo: this.activatedRoute

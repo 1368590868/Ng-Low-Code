@@ -19,6 +19,9 @@
         z-index: 11;
         border-top: none;
       }
+      .p-datatable-tbody tr {
+        transition: background-color var(--transition-duration);
+      }
       .p-datatable-tbody tr.highlighted {
         background-color: var(--yellow-400);
       }

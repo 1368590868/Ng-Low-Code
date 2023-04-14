@@ -236,22 +236,25 @@ export class PortalEditSearchComponent
     }
     const key = `CUSTOM_SEARCH_${index}`;
     const result = this.controls.filter(c => c.filterType === filterType);
-    this.targetColumns = [
-      {
-        key: key,
-        type: result[0].value,
-        props: {
-          label: key
-        },
+    const searchRule = {
+      field: key,
+      matchMode: this.portalItemService.getFilterMatchModeOptions({
         filterType: filterType,
-        searchRule: {
-          field: key,
-          whereClause: `${key} = ##VALUE##`
-        },
-        selected: true
+        type: result[0].value
+      })[0].value
+    };
+    const model = {
+      key: key,
+      type: result[0].value,
+      props: {
+        label: key
       },
-      ...this.targetColumns
-    ];
+      filterType: filterType,
+      searchRule: { ...searchRule },
+      searchRule1: this.isLinkedItem ? { ...searchRule } : undefined,
+      selected: true
+    };
+    this.targetColumns = [model, ...this.targetColumns];
   }
 
   onRemoveCustomColumn(event: MouseEvent, field: GridSearchField) {

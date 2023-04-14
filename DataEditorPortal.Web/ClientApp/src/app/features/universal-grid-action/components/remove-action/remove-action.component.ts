@@ -63,12 +63,36 @@ export class RemoveActionComponent
     return null;
   }
 
-  onSave(): void {
+  deleteGridData() {
     this.systemLogService.addSiteVisitLog({
       action: 'Remove',
       section: this.gridName,
       params: JSON.stringify(this.selectedRecords)
     });
+    this.gridService
+      .deleteGridData(
+        this.gridName,
+        this.selectedRecords.map((x: any) => x[this.recordKey])
+      )
+      .subscribe(res => {
+        if (!res.isError && res.result) {
+          this.notifyService.notifySuccess(
+            'Success',
+            'Remove Successfully Completed.'
+          );
+          // run after saved event if configured.
+          const handler = this.getEventActionHandler(
+            this.eventConfig?.afterSaved
+          );
+          if (handler) handler.excuteAction().subscribe();
+          this.savedEvent.emit();
+        } else {
+          this.errorEvent.emit();
+        }
+      });
+  }
+
+  onSave(): void {
     const handler = this.getEventActionHandler(this.eventConfig?.onValidate);
     if (handler) {
       handler
@@ -79,34 +103,11 @@ export class RemoveActionComponent
           errorMsg: 'Validation failed. Please check your data.'
         })
         .subscribe((res: boolean) => {
-          if (res) {
-            this.gridService
-              .deleteGridData(
-                this.gridName,
-                this.selectedRecords.map((x: any) => x[this.recordKey])
-              )
-              .subscribe(res => {
-                if (!res.isError && res.result) {
-                  this.notifyService.notifySuccess(
-                    'Success',
-                    'Remove Successfully Completed.'
-                  );
-                  // run after saved event if configured.
-                  const handler = this.getEventActionHandler(
-                    this.eventConfig?.afterSaved
-                  );
-                  if (handler) handler.excuteAction().subscribe();
-                  this.savedEvent.emit();
-                } else {
-                  this.errorEvent.emit();
-                }
-              });
-          } else {
-            this.errorEvent.emit();
-          }
+          if (res) this.deleteGridData();
+          else this.errorEvent.emit();
         });
     } else {
-      this.savedEvent.emit();
+      this.deleteGridData();
     }
   }
 }

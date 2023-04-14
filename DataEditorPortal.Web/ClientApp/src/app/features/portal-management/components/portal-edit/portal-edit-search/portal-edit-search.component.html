@@ -18,7 +18,7 @@
       [sourceStyle]="{ height: '32.1542rem' }"
       [targetStyle]="{ height: '36.5714rem' }"
       sourceFilterPlaceholder="Search by name"
-      filterBy="name"
+      filterBy="key"
       [showTargetFilter]="false"
       [showSourceControls]="false"
       [showTargetControls]="false"
@@ -69,6 +69,7 @@
       <div class="p-picklist-list flex-grow-1">
         <div *ngIf="this.model && this.model.key; else emptyMessage">
           <app-search-designer-config
+            [useTwoSearchRule]="isLinkedItem"
             [config]="model"
             [allSelectedFields]="allSelectedFields"
             (configChange)="configChange($event)"></app-search-designer-config>

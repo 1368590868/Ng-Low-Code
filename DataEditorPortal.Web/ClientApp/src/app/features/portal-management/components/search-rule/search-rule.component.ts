@@ -36,9 +36,6 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   }
   _options: any[] = [];
 
-  @Input()
-  advancedModeOnly = false;
-
   visible = false;
   dialogStyle: any = {
     minWidth: '40rem'
@@ -51,6 +48,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
     '--      FIRST_NAME = ##VALUE## \r\n' +
     "--      FIRST_NAME LIKE ##VALUE## + '%'";
 
+  formControlField: FormControl = new FormControl();
   formControlMatchMode: FormControl = new FormControl();
   formControlQuery: FormControl = new FormControl();
   field?: string;
@@ -63,7 +61,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   set whereClause(val: string | undefined) {
     this._whereClause = val;
     this.onChange?.({
-      field: this.field,
+      field: this.formControlField.value,
       whereClause: val
     });
   }
@@ -83,6 +81,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   set value(val: { field: string; matchMode?: string; whereClause?: string }) {
     if (val) {
       this.field = val.field;
+      this.formControlField.setValue(val.field);
       if (val.matchMode)
         this.formControlMatchMode.setValue(val.matchMode, { emitEvent: false });
       this._whereClause = val.whereClause;
@@ -110,10 +109,25 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
       .pipe(distinctUntilChanged())
       .subscribe(val => {
         this.onChange?.({
-          field: this.field,
+          field: this.formControlField.value,
           matchMode: val
         });
       });
+    this.formControlField.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe(val => {
+        this.onChange?.({
+          field: val,
+          matchMode: this.formControlMatchMode.value
+        });
+      });
+  }
+  onFormControlFieldBlur() {
+    console.log('test');
+    const val = this.formControlField.value;
+    if (!val) {
+      this.formControlField.setValue(this.field);
+    }
   }
 
   onMonacoEditorInit(editor: any) {
@@ -164,7 +178,6 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
       [formControl]="formControl"
       [formlyAttributes]="field"
       [options]="props.options"
-      [advancedModeOnly]="props.advancedModeOnly"
       (onChange)="
         props.change && props.change(field, $event)
       "></app-search-rule>
@@ -172,7 +185,5 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldSearchRuleEditorComponent extends FieldType<
-  FieldTypeConfig<
-    FormlyFieldProps & { options: any[]; advancedModeOnly: boolean }
-  >
+  FieldTypeConfig<FormlyFieldProps & { options: any[] }>
 > {}
