@@ -2,12 +2,14 @@
 using Dapper;
 using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.Data.Models;
 using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -58,6 +60,8 @@ namespace DataEditorPortal.Web.Services
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IEventLogService _eventLogService;
+        private readonly IAttachmentService _attachmentService;
+        private readonly IMemoryCache _memoryCache;
 
         public UniversalGridService(
             IServiceProvider serviceProvider,
@@ -66,7 +70,9 @@ namespace DataEditorPortal.Web.Services
             ILogger<UniversalGridService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IEventLogService eventLogService)
+            IEventLogService eventLogService,
+            IAttachmentService attachmentService,
+            IMemoryCache memoryCache)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
@@ -75,6 +81,8 @@ namespace DataEditorPortal.Web.Services
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _eventLogService = eventLogService;
+            _attachmentService = attachmentService;
+            _memoryCache = memoryCache;
         }
 
         #region Grid cofnig, columns config, search config and detail form config
@@ -225,22 +233,31 @@ namespace DataEditorPortal.Web.Services
         #region Grid List data
         public GridData GetGridData(string name, GridParam param)
         {
-            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
+            var config = _memoryCache.GetOrCreate($"grid.{name}", entry =>
+            {
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
+                return _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
+            });
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             #region compose the query text
 
             // get query text for list data from grid config.
-            var dataSourceConfig = new DataSourceConfig();
-            if (config.ItemType == GridItemType.LINKED)
+            var dataSourceConfig = _memoryCache.GetOrCreate($"grid.{name}.datasource", entry =>
             {
-                var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig);
-                dataSourceConfig = linkedDataSourceConfig.LinkedTable;
-            }
-            else
-            {
-                dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-            }
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
+                var result = new DataSourceConfig();
+                if (config.ItemType == GridItemType.LINKED)
+                {
+                    var linkedDataSourceConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig);
+                    result = linkedDataSourceConfig.LinkedTable;
+                }
+                else
+                {
+                    result = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+                }
+                return result;
+            });
 
             var filtersApplied = ProcessFilterParam(dataSourceConfig.Filters, new List<FilterParam>());
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
@@ -298,6 +315,11 @@ namespace DataEditorPortal.Web.Services
                 // replace the order by clause by input Sorts in queryText
                 queryText = _queryBuilder.UseOrderBy(queryText, param.Sorts);
             }
+
+            // join attachments 
+            var attachmentCols = GetAttachmentCols(config);
+            if (attachmentCols.Any())
+                queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
 
             #endregion
 
@@ -511,12 +533,21 @@ namespace DataEditorPortal.Web.Services
 
         public IDictionary<string, object> GetGridDataDetail(string name, string id)
         {
-            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
+            var config = _memoryCache.GetOrCreate($"grid.{name}", entry =>
+            {
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
+                return _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
+            });
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
             var queryText = _queryBuilder.GenerateSqlTextForDetail(dataSourceConfig);
+
+            // join attachments 
+            var attachmentCols = GetAttachmentCols(config);
+            if (attachmentCols.Any())
+                queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
 
             IDictionary<string, object> result = new Dictionary<string, object>();
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
@@ -710,8 +741,13 @@ namespace DataEditorPortal.Web.Services
                     var affected = con.Execute(queryText, dynamicParameters, trans);
                     var returnedId = dynamicParameters.Get<object>(paramReturnId);
 
-                    // process file upload
-                    SaveUploadedFiles(config.Name, uploadedFieldsMeta);
+                    if (uploadedFieldsMeta.Any())
+                    {
+                        // assign fileUploadConfig and save files
+                        var attachmentCols = GetAttachmentCols(config);
+                        uploadedFieldsMeta.ForEach(x => x.FileUploadConfig = attachmentCols.FirstOrDefault(c => c.field == x.FieldName).fileUploadConfig);
+                        SaveUploadedFiles(uploadedFieldsMeta, returnedId, config.Name);
+                    }
 
                     if (relationData != null)
                     {
@@ -831,8 +867,13 @@ namespace DataEditorPortal.Web.Services
                 {
                     var affected = con.Execute(queryText, param, trans);
 
-                    // process file upload
-                    SaveUploadedFiles(config.Name, uploadedFieldsMeta);
+                    if (uploadedFieldsMeta.Any())
+                    {
+                        // assign fileUploadConfig and save files
+                        var attachmentCols = GetAttachmentCols(config);
+                        uploadedFieldsMeta.ForEach(x => x.FileUploadConfig = attachmentCols.FirstOrDefault(c => c.field == x.FieldName).fileUploadConfig);
+                        SaveUploadedFiles(uploadedFieldsMeta, id, config.Name);
+                    }
 
                     if (relationData != null)
                     {
@@ -1085,23 +1126,10 @@ namespace DataEditorPortal.Web.Services
 
         #region File upload API
 
-        private IFileStorageService GetFileStorageService(FileStorageType type)
+        private List<UploadedFileMeta> ProcessFileUploadFileds(List<FormFieldConfig> formFields, Dictionary<string, object> model)
         {
-            switch (type)
-            {
-                case FileStorageType.FileSystem:
-                    return _serviceProvider.GetRequiredService<PhsicalFileStorageService>();
-                case FileStorageType.SqlBinary:
-                    return _serviceProvider.GetRequiredService<BinaryFileStorageService>();
-                default:
-                    return _serviceProvider.GetRequiredService<PhsicalFileStorageService>();
-            }
-        }
-
-        private Dictionary<string, List<UploadedFileModel>> ProcessFileUploadFileds(List<FormFieldConfig> formFields, Dictionary<string, object> model)
-        {
-            var result = new Dictionary<string, List<UploadedFileModel>>();
-            var fileUploadFields = formFields.Where(x => x.type == "fileUpload").ToList();
+            var result = new List<UploadedFileMeta>();
+            var fileUploadFields = formFields.Where(x => x.type == "attachments").ToList();
             foreach (var field in fileUploadFields)
             {
                 if (model.ContainsKey(field.key))
@@ -1110,29 +1138,44 @@ namespace DataEditorPortal.Web.Services
                     var jsonElement = (JsonElement)model[field.key];
                     if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
                     {
-                        var valueStr = jsonElement.ToString();
-                        model[field.key] = valueStr.Replace("\"status\":\"New\"", "\"status\":\"Current\"");
-
-                        var storageType = ((JsonElement)field.props).GetProperty("storageType").ToString();
-                        result.Add(storageType, JsonSerializer.Deserialize<List<UploadedFileModel>>(valueStr, jsonOptions));
+                        result.Add(new UploadedFileMeta()
+                        {
+                            FieldName = field.key,
+                            UploadedFiles = JsonSerializer.Deserialize<List<UploadedFileModel>>(jsonElement.ToString(), jsonOptions)
+                        });
                     }
-                    else
-                        model[field.key] = "[]";
+                    model[field.key] = null;
                 }
             }
             return result;
         }
 
-        private void SaveUploadedFiles(string gridName, Dictionary<string, List<UploadedFileModel>> uploadedFiledsMeta)
+        private void SaveUploadedFiles(List<UploadedFileMeta> uploadedFileMeta, object dataId, string gridName)
         {
-            foreach (var meta in uploadedFiledsMeta)
+            var attachmentService = _serviceProvider.GetRequiredService<IAttachmentService>();
+            foreach (var meta in uploadedFileMeta)
             {
-                var storageType = meta.Key;
-                FileStorageType storageTypeEnum = FileStorageType.FileSystem;
-                Enum.TryParse(storageType, out storageTypeEnum);
-                var fileStorageService = GetFileStorageService(storageTypeEnum);
-                fileStorageService.SaveFiles(meta.Value, gridName);
+                attachmentService.SaveUploadedFiles(meta, dataId, gridName);
             }
+        }
+
+        private IEnumerable<GridColConfig> GetAttachmentCols(UniversalGridConfiguration config)
+        {
+            return _memoryCache.GetOrCreate($"grid.{config.Name}.attachment.cols", entry =>
+            {
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
+                var columnsConfig = JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
+                return columnsConfig.Where(x => x.filterType == "attachments").Select(x =>
+                {
+                    if (x.fileUploadConfig == null)
+                    {
+                        x.fileUploadConfig = _attachmentService.GetDefaultConfig();
+                        var datasourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+                        x.fileUploadConfig.ForeignKeyName = datasourceConfig.IdColumn;
+                    }
+                    return x;
+                });
+            });
         }
 
         #endregion

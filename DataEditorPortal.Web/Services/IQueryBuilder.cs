@@ -23,6 +23,7 @@ namespace DataEditorPortal.Web.Services
         object TransformValue(object value, DataRow schema);
         object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues);
         string ReplaceQueryParamters(string queryText);
+        string JoinAttachments(string query, IEnumerable<GridColConfig> attachmentCols);
         // universal grid
         string GenerateSqlTextForList(DataSourceConfig config);
         string GenerateSqlTextForDetail(DataSourceConfig config);
@@ -190,6 +191,8 @@ namespace DataEditorPortal.Web.Services
 
         public virtual object GetJsonElementValue(object value)
         {
+            if (value is byte[]) return value;
+
             JsonElement jsonElement;
             if (value is JsonElement) jsonElement = (JsonElement)value;
             else jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(value));

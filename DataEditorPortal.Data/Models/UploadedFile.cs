@@ -10,6 +10,8 @@ namespace DataEditorPortal.Data.Models
         [Key]
         [Column("ID")]
         public string Id { get; set; }
+        [Column("DATA_ID")]
+        public string DataId { get; set; }
         [Column("FILE_NAME")]
         public string FileName { get; set; }
         [Column("CONTENT_TYPE")]

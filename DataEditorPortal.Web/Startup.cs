@@ -107,10 +107,10 @@ namespace DataEditorPortal.Web
             services.AddScoped<IEventLogService, EventLogService>();
             services.AddSingleton<ILicenseService, LicenseService>();
 
-            services.AddScoped<PhsicalFileStorageService>();
-            services.AddScoped<BinaryFileStorageService>();
+            services.AddScoped<IAttachmentService, AttachmentService>();
             #endregion
 
+            services.AddMemoryCache();
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>

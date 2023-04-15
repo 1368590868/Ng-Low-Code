@@ -8,6 +8,7 @@ using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.PortalItem;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -53,6 +54,7 @@ namespace DataEditorPortal.Web.Services
         private readonly ILogger<PortalItemService> _logger;
         private readonly IMapper _mapper;
         private IHttpContextAccessor _httpContextAccessor;
+        private readonly IMemoryCache _memoryCache;
 
         public PortalItemService(
             IServiceProvider serviceProvider,
@@ -60,7 +62,8 @@ namespace DataEditorPortal.Web.Services
             IQueryBuilder queryBuilder,
             ILogger<PortalItemService> logger,
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IMemoryCache memoryCache)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
@@ -68,6 +71,7 @@ namespace DataEditorPortal.Web.Services
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _memoryCache = memoryCache;
         }
 
         public bool ExistName(string name, Guid? id)
@@ -362,6 +366,8 @@ namespace DataEditorPortal.Web.Services
 
             _depDbContext.SaveChanges();
 
+            RemoveGridCache(config.Name);
+
             return true;
         }
 
@@ -412,6 +418,8 @@ namespace DataEditorPortal.Web.Services
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
 
             _depDbContext.SaveChanges();
+
+            RemoveGridCache(config.Name);
 
             return true;
         }
@@ -606,6 +614,13 @@ namespace DataEditorPortal.Web.Services
             _depDbContext.SaveChanges();
 
             return true;
+        }
+
+        private void RemoveGridCache(string name)
+        {
+            _memoryCache.Remove($"grid.{name}");
+            _memoryCache.Remove($"grid.{name}.datasource");
+            _memoryCache.Remove($"grid.{name}.attachment.cols");
         }
     }
 }
