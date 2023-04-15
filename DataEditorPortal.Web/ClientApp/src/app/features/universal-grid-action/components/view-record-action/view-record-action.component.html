@@ -22,8 +22,8 @@
               ? numeric
               : viewData.filterType === 'boolean'
               ? boolean
-              : viewData.filterType === 'upload'
-              ? upload
+              : viewData.filterType === 'attachments'
+              ? attachments
               : normal
           "></ng-container>
         <ng-template #boolean>{{ viewData.value | boolean }}</ng-template>
@@ -35,9 +35,9 @@
           viewData.value
             | number : (viewData.format === '' ? undefined : viewData.format)
         }}</ng-template>
-        <ng-template #upload
+        <ng-template #attachments
           ><div
-            [innerHTML]="viewData.value | upload : true"
+            [innerHTML]="viewData.value | attachments : true"
             class="flex flex-column"></div>
         </ng-template>
         <ng-template #normal>{{ viewData.value }}</ng-template>
