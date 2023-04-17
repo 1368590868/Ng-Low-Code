@@ -43,6 +43,9 @@ namespace DataEditorPortal.Web.Services
         bool AddGridData(string name, Dictionary<string, object> model);
         bool DeleteGridData(string name, string[] ids);
 
+        // file upload api
+        IEnumerable<GridColConfig> GetAttachmentCols(UniversalGridConfiguration config);
+
         // linked table api
         dynamic GetLinkedGridConfig(string name);
         GridData GetLinkedTableDataForFieldControl(string table1Name, GridParam param);
@@ -1129,7 +1132,7 @@ namespace DataEditorPortal.Web.Services
         private List<UploadedFileMeta> ProcessFileUploadFileds(List<FormFieldConfig> formFields, Dictionary<string, object> model)
         {
             var result = new List<UploadedFileMeta>();
-            var fileUploadFields = formFields.Where(x => x.type == "attachments").ToList();
+            var fileUploadFields = formFields.Where(x => x.filterType == "attachments").ToList();
             foreach (var field in fileUploadFields)
             {
                 if (model.ContainsKey(field.key))
@@ -1159,13 +1162,16 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        private IEnumerable<GridColConfig> GetAttachmentCols(UniversalGridConfiguration config)
+        public IEnumerable<GridColConfig> GetAttachmentCols(UniversalGridConfiguration config)
         {
             return _memoryCache.GetOrCreate($"grid.{config.Name}.attachment.cols", entry =>
             {
                 entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
+
+                if (string.IsNullOrEmpty(config.ColumnsConfig)) return new List<GridColConfig>();
+
                 var columnsConfig = JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
-                return columnsConfig.Where(x => x.filterType == "attachments").Select(x =>
+                return columnsConfig.Where(x => x.type == "AttachmentField" && x.filterType == "attachments").Select(x =>
                 {
                     if (x.fileUploadConfig == null)
                     {
@@ -1202,7 +1208,8 @@ namespace DataEditorPortal.Web.Services
             return new
             {
                 columns = columns.Where(c => columnsForLinkedField.Contains(c.field)).ToList(),
-                dataKey = linkedTableInfo.LinkedTable.IdColumn
+                dataKey = linkedTableInfo.LinkedTable.IdColumn,
+                table2Name = linkedTableInfo.Table2Name
             };
         }
 
@@ -1245,40 +1252,45 @@ namespace DataEditorPortal.Web.Services
 
         private LinkedTableInfo GetLinkedTableInfo(string table1Name)
         {
-            var queryTables = from u in _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection)
-                              join m in _depDbContext.SiteMenus on u.Name equals m.Name
-                              select new { m, u };
+            return _memoryCache.GetOrCreate($"grid.{table1Name}.linked.table.info", entry =>
+            {
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
 
-            var queryTable1 = queryTables.Where(t => t.m.Name == table1Name && t.u.ItemType == GridItemType.LINKED_SINGLE);
+                var queryTables = from u in _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection)
+                                  join m in _depDbContext.SiteMenus on u.Name equals m.Name
+                                  select new { m, u };
 
-            var queryTable2 = from t in queryTables
-                              join t1 in queryTable1 on t.m.ParentId equals t1.m.ParentId
-                              where t.u.ItemType == GridItemType.LINKED_SINGLE && t.u.Name != table1Name
-                              select t;
+                var queryTable1 = queryTables.Where(t => t.m.Name == table1Name && t.u.ItemType == GridItemType.LINKED_SINGLE);
 
-            var resultQuery = from t2 in queryTable2
-                              join tMain in queryTables on t2.m.ParentId equals tMain.m.Id
-                              select new LinkedTableInfo
-                              {
-                                  Table2Name = t2.m.Name,
-                                  Table2Id = t2.m.Id,
-                                  Id = tMain.m.Id,
-                                  Name = tMain.m.Name,
-                                  ConnectionString = tMain.u.DataSourceConnection.ConnectionString,
-                                  DataSourceConfig = tMain.u.DataSourceConfig
-                              };
-            var result = resultQuery.FirstOrDefault();
+                var queryTable2 = from t in queryTables
+                                  join t1 in queryTable1 on t.m.ParentId equals t1.m.ParentId
+                                  where t.u.ItemType == GridItemType.LINKED_SINGLE && t.u.Name != table1Name
+                                  select t;
 
-            var config = JsonSerializer.Deserialize<LinkedDataSourceConfig>(result.DataSourceConfig);
-            result.LinkedTable = config.LinkedTable;
-            result.Table1MappingField = config.PrimaryTable.Id == result.Table2Id
-                ? config.SecondaryTable.MapToLinkedTableField
-                : config.PrimaryTable.MapToLinkedTableField;
-            result.Table2MappingField = config.PrimaryTable.Id == result.Table2Id
-                ? config.PrimaryTable.MapToLinkedTableField
-                : config.SecondaryTable.MapToLinkedTableField;
+                var resultQuery = from t2 in queryTable2
+                                  join tMain in queryTables on t2.m.ParentId equals tMain.m.Id
+                                  select new LinkedTableInfo
+                                  {
+                                      Table2Name = t2.m.Name,
+                                      Table2Id = t2.m.Id,
+                                      Id = tMain.m.Id,
+                                      Name = tMain.m.Name,
+                                      ConnectionString = tMain.u.DataSourceConnection.ConnectionString,
+                                      DataSourceConfig = tMain.u.DataSourceConfig
+                                  };
+                var result = resultQuery.FirstOrDefault();
 
-            return result;
+                var config = JsonSerializer.Deserialize<LinkedDataSourceConfig>(result.DataSourceConfig);
+                result.LinkedTable = config.LinkedTable;
+                result.Table1MappingField = config.PrimaryTable.Id == result.Table2Id
+                    ? config.SecondaryTable.MapToLinkedTableField
+                    : config.PrimaryTable.MapToLinkedTableField;
+                result.Table2MappingField = config.PrimaryTable.Id == result.Table2Id
+                    ? config.PrimaryTable.MapToLinkedTableField
+                    : config.SecondaryTable.MapToLinkedTableField;
+
+                return result;
+            });
         }
         private List<RelationDataModel> GetLinkDataModelForForm(string table1Name, object table1Id)
         {
@@ -1426,21 +1438,21 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
+        class LinkedTableInfo
+        {
+            public string Table2Name { get; set; }
+            public Guid Table2Id { get; set; }
+            public string Name { get; set; }
+            public Guid Id { get; set; }
+
+            public string ConnectionString { get; set; }
+            public DataSourceConfig LinkedTable { get; set; }
+            public string DataSourceConfig { get; set; }
+            public string Table2MappingField { get; set; }
+            public string Table1MappingField { get; set; }
+        }
+
         #endregion
-
     }
 
-    class LinkedTableInfo
-    {
-        public string Table2Name { get; set; }
-        public Guid Table2Id { get; set; }
-        public string Name { get; set; }
-        public Guid Id { get; set; }
-
-        public string ConnectionString { get; set; }
-        public DataSourceConfig LinkedTable { get; set; }
-        public string DataSourceConfig { get; set; }
-        public string Table2MappingField { get; set; }
-        public string Table1MappingField { get; set; }
-    }
 }

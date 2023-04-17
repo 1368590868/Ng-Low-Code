@@ -1,5 +1,4 @@
 ﻿using AutoWrapper.Filters;
-using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
@@ -7,8 +6,9 @@ using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -27,20 +27,26 @@ namespace DataEditorPortal.Web.Controllers
         private readonly DepDbContext _depDbContext;
         private readonly IConfiguration _config;
         private readonly IHostEnvironment _hostEnvironment;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IUniversalGridService _universalGridService;
+        private readonly IMemoryCache _memoryCache;
+        private readonly IAttachmentService _attachmentService;
 
         public AttachmentController(
             ILogger<AttachmentController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
             IHostEnvironment hostEnvironment,
-            IServiceProvider serviceProvider)
+            IUniversalGridService universalGridService,
+            IMemoryCache memoryCache,
+            IAttachmentService attachmentService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _config = config;
             _hostEnvironment = hostEnvironment;
-            _serviceProvider = serviceProvider;
+            _universalGridService = universalGridService;
+            _memoryCache = memoryCache;
+            _attachmentService = attachmentService;
         }
 
         [HttpPost]
@@ -114,38 +120,32 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
-        [Route("download-file/{fileId}/{fileName}")]
+        [Route("download-file/{gridName}/{fieldName}/{fileId}/{fileName}")]
         [AutoWrapIgnore]
-        public ActionResult DownloadFile(string fileId)
+        public ActionResult DownloadFile(string gridName, string fieldName, string fileId)
         {
-            var uploadedFile = _depDbContext.UploadedFiles.FirstOrDefault(x => x.Id == fileId);
-            if (uploadedFile == null)
+            try
+            {
+                var config = _memoryCache.GetOrCreate($"grid.{gridName}", entry =>
+                {
+                    entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
+                    return _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == gridName);
+                });
+
+                var attachmentCols = _universalGridService.GetAttachmentCols(config);
+                var fileUploadConfig = attachmentCols.FirstOrDefault(x => x.field.ToLower() == fieldName.ToLower()).fileUploadConfig;
+                var result = _attachmentService.GetFileStream(fileId, fileUploadConfig);
+
+                return File(result.stream, result.contentType, result.fileName);
+            }
+            catch (Exception ex)
+            {
                 return new ContentResult
                 {
                     Content = "<h1 style='text-align:center'>File Not Found</h1><script>setTimeout(function(){window.close()}, 2000)</script>",
                     ContentType = "text/html",
                     StatusCode = 404
                 };
-
-            var fileStorageService = GetFileStorageService(uploadedFile.StorageType);
-            var stream = fileStorageService.GetFileStream(uploadedFile.Id);
-            return File(
-                stream,
-                string.IsNullOrEmpty(uploadedFile.ContentType) ? "application/octet-stream" : uploadedFile.ContentType,
-                uploadedFile.FileName
-            );
-        }
-
-        private IFileStorageService GetFileStorageService(FileStorageType type)
-        {
-            switch (type)
-            {
-                case FileStorageType.FileSystem:
-                    return _serviceProvider.GetRequiredService<PhsicalFileStorageService>();
-                case FileStorageType.SqlBinary:
-                    return _serviceProvider.GetRequiredService<BinaryFileStorageService>();
-                default:
-                    return _serviceProvider.GetRequiredService<PhsicalFileStorageService>();
             }
         }
     }

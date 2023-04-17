@@ -640,13 +640,9 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("FILE_PATH");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("NUMBER(10)")
+                    b.Property<string>("Status")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("STATUS");
-
-                    b.Property<int>("StorageType")
-                        .HasColumnType("NUMBER(10)")
-                        .HasColumnName("STORAGE_TYPE");
 
                     b.HasKey("Id");
 
