@@ -60,9 +60,16 @@
             >
           </div>
           <app-form-designer-view
-            *ngIf="column.selected"
+            *ngIf="column.selected && !column.computedConfig"
             layout="horizontal"
             [config]="column"></app-form-designer-view>
+
+          <div
+            *ngIf="column.selected && column.computedConfig"
+            class="flex align-items-center py-2">
+            <label style="width: 40%">{{ column.props.label }}</label>
+            <p-tag severity="warning">Computed Field</p-tag>
+          </div>
         </ng-template>
         <ng-template pTemplate="emptymessagetarget">
           <div class="w-full relative">
