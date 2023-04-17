@@ -29,5 +29,10 @@ namespace DataEditorPortal.Data.Contexts
 
         public virtual DbSet<DemoTable> DemoTables { get; set; }
 
+        // LPA Demo
+        public virtual DbSet<LPASITE> LPASITE { get; set; }
+        public virtual DbSet<LPAREMEDIATIONACTSITE> LPAREMEDIATIONACTSITE { get; set; }
+        public virtual DbSet<LPASITE_RELATION> LPASITE_RELATION { get; set; }
+        public virtual DbSet<GFORM_SITE_HIERARCHY_MV> GFORM_SITE_HIERARCHY_MV { get; set; }
     }
 }

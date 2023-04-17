@@ -144,7 +144,7 @@ namespace DataEditorPortal.Web.Services
                 var queryText = $@"
                     DECLARE @InsertedIDResults TABLE (ID NVARCHAR(40)); 
                     INSERT INTO {source} ({columns}) OUTPUT INSERTED.{config.IdColumn} INTO @InsertedIDResults VALUES ({param});
-                    SET @RETURNED_ID = (SELECT TOP 1 ID FROM @InsertedIDResults);
+                    SET {ParameterPrefix}{ParameterName($"RETURNED_{config.IdColumn}")} = (SELECT TOP 1 ID FROM @InsertedIDResults);
                 ";
 
                 return queryText;

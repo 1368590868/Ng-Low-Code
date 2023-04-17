@@ -122,7 +122,7 @@ namespace DataEditorPortal.Web.Controllers
             var ids = model.RootElement
                 .GetProperty("ids")
                 .EnumerateArray()
-                .Select(x => x.GetString())
+                .Select(x => x.GetRawText())
                 .ToArray();
             return _universalGridService.DeleteGridData(name, ids);
         }
@@ -132,6 +132,7 @@ namespace DataEditorPortal.Web.Controllers
         [AutoWrapIgnore]
         public IActionResult ExportData(string name, [FromBody] ExportParam exportParam)
         {
+            exportParam.IndexCount = 0;
             var fs = _universalGridService.ExportExcel(name, exportParam);
 
             return File(fs, "application/ms-excel", exportParam.FileName);
@@ -153,9 +154,9 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("{table1Name}/linked-table-editor/table-data")]
-        public GridData GetLinkedTableDataForFieldControl(string table1Name, [FromBody] Dictionary<string, object> searchParam)
+        public GridData GetLinkedTableDataForFieldControl(string table1Name, GridParam gridParam)
         {
-            return _universalGridService.GetLinkedTableDataForFieldControl(table1Name, searchParam);
+            return _universalGridService.GetLinkedTableDataForFieldControl(table1Name, gridParam);
         }
 
         [HttpPost]

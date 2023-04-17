@@ -10,6 +10,7 @@ import { ColumnsConfig } from '../link-data-editor.type';
 import { LinkDataTableService } from '../service/link-data-table.service';
 import { forkJoin } from 'rxjs';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { GridParam } from 'src/app/shared';
 
 @Component({
   selector: 'app-link-data-table',
@@ -33,6 +34,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   @Input() searchParams: any = {};
   @Input() table1Id?: string;
   columnsConfig: ColumnsConfig[] = [];
+  fetchDataParam?: GridParam;
   dataSource: any[] = [];
   dataKey = '';
 
@@ -123,12 +125,9 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   }
 
   fetchData() {
+    this.fetchDataParam = this.getFetchParam();
     this.linkDataTableService
-      .getTableData(
-        this.table1Name,
-        this.searchParams,
-        this.sortMeta ? [this.sortMeta] : undefined
-      )
+      .getTableData(this.table1Name, this.fetchDataParam)
       .subscribe(dataSource => {
         this.dataSource = dataSource || [];
         this.selection = dataSource.filter((item: any) =>
@@ -145,11 +144,12 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   ngOnInit(): void {
     if (this.table1Name !== '') {
+      this.fetchDataParam = this.getFetchParam();
       forkJoin([
         this.linkDataTableService.getTableConfig(this.table1Name),
         this.linkDataTableService.getTableData(
           this.table1Name,
-          this.searchParams
+          this.fetchDataParam
         )
       ]).subscribe(([tableConfig, dataSource]) => {
         this.columnsConfig = tableConfig.columns;
@@ -162,5 +162,33 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
         this.cdr.detectChanges();
       });
     }
+  }
+
+  getFetchParam() {
+    const fetchParam: any = {
+      filters: [],
+      sorts: [],
+      searches: this.searchParams
+    };
+
+    // set filters from table onFilter params
+    // const obj = this.filters;
+    // for (const prop in obj) {
+    //   if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+    //     // do stuff
+    //     const fieldProp = obj[prop];
+    //     for (let i = 0; i < fieldProp.length; i++) {
+    //       if (fieldProp[i].value != null) {
+    //         fieldProp[i].field = prop;
+    //         fetchParam.filters.push(fieldProp[i]);
+    //       }
+    //     }
+    //   }
+    // }
+
+    if (this.sortMeta) {
+      fetchParam.sorts = [this.sortMeta];
+    }
+    return fetchParam;
   }
 }

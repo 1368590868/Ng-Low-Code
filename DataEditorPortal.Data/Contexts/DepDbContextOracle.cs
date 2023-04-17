@@ -37,6 +37,11 @@ namespace DataEditorPortal.Data.Contexts
                 entity.Property(e => e.DetailConfig).HasColumnType("CLOB");
             });
 
+            modelBuilder.Entity<SiteSetting>(entity =>
+            {
+                entity.Property(e => e.SiteLogo).HasColumnType("CLOB");
+            });
+
             modelBuilder.Entity<SiteContent>(entity =>
             {
                 entity.Property(e => e.Content).HasColumnType("CLOB");
@@ -45,6 +50,20 @@ namespace DataEditorPortal.Data.Contexts
             modelBuilder.Entity<UploadedFile>(entity =>
             {
                 entity.Property(e => e.FileBytes).HasColumnType("BLOB");
+            });
+
+            // LPA Demo
+            modelBuilder.Entity<LPASITE>(entity =>
+            {
+                OraclePropertyBuilderExtensions.UseIdentityColumn(entity.Property(e => e.OBJECTID));
+            });
+            modelBuilder.Entity<LPAREMEDIATIONACTSITE>(entity =>
+            {
+                OraclePropertyBuilderExtensions.UseIdentityColumn(entity.Property(e => e.OBJECTID));
+            });
+            modelBuilder.Entity<LPASITE_RELATION>(entity =>
+            {
+                OraclePropertyBuilderExtensions.UseIdentityColumn(entity.Property(e => e.OBJECTID));
             });
         }
     }

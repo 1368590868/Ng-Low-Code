@@ -165,6 +165,178 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.ToTable("EVENT_LOGS");
                 });
 
+            modelBuilder.Entity("DataEditorPortal.Data.Models.GFORM_SITE_HIERARCHY_MV", b =>
+                {
+                    b.Property<string>("HIERARCHY_GLOBALID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AREA_NAME")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DIVISION_NAME")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DOT_OPERATOR_NAME")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LOCATION")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SITENAME")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SITETYPE")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("HIERARCHY_GLOBALID");
+
+                    b.ToTable("GFORM_SITE_HIERARCHY_MV");
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.LPAREMEDIATIONACTSITE", b =>
+                {
+                    b.Property<int>("OBJECTID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ASSIGNEDTO")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BOUNDARYGLOBALID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("COMMENTS")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CREATIONUSER")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DATECREATED")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DATEMODIFIED")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EVENTID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FEATUREGLOBALID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GLOBALID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LASTUSER")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LPAACTIVITYSTATUS")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("REMEDIATIONACTUALDATE")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("REMEDIATIONPROPOSEDDATE")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("STATUS")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TYPE")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OBJECTID");
+
+                    b.ToTable("LPAREMEDIATIONACTSITE");
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.LPASITE", b =>
+                {
+                    b.Property<int>("OBJECTID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ASSESSEDBY")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BOUNDARYGLOBALID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("COMMENTS")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CREATIONUSER")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("D40CRITERIA")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DATECREATED")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DATEMODIFIED")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DISCOVERYDATE")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EVENTID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FEATUREGLOBALID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GLOBALID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LASTUSER")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LPANAME")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LPASTATUS")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("REMEDIATIONACTUALDATE")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("REMEDIATIONPROPOSEDDATE")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("REQREMEDIATIONDATE")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("STATUS")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TYPE")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OBJECTID");
+
+                    b.ToTable("LPASITE");
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.LPASITE_RELATION", b =>
+                {
+                    b.Property<int>("OBJECTID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("LEFTID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RIGHTID")
+                        .HasColumnType("int");
+
+                    b.HasKey("OBJECTID");
+
+                    b.ToTable("LPASITE_RELATION");
+                });
+
             modelBuilder.Entity("DataEditorPortal.Data.Models.Lookup", b =>
                 {
                     b.Property<Guid>("Id")
