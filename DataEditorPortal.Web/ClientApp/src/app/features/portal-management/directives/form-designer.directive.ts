@@ -113,6 +113,14 @@ export class FormDesignerDirective {
       hide: true
     },
     {
+      key: 'key',
+      type: 'input',
+      props: {
+        label: 'Field Name',
+        disabled: true
+      }
+    },
+    {
       key: 'type',
       type: 'select',
       defaultValue: 'input',
