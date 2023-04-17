@@ -58,7 +58,7 @@ export const FROM_DESIGNER_CONTROLS: {
   {
     label: 'File Upload',
     value: 'fileUpload',
-    filterType: 'text'
+    filterType: 'attachments'
   },
   {
     label: 'Link Data Editor',
@@ -132,7 +132,7 @@ export class FormDesignerDirective {
         placeholder: 'Default Value'
       },
       expressions: {
-        hide: `formState.hideDefaultValue`
+        hide: `formState.hideDefaultValue || 'input,checkbox,textarea,inputNumber'.indexOf(field.parent.model.type) < 0`
       }
     },
     {
@@ -278,20 +278,6 @@ export class FormDesignerDirective {
         // props for file upload
         {
           fieldGroup: [
-            {
-              key: 'storageType',
-              type: 'select',
-              defaultValue: 'FileSystem',
-              props: {
-                label: 'Storage Provider',
-                showClear: false,
-                options: [
-                  { label: 'File System', value: 'FileSystem' },
-                  { label: 'Sql Binary', value: 'SqlBinary' }
-                ],
-                required: true
-              }
-            },
             {
               key: 'accept',
               type: 'input',

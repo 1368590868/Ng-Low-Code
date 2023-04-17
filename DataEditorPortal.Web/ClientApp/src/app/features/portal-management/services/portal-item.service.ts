@@ -253,10 +253,13 @@ export class PortalItemService {
     );
   }
 
-  getDataSourceTableColumnsByPortalId(): Observable<DataSourceTableColumn[]> {
+  getDataSourceTableColumnsByPortalId(
+    forForm = false
+  ): Observable<DataSourceTableColumn[]> {
     return this.http
       .get<ApiResponse<DataSourceTableColumn[]>>(
-        `${this._apiUrl}portal-item/${this.itemId}/datasource/columns`
+        `${this._apiUrl}portal-item/${this.itemId}/datasource/columns`,
+        { params: { forForm } }
       )
       .pipe(map(x => x.result || []));
   }

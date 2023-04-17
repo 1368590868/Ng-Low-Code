@@ -3,8 +3,10 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   forwardRef,
+  HostBinding,
   Inject,
-  Input
+  Input,
+  OnInit
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
@@ -29,11 +31,13 @@ import { NotifyService } from 'src/app/shared';
   ]
 })
 export class FileUploadComponent implements ControlValueAccessor {
+  @Input() gridName = '';
+  @Input() fieldName: any;
   @Input() accept = '.dwg,.dxf,.dgn,.pdf,.ppt,.docx,.doc,.xlsx,.xls,image/*';
   @Input() maxFileSize = 10000;
   @Input() chooseLabel = 'Browse';
   @Input() multiple = false;
-  @Input() fileLimit: any = null;
+  @Input() fileLimit = 1;
   newAttachments: any[] = [];
   progress = 0;
 
@@ -112,7 +116,7 @@ export class FileUploadComponent implements ControlValueAccessor {
     const url =
       data.status === 'New'
         ? `${this.apiUrl}attachment/download-temp-file/${data.fileId}/${data.fileName}`
-        : `${this.apiUrl}attachment/download-file/${data.fileId}/${data.fileName}`;
+        : `${this.apiUrl}attachment/download-file/${this.gridName}/${this.fieldName}/${data.fileId}/${data.fileName}`;
     const a = document.createElement('a');
 
     a.href = url;
@@ -151,18 +155,35 @@ export class FileUploadComponent implements ControlValueAccessor {
     [maxFileSize]="props.maxFileSize"
     [chooseLabel]="props.chooseLabel || 'Browse'"
     [multiple]="props.multiple"
-    [fileLimit]="props.fileLimit"></app-file-upload>`,
+    [fileLimit]="props.fileLimit || 1"
+    [gridName]="props.gridName"
+    [fieldName]="field.key"></app-file-upload>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldFileUploadComponent extends FieldType<
-  FieldTypeConfig<
-    FormlyFieldProps & {
-      options: any[];
-      accept: string;
-      maxFileSize: number;
-      chooseLabel: string;
-      multiple: boolean;
-      fileLimit: number;
-    }
+export class FormlyFieldFileUploadComponent
+  extends FieldType<
+    FieldTypeConfig<
+      FormlyFieldProps & {
+        options: any[];
+        accept: string;
+        maxFileSize: number;
+        chooseLabel: string;
+        multiple: boolean;
+        fileLimit: number;
+        gridName: string;
+        fieldName: any;
+      }
+    >
   >
-> {}
+  implements OnInit
+{
+  @HostBinding('style.width') width = 'auto';
+  @HostBinding('style.margin-top') marginTop = '0';
+
+  ngOnInit(): void {
+    this.formControl.valueChanges.subscribe(val => {
+      this.width = val && val !== '[]' ? '100% !important' : 'auto';
+      this.marginTop = val && val !== '[]' ? '0.25rem' : '0';
+    });
+  }
+}

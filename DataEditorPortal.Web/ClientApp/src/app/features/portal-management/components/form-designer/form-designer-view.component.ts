@@ -5,9 +5,12 @@ import { GridFormField } from '../../models/portal-item';
 
 @Component({
   selector: 'app-form-designer-view',
-  template: `<formly-form [fields]="fields" class="p-fluid"></formly-form>`
+  template: `<formly-form
+    [fields]="fields"
+    class="p-fluid {{ layout }}"></formly-form>`
 })
 export class FormDesignerViewComponent {
+  @Input() layout: 'vertical' | 'horizontal' = 'vertical';
   form = new FormGroup({});
   options: FormlyFormOptions = {};
   model: any = {};
@@ -24,6 +27,9 @@ export class FormDesignerViewComponent {
       if (field.type === 'datepicker') {
         field.defaultValue = new Date();
       }
+      if (field.type === 'checkbox') {
+        field.props['hideLabel'] = this.layout === 'vertical';
+      }
       this.fields = [field];
     }
   }
@@ -37,7 +43,9 @@ export class FormDesignerViewComponent {
     if (field.type === 'datepicker') {
       field.defaultValue = new Date();
     }
-    field.props['hideLabel'] = field.type === 'checkbox';
+    if (field.type === 'checkbox') {
+      field.props['hideLabel'] = this.layout === 'vertical';
+    }
 
     // trigger ngx-formly to reload
     field.hide = true;

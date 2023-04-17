@@ -153,6 +153,14 @@ export class EditRecordActionComponent
               }
             });
 
+          fields
+            .filter(f => f.type === 'fileUpload')
+            .forEach(x => {
+              if (x.props) {
+                x.props['gridName'] = this.gridName;
+              }
+            });
+
           this.fields = fields;
           if (fields.length > 0) this.loadedEvent.emit();
         })

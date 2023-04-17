@@ -36,12 +36,12 @@ export class FormDesignerConfigComponent
                   if (dField.props)
                     dField.props['hideLabel'] = value === 'checkbox';
 
-                  dField.hide = true;
+                  dField.hide = true; // trigger ngx-formly to reload
                   if (
                     'input,checkbox,textarea,inputNumber'.indexOf(value) >= 0
                   ) {
                     dField.type = value;
-                    dField.hide = false;
+                    dField.hide = false; // trigger ngx-formly to reload
                   }
                 }
               })
