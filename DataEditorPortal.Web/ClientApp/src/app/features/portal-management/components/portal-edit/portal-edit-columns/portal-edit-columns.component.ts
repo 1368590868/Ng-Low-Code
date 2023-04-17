@@ -7,6 +7,7 @@ import { NotifyService } from 'src/app/shared';
 import { DataSourceTableColumn, GridColumn } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-portal-edit-columns',
@@ -54,6 +55,14 @@ export class PortalEditColumnsComponent
       }
     },
     {
+      key: 'hidden',
+      defaultValue: false,
+      type: 'checkbox',
+      props: {
+        label: 'Hidden'
+      }
+    },
+    {
       key: 'width',
       defaultValue: '10rem',
       type: 'input',
@@ -75,6 +84,16 @@ export class PortalEditColumnsComponent
       },
       expressions: {
         hide: `field.parent.model.type !== 'TemplateField'`
+      }
+    },
+    {
+      key: 'fileUploadConfig',
+      type: 'input',
+      props: {
+        label: 'Attachments Config'
+      },
+      expressions: {
+        hide: `field.parent.model.type !== 'AttachmentField'`
       }
     },
     {
@@ -114,8 +133,8 @@ export class PortalEditColumnsComponent
                 value: 'enums'
               },
               {
-                label: 'Upload',
-                value: 'upload'
+                label: 'Attachments',
+                value: 'attachments'
               }
             ]
           }
@@ -141,6 +160,23 @@ export class PortalEditColumnsComponent
       ],
       expressions: {
         hide: `field.parent.model.type !== 'DataBaseField'`
+      }
+    }
+  ];
+
+  addCustomColumnModels: MenuItem[] = [
+    {
+      label: 'Template Column',
+      icon: 'pi pi-fw pi-code',
+      command: () => {
+        this.onAddTemplateColumn();
+      }
+    },
+    {
+      label: 'Attachments Column',
+      icon: 'pi pi-fw pi-file',
+      command: () => {
+        this.onAddAttachmentsColumn();
       }
     }
   ];
@@ -293,19 +329,51 @@ export class PortalEditColumnsComponent
   }
 
   onAddTemplateColumn() {
-    const count = this.targetColumns.filter(
-      x => x.type === 'TemplateField'
-    ).length;
+    let index = 1;
+    for (index = 1; index <= 100; index++) {
+      if (!this.targetColumns.find(x => x.field === `TEMPLATE_${index}`)) break;
+    }
     this.targetColumns = [
       {
         type: 'TemplateField',
-        field: `Template_${count + 1}`,
+        field: `TEMPLATE_${index}`,
         filterType: 'none',
-        header: `Template_${count + 1}`,
+        header: `TEMPLATE_${index}`,
         width: '10rem',
         selected: true
       },
       ...this.targetColumns
     ];
+  }
+
+  onAddAttachmentsColumn() {
+    let index = 1;
+    for (index = 1; index <= 100; index++) {
+      if (!this.targetColumns.find(x => x.field === `ATTACHMENT_${index}`))
+        break;
+    }
+    this.targetColumns = [
+      {
+        type: 'AttachmentField',
+        field: `ATTACHMENT_${index}`,
+        filterType: 'attachments',
+        header: `ATTACHMENT_${index}`,
+        width: '10rem',
+        selected: true
+      },
+      ...this.targetColumns
+    ];
+  }
+
+  onRemoveCustomColumn(event: MouseEvent, field: GridColumn) {
+    console.log();
+    event.stopPropagation();
+    const index = this.targetColumns.findIndex(x => x.field === field.field);
+    if (index >= 0) {
+      this.targetColumns.splice(index, 1);
+      if (field.field === this.model.field) {
+        this.model = {};
+      }
+    }
   }
 }
