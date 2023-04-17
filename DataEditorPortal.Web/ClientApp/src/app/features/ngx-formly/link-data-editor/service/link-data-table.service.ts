@@ -19,7 +19,9 @@ export class LinkDataTableService {
         `${this._apiUrl}universal-grid/${name}/linked-table-editor/table-config`,
         null
       )
-      .pipe(map(res => res.result || { columns: [], dataKey: '' }));
+      .pipe(
+        map(res => res.result || { columns: [], dataKey: '', table2Name: '' })
+      );
   }
 
   getTableData(name: string, tableParams: any) {

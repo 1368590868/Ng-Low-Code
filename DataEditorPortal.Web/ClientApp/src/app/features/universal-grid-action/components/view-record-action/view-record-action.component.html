@@ -37,7 +37,9 @@
         }}</ng-template>
         <ng-template #attachments
           ><div
-            [innerHTML]="viewData.value | attachments : true"
+            [innerHTML]="
+              viewData.value | attachments : gridName : viewData.name : true
+            "
             class="flex flex-column"></div>
         </ng-template>
         <ng-template #normal>{{ viewData.value }}</ng-template>

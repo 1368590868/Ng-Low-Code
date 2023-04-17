@@ -16,6 +16,7 @@ export interface ColumnsConfig {
 export interface TableConfig {
   columns: ColumnsConfig[];
   dataKey: string;
+  table2Name: string;
 }
 
 interface LinkDataEditorProps extends FormlyFieldProps {

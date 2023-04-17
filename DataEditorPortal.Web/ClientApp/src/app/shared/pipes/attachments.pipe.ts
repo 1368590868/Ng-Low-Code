@@ -13,7 +13,12 @@ export class AttachmentsPipe implements PipeTransform {
   constructor(@Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
   }
-  transform(value: string, isShowAll = false): string {
+  transform(
+    value: string,
+    gridName: string,
+    fieldName: string,
+    isShowAll = false
+  ): string {
     let parseVal: AttachmentType[] = [];
     if (!value) return '';
     try {
@@ -25,7 +30,9 @@ export class AttachmentsPipe implements PipeTransform {
     const filterArray = parseVal.filter(item => item?.status !== 'Deleted');
     const result = filterArray
       .map(item => {
-        const url = `${this._apiUrl}attachment/download-file/${
+        const url = `${
+          this._apiUrl
+        }attachment/download-file/${gridName}/${fieldName}/${
           item.fileId
         }/${encodeURIComponent(item.fileName || '')}`;
         const html = `<a href=${url} target="_blank" class="no-underline cursor-pointer text-primary">${item.fileName}</a>`;

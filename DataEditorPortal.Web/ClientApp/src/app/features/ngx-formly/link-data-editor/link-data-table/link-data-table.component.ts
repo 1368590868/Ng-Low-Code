@@ -37,6 +37,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   fetchDataParam?: GridParam;
   dataSource: any[] = [];
   dataKey = '';
+  table2Name = '';
 
   selection: any = [];
   onChange?: any;
@@ -155,6 +156,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
         this.columnsConfig = tableConfig.columns;
         this.dataSource = dataSource || [];
         this.dataKey = tableConfig.dataKey;
+        this.table2Name = tableConfig.table2Name;
         this.selection = dataSource.filter((item: any) =>
           this.innerValue.find((x: any) => x.table2Id === item[this.dataKey])
         );

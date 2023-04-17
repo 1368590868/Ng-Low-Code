@@ -71,7 +71,10 @@
             | number : (col.format === '' ? undefined : col.format)
         }}</ng-template>
         <ng-template #attachments
-          ><span [innerHTML]="data[col.field] | attachments"></span
+          ><span
+            [innerHTML]="
+              data[col.field] | attachments : table2Name : col.field
+            "></span
         ></ng-template>
         <ng-template #normal>{{ data[col.field] }}</ng-template>
       </td>

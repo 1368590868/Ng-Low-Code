@@ -11,6 +11,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { ConfirmationService } from 'primeng/api';
+import { startWith } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 @Component({
   selector: 'app-file-upload',
@@ -116,7 +117,9 @@ export class FileUploadComponent implements ControlValueAccessor {
     const url =
       data.status === 'New'
         ? `${this.apiUrl}attachment/download-temp-file/${data.fileId}/${data.fileName}`
-        : `${this.apiUrl}attachment/download-file/${this.gridName}/${this.fieldName}/${data.fileId}/${data.fileName}`;
+        : `${this.apiUrl}attachment/download-file/${this.gridName}/${
+            this.fieldName
+          }/${data.fileId}/${encodeURIComponent(data.fileName || '')}`;
     const a = document.createElement('a');
 
     a.href = url;
@@ -181,9 +184,11 @@ export class FormlyFieldFileUploadComponent
   @HostBinding('style.margin-top') marginTop = '0';
 
   ngOnInit(): void {
-    this.formControl.valueChanges.subscribe(val => {
-      this.width = val && val !== '[]' ? '100% !important' : 'auto';
-      this.marginTop = val && val !== '[]' ? '0.25rem' : '0';
-    });
+    this.formControl.valueChanges
+      .pipe(startWith(this.formControl.value))
+      .subscribe(val => {
+        this.width = val && val !== '[]' ? '100% !important' : 'auto';
+        this.marginTop = val && val !== '[]' ? '0.25rem' : '0';
+      });
   }
 }
