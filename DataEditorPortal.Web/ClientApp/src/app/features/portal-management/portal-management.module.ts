@@ -69,7 +69,9 @@ import {
   EventConfigComponent,
   PortalEditLinkComponent,
   PortalEditLinkTableComponent,
-  AdvancedDialogComponent
+  AdvancedDialogComponent,
+  FileUploadConfigurationComponent,
+  FormlyFieldFileUploadConfigurationComponent
 } from './components';
 import { FROM_DESIGNER_CONTROLS } from './directives/form-designer.directive';
 import { MonacoEditorConfig } from './monaco-editor-config';
@@ -106,7 +108,9 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
     EventConfigComponent,
     PortalEditLinkComponent,
     PortalEditLinkTableComponent,
-    AdvancedDialogComponent
+    AdvancedDialogComponent,
+    FileUploadConfigurationComponent,
+    FormlyFieldFileUploadConfigurationComponent
   ],
   imports: [
     CommonModule,
@@ -135,6 +139,11 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
         {
           name: 'computedValueEditor',
           component: FormlyFieldComputedValueEditorComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'fileUploadConfig',
+          component: FormlyFieldFileUploadConfigurationComponent,
           wrappers: ['form-field']
         }
       ]
