@@ -88,7 +88,7 @@ export class PortalEditColumnsComponent
     },
     {
       key: 'fileUploadConfig',
-      type: 'input',
+      type: 'fileUploadConfig',
       props: {
         label: 'Attachments Config'
       },
