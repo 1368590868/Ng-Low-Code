@@ -90,7 +90,7 @@ export class PortalEditColumnsComponent
       key: 'fileUploadConfig',
       type: 'fileUploadConfig',
       props: {
-        label: 'Attachments Config'
+        label: 'Attachments Configration'
       },
       expressions: {
         hide: `field.parent.model.type !== 'AttachmentField'`

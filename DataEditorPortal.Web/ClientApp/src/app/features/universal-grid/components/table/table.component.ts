@@ -20,6 +20,7 @@ import { GridParam, SearchParam, UserService } from 'src/app/shared';
 import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 import { DataFormatService } from '../../services/data-format.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ObjectUtils } from 'primeng/utils';
 
 @Component({
   selector: 'app-table',
@@ -111,6 +112,9 @@ export class TableComponent implements OnInit, OnDestroy {
       this.setAllows();
       this.setRowActions();
       this.setTableActions();
+
+      // reset columnOrderStateRestored flag.
+      this.table.columnOrderStateRestored = false;
       this.cols = result[1];
 
       // load column filter options
@@ -349,6 +353,19 @@ export class TableComponent implements OnInit, OnDestroy {
     this.first = 0;
     this.selection = [];
     this.resetData.emit();
+  }
+
+  onColReorder({ dragIndex, dropIndex }: any) {
+    const shiftIndex = this.selectionMode === 'multiple' ? 2 : 1;
+    const widths = this.table.columnWidthsState.split(',');
+    ObjectUtils.reorderArray(
+      widths,
+      dragIndex + shiftIndex,
+      dropIndex + shiftIndex
+    );
+    this.table.columnWidthsState = widths.join(',');
+    this.table.restoreColumnWidths();
+    this.table.saveState();
   }
 
   onStateSave(state: TableState) {

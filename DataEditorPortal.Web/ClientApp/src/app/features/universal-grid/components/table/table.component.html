@@ -28,7 +28,8 @@
       (onStateSave)="onStateSave($event)"
       [tableStyle]="{ tableLayout: 'fixed' }"
       (onRowSelect)="onRowSelect($event)"
-      (onRowUnselect)="onRowUnselect($event)">
+      (onRowUnselect)="onRowUnselect($event)"
+      (onColReorder)="onColReorder($event)">
       <ng-template pTemplate="caption">
         <div
           class="flex"
