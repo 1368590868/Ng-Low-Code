@@ -26,8 +26,8 @@
     }
     .p-picklist-target-wrapper {
       .p-picklist-item {
-        padding-top: 0;
-        padding-bottom: 0;
+        padding-top: 0.5;
+        padding-bottom: 0.5;
         position: relative;
 
         &::before {
@@ -36,6 +36,10 @@
           width: 100%;
           height: 100%;
           z-index: 2;
+        }
+
+        .p-field {
+          margin-bottom: 0 !important;
         }
       }
     }
