@@ -28,6 +28,7 @@
   [(visible)]="visible"
   [style]="{ minWidth: '48rem' }"
   [modal]="true"
+  (onHide)="onHide()"
   header="File Upload Configuration"
   [dismissableMask]="true"
   appendTo="body"
@@ -39,7 +40,7 @@
         <div class="flex align-items-center">
           <p-dropdown
             [class]="validationError"
-            [required]="true"
+            [required]="isRequired"
             [options]="dbConnections"
             [formControl]="formControlConnection"
             (onChange)="onConnectionChange($event)"
@@ -66,7 +67,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               [class]="validationError"
-              [required]="true"
+              [required]="isRequired"
               [options]="dbTables"
               [formControl]="formControlDbTable"
               (onChange)="onTableNameChange($event)"
@@ -96,7 +97,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               [class]="validationError"
-              [required]="true"
+              [required]="isRequired"
               [(ngModel)]="storageTypeColumn"
               (ngModelChange)="onStorageTypeChange($event)"
               [options]="[
@@ -132,7 +133,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               [class]="validationError"
-              [required]="true"
+              [required]="isRequired"
               [(ngModel)]="idColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -164,7 +165,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               [class]="validationError"
-              [required]="true"
+              [required]="isRequired"
               [(ngModel)]="fileNameColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -196,7 +197,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               [class]="validationError"
-              [required]="true"
+              [required]="isRequired"
               [(ngModel)]="commentsColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -228,7 +229,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               [class]="validationError"
-              [required]="true"
+              [required]="isRequired"
               [(ngModel)]="contentTypeColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -260,7 +261,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               [class]="validationError"
-              [required]="true"
+              [required]="isRequired"
               [(ngModel)]="dataIdColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -292,7 +293,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               [class]="validationError"
-              [required]="true"
+              [required]="isRequired"
               [(ngModel)]="fileBytesColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -323,7 +324,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               [class]="validationError"
-              [required]="true"
+              [required]="isRequired"
               [(ngModel)]="filePathColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -355,7 +356,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               [class]="validationError"
-              [required]="true"
+              [required]="isRequired"
               [(ngModel)]="statusColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"

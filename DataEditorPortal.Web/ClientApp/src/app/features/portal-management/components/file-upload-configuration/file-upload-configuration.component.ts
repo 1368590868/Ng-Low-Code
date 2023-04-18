@@ -2,10 +2,8 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   Input,
   OnInit,
-  Renderer2,
   ViewChild,
   forwardRef
 } from '@angular/core';
@@ -23,7 +21,6 @@ import {
 import { PortalItemService } from '../../services/portal-item.service';
 import { forkJoin } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
-import { AfterViewInit } from '@angular/core';
 
 @Component({
   selector: 'app-file-upload-configuration',
@@ -90,10 +87,12 @@ export class FileUploadConfigurationComponent
   fileBytesColumn: null | string = null;
 
   validationError = '';
+  isRequired = false;
 
   @Input()
   set value(val: any) {
     if (val) {
+      this.innerValue = val;
       this.dsConfig = val;
       this.idColumn = val.fieldMapping.ID;
       this.contentTypeColumn = val.fieldMapping.CONTENT_TYPE;
@@ -219,6 +218,7 @@ export class FileUploadConfigurationComponent
   }
 
   onOk() {
+    this.isRequired = true;
     if (this.valid()) {
       if (this.storageTypeColumn === 'SqlBinary') {
         if (this.fileBytesColumn == null) {
@@ -245,6 +245,22 @@ export class FileUploadConfigurationComponent
       this.innerValue = this.dsConfig;
       this.onChange?.(this.dsConfig);
       this.visible = false;
+    }
+  }
+
+  onHide() {
+    this.isRequired = false;
+
+    if (!this.innerValue) {
+      this.idColumn = null;
+      this.contentTypeColumn = null;
+      this.statusColumn = null;
+      this.fileNameColumn = null;
+      this.storageTypeColumn = null;
+      this.commentsColumn = null;
+      this.dataIdColumn = null;
+      this.filePathColumn = null;
+      this.fileBytesColumn = null;
     }
   }
 
