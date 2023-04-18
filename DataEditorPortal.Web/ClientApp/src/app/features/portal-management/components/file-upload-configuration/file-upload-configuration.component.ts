@@ -2,8 +2,11 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   Input,
   OnInit,
+  Renderer2,
+  ViewChild,
   forwardRef
 } from '@angular/core';
 import {
@@ -20,6 +23,7 @@ import {
 import { PortalItemService } from '../../services/portal-item.service';
 import { forkJoin } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
+import { AfterViewInit } from '@angular/core';
 
 @Component({
   selector: 'app-file-upload-configuration',
@@ -43,6 +47,7 @@ export class FileUploadConfigurationComponent
 {
   visible = false;
   isLoading = false;
+  innerValue: any = null;
 
   onChange?: any;
   onTouch?: any;
@@ -84,6 +89,8 @@ export class FileUploadConfigurationComponent
   filePathColumn: null | string = null;
   fileBytesColumn: null | string = null;
 
+  validationError = '';
+
   @Input()
   set value(val: any) {
     if (val) {
@@ -119,6 +126,8 @@ export class FileUploadConfigurationComponent
   setDisabledState?(isDisabled: boolean): void {
     this.disabled = isDisabled;
   }
+
+  @ViewChild('dropdown') dropdown: any;
 
   constructor(
     private portalItemService: PortalItemService,
@@ -169,8 +178,6 @@ export class FileUploadConfigurationComponent
 
       this.portalItemService.saveCurrentStep('datasource');
     }
-
-    console.log(this.dsConfig);
   }
 
   onStorageTypeChange(value: string) {
@@ -181,6 +188,9 @@ export class FileUploadConfigurationComponent
 
   showDialog() {
     this.visible = true;
+    if (this.innerValue) {
+      this.value = this.innerValue;
+    }
   }
 
   onCancel() {
@@ -204,7 +214,7 @@ export class FileUploadConfigurationComponent
     this.filePathColumn = null;
     this.fileBytesColumn = null;
     this.dsConfig.fieldMapping = undefined;
-
+    this.innerValue = null;
     this.onChange?.(null);
   }
 
@@ -232,13 +242,14 @@ export class FileUploadConfigurationComponent
         FILE_PATH: this.filePathColumn,
         FILE_BYTES: this.fileBytesColumn
       };
-      console.log(this.dsConfig);
+      this.innerValue = this.dsConfig;
       this.onChange?.(this.dsConfig);
       this.visible = false;
     }
   }
 
   valid() {
+    this.validationError = 'ng-dirty';
     if (
       this.dsConfig.dataSourceConnectionId == null ||
       this.idColumn == null ||
@@ -300,7 +311,6 @@ export class FileUploadConfigurationComponent
   }
 
   onTableNameChange({ value }: { value: string }) {
-    console.log(value);
     const item = this.dbTables.find(x => x.value === value);
     if (item) {
       this.getDbTableColumns();
@@ -315,7 +325,6 @@ export class FileUploadConfigurationComponent
     const selectedDbTable = this.formControlDbTable.value;
 
     if (!selectedDbTable) return;
-    console.log(selectedDbTable);
     const [tableSchema, tableName] = selectedDbTable.split('.');
     this.portalItemService
       .getDataSourceTableColumns(

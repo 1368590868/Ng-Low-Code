@@ -4,12 +4,12 @@
       class="cursor-pointer"
       *ngIf="dsConfig.fieldMapping"
       severity="info"
-      text="Use Custom Configuration"
+      text="Use existing table"
       (click)="showDialog()"></p-message>
     <p-message
       *ngIf="!dsConfig.fieldMapping"
       severity="info"
-      text="Use Default Configuration "></p-message>
+      text="Use default table"></p-message>
     <p-button
       *ngIf="dsConfig.fieldMapping"
       styleClass="p-button-text p-button-rounded remove-btn"
@@ -26,7 +26,7 @@
 </div>
 <p-dialog
   [(visible)]="visible"
-  [style]="{ minWidth: '45rem' }"
+  [style]="{ minWidth: '48rem' }"
   [modal]="true"
   header="File Upload Configuration"
   [dismissableMask]="true"
@@ -38,6 +38,7 @@
         <label for="" class="mb-1">Database Connection</label>
         <div class="flex align-items-center">
           <p-dropdown
+            [class]="validationError"
             [required]="true"
             [options]="dbConnections"
             [formControl]="formControlConnection"
@@ -64,6 +65,7 @@
 
           <div class="flex align-items-center">
             <p-dropdown
+              [class]="validationError"
               [required]="true"
               [options]="dbTables"
               [formControl]="formControlDbTable"
@@ -93,6 +95,7 @@
 
           <div class="flex align-items-center">
             <p-dropdown
+              [class]="validationError"
               [required]="true"
               [(ngModel)]="storageTypeColumn"
               (ngModelChange)="onStorageTypeChange($event)"
@@ -108,7 +111,7 @@
       </div>
     </div>
 
-    <p-divider styleClass="mb-4">Field Mapping</p-divider>
+    <p-divider styleClass="mb-4">Fields Mapping</p-divider>
 
     <div class="flex justify-content-between">
       <div class="flex flex-column mb-3">
@@ -128,6 +131,7 @@
 
           <div class="flex align-items-center">
             <p-dropdown
+              [class]="validationError"
               [required]="true"
               [(ngModel)]="idColumn"
               [options]="dbTableColumns"
@@ -143,7 +147,7 @@
 
     <div class="flex justify-content-between">
       <div class="flex flex-column mb-3">
-        <label for="" class="mb-1">Field Name</label>
+        <label for="" class="mb-1"></label>
         <div class="flex align-items-center">
           <input
             type="text"
@@ -155,10 +159,11 @@
       </div>
       <div class="flex flex-column mb-3">
         <ng-container>
-          <label for="tableName" class="mb-1">Map To</label>
+          <label for="tableName" class="mb-1"></label>
 
           <div class="flex align-items-center">
             <p-dropdown
+              [class]="validationError"
               [required]="true"
               [(ngModel)]="fileNameColumn"
               [options]="dbTableColumns"
@@ -174,7 +179,7 @@
 
     <div class="flex justify-content-between">
       <div class="flex flex-column mb-3">
-        <label for="" class="mb-1">Field Name</label>
+        <label for="" class="mb-1"></label>
         <div class="flex align-items-center">
           <input
             type="text"
@@ -186,10 +191,11 @@
       </div>
       <div class="flex flex-column mb-3">
         <ng-container>
-          <label for="tableName" class="mb-1">Map To</label>
+          <label for="tableName" class="mb-1"></label>
 
           <div class="flex align-items-center">
             <p-dropdown
+              [class]="validationError"
               [required]="true"
               [(ngModel)]="commentsColumn"
               [options]="dbTableColumns"
@@ -205,7 +211,7 @@
 
     <div class="flex justify-content-between">
       <div class="flex flex-column mb-3">
-        <label for="" class="mb-1">Field Name</label>
+        <label for="" class="mb-1"></label>
         <div class="flex align-items-center">
           <input
             type="text"
@@ -217,10 +223,11 @@
       </div>
       <div class="flex flex-column mb-3">
         <ng-container>
-          <label for="tableName" class="mb-1">Map To</label>
+          <label for="tableName" class="mb-1"></label>
 
           <div class="flex align-items-center">
             <p-dropdown
+              [class]="validationError"
               [required]="true"
               [(ngModel)]="contentTypeColumn"
               [options]="dbTableColumns"
@@ -236,7 +243,7 @@
 
     <div class="flex justify-content-between">
       <div class="flex flex-column mb-3">
-        <label for="" class="mb-1">Field Name</label>
+        <label for="" class="mb-1"></label>
         <div class="flex align-items-center">
           <input
             type="text"
@@ -248,10 +255,11 @@
       </div>
       <div class="flex flex-column mb-3">
         <ng-container>
-          <label for="tableName" class="mb-1">Map To</label>
+          <label for="tableName" class="mb-1"></label>
 
           <div class="flex align-items-center">
             <p-dropdown
+              [class]="validationError"
               [required]="true"
               [(ngModel)]="dataIdColumn"
               [options]="dbTableColumns"
@@ -267,7 +275,7 @@
 
     <div class="flex justify-content-between" *ngIf="isStorageTypeBinary">
       <div class="flex flex-column mb-3">
-        <label for="" class="mb-1">Field Name</label>
+        <label for="" class="mb-1"></label>
         <div class="flex align-items-center">
           <input
             type="text"
@@ -279,10 +287,11 @@
       </div>
       <div class="flex flex-column mb-3">
         <ng-container>
-          <label for="tableName" class="mb-1">Map To</label>
+          <label for="tableName" class="mb-1"></label>
 
           <div class="flex align-items-center">
             <p-dropdown
+              [class]="validationError"
               [required]="true"
               [(ngModel)]="fileBytesColumn"
               [options]="dbTableColumns"
@@ -297,7 +306,7 @@
     </div>
     <div class="flex justify-content-between" *ngIf="!isStorageTypeBinary">
       <div class="flex flex-column mb-3">
-        <label for="" class="mb-1">Field Name</label>
+        <label for="" class="mb-1"></label>
         <div class="flex align-items-center">
           <input
             type="text"
@@ -309,10 +318,11 @@
       </div>
       <div class="flex flex-column mb-3">
         <ng-container>
-          <label for="tableName" class="mb-1">Map To</label>
+          <label for="tableName" class="mb-1"></label>
 
           <div class="flex align-items-center">
             <p-dropdown
+              [class]="validationError"
               [required]="true"
               [(ngModel)]="filePathColumn"
               [options]="dbTableColumns"
@@ -328,7 +338,7 @@
 
     <div class="flex justify-content-between">
       <div class="flex flex-column mb-3">
-        <label for="" class="mb-1">Field Name</label>
+        <label for="" class="mb-1"></label>
         <div class="flex align-items-center">
           <input
             type="text"
@@ -340,10 +350,11 @@
       </div>
       <div class="flex flex-column mb-3">
         <ng-container>
-          <label for="tableName" class="mb-1">Map To</label>
+          <label for="tableName" class="mb-1"></label>
 
           <div class="flex align-items-center">
             <p-dropdown
+              [class]="validationError"
               [required]="true"
               [(ngModel)]="statusColumn"
               [options]="dbTableColumns"
