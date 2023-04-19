@@ -139,7 +139,11 @@ export class FileUploadComponent implements ControlValueAccessor {
       this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
         'Deleted';
     }
-    this.onChange(JSON.stringify(this.newAttachments));
+    if (this.newAttachments.length === 0) {
+      this.onChange(null);
+    } else {
+      this.onChange(JSON.stringify(this.newAttachments));
+    }
   }
 
   tempAttachmentRestore(data: any) {
