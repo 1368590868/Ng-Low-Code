@@ -4,7 +4,6 @@ import {
   Component,
   Input,
   OnInit,
-  ViewChild,
   forwardRef
 } from '@angular/core';
 import {
@@ -20,7 +19,6 @@ import {
 } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
 import { forkJoin } from 'rxjs';
-import { NotifyService } from 'src/app/shared';
 
 @Component({
   selector: 'app-file-upload-configuration',
@@ -132,8 +130,6 @@ export class FileUploadConfigurationComponent
     this.disabled = isDisabled;
   }
 
-  @ViewChild('dropdown') dropdown: any;
-
   constructor(private portalItemService: PortalItemService) {}
 
   ngOnInit(): void {
@@ -219,6 +215,7 @@ export class FileUploadConfigurationComponent
   }
 
   onOk() {
+    // submit form need to check  required fields
     this.isRequired = true;
     if (this.valid()) {
       if (this.storageTypeColumn === 'SqlBinary') {
