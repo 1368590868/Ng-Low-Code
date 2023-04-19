@@ -116,7 +116,7 @@ export class PortalListComponent implements OnInit {
           });
         }
       });
-      if (row['configCompleted']) {
+      if (row['configCompleted'] && row['itemType'] !== 'linked') {
         items.push({
           label: 'Config Actions',
           icon: 'pi pi-fw pi-th-large',
