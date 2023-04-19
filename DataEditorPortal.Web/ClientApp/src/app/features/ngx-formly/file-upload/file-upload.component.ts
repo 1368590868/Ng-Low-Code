@@ -19,7 +19,6 @@ import { NotifyService } from 'src/app/shared';
 })
 export class FilterPipe implements PipeTransform {
   transform(value: any[]): number {
-    console.log(value);
     return value.filter(x => x.status !== 'Deleted').length;
   }
 }
