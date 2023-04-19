@@ -4,12 +4,14 @@ import {
   Component,
   Input,
   OnInit,
+  ViewChildren,
   forwardRef
 } from '@angular/core';
 import {
   ControlValueAccessor,
   FormControl,
-  NG_VALUE_ACCESSOR
+  NG_VALUE_ACCESSOR,
+  NgModel
 } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import {
@@ -40,6 +42,7 @@ import { forkJoin } from 'rxjs';
 export class FileUploadConfigurationComponent
   implements ControlValueAccessor, OnInit
 {
+  @ViewChildren('dropdownList') dropdownList!: NgModel[];
   visible = false;
   isLoading = false;
   innerValue: any = null;
@@ -83,9 +86,6 @@ export class FileUploadConfigurationComponent
   dataIdColumn: null | string = null;
   filePathColumn: null | string = null;
   fileBytesColumn: null | string = null;
-
-  validationError = '';
-  isRequired = false;
 
   @Input()
   set value(val: any) {
@@ -215,8 +215,9 @@ export class FileUploadConfigurationComponent
   }
 
   onOk() {
-    // submit form need to check  required fields
-    this.isRequired = true;
+    this.dropdownList.forEach(x => {
+      x.control.markAsDirty();
+    });
     if (this.valid()) {
       if (this.storageTypeColumn === 'SqlBinary') {
         if (this.fileBytesColumn == null) {
@@ -245,15 +246,16 @@ export class FileUploadConfigurationComponent
   }
 
   onHide() {
-    this.isRequired = false;
-
     if (!this.innerValue) {
       this.onReset();
     }
+
+    this.dropdownList.forEach(x => {
+      x.control.markAsPristine();
+    });
   }
 
   valid() {
-    this.validationError = 'ng-dirty';
     if (
       this.dsConfig.dataSourceConnectionId == null ||
       this.idColumn == null ||
