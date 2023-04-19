@@ -199,7 +199,6 @@ export class PortalEditLinkComponent
     this.isSavingAndExit = true;
     if (this.valid()) {
       this.onSave();
-      this.saveSucess();
     }
   }
 
@@ -233,6 +232,9 @@ export class PortalEditLinkComponent
         if (!res.isError) {
           this.saveSucess();
         }
+        this.isSaving = false;
+        this.isSavingAndExit = false;
+        this.isSavingAndNext = false;
       });
   }
 
