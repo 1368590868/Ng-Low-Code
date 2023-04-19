@@ -91,20 +91,26 @@ export class FileUploadConfigurationComponent
 
   @Input()
   set value(val: any) {
-    if (val) {
-      this.innerValue = val;
-      this.dsConfig = val;
-      this.idColumn = val.fieldMapping.ID;
-      this.contentTypeColumn = val.fieldMapping.CONTENT_TYPE;
-      this.statusColumn = val.fieldMapping.STATUS;
-      this.fileNameColumn = val.fieldMapping.FILE_NAME;
-      this.storageTypeColumn = val.fileStorageType;
-      this.commentsColumn = val.fieldMapping.COMMENTS;
-      this.dataIdColumn = val.fieldMapping.DATA_ID;
-      this.filePathColumn = val.fieldMapping.FILE_PATH;
-      this.fileBytesColumn = val.fieldMapping.FILE_BYTES;
+    if (!val) {
+      this.onReset();
+      this.dsConfig.fieldMapping = undefined;
+    }
+    this.innerValue = val;
 
-      this.formControlConnection.setValue(val.dataSourceConnectionId);
+    const newVal = JSON.parse(JSON.stringify(val || null));
+    if (newVal) {
+      this.dsConfig = newVal;
+      this.idColumn = newVal.fieldMapping.ID;
+      this.contentTypeColumn = newVal.fieldMapping.CONTENT_TYPE;
+      this.statusColumn = newVal.fieldMapping.STATUS;
+      this.fileNameColumn = newVal.fieldMapping.FILE_NAME;
+      this.storageTypeColumn = newVal.fileStorageType;
+      this.commentsColumn = newVal.fieldMapping.COMMENTS;
+      this.dataIdColumn = newVal.fieldMapping.DATA_ID;
+      this.filePathColumn = newVal.fieldMapping.FILE_PATH;
+      this.fileBytesColumn = newVal.fieldMapping.FILE_BYTES;
+
+      this.formControlConnection.setValue(newVal.dataSourceConnectionId);
       this.formControlDbTable.setValue(
         `${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`
       );
@@ -128,10 +134,7 @@ export class FileUploadConfigurationComponent
 
   @ViewChild('dropdown') dropdown: any;
 
-  constructor(
-    private portalItemService: PortalItemService,
-    private notifyService: NotifyService
-  ) {}
+  constructor(private portalItemService: PortalItemService) {}
 
   ngOnInit(): void {
     this.formControlDbTable.valueChanges.subscribe(value => {
@@ -195,14 +198,8 @@ export class FileUploadConfigurationComponent
   onCancel() {
     this.visible = false;
   }
-  onNotifyWarning() {
-    this.notifyService.notifyWarning(
-      'Warning',
-      'Please Check Your Map To Data.'
-    );
-  }
 
-  removeConfig() {
+  onReset() {
     this.idColumn = null;
     this.contentTypeColumn = null;
     this.statusColumn = null;
@@ -212,6 +209,10 @@ export class FileUploadConfigurationComponent
     this.dataIdColumn = null;
     this.filePathColumn = null;
     this.fileBytesColumn = null;
+  }
+
+  removeConfig() {
+    this.onReset();
     this.dsConfig.fieldMapping = undefined;
     this.innerValue = null;
     this.onChange?.(null);
@@ -222,12 +223,10 @@ export class FileUploadConfigurationComponent
     if (this.valid()) {
       if (this.storageTypeColumn === 'SqlBinary') {
         if (this.fileBytesColumn == null) {
-          this.onNotifyWarning();
           return;
         }
       } else {
         if (this.filePathColumn == null) {
-          this.onNotifyWarning();
           return;
         }
       }
@@ -252,15 +251,7 @@ export class FileUploadConfigurationComponent
     this.isRequired = false;
 
     if (!this.innerValue) {
-      this.idColumn = null;
-      this.contentTypeColumn = null;
-      this.statusColumn = null;
-      this.fileNameColumn = null;
-      this.storageTypeColumn = null;
-      this.commentsColumn = null;
-      this.dataIdColumn = null;
-      this.filePathColumn = null;
-      this.fileBytesColumn = null;
+      this.onReset();
     }
   }
 
@@ -275,7 +266,6 @@ export class FileUploadConfigurationComponent
       this.commentsColumn == null ||
       this.dataIdColumn == null
     ) {
-      this.onNotifyWarning();
       return false;
     }
     return true;
