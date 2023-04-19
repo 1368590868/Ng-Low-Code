@@ -1,3 +1,4 @@
+import { Pipe, PipeTransform } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -13,11 +14,21 @@ import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { ConfirmationService } from 'primeng/api';
 import { startWith } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
+@Pipe({
+  name: 'filter'
+})
+export class FilterPipe implements PipeTransform {
+  transform(value: any[]): number {
+    console.log(value);
+    return value.filter(x => x.status !== 'Deleted').length;
+  }
+}
 @Component({
   selector: 'app-file-upload',
   templateUrl: './file-upload.component.html',
   styleUrls: ['./file-upload.component.scss'],
   providers: [
+    FilterPipe,
     ConfirmationService,
     {
       provide: CUSTOM_ELEMENTS_SCHEMA,
@@ -72,16 +83,15 @@ export class FileUploadComponent implements ControlValueAccessor {
   constructor(
     private confirmationService: ConfirmationService,
     private notifyService: NotifyService,
-    @Inject('API_URL') apiUrl: string
+    @Inject('API_URL') apiUrl: string,
+    private filterPipe: FilterPipe
   ) {
     this.apiUrl = apiUrl;
   }
 
   onFileUploadSelect(event: any, AttachmentsRef: any) {
-    if (
-      event.currentFiles.length + this.newAttachments.length >
-      this.fileLimit
-    ) {
+    const isNotDeletedFile = this.filterPipe.transform(this.newAttachments);
+    if (event.currentFiles.length + isNotDeletedFile > this.fileLimit) {
       this.notifyService.notifyError('Error', 'File Limit Exceeded');
       AttachmentsRef.clear();
     } else {
@@ -94,6 +104,7 @@ export class FileUploadComponent implements ControlValueAccessor {
       for (const file of event.originalEvent.body.result) {
         this.newAttachments.push(file);
       }
+      this.newAttachments = JSON.parse(JSON.stringify(this.newAttachments));
       this.onChange(JSON.stringify(this.newAttachments ?? []));
     }
   }
@@ -139,16 +150,19 @@ export class FileUploadComponent implements ControlValueAccessor {
       this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
         'Deleted';
     }
+
     if (this.newAttachments.length === 0) {
       this.onChange(null);
     } else {
       this.onChange(JSON.stringify(this.newAttachments));
     }
+    this.newAttachments = JSON.parse(JSON.stringify(this.newAttachments));
   }
 
   tempAttachmentRestore(data: any) {
     this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
       'Current';
+    this.newAttachments = JSON.parse(JSON.stringify(this.newAttachments));
     this.onChange(JSON.stringify(this.newAttachments));
   }
 }
