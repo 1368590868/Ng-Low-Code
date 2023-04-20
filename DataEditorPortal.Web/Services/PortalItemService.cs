@@ -8,6 +8,7 @@ using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.PortalItem;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -30,7 +31,7 @@ namespace DataEditorPortal.Web.Services
         Guid Update(Guid id, PortalItemData model);
         List<DataSourceTable> GetDataSourceTables(Guid connectionId);
         List<DataSourceTableColumn> GetDataSourceTableColumns(Guid connectionId, string sqlText);
-        List<DataSourceTableColumn> GetDataSourceTableColumnsByPortalId(Guid id);
+        List<DataSourceTableColumn> GetDataSourceTableColumnsByPortalId(Guid id, bool forForm);
         DataSourceConfig GetDataSourceConfig(Guid id);
         bool SaveDataSourceConfig(Guid id, DataSourceConfig model);
         List<GridColConfig> GetGridColumnsConfig(Guid id);
@@ -53,6 +54,7 @@ namespace DataEditorPortal.Web.Services
         private readonly ILogger<PortalItemService> _logger;
         private readonly IMapper _mapper;
         private IHttpContextAccessor _httpContextAccessor;
+        private readonly IMemoryCache _memoryCache;
 
         public PortalItemService(
             IServiceProvider serviceProvider,
@@ -60,7 +62,8 @@ namespace DataEditorPortal.Web.Services
             IQueryBuilder queryBuilder,
             ILogger<PortalItemService> logger,
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IMemoryCache memoryCache)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
@@ -68,6 +71,7 @@ namespace DataEditorPortal.Web.Services
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _memoryCache = memoryCache;
         }
 
         public bool ExistName(string name, Guid? id)
@@ -285,14 +289,25 @@ namespace DataEditorPortal.Web.Services
             return result;
         }
 
-        public List<DataSourceTableColumn> GetDataSourceTableColumnsByPortalId(Guid id)
+        public List<DataSourceTableColumn> GetDataSourceTableColumnsByPortalId(Guid id, bool forForm = false)
         {
             var datasourceConfig = GetDataSourceConfig(id);
             if (datasourceConfig == null)
                 throw new DepException("DataSource Config is empty for Portal Item: " + id);
 
             var sqlText = _queryBuilder.GetSqlTextForDatabaseSource(datasourceConfig);
-            return GetDataSourceTableColumns(datasourceConfig.DataSourceConnectionId, sqlText);
+            var result = GetDataSourceTableColumns(datasourceConfig.DataSourceConnectionId, sqlText);
+            if (forForm)
+            {
+                var columns = GetGridColumnsConfig(id).Where(x => x.type == "AttachmentField").ToList();
+                columns.ForEach(x => result.Add(new DataSourceTableColumn()
+                {
+                    FilterType = "attachments",
+                    AllowDBNull = true,
+                    ColumnName = x.field
+                }));
+            }
+            return result;
         }
 
         public DataSourceConfig GetDataSourceConfig(Guid id)
@@ -362,6 +377,8 @@ namespace DataEditorPortal.Web.Services
 
             _depDbContext.SaveChanges();
 
+            RemoveGridCache(config.Name);
+
             return true;
         }
 
@@ -412,6 +429,8 @@ namespace DataEditorPortal.Web.Services
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
 
             _depDbContext.SaveChanges();
+
+            RemoveGridCache(config.Name);
 
             return true;
         }
@@ -605,7 +624,18 @@ namespace DataEditorPortal.Web.Services
 
             _depDbContext.SaveChanges();
 
+            var linkedTableNames = _depDbContext.SiteMenus.Where(x => x.ParentId == siteMenu.Id).Select(x => x.Name).ToList();
+            if (linkedTableNames.Count > 0) _memoryCache.Remove($"grid.{linkedTableNames[0]}.linked.table.info");
+            if (linkedTableNames.Count > 1) _memoryCache.Remove($"grid.{linkedTableNames[1]}.linked.table.info");
+
             return true;
+        }
+
+        private void RemoveGridCache(string name)
+        {
+            _memoryCache.Remove($"grid.{name}");
+            _memoryCache.Remove($"grid.{name}.datasource");
+            _memoryCache.Remove($"grid.{name}.attachment.cols");
         }
     }
 }

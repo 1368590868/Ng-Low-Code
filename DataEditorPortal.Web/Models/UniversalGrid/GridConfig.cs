@@ -1,6 +1,8 @@
-﻿using System;
+﻿using DataEditorPortal.Data.Common;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace DataEditorPortal.Web.Models.UniversalGrid
@@ -73,13 +75,12 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string filterType { get; set; }
 
         public bool sortable { get; set; }
-
-        //public int order { get; set; }
-
-        //public bool aggregate { get; set; } = false;
+        public bool hidden { get; set; }
 
         public string template { get; set; }
         public string format { get; set; }
+
+        public FileUploadConfig fileUploadConfig { get; set; }
     }
 
     public class DataSourceConfig
@@ -146,5 +147,21 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public Guid Id { get; set; }
         public List<string> ColumnsForLinkedField { get; set; }
         public string MapToLinkedTableField { get; set; }
+    }
+
+    public class FileUploadConfig
+    {
+        public Guid DataSourceConnectionId { get; set; }
+        public string TableName { get; set; }
+        public string TableSchema { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public FileStorageType FileStorageType { get; set; }
+        public string ForeignKeyName { get; set; }
+        public Dictionary<string, string> FieldMapping { get; set; }
+
+        public string GetMappedColumn(string column)
+        {
+            return FieldMapping.FirstOrDefault(x => x.Key == column).Value;
+        }
     }
 }

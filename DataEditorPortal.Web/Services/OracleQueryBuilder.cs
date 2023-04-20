@@ -1,6 +1,7 @@
 ﻿using DataEditorPortal.Web.Models.UniversalGrid;
 using Oracle.ManagedDataAccess.Client;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.Json;
@@ -184,6 +185,47 @@ namespace DataEditorPortal.Web.Services
 
                 return queryText;
             }
+        }
+
+        public string JoinAttachments(string query, IEnumerable<GridColConfig> attachmentCols)
+        {
+            var leftJoinQuery = string.Join("", attachmentCols.Select(col =>
+            {
+                var config = col.fileUploadConfig;
+                return $@"
+                    LEFT JOIN (
+                        SELECT 
+                            {EscapeColumnName(config.GetMappedColumn("DATA_ID"))},
+                            '[' || 
+                                REPLACE(
+                                    LISTAGG(
+                                        '{{' || 
+                                            '""fileId"":""' || {EscapeColumnName(config.GetMappedColumn("ID"))} || '"",' || 
+                                            '""fileName"":""' || {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))} || '"",' || 
+                                            '""contentType"":""' || {EscapeColumnName(config.GetMappedColumn("CONTENT_TYPE"))} || '"",' || 
+                                            '""comments"":""' || {EscapeColumnName(config.GetMappedColumn("COMMENTS"))} || '"",' || 
+                                            '""status"":""' || {EscapeColumnName(config.GetMappedColumn("STATUS"))} || '""' ||
+                                        '}}'
+                                        , ','
+                                    ) WITHIN GROUP (ORDER BY { EscapeColumnName(config.GetMappedColumn("FILE_NAME"))})
+                                    , CHR(0)
+                                ) || 
+                            ']' AS ATTACHMENTS
+                        FROM {config.TableSchema}.{config.TableName}
+                        GROUP BY {EscapeColumnName(config.GetMappedColumn("DATA_ID"))}
+                    ) {col.field}_ATTACHMENTS ON ALL_DATA.{EscapeColumnName(config.ForeignKeyName)} = {col.field}_ATTACHMENTS.{EscapeColumnName(config.GetMappedColumn("DATA_ID"))}
+                ";
+            }));
+
+            var selectQuery = string.Join(",", attachmentCols.Select(col => $"{col.field}_ATTACHMENTS.ATTACHMENTS AS {EscapeColumnName(col.field)}"));
+
+            var result = $@"
+                SELECT ALL_DATA.*, {selectQuery} FROM (
+                    {query}
+                ) ALL_DATA
+                {leftJoinQuery}
+            ";
+            return result;
         }
 
         #endregion

@@ -482,9 +482,9 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{id}/datasource/columns")]
-        public List<DataSourceTableColumn> GetDataSourceTableColumnsByPortalId(Guid id)
+        public List<DataSourceTableColumn> GetDataSourceTableColumnsByPortalId(Guid id, [FromQuery] bool forForm)
         {
-            return _portalItemService.GetDataSourceTableColumnsByPortalId(id);
+            return _portalItemService.GetDataSourceTableColumnsByPortalId(id, forForm);
         }
 
         [HttpGet]
