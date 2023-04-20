@@ -141,7 +141,7 @@ namespace DataEditorPortal.Web.Services
 
             if (string.IsNullOrEmpty(config.ColumnsConfig)) config.ColumnsConfig = "[]";
 
-            return JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
+            return JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig).Where(x => !x.hidden).ToList();
         }
 
         public List<SearchFieldConfig> GetGridSearchConfig(string name)

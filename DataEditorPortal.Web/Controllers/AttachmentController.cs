@@ -100,23 +100,24 @@ namespace DataEditorPortal.Web.Controllers
         [AutoWrapIgnore]
         public ActionResult DownloadTempFile(string fileId, string fileName)
         {
-            string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot\\FileUploadTemp");
-            var filePath = Path.Combine(tempFolder, $"{fileId} - {fileName}");
-            if (System.IO.File.Exists(filePath))
+            try
             {
-                if (System.IO.File.Exists(filePath))
-                {
-                    var stream = System.IO.File.OpenRead(filePath);
+                string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot\\FileUploadTemp");
+                var filePath = Path.Combine(tempFolder, $"{fileId} - {fileName}");
 
-                    return File(stream, "application/octet-stream", fileName);
-                }
+                var stream = System.IO.File.OpenRead(filePath);
+
+                return File(stream, "application/octet-stream", fileName);
             }
-            return new ContentResult
+            catch (Exception ex)
             {
-                Content = "<h1 style='text-align:center'>File Not Found</h1><script>setTimeout(function(){window.close()}, 2000)</script>",
-                ContentType = "text/html",
-                StatusCode = 404
-            };
+                return new ContentResult
+                {
+                    Content = "<h1 style='text-align:center'>File Not Found</h1><script>setTimeout(function(){window.close()}, 2000)</script>",
+                    ContentType = "text/html",
+                    StatusCode = 404
+                };
+            }
         }
 
         [HttpGet]

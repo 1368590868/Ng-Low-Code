@@ -75,10 +75,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string filterType { get; set; }
 
         public bool sortable { get; set; }
-
-        //public int order { get; set; }
-
-        //public bool aggregate { get; set; } = false;
+        public bool hidden { get; set; }
 
         public string template { get; set; }
         public string format { get; set; }
@@ -157,6 +154,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public Guid DataSourceConnectionId { get; set; }
         public string TableName { get; set; }
         public string TableSchema { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public FileStorageType FileStorageType { get; set; }
         public string ForeignKeyName { get; set; }
         public Dictionary<string, string> FieldMapping { get; set; }
