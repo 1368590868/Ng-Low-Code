@@ -1,9 +1,11 @@
+import { AsyncPipe } from '@angular/common';
 import { Component, ChangeDetectionStrategy, Type } from '@angular/core';
 import {
   FieldType,
   FieldTypeConfig,
   FormlyFieldConfig
 } from '@ngx-formly/core';
+import { FormlySelectOptionsPipe } from '@ngx-formly/core/select';
 import { FormlyFieldProps } from '@ngx-formly/primeng/form-field';
 
 interface MultiSelectProps extends FormlyFieldProps {
@@ -32,14 +34,29 @@ export interface FormlyMultiSelectFieldConfig
       [virtualScroll]="props.virtualScroll"
       [virtualScrollItemSize]="props.virtualScrollItemSize"
       [showToggleAll]="false"
-      [filter]="props.filter === undefined ? true : props.filter"
+      [filter]="showFilter(props.options || [])"
       [appendTo]="props.appendTo || 'body'"
       [showHeader]="props.showHeader === undefined ? true : props.showHeader"
       [display]="props.display || 'chip'">
     </p-multiSelect>
   `,
+  providers: [FormlySelectOptionsPipe, AsyncPipe],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldMultiSelectComponent extends FieldType<
   FieldTypeConfig<MultiSelectProps>
-> {}
+> {
+  constructor(
+    private formlySelectOptionsPipe: FormlySelectOptionsPipe,
+    private asyncPipe: AsyncPipe
+  ) {
+    super();
+  }
+  showFilter(options: any): boolean {
+    const newOptions = this.asyncPipe.transform(
+      this.formlySelectOptionsPipe.transform(options, this.field)
+    );
+
+    return (newOptions || []).length > 5;
+  }
+}
