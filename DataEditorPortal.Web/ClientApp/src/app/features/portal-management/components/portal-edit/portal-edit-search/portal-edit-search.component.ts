@@ -260,7 +260,6 @@ export class PortalEditSearchComponent
   onRemoveCustomColumn(event: MouseEvent, field: GridSearchField) {
     event.stopPropagation();
     const index = this.targetColumns.findIndex(x => x.key === field.key);
-    console.log(index);
     if (index >= 0) {
       this.targetColumns.splice(index, 1);
       if (field.key === this.model.key) {

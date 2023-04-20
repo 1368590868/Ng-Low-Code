@@ -16,6 +16,7 @@ export interface ColumnsConfig {
 export interface TableConfig {
   columns: ColumnsConfig[];
   dataKey: string;
+  table2Name: string;
 }
 
 interface LinkDataEditorProps extends FormlyFieldProps {
@@ -32,7 +33,15 @@ interface LinkDataEditorProps extends FormlyFieldProps {
     [formControl]="formControl"
     [formlyAttributes]="field"
     [table1Id]="props.table1Id"></app-link-data-table> `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [
+    `
+      :host {
+        width: 100% !important;
+        margin-top: 0.25rem;
+      }
+    `
+  ]
 })
 export class FormlyFieldLinkDataEditorComponent extends FieldType<
   FieldTypeConfig<LinkDataEditorProps>

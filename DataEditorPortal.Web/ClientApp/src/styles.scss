@@ -74,6 +74,32 @@ formly-form {
       padding-top: 0.5rem;
     }
   }
+  &.horizontal {
+    .p-field {
+      display: flex;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      position: relative;
+      margin-bottom: 1.5rem;
+      small.p-error {
+        width: 60%;
+        margin-left: auto;
+        position: absolute;
+        right: 0;
+        bottom: -1.25rem;
+      }
+      label {
+        width: 40%;
+        margin-top: 0.4167rem;
+        & + * {
+          width: 60%;
+        }
+      }
+      .p-checkbox-label {
+        display: none;
+      }
+    }
+  }
 }
 
 .p-orderlist-item.cdk-drag-preview {

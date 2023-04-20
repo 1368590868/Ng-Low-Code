@@ -1,3 +1,4 @@
+import { trigger, transition, style, animate } from '@angular/animations';
 import { Component } from '@angular/core';
 import {
   FieldWrapper,
@@ -31,13 +32,22 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
       </label>
       <ng-container #fieldComponent></ng-container>
 
-      <small *ngIf="showError" class="p-error">
+      <small *ngIf="showError" class="p-error" @fadeInOut>
         <formly-validation-message
           class="ui-message-text"
           [field]="field"></formly-validation-message>
       </small>
     </div>
-  `
+  `,
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('200ms', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [animate('200ms', style({ opacity: 0 }))])
+    ])
+  ]
 })
 export class FormlyWrapperFormFieldComponent extends FieldWrapper<
   FormlyFieldConfig<FormlyFieldProps>

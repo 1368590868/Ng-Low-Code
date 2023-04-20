@@ -145,7 +145,8 @@ export class FormLayoutComponent {
             required: !x.allowDBNull
             // placeholder: x.columnName
           },
-          filterType: x.filterType
+          filterType: x.filterType,
+          selected: false
         };
       });
   }

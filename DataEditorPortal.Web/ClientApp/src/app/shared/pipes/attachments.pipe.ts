@@ -1,20 +1,25 @@
 import { Inject, Pipe, PipeTransform } from '@angular/core';
 
-type UploadType = {
+type AttachmentType = {
   fileId?: string;
   fileName?: string;
   status?: string;
   contentType?: string;
 };
 
-@Pipe({ name: 'upload' })
-export class UploadPipe implements PipeTransform {
+@Pipe({ name: 'attachments' })
+export class AttachmentsPipe implements PipeTransform {
   private _apiUrl: string;
   constructor(@Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
   }
-  transform(value: string, isShowAll = false): string {
-    let parseVal: UploadType[] = [];
+  transform(
+    value: string,
+    gridName: string,
+    fieldName: string,
+    isShowAll = false
+  ): string {
+    let parseVal: AttachmentType[] = [];
     if (!value) return '';
     try {
       if (typeof value === 'string') parseVal = JSON.parse(value);
@@ -25,7 +30,11 @@ export class UploadPipe implements PipeTransform {
     const filterArray = parseVal.filter(item => item?.status !== 'Deleted');
     const result = filterArray
       .map(item => {
-        const url = `${this._apiUrl}attachment/download-file/${item.fileId}/${item.fileName}`;
+        const url = `${
+          this._apiUrl
+        }attachment/download-file/${gridName}/${fieldName}/${
+          item.fileId
+        }/${encodeURIComponent(item.fileName || '')}`;
         const html = `<a href=${url} target="_blank" class="no-underline cursor-pointer text-primary">${item.fileName}</a>`;
         return html;
       })

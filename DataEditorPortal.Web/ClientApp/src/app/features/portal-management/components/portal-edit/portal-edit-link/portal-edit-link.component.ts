@@ -191,44 +191,51 @@ export class PortalEditLinkComponent
     this.isSavingAndNext = true;
 
     if (this.valid()) {
-      const data: DataSourceConfig = {
-        dataSourceConnectionId: this.dsConfig.dataSourceConnectionId,
-        idColumn: this.dsConfig.idColumn,
-        queryToGetId: this.advancedValue
-      };
-      if (!this.dsConfig.queryText) {
-        data.tableName = this.dsConfig.tableName;
-        data.tableSchema = this.dsConfig.tableSchema;
-      } else {
-        data.queryText = this.dsConfig.queryText;
-      }
-      this.portalItemService
-        .saveLinkedDatasource({
-          primaryTable: {
-            id: this.dataSourceConfig.primaryTable?.id,
-            columnsForLinkedField: this.primarySelected,
-            mapToLinkedTableField: this.formControlPrimaryMap.value
-          },
-          secondaryTable: {
-            id: this.dataSourceConfig.secondaryTable?.id,
-            columnsForLinkedField: this.secondarySelected,
-            mapToLinkedTableField: this.formControlSecondaryMap.value
-          },
-          linkedTable: data
-        })
-        .subscribe(res => {
-          if (!res.isError) {
-            this.saveSucess();
-          }
-        });
+      this.onSave();
     }
   }
 
   onSaveAndExit() {
     this.isSavingAndExit = true;
     if (this.valid()) {
-      this.saveSucess();
+      this.onSave();
     }
+  }
+
+  onSave() {
+    const data: DataSourceConfig = {
+      dataSourceConnectionId: this.dsConfig.dataSourceConnectionId,
+      idColumn: this.dsConfig.idColumn,
+      queryToGetId: this.advancedValue
+    };
+    if (!this.dsConfig.queryText) {
+      data.tableName = this.dsConfig.tableName;
+      data.tableSchema = this.dsConfig.tableSchema;
+    } else {
+      data.queryText = this.dsConfig.queryText;
+    }
+    this.portalItemService
+      .saveLinkedDatasource({
+        primaryTable: {
+          id: this.dataSourceConfig.primaryTable?.id,
+          columnsForLinkedField: this.primarySelected,
+          mapToLinkedTableField: this.formControlPrimaryMap.value
+        },
+        secondaryTable: {
+          id: this.dataSourceConfig.secondaryTable?.id,
+          columnsForLinkedField: this.secondarySelected,
+          mapToLinkedTableField: this.formControlSecondaryMap.value
+        },
+        linkedTable: data
+      })
+      .subscribe(res => {
+        if (!res.isError) {
+          this.saveSucess();
+        }
+        this.isSaving = false;
+        this.isSavingAndExit = false;
+        this.isSavingAndNext = false;
+      });
   }
 
   saveSucess() {

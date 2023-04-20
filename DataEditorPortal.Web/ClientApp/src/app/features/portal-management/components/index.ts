@@ -10,3 +10,4 @@ export * from './form-designer/form-designer-view.component';
 export * from './form-designer/form-designer-config.component';
 export * from './form-designer/search-designer-config.component';
 export * from './portal-edit/portal-edit-link/advanced-dialog/advanced-dialog.component';
+export * from './file-upload-configuration/file-upload-configuration.component';

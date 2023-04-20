@@ -55,7 +55,7 @@ export class PortalEditFormComponent
     if (this.portalItemService.itemId) {
       forkJoin([
         this.portalItemService.getGridFormConfig(),
-        this.portalItemService.getDataSourceTableColumnsByPortalId(),
+        this.portalItemService.getDataSourceTableColumnsByPortalId(true),
         this.portalItemService.getDataSourceConfig()
       ]).subscribe(res => {
         this.isLoading = false;
@@ -77,6 +77,8 @@ export class PortalEditFormComponent
               allowDBNull: true
             }
           ]);
+        } else {
+          this.dbColumns = res[1];
         }
 
         this.dataSourceIsQueryText = !!res[2].queryText;

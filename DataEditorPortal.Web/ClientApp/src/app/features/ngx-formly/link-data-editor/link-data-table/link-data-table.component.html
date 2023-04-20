@@ -5,7 +5,7 @@
   styleClass="p-datatable-striped"
   [columns]="columnsConfig"
   [scrollable]="true"
-  scrollHeight="20rem"
+  scrollHeight="17.5rem"
   [resizableColumns]="true"
   columnResizeMode="expand"
   selectionMode="multiple"
@@ -14,7 +14,7 @@
   [(selection)]="selection"
   [dataKey]="dataKey"
   [lazy]="true"
-  [virtualScroll]="true"
+  [virtualScroll]="dataSource.length > 5"
   [virtualScrollItemSize]="51.75"
   [virtualScrollDelay]="0"
   (onRowSelect)="onRowSelect($event)"
@@ -31,7 +31,7 @@
         *ngFor="let col of columns"
         pResizableColumn
         [pSortableColumn]="col.field"
-        [style.width]="col.width"
+        [style.width]="'8rem'"
         [pSortableColumnDisabled]="!col.sortable">
         <span style="vertical-align: middle">{{ col.header }}</span>
         <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
@@ -48,7 +48,7 @@
       </td>
       <td
         *ngFor="let col of columns"
-        [title]="col.filterType !== 'upload' ? data[col.field] || '' : ''">
+        [title]="col.filterType !== 'attachments' ? data[col.field] || '' : ''">
         <ng-container
           *ngIf="!col.template"
           [ngTemplateOutlet]="
@@ -58,8 +58,8 @@
               ? numeric
               : col.filterType === 'boolean'
               ? boolean
-              : col.filterType === 'upload'
-              ? upload
+              : col.filterType === 'attachments'
+              ? attachments
               : normal
           "></ng-container>
         <ng-template #boolean>{{ data[col.field] | boolean }}</ng-template>
@@ -70,17 +70,20 @@
           data[col.field]
             | number : (col.format === '' ? undefined : col.format)
         }}</ng-template>
-        <ng-template #upload
-          ><span [innerHTML]="data[col.field] | upload"></span
+        <ng-template #attachments
+          ><span
+            [innerHTML]="
+              data[col.field] | attachments : table2Name : col.field
+            "></span
         ></ng-template>
         <ng-template #normal>{{ data[col.field] }}</ng-template>
       </td>
     </tr>
   </ng-template>
   <ng-template pTemplate="emptymessage" let-columns>
-    <tr style="height: 16rem">
+    <tr>
       <td class="text-lg" [attr.colspan]="columns.length + 2">
-        <div class="pl-3">{{ 'No data were found.' }}</div>
+        <div>{{ 'No data were found.' }}</div>
       </td>
     </tr>
   </ng-template>
