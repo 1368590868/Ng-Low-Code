@@ -41,7 +41,7 @@ namespace DataEditorPortal.Web.Services
         bool OnValidateGridData(string name, string type, string id, Dictionary<string, object> model);
         bool UpdateGridData(string name, string id, Dictionary<string, object> model);
         bool AddGridData(string name, Dictionary<string, object> model);
-        bool DeleteGridData(string name, string[] ids);
+        bool DeleteGridData(string name, object[] ids);
 
         // file upload api
         IEnumerable<GridColConfig> GetAttachmentCols(UniversalGridConfiguration config);
@@ -223,12 +223,15 @@ namespace DataEditorPortal.Web.Services
             type = type.ToLower();
             var formLayout = type == "add" ? detailConfig.AddingForm : type == "update" ? detailConfig.UpdatingForm : type == "delete" ? detailConfig.DeletingForm : null;
 
-            // do not send query text to front end.
-            if (formLayout.OnValidate != null && formLayout.OnValidate.EventType != FormEventType.Javascript) formLayout.OnValidate.Script = null;
-            // if event config is not javascript, do not send to front end.
-            if (formLayout.AfterSaved != null && formLayout.AfterSaved.EventType != FormEventType.Javascript) formLayout.AfterSaved = null;
-
-            return new GridFormLayout() { OnValidate = formLayout.OnValidate, AfterSaved = formLayout.AfterSaved };
+            if (formLayout != null)
+            {
+                // do not send query text to front end.
+                if (formLayout.OnValidate != null && formLayout.OnValidate.EventType != FormEventType.Javascript) formLayout.OnValidate.Script = null;
+                // if event config is not javascript, do not send to front end.
+                if (formLayout.AfterSaved != null && formLayout.AfterSaved.EventType != FormEventType.Javascript) formLayout.AfterSaved = null;
+                return new GridFormLayout() { OnValidate = formLayout.OnValidate, AfterSaved = formLayout.AfterSaved };
+            }
+            else return null;
         }
 
         #endregion
@@ -911,7 +914,7 @@ namespace DataEditorPortal.Web.Services
             return true;
         }
 
-        public bool DeleteGridData(string name, string[] ids)
+        public bool DeleteGridData(string name, object[] ids)
         {
             var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
@@ -950,7 +953,8 @@ namespace DataEditorPortal.Web.Services
                 {
                     var affected = con.Execute(queryText, param, trans);
 
-                    RemoveLinkedData(config.Name, ids);
+                    if (config.ItemType == GridItemType.LINKED_SINGLE)
+                        RemoveLinkedData(config.Name, ids);
 
                     trans.Commit();
 
@@ -961,7 +965,7 @@ namespace DataEditorPortal.Web.Services
                     {
                         EventName = "After Deleting",
                         EventSection = config.Name,
-                        EventConfig = detailConfig.DeletingForm.AfterSaved,
+                        EventConfig = detailConfig.DeletingForm?.AfterSaved,
                         Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
                         ConnectionString = config.DataSourceConnection.ConnectionString
                     }, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
@@ -1399,7 +1403,7 @@ namespace DataEditorPortal.Web.Services
                 }
             }
         }
-        private void RemoveLinkedData(string table1Name, string[] table1Ids)
+        private void RemoveLinkedData(string table1Name, object[] table1Ids)
         {
             var linkedTableInfo = GetLinkedTableInfo(table1Name);
 

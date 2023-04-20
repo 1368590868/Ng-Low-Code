@@ -34,4 +34,9 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string field { get; set; }
         public int order { get; set; }
     }
+
+    public class BatchDeleteParam
+    {
+        public object[] Ids { get; set; }
+    }
 }
