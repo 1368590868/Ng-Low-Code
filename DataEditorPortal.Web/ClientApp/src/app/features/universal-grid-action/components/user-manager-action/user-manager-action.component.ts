@@ -176,9 +176,7 @@ export class UserManagerActionComponent
             options: []
           },
           hooks: {
-            onInit: (field: any) => {
-              this.ngxFormlyService.initDependOnFields(field);
-            }
+            onInit: this.ngxFormlyService.getFieldLookupOnInit()
           }
         }
       ]

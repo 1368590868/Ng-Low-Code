@@ -406,7 +406,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   calcCustomTemplate(data: any, template: string) {
-    const expression = evalStringExpression(template, ['RowData', 'Pipes']);
+    const expression = evalStringExpression(template, ['$rowData', 'Pipes']);
     return evalExpression(expression, data, [data, this.formatters]);
   }
 

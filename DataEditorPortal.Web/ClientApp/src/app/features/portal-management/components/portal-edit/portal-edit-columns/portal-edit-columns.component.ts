@@ -33,9 +33,9 @@ export class PortalEditColumnsComponent
   model: any = {};
   helperMessage =
     '// E.g. \r\n' +
-    "// Pipes.date.transform(RowData.CREATE_DATE,'short') \r\n" +
+    "// Pipes.date.transform($rowData.CREATE_DATE,'short') \r\n" +
     '// OR \r\n' +
-    '// RowData.NAME + RowData.CHECKED';
+    '// $rowData.NAME + $rowData.CHECKED';
   fields: FormlyFieldConfig[] = [
     {
       key: 'type',

@@ -157,9 +157,7 @@ export class PersonalDialogComponent {
             options: []
           },
           hooks: {
-            onInit: (field: any) => {
-              this.ngxFormlyService.initDependOnFields(field);
-            }
+            onInit: this.ngxFormlyService.getFieldLookupOnInit()
           }
         }
       ]

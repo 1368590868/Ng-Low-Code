@@ -84,9 +84,13 @@ export const MonacoEditorConfig: NgxMonacoEditorConfig = {
     // extra libraries
     const libSource = [
       '/**',
+      '* Returns all data of the current form',
+      '*/',
+      'let $model : any;',
+      '/**',
       '* Returns all data of the current row',
       '*/',
-      'let RowData : any;',
+      'let $rowData : any;',
       'declare class DecimalPipe {',
       '/**',
       '   * @param value The value to be formatted.',

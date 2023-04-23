@@ -112,29 +112,30 @@ export class EditRecordActionComponent
                 if (Array.isArray(f.props['optionsLookup'])) {
                   f.props.options = f.props['optionsLookup'];
                 } else {
-                  f.hooks = {
-                    onInit: field => {
-                      if (
-                        field.props &&
-                        field.props['dependOnFields'] &&
-                        field.props['dependOnFields'].length > 0
-                      ) {
-                        this.ngxFormlyService.initDependOnFields(field);
-                      } else {
-                        this.ngxFormlyService.initFieldOptions(field);
-                      }
-                    }
-                  };
+                  this.ngxFormlyService.initFieldLookup(f);
                 }
               }
             });
 
+          // set validators
           fields
             .filter(
               (x: any) => x.validatorConfig && Array.isArray(x.validatorConfig)
             )
-            .forEach(x => this.ngxFormlyService.initValidators(x));
+            .forEach(x => {
+              this.ngxFormlyService.initValidators(x);
+            });
 
+          // fields
+          //   .filter((x: any) => x.key === 'REMEDIATIONACTUALDATE')
+          //   .forEach(x => {
+          //     x.expressions = {
+          //       // hide: `field.parent.model.LPAACTIVITYSTATUS !== 'Remediated'`,
+          //       'props.required': `field.parent.model.LPAACTIVITYSTATUS === 'Remediated'`
+          //     };
+          //   });
+
+          // set props for linkDataEditor
           fields
             .filter(f => f.type === 'linkDataEditor')
             .forEach(x => {
@@ -145,6 +146,7 @@ export class EditRecordActionComponent
               }
             });
 
+          // set props for checkbox
           fields
             .filter(f => f.type === 'checkbox')
             .forEach(x => {
@@ -153,6 +155,7 @@ export class EditRecordActionComponent
               }
             });
 
+          // set props for fileUpload
           fields
             .filter(f => f.type === 'fileUpload')
             .forEach(x => {
@@ -251,6 +254,7 @@ export class EditRecordActionComponent
   }
 
   onFormSubmit(model: EditFormData) {
+    (this.editForm.form as any)._updateTreeValidity({ emitEvent: false });
     if (this.form.valid) {
       // run on validate event if configured
       const handler = this.getEventActionHandler(this.eventConfig?.onValidate);
