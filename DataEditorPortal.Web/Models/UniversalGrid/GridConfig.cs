@@ -71,7 +71,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string type { get; set; }
         public string field { get; set; }
         public string header { get; set; }
-        public string width { get; set; }
+        public int width { get; set; }
         public string filterType { get; set; }
 
         public bool sortable { get; set; }

@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -110,21 +108,16 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpDelete]
         [Route("{name}/data/{id}/delete")]
-        public bool DeleteData(string name, string id)
+        public bool DeleteData(string name, object id)
         {
-            return _universalGridService.DeleteGridData(name, new string[] { id });
+            return _universalGridService.DeleteGridData(name, new object[] { id });
         }
 
         [HttpPost]
         [Route("{name}/data/batch-delete")]
-        public bool BatchDeleteData(string name, [FromBody] JsonDocument model)
+        public bool BatchDeleteData(string name, [FromBody] BatchDeleteParam param)
         {
-            var ids = model.RootElement
-                .GetProperty("ids")
-                .EnumerateArray()
-                .Select(x => x.GetRawText())
-                .ToArray();
-            return _universalGridService.DeleteGridData(name, ids);
+            return _universalGridService.DeleteGridData(name, param.Ids);
         }
 
         [HttpPost]
