@@ -126,14 +126,16 @@ export class EditRecordActionComponent
               this.ngxFormlyService.initValidators(x);
             });
 
-          // fields
-          //   .filter((x: any) => x.key === 'REMEDIATIONACTUALDATE')
-          //   .forEach(x => {
-          //     x.expressions = {
-          //       // hide: `field.parent.model.LPAACTIVITYSTATUS !== 'Remediated'`,
-          //       'props.required': `field.parent.model.LPAACTIVITYSTATUS === 'Remediated'`
-          //     };
-          //   });
+          // set expressions
+          fields
+            .filter((x: any) => x.expressionsConfig)
+            .forEach((x: any) => {
+              x.expressions = {};
+              Object.keys(x.expressionsConfig).forEach(key => {
+                x.expressions[key.replace('_', '.')] = x.expressionsConfig[key];
+              });
+              x.expressionsConfig = undefined;
+            });
 
           // set props for linkDataEditor
           fields

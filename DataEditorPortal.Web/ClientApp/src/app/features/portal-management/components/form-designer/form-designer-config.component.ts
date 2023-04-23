@@ -14,7 +14,16 @@ import { FormDesignerDirective } from '../../directives/form-designer.directive'
         (modelChange)="modelChange($event)"
         class="p-fluid"></formly-form>
     </form>
-  `
+  `,
+  styles: [
+    `
+      :host ::ng-deep {
+        .monaco-editor-wrapper {
+          height: 6rem !important;
+        }
+      }
+    `
+  ]
 })
 export class FormDesignerConfigComponent
   extends FormDesignerDirective
@@ -50,5 +59,42 @@ export class FormDesignerConfigComponent
         }
       };
     }
+
+    // add expressions.
+    this.fields.push({
+      key: 'expressionsConfig',
+      fieldGroup: [
+        {
+          wrappers: ['divider'],
+          props: {
+            label: 'Reactions'
+          }
+        },
+        {
+          key: 'hide',
+          type: 'monacoEditor',
+          props: {
+            label: 'hide = ',
+            description:
+              'Only Support Javascript Expression\nExpression value type is `boolean`',
+            config: {
+              language: 'javascript'
+            }
+          }
+        },
+        {
+          key: 'props_required',
+          type: 'monacoEditor',
+          props: {
+            label: 'props.required =',
+            description:
+              'Only Support Javascript Expression\nExpression value type is `boolean`',
+            config: {
+              language: 'javascript'
+            }
+          }
+        }
+      ]
+    });
   }
 }
