@@ -640,7 +640,7 @@ namespace DataEditorPortal.Web.Services
                     model.Add(dataSourceConfig.IdColumn, id);
 
                 // calculate the computed field values
-                AssignComputedValues(formLayout.FormFields, model, con);
+                ProcessComputedValues(formLayout.FormFields, model, con);
 
                 // generate the query text and parameter
                 var queryText = _queryBuilder.ReplaceQueryParamters(formLayout.OnValidate.Script);
@@ -715,13 +715,7 @@ namespace DataEditorPortal.Web.Services
                 }
 
                 // calculate the computed field values
-                AssignComputedValues(formLayout.FormFields, model, con);
-
-                // filter the columns that have values
-                var columns = formLayout.FormFields
-                    .Select(x => x.key)
-                    .Where(x => model.Keys.Contains(x) && model[x] != null)
-                    .ToList();
+                ProcessComputedValues(formLayout.FormFields, model, con);
 
                 // generate the query text and parameters
                 var queryText = _queryBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
@@ -729,7 +723,7 @@ namespace DataEditorPortal.Web.Services
                     IdColumn = dataSourceConfig.IdColumn,
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
-                    Columns = columns,
+                    Columns = formLayout.FormFields.Select(x => x.key).Where(x => model.Keys.Contains(x) && model[x] != null).ToList(),
                     QueryText = formLayout.QueryText
                 });
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
@@ -766,14 +760,17 @@ namespace DataEditorPortal.Web.Services
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
 
                     // run after saved event handler
-                    AfterSaved(new EventActionModel()
+                    if (formLayout?.AfterSaved != null)
                     {
-                        EventName = "After Inserting",
-                        EventSection = config.Name,
-                        EventConfig = formLayout.AfterSaved,
-                        Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
-                        ConnectionString = config.DataSourceConnection.ConnectionString
-                    }, model);
+                        AfterSaved(new EventActionModel()
+                        {
+                            EventName = "After Inserting",
+                            EventSection = config.Name,
+                            EventConfig = formLayout.AfterSaved,
+                            Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
+                            ConnectionString = config.DataSourceConnection.ConnectionString
+                        }, model);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -840,13 +837,7 @@ namespace DataEditorPortal.Web.Services
                 }
 
                 // calculate the computed field values
-                AssignComputedValues(formLayout.FormFields, model, con);
-
-                // filter the columns that have values
-                var columns = formLayout.FormFields
-                    .Select(x => x.key)
-                    .Where(x => model.Keys.Contains(x) && model[x] != null)
-                    .ToList();
+                ProcessComputedValues(formLayout.FormFields, model, con);
 
                 // generate the query text
                 var queryText = _queryBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
@@ -854,7 +845,7 @@ namespace DataEditorPortal.Web.Services
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
                     IdColumn = dataSourceConfig.IdColumn,
-                    Columns = columns,
+                    Columns = formLayout.FormFields.Select(x => x.key).Where(x => model.Keys.Contains(x) && model[x] != null).ToList(),
                     QueryText = formLayout.QueryText
                 });
 
@@ -892,14 +883,17 @@ namespace DataEditorPortal.Web.Services
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
 
                     // run after saved event
-                    AfterSaved(new EventActionModel()
+                    if (formLayout?.AfterSaved != null)
                     {
-                        EventName = "After Updating",
-                        EventSection = config.Name,
-                        EventConfig = formLayout.AfterSaved,
-                        Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
-                        ConnectionString = config.DataSourceConnection.ConnectionString
-                    }, model);
+                        AfterSaved(new EventActionModel()
+                        {
+                            EventName = "After Updating",
+                            EventSection = config.Name,
+                            EventConfig = formLayout.AfterSaved,
+                            Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
+                            ConnectionString = config.DataSourceConnection.ConnectionString
+                        }, model);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -961,14 +955,17 @@ namespace DataEditorPortal.Web.Services
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
 
                     // run after saved event
-                    AfterSaved(new EventActionModel()
+                    if (detailConfig.DeletingForm?.AfterSaved != null)
                     {
-                        EventName = "After Deleting",
-                        EventSection = config.Name,
-                        EventConfig = detailConfig.DeletingForm?.AfterSaved,
-                        Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
-                        ConnectionString = config.DataSourceConnection.ConnectionString
-                    }, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
+                        AfterSaved(new EventActionModel()
+                        {
+                            EventName = "After Deleting",
+                            EventSection = config.Name,
+                            EventConfig = detailConfig.DeletingForm?.AfterSaved,
+                            Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
+                            ConnectionString = config.DataSourceConnection.ConnectionString
+                        }, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -983,7 +980,7 @@ namespace DataEditorPortal.Web.Services
             return true;
         }
 
-        private void AssignComputedValues(List<FormFieldConfig> formFields, Dictionary<string, object> model, DbConnection con)
+        private void ProcessComputedValues(List<FormFieldConfig> formFields, Dictionary<string, object> model, DbConnection con)
         {
             var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
             var currentUser = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
@@ -1034,6 +1031,12 @@ namespace DataEditorPortal.Web.Services
                                 SetModelValue(model, field.key, currentUser.Email);
                             }
                         }
+                    }
+                    else
+                    {
+                        // It is not a computed field, but it is added in form config without value in model.
+                        // Give it null value in order to generate a parameter for custom query text. 
+                        SetModelValue(model, field.key, null);
                     }
                 }
             }
@@ -1151,7 +1154,7 @@ namespace DataEditorPortal.Web.Services
                             UploadedFiles = JsonSerializer.Deserialize<List<UploadedFileModel>>(jsonElement.ToString(), jsonOptions)
                         });
                     }
-                    model[field.key] = null;
+                    model.Remove(field.key);
                 }
             }
             return result;
@@ -1333,7 +1336,7 @@ namespace DataEditorPortal.Web.Services
                 {
                     var valueStr = jsonElement.ToString();
                     result = JsonSerializer.Deserialize<List<RelationDataModel>>(valueStr, jsonOptions);
-                    model[Constants.LINK_DATA_FIELD_NAME] = null;
+                    model.Remove(Constants.LINK_DATA_FIELD_NAME);
                 }
             }
             return result;
