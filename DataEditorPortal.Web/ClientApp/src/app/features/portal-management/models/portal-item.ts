@@ -59,7 +59,7 @@ export interface GridColumn {
   type?: string;
   field?: string;
   header?: string;
-  width?: string;
+  width?: number;
   filterType?: string;
   uiType?: string;
   order?: number;

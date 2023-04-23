@@ -15,11 +15,12 @@ import {
 } from 'src/app/features/universal-grid-action';
 import { GridColumn, GridConfig, GridData } from '../../models/grid-types';
 import { Table } from 'primeng/table';
-import { TableState } from 'primeng/api';
+import { ConfirmationService, TableState } from 'primeng/api';
 import { GridParam, SearchParam, UserService } from 'src/app/shared';
 import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 import { DataFormatService } from '../../services/data-format.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomHandler } from 'primeng/dom';
 
 @Component({
   selector: 'app-table',
@@ -63,7 +64,15 @@ export class TableComponent implements OnInit, OnDestroy {
   loading = false;
   @ViewChild('dataTable') table!: Table;
 
-  cols: GridColumn[] = [];
+  columnsConfig: GridColumn[] = [];
+  columnsConfigCached: GridColumn[] = [];
+  columns: GridColumn[] = [];
+  columnSelectorVisible = false;
+  columnsSelected: string[] = [];
+  columnsHiddenState: string[] = [];
+  columnsOrderState: string[] = [];
+  columnsWidthState: number[] = [];
+
   stateKey!: string;
   first = 0;
   rows = 100;
@@ -85,7 +94,8 @@ export class TableComponent implements OnInit, OnDestroy {
     private gridTableService: GridTableService,
     private dataFormatService: DataFormatService,
     private userService: UserService,
-    private domSanitizer: DomSanitizer
+    private domSanitizer: DomSanitizer,
+    private confirmationService: ConfirmationService
   ) {
     this.formatters = this.dataFormatService.getFormatters();
   }
@@ -111,10 +121,15 @@ export class TableComponent implements OnInit, OnDestroy {
       this.setAllows();
       this.setRowActions();
       this.setTableActions();
-      this.cols = result[1];
+
+      // set grid columns
+      this.restoreColumnState();
+      this.columnsConfig = result[1];
+      this.columnsConfigCached = JSON.parse(JSON.stringify(result[1]));
+      this.restoreColumns();
 
       // load column filter options
-      this.cols.forEach(col => {
+      this.columns.forEach(col => {
         if (col.field && col.filterType === 'enums') {
           this.gridTableService
             .getTableColumnFilterOptions(this.gridName, col.field)
@@ -351,6 +366,32 @@ export class TableComponent implements OnInit, OnDestroy {
     this.resetData.emit();
   }
 
+  onColResize($event: any) {
+    const colIndex = DomHandler.index($event.element);
+    const shiftIndex = this.selectionMode === 'multiple' ? 2 : 1;
+
+    const cols = [...this.columns];
+    const width = cols[colIndex - shiftIndex].width;
+    cols[colIndex - shiftIndex].width = width + $event.delta;
+
+    this.columns = [...cols];
+    this.table.destroyStyleElement(); // remove primeNg table column width style
+
+    this.table.cd.detectChanges();
+  }
+
+  onColReorder($event: any) {
+    const { dragIndex, dropIndex, columns } = $event;
+    const dragCol = columns[dropIndex];
+    const dropCol =
+      dragIndex > dropIndex ? columns[dropIndex + 1] : columns[dropIndex - 1];
+
+    const from = this.columnsConfig.findIndex(x => x.field === dragCol.field);
+    const to = this.columnsConfig.findIndex(x => x.field === dropCol.field);
+
+    this.columnsConfig.splice(to, 0, this.columnsConfig.splice(from, 1)[0]);
+  }
+
   onStateSave(state: TableState) {
     // do not save selection to state.
     state.selection = undefined;
@@ -358,6 +399,9 @@ export class TableComponent implements OnInit, OnDestroy {
     state.multiSortMeta = undefined;
     state.sortField = undefined;
     state.sortOrder = undefined;
+
+    (state as any).hiddenColumns = this.columnsHiddenState;
+
     this.table.getStorage().setItem(this.stateKey, JSON.stringify(state));
   }
 
@@ -396,5 +440,109 @@ export class TableComponent implements OnInit, OnDestroy {
         )
         .subscribe();
     }
+  }
+
+  // column state, order, width, visiblity
+  restoreColumnState() {
+    const stateString = this.table.getStorage().getItem(this.stateKey);
+    if (stateString) {
+      const state = JSON.parse(stateString);
+      this.columnsHiddenState = state.hiddenColumns || [];
+      this.columnsOrderState = state.columnOrder;
+      this.columnsWidthState = state.columnWidths.split(',');
+    }
+  }
+
+  restoreColumns() {
+    const reorderedColumns: GridColumn[] = [];
+    this.columnsOrderState.forEach((key, index) => {
+      const col = this.columnsConfig.find(x => x.field === key);
+      if (col) {
+        const savedWidth =
+          index + 2 < this.columnsWidthState.length - 1
+            ? this.columnsWidthState[index + 2]
+            : 0;
+        if (savedWidth) col.width = savedWidth * 1; // restore column width
+        reorderedColumns.push(col);
+      }
+    });
+    // add any new columns if not in state.
+    this.columnsConfig.forEach(col => {
+      if (reorderedColumns.findIndex(r => r.field === col.field) < 0) {
+        reorderedColumns.push(col);
+      }
+    });
+    this.columnsConfig = reorderedColumns;
+
+    // // remove the hidden columns
+    const visibleColumns: GridColumn[] = [];
+    this.columnsConfig.forEach(x => {
+      if (this.columnsHiddenState.findIndex(name => x.field === name) < 0) {
+        if (!x.width) x.width = 250; // set default width
+        visibleColumns.push(x);
+      }
+    });
+
+    this.setTableWidth(visibleColumns);
+    this.table.destroyStyleElement(); // remove primeNg table column width style
+
+    this.columns = visibleColumns;
+    this.columnsSelected = this.columns.map(x => x.field || '');
+  }
+
+  setTableWidth(visibleCols: GridColumn[]) {
+    // get the width of selection colmun and action column
+    const tableHead = DomHandler.findSingle(
+      this.table.containerViewChild.nativeElement,
+      '.p-datatable-thead'
+    );
+    const headers = DomHandler.find(
+      tableHead,
+      'tr > th.selection, tr > th.action'
+    );
+    let width = 0;
+    headers.forEach(header => (width += DomHandler.getOuterWidth(header) * 1));
+    // reset table width
+    visibleCols.forEach(cols => (width += cols.width * 1));
+    this.table.setResizeTableWidth(width + 'px');
+  }
+
+  onColumnsSelected(columnsSelected: string[]) {
+    this.columnsHiddenState = this.columnsConfig
+      .filter(x => columnsSelected.findIndex(name => name === x.field) < 0)
+      .map(x => x.field || '');
+
+    const visibleCols: GridColumn[] = [];
+    this.columnsConfig.forEach(x => {
+      if (this.columnsHiddenState.findIndex(name => x.field === name) < 0) {
+        if (!x.width) x.width = 250; // set default width
+        visibleCols.push(x);
+      }
+    });
+    this.setTableWidth(visibleCols);
+    this.columns = visibleCols;
+
+    setTimeout(() => this.table.saveState(), 100);
+  }
+
+  resetToDefaultColumns() {
+    this.columnsHiddenState = [];
+    this.columnsOrderState = [];
+    this.columnsWidthState = [];
+    this.columnsConfig = JSON.parse(JSON.stringify(this.columnsConfigCached));
+    this.restoreColumns();
+    setTimeout(() => this.table.saveState(), 100);
+  }
+
+  confirmResetColumns(event: any) {
+    this.confirmationService.confirm({
+      target: event.target,
+      message:
+        'Are you sure that you want to reset your table back to original view?',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.resetToDefaultColumns();
+      }
+    });
   }
 }

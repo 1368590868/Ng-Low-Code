@@ -1,10 +1,12 @@
+<p-confirmPopup></p-confirmPopup>
+
 <div class="p-card flex flex-column">
   <div class="flex-grow-1">
     <p-table
       #dataTable
       class="data-table"
       styleClass="p-datatable-striped"
-      [columns]="cols"
+      [columns]="columns"
       [scrollable]="true"
       scrollHeight="flex"
       [resizableColumns]="true"
@@ -26,9 +28,10 @@
       (onFilter)="onFilter($event)"
       (onSort)="onSort($event)"
       (onStateSave)="onStateSave($event)"
-      [tableStyle]="{ tableLayout: 'fixed' }"
       (onRowSelect)="onRowSelect($event)"
-      (onRowUnselect)="onRowUnselect($event)">
+      (onRowUnselect)="onRowUnselect($event)"
+      (onColResize)="onColResize($event)"
+      (onColReorder)="onColReorder($event)">
       <ng-template pTemplate="caption">
         <div
           class="flex"
@@ -71,27 +74,36 @@
               >
             </div>
             <p-button
+              pTooltip="Reset the sorts and filters"
+              tooltipPosition="left"
               icon="pi pi-refresh text-lg"
-              styleClass="p-button-rounded p-button-outlined"
+              styleClass="p-button-rounded p-button-outlined mr-1"
               (onClick)="resetAndRefresh()"></p-button>
+            <p-button
+              icon="pi pi-pause text-lg"
+              styleClass="p-button-rounded p-button-outlined mr-1"
+              (onClick)="columnSelectorVisible = true"></p-button>
+            <p-button
+              icon="pi pi-sync text-lg"
+              styleClass="p-button-rounded p-button-outlined"
+              (onClick)="confirmResetColumns($event)"></p-button>
           </div>
         </div>
       </ng-template>
 
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th
-            *ngIf="selectionMode === 'multiple'"
-            style="width: 2.875rem !important; max-width: 2.875rem !important">
+          <th *ngIf="selectionMode === 'multiple'" class="selection">
             <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
           </th>
-          <th style="width: 5rem !important; max-width: 5rem !important"></th>
+          <th class="action"></th>
           <th
             *ngFor="let col of columns"
             pReorderableColumn
             pResizableColumn
             [pSortableColumn]="col.field"
-            [style.width]="col.width"
+            [style.width]="col.width + 'px !important'"
+            [style.max-width]="col.width + 'px !important'"
             [pSortableColumnDisabled]="!col.sortable">
             <span style="vertical-align: middle">{{ col.header }}</span>
             <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
@@ -237,3 +249,26 @@
   class="sidebar">
   <iframe [src]="helpUrl" class="w-full h-full" frameborder="0"></iframe>
 </p-sidebar>
+
+<p-dialog
+  #columnSelector
+  header="Show/Hide Columns"
+  [(visible)]="columnSelectorVisible"
+  [style]="{ width: '31.25rem' }"
+  [modal]="true"
+  [dismissableMask]="true"
+  contentStyleClass="border-top-1 surface-border pt-4 pb-0"
+  appendTo="body">
+  <div class="flex flex-column">
+    <p class="mb-4">Choose the columns(s) to display:</p>
+    <p-checkbox
+      *ngFor="let option of columnsConfig"
+      [inputId]="option.field || ''"
+      class="my-1"
+      [value]="option.field"
+      [label]="option.header || ''"
+      [(ngModel)]="columnsSelected"
+      (ngModelChange)="onColumnsSelected($event)"></p-checkbox>
+  </div>
+  <ng-template pTemplate="footer"> </ng-template>
+</p-dialog>

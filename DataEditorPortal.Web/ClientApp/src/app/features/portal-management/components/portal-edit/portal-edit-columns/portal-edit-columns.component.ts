@@ -64,12 +64,12 @@ export class PortalEditColumnsComponent
     },
     {
       key: 'width',
-      defaultValue: '10rem',
-      type: 'input',
+      defaultValue: '200',
+      type: 'inputNumber',
       props: {
         label: 'Column Width',
         required: true,
-        placeholder: 'Enter numeric value in rem or percentage'
+        placeholder: 'Enter numeric value in px'
       }
     },
     {
@@ -90,7 +90,7 @@ export class PortalEditColumnsComponent
       key: 'fileUploadConfig',
       type: 'fileUploadConfig',
       props: {
-        label: 'Attachments Config'
+        label: 'Attachments Configration'
       },
       expressions: {
         hide: `field.parent.model.type !== 'AttachmentField'`
@@ -211,7 +211,7 @@ export class PortalEditColumnsComponent
               key: x.columnName,
               filterType: x.filterType,
               header: x.columnName,
-              width: '10rem',
+              width: 250,
               sortable: true
             };
           });
@@ -339,7 +339,7 @@ export class PortalEditColumnsComponent
         field: `TEMPLATE_${index}`,
         filterType: 'none',
         header: `TEMPLATE_${index}`,
-        width: '10rem',
+        width: 250,
         selected: true
       },
       ...this.targetColumns
@@ -358,7 +358,7 @@ export class PortalEditColumnsComponent
         field: `ATTACHMENT_${index}`,
         filterType: 'attachments',
         header: `ATTACHMENT_${index}`,
-        width: '10rem',
+        width: 250,
         selected: true
       },
       ...this.targetColumns

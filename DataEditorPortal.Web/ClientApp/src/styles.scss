@@ -80,13 +80,9 @@ formly-form {
       align-items: flex-start;
       flex-wrap: wrap;
       position: relative;
-      margin-bottom: 1.5rem;
       small.p-error {
         width: 60%;
         margin-left: auto;
-        position: absolute;
-        right: 0;
-        bottom: -1.25rem;
       }
       label {
         width: 40%;

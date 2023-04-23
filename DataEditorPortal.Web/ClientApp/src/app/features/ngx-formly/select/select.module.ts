@@ -1,9 +1,12 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 import { DropdownModule } from 'primeng/dropdown';
-import { FormlySelectModule as FormlyCoreSelectModule } from '@ngx-formly/core/select';
+import {
+  FormlySelectModule as FormlyCoreSelectModule,
+  FormlySelectOptionsPipe
+} from '@ngx-formly/core/select';
 import { FormlyFieldSelectComponent } from './select.type';
 
 @NgModule({
@@ -23,6 +26,7 @@ import { FormlyFieldSelectComponent } from './select.type';
         { name: 'enum', extends: 'select' }
       ]
     })
-  ]
+  ],
+  providers: [FormlySelectOptionsPipe, AsyncPipe]
 })
 export class FormlySelectModule {}

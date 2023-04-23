@@ -42,6 +42,9 @@ import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorModule } from 'primeng/paginator';
 import { SidebarModule } from 'primeng/sidebar';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ConfirmationService } from 'primeng/api';
 
 @NgModule({
   declarations: [
@@ -77,7 +80,9 @@ import { SidebarModule } from 'primeng/sidebar';
     RippleModule,
     ButtonModule,
     PaginatorModule,
-    SidebarModule
+    SidebarModule,
+    CheckboxModule,
+    ConfirmPopupModule
   ],
   providers: [
     GridTableService,
@@ -85,7 +90,8 @@ import { SidebarModule } from 'primeng/sidebar';
     DatePipe,
     DecimalPipe,
     CurrencyPipe,
-    PercentPipe
+    PercentPipe,
+    ConfirmationService
   ]
 })
 export class UniversalGridModule {}
