@@ -39,8 +39,7 @@
         <label for="" class="mb-1">Database Connection</label>
         <div class="flex align-items-center">
           <p-dropdown
-            [class]="validationError"
-            [required]="isRequired"
+            [required]="true"
             [options]="dbConnections"
             [formControl]="formControlConnection"
             (onChange)="onConnectionChange($event)"
@@ -66,8 +65,7 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [class]="validationError"
-              [required]="isRequired"
+              [required]="true"
               [options]="dbTables"
               [formControl]="formControlDbTable"
               (onChange)="onTableNameChange($event)"
@@ -96,8 +94,8 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [class]="validationError"
-              [required]="isRequired"
+              #dropdownList="ngModel"
+              [required]="true"
               [(ngModel)]="storageTypeColumn"
               (ngModelChange)="onStorageTypeChange($event)"
               [options]="[
@@ -132,8 +130,8 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [class]="validationError"
-              [required]="isRequired"
+              #dropdownList="ngModel"
+              [required]="true"
               [(ngModel)]="idColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -164,8 +162,8 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [class]="validationError"
-              [required]="isRequired"
+              #dropdownList="ngModel"
+              [required]="true"
               [(ngModel)]="fileNameColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -196,8 +194,8 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [class]="validationError"
-              [required]="isRequired"
+              #dropdownList="ngModel"
+              [required]="true"
               [(ngModel)]="commentsColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -228,8 +226,8 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [class]="validationError"
-              [required]="isRequired"
+              #dropdownList="ngModel"
+              [required]="true"
               [(ngModel)]="contentTypeColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -260,8 +258,8 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [class]="validationError"
-              [required]="isRequired"
+              #dropdownList="ngModel"
+              [required]="true"
               [(ngModel)]="dataIdColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -292,8 +290,8 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [class]="validationError"
-              [required]="isRequired"
+              #dropdownList="ngModel"
+              [required]="true"
               [(ngModel)]="fileBytesColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -323,8 +321,8 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [class]="validationError"
-              [required]="isRequired"
+              #dropdownList="ngModel"
+              [required]="true"
               [(ngModel)]="filePathColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -355,8 +353,8 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [class]="validationError"
-              [required]="isRequired"
+              #dropdownList="ngModel"
+              [required]="true"
               [(ngModel)]="statusColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"

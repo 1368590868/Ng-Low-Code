@@ -1,4 +1,5 @@
 ﻿using DataEditorPortal.Data.Common;
+using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -18,5 +19,12 @@ namespace DataEditorPortal.Web.Models
     public class UploadedFileInput
     {
         public List<IFormFile> Files { get; set; }
+    }
+
+    public class UploadedFileMeta
+    {
+        public string FieldName { get; set; }
+        public List<UploadedFileModel> UploadedFiles { get; set; }
+        public FileUploadConfig FileUploadConfig { get; set; }
     }
 }

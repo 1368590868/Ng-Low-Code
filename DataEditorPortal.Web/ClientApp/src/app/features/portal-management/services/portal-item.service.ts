@@ -79,10 +79,12 @@ export class PortalItemService {
   }
 
   saveLinkedDatasource(data: LinkedDataSourceConfig) {
-    return this.http.post<ApiResponse<string>>(
-      `${this._apiUrl}portal-item/${this.itemId}/linked-datasource`,
-      data
-    );
+    return this.http
+      .post<ApiResponse<string>>(
+        `${this._apiUrl}portal-item/${this.itemId}/linked-datasource`,
+        data
+      )
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   getLinkedSingleTableConfig(id: string) {
@@ -299,10 +301,12 @@ export class PortalItemService {
   }
 
   saveGridColumnsConfig(data: GridColumn[]) {
-    return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}portal-item/${this.itemId}/grid-columns`,
-      data
-    );
+    return this.http
+      .post<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/${this.itemId}/grid-columns`,
+        data
+      )
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   getGridSearchConfig(): Observable<GridSearchField[]> {
@@ -314,10 +318,12 @@ export class PortalItemService {
   }
 
   saveGridSearchConfig(data: GridSearchField[]) {
-    return this.http.post<ApiResponse<boolean>>(
-      `${this._apiUrl}portal-item/${this.itemId}/grid-search`,
-      data
-    );
+    return this.http
+      .post<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/${this.itemId}/grid-search`,
+        data
+      )
+      .pipe(tap(() => this.refreshMenu()));
   }
 
   getGridFormConfig(): Observable<GirdDetailConfig> {

@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using System.Text.Json;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -122,7 +121,7 @@ namespace DataEditorPortal.Web.Controllers
             try
             {
                 var connection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Id == model.ConnectionId);
-                var query = _queryBuilder.ProcessQueryWithParamters(model.QueryText, new Dictionary<string, JsonElement>());
+                var query = _queryBuilder.ProcessQueryWithParamters(model.QueryText, new Dictionary<string, object>());
 
                 using (var con = _serviceProvider.GetRequiredService<DbConnection>())
                 {
@@ -139,7 +138,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("{id}/options")]
-        public List<DropdownOptionsItem> GetLookup(Guid id, [FromBody] Dictionary<string, JsonElement> model)
+        public List<DropdownOptionsItem> GetLookup(Guid id, [FromBody] Dictionary<string, object> model)
         {
             var lookup = _depDbContext.Lookups.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Id == id);
 

@@ -19,10 +19,11 @@ namespace DataEditorPortal.Web.Services
         string UseSearches(string query, List<FilterParam> filterParams = null);
         string GetFilterType(DataRow schema);
         string ParameterName(string name);
-        object GetJsonElementValue(JsonElement jsonElement);
+        object GetJsonElementValue(object value);
         object TransformValue(object value, DataRow schema);
         object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues);
         string ReplaceQueryParamters(string queryText);
+        string JoinAttachments(string query, IEnumerable<GridColConfig> attachmentCols);
         // universal grid
         string GenerateSqlTextForList(DataSourceConfig config);
         string GenerateSqlTextForDetail(DataSourceConfig config);
@@ -37,7 +38,7 @@ namespace DataEditorPortal.Web.Services
         string GetSqlTextForDatabaseSource(DataSourceConfig config);
 
         // for lookup
-        (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, Dictionary<string, JsonElement> model);
+        (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, Dictionary<string, object> model);
     }
 
     public abstract class QueryBuilder
@@ -188,8 +189,14 @@ namespace DataEditorPortal.Web.Services
             return "text";
         }
 
-        public virtual object GetJsonElementValue(JsonElement jsonElement)
+        public virtual object GetJsonElementValue(object value)
         {
+            if (value is byte[]) return value;
+
+            JsonElement jsonElement;
+            if (value is JsonElement) jsonElement = (JsonElement)value;
+            else jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(value));
+
             if (jsonElement.ValueKind == JsonValueKind.Array)
             {
                 return jsonElement.EnumerateArray().Select(m => GetJsonElementValue(m)).ToList();
@@ -235,8 +242,7 @@ namespace DataEditorPortal.Web.Services
             var dict = new Dictionary<string, object>();
             foreach (var item in keyValues)
             {
-                var jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(item.Value));
-                dict.Add(ParameterName(item.Key), GetJsonElementValue(jsonElement));
+                dict.Add(ParameterName(item.Key), GetJsonElementValue(item.Value));
             }
 
             dynamic param = dict.Aggregate(
@@ -361,7 +367,7 @@ namespace DataEditorPortal.Web.Services
 
         #endregion
 
-        public (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, Dictionary<string, JsonElement> model)
+        public (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, Dictionary<string, object> model)
         {
             var fieldRegex = new Regex(@"\#\#([a-zA-Z]{1}[a-zA-Z0-9_]+?)\#\#");
             var regex = new Regex(@"\{\{(.+?)\}\}");
