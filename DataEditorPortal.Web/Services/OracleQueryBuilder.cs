@@ -154,7 +154,29 @@ namespace DataEditorPortal.Web.Services
             if (type == typeof(TimeSpan))
                 return ((TimeSpan)value).TotalSeconds / 3600;
 
+            if (type == typeof(string) && value.ToString().Length == 32)
+            {
+                Guid temp;
+                if (TryParseHexToGuid((string)value, out temp))
+                {
+                    return temp.ToString();
+                }
+            }
             return value;
+        }
+
+        private bool TryParseHexToGuid(string text, out Guid guid)
+        {
+            try
+            {
+                byte[] bytes = Convert.FromHexString(text);
+                guid = new Guid(bytes);
+                return true;
+            }
+            catch (Exception) { }
+
+            guid = Guid.Empty;
+            return false;
         }
 
         protected override string EscapeColumnName(string columnName)

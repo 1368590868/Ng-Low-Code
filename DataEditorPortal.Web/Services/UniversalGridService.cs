@@ -1348,8 +1348,6 @@ namespace DataEditorPortal.Web.Services
 
             var linkedTableInfo = GetLinkedTableInfo(table1Name);
 
-            var columns = new List<string>() { linkedTableInfo.Table1MappingField, linkedTableInfo.Table2MappingField };
-
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = linkedTableInfo.ConnectionString;
@@ -1362,6 +1360,12 @@ namespace DataEditorPortal.Web.Services
                         .Select(x => x.Table2Id);
                     if (toAdd.Any())
                     {
+                        var queryToGetId = linkedTableInfo.LinkedTable.QueryToGetId;
+                        var columns = new List<string>() { linkedTableInfo.Table1MappingField, linkedTableInfo.Table2MappingField };
+                        if (queryToGetId != null && !string.IsNullOrEmpty(queryToGetId.queryText))
+                        {
+                            columns.Add(linkedTableInfo.LinkedTable.IdColumn);
+                        }
                         linkedTableInfo.LinkedTable.Columns = columns;
                         var sql = _queryBuilder.GenerateSqlTextForInsert(linkedTableInfo.LinkedTable);
 
@@ -1369,7 +1373,6 @@ namespace DataEditorPortal.Web.Services
                         {
                             var value = new List<KeyValuePair<string, object>>();
                             // if queryToGetId configured, get id first.
-                            var queryToGetId = linkedTableInfo.LinkedTable.QueryToGetId;
                             if (queryToGetId != null && !string.IsNullOrEmpty(queryToGetId.queryText))
                             {
                                 var idValue = con.ExecuteScalar(queryToGetId.queryText, null, null, null, queryToGetId.type);
