@@ -407,7 +407,7 @@ namespace DataEditorPortal.Web.Services
                     type = "DataBaseField",
                     field = x.ColumnName,
                     header = x.ColumnName,
-                    width = "250px",
+                    width = 250,
                     filterType = x.FilterType,
                     sortable = true
                 }).ToList();
