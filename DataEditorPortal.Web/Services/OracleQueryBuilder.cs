@@ -66,7 +66,8 @@ namespace DataEditorPortal.Web.Services
                 }
                 else if (jsonElement.ValueKind == JsonValueKind.Array)
                 {
-                    clause = $"{field} IN {parameter}";
+                    if (jsonElement.EnumerateArray().ToList().Count > 0)
+                        clause = $"{field} IN {parameter}";
                 }
                 else if (jsonElement.ValueKind == JsonValueKind.String)
                 {
