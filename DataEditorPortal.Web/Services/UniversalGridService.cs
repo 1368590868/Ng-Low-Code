@@ -1215,7 +1215,7 @@ namespace DataEditorPortal.Web.Services
             return new
             {
                 columns = columns.Where(c => columnsForLinkedField.Contains(c.field)).ToList(),
-                dataKey = linkedTableInfo.LinkedTable.IdColumn,
+                dataKey = JsonSerializer.Deserialize<DataSourceConfig>(linkedTableInfo.Table2DataSource).IdColumn,
                 table2Name = linkedTableInfo.Table2Name
             };
         }
@@ -1280,6 +1280,7 @@ namespace DataEditorPortal.Web.Services
                                   {
                                       Table2Name = t2.m.Name,
                                       Table2Id = t2.m.Id,
+                                      Table2DataSource = t2.u.DataSourceConfig,
                                       Id = tMain.m.Id,
                                       Name = tMain.m.Name,
                                       ConnectionString = tMain.u.DataSourceConnection.ConnectionString,
@@ -1449,6 +1450,7 @@ namespace DataEditorPortal.Web.Services
         {
             public string Table2Name { get; set; }
             public Guid Table2Id { get; set; }
+            public string Table2DataSource { get; set; }
             public string Name { get; set; }
             public Guid Id { get; set; }
 
