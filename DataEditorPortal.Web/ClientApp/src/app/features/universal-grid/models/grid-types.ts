@@ -26,7 +26,7 @@ export interface GridConfig {
 export interface GridColumn {
   field?: string;
   header?: string;
-  width?: string;
+  width: number;
   filterType?: string;
   uiType?: string;
   order?: number;
