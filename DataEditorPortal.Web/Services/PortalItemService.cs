@@ -624,6 +624,8 @@ namespace DataEditorPortal.Web.Services
 
             _depDbContext.SaveChanges();
 
+            RemoveGridCache(config.Name);
+
             var linkedTableNames = _depDbContext.SiteMenus.Where(x => x.ParentId == siteMenu.Id).Select(x => x.Name).ToList();
             if (linkedTableNames.Count > 0) _memoryCache.Remove($"grid.{linkedTableNames[0]}.linked.table.info");
             if (linkedTableNames.Count > 1) _memoryCache.Remove($"grid.{linkedTableNames[1]}.linked.table.info");
