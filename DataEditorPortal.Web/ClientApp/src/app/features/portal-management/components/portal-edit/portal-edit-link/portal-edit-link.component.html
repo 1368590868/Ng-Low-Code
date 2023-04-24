@@ -93,29 +93,27 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-column mb-2 ml-4">
+      <div class="flex flex-column mb-2" style="margin-left: '-1.23rem'">
         <label class="mb-4"> </label>
         <div class="flex align-items-center">
+          <p-button
+            title="Advanced Configuration"
+            styleClass="p-button-text p-button-rounded"
+            icon="pi pi-ellipsis-v"
+            (onClick)="advancedDialog.showDialog()"></p-button>
           <p-message
             severity="info"
             [text]="
               advancedValue
-                ? 'Query Text'
-                : 'Automatically Obtained From The Database'
+                ? 'Obtained from custom query text'
+                : 'Automatically obtained from the database'
             "
-            styleClass="mr-1"></p-message>
+            styleClass="mr-1 ml-1"></p-message>
           <p-button
             *ngIf="advancedValue"
             styleClass="p-button-text p-button-rounded remove-btn"
             icon="pi pi-times-circle"
             (onClick)="advancedDialog.onRemove()"></p-button>
-
-          <p-button
-            class="ml-1"
-            title="Advanced Configuration"
-            styleClass="p-button-text p-button-rounded"
-            icon="pi pi-ellipsis-v"
-            (onClick)="advancedDialog.showDialog()"></p-button>
         </div>
       </div>
     </div>
