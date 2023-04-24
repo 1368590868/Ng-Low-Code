@@ -43,6 +43,7 @@ export class FileUploadConfigurationComponent
   implements ControlValueAccessor, OnInit
 {
   @ViewChildren('dropdownList') dropdownList!: NgModel[];
+  @Input() foreignKeyOptions!: { label: string; value: string }[];
   visible = false;
   isLoading = false;
   innerValue: any = null;
@@ -66,6 +67,7 @@ export class FileUploadConfigurationComponent
   } = {
     idColumn: undefined,
     dataSourceConnectionId: '',
+    foreignKeyName: '',
     tableName: '',
     tableSchema: '',
     fileStorageType: '',
@@ -82,6 +84,7 @@ export class FileUploadConfigurationComponent
   statusColumn: null | string = null;
   fileNameColumn: null | string = null;
   storageTypeColumn: null | string = null;
+  foreignKeyNameColumn: null | string = null;
   commentsColumn: null | string = null;
   dataIdColumn: null | string = null;
   filePathColumn: null | string = null;
@@ -103,6 +106,7 @@ export class FileUploadConfigurationComponent
       this.statusColumn = newVal.fieldMapping.STATUS;
       this.fileNameColumn = newVal.fieldMapping.FILE_NAME;
       this.storageTypeColumn = newVal.fileStorageType;
+      this.foreignKeyNameColumn = newVal.foreignKeyName;
       this.commentsColumn = newVal.fieldMapping.COMMENTS;
       this.dataIdColumn = newVal.fieldMapping.DATA_ID;
       this.filePathColumn = newVal.fieldMapping.FILE_PATH;
@@ -202,6 +206,7 @@ export class FileUploadConfigurationComponent
     this.fileNameColumn = null;
     this.storageTypeColumn = null;
     this.commentsColumn = null;
+    this.foreignKeyNameColumn = null;
     this.dataIdColumn = null;
     this.filePathColumn = null;
     this.fileBytesColumn = null;
@@ -229,6 +234,7 @@ export class FileUploadConfigurationComponent
         }
       }
       this.dsConfig.fileStorageType = this.storageTypeColumn || '';
+      this.dsConfig.foreignKeyName = this.foreignKeyNameColumn || '';
       this.dsConfig.fieldMapping = {
         ID: this.idColumn,
         CONTENT_TYPE: this.contentTypeColumn,
@@ -263,7 +269,8 @@ export class FileUploadConfigurationComponent
       this.statusColumn == null ||
       this.storageTypeColumn == null ||
       this.commentsColumn == null ||
-      this.dataIdColumn == null
+      this.dataIdColumn == null ||
+      this.foreignKeyNameColumn == null
     ) {
       return false;
     }
@@ -345,9 +352,16 @@ export class FileUploadConfigurationComponent
   selector: 'app-formly-file-upload-configuration',
   template: ` <app-file-upload-configuration
     [formControl]="formControl"
-    [formlyAttributes]="field"></app-file-upload-configuration>`,
+    [formlyAttributes]="field"
+    [foreignKeyOptions]="
+      props.foreignKeyOptions || []
+    "></app-file-upload-configuration>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldFileUploadConfigurationComponent extends FieldType<
-  FieldTypeConfig<FormlyFieldProps>
+  FieldTypeConfig<
+    FormlyFieldProps & {
+      foreignKeyOptions: { label: string; value: string }[];
+    }
+  >
 > {}

@@ -77,17 +77,6 @@
       </div>
     </div>
     <div class="flex justify-content-between">
-      <!-- <div class="flex flex-column mb-3">
-        <label for="" class="mb-1">Field Name</label>
-        <div class="flex align-items-center">
-          <input
-            type="text"
-            pInputText
-            [ngModel]="'STORAGE_TYPE'"
-            [disabled]="true"
-            [style]="{ minWidth: '20rem' }" />
-        </div>
-      </div> -->
       <div class="flex flex-column mb-3">
         <ng-container>
           <label for="tableName" class="mb-1">Storage Type</label>
@@ -107,6 +96,20 @@
               appendTo="body"></p-dropdown>
           </div>
         </ng-container>
+      </div>
+
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1">Foreign Key</label>
+        <div class="flex align-items-center">
+          <p-dropdown
+            #dropdownList="ngModel"
+            [required]="true"
+            [(ngModel)]="foreignKeyNameColumn"
+            [options]="foreignKeyOptions"
+            placeholder="Please Select"
+            [style]="{ minWidth: '20rem' }"
+            appendTo="body"></p-dropdown>
+        </div>
       </div>
     </div>
 
