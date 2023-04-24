@@ -104,6 +104,13 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     setTimeout(() => {
       expressionFormControl?.markAsPristine();
     });
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(
+      ['/**', '* Current form model', '*/', 'let $model : any;'].join('\n'),
+      'expressions.d.ts'
+    );
   }
 
   initForm(val: any) {
