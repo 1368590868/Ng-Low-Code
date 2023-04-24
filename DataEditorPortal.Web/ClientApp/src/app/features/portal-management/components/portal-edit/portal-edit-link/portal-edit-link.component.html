@@ -157,11 +157,14 @@
                   type="button"
                   pButton
                   [label]="
-                    primary?.configCompleted === false ? 'Configure' : 'Edit'
+                    primary?.configCompleted === false
+                      ? 'Continue Editing'
+                      : 'Edit'
                   "
                   [routerLink]="'./edit/' + primary.id"
                   class="p-button-text"></button>
                 <button
+                  *ngIf="primary?.configCompleted"
                   type="button"
                   pButton
                   label="Action"
@@ -263,12 +266,15 @@
                   type="button"
                   pButton
                   [label]="
-                    secondary?.configCompleted === false ? 'Configure' : 'Edit'
+                    secondary?.configCompleted === false
+                      ? 'Continue Editing'
+                      : 'Edit'
                   "
                   [routerLink]="'./edit/' + secondary.id"
                   class="p-button-text"></button>
 
                 <button
+                  *ngIf="secondary?.configCompleted"
                   type="button"
                   pButton
                   label="Action"
