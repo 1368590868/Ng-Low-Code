@@ -26,7 +26,6 @@ export class PermissionRouterGuard implements CanActivate {
       if (route.params['name']) {
         const routerParam =
           'VIEW_' + route.params['name'].toUpperCase().replace(/-/g, '_');
-        console.log(routerParam);
         if (!this.userService.USER.permissions![routerParam]) {
           this.router.navigate(['error-page'], {
             queryParams: { code: '401' }

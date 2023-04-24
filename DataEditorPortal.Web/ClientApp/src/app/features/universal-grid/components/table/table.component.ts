@@ -161,7 +161,7 @@ export class TableComponent implements OnInit, OnDestroy {
   getPermission(name: string) {
     return (
       this.userService.USER.permissions?.[
-        name + this.gridName.toUpperCase().replace('-', '_')
+        name + this.gridName.toUpperCase().replace(/-/g, '_')
       ] ?? false
     );
   }
