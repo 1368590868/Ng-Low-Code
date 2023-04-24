@@ -29,6 +29,7 @@ namespace DataEditorPortal.Web.Services
         bool ExistName(string name, Guid? id);
         Guid Create(PortalItemData model);
         Guid Update(Guid id, PortalItemData model);
+        bool Delete(Guid id);
         List<DataSourceTable> GetDataSourceTables(Guid connectionId);
         List<DataSourceTableColumn> GetDataSourceTableColumns(Guid connectionId, string sqlText);
         List<DataSourceTableColumn> GetDataSourceTableColumnsByPortalId(Guid id, bool forForm);
@@ -121,7 +122,7 @@ namespace DataEditorPortal.Web.Services
             // create site menu
             var siteMenu = _mapper.Map<SiteMenu>(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
-            siteMenu.Type = model.ItemType == "linked-single" ? "Sub Portal Item" : "Portal Item";
+            siteMenu.Type = model.ItemType == GridItemType.LINKED_SINGLE ? "Sub Portal Item" : "Portal Item";
             _depDbContext.SiteMenus.Add(siteMenu);
 
             // create universal grid configuration
@@ -132,22 +133,23 @@ namespace DataEditorPortal.Web.Services
             item.CreatedDate = DateTime.UtcNow;
             _depDbContext.UniversalGridConfigurations.Add(item);
 
-            if (siteMenu.Type == "Portal Item")
+
+            // create permissions
+            var types = new List<string>();
+            if (model.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
+            if (model.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
+            if (model.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
+            types.ForEach(t =>
             {
-                // create permissions
-                var types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
-                types.ForEach(t =>
+                var permission = new SitePermission()
                 {
-                    var permission = new SitePermission()
-                    {
-                        Id = Guid.NewGuid(),
-                        Category = $"Portal Item: { model.Label }",
-                        PermissionName = $"{t}_{ model.Name.Replace("-", "_") }".ToUpper(),
-                        PermissionDescription = $"{t} { model.Label }"
-                    };
-                    _depDbContext.Add(permission);
-                });
-            }
+                    Id = Guid.NewGuid(),
+                    Category = $"Portal Item: { model.Label }",
+                    PermissionName = $"{t}_{ model.Name.Replace("-", "_") }".ToUpper(),
+                    PermissionDescription = $"{t} { model.Label }"
+                };
+                _depDbContext.Add(permission);
+            });
 
             _depDbContext.SaveChanges();
 
@@ -164,18 +166,15 @@ namespace DataEditorPortal.Web.Services
 
             model.Name = GetCodeName(model.Label);
 
-            if (siteMenu.Type == "Portal Item")
-            {
-                // update permissions
-                var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"Portal Item: { siteMenu.Label }").ToList();
+            // update permissions
+            var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"Portal Item: { siteMenu.Label }").ToList();
 
-                permissions.ForEach(p =>
-                {
-                    p.Category = p.Category.Replace(siteMenu.Label, model.Label);
-                    p.PermissionName = p.PermissionName.Replace(siteMenu.Name.Replace("-", "_").ToUpper(), model.Name.Replace("-", "_").ToUpper());
-                    p.PermissionDescription = p.PermissionDescription.Replace(siteMenu.Label, model.Label);
-                });
-            }
+            permissions.ForEach(p =>
+            {
+                p.Category = p.Category.Replace(siteMenu.Label, model.Label);
+                p.PermissionName = p.PermissionName.Replace(siteMenu.Name.Replace("-", "_").ToUpper(), model.Name.Replace("-", "_").ToUpper());
+                p.PermissionDescription = p.PermissionDescription.Replace(siteMenu.Label, model.Label);
+            });
 
             var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             item.Name = model.Name;
@@ -191,10 +190,45 @@ namespace DataEditorPortal.Web.Services
             }
             _mapper.Map(model, siteMenu);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
-            siteMenu.Type = model.ItemType == "linked-single" ? "Sub Portal Item" : "Portal Item";
+            siteMenu.Type = model.ItemType == GridItemType.LINKED_SINGLE ? "Sub Portal Item" : "Portal Item";
 
             _depDbContext.SaveChanges();
             return siteMenu.Id;
+        }
+
+        public bool Delete(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type != "System");
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            DeleteInternal(siteMenu);
+            _depDbContext.SaveChanges();
+
+            return true;
+        }
+
+        private void DeleteInternal(SiteMenu siteMenu)
+        {
+            if (siteMenu != null)
+            {
+                // remove permission
+                var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"Portal Item: { siteMenu.Label }").ToList();
+                permissions.ForEach(p => _depDbContext.SitePermissions.Remove(p));
+
+                // remove configuration
+                var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+                _depDbContext.UniversalGridConfigurations.Remove(item);
+
+                // remove linked table
+                var childrenMenus = _depDbContext.SiteMenus.Where(x => x.ParentId == siteMenu.Id).ToList();
+                childrenMenus.ForEach(m => DeleteInternal(m));
+
+                // remove siteMenu
+                _depDbContext.SiteMenus.Remove(siteMenu);
+            }
         }
 
         public List<DataSourceTable> GetDataSourceTables(Guid connectionId)
@@ -497,6 +531,8 @@ namespace DataEditorPortal.Web.Services
 
             _depDbContext.SaveChanges();
 
+            RemoveGridCache(config.Name);
+
             return true;
         }
 
@@ -539,6 +575,8 @@ namespace DataEditorPortal.Web.Services
 
             _depDbContext.SaveChanges();
 
+            RemoveGridCache(config.Name);
+
             return true;
         }
 
@@ -577,6 +615,8 @@ namespace DataEditorPortal.Web.Services
             config.CustomActionConfig = JsonSerializer.Serialize(model);
 
             _depDbContext.SaveChanges();
+
+            RemoveGridCache(config.Name);
 
             return true;
         }

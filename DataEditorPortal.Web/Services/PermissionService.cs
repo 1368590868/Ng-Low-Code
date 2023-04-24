@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace DataEditorPortal.Web.Services
         {
             #region get the menu structure in tree view
 
-            var menus = (from m in _depDbContext.SiteMenus where m.Type != "System" && m.Type != "Sub Portal item" select m).ToList();
+            var menus = (from m in _depDbContext.SiteMenus where m.Type != "System" select m).ToList();
 
             var permissionNodes = menus
                 .Where(x => x.ParentId == null)
@@ -40,21 +41,7 @@ namespace DataEditorPortal.Web.Services
                 .ThenBy(x => x.Name)
                 .Select(x =>
                 {
-                    var items = menus
-                            .Where(m => m.ParentId == x.Id)
-                            .OrderBy(x => x.Order)
-                            .ThenBy(x => x.Name)
-                            .Select(m => new PermissionNode
-                            {
-                                Label = m.Label,
-                                Key = m.Id,
-                                Name = m.Name,
-                                Icon = m.Icon,
-                                Description = m.Description,
-                                Type = m.Type,
-                                Selectable = !isAdmin
-                            })
-                            .ToList();
+                    var items = GetChildren(menus, x.Id, !isAdmin);
 
                     return new PermissionNode
                     {
@@ -81,6 +68,31 @@ namespace DataEditorPortal.Web.Services
             return permissionNodes;
         }
 
+        private List<PermissionNode> GetChildren(List<SiteMenu> menus, System.Guid parentId, bool selectable)
+        {
+            return menus
+                .Where(m => m.ParentId == parentId)
+                .OrderBy(x => x.Order)
+                .ThenBy(x => x.Name)
+                .Select(m =>
+                {
+                    var items = GetChildren(menus, m.Id, selectable);
+
+                    return new PermissionNode
+                    {
+                        Label = m.Label,
+                        Key = m.Id,
+                        Name = m.Name,
+                        Icon = m.Icon,
+                        Description = m.Description,
+                        Type = m.Type,
+                        Selectable = selectable,
+                        Children = items.Any() ? items : null
+                    };
+                })
+                .ToList();
+        }
+
         private void SetPortalItemPermissions(PermissionNode node, List<AppRolePermission> rolePermissions, bool isAdmin)
         {
             if (node.Children != null)
@@ -89,6 +101,26 @@ namespace DataEditorPortal.Web.Services
                 {
                     SetPortalItemPermissions(x, rolePermissions, isAdmin);
                 });
+
+                // it is portal item, but it has children, it must be linked table.
+                if (node.Type == "Portal Item")
+                {
+                    var permission = rolePermissions
+                    .Where(p => p.PermissionName.Contains($"_{ node.Name.Replace("-", "_") }".ToUpper()))
+                    .Select(x => new PermissionNode
+                    {
+                        Label = x.PermissionDescription,
+                        Key = x.Id,
+                        Name = x.PermissionName,
+                        Description = x.PermissionDescription,
+                        Selected = x.Selected,
+                        Selectable = !isAdmin
+                    })
+                    .ToList();
+
+                    node.Children.ForEach(x => permission.AddRange(x.Children));
+                    node.Children = permission;
+                }
             }
             else
             {

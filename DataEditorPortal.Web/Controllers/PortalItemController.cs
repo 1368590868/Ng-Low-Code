@@ -153,7 +153,7 @@ namespace DataEditorPortal.Web.Controllers
         {
             model.Name = _portalItemService.GetCodeName(model.Label);
 
-            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type != "Portal Item");
             if (siteMenu == null)
             {
                 throw new ApiException("Not Found", 404);
@@ -188,6 +188,27 @@ namespace DataEditorPortal.Web.Controllers
 
             _mapper.Map(model, siteMenu);
 
+            _depDbContext.SaveChanges();
+
+            return siteMenu.Id;
+        }
+
+
+        [HttpDelete]
+        [Route("menu-item/{id}/delete")]
+        public Guid DeleteMenuItem(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type != "Portal Item" && x.Type != "System");
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var isNotEmpty = _depDbContext.SiteMenus.Any(x => x.ParentId == id);
+            if (isNotEmpty)
+                throw new ApiException("Folder is not empty");
+
+            _depDbContext.Remove(siteMenu);
             _depDbContext.SaveChanges();
 
             return siteMenu.Id;
@@ -362,6 +383,13 @@ namespace DataEditorPortal.Web.Controllers
         public Guid UpdatePortalItem(Guid id, [FromBody] PortalItemData model)
         {
             return _portalItemService.Update(id, model);
+        }
+
+        [HttpDelete]
+        [Route("{id}/delete")]
+        public bool Delete(Guid id)
+        {
+            return _portalItemService.Delete(id);
         }
 
         #endregion

@@ -34,6 +34,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public object props { get; set; }
         public object validatorConfig { get; set; }
         public ComputedConfig computedConfig { get; set; }
+        public object expressionsConfig { get; set; }
     }
 
     public class ComputedConfig
