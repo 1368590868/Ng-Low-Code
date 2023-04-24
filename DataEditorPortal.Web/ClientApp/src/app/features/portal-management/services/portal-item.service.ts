@@ -118,6 +118,14 @@ export class PortalItemService {
     );
   }
 
+  deleteMenuItem(id: string): Observable<ApiResponse<boolean>> {
+    return this.http
+      .delete<ApiResponse<boolean>>(
+        `${this._apiUrl}portal-item/menu-item/${id}/delete`
+      )
+      .pipe(tap(() => this.refreshMenu()));
+  }
+
   publish(id: string): Observable<ApiResponse<string>> {
     return this.http
       .put<ApiResponse<string>>(
@@ -188,6 +196,12 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${this.itemId}/update`,
         data
       )
+      .pipe(tap(() => this.refreshMenu()));
+  }
+
+  deletePortalItem(id: string): Observable<ApiResponse<boolean>> {
+    return this.http
+      .delete<ApiResponse<boolean>>(`${this._apiUrl}portal-item/${id}/delete`)
       .pipe(tap(() => this.refreshMenu()));
   }
 

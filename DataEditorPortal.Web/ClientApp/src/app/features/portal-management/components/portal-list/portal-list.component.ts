@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MenuItem, TreeNode } from 'primeng/api';
+import { ConfirmationService, MenuItem, TreeNode } from 'primeng/api';
 import { ContextMenu } from 'primeng/contextmenu';
 import { Menu } from 'primeng/menu';
 import { tap } from 'rxjs';
@@ -13,7 +13,8 @@ import { AddPortalDialogComponent } from './add-portal-dialog/add-portal-dialog.
 @Component({
   selector: 'app-portal-list',
   templateUrl: './portal-list.component.html',
-  styleUrls: ['./portal-list.component.scss']
+  styleUrls: ['./portal-list.component.scss'],
+  providers: [ConfirmationService]
 })
 export class PortalListComponent implements OnInit {
   data!: PortalItem[];
@@ -72,7 +73,8 @@ export class PortalListComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
     private notifyService: NotifyService,
-    private configDataService: ConfigDataService
+    private configDataService: ConfigDataService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -248,6 +250,21 @@ export class PortalListComponent implements OnInit {
       });
     }
 
+    const hasChildren = rowNode.children && rowNode.children.length > 0;
+    if (
+      row['type'] !== 'System' &&
+      (row['type'] === 'Portal Item' || !hasChildren)
+    ) {
+      items.push({
+        separator: true
+      });
+      items.push({
+        label: 'Delete',
+        icon: 'pi pi-fw pi-trash',
+        command: () => this.delete(row)
+      });
+    }
+
     return items;
   }
 
@@ -313,6 +330,25 @@ export class PortalListComponent implements OnInit {
         })
       )
       .subscribe();
+  }
+
+  delete(row: PortalItemData) {
+    this.confirmationService.confirm({
+      message: 'Are you sure that you want to delete this item?',
+      accept: () => {
+        const deleteMethod =
+          row['type'] === 'Portal Item' ? 'deletePortalItem' : 'deleteMenuItem';
+        this.portalItemService[deleteMethod](row['id'])
+          .pipe(
+            tap(res => {
+              if (res && !res.isError) {
+                this.getPortalList();
+              }
+            })
+          )
+          .subscribe();
+      }
+    });
   }
 
   onDiaglogSaved() {
