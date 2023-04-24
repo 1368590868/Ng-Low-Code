@@ -23,13 +23,17 @@ export class PortalEditColumnsComponent
   isSavingAndNext = false;
   isSavingAndExit = false;
 
-  dataSourceTableColumns: DataSourceTableColumn[] = [];
+  dataSourceTableColumns: GridColumn[] = [];
   sourceColumns: GridColumn[] = [];
   targetColumns: GridColumn[] = [];
   @ViewChild('pickList') pickList!: PickList;
 
   form = new FormGroup({});
-  options: FormlyFormOptions = {};
+  options: FormlyFormOptions = {
+    formState: {
+      foreignKeyOptions: []
+    }
+  };
   model: any = {};
   helperMessage =
     '// E.g. \r\n' +
@@ -93,6 +97,7 @@ export class PortalEditColumnsComponent
         label: 'Attachments Configration'
       },
       expressions: {
+        'props.foreignKeyOptions': 'formState.foreignKeyOptions',
         hide: `field.parent.model.type !== 'AttachmentField'`
       }
     },
@@ -201,6 +206,9 @@ export class PortalEditColumnsComponent
             key: x.field,
             selected: true
           };
+        });
+        this.options.formState.foreignKeyOptions = res[1].map(x => {
+          return { label: x.columnName, value: x.columnName };
         });
         this.sourceColumns = res[1]
           .filter(s => !this.targetColumns.find(t => t.field === s.columnName))
