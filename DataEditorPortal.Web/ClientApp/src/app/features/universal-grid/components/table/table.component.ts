@@ -459,7 +459,7 @@ export class TableComponent implements OnInit, OnDestroy {
       const col = this.columnsConfig.find(x => x.field === key);
       if (col) {
         const savedWidth =
-          index + 2 < this.columnsWidthState.length - 1
+          index + 2 < this.columnsWidthState.length
             ? this.columnsWidthState[index + 2]
             : 0;
         if (savedWidth) col.width = savedWidth * 1; // restore column width
