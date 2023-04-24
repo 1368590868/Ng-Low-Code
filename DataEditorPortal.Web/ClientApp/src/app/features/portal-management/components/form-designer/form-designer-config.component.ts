@@ -67,7 +67,7 @@ export class FormDesignerConfigComponent
         {
           wrappers: ['divider'],
           props: {
-            label: 'Reactions'
+            label: 'Expressions'
           }
         },
         {
@@ -76,10 +76,11 @@ export class FormDesignerConfigComponent
           props: {
             label: 'hide = ',
             description:
-              'Only Support Javascript Expression\nExpression value type is `boolean`',
+              'Only Support Javascript Expression\nExpression value type is `boolean`\n<a href="https://formly.dev/docs/guide/expression-properties" target="_blank">See more</a>',
             config: {
               language: 'javascript'
-            }
+            },
+            onInit: (editor: any) => this.onMonacoEditorInit(editor)
           }
         },
         {
@@ -88,13 +89,32 @@ export class FormDesignerConfigComponent
           props: {
             label: 'props.required =',
             description:
-              'Only Support Javascript Expression\nExpression value type is `boolean`',
+              'Only Support Javascript Expression\nExpression value type is `boolean`\n<a href="https://formly.dev/docs/guide/expression-properties" target="_blank">See more</a>',
             config: {
               language: 'javascript'
-            }
+            },
+            onInit: (editor: any) => this.onMonacoEditorInit(editor)
           }
         }
       ]
     });
+  }
+
+  onMonacoEditorInit(editor: any) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(
+      [
+        '/**',
+        '* Current field config',
+        '*/',
+        'let field : any;',
+        '/**',
+        '* Current form model',
+        '*/',
+        'let model : any;'
+      ].join('\n'),
+      'expressions.d.ts'
+    );
   }
 }
