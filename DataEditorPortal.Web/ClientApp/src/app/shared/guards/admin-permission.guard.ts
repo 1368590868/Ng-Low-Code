@@ -12,7 +12,7 @@ import { UserService } from '..';
 @Injectable({
   providedIn: 'root'
 })
-export class PermissionRouterGuard implements CanActivate {
+export class AdminPermissionGuard implements CanActivate {
   constructor(private userService: UserService, private router: Router) {}
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -23,20 +23,12 @@ export class PermissionRouterGuard implements CanActivate {
     | boolean
     | UrlTree {
     if (!this.userService.USER.isAdmin) {
-      if (route.params['name']) {
-        const routerParam =
-          'VIEW_' + route.params['name'].toUpperCase().replace(/-/g, '_');
-        if (!this.userService.USER.permissions![routerParam]) {
-          this.router.navigate(['error-page'], {
-            queryParams: { code: '401' }
-          });
-        }
-      } else {
-        this.router.navigate(['error-page'], {
-          queryParams: { code: '401' }
-        });
-      }
+      this.router.navigate(['error-page'], {
+        queryParams: { code: '401' }
+      });
+      return false;
+    } else {
+      return true;
     }
-    return true;
   }
 }

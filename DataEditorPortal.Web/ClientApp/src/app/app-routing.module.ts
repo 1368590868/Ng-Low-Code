@@ -10,7 +10,7 @@ import {
   DataDictionaryComponent,
   SystemLogComponent
 } from './features/core';
-import { AuthRouterGuard, PermissionRouterGuard } from './shared';
+import { AdminPermissionGuard, AuthRouterGuard } from './shared';
 
 const routes: Routes = [
   { path: '', component: TileComponent, canActivate: [AuthRouterGuard] },
@@ -28,17 +28,17 @@ const routes: Routes = [
   {
     path: 'site-settings',
     component: SiteSettingsComponent,
-    canActivate: [AuthRouterGuard, PermissionRouterGuard]
+    canActivate: [AuthRouterGuard, AdminPermissionGuard]
   },
   {
     path: 'data-dictionaries',
     component: DataDictionaryComponent,
-    canActivate: [AuthRouterGuard, PermissionRouterGuard]
+    canActivate: [AuthRouterGuard, AdminPermissionGuard]
   },
   {
     path: 'system-event-logs',
     component: SystemLogComponent,
-    canActivate: [AuthRouterGuard, PermissionRouterGuard]
+    canActivate: [AuthRouterGuard, AdminPermissionGuard]
   },
   {
     path: 'portal-item',
@@ -54,7 +54,7 @@ const routes: Routes = [
       import('./features/portal-management/portal-management.module').then(
         m => m.PortalManagementModule
       ),
-    canActivate: [AuthRouterGuard, PermissionRouterGuard]
+    canActivate: [AuthRouterGuard, AdminPermissionGuard]
   },
   { path: '**', component: ErrorPageComponent }
 ];

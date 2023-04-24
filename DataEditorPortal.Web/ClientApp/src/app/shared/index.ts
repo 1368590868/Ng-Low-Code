@@ -15,7 +15,7 @@ import { BooleanTextPipe } from './pipes/boolean-text.pipe';
 import { AttachmentsPipe } from './pipes/attachments.pipe';
 
 export { AuthRouterGuard } from './guards/auth-router.guard';
-export { PermissionRouterGuard } from './guards/permission-router.guard';
+export { AdminPermissionGuard } from './guards/admin-permission.guard';
 export { ApiResponse } from './models/api-response';
 export { SiteMenu } from './models/menu';
 export { AppUser } from './models/user';
