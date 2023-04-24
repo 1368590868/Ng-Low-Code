@@ -59,19 +59,7 @@ export class SearchComponent implements OnInit, OnDestroy {
             if (Array.isArray(f.props['optionsLookup'])) {
               f.props.options = f.props['optionsLookup'];
             } else {
-              f.hooks = {
-                onInit: field => {
-                  if (
-                    field.props &&
-                    field.props['dependOnFields'] &&
-                    field.props['dependOnFields'].length > 0
-                  ) {
-                    this.ngxFormlyService.initDependOnFields(field);
-                  } else {
-                    this.ngxFormlyService.initFieldOptions(field);
-                  }
-                }
-              };
+              this.ngxFormlyService.initFieldLookup(f);
             }
           }
         });

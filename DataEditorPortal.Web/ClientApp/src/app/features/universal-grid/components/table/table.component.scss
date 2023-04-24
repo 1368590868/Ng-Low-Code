@@ -59,6 +59,10 @@
         .p-button-rounded .pi.p-button-icon {
           z-index: -1;
         }
+        app-action-wrapper {
+          margin-top: 0.125rem;
+          margin-bottom: 0.125rem;
+        }
       }
 
       [styleClass='p-paginator-bottom'] {

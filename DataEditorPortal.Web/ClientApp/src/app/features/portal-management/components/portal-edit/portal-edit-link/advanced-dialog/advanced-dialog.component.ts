@@ -57,7 +57,6 @@ export class AdvancedDialogComponent implements ControlValueAccessor {
   }
 
   writeValue(value: any): void {
-    console.log(value);
     this.value = value;
   }
   registerOnChange(fn: any): void {

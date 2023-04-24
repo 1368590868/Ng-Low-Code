@@ -46,7 +46,7 @@ const routes: Routes = [
       import('./features/universal-grid/universal-grid.module').then(
         m => m.UniversalGridModule
       ),
-    canActivate: [AuthRouterGuard, PermissionRouterGuard]
+    canActivate: [AuthRouterGuard]
   },
   {
     path: 'portal-management',

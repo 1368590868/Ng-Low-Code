@@ -406,7 +406,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   calcCustomTemplate(data: any, template: string) {
-    const expression = evalStringExpression(template, ['RowData', 'Pipes']);
+    const expression = evalStringExpression(template, ['$rowData', 'Pipes']);
     return evalExpression(expression, data, [data, this.formatters]);
   }
 
@@ -459,7 +459,7 @@ export class TableComponent implements OnInit, OnDestroy {
       const col = this.columnsConfig.find(x => x.field === key);
       if (col) {
         const savedWidth =
-          index + 2 < this.columnsWidthState.length - 1
+          index + 2 < this.columnsWidthState.length
             ? this.columnsWidthState[index + 2]
             : 0;
         if (savedWidth) col.width = savedWidth * 1; // restore column width

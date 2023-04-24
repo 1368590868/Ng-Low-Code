@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import {
   Component,
   Inject,
@@ -30,7 +31,8 @@ import { UniversalGridService } from '../../services/universal-grid.service';
 @Component({
   selector: 'app-edit-record-action',
   templateUrl: './edit-record-action.component.html',
-  styleUrls: ['./edit-record-action.component.scss']
+  styleUrls: ['./edit-record-action.component.scss'],
+  providers: [DatePipe]
 })
 export class EditRecordActionComponent
   extends GridActionDirective
@@ -54,6 +56,7 @@ export class EditRecordActionComponent
     private notifyService: NotifyService,
     private ngxFormlyService: NgxFormlyService,
     private systemLogService: SystemLogService,
+    private datePipe: DatePipe,
     private injector: Injector,
     @Inject('EVENT_ACTION_CONFIG')
     private EVENT_ACTION_CONFIG: {
@@ -93,8 +96,33 @@ export class EditRecordActionComponent
       .getFormConfig(this.gridName, this.isAddForm ? 'ADD' : 'UPDATE')
       .pipe(
         tap(result => {
-          // fetch lookups
           const fields = result as FormlyFieldConfig[];
+
+          // set default value
+          fields
+            .filter(f => f.defaultValue)
+            .forEach(f => {
+              const matches = [
+                ...f.defaultValue.matchAll(
+                  /##SEARCHES[.]{1}([a-zA-Z]{1}[a-zA-Z0-9_]+?)([:]{1}([a-zA-Z]{1}[a-zA-Z0-9_]+?))*##/g
+                )
+              ];
+              let value = f.defaultValue;
+              matches.forEach(match => {
+                let searchVal = this.fetchDataParam?.searches
+                  ? this.fetchDataParam?.searches[match[1]]
+                  : '';
+                if (searchVal && searchVal.getDate)
+                  searchVal = this.datePipe.transform(
+                    searchVal,
+                    match[3] ?? 'yyyyMMdd'
+                  );
+                value = value.replace(match[0], searchVal ?? '');
+              });
+              f.defaultValue = value;
+            });
+
+          // fetch lookups
           fields
             .filter(
               // advanced setting: options from lookup
@@ -112,29 +140,32 @@ export class EditRecordActionComponent
                 if (Array.isArray(f.props['optionsLookup'])) {
                   f.props.options = f.props['optionsLookup'];
                 } else {
-                  f.hooks = {
-                    onInit: field => {
-                      if (
-                        field.props &&
-                        field.props['dependOnFields'] &&
-                        field.props['dependOnFields'].length > 0
-                      ) {
-                        this.ngxFormlyService.initDependOnFields(field);
-                      } else {
-                        this.ngxFormlyService.initFieldOptions(field);
-                      }
-                    }
-                  };
+                  this.ngxFormlyService.initFieldLookup(f);
                 }
               }
             });
 
+          // set validators
           fields
             .filter(
               (x: any) => x.validatorConfig && Array.isArray(x.validatorConfig)
             )
-            .forEach(x => this.ngxFormlyService.initValidators(x));
+            .forEach(x => {
+              this.ngxFormlyService.initValidators(x);
+            });
 
+          // set expressions
+          fields
+            .filter((x: any) => x.expressionsConfig)
+            .forEach((x: any) => {
+              x.expressions = {};
+              Object.keys(x.expressionsConfig).forEach(key => {
+                x.expressions[key.replace('_', '.')] = x.expressionsConfig[key];
+              });
+              x.expressionsConfig = undefined;
+            });
+
+          // set props for linkDataEditor
           fields
             .filter(f => f.type === 'linkDataEditor')
             .forEach(x => {
@@ -145,6 +176,7 @@ export class EditRecordActionComponent
               }
             });
 
+          // set props for checkbox
           fields
             .filter(f => f.type === 'checkbox')
             .forEach(x => {
@@ -153,6 +185,7 @@ export class EditRecordActionComponent
               }
             });
 
+          // set props for fileUpload
           fields
             .filter(f => f.type === 'fileUpload')
             .forEach(x => {
@@ -251,6 +284,7 @@ export class EditRecordActionComponent
   }
 
   onFormSubmit(model: EditFormData) {
+    (this.editForm.form as any)._updateTreeValidity({ emitEvent: false });
     if (this.form.valid) {
       // run on validate event if configured
       const handler = this.getEventActionHandler(this.eventConfig?.onValidate);

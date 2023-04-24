@@ -46,9 +46,9 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   helperMessage =
     '// Please enter the validation expression that returns boolen.\r\n' +
     '// E.g. \r\n' +
-    '// model.NAME && model.NAME.length > 5 \r\n' +
-    '// model.PASSWORD === model.CONFIRM_PASSOWRD \r\n' +
-    '// /^[0-9]*$/.test(model.PHONE_NUMBER)';
+    '// $model.NAME && $model.NAME.length > 5 \r\n' +
+    '// $model.PASSWORD === $model.CONFIRM_PASSOWRD \r\n' +
+    '// /^[0-9]*$/.test($model.PHONE_NUMBER)';
 
   innerValue: any;
 
@@ -104,6 +104,13 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     setTimeout(() => {
       expressionFormControl?.markAsPristine();
     });
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(
+      ['/**', '* Current form model', '*/', 'let $model : any;'].join('\n'),
+      'expressions.d.ts'
+    );
   }
 
   initForm(val: any) {
