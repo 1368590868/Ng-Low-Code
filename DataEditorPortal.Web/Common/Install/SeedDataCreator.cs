@@ -1628,9 +1628,9 @@ namespace DataEditorPortal.Web.Common.Install
                 new SitePermission()
                 {
                     Id = Guid.NewGuid(),
-                    Category = $"Portal Item: Site LPA(s)",
-                    PermissionName = $"VIEW_SITE_LPA_S".ToUpper(),
-                    PermissionDescription = $"View Site LPA(s)"
+                    Category = $"Portal Item: LPA Site",
+                    PermissionName = $"VIEW_LPA_SITE".ToUpper(),
+                    PermissionDescription = $"View LPA Site"
                 },
                 new SitePermission()
                 {
@@ -1659,13 +1659,6 @@ namespace DataEditorPortal.Web.Common.Install
                     Category = $"Portal Item: Site LPA(s))",
                     PermissionName = $"EXPORT_SITE_LPA_S".ToUpper(),
                     PermissionDescription = $"Export Site LPA(s)"
-                },
-                new SitePermission()
-                {
-                    Id = Guid.NewGuid(),
-                    Category = $"Portal Item: Remediation Activities",
-                    PermissionName = $"VIEW_REMEDIATION_ACTIVITIES".ToUpper(),
-                    PermissionDescription = $"View Remediation Activities"
                 },
                 new SitePermission()
                 {
