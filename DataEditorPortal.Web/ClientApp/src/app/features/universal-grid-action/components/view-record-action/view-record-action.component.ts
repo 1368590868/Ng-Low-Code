@@ -55,7 +55,18 @@ export class ViewRecordActionComponent
             };
           })
           .filter(x => x.name !== undefined);
-        this.viewData = key;
+        // sort by res
+        const result = res.map(x => {
+          return {
+            name: x.header,
+            value: key.find(y => y.name === x.header)?.value,
+            type: x.type,
+            format: x.format,
+            template: x.template,
+            filterType: x.filterType
+          };
+        });
+        this.viewData = result;
         this.loading = false;
         this.loadedEvent.emit();
       }
