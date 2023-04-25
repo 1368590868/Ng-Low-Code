@@ -375,12 +375,16 @@ namespace DataEditorPortal.Web.Services
 
             var keyValuePairs = new List<KeyValuePair<string, object>>();
 
+            model = model.AsEnumerable()
+                .Select(x => new KeyValuePair<string, object>(x.Key.ToUpper(), x.Value))
+                .ToDictionary(x => x.Key, x => x.Value);
+
             // process optional criterias
             foreach (Match match in optionalCriterias)
             {
                 // check the value in model.
                 var fieldMatch = fieldRegex.Match(match.Value);
-                var key = fieldMatch.Groups[1].Value;
+                var key = fieldMatch.Groups[1].Value.ToUpper();
 
                 object value = null;
                 if (model.ContainsKey(key))
@@ -394,9 +398,15 @@ namespace DataEditorPortal.Web.Services
                 }
                 else
                 {
-                    if (new Regex(@$"IN {fieldMatch.Value.ToUpper()}").IsMatch(match.Value.ToUpper()) && !(value is IEnumerable<object>))
+                    if (
+                            new Regex(@$"IN {fieldMatch.Value.ToUpper()}").IsMatch(match.Value.ToUpper()) // The criteria is IN operator, it needs value is array
+                            && (
+                                !(value is IEnumerable<object>) || // value is not an array
+                                !(value as IEnumerable<object>).Any() // value is an array but empty
+                            )
+                        )
                     {
-                        // check the operator, if it is "IN", but value is not IEnumerable<object>
+                        // check the operator, if it is "IN", but value is not IEnumerable<object> or empty
                         // we dont need to apply this criteria, replace it with empty.
                         queryText = queryText.Replace(match.Value, "");
                     }

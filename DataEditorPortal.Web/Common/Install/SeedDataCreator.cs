@@ -311,6 +311,13 @@ namespace DataEditorPortal.Web.Common.Install
                     Name = "Employers",
                     QueryText = $"SELECT dd.LABEL, dd.VALUE, dd.VALUE1, dd.VALUE2 FROM {Constants.DEFAULT_SCHEMA}.DATA_DICTIONARIES dd WHERE dd.CATEGORY = 'Employer' {{{{ AND dd.VALUE1 IN ##VENDOR## }}}} ORDER BY dd.LABEL",
                     DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
+                },
+                new Lookup()
+                {
+                    Id = Guid.Parse("8BE7B1D6-F09A-4EEE-B8EC-4DFCF689005B"),
+                    Name = "Employers in Editing Form",
+                    QueryText = $"SELECT dd.LABEL, dd.VALUE, dd.VALUE1, dd.VALUE2 FROM {Constants.DEFAULT_SCHEMA}.DATA_DICTIONARIES dd WHERE dd.CATEGORY = 'Employer' {{{{ AND dd.VALUE1 = ##VENDOR## }}}} ORDER BY dd.LABEL",
+                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
                 }
             };
             foreach (var item in lookups)
@@ -383,7 +390,7 @@ namespace DataEditorPortal.Web.Common.Install
                             props = new {
                                 label = "Roles",
                                 placeholder = "Please select",
-                                optionsLookup = "727052BA-0033-42C9-A39C-06A103E4B021"
+                                optionsLookup = new { id = "727052BA-0033-42C9-A39C-06A103E4B021" }
                             },
                             searchRule = new SearchFieldFilterRule
                             {
@@ -398,7 +405,7 @@ namespace DataEditorPortal.Web.Common.Install
                             props = new {
                                 label = "Vendor",
                                 placeholder = "Please select",
-                                optionsLookup = "E1F3E2C7-25CA-4D69-9405-ABC54923864D"
+                                optionsLookup = new { id = "E1F3E2C7-25CA-4D69-9405-ABC54923864D" }
                             },
                             searchRule = new SearchFieldFilterRule
                             {
@@ -413,8 +420,10 @@ namespace DataEditorPortal.Web.Common.Install
                             props = new {
                                 label = "Employer",
                                 placeholder = "Please select",
-                                optionsLookup = "704A3D00-62DF-4C62-A4BD-457C4DC242CA",
-                                dependOnFields = new object[]{ "VENDOR" }
+                                optionsLookup = new {
+                                    id = "704A3D00-62DF-4C62-A4BD-457C4DC242CA",
+                                    deps = new object[] { "VENDOR" }
+                                }
                             },
                             searchRule = new SearchFieldFilterRule
                             {
@@ -922,7 +931,7 @@ namespace DataEditorPortal.Web.Common.Install
                         props = new {
                             label = "DOT Operator",
                             placeholder = "Select Operator...",
-                            optionsLookup = "140FEA8D-DEA8-4314-8B29-6F1BD140C79A"
+                            optionsLookup = new { id = "140FEA8D-DEA8-4314-8B29-6F1BD140C79A" }
                         },
                         searchRule = new SearchFieldFilterRule
                         {
@@ -942,8 +951,10 @@ namespace DataEditorPortal.Web.Common.Install
                         props = new {
                             label = "Division",
                             placeholder = "Select Division...",
-                            optionsLookup = "EF604385-873D-4229-9685-1D14BE1B484C",
-                            dependOnFields = new object[]{ "DOT_OPERATOR_NAME" }
+                            optionsLookup = new {
+                                id = "EF604385-873D-4229-9685-1D14BE1B484C",
+                                deps = new object[]{ "DOT_OPERATOR_NAME" }
+                            },
                         },
                         searchRule = new SearchFieldFilterRule
                         {
@@ -963,8 +974,10 @@ namespace DataEditorPortal.Web.Common.Install
                         props = new {
                             label = "Area",
                             placeholder = "Select Area...",
-                            optionsLookup = "44A5D080-876C-42B4-8243-739D2BCEA013",
-                            dependOnFields = new object[]{ "DOT_OPERATOR_NAME", "DIVISION_NAME" }
+                            optionsLookup = new {
+                                id = "44A5D080-876C-42B4-8243-739D2BCEA013",
+                                deps = new object[]{ "DOT_OPERATOR_NAME", "DIVISION_NAME" }
+                            }
                         },
                         searchRule = new SearchFieldFilterRule
                         {
@@ -984,8 +997,10 @@ namespace DataEditorPortal.Web.Common.Install
                         props = new {
                             label = "Location",
                             placeholder = "Select Location...",
-                            optionsLookup = "4F584448-9877-4037-AF0D-1AD2B17AD9F1",
-                            dependOnFields = new object[]{ "DOT_OPERATOR_NAME", "DIVISION_NAME", "AREA_NAME" }
+                            optionsLookup = new {
+                                id = "4F584448-9877-4037-AF0D-1AD2B17AD9F1",
+                                deps = new object[]{ "DOT_OPERATOR_NAME", "DIVISION_NAME", "AREA_NAME" }
+                            }
                         },
                         searchRule = new SearchFieldFilterRule
                         {
@@ -1005,8 +1020,10 @@ namespace DataEditorPortal.Web.Common.Install
                         props = new {
                             label = "Site Name",
                             placeholder = "Select Site Name...",
-                            optionsLookup = "901B664B-B443-45C1-8F49-B585A845E321",
-                            dependOnFields = new object[]{ "DOT_OPERATOR_NAME", "DIVISION_NAME", "AREA_NAME", "LOCATION" }
+                            optionsLookup = new {
+                                id = "901B664B-B443-45C1-8F49-B585A845E321",
+                                deps = new object[]{ "DOT_OPERATOR_NAME", "DIVISION_NAME", "AREA_NAME", "LOCATION" }
+                            }
                         },
                         searchRule = new SearchFieldFilterRule
                         {

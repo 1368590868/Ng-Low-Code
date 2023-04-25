@@ -88,20 +88,18 @@ namespace DataEditorPortal.Web.Controllers
                 .ToList()
                 .ForEach(r => _depDbContext.SiteRolePermissions.Remove(r));
 
-            foreach (var p in role.Permissions)
+            role.Permissions.Where(p => p.Selected).Select(p => p.Id).Distinct().ToList().ForEach(id =>
             {
-                if (p.Selected)
+                var permission = new SiteRolePermission()
                 {
-                    var permission = new SiteRolePermission()
-                    {
-                        SiteRoleId = siteRole.Id,
-                        SitePermissionId = p.Id,
-                        CreatedBy = userId,
-                        CreatedDate = DateTime.UtcNow
-                    };
-                    _depDbContext.SiteRolePermissions.Add(permission);
-                }
-            }
+                    SiteRoleId = siteRole.Id,
+                    SitePermissionId = id,
+                    CreatedBy = userId,
+                    CreatedDate = DateTime.UtcNow
+                };
+                _depDbContext.SiteRolePermissions.Add(permission);
+            });
+
             _depDbContext.SaveChanges();
 
             return siteRole.Id;
