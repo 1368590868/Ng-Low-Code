@@ -85,7 +85,6 @@ export class FormLayoutComponent {
   @ViewChild('pickList') pickList!: PickList;
 
   model: any = {};
-  allSelectedFields: { key: string; type: string }[] = [];
   @ViewChildren(FormDesignerViewComponent)
   formDesignerViews!: FormDesignerViewComponent[];
 
@@ -169,9 +168,6 @@ export class FormLayoutComponent {
   onTargetSelect({ items }: { items: GridFormField[] }) {
     if (items.length === 1) {
       this.model = items[0];
-      this.allSelectedFields = this.targetColumns.map(x => {
-        return { key: x.key, type: x.type };
-      });
     } else {
       this.model = {};
     }

@@ -40,8 +40,8 @@ export class UserManagerActionComponent
           props: {
             required: true,
             type: 'text',
-            label: 'CNP ID',
-            placeholder: 'CNP ID'
+            label: 'User ID',
+            placeholder: 'User ID'
           },
           expressions: {
             'props.disabled': 'formState.isAddForm'
@@ -66,7 +66,7 @@ export class UserManagerActionComponent
                 });
               },
               message: () => {
-                return 'The  CNP ID has already been exist.';
+                return 'The User ID has already been exist.';
               }
             }
           }
@@ -154,7 +154,9 @@ export class UserManagerActionComponent
           props: {
             label: 'Vendor',
             placeholder: 'Please select',
-            optionsLookup: 'E1F3E2C7-25CA-4D69-9405-ABC54923864D',
+            optionsLookup: {
+              id: 'E1F3E2C7-25CA-4D69-9405-ABC54923864D'
+            },
             options: []
           },
           hooks: {
@@ -171,8 +173,10 @@ export class UserManagerActionComponent
           props: {
             label: 'Employer',
             placeholder: 'Please select',
-            optionsLookup: '704A3D00-62DF-4C62-A4BD-457C4DC242CA',
-            dependOnFields: ['vendor'],
+            optionsLookup: {
+              id: '8BE7B1D6-F09A-4EEE-B8EC-4DFCF689005B',
+              deps: ['vendor']
+            },
             options: []
           },
           hooks: {

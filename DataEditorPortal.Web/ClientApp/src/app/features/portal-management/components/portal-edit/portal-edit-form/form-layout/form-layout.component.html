@@ -85,7 +85,6 @@
           <div *ngIf="this.model && this.model.key; else emptyMessage">
             <app-form-designer-config
               [config]="model"
-              [allSelectedFields]="allSelectedFields"
               (configChange)="configChange($event)"></app-form-designer-config>
           </div>
           <ng-template #emptyMessage>
