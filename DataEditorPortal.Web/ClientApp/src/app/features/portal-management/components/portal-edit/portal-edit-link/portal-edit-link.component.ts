@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { NotifyService } from 'src/app/shared';
@@ -12,7 +12,7 @@ import {
   LinkedDataSourceConfig,
   LinkedSingleConfig
 } from '../../../models/portal-item';
-import { FormControl } from '@angular/forms';
+import { FormControl, NgModel } from '@angular/forms';
 import { AdvancedQueryModel } from '..';
 import { CustomActionsComponent } from '../..';
 import { AdvancedDialogComponent } from './advanced-dialog/advanced-dialog.component';
@@ -27,6 +27,7 @@ export class PortalEditLinkComponent
 {
   @ViewChild('customActions') customActions!: CustomActionsComponent;
   @ViewChild('advancedDialog') advancedDialog!: AdvancedDialogComponent;
+  @ViewChildren('validationRef') validationRef!: NgModel[];
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
@@ -172,8 +173,6 @@ export class PortalEditLinkComponent
 
   valid() {
     if (
-      !this.primaryTableConfig?.details ||
-      !this.secondaryTableConfig?.details ||
       this.primarySelected.length === 0 ||
       this.secondarySelected.length === 0 ||
       this.dsConfig.dataSourceConnectionId == null ||
@@ -181,7 +180,31 @@ export class PortalEditLinkComponent
       this.formControlPrimaryMap.value == null ||
       this.formControlSecondaryMap.value == null
     ) {
-      this.notifyService.notifyWarning('Warning', 'Please Check Your Data.');
+      this.formControlSecondaryMap.markAsDirty();
+      this.formControlPrimaryMap.markAsDirty();
+      this.validationRef.forEach(x => {
+        x.control.markAsDirty();
+      });
+      if (
+        !this.primaryTableConfig?.details ||
+        !this.secondaryTableConfig?.details
+      ) {
+        this.notifyService.notifyWarning(
+          'Warning',
+          'Please add the table first.'
+        );
+      }
+      if (
+        this.primaryTableConfig?.details &&
+        this.secondaryTableConfig?.details &&
+        (this.primaryTableConfig.details[0].configCompleted === false ||
+          this.secondaryTableConfig.details[0].configCompleted === false)
+      ) {
+        this.notifyService.notifyWarning(
+          'Warning',
+          'Please continue complete the form.'
+        );
+      }
       return false;
     }
     return true;
