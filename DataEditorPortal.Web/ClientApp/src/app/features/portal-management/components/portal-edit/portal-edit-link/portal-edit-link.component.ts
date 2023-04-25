@@ -187,22 +187,13 @@ export class PortalEditLinkComponent
       });
       if (
         !this.primaryTableConfig?.details ||
-        !this.secondaryTableConfig?.details
+        !this.secondaryTableConfig?.details ||
+        this.primaryTableConfig.details[0].configCompleted === false ||
+        this.secondaryTableConfig.details[0].configCompleted === false
       ) {
         this.notifyService.notifyWarning(
           'Warning',
-          'Please add the table first.'
-        );
-      }
-      if (
-        this.primaryTableConfig?.details &&
-        this.secondaryTableConfig?.details &&
-        (this.primaryTableConfig.details[0].configCompleted === false ||
-          this.secondaryTableConfig.details[0].configCompleted === false)
-      ) {
-        this.notifyService.notifyWarning(
-          'Warning',
-          'Please continue complete the form.'
+          'Please complete the configuration for primary table and secondary table.'
         );
       }
       return false;
