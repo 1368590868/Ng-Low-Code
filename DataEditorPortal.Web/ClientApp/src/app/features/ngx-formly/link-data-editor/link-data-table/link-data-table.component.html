@@ -77,9 +77,7 @@
             "></span
         ></ng-template>
         <ng-template #normal>{{ data[col.field] }}</ng-template>
-        <span
-          *ngIf="col.template"
-          [innerHTML]="calcCustomTemplate(data, col.template)">
+        <span *ngIf="col.template" [innerHTML]="data | template : col.template">
         </span>
       </td>
     </tr>

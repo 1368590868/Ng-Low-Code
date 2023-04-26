@@ -12,7 +12,6 @@ import { forkJoin } from 'rxjs';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { GridParam } from 'src/app/shared';
 import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
-import { DataFormatService } from 'src/app/features/universal-grid/services/data-format.service';
 
 @Component({
   selector: 'app-link-data-table',
@@ -49,7 +48,6 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   innerValue: any[] = [];
 
   sortMeta!: any;
-  formatters?: any;
 
   @Input()
   set value(val: any[]) {
@@ -62,11 +60,8 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   constructor(
     private linkDataTableService: LinkDataTableService,
-    private cdr: ChangeDetectorRef,
-    private dataFormatService: DataFormatService
-  ) {
-    this.formatters = this.dataFormatService.getFormatters();
-  }
+    private cdr: ChangeDetectorRef
+  ) {}
 
   writeValue(value: any): void {
     this.value = value;
@@ -170,11 +165,6 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
         this.cdr.detectChanges();
       });
     }
-  }
-
-  calcCustomTemplate(data: any, template: string) {
-    const expression = evalStringExpression(template, ['$rowData', 'Pipes']);
-    return evalExpression(expression, data, [data, this.formatters]);
   }
 
   getFetchParam() {

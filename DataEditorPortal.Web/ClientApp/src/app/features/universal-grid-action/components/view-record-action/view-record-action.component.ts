@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GridColumn } from 'src/app/features/portal-management/models/portal-item';
-import { DataFormatService } from 'src/app/features/universal-grid/services/data-format.service';
 import { SystemLogService } from 'src/app/shared';
-import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UniversalGridService } from '../../services/universal-grid.service';
 
@@ -10,6 +8,7 @@ export interface ViewColumn extends GridColumn {
   name?: string;
   value?: string;
 }
+
 @Component({
   selector: 'app-view-record-action',
   templateUrl: './view-record-action.component.html',
@@ -25,12 +24,10 @@ export class ViewRecordActionComponent
 
   constructor(
     private universalGridService: UniversalGridService,
-    private dataFormatService: DataFormatService,
     private systemLogService: SystemLogService
   ) {
     super();
     this.viewData = [];
-    this.formatters = this.dataFormatService.getFormatters();
   }
 
   ngOnInit(): void {
@@ -71,10 +68,5 @@ export class ViewRecordActionComponent
         this.loadedEvent.emit();
       }
     });
-  }
-
-  calcCustomTemplate(data: any, template: string) {
-    const expression = evalStringExpression(template, ['$rowData', 'Pipes']);
-    return evalExpression(expression, data, [data, this.formatters]);
   }
 }

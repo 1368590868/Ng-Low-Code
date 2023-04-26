@@ -13,6 +13,8 @@ import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
 import { PermissionDirective } from './directive/permission.directive';
 import { BooleanTextPipe } from './pipes/boolean-text.pipe';
 import { AttachmentsPipe } from './pipes/attachments.pipe';
+import { TemplatePipe } from './pipes/template.pipe';
+import { DataFormatService } from './services/data-format.service';
 
 export { AuthRouterGuard } from './guards/auth-router.guard';
 export { AdminPermissionGuard } from './guards/admin-permission.guard';
@@ -26,14 +28,25 @@ export { ConfigDataService } from './services/config-data.service';
 export { UserService } from './services/user.service';
 export { DataDictionaryService } from './services/data-dictionary.service';
 export { SystemLogService } from './services/system-log.service';
+export { DataFormatService } from './services/data-format.service';
 export { SystemLogDialogComponent } from '../features/core/components/system-log/system-log-dialog/system-log-dialog.component';
 export * from './models/universal.type';
 export { SystemLogData } from '../shared/models/system-log';
 
 @NgModule({
-  declarations: [PermissionDirective, BooleanTextPipe, AttachmentsPipe],
+  declarations: [
+    PermissionDirective,
+    BooleanTextPipe,
+    AttachmentsPipe,
+    TemplatePipe
+  ],
   imports: [CommonModule, FormsModule, HttpClientModule, FormlyModule],
-  exports: [PermissionDirective, BooleanTextPipe, AttachmentsPipe],
+  exports: [
+    PermissionDirective,
+    BooleanTextPipe,
+    AttachmentsPipe,
+    TemplatePipe
+  ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
@@ -45,7 +58,8 @@ export { SystemLogData } from '../shared/models/system-log';
       useClass: HttpErrorInterceptor,
       multi: true
     },
-    MessageService
+    MessageService,
+    DataFormatService
   ]
 })
 export class SharedModule {}

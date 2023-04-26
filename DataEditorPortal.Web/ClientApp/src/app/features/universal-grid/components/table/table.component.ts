@@ -17,8 +17,6 @@ import { GridColumn, GridConfig, GridData } from '../../models/grid-types';
 import { Table } from 'primeng/table';
 import { ConfirmationService, TableState } from 'primeng/api';
 import { GridParam, SearchParam, UserService } from 'src/app/shared';
-import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
-import { DataFormatService } from '../../services/data-format.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DomHandler } from 'primeng/dom';
 
@@ -88,17 +86,12 @@ export class TableComponent implements OnInit, OnDestroy {
 
   firstLoadDone = false;
 
-  formatters?: any;
-
   constructor(
     private gridTableService: GridTableService,
-    private dataFormatService: DataFormatService,
     private userService: UserService,
     private domSanitizer: DomSanitizer,
     private confirmationService: ConfirmationService
-  ) {
-    this.formatters = this.dataFormatService.getFormatters();
-  }
+  ) {}
 
   ngOnInit() {
     // this.reset();
@@ -403,11 +396,6 @@ export class TableComponent implements OnInit, OnDestroy {
     (state as any).hiddenColumns = this.columnsHiddenState;
 
     this.table.getStorage().setItem(this.stateKey, JSON.stringify(state));
-  }
-
-  calcCustomTemplate(data: any, template: string) {
-    const expression = evalStringExpression(template, ['$rowData', 'Pipes']);
-    return evalExpression(expression, data, [data, this.formatters]);
   }
 
   // linked features
