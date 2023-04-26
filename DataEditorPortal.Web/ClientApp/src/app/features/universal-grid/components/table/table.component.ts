@@ -180,25 +180,25 @@ export class TableComponent implements OnInit, OnDestroy {
 
   setRowActions() {
     const actions: GridActionOption[] = [];
-    if (this.allowEdit) {
-      const viewWrapper: GridActionWrapperOption = {
-        label: '',
-        icon: 'pi pi-info-circle',
-        class: 'flex',
-        buttonStyleClass: 'p-button-text'
-      };
-      if (this.tableConfig.customViewFormName) {
-        actions.push({
-          name: this.tableConfig.customViewFormName,
-          wrapper: viewWrapper
-        });
-      } else {
-        actions.push({
-          name: 'view-record',
-          wrapper: viewWrapper
-        });
-      }
+    const viewWrapper: GridActionWrapperOption = {
+      label: '',
+      icon: 'pi pi-info-circle',
+      class: 'flex',
+      buttonStyleClass: 'p-button-text'
+    };
+    if (this.tableConfig.customViewFormName) {
+      actions.push({
+        name: this.tableConfig.customViewFormName,
+        wrapper: viewWrapper
+      });
+    } else {
+      actions.push({
+        name: 'view-record',
+        wrapper: viewWrapper
+      });
+    }
 
+    if (this.allowEdit) {
       const editWrapper: GridActionWrapperOption = {
         label: '',
         icon: 'pi pi-file-edit',
