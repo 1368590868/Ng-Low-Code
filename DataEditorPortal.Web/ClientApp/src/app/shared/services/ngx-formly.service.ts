@@ -1,7 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { distinctUntilChanged, map, Observable, tap, debounceTime } from 'rxjs';
+import {
+  distinctUntilChanged,
+  map,
+  Observable,
+  tap,
+  debounceTime,
+  startWith,
+  Subject,
+  takeUntil
+} from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 import { evalExpression, evalStringExpression } from '../utils';
 
@@ -14,7 +23,7 @@ export class NgxFormlyService {
     this._apiUrl = apiUrl;
   }
 
-  getLookup(id: string, data?: any): Observable<any[]> {
+  private getLookup(id: string, data?: any): Observable<any[]> {
     return this.http
       .post<ApiResponse<any[]>>(
         `${this._apiUrl}lookup/${id}/options`,
@@ -24,9 +33,9 @@ export class NgxFormlyService {
   }
 
   initFieldOptions(field: any, data?: any) {
-    if (field.props && field.props['optionsLookup']) {
+    if (field.props && field.props.optionsLookup) {
       // get lookups from server
-      this.getLookup(field.props['optionsLookup'], data)
+      this.getLookup(field.props.optionsLookup.id, data)
         .pipe(
           tap(result => {
             if (field.props) {
@@ -51,6 +60,7 @@ export class NgxFormlyService {
                     field.formControl.setValue(filteredData);
                 }
               }
+              field.options.detectChanges(field);
             }
           })
         )
@@ -58,53 +68,52 @@ export class NgxFormlyService {
     }
   }
 
-  getFieldLookupOnInit() {
+  getFieldLookupOnInit(destroy$: Subject<void>) {
     return (f: any) => {
-      if (
-        f.props &&
-        f.props['dependOnFields'] &&
-        f.props['dependOnFields'].length > 0
-      ) {
-        const model: any = {};
+      if (f.props && f.props.optionsLookup) {
+        const $deps = f.props.optionsLookup.deps;
+        if ($deps && $deps.length > 0) {
+          const model: any = {};
 
-        // calculate values for depends on fields
-        f.props['dependOnFields'].forEach((key: string) => {
-          if (f.key === key) return;
-          const dependOnField = f.parent.get(key);
-          model[key] = dependOnField.formControl.value;
-        });
+          // calculate values for depends on fields
+          $deps.forEach((key: string) => {
+            if (f.key === key) return;
+            const dependOnField = f.parent.get(key);
+            model[key] = dependOnField.formControl.value;
+          });
 
-        // load lookups for field.
-        this.initFieldOptions(f, model);
+          // load lookups for field.
+          this.initFieldOptions(f, model);
 
-        // subscribe depends on fields value changes.
-        f.props['dependOnFields'].forEach((key: string) => {
-          if (f.key === key) return;
-          const dependOnField = f.parent.get(key);
-          dependOnField.formControl?.valueChanges
-            .pipe(
-              distinctUntilChanged(),
-              debounceTime(300),
-              tap(val => {
-                model[key] = val;
-                this.initFieldOptions(f, model);
-              })
-            )
-            .subscribe();
-        });
-      } else {
-        this.initFieldOptions(f);
+          // subscribe depends on fields value changes.
+          $deps.forEach((key: string) => {
+            if (f.key === key) return;
+            const dependOnField = f.parent.get(key);
+            dependOnField.formControl?.valueChanges
+              .pipe(
+                distinctUntilChanged(),
+                takeUntil(destroy$),
+                tap(val => {
+                  model[key] = val;
+                  this.initFieldOptions(f, model);
+                })
+              )
+              .subscribe();
+          });
+        } else {
+          this.initFieldOptions(f);
+        }
       }
     };
   }
 
-  initFieldLookup(field: any) {
-    const onInit = this.getFieldLookupOnInit();
+  initFieldLookup(field: any, destory$: Subject<void>) {
+    const onInit = this.getFieldLookupOnInit(destory$);
     // set onInit hooks
     this.setFieldHook(field, 'onInit', onInit);
   }
 
-  initValidators(field: any) {
+  initValidators(field: any, destory$: Subject<void>) {
     if (Array.isArray(field.validatorConfig)) {
       const validators: any = { validation: [] };
       let $deps: string[] = [];
@@ -146,12 +155,13 @@ export class NgxFormlyService {
         // subscribe $deps value change to trigger validation
         const onInit = (f: any) => {
           $deps.forEach(key => {
-            console.log(key);
             const $dep = f.parent.get(key);
             if ($dep) {
-              $dep.formControl.valueChanges.subscribe(() => {
-                setTimeout(() => f?.formControl?.updateValueAndValidity());
-              });
+              $dep.formControl.valueChanges
+                .pipe(takeUntil(destory$))
+                .subscribe(() => {
+                  setTimeout(() => f?.formControl?.updateValueAndValidity());
+                });
             }
           });
         };
@@ -162,7 +172,7 @@ export class NgxFormlyService {
     }
   }
 
-  setFieldHook(field: any, name: string, callback: (f: any) => void) {
+  private setFieldHook(field: any, name: string, callback: (f: any) => void) {
     if (field.hooks) {
       if (field.hooks[name]) {
         const prevCallback = field.hooks[name];

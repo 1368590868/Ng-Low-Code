@@ -57,17 +57,17 @@ export class OptionDialogComponent implements ControlValueAccessor {
     private notifyService: NotifyService
   ) {}
 
-  set value(val: string | any[]) {
+  set value(val: { id: string } | any[]) {
     if (Array.isArray(val)) {
       this.options = val;
     } else if (val) {
-      this.optionsLookup = val;
+      this.optionsLookup = val.id || (val as unknown as string);
     } else {
       this.options = [];
       this.optionsLookup = undefined;
     }
-    this.onChange?.(val);
-    this.onTouch?.(val);
+    // this.onChange?.(val);
+    // this.onTouch?.(val);
   }
   writeValue(value: any): void {
     this.value = value;
@@ -205,25 +205,32 @@ export class OptionDialogComponent implements ControlValueAccessor {
     if (this.validate()) {
       if (this.isAdvanced) {
         this.isLoading = true;
-        this.lookupService
-          .saveOptionQuery({
-            id: this.optionsLookup,
-            name: this.formControlName.value,
-            queryText:
-              this.formControlQuery.value === this.helperMessage
-                ? ''
-                : this.formControlQuery.value,
-            connectionId: this.formControlConnection.value
-          })
-          .subscribe(res => {
-            this.isLoading = false;
-            if (res && !res.isError) {
-              this.options = [];
-              this.optionsLookup = res.result;
-              this.onChange(this.optionsLookup);
-              this.visible = false;
-            }
-          });
+        const data = {
+          id: this.optionsLookup,
+          name: this.formControlName.value,
+          queryText:
+            this.formControlQuery.value === this.helperMessage
+              ? ''
+              : this.formControlQuery.value,
+          connectionId: this.formControlConnection.value
+        };
+        this.lookupService.saveOptionQuery(data).subscribe(res => {
+          this.isLoading = false;
+          if (res && !res.isError) {
+            this.options = [];
+            this.optionsLookup = res.result;
+
+            const matches = [
+              ...data.queryText.matchAll(/##([a-zA-Z]{1}[a-zA-Z0-9_]+?)##/g)
+            ];
+            const deps = matches
+              .map(match => match[1]) // get the field name
+              .filter((value, index, array) => array.indexOf(value) === index); // distinct
+
+            this.onChange({ id: this.optionsLookup, deps });
+            this.visible = false;
+          }
+        });
       } else {
         this.optionsLookup = undefined;
         this.options = this.formControlOptions.map(item => {

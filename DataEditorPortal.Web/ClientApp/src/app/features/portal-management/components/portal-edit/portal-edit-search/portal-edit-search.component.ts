@@ -39,13 +39,8 @@ export class PortalEditSearchComponent
   @ViewChild('pickList') pickList!: PickList;
 
   form = new FormGroup({});
-  options: FormlyFormOptions = {
-    formState: {
-      dependOnOptions: []
-    }
-  };
+  options: FormlyFormOptions = {};
   model: any = {};
-  allSelectedFields: { key: string; type: string }[] = [];
   @ViewChildren(FormDesignerViewComponent)
   formDesignerViews!: FormDesignerViewComponent[];
 
@@ -157,11 +152,6 @@ export class PortalEditSearchComponent
   onTargetSelect({ items }: { items: GridSearchField[] }) {
     if (items.length === 1) {
       this.model = items[0];
-
-      // update depends on options
-      this.allSelectedFields = this.targetColumns.map(x => {
-        return { key: x.key, type: x.type };
-      });
     } else {
       this.model = {};
     }

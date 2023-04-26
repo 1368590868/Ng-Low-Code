@@ -6,6 +6,7 @@
       #dataTable
       class="data-table"
       styleClass="p-datatable-striped"
+      [tableStyle]="{ 'table-layout': 'fixed' }"
       [columns]="columns"
       [scrollable]="true"
       scrollHeight="flex"
@@ -256,7 +257,6 @@
   [(visible)]="columnSelectorVisible"
   [style]="{ width: '31.25rem' }"
   [modal]="true"
-  [dismissableMask]="true"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0"
   appendTo="body">
   <div class="flex flex-column">

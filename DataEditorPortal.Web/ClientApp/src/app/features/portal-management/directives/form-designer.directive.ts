@@ -76,7 +76,6 @@ export class FormDesignerDirective {
   form = new FormGroup({});
   options: FormlyFormOptions = {
     formState: {
-      dependOnOptions: [],
       hideValidation: false,
       hideComputedValue: false,
       hideDefaultValue: false
@@ -209,21 +208,6 @@ export class FormDesignerDirective {
               type: 'optionsEditor',
               props: {
                 label: 'Options'
-              }
-            },
-            {
-              key: 'dependOnFields',
-              type: 'multiSelect',
-              defaultValue: [],
-              props: {
-                label: 'Depends on',
-                placeholder: 'Select fields',
-                showHeader: false,
-                filter: false
-              },
-              expressions: {
-                hide: `!field.parent.model.optionsLookup || Array.isArray(field.parent.model.optionsLookup)`,
-                'props.options': `formState.dependOnOptions`
               }
             }
           ],
@@ -387,21 +371,6 @@ export class FormDesignerDirective {
     if (val) {
       this.model = val;
     }
-  }
-  @Input()
-  set allSelectedFields(val: { key: string; type: string }[]) {
-    this.options.formState.dependOnOptions = val
-      .filter(
-        x =>
-          x.key !== this.model.key &&
-          ['select', 'multiSelect'].indexOf(x.type) >= 0
-      )
-      .map(x => {
-        return {
-          label: x.key,
-          value: x.key
-        };
-      });
   }
 
   @Output() configChange = new EventEmitter<GridFormField>();

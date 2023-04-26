@@ -38,8 +38,4 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
     this.configDataService.getSiteSettings().subscribe();
   }
-
-  onpenDialog() {
-    this.dialog.onpenDialog();
-  }
 }

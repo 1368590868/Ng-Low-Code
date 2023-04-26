@@ -174,52 +174,61 @@
             </tr>
           </ng-template>
         </p-table>
-        <div class="flex align-items-center mt-3">
-          <div class="flex flex-column mb-2 ml-4">
-            <label for="idColumn" class="mb-1"
-              >Id Column of Primary Table</label
-            >
-            <div class="flex align-items-center">
-              <input
-                pInputText
-                [value]="primaryTableConfig.idColumn"
-                [disabled]="true"
-                [style]="{ minWidth: '20rem' }" />
+        <div
+          *ngIf="
+            secondaryTableConfig?.details &&
+            primaryTableConfig.details[0].configCompleted &&
+            secondaryTableConfig.details[0].configCompleted
+          ">
+          <div class="flex align-items-center mt-3">
+            <div class="flex flex-column mb-2 ml-4">
+              <label for="idColumn" class="mb-1"
+                >Id Column of Primary Table</label
+              >
+              <div class="flex align-items-center">
+                <input
+                  pInputText
+                  [value]="primaryTableConfig.idColumn"
+                  [disabled]="true"
+                  [style]="{ minWidth: '20rem' }" />
+              </div>
+            </div>
+            <div class="flex flex-column mb-2 ml-4">
+              <label for="idColumn" class="mb-1"
+                >Map to Column of Link Table</label
+              >
+              <div class="flex align-items-center">
+                <p-dropdown
+                  [required]="true"
+                  [formControl]="formControlPrimaryMap"
+                  [options]="dbTableColumns"
+                  placeholder="Please Select"
+                  [style]="{ minWidth: '20rem' }"
+                  optionLabel="columnName"
+                  optionValue="columnName"
+                  appendTo="body"></p-dropdown>
+              </div>
             </div>
           </div>
-          <div class="flex flex-column mb-2 ml-4">
-            <label for="idColumn" class="mb-1"
-              >Map to Column of Link Table</label
+          <div class="flex flex-column mb-2 ml-4 mt-3">
+            <label for="columnsForLinkedField" class="mb-1"
+              >Select Columns of Link Data Editor</label
             >
             <div class="flex align-items-center">
-              <p-dropdown
+              <p-multiSelect
+                #validationRef="ngModel"
                 [required]="true"
-                [formControl]="formControlPrimaryMap"
-                [options]="dbTableColumns"
-                placeholder="Please Select"
-                [style]="{ minWidth: '20rem' }"
-                optionLabel="columnName"
-                optionValue="columnName"
-                appendTo="body"></p-dropdown>
+                [style]="{ width: '41.5rem' }"
+                [showToggleAll]="false"
+                appendTo="body"
+                placeholder="Place Select One Column"
+                [filter]="false"
+                [showHeader]="false"
+                display="chip"
+                [(ngModel)]="primarySelected"
+                [options]="primaryTableConfig.columns">
+              </p-multiSelect>
             </div>
-          </div>
-        </div>
-        <div class="flex flex-column mb-2 ml-4 mt-3">
-          <label for="columnsForLinkedField" class="mb-1"
-            >Select Columns of Link Data Editor</label
-          >
-          <div class="flex align-items-center">
-            <p-multiSelect
-              [style]="{ width: '41.5rem' }"
-              [showToggleAll]="false"
-              appendTo="body"
-              placeholder="Place Select One Column"
-              [filter]="false"
-              [showHeader]="false"
-              display="chip"
-              [(ngModel)]="primarySelected"
-              [options]="primaryTableConfig.columns">
-            </p-multiSelect>
           </div>
         </div>
       </ng-container>
@@ -284,53 +293,61 @@
             </tr>
           </ng-template>
         </p-table>
-        <div class="flex align-items-center mt-3">
-          <div class="flex flex-column mb-2 ml-4">
-            <label for="idColumn" class="mb-1"
-              >Id Column of Secondary Table</label
-            >
-            <div class="flex align-items-center">
-              <input
-                pInputText
-                [value]="secondaryTableConfig.idColumn"
-                [disabled]="true"
-                [style]="{ minWidth: '20rem' }" />
+        <div
+          *ngIf="
+            secondaryTableConfig.details &&
+            secondaryTableConfig.details[0].configCompleted
+          ">
+          <div class="flex align-items-center mt-3">
+            <div class="flex flex-column mb-2 ml-4">
+              <label for="idColumn" class="mb-1"
+                >Id Column of Secondary Table</label
+              >
+              <div class="flex align-items-center">
+                <input
+                  pInputText
+                  [value]="secondaryTableConfig.idColumn"
+                  [disabled]="true"
+                  [style]="{ minWidth: '20rem' }" />
+              </div>
+            </div>
+            <div class="flex flex-column mb-2 ml-4">
+              <label for="idColumn" class="mb-1"
+                >Map to Column of Link Table</label
+              >
+              <div class="flex align-items-center">
+                <p-dropdown
+                  [required]="true"
+                  [formControl]="formControlSecondaryMap"
+                  [options]="dbTableColumns"
+                  placeholder="Please Select"
+                  [style]="{ minWidth: '20rem' }"
+                  optionLabel="columnName"
+                  optionValue="columnName"
+                  appendTo="body"></p-dropdown>
+              </div>
             </div>
           </div>
-          <div class="flex flex-column mb-2 ml-4">
-            <label for="idColumn" class="mb-1"
-              >Map to Column of Link Table</label
-            >
-            <div class="flex align-items-center">
-              <p-dropdown
-                [required]="true"
-                [formControl]="formControlSecondaryMap"
-                [options]="dbTableColumns"
-                placeholder="Please Select"
-                [style]="{ minWidth: '20rem' }"
-                optionLabel="columnName"
-                optionValue="columnName"
-                appendTo="body"></p-dropdown>
-            </div>
-          </div>
-        </div>
 
-        <div class="flex flex-column mb-2 ml-4 mt-3">
-          <label for="columnsForLinkedField" class="mb-1"
-            >Select Columns for Link Data Editor</label
-          >
-          <div class="flex align-items-center">
-            <p-multiSelect
-              [style]="{ width: '41.5rem' }"
-              [showToggleAll]="false"
-              appendTo="body"
-              placeholder="Place Select One Column"
-              [filter]="false"
-              [showHeader]="false"
-              display="chip"
-              [(ngModel)]="secondarySelected"
-              [options]="secondaryTableConfig.columns">
-            </p-multiSelect>
+          <div class="flex flex-column mb-2 ml-4 mt-3">
+            <label for="columnsForLinkedField" class="mb-1"
+              >Select Columns for Link Data Editor</label
+            >
+            <div class="flex align-items-center">
+              <p-multiSelect
+                #validationRef="ngModel"
+                [required]="true"
+                [style]="{ width: '41.5rem' }"
+                [showToggleAll]="false"
+                appendTo="body"
+                placeholder="Place Select One Column"
+                [filter]="false"
+                [showHeader]="false"
+                display="chip"
+                [(ngModel)]="secondarySelected"
+                [options]="secondaryTableConfig.columns">
+              </p-multiSelect>
+            </div>
           </div>
         </div>
       </ng-container>
