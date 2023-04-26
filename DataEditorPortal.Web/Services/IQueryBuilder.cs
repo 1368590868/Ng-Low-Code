@@ -150,8 +150,8 @@ namespace DataEditorPortal.Web.Services
             var where = GenerateWhereClause(filterParams);
 
             return where.Any()
-                ? query.Replace("##FILTERS##", $" ({string.Join(" AND ", where)}) ")
-                : query.Replace("##FILTERS##", " 1=1 ");
+                ? query.Replace("##FILTERS##", $"({string.Join(" AND ", where)})")
+                : query.Replace("##FILTERS##", "1=1");
         }
 
         public virtual string UseSearches(string query, List<FilterParam> filterParams = null)
@@ -171,8 +171,8 @@ namespace DataEditorPortal.Web.Services
             }
 
             return filters.Any()
-                ? query.Replace("##SEARCHES##", $" ({string.Join(" AND ", filters)}) ")
-                : query.Replace("##SEARCHES##", " 1=1 ");
+                ? query.Replace("##SEARCHES##", $"({string.Join(" AND ", filters)})")
+                : query.Replace("##SEARCHES##", "1=1");
         }
 
         public virtual string GetFilterType(DataRow schema)

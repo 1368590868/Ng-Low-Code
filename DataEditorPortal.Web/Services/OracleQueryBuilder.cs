@@ -216,27 +216,27 @@ namespace DataEditorPortal.Web.Services
             {
                 var config = col.fileUploadConfig;
                 return $@"
-                    LEFT JOIN (
-                        SELECT 
-                            {EscapeColumnName(config.GetMappedColumn("DATA_ID"))},
-                            '[' || 
-                                REPLACE(
-                                    LISTAGG(
-                                        '{{' || 
-                                            '""fileId"":""' || {EscapeColumnName(config.GetMappedColumn("ID"))} || '"",' || 
-                                            '""fileName"":""' || {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))} || '"",' || 
-                                            '""contentType"":""' || {EscapeColumnName(config.GetMappedColumn("CONTENT_TYPE"))} || '"",' || 
-                                            '""comments"":""' || {EscapeColumnName(config.GetMappedColumn("COMMENTS"))} || '"",' || 
-                                            '""status"":""' || {EscapeColumnName(config.GetMappedColumn("STATUS"))} || '""' ||
-                                        '}}'
-                                        , ','
-                                    ) WITHIN GROUP (ORDER BY { EscapeColumnName(config.GetMappedColumn("FILE_NAME"))})
-                                    , CHR(0)
-                                ) || 
-                            ']' AS ATTACHMENTS
-                        FROM {config.TableSchema}.{config.TableName}
-                        GROUP BY {EscapeColumnName(config.GetMappedColumn("DATA_ID"))}
-                    ) {col.field}_ATTACHMENTS ON ALL_DATA.{EscapeColumnName(config.ForeignKeyName)} = {col.field}_ATTACHMENTS.{EscapeColumnName(config.GetMappedColumn("DATA_ID"))}
+                LEFT JOIN (
+                    SELECT 
+                        {EscapeColumnName(config.GetMappedColumn("DATA_ID"))},
+                        '[' || 
+                            REPLACE(
+                                LISTAGG(
+                                    '{{' || 
+                                        '""fileId"":""' || {EscapeColumnName(config.GetMappedColumn("ID"))} || '"",' || 
+                                        '""fileName"":""' || {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))} || '"",' || 
+                                        '""contentType"":""' || {EscapeColumnName(config.GetMappedColumn("CONTENT_TYPE"))} || '"",' || 
+                                        '""comments"":""' || {EscapeColumnName(config.GetMappedColumn("COMMENTS"))} || '"",' || 
+                                        '""status"":""' || {EscapeColumnName(config.GetMappedColumn("STATUS"))} || '""' ||
+                                    '}}'
+                                    , ','
+                                ) WITHIN GROUP (ORDER BY { EscapeColumnName(config.GetMappedColumn("FILE_NAME"))})
+                                , CHR(0)
+                            ) || 
+                        ']' AS ATTACHMENTS
+                    FROM {config.TableSchema}.{config.TableName}
+                    GROUP BY {EscapeColumnName(config.GetMappedColumn("DATA_ID"))}
+                ) {col.field}_ATTACHMENTS ON ALL_DATA.{EscapeColumnName(config.ForeignKeyName)} = {col.field}_ATTACHMENTS.{EscapeColumnName(config.GetMappedColumn("DATA_ID"))}
                 ";
             }));
 
