@@ -215,11 +215,6 @@ namespace DataEditorPortal.Web.Services
                 {
                     return date;
                 }
-                Guid guid;
-                if (new Regex("^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$").IsMatch(jsonElement.ToString()) && Guid.TryParse(jsonElement.ToString(), out guid))
-                {
-                    return guid.ToByteArray();
-                }
                 return jsonElement.GetString();
             }
             else return null;

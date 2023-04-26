@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -182,6 +183,22 @@ namespace DataEditorPortal.Web.Services
         protected override string EscapeColumnName(string columnName)
         {
             return string.Format("\"{0}\"", columnName);
+        }
+
+        public override object GetJsonElementValue(object value)
+        {
+            var result = base.GetJsonElementValue(value);
+
+            if (result != null && result.GetType() == typeof(string))
+            {
+                Guid guid;
+                if (new Regex("^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$").IsMatch(result.ToString()) && Guid.TryParse(result.ToString(), out guid))
+                {
+                    return guid.ToByteArray();
+                }
+            }
+
+            return result;
         }
 
         #endregion
