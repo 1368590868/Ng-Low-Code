@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { Subject } from 'rxjs';
 import {
   NgxFormlyService,
   NotifyService,
@@ -22,6 +23,7 @@ export class UserManagerActionComponent
 {
   @ViewChild('editForm') editForm!: NgForm;
   @Input() isAddForm = false;
+  $destory = new Subject<void>();
 
   form = new FormGroup({});
   model: ManageRoleForm = {};
@@ -160,9 +162,7 @@ export class UserManagerActionComponent
             options: []
           },
           hooks: {
-            onInit: (field: any) => {
-              this.ngxFormlyService.initFieldOptions(field);
-            }
+            onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
           }
         },
         {
@@ -180,7 +180,7 @@ export class UserManagerActionComponent
             options: []
           },
           hooks: {
-            onInit: this.ngxFormlyService.getFieldLookupOnInit()
+            onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
           }
         }
       ]
@@ -347,6 +347,7 @@ export class UserManagerActionComponent
   }
 
   onCancel(): void {
+    this.$destory.next();
     this.options.resetModel?.();
   }
 }

@@ -1,9 +1,9 @@
 <p-dialog
   header="Persional Information"
   [(visible)]="visible"
-  *ngIf="visible"
   [style]="{ width: '40rem' }"
   [modal]="true"
+  (onHide)="onHide()"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0"
   appendTo="body">
   <form

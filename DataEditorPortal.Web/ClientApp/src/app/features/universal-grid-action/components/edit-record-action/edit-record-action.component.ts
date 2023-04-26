@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { tap } from 'rxjs';
+import { Subject, tap } from 'rxjs';
 import {
   NgxFormlyService,
   NotifyService,
@@ -40,6 +40,7 @@ export class EditRecordActionComponent
 {
   @Input() isAddForm = false;
   @Input() layout: 'vertical' | 'horizontal' = 'horizontal';
+  destroy$ = new Subject<void>();
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
@@ -140,7 +141,7 @@ export class EditRecordActionComponent
                 if (Array.isArray(f.props['optionsLookup'])) {
                   f.props.options = f.props['optionsLookup'];
                 } else {
-                  this.ngxFormlyService.initFieldLookup(f);
+                  this.ngxFormlyService.initFieldLookup(f, this.destroy$);
                 }
               }
             });
@@ -315,8 +316,7 @@ export class EditRecordActionComponent
   }
 
   onCancel(): void {
-    this.fields = [];
+    this.destroy$.next();
     this.form.reset(undefined, { emitEvent: false });
-    // this.options.resetModel?.();
   }
 }

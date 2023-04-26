@@ -7,7 +7,9 @@ import {
   Observable,
   tap,
   debounceTime,
-  startWith
+  startWith,
+  Subject,
+  takeUntil
 } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 import { evalExpression, evalStringExpression } from '../utils';
@@ -58,6 +60,7 @@ export class NgxFormlyService {
                     field.formControl.setValue(filteredData);
                 }
               }
+              field.options.detectChanges(field);
             }
           })
         )
@@ -65,7 +68,7 @@ export class NgxFormlyService {
     }
   }
 
-  getFieldLookupOnInit() {
+  getFieldLookupOnInit(destroy$: Subject<void>) {
     return (f: any) => {
       if (f.props && f.props.optionsLookup) {
         const $deps = f.props.optionsLookup.deps;
@@ -89,7 +92,7 @@ export class NgxFormlyService {
             dependOnField.formControl?.valueChanges
               .pipe(
                 distinctUntilChanged(),
-                debounceTime(300),
+                takeUntil(destroy$),
                 tap(val => {
                   model[key] = val;
                   this.initFieldOptions(f, model);
@@ -104,8 +107,8 @@ export class NgxFormlyService {
     };
   }
 
-  initFieldLookup(field: any) {
-    const onInit = this.getFieldLookupOnInit();
+  initFieldLookup(field: any, destory$: Subject<void>) {
+    const onInit = this.getFieldLookupOnInit(destory$);
     // set onInit hooks
     this.setFieldHook(field, 'onInit', onInit);
   }
@@ -152,7 +155,6 @@ export class NgxFormlyService {
         // subscribe $deps value change to trigger validation
         const onInit = (f: any) => {
           $deps.forEach(key => {
-            console.log(key);
             const $dep = f.parent.get(key);
             if ($dep) {
               $dep.formControl.valueChanges.subscribe(() => {

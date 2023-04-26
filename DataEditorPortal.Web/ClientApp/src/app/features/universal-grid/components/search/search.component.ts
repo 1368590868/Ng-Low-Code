@@ -18,7 +18,7 @@ import { GridTableService } from '../../services/grid-table.service';
 export class SearchComponent implements OnInit, OnDestroy {
   @Input()
   gridName!: string;
-  destroy$ = new Subject();
+  destroy$ = new Subject<void>();
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
@@ -59,7 +59,7 @@ export class SearchComponent implements OnInit, OnDestroy {
             if (Array.isArray(f.props['optionsLookup'])) {
               f.props.options = f.props['optionsLookup'];
             } else {
-              this.ngxFormlyService.initFieldLookup(f);
+              this.ngxFormlyService.initFieldLookup(f, this.destroy$);
             }
           }
         });
@@ -78,7 +78,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next(null);
+    this.destroy$.next();
     this.destroy$.complete();
   }
 

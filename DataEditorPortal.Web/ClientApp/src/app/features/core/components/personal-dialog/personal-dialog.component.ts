@@ -1,7 +1,14 @@
-import { Component, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { NgForm, FormGroup, AbstractControl } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { MenuItem } from 'primeng/api';
+import { Subject } from 'rxjs';
 import { ManageRoleForm } from 'src/app/features/universal-grid-action/models/user-manager';
 import {
   NotifyService,
@@ -17,8 +24,22 @@ import {
 })
 export class PersonalDialogComponent {
   @ViewChild('editForm') editForm!: NgForm;
+  $destory = new Subject<void>();
+
+  _visible = false;
+  @Input() set visible(val: boolean) {
+    this._visible = val;
+    if (val) {
+      this.onpenDialog();
+    }
+    this.visibleChange.emit(val);
+  }
+  get visible() {
+    return this._visible;
+  }
+  @Output() visibleChange = new EventEmitter<boolean>();
+
   items!: MenuItem[];
-  visible = false;
   form = new FormGroup({});
   model = {};
   userId = '';
@@ -131,7 +152,6 @@ export class PersonalDialogComponent {
           className: 'w-6',
           key: 'vendor',
           type: 'select',
-          defaultValue: null,
           props: {
             label: 'Vendor',
             placeholder: 'Please select',
@@ -141,16 +161,13 @@ export class PersonalDialogComponent {
             options: []
           },
           hooks: {
-            onInit: (field: any) => {
-              this.ngxFormlyService.initFieldOptions(field);
-            }
+            onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
           }
         },
         {
           className: 'w-6',
           key: 'employer',
           type: 'select',
-          defaultValue: null,
           props: {
             label: 'Employer',
             placeholder: 'Please select',
@@ -161,7 +178,7 @@ export class PersonalDialogComponent {
             options: []
           },
           hooks: {
-            onInit: this.ngxFormlyService.getFieldLookupOnInit()
+            onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
           }
         }
       ]
@@ -223,7 +240,6 @@ export class PersonalDialogComponent {
           autoEmail: res.autoEmail
         });
       });
-    this.visible = true;
   }
   onFormSubmit(model: ManageRoleForm) {
     if (this.form.valid) {
@@ -243,10 +259,15 @@ export class PersonalDialogComponent {
         });
     }
   }
+  onHide() {
+    this.$destory.next();
+    this.form.reset(undefined, { emitEvent: false });
+  }
+
   onCancel() {
-    this.options.resetModel?.();
     this.visible = false;
   }
+
   onOk() {
     this.editForm.onSubmit(new Event('submit'));
   }
