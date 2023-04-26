@@ -303,6 +303,11 @@ namespace DataEditorPortal.Web.Services
             filtersApplied = ProcessFilterParam(param.Filters, filtersApplied);
             queryText = _queryBuilder.UseFilters(queryText, param.Filters);
 
+            // join attachments 
+            var attachmentCols = GetAttachmentCols(config);
+            if (attachmentCols.Any())
+                queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
+
             // set default sorts
             if (!param.Sorts.Any())
             {
@@ -321,11 +326,6 @@ namespace DataEditorPortal.Web.Services
                 // replace the order by clause by input Sorts in queryText
                 queryText = _queryBuilder.UseOrderBy(queryText, param.Sorts);
             }
-
-            // join attachments 
-            var attachmentCols = GetAttachmentCols(config);
-            if (attachmentCols.Any())
-                queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
 
             #endregion
 

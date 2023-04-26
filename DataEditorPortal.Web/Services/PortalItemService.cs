@@ -524,6 +524,8 @@ namespace DataEditorPortal.Web.Services
                         x.searchRule1 = null;
                     });
                     mu.u.SearchConfig = JsonSerializer.Serialize(searchConfig);
+
+                    RemoveGridCache(mu.u.Name);
                 });
 
                 config.ConfigCompleted = true;
