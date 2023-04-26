@@ -98,108 +98,114 @@ export class EditRecordActionComponent
       .pipe(
         tap(result => {
           const fields = result as FormlyFieldConfig[];
-
-          // set default value
-          fields
-            .filter(f => f.defaultValue)
-            .forEach(f => {
-              const matches = [
-                ...f.defaultValue.matchAll(
-                  /##SEARCHES[.]{1}([a-zA-Z]{1}[a-zA-Z0-9_]+?)([:]{1}([a-zA-Z]{1}[a-zA-Z0-9_]+?))*##/g
-                )
-              ];
-              let value = f.defaultValue;
-              matches.forEach(match => {
-                let searchVal = this.fetchDataParam?.searches
-                  ? this.fetchDataParam?.searches[match[1]]
-                  : '';
-                if (searchVal && searchVal.getDate)
-                  searchVal = this.datePipe.transform(
-                    searchVal,
-                    match[3] ?? 'yyyyMMdd'
-                  );
-                value = value.replace(match[0], searchVal ?? '');
-              });
-              f.defaultValue = value;
-            });
-
-          // fetch lookups
-          fields
-            .filter(
-              // advanced setting: options from lookup
-              x =>
-                typeof x.type === 'string' &&
-                ['select', 'multiSelect'].indexOf(x.type) >= 0 &&
-                x.props &&
-                x.props['optionsLookup']
-            )
-            .forEach(f => {
-              if (f.props) {
-                f.props.placeholder = 'Please Select';
-                if (!f.props.options) f.props.options = [];
-
-                if (Array.isArray(f.props['optionsLookup'])) {
-                  f.props.options = f.props['optionsLookup'];
-                } else {
-                  this.ngxFormlyService.initFieldLookup(f, this.destroy$);
-                }
-              }
-            });
-
-          // set validators
-          fields
-            .filter(
-              (x: any) => x.validatorConfig && Array.isArray(x.validatorConfig)
-            )
-            .forEach(x => {
-              this.ngxFormlyService.initValidators(x);
-            });
-
-          // set expressions
-          fields
-            .filter((x: any) => x.expressionsConfig)
-            .forEach((x: any) => {
-              x.expressions = {};
-              Object.keys(x.expressionsConfig).forEach(key => {
-                x.expressions[key.replace('_', '.')] = x.expressionsConfig[key];
-              });
-              x.expressionsConfig = undefined;
-            });
-
-          // set props for linkDataEditor
-          fields
-            .filter(f => f.type === 'linkDataEditor')
-            .forEach(x => {
-              if (x.props) {
-                x.props['table1Name'] = this.gridName;
-                x.props['searchParams'] = this.fetchDataParam?.searches;
-                x.props['table1Id'] = this.dataKey;
-              }
-            });
-
-          // set props for checkbox
-          fields
-            .filter(f => f.type === 'checkbox')
-            .forEach(x => {
-              if (x.props) {
-                x.props['hideLabel'] = this.layout === 'vertical';
-              }
-            });
-
-          // set props for fileUpload
-          fields
-            .filter(f => f.type === 'fileUpload')
-            .forEach(x => {
-              if (x.props) {
-                x.props['gridName'] = this.gridName;
-              }
-            });
-
+          this.configFieldDefaultValue(fields);
+          this.configFieldLookup(fields);
+          this.configFieldValidator(fields);
+          this.configFieldExpressions(fields);
+          this.configFieldProps(fields);
           this.fields = fields;
           if (fields.length > 0) this.loadedEvent.emit();
         })
       )
       .subscribe();
+  }
+
+  private configFieldLookup(fields: FormlyFieldConfig[]) {
+    // fetch lookups
+    fields
+      .filter(
+        // advanced setting: options from lookup
+        x =>
+          typeof x.type === 'string' &&
+          ['select', 'multiSelect'].indexOf(x.type) >= 0 &&
+          x.props &&
+          x.props['optionsLookup']
+      )
+      .forEach(f => {
+        if (f.props) {
+          f.props.placeholder = 'Please Select';
+          if (!f.props.options) f.props.options = [];
+
+          if (Array.isArray(f.props['optionsLookup'])) {
+            f.props.options = f.props['optionsLookup'];
+          } else {
+            this.ngxFormlyService.initFieldLookup(f, this.destroy$);
+          }
+        }
+      });
+  }
+  private configFieldDefaultValue(fields: FormlyFieldConfig[]) {
+    // set default value
+    fields
+      .filter(f => f.defaultValue)
+      .forEach(f => {
+        const matches = [
+          ...f.defaultValue.matchAll(
+            /##SEARCHES[.]{1}([a-zA-Z]{1}[a-zA-Z0-9_]+?)([:]{1}([a-zA-Z]{1}[a-zA-Z0-9_]+?))*##/g
+          )
+        ];
+        let value = f.defaultValue;
+        matches.forEach(match => {
+          let searchVal = this.fetchDataParam?.searches
+            ? this.fetchDataParam?.searches[match[1]]
+            : '';
+          if (searchVal && searchVal.getDate)
+            searchVal = this.datePipe.transform(
+              searchVal,
+              match[3] ?? 'yyyyMMdd'
+            );
+          value = value.replace(match[0], searchVal ?? '');
+        });
+        f.defaultValue = value;
+      });
+  }
+  private configFieldValidator(fields: FormlyFieldConfig[]) {
+    // set validators
+    fields
+      .filter((x: any) => x.validatorConfig && Array.isArray(x.validatorConfig))
+      .forEach(x => {
+        this.ngxFormlyService.initValidators(x, this.destroy$);
+      });
+  }
+  private configFieldProps(fields: FormlyFieldConfig[]) {
+    // set props for linkDataEditor
+    fields
+      .filter(f => f.type === 'linkDataEditor')
+      .forEach(x => {
+        if (x.props) {
+          x.props['table1Name'] = this.gridName;
+          x.props['searchParams'] = this.fetchDataParam?.searches;
+          x.props['table1Id'] = this.dataKey;
+        }
+      });
+    // set props for checkbox
+    fields
+      .filter(f => f.type === 'checkbox')
+      .forEach(x => {
+        if (x.props) {
+          x.props['hideLabel'] = this.layout === 'vertical';
+        }
+      });
+    // set props for fileUpload
+    fields
+      .filter(f => f.type === 'fileUpload')
+      .forEach(x => {
+        if (x.props) {
+          x.props['gridName'] = this.gridName;
+        }
+      });
+  }
+  private configFieldExpressions(fields: FormlyFieldConfig[]) {
+    // set expressions
+    fields
+      .filter((x: any) => x.expressionsConfig)
+      .forEach((x: any) => {
+        x.expressions = {};
+        Object.keys(x.expressionsConfig).forEach(key => {
+          x.expressions[key.replace('_', '.')] = x.expressionsConfig[key];
+        });
+        x.expressionsConfig = undefined;
+      });
   }
 
   getEventConfig() {

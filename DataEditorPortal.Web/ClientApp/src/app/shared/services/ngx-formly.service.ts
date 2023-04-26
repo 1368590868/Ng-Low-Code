@@ -23,7 +23,7 @@ export class NgxFormlyService {
     this._apiUrl = apiUrl;
   }
 
-  getLookup(id: string, data?: any): Observable<any[]> {
+  private getLookup(id: string, data?: any): Observable<any[]> {
     return this.http
       .post<ApiResponse<any[]>>(
         `${this._apiUrl}lookup/${id}/options`,
@@ -113,7 +113,7 @@ export class NgxFormlyService {
     this.setFieldHook(field, 'onInit', onInit);
   }
 
-  initValidators(field: any) {
+  initValidators(field: any, destory$: Subject<void>) {
     if (Array.isArray(field.validatorConfig)) {
       const validators: any = { validation: [] };
       let $deps: string[] = [];
@@ -157,9 +157,11 @@ export class NgxFormlyService {
           $deps.forEach(key => {
             const $dep = f.parent.get(key);
             if ($dep) {
-              $dep.formControl.valueChanges.subscribe(() => {
-                setTimeout(() => f?.formControl?.updateValueAndValidity());
-              });
+              $dep.formControl.valueChanges
+                .pipe(takeUntil(destory$))
+                .subscribe(() => {
+                  setTimeout(() => f?.formControl?.updateValueAndValidity());
+                });
             }
           });
         };
@@ -170,7 +172,7 @@ export class NgxFormlyService {
     }
   }
 
-  setFieldHook(field: any, name: string, callback: (f: any) => void) {
+  private setFieldHook(field: any, name: string, callback: (f: any) => void) {
     if (field.hooks) {
       if (field.hooks[name]) {
         const prevCallback = field.hooks[name];
