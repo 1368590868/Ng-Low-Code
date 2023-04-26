@@ -74,7 +74,7 @@ export class ViewRecordActionComponent
   }
 
   calcCustomTemplate(data: any, template: string) {
-    const expression = evalStringExpression(template, ['row', 'pipes']);
+    const expression = evalStringExpression(template, ['$rowData', 'Pipes']);
     return evalExpression(expression, data, [data, this.formatters]);
   }
 }
