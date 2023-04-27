@@ -6,7 +6,6 @@ using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -88,12 +87,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("username-exists")]
         public bool ExistName([FromQuery] string username, [FromQuery] Guid? id)
         {
-            if (_depDbContext is DepDbContextOracle)
-            {
-                _depDbContext.Database.ExecuteSqlRaw("ALTER SESSION SET NLS_COMP=LINGUISTIC;");
-                _depDbContext.Database.ExecuteSqlRaw("ALTER SESSION SET NLS_SORT=Latin_AI;");
-            }
-            return _depDbContext.Users.Where(x => x.Username == username && x.Id != id).Any();
+            return _depDbContext.Users.Where(x => x.Username.ToUpper() == username.ToUpper() && x.Id != id).Any();
         }
 
         [HttpGet]
