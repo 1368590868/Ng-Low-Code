@@ -16,7 +16,6 @@ import { ActionWrapperComponent } from '../components/action-wrapper/action-wrap
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { UniversalGridService } from '../services/universal-grid.service';
-import * as qs from 'qs';
 
 @Directive({
   selector: '[appUniversalGridAction]'
@@ -29,7 +28,6 @@ export class UniversalGridActionDirective
   @Input() selectedRecords: any[] = [];
   @Input() recordKey!: string;
   @Input() fetchDataParam: any;
-  @Input() rowData: any;
 
   @Output() savedEvent = new EventEmitter<void>();
 
@@ -66,52 +64,6 @@ export class UniversalGridActionDirective
   ngDoCheck(): void {
     if (!this.actionLoaded) {
       this.renderGridActions();
-    }
-  }
-
-  onUrlParamsChange() {
-    const urlParams = qs.parse(window.location.search, {
-      ignoreQueryPrefix: true
-    }) as any;
-
-    if (Object.keys(urlParams).length <= 0 || !urlParams['edit']) {
-      return null;
-    }
-    return urlParams['edit'][this.recordKey] as any;
-  }
-
-  addUrlParams() {
-    const urlParams = qs.parse(window.location.search, {
-      ignoreQueryPrefix: true
-    }) as any;
-
-    if (Object.keys(urlParams).length > 0) {
-      return Object.keys(urlParams).find(key => {
-        return key === 'add';
-      });
-    }
-    return false;
-  }
-
-  onRowSelectedAndDeleteOrExport(type: string) {
-    const urlParams = qs.parse(window.location.search, {
-      ignoreQueryPrefix: true
-    }) as any;
-
-    if (type === 'delete') {
-      if (
-        Object.keys(urlParams).length <= 0 ||
-        !urlParams[type] ||
-        !urlParams['select']
-      ) {
-        return null;
-      }
-      return urlParams['select'] as any;
-    } else {
-      if (Object.keys(urlParams).length <= 0 || !urlParams[type]) {
-        return null;
-      }
-      return true;
     }
   }
 
@@ -169,24 +121,11 @@ export class UniversalGridActionDirective
           Object.assign(config.props, tableParams);
           wrapperRef.instance.actionConfig = config;
 
-          wrapperRef.instance.savedEvent.subscribe(() => {
-            this.savedEvent.emit();
-          });
-          if (config.name === 'edit-record') {
-            if (this.rowData[this.recordKey] === this.onUrlParamsChange()) {
-              wrapperRef.instance.showDialog();
-            }
-          } else if (config.name === 'add-record' && this.addUrlParams()) {
-            wrapperRef.instance.showDialog();
-          } else if (config.name === 'remove-record') {
-            if (this.onRowSelectedAndDeleteOrExport('delete')) {
-              wrapperRef.instance.showDialog();
-            }
-          } else if (config.name === 'export-excel') {
-            if (this.onRowSelectedAndDeleteOrExport('export')) {
-              wrapperRef.instance.showDialog();
-            }
-          }
+          wrapperRef.instance.savedEvent
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(() => {
+              this.savedEvent.emit();
+            });
           this.actionWrapperRefs.push(wrapperRef);
         }
       });
