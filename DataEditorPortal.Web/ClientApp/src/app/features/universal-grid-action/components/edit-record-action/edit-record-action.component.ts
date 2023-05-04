@@ -27,6 +27,7 @@ import {
   EventActionHandlerService
 } from '../../services/event-action-handler.service';
 import { UniversalGridService } from '../../services/universal-grid.service';
+import * as qs from 'qs';
 
 @Component({
   selector: 'app-edit-record-action',
@@ -81,6 +82,7 @@ export class EditRecordActionComponent
               }
             });
             this.model = result;
+            this.onUrlParamsChange();
           }),
           tap(() => this.getFormConfig()),
           tap(() => this.getEventConfig())
@@ -89,6 +91,26 @@ export class EditRecordActionComponent
     } else {
       this.getFormConfig();
       this.getEventConfig();
+    }
+  }
+
+  onUrlParamsChange() {
+    const urlParams = qs.parse(window.location.search, {
+      ignoreQueryPrefix: true
+    });
+
+    if (Object.keys(urlParams).length > 0) {
+      const action = Object.keys(urlParams);
+      action.forEach(key => {
+        if (key === 'edit') {
+          const editData = urlParams[key] as any;
+          this.model = { ...this.model, ...editData };
+        }
+        if (key === 'add') {
+          const addData = urlParams[key] as any;
+          this.model = { ...this.model, ...addData };
+        }
+      });
     }
   }
 
@@ -104,6 +126,8 @@ export class EditRecordActionComponent
           this.configFieldExpressions(fields);
           this.configFieldProps(fields);
           this.fields = fields;
+          this.onUrlParamsChange();
+
           if (fields.length > 0) this.loadedEvent.emit();
         })
       )

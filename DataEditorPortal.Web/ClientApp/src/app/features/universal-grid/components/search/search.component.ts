@@ -1,4 +1,11 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
@@ -16,6 +23,7 @@ import { GridTableService } from '../../services/grid-table.service';
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit, OnDestroy {
+  @Output() urlParamsChange = new EventEmitter<any>();
   @Input()
   gridName!: string;
   destroy$ = new Subject<void>();
@@ -74,6 +82,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         });
 
       this.fields = fields;
+      this.urlParamsChange.emit('search');
     });
   }
 

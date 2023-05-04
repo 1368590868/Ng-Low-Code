@@ -32,6 +32,7 @@ export class TableComponent implements OnInit, OnDestroy {
   @Output() rowSelect = new EventEmitter<any>();
   @Output() rowUnselect = new EventEmitter<any>();
   @Output() resetData = new EventEmitter<any>();
+  @Output() tableSelected = new EventEmitter<any>();
 
   destroy$ = new Subject();
 
@@ -277,6 +278,8 @@ export class TableComponent implements OnInit, OnDestroy {
           this.records = res.data;
           this.totalRecords = res.total;
           this.firstLoadDone = true;
+
+          this.tableSelected.emit('select');
         }),
         tap(() => this.highlightLinkedData(this.table2Id)),
         finalize(() => {
