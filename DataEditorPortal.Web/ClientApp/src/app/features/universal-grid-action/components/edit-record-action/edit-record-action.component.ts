@@ -97,8 +97,8 @@ export class EditRecordActionComponent
   }
 
   onLoadUrlParams() {
-    if (this.initParams) {
-      this.model = { ...this.model, ...this.initParams };
+    if (this.initParams && this.initParams?.payload) {
+      this.model = { ...this.model, ...this.initParams.payload };
     }
   }
 
