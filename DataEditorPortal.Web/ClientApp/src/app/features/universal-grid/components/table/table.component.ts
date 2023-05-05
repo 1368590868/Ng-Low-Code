@@ -19,6 +19,7 @@ import { ConfirmationService, TableState } from 'primeng/api';
 import { GridParam, SearchParam, UserService } from 'src/app/shared';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DomHandler } from 'primeng/dom';
+import { UrlParamsService } from '../../services/url-params.service';
 
 @Component({
   selector: 'app-table',
@@ -32,7 +33,6 @@ export class TableComponent implements OnInit, OnDestroy {
   @Output() rowSelect = new EventEmitter<any>();
   @Output() rowUnselect = new EventEmitter<any>();
   @Output() resetData = new EventEmitter<any>();
-  @Output() tableSelected = new EventEmitter<any>();
 
   destroy$ = new Subject();
 
@@ -91,7 +91,8 @@ export class TableComponent implements OnInit, OnDestroy {
     private gridTableService: GridTableService,
     private userService: UserService,
     private domSanitizer: DomSanitizer,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private urlParamsService: UrlParamsService
   ) {}
 
   ngOnInit() {
@@ -132,7 +133,7 @@ export class TableComponent implements OnInit, OnDestroy {
             });
         }
       });
-
+      this.initUrlParams(this.tableConfig);
       this.loading = false;
     });
 
@@ -145,6 +146,19 @@ export class TableComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe();
+  }
+
+  initUrlParams(tableConfig: GridConfig) {
+    this.urlParamsService.getInitParams(this.gridName);
+    if (this.urlParamsService.initParams) {
+      this.filters = this.urlParamsService.getIdFilter(tableConfig.dataKey);
+
+      this.selection = this.urlParamsService.getTableSelection(
+        tableConfig.dataKey
+      );
+
+      this.onFilter({ filters: this.filters });
+    }
   }
 
   ngOnDestroy() {
@@ -198,6 +212,7 @@ export class TableComponent implements OnInit, OnDestroy {
         wrapper: viewWrapper
       });
     }
+    const params = this.urlParamsService.initParams;
 
     if (this.allowEdit) {
       const editWrapper: GridActionWrapperOption = {
@@ -209,12 +224,14 @@ export class TableComponent implements OnInit, OnDestroy {
       if (this.tableConfig.customEditFormName) {
         actions.push({
           name: this.tableConfig.customEditFormName,
-          wrapper: editWrapper
+          wrapper: editWrapper,
+          props: { initParams: params }
         });
       } else {
         actions.push({
           name: 'edit-record',
-          wrapper: editWrapper
+          wrapper: editWrapper,
+          props: { initParams: params }
         });
       }
     }
@@ -223,12 +240,12 @@ export class TableComponent implements OnInit, OnDestroy {
 
   setTableActions() {
     const actions: GridActionOption[] = [];
-
+    const params = this.urlParamsService.initParams;
     if (this.allowAdd) {
       if (this.tableConfig.customAddFormName) {
         actions.push({ name: this.tableConfig.customAddFormName });
       } else {
-        actions.push({ name: 'add-record' });
+        actions.push({ name: 'add-record', props: { initParams: params } });
       }
     }
     if (this.allowDelete) {
@@ -277,9 +294,11 @@ export class TableComponent implements OnInit, OnDestroy {
         tap(res => {
           this.records = res.data;
           this.totalRecords = res.total;
-          this.firstLoadDone = true;
 
-          this.tableSelected.emit('select');
+          if (this.urlParamsService.initParams && !this.firstLoadDone) {
+            this.selection = JSON.parse(JSON.stringify(this.selection));
+          }
+          this.firstLoadDone = true;
         }),
         tap(() => this.highlightLinkedData(this.table2Id)),
         finalize(() => {

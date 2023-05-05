@@ -29,12 +29,10 @@
     <div class="table-area w-full">
       <app-table
         #table
-        (tableSelected)="onUrlParamsChange($event)"
         @fadeInOut
         *ngIf="itemType === 'single' && gridName"
         [gridName]="gridName"></app-table>
       <app-linked-table
-        (tableSelected)="onUrlParamsChange($event)"
         @fadeInOut
         *ngIf="itemType === 'linked' && gridName"
         [gridName]="gridName"></app-linked-table>
