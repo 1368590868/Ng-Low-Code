@@ -133,7 +133,7 @@ export class TableComponent implements OnInit, OnDestroy {
             });
         }
       });
-      this.initUrlParams(this.tableConfig);
+      this.initUrlParams();
       this.loading = false;
     });
 
@@ -148,13 +148,18 @@ export class TableComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  initUrlParams(tableConfig: GridConfig) {
-    this.urlParamsService.getInitParams(this.gridName);
+  initUrlParams() {
+    this.urlParamsService.getInitParams(
+      this.gridName,
+      this.tableConfig.dataKey
+    );
     if (this.urlParamsService.initParams) {
-      this.filters = this.urlParamsService.getIdFilter(tableConfig.dataKey);
+      this.filters = this.urlParamsService.getIdFilter(
+        this.tableConfig.dataKey
+      );
 
       this.selection = this.urlParamsService.getTableSelection(
-        tableConfig.dataKey
+        this.tableConfig.dataKey
       );
 
       this.onFilter({ filters: this.filters });

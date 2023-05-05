@@ -44,10 +44,8 @@ export class ActionWrapperComponent implements OnInit {
   constructor(private urlParamsService: UrlParamsService) {}
 
   ngOnInit(): void {
-    this.initParams = this.urlParamsService.getInitParams(
-      this.actionConfig?.props?.['gridName']
-    );
-    if (this.initParams && this.initParams['a'] === this.actionConfig?.name) {
+    this.initParams = this.urlParamsService.initParams;
+    if (this.initParams && this.initParams.action === this.actionConfig?.name) {
       this.showDialog();
       this.urlParamsService.clearInitParams();
     }
