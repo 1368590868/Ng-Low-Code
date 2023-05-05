@@ -28,6 +28,7 @@ import {
 } from '../../services/event-action-handler.service';
 import { UniversalGridService } from '../../services/universal-grid.service';
 import * as qs from 'qs';
+import { GridTableService } from 'src/app/features/universal-grid/services/grid-table.service';
 
 @Component({
   selector: 'app-edit-record-action',
@@ -60,6 +61,7 @@ export class EditRecordActionComponent
     private systemLogService: SystemLogService,
     private datePipe: DatePipe,
     private injector: Injector,
+    private gridTableService: GridTableService,
     @Inject('EVENT_ACTION_CONFIG')
     private EVENT_ACTION_CONFIG: {
       name: string;
@@ -82,7 +84,7 @@ export class EditRecordActionComponent
               }
             });
             this.model = result;
-            this.onUrlParamsChange();
+            this.onLoadUrlParams();
           }),
           tap(() => this.getFormConfig()),
           tap(() => this.getEventConfig())
@@ -94,23 +96,9 @@ export class EditRecordActionComponent
     }
   }
 
-  onUrlParamsChange() {
-    const urlParams = qs.parse(window.location.search, {
-      ignoreQueryPrefix: true
-    });
-
-    if (Object.keys(urlParams).length > 0) {
-      const action = Object.keys(urlParams);
-      action.forEach(key => {
-        if (key === 'edit') {
-          const editData = urlParams[key] as any;
-          this.model = { ...this.model, ...editData };
-        }
-        if (key === 'add') {
-          const addData = urlParams[key] as any;
-          this.model = { ...this.model, ...addData };
-        }
-      });
+  onLoadUrlParams() {
+    if (this.initParams) {
+      this.model = { ...this.model, ...this.initParams };
     }
   }
 
@@ -126,7 +114,7 @@ export class EditRecordActionComponent
           this.configFieldExpressions(fields);
           this.configFieldProps(fields);
           this.fields = fields;
-          this.onUrlParamsChange();
+          this.onLoadUrlParams();
 
           if (fields.length > 0) this.loadedEvent.emit();
         })

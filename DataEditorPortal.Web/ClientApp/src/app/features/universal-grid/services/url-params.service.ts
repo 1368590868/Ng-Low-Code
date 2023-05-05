@@ -44,8 +44,6 @@ export class UrlParamsService {
   }
 
   getTableSelection(dataKey: string) {
-    console.log(this.initParams['p']);
-
     if (
       this.initParams &&
       this.initParams['p'] &&
