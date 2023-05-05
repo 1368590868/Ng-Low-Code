@@ -5,8 +5,10 @@ import {
   ViewContainerRef,
   ComponentRef,
   Output,
-  EventEmitter
+  EventEmitter,
+  OnInit
 } from '@angular/core';
+import { UrlParamsService } from 'src/app/features/universal-grid/services/url-params.service';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { GridActionConfig } from '../../models/grid-config';
 
@@ -15,7 +17,7 @@ import { GridActionConfig } from '../../models/grid-config';
   templateUrl: './action-wrapper.component.html',
   styleUrls: ['./action-wrapper.component.scss']
 })
-export class ActionWrapperComponent {
+export class ActionWrapperComponent implements OnInit {
   @Input() class = 'mr-2';
   @Input() label = 'Add New';
   @Input() icon = 'pi pi-plus';
@@ -36,6 +38,20 @@ export class ActionWrapperComponent {
   visible = false;
   isLoading = false;
   buttonDisabled = true;
+
+  initParams?: any;
+
+  constructor(private urlParamsService: UrlParamsService) {}
+
+  ngOnInit(): void {
+    this.initParams = this.urlParamsService.getInitParams(
+      this.actionConfig?.props?.['gridName']
+    );
+    if (this.initParams && this.initParams['a'] === this.actionConfig?.name) {
+      this.showDialog();
+      this.urlParamsService.clearInitParams();
+    }
+  }
 
   showDialog() {
     this.isLoading = false;
@@ -83,9 +99,8 @@ export class ActionWrapperComponent {
       }
     }
 
-    // actionRef.instance.selectedRecords = this.selectedRecords;
-    // actionRef.instance.recordKey = this.recordKey;
-    // actionRef.instance.fetchDataParam = this.fetchDataParam;
+    // assign initParams
+    Object.assign(actionRef.instance, { initParams: this.initParams });
 
     // bind action events
     actionRef.instance.savedEvent.asObservable().subscribe(() => {
