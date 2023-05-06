@@ -24,7 +24,8 @@ import { UrlParamsService } from '../../services/url-params.service';
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
-  styleUrls: ['./table.component.scss']
+  styleUrls: ['./table.component.scss'],
+  providers: [UrlParamsService]
 })
 export class TableComponent implements OnInit, OnDestroy {
   @Input() headerSize: 'compact' | 'normal' = 'normal';
@@ -493,7 +494,7 @@ export class TableComponent implements OnInit, OnDestroy {
     const visibleColumns: GridColumn[] = [];
     this.columnsConfig.forEach(x => {
       if (this.columnsHiddenState.findIndex(name => x.field === name) < 0) {
-        if (!x.width) x.width = 250; // set default width
+        if (!x.width) x.width = 200; // set default width
         visibleColumns.push(x);
       }
     });
@@ -530,7 +531,7 @@ export class TableComponent implements OnInit, OnDestroy {
     const visibleCols: GridColumn[] = [];
     this.columnsConfig.forEach(x => {
       if (this.columnsHiddenState.findIndex(name => x.field === name) < 0) {
-        if (!x.width) x.width = 250; // set default width
+        if (!x.width) x.width = 200; // set default width
         visibleCols.push(x);
       }
     });

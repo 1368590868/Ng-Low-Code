@@ -7,9 +7,7 @@ interface UrlParamsType {
   payload?: any;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class UrlParamsService {
   public initParams!: UrlParamsType | null;
   public _config: any;

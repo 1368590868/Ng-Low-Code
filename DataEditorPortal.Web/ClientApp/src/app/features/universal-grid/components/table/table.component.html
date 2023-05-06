@@ -86,10 +86,14 @@
               styleClass="p-button-rounded p-button-outlined mr-1"
               (onClick)="resetAndRefresh()"></p-button>
             <p-button
+              pTooltip="Show/Hide columns"
+              tooltipPosition="left"
               icon="pi pi-pause text-lg"
               styleClass="p-button-rounded p-button-outlined mr-1"
               (onClick)="columnSelectorVisible = true"></p-button>
             <p-button
+              pTooltip="Reset table back to original view"
+              tooltipPosition="left"
               icon="pi pi-sync text-lg"
               styleClass="p-button-rounded p-button-outlined"
               (onClick)="confirmResetColumns($event)"></p-button>

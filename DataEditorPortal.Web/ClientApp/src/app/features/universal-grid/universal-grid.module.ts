@@ -44,7 +44,6 @@ import { SidebarModule } from 'primeng/sidebar';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmationService } from 'primeng/api';
-import { UrlParamsService } from './services/url-params.service';
 
 @NgModule({
   declarations: [
@@ -90,8 +89,7 @@ import { UrlParamsService } from './services/url-params.service';
     DecimalPipe,
     CurrencyPipe,
     PercentPipe,
-    ConfirmationService,
-    UrlParamsService
+    ConfirmationService
   ]
 })
 export class UniversalGridModule {}
