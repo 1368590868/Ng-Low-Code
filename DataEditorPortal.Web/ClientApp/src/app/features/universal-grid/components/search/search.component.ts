@@ -7,23 +7,23 @@ import {
   Output
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 import {
   NgxFormlyService,
   SearchParam,
   SystemLogService
 } from 'src/app/shared';
 import { GridTableService } from '../../services/grid-table.service';
+import { UrlParamsService } from '../../services/url-params.service';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+  styleUrls: ['./search.component.scss'],
+  providers: [UrlParamsService]
 })
 export class SearchComponent implements OnInit, OnDestroy {
-  @Output() urlParamsChange = new EventEmitter<any>();
   @Input()
   gridName!: string;
   destroy$ = new Subject<void>();
@@ -36,10 +36,10 @@ export class SearchComponent implements OnInit, OnDestroy {
   fields!: FormlyFieldConfig[];
 
   constructor(
-    private route: ActivatedRoute,
     private gridTableService: GridTableService,
     private ngxFormlyService: NgxFormlyService,
-    private systemLogService: SystemLogService
+    private systemLogService: SystemLogService,
+    private urlParamsService: UrlParamsService
   ) {}
 
   ngOnInit(): void {
@@ -82,7 +82,17 @@ export class SearchComponent implements OnInit, OnDestroy {
         });
 
       this.fields = fields;
-      this.urlParamsChange.emit('search');
+      const searchParams = this.urlParamsService.getSearchInitParams();
+      if (searchParams && searchParams.action === 'search') {
+        if (searchParams?.payload) {
+          this.model = { ...this.model, ...searchParams?.payload };
+        }
+
+        // wait table listening Search
+        setTimeout(() => {
+          this.onSubmit(this.model);
+        });
+      }
     });
   }
 

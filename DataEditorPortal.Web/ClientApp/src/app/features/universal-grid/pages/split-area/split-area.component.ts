@@ -14,11 +14,7 @@ import {
 } from '@angular/animations';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { GridTableService } from '../../services/grid-table.service';
 import { ConfigDataService } from 'src/app/shared';
-import { SearchComponent } from '../../components/search/search.component';
-import * as qs from 'qs';
-import { TableComponent } from '../../components/table/table.component';
 
 @Component({
   selector: 'app-split-area',
@@ -51,8 +47,6 @@ import { TableComponent } from '../../components/table/table.component';
 })
 export class SplitAreaComponent implements OnInit, OnDestroy {
   @ViewChild('splitter') splitterRef: any;
-  @ViewChild('search') searchRef!: SearchComponent;
-  @ViewChild('table') table!: TableComponent;
   panelSizesPrev = [20, 80];
   stateKey = 'universal-grid-splitter';
   stateStorage = 'session';
@@ -63,7 +57,6 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private gridTableService: GridTableService,
     private changeDetectorRef: ChangeDetectorRef,
     public configDataService: ConfigDataService
   ) {}
@@ -97,37 +90,6 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
         this.changeDetectorRef.detectChanges();
       }
     });
-  }
-
-  executeAction(key: string, urlParams: any, isAction: string) {
-    switch (key) {
-      case 'search': {
-        if (isAction === 'search') {
-          this.searchRef.model = urlParams[key] as any;
-          this.searchRef.onSubmit(this.searchRef.model);
-        }
-        break;
-      }
-      case 'select': {
-        if (isAction === 'select') {
-          console.log(urlParams[key]);
-          this.table.selection = urlParams[key] as any;
-        }
-        break;
-      }
-    }
-  }
-
-  onUrlParamsChange(params: any) {
-    const urlParams = qs.parse(window.location.search, {
-      ignoreQueryPrefix: true
-    });
-    if (Object.keys(urlParams).length > 0) {
-      const action = Object.keys(urlParams);
-      action.forEach(key => {
-        this.executeAction(key, urlParams, params);
-      });
-    }
   }
 
   ngOnDestroy() {

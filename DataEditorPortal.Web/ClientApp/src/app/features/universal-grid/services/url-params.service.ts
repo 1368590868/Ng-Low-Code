@@ -45,18 +45,38 @@ export class UrlParamsService {
       };
 
       this.clearUrlParams();
-
       return this.initParams;
+    }
+    this.clearUrlParams();
+    return null;
+  }
+
+  getSearchInitParams() {
+    const urlParams = qs.parse(window.location.search, {
+      ignoreQueryPrefix: true
+    });
+
+    if (Object.keys(urlParams).length > 0 && urlParams['a']) {
+      if (urlParams['p']) urlParams['p'] = qs.parse(urlParams['p'] as string);
+      const payload = urlParams['p'] as any;
+      console.log(payload);
+      return {
+        action: <string>urlParams['a'],
+        name: <string>urlParams['n'],
+        payload
+      };
     }
     return null;
   }
 
   clearUrlParams() {
-    let url = window.location.href;
-    if (url.indexOf('?') !== -1) {
-      url = url.substring(0, url.indexOf('?'));
-    }
-    window.history.replaceState({}, document.title, url);
+    setTimeout(() => {
+      let url = window.location.href;
+      if (url.indexOf('?') !== -1) {
+        url = url.substring(0, url.indexOf('?'));
+      }
+      window.history.replaceState({}, document.title, url);
+    });
   }
 
   getIdFilter(dataKey: string) {
