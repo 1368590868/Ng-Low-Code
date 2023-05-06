@@ -218,7 +218,6 @@ export class TableComponent implements OnInit, OnDestroy {
         wrapper: viewWrapper
       });
     }
-    const params = this.urlParamsService.initParams;
 
     if (this.allowEdit) {
       const editWrapper: GridActionWrapperOption = {
@@ -230,14 +229,12 @@ export class TableComponent implements OnInit, OnDestroy {
       if (this.tableConfig.customEditFormName) {
         actions.push({
           name: this.tableConfig.customEditFormName,
-          wrapper: editWrapper,
-          props: { initParams: params }
+          wrapper: editWrapper
         });
       } else {
         actions.push({
           name: 'edit-record',
-          wrapper: editWrapper,
-          props: { initParams: params }
+          wrapper: editWrapper
         });
       }
     }
@@ -246,12 +243,11 @@ export class TableComponent implements OnInit, OnDestroy {
 
   setTableActions() {
     const actions: GridActionOption[] = [];
-    const params = this.urlParamsService.initParams;
     if (this.allowAdd) {
       if (this.tableConfig.customAddFormName) {
         actions.push({ name: this.tableConfig.customAddFormName });
       } else {
-        actions.push({ name: 'add-record', props: { initParams: params } });
+        actions.push({ name: 'add-record' });
       }
     }
     if (this.allowDelete) {
