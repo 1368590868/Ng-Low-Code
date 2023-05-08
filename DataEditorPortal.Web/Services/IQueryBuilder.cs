@@ -38,7 +38,7 @@ namespace DataEditorPortal.Web.Services
         string GetSqlTextForDatabaseSource(DataSourceConfig config);
 
         // for lookup
-        (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, Dictionary<string, object> model);
+        (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, IDictionary<string, object> model);
     }
 
     public abstract class QueryBuilder
@@ -362,7 +362,7 @@ namespace DataEditorPortal.Web.Services
 
         #endregion
 
-        public (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, Dictionary<string, object> model)
+        public (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, IDictionary<string, object> model)
         {
             var fieldRegex = new Regex(@"\#\#([a-zA-Z]{1}[a-zA-Z0-9_]+?)\#\#");
             var regex = new Regex(@"\{\{(.+?)\}\}");

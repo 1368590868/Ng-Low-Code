@@ -38,9 +38,9 @@ namespace DataEditorPortal.Web.Services
         MemoryStream ExportExcel(string name, ExportParam param);
 
         IDictionary<string, object> GetGridDataDetail(string name, string id);
-        bool OnValidateGridData(string name, string type, string id, Dictionary<string, object> model);
-        bool UpdateGridData(string name, string id, Dictionary<string, object> model);
-        bool AddGridData(string name, Dictionary<string, object> model);
+        bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model);
+        bool UpdateGridData(string name, string id, IDictionary<string, object> model);
+        bool AddGridData(string name, IDictionary<string, object> model);
         bool DeleteGridData(string name, object[] ids);
 
         // file upload api
@@ -95,8 +95,7 @@ namespace DataEditorPortal.Web.Services
             var item = _depDbContext.SiteMenus.Where(x => x.Name == name).FirstOrDefault();
             if (item == null) throw new DepException($"Portal Item with name:{name} deosn't exists");
 
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
@@ -136,8 +135,7 @@ namespace DataEditorPortal.Web.Services
 
         public List<GridColConfig> GetGridColumnsConfig(string name)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             if (string.IsNullOrEmpty(config.ColumnsConfig)) config.ColumnsConfig = "[]";
 
@@ -146,8 +144,7 @@ namespace DataEditorPortal.Web.Services
 
         public List<SearchFieldConfig> GetGridSearchConfig(string name)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             if (string.IsNullOrEmpty(config.SearchConfig)) config.SearchConfig = "[]";
 
@@ -160,8 +157,7 @@ namespace DataEditorPortal.Web.Services
 
         public List<FormFieldConfig> GetGridFormConfig(string name, string type)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             if (string.IsNullOrEmpty(config.DetailConfig)) throw new DepException("Grid Detail Config can not be empty.");
 
@@ -213,8 +209,7 @@ namespace DataEditorPortal.Web.Services
 
         public GridFormLayout GetFormEventConfig(string name, string type)
         {
-            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             if (string.IsNullOrEmpty(config.DetailConfig)) throw new DepException("Grid Detail Config can not be empty.");
 
@@ -239,12 +234,7 @@ namespace DataEditorPortal.Web.Services
         #region Grid List data
         public GridData GetGridData(string name, GridParam param)
         {
-            var config = _memoryCache.GetOrCreate($"grid.{name}", entry =>
-            {
-                entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
-                return _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
-            });
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             #region compose the query text
 
@@ -475,8 +465,7 @@ namespace DataEditorPortal.Web.Services
 
         public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column)
         {
-            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
             var columnsConfig = JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
@@ -539,12 +528,7 @@ namespace DataEditorPortal.Web.Services
 
         public IDictionary<string, object> GetGridDataDetail(string name, string id)
         {
-            var config = _memoryCache.GetOrCreate($"grid.{name}", entry =>
-            {
-                entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
-                return _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
-            });
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
@@ -599,10 +583,9 @@ namespace DataEditorPortal.Web.Services
                 return result;
         }
 
-        public bool OnValidateGridData(string name, string type, string id, Dictionary<string, object> model)
+        public bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model)
         {
-            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
@@ -673,10 +656,9 @@ namespace DataEditorPortal.Web.Services
             return result;
         }
 
-        public bool AddGridData(string name, Dictionary<string, object> model)
+        public bool AddGridData(string name, IDictionary<string, object> model)
         {
-            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
@@ -785,10 +767,9 @@ namespace DataEditorPortal.Web.Services
             return true;
         }
 
-        public bool UpdateGridData(string name, string id, Dictionary<string, object> model)
+        public bool UpdateGridData(string name, string id, IDictionary<string, object> model)
         {
-            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
@@ -910,8 +891,7 @@ namespace DataEditorPortal.Web.Services
 
         public bool DeleteGridData(string name, object[] ids)
         {
-            var config = _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
-            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
@@ -980,7 +960,7 @@ namespace DataEditorPortal.Web.Services
             return true;
         }
 
-        private void ProcessComputedValues(List<FormFieldConfig> formFields, Dictionary<string, object> model, DbConnection con)
+        private void ProcessComputedValues(List<FormFieldConfig> formFields, IDictionary<string, object> model, DbConnection con)
         {
             var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
             var currentUser = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
@@ -1042,14 +1022,14 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        private void SetModelValue(Dictionary<string, object> model, string key, object value)
+        private void SetModelValue(IDictionary<string, object> model, string key, object value)
         {
             if (model.Keys.Contains(key)) model[key] = value;
             else
                 model.Add(key, value);
         }
 
-        private void AfterSaved(EventActionModel actionConfig, Dictionary<string, object> model)
+        private void AfterSaved(EventActionModel actionConfig, IDictionary<string, object> model)
         {
             var eventConfig = actionConfig.EventConfig;
 
@@ -1136,7 +1116,7 @@ namespace DataEditorPortal.Web.Services
 
         #region File upload API
 
-        private List<UploadedFileMeta> ProcessFileUploadFileds(List<FormFieldConfig> formFields, Dictionary<string, object> model)
+        private List<UploadedFileMeta> ProcessFileUploadFileds(List<FormFieldConfig> formFields, IDictionary<string, object> model)
         {
             var result = new List<UploadedFileMeta>();
             var fileUploadFields = formFields.Where(x => x.filterType == "attachments").ToList();
@@ -1326,7 +1306,7 @@ namespace DataEditorPortal.Web.Services
 
             return relationData;
         }
-        private List<RelationDataModel> ProcessLinkDataField(Dictionary<string, object> model)
+        private List<RelationDataModel> ProcessLinkDataField(IDictionary<string, object> model)
         {
             List<RelationDataModel> result = null;
             if (model.ContainsKey(Constants.LINK_DATA_FIELD_NAME) && model[Constants.LINK_DATA_FIELD_NAME] != null)
@@ -1465,6 +1445,22 @@ namespace DataEditorPortal.Web.Services
         }
 
         #endregion
+
+        #region private methods
+
+        private UniversalGridConfiguration GetUniversalGridConfiguration(string name)
+        {
+            var config = _memoryCache.GetOrCreate($"grid.{name}", entry =>
+            {
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
+                return _depDbContext.UniversalGridConfigurations.Include(x => x.DataSourceConnection).FirstOrDefault(x => x.Name == name);
+            });
+            if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
+            return config;
+        }
+
+        #endregion
+
     }
 
 }
