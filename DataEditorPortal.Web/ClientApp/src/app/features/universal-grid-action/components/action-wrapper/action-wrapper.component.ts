@@ -6,7 +6,8 @@ import {
   ComponentRef,
   Output,
   EventEmitter,
-  OnInit
+  OnInit,
+  HostBinding
 } from '@angular/core';
 import { UrlParamsService } from 'src/app/features/universal-grid/services/url-params.service';
 import { GridActionDirective } from '../../directives/grid-action.directive';
@@ -26,6 +27,11 @@ export class ActionWrapperComponent implements OnInit {
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
   @Input() dialogStyle = { width: '31.25rem' };
+  @Input() set visible(val: boolean) {
+    if (val) this.display = 'block';
+    else this.display = 'none';
+  }
+  @HostBinding('style.display') display = 'block';
 
   @Input() actionConfig!: GridActionConfig;
 
@@ -35,7 +41,7 @@ export class ActionWrapperComponent implements OnInit {
   viewContainerRef!: ViewContainerRef;
 
   componentRef!: ComponentRef<GridActionDirective>;
-  visible = false;
+  dialogVisible = false;
   isLoading = false;
   buttonDisabled = true;
 
@@ -58,7 +64,7 @@ export class ActionWrapperComponent implements OnInit {
 
   showDialog() {
     this.isLoading = false;
-    this.visible = true;
+    this.dialogVisible = true;
     this.renderAction();
   }
 
@@ -68,7 +74,7 @@ export class ActionWrapperComponent implements OnInit {
   }
 
   onCancel() {
-    this.visible = false;
+    this.dialogVisible = false;
   }
 
   onOk() {
@@ -76,7 +82,7 @@ export class ActionWrapperComponent implements OnInit {
     if (this.hasEventHandler('onSave'))
       (this.componentRef.instance as any).onSave();
     else {
-      this.visible = false;
+      this.dialogVisible = false;
     }
   }
 
@@ -107,7 +113,7 @@ export class ActionWrapperComponent implements OnInit {
 
     // bind action events
     actionRef.instance.savedEvent.asObservable().subscribe(() => {
-      this.visible = false;
+      this.dialogVisible = false;
       this.savedEvent.emit();
     });
     actionRef.instance.errorEvent.asObservable().subscribe(() => {

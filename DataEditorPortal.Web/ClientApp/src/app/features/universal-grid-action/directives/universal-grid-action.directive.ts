@@ -49,14 +49,14 @@ export class UniversalGridActionDirective
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('selectedRecords' in changes) {
-      // selectedRecords changed, reloaded actions.
-      this.actionLoaded = false;
+      this.actionWrapperRefs.forEach(wrapper => {
+        this.syncActionProps(wrapper, 'selectedRecords');
+        this.setActionWrapperVisible(wrapper);
+      });
     }
     if ('fetchDataParam' in changes) {
       this.actionWrapperRefs.forEach(wrapper => {
-        if (wrapper.instance.actionConfig.props)
-          wrapper.instance.actionConfig.props['fetchDataParam'] =
-            this.fetchDataParam;
+        this.syncActionProps(wrapper, 'fetchDataParam');
       });
     }
   }
@@ -82,14 +82,7 @@ export class UniversalGridActionDirective
           return action.name === x.name;
         });
 
-        if (
-          actionCfg &&
-          ((actionCfg.requireGridRowSelected === true &&
-            this.selectedRecords.length > 0) ||
-            actionCfg.requireGridRowSelected === this.selectedRecords.length ||
-            actionCfg.requireGridRowSelected === undefined ||
-            actionCfg.requireGridRowSelected === false)
-        ) {
+        if (actionCfg) {
           const wrapperRef =
             this.viewContainerRef.createComponent<ActionWrapperComponent>(
               ActionWrapperComponent
@@ -126,11 +119,28 @@ export class UniversalGridActionDirective
             .subscribe(() => {
               this.savedEvent.emit();
             });
+
+          this.setActionWrapperVisible(wrapperRef);
           this.actionWrapperRefs.push(wrapperRef);
         }
       });
 
       this.actionLoaded = true;
     }
+  }
+
+  setActionWrapperVisible(wrapper: ComponentRef<ActionWrapperComponent>) {
+    const actionCfg = wrapper.instance.actionConfig;
+    wrapper.instance.visible =
+      (actionCfg.requireGridRowSelected === true &&
+        this.selectedRecords.length > 0) ||
+      actionCfg.requireGridRowSelected === this.selectedRecords.length ||
+      actionCfg.requireGridRowSelected === undefined ||
+      actionCfg.requireGridRowSelected === false;
+  }
+
+  syncActionProps(wrapper: ComponentRef<ActionWrapperComponent>, prop: string) {
+    if (wrapper.instance.actionConfig.props)
+      wrapper.instance.actionConfig.props[prop] = (this as any)[prop];
   }
 }
