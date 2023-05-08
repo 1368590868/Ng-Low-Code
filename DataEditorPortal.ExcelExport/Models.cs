@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml;
+﻿//using DocumentFormat.OpenXml;
 using System;
 using System.Collections.Generic;
 
@@ -28,13 +28,13 @@ namespace DataEditorPortal.ExcelExport
         public bool Flag { get; set; } = false;
         public FormatOptions FormatCell { get; set; }
         public string FormulaStr { get; set; }
-        public UInt32Value FormatIndex { get; set; }
+        //public UInt32Value FormatIndex { get; set; }
     }
 
     public class SheetParam
     {
         public string Name { get; set; }
-        public UInt32Value ID { get; set; }
+        public uint ID { get; set; }
         public FreezePaneOptions FreezePane { get; set; }
         public IList<ColumnOptions> ColumnParams { get; set; }
         public IList<RowOptions> RowParams { get; set; }
