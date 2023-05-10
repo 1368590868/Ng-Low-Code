@@ -26,6 +26,7 @@ namespace DataEditorPortal.Data.Contexts
         public virtual DbSet<UploadedFile> UploadedFiles { get; set; }
 
         public virtual DbSet<UniversalGridConfiguration> UniversalGridConfigurations { get; set; }
+        public virtual DbSet<DataImportHistory> DataImportHistories { get; set; }
 
         public virtual DbSet<DemoTable> DemoTables { get; set; }
 

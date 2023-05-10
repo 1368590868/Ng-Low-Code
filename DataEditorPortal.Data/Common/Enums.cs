@@ -19,4 +19,11 @@
         FileSystem,
         SqlBinary
     }
+
+    public enum DataImportResult
+    {
+        Complete,
+        InProgress,
+        Failed
+    }
 }
