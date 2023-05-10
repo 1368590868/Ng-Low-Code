@@ -38,6 +38,7 @@ namespace DataEditorPortal.Web.Jobs
             var gridName = dataMap.GetString("gridName");
             var uploadedFile = dataMap.Get("templateFile") as UploadedFileModel;
             var createdById = dataMap.GetGuid("createdById");
+            var createdByName = dataMap.GetString("createdByName");
             if (!context.JobDetail.JobDataMap.Contains("progress"))
                 context.JobDetail.JobDataMap.Add("progress", 0);
 
@@ -59,17 +60,18 @@ namespace DataEditorPortal.Web.Jobs
             var count = 0;
             try
             {
-                sourceObjs = _importDataServcie.GetSourceData(uploadedFile);
-
+                sourceObjs = _importDataServcie.GetSourceData(uploadedFile, true);
                 if (sourceObjs != null)
                 {
+                    _universalGridService.CurrentUsername = createdByName;
+
                     // start to import, using grid service to add or update
                     foreach (var obj in sourceObjs)
                     {
                         _universalGridService.AddGridData(gridName, obj);
                         count++;
 
-                        context.JobDetail.JobDataMap["progress"] = count / (double)sourceObjs.Count;
+                        context.JobDetail.JobDataMap["progress"] = count / (double)sourceObjs.Count * 100;
                     }
                 }
 

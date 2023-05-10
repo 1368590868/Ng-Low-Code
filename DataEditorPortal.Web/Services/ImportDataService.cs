@@ -14,7 +14,7 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IImportDataServcie
     {
-        public IList<IDictionary<string, object>> GetSourceData(UploadedFileModel uploadedFile);
+        public IList<IDictionary<string, object>> GetSourceData(UploadedFileModel uploadedFile, bool removeFile = false);
     }
 
     public class ImportDataService : IImportDataServcie
@@ -39,7 +39,7 @@ namespace DataEditorPortal.Web.Services
             _mapper = mapper;
         }
 
-        public IList<IDictionary<string, object>> GetSourceData(UploadedFileModel uploadedFile)
+        public IList<IDictionary<string, object>> GetSourceData(UploadedFileModel uploadedFile, bool removeFile = false)
         {
             string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot/FileUploadTemp");
             var tempFilePath = Path.Combine(tempFolder, $"{uploadedFile.FileId} - {uploadedFile.FileName}");
@@ -62,6 +62,8 @@ namespace DataEditorPortal.Web.Services
                     }
                 }
             }
+
+            if (removeFile) File.Delete(tempFilePath);
 
             return sourceObjs;
         }

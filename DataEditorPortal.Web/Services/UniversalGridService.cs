@@ -25,6 +25,7 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IUniversalGridService
     {
+        string CurrentUsername { get; set; }
         GridConfig GetGridConfig(string name);
         List<GridColConfig> GetGridColumnsConfig(string name);
         List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column);
@@ -66,6 +67,8 @@ namespace DataEditorPortal.Web.Services
         private readonly IAttachmentService _attachmentService;
         private readonly IMemoryCache _memoryCache;
 
+        public string CurrentUsername { get; set; }
+
         public UniversalGridService(
             IServiceProvider serviceProvider,
             DepDbContext depDbContext,
@@ -83,9 +86,14 @@ namespace DataEditorPortal.Web.Services
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
-            _eventLogService = eventLogService;
             _attachmentService = attachmentService;
             _memoryCache = memoryCache;
+
+            if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
+                CurrentUsername = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
+
+            _eventLogService = eventLogService;
+            _eventLogService.CurrentUsername = CurrentUsername;
         }
 
         #region Grid cofnig, columns config, search config and detail form config
@@ -749,7 +757,7 @@ namespace DataEditorPortal.Web.Services
                             EventName = "After Inserting",
                             EventSection = config.Name,
                             EventConfig = formLayout.AfterSaved,
-                            Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
+                            Username = CurrentUsername,
                             ConnectionString = config.DataSourceConnection.ConnectionString
                         }, model);
                     }
@@ -871,7 +879,7 @@ namespace DataEditorPortal.Web.Services
                             EventName = "After Updating",
                             EventSection = config.Name,
                             EventConfig = formLayout.AfterSaved,
-                            Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
+                            Username = CurrentUsername,
                             ConnectionString = config.DataSourceConnection.ConnectionString
                         }, model);
                     }
@@ -942,7 +950,7 @@ namespace DataEditorPortal.Web.Services
                             EventName = "After Deleting",
                             EventSection = config.Name,
                             EventConfig = detailConfig.DeletingForm?.AfterSaved,
-                            Username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username,
+                            Username = CurrentUsername,
                             ConnectionString = config.DataSourceConnection.ConnectionString
                         }, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
                     }
@@ -962,8 +970,7 @@ namespace DataEditorPortal.Web.Services
 
         private void ProcessComputedValues(List<FormFieldConfig> formFields, IDictionary<string, object> model, DbConnection con)
         {
-            var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
-            var currentUser = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
+            var currentUser = _depDbContext.Users.FirstOrDefault(x => x.Username == CurrentUsername);
 
             foreach (var field in formFields)
             {

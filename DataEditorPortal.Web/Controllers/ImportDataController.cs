@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -28,7 +29,7 @@ namespace DataEditorPortal.Web.Controllers
         private readonly IUniversalGridService _universalGridService;
         private readonly IImportDataServcie _importDataServcie;
         private readonly IMapper _mapper;
-        private readonly IScheduler _scheduler;
+        private readonly ISchedulerFactory _schedulerFactory;
 
         public ImportDataController(
             ILogger<ImportDataController> logger,
@@ -36,14 +37,14 @@ namespace DataEditorPortal.Web.Controllers
             IUniversalGridService universalGridService,
             IImportDataServcie importDataServcie,
             IMapper mapper,
-            IScheduler scheduler)
+            ISchedulerFactory schedulerFactory)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _universalGridService = universalGridService;
             _importDataServcie = importDataServcie;
             _mapper = mapper;
-            _scheduler = scheduler;
+            _schedulerFactory = schedulerFactory;
         }
 
         [HttpGet]
@@ -61,7 +62,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{gridName}/{id}/import-status")]
-        public ImportHistoryModel GetImportStatus(string gridName, Guid id)
+        public async Task<ApiResponse> GetImportStatus(string gridName, Guid id)
         {
             var entity = _depDbContext.DataImportHistories
                 .Include(x => x.CreatedBy)
@@ -72,14 +73,16 @@ namespace DataEditorPortal.Web.Controllers
             if (entity == null) throw new ApiException("Not Found", 404);
 
             var item = _mapper.Map<ImportHistoryModel>(entity);
-            var jobs = _scheduler.GetCurrentlyExecutingJobs().Result;
+
+            var scheduler = await _schedulerFactory.GetScheduler().ConfigureAwait(true);
+            var jobs = await scheduler.GetCurrentlyExecutingJobs().ConfigureAwait(true);
             if (jobs != null)
             {
                 var job = jobs.FirstOrDefault(x => x.JobDetail.Key.Name == item.Id.ToString());
                 if (job != null) item.Progress = job.JobDetail.JobDataMap.GetDouble("progress");
             }
 
-            return item;
+            return new ApiResponse(item);
         }
 
         [HttpPost]
@@ -119,6 +122,7 @@ namespace DataEditorPortal.Web.Controllers
             jobDataMap.Add("gridName", gridName);
             jobDataMap.Add("templateFile", uploadedFile);
             jobDataMap.Add("createdById", currentUserId);
+            jobDataMap.Add("createdByName", username);
 
             var jobName = Guid.NewGuid().ToString();
             var job = JobBuilder.Create<DataImportJob>()
@@ -131,7 +135,8 @@ namespace DataEditorPortal.Web.Controllers
                 .StartNow()
                 .Build();
 
-            _scheduler.ScheduleJob(job, trigger);
+            var scheduler = _schedulerFactory.GetScheduler().Result;
+            scheduler.ScheduleJob(job, trigger);
         }
 
     }

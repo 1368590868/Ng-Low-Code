@@ -10,6 +10,7 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IEventLogService
     {
+        string CurrentUsername { get; set; }
         void AddPageRequestLog(EventLogModel model);
         void AddDbQueryLog(string category, string section, string details, object param = null, string result = "");
         void AddEventLog(EventLogModel eventLog);
@@ -21,6 +22,8 @@ namespace DataEditorPortal.Web.Services
         private readonly DepDbContext _depDbContext;
         private readonly ILogger<EventLogService> _logger;
 
+        public string CurrentUsername { get; set; }
+
         public EventLogService(
             IHttpContextAccessor httpContextAccessor,
             DepDbContext depDbContext,
@@ -29,23 +32,22 @@ namespace DataEditorPortal.Web.Services
             _httpContextAccessor = httpContextAccessor;
             _depDbContext = depDbContext;
             _logger = logger;
+
+            if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
+                CurrentUsername = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
         }
 
         public void AddPageRequestLog(EventLogModel model)
         {
             try
             {
-                var username = string.Empty;
-                if (_httpContextAccessor.HttpContext.User != null && _httpContextAccessor.HttpContext.User.Identity != null)
-                    username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
-
                 _depDbContext.Add(new EventLog()
                 {
                     Category = EventLogCategory.PAGE_REQUEST,
                     EventSection = model.Section.Replace("-", "_").ToUpper(),
                     EventName = model.Action,
                     EventTime = DateTime.UtcNow,
-                    Username = username,
+                    Username = CurrentUsername,
                     Details = model.Details,
                     Params = model.Params
                 });
@@ -61,17 +63,13 @@ namespace DataEditorPortal.Web.Services
         {
             try
             {
-                var username = string.Empty;
-                if (_httpContextAccessor.HttpContext.User != null && _httpContextAccessor.HttpContext.User.Identity != null)
-                    username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
-
                 _depDbContext.Add(new EventLog()
                 {
                     Category = category,
                     EventSection = section.Replace("-", "_").ToUpper(),
                     EventName = "Database Query",
                     EventTime = DateTime.UtcNow,
-                    Username = username,
+                    Username = CurrentUsername,
                     Details = details,
                     Params = param != null ? JsonSerializer.Serialize(param) : "",
                     Result = result

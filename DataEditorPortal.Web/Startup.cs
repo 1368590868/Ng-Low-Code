@@ -107,8 +107,8 @@ namespace DataEditorPortal.Web
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IEventLogService, EventLogService>();
             services.AddSingleton<ILicenseService, LicenseService>();
-
             services.AddScoped<IAttachmentService, AttachmentService>();
+            services.AddScoped<IImportDataServcie, ImportDataService>();
             #endregion
 
             services.AddMemoryCache();
