@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Oracle.ManagedDataAccess.Client;
+using Quartz;
 using System;
 using System.Data.Common;
 
@@ -142,6 +143,9 @@ namespace DataEditorPortal.Web
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddQuartz(q => { q.UseMicrosoftDependencyInjectionJobFactory(); });
+            services.AddQuartzServer(options => { options.WaitForJobsToComplete = true; });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

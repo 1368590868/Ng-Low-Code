@@ -18,5 +18,7 @@ namespace DataEditorPortal.Web.Models.ImportData
         public string CreatedByUser { get; set; }
 
         public DateTime CreatedDate { get; set; }
+
+        public double Progress { get; set; }
     }
 }
