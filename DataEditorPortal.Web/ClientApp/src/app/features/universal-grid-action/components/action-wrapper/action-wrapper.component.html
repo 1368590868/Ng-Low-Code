@@ -13,7 +13,7 @@
   contentStyleClass="border-top-1 surface-border pt-4 pb-0"
   appendTo="body">
   <div #container></div>
-  <ng-template pTemplate="footer">
+  <ng-template pTemplate="footer" *ngIf="!hideFooter">
     <p-button
       *ngIf="cancelText"
       icon="pi pi-times"

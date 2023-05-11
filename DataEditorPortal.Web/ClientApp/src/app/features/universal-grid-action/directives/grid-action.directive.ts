@@ -12,5 +12,6 @@ export class GridActionDirective {
 
   @Output() loadedEvent = new EventEmitter<void>();
   @Output() savedEvent = new EventEmitter<void>();
+  @Output() cancelEvent = new EventEmitter<void>();
   @Output() errorEvent = new EventEmitter<void>();
 }

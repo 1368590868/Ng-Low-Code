@@ -32,6 +32,7 @@ export class ActionWrapperComponent implements OnInit {
     else this.display = 'none';
   }
   @HostBinding('style.display') display = 'block';
+  @Input() hideFooter = false;
 
   @Input() actionConfig!: GridActionConfig;
 
@@ -71,6 +72,7 @@ export class ActionWrapperComponent implements OnInit {
   onHide() {
     if (this.hasEventHandler('onCancel'))
       (this.componentRef.instance as any).onCancel();
+    this.viewContainerRef.clear();
   }
 
   onCancel() {
@@ -115,6 +117,9 @@ export class ActionWrapperComponent implements OnInit {
     actionRef.instance.savedEvent.asObservable().subscribe(() => {
       this.dialogVisible = false;
       this.savedEvent.emit();
+    });
+    actionRef.instance.cancelEvent.asObservable().subscribe(() => {
+      this.dialogVisible = false;
     });
     actionRef.instance.errorEvent.asObservable().subscribe(() => {
       this.isLoading = false;

@@ -1,0 +1,24 @@
+.dialog-footer {
+  padding: 1.5rem 0;
+  p-button + p-button {
+    margin-left: 0.5rem;
+  }
+}
+
+.upload-label {
+  span {
+    flex: 0 15rem;
+  }
+}
+
+td:has(.hasError) {
+  border: 1px solid var(--red-500) !important;
+}
+
+.data-table {
+  ::ng-deep {
+    .p-datatable-wrapper {
+      overflow-x: auto;
+    }
+  }
+}

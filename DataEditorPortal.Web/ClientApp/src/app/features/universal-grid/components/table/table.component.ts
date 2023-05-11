@@ -261,6 +261,9 @@ export class TableComponent implements OnInit, OnDestroy {
       actions.push({ name: 'export-excel' });
     }
 
+    // import permission
+    actions.push({ name: 'import-excel' });
+
     this.tableConfig.customActions?.forEach(x => {
       actions.push(x);
     });
