@@ -18,6 +18,15 @@ export class HasErrorPipe implements PipeTransform {
   selector: 'app-import-excel-action',
   templateUrl: './import-excel-action.component.html',
   styleUrls: ['./import-excel-action.component.scss'],
+  styles: [
+    `
+      :host {
+        display: flex;
+        flex-flow: column;
+        overflow: auto;
+      }
+    `
+  ],
   providers: [HasErrorPipe, ImportActionService, ImportStatusComponent]
 })
 export class ImportExcelActionComponent
@@ -61,8 +70,7 @@ export class ImportExcelActionComponent
   }
 
   onDownloadTemplate() {
-    const url =
-      'http://81rc.81.cn/sy/gzdt_210283/_attachment/2023/03/22/16210167_0f366e463a34a7ee8814aa6a611e8fcf.xls';
+    const url = `${this.apiUrl}attachment/download-temp-file/af06da4a-1d5f-4eaa-8610-b6e42bf42647/test.xlsx`;
     const a = document.createElement('a');
     a.href = url;
     a.target = '_black';
@@ -94,8 +102,15 @@ export class ImportExcelActionComponent
       .getFileInfo(this.file, this.gridName)
       .subscribe(res => {
         if (res?.data) {
+          if (res?.data?.length > 0) {
+            this.step = 3;
+          } else {
+            this.notifyService.notifyWarning(
+              'Warning',
+              'The uploaded file data is empty.'
+            );
+          }
           this.infoList = res?.data;
-          this.step = 3;
           this.innerInfoList = res?.data;
           if (this.infoList && this.infoList.length > 0) {
             this.columns = Object.keys(this.infoList[0])

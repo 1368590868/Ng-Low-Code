@@ -1,4 +1,4 @@
-<div *ngIf="step === 1" class="mb-3">
+<div *ngIf="step === 1" class="mb-3 overflow-auto">
   <div class="mb-3">
     <p-button
       icon="pi pi-file"
@@ -10,10 +10,8 @@
   <p-table
     [value]="importFileList"
     [paginator]="true"
-    [rows]="10"
-    [showCurrentPageReport]="true"
-    [rowsPerPageOptions]="[10, 20]"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries  ">
+    [rows]="5"
+    [showCurrentPageReport]="false">
     <ng-template pTemplate="header">
       <tr>
         <th pSortableColumn="name">
@@ -52,18 +50,7 @@
             [showAddButton]="false"
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
-        <th pSortableColumn="status">
-          Status <p-sortIcon field="status"></p-sortIcon>
-          <p-columnFilter
-            style="vertical-align: middle"
-            type="text"
-            field="status"
-            display="menu"
-            [hideOnClear]="true"
-            [showOperator]="false"
-            [showAddButton]="false"
-            [maxFractionDigits]="4"></p-columnFilter>
-        </th>
+        <th pSortableColumn="status">Status</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-fileList>
@@ -80,7 +67,7 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage" let-columns>
-      <tr>
+      <tr class="h-10rem">
         <td class="text-lg text-center" [attr.colspan]="6">
           No records found.
         </td>
@@ -89,7 +76,7 @@
   </p-table>
 </div>
 
-<div *ngIf="step === 2">
+<div *ngIf="step === 2" class="overflow-auto p-1">
   <div class="upload-label flex align-items-center mb-3">
     <span
       ><label class="line-height-3">Download Template</label
@@ -102,37 +89,43 @@
     <p-button
       icon="pi pi-file"
       (onClick)="onDownloadTemplate()"
-      styleClass="p-button-outlined w-auto"
-      label="Download"></p-button>
+      styleClass="p-button-link"
+      label="Template"></p-button>
   </div>
 
   <div class="upload-label flex align-items-center mb-3">
     <span class="line-height-3">Import Excel</span>
-    <p-fileUpload
-      #upload
-      name="files"
-      styleClass="w-auto"
-      [url]="apiUrl + 'attachment/upload-temp-file'"
-      mode="basic"
-      [auto]="false"
-      [maxFileSize]="5000000"
-      [fileLimit]="1"
-      accept=".xls,.xlsx,.xlsm,.xlsb,.xml,.csv"
-      (onSelect)="onSelect($event, upload)"
-      (onUpload)="onUpload($event)"
-      (onError)="onUploadError($event, upload)"
-      [chooseLabel]="file?.fileName ?? 'Upload'"></p-fileUpload>
+    <p-button
+      icon="pi pi-file"
+      styleClass="p-button-outlined"
+      [label]="file?.fileName ?? 'Upload'">
+      <p-fileUpload
+        [style]="{ position: 'absolute', top: 0, left: 0, opacity: 0 }"
+        #upload
+        name="files"
+        styleClass="w-auto"
+        [url]="apiUrl + 'attachment/upload-temp-file'"
+        mode="basic"
+        [auto]="false"
+        [maxFileSize]="5000000"
+        [fileLimit]="1"
+        accept=".xls,.xlsx,.xlsm,.xlsb,.xml,.csv"
+        (onSelect)="onSelect($event, upload)"
+        (onUpload)="onUpload($event)"
+        (onError)="onUploadError($event, upload)"
+        [chooseLabel]="file?.fileName ?? 'Upload'"></p-fileUpload>
+    </p-button>
   </div>
 </div>
 
-<div *ngIf="step === 3" class="flex flex-column">
+<div *ngIf="step === 3" class="flex flex-column overflow-auto p-1">
   <p-button
     *ngFor="let data of statusList"
     (onClick)="onShowInfo(data.status)"
     [styleClass]="
       data.status === 1
         ? 'p-button-text p-button-success'
-        : data.status === 0
+        : data.status === 3
         ? 'p-button-text p-button-danger'
         : 'p-button-text p-button-warning'
     "
@@ -150,11 +143,9 @@
       class="data-table"
       [value]="infoList"
       [paginator]="true"
-      [rows]="10"
+      [rows]="5"
       [columns]="columns"
-      [showCurrentPageReport]="true"
-      [rowsPerPageOptions]="[10, 20]"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries  ">
+      [showCurrentPageReport]="false">
       <ng-template pTemplate="header" let-columns>
         <tr>
           <th
@@ -162,8 +153,11 @@
             [pSortableColumn]="col.header"
             [style.min-width]="'12rem !important'">
             <span style="vertical-align: middle">{{ col.header }}</span>
-            <p-sortIcon [field]="col.header"></p-sortIcon>
+            <p-sortIcon
+              [field]="col.header"
+              *ngIf="col.header !== 'status'"></p-sortIcon>
             <p-columnFilter
+              *ngIf="col.header !== 'status'"
               style="vertical-align: middle"
               type="text"
               [field]="col.header"
@@ -218,7 +212,7 @@
 </div>
 
 <div class="dialog-footer flex justify-content-between">
-  <div>
+  <div class="ml-1">
     <p-button
       *ngIf="step !== 1"
       icon="pi pi-angle-left"
@@ -228,6 +222,7 @@
   </div>
   <div>
     <p-button
+      *ngIf="step !== 1"
       icon="pi pi-times"
       (onClick)="onCancel()"
       label="Cancel"
