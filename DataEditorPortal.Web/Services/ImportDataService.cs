@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using DataEditorPortal.Data.Contexts;
+﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
@@ -31,9 +30,7 @@ namespace DataEditorPortal.Web.Services
         private readonly DepDbContext _depDbContext;
         private readonly IHostEnvironment _hostEnvironment;
         private readonly IUniversalGridService _universalGridService;
-        private readonly IMapper _mapper;
         private readonly IMemoryCache _memoryCache;
-        private readonly IServiceProvider _serviceProvider;
         private readonly ILookupService _lookupService;
 
         public ImportDataService(
@@ -41,18 +38,14 @@ namespace DataEditorPortal.Web.Services
             DepDbContext depDbContext,
             IHostEnvironment hostEnvironment,
             IUniversalGridService universalGridService,
-            IMapper mapper,
             IMemoryCache memoryCache,
-            IServiceProvider serviceProvider,
             ILookupService lookupService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _hostEnvironment = hostEnvironment;
             _universalGridService = universalGridService;
-            _mapper = mapper;
             _memoryCache = memoryCache;
-            _serviceProvider = serviceProvider;
             _lookupService = lookupService;
         }
 
@@ -125,24 +118,42 @@ namespace DataEditorPortal.Web.Services
             {
                 foreach (var field in fields)
                 {
-                    if (IsOptionField(field))
+                    if (obj.ContainsKey(field.key))
                     {
-                        var options = GetFieldOptions(field);
-                        if (options != null)
+                        if (IsOptionField(field))
                         {
-                            if (obj.ContainsKey(field.key))
-                            {
-                                var value = obj[field.key];
-                                var transformed = options.FirstOrDefault(o => string.Compare(o.Label.ToString(), value.ToString(), true) == 0);
-                                if (transformed != null)
-                                    obj[field.key] = transformed.Value;
-                            }
+                            obj[field.key] = TransformOptionLabel(field, obj[field.key]);
+                        }
+                        if (field.filterType == "boolean")
+                        {
+                            obj[field.key] = TransformBoolean(obj[field.key].ToString());
                         }
                     }
                 }
             }
 
             return sourceObjs;
+        }
+
+        private object TransformOptionLabel(FormFieldConfig field, object value)
+        {
+            var options = GetFieldOptions(field);
+            if (options != null)
+            {
+                var transformed = options.FirstOrDefault(o => string.Compare(o.Label.ToString(), value.ToString(), true) == 0);
+                if (transformed != null)
+                    return transformed.Value;
+            }
+            return value;
+        }
+
+        private string TransformBoolean(object value)
+        {
+            return value.ToString()
+                    .Replace("Yes", "True", StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("No", "False", StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("Y", "False", StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("N", "False", StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -306,6 +317,8 @@ namespace DataEditorPortal.Web.Services
 
         private int SetBooleanColumn(FormFieldConfig field, ExcelWorksheet worksheet, int columnIndex)
         {
+            worksheet.Column(columnIndex).Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
             var reference = SetExcelDataOptions(worksheet.Workbook, "boolean options", new List<string>() { "Yes", "No" });
 
             var col = worksheet.Cells[1, columnIndex].Address[0];
@@ -546,9 +559,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 else
                 {
-                    var yesOrNo = value.ToString()
-                        .Replace("Yes", "True", StringComparison.InvariantCultureIgnoreCase)
-                        .Replace("No", "False", StringComparison.InvariantCultureIgnoreCase);
+                    var yesOrNo = TransformBoolean(value);
                     return bool.TryParse(yesOrNo, out _);
                 }
             }
