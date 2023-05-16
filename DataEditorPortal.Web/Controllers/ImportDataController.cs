@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoWrapper.Filters;
 using AutoWrapper.Wrappers;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Jobs;
@@ -104,18 +105,11 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{gridName}/upload-excel-template")]
         public GridData UploadExcelTemplate(string gridName, [FromBody] UploadedFileModel uploadedFile)
         {
-            var sourceObjs = _importDataServcie.GetSourceData(uploadedFile);
+            var sourceObjs = _importDataServcie.GetSourceData(gridName, uploadedFile);
 
             if (sourceObjs != null)
             {
-                // start to validate every records
-
-                foreach (var obj in sourceObjs)
-                {
-                    // obj.Add("status", ReviewImportStatus.ReadyToImport);
-                    obj.Add("status", ReviewImportStatus.ValidationError);
-                    obj.Add("errors", new List<ReviewImportError>() { new ReviewImportError() { Field = "FIRST_NAME", ErrorMsg = "FIRST_NAME is required." } });
-                }
+                _importDataServcie.ValidateImportedData(gridName, sourceObjs);
             }
 
             var result = new GridData()
@@ -154,5 +148,14 @@ namespace DataEditorPortal.Web.Controllers
             scheduler.ScheduleJob(job, trigger);
         }
 
+        [HttpGet]
+        [Route("{gridName}/download-template")]
+        [AutoWrapIgnore]
+        public IActionResult ExportData(string gridName)
+        {
+            var fs = _importDataServcie.GenerateImportTemplate(gridName, "");
+
+            return File(fs, "application/ms-excel", $"{gridName}_import_template.xlsx");
+        }
     }
 }

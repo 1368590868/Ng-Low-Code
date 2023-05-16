@@ -2,12 +2,12 @@
 {
     public class DropdownOptionsItem
     {
-        public dynamic Label { get; set; }
-        public dynamic Value { get; set; }
+        public object Label { get; set; }
+        public object Value { get; set; }
 
         //For cases where we need additional info 
-        public dynamic Value1 { get; set; }
+        public object Value1 { get; set; }
 
-        public dynamic Value2 { get; set; }
+        public object Value2 { get; set; }
     }
 }

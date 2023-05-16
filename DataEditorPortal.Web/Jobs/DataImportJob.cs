@@ -60,7 +60,7 @@ namespace DataEditorPortal.Web.Jobs
             var count = 0;
             try
             {
-                sourceObjs = _importDataServcie.GetSourceData(uploadedFile, true);
+                sourceObjs = _importDataServcie.GetSourceData(gridName, uploadedFile, true);
                 if (sourceObjs != null)
                 {
                     _universalGridService.CurrentUsername = createdByName;

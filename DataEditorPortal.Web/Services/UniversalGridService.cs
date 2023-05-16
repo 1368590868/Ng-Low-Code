@@ -53,6 +53,10 @@ namespace DataEditorPortal.Web.Services
         dynamic GetLinkedTableConfigForFieldControl(string tableName);
         IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id);
 
+        // utility
+        UniversalGridConfiguration GetUniversalGridConfiguration(string name);
+        GridFormLayout GetAddingFormConfig(UniversalGridConfiguration config);
+        GridFormLayout GetUpdatingFormConfig(UniversalGridConfiguration config);
     }
 
     public class UniversalGridService : IUniversalGridService
@@ -1453,9 +1457,9 @@ namespace DataEditorPortal.Web.Services
 
         #endregion
 
-        #region private methods
+        #region utility methods
 
-        private UniversalGridConfiguration GetUniversalGridConfiguration(string name)
+        public UniversalGridConfiguration GetUniversalGridConfiguration(string name)
         {
             var config = _memoryCache.GetOrCreate($"grid.{name}", entry =>
             {
@@ -1464,6 +1468,56 @@ namespace DataEditorPortal.Web.Services
             });
             if (config == null) throw new DepException("Grid configuration does not exists with name: " + name);
             return config;
+        }
+
+        public GridFormLayout GetAddingFormConfig(UniversalGridConfiguration config)
+        {
+            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+            if (detailConfig.AddingForm != null && detailConfig.AddingForm.UseCustomForm)
+            {
+                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
+            if (detailConfig.AddingForm == null || detailConfig.AddingForm.FormFields.Count == 0)
+            {
+                throw new DepException("No adding form configured for this portal item. Please go Portal Management to complete the configuration.");
+            }
+            if (detailConfig.AddingForm.UseCustomForm)
+            {
+                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
+
+            return detailConfig.AddingForm;
+        }
+
+        public GridFormLayout GetUpdatingFormConfig(UniversalGridConfiguration config)
+        {
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+
+            // get detail config
+            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
+
+            if (detailConfig.UpdatingForm != null && detailConfig.UpdatingForm.UseCustomForm)
+            {
+                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
+            }
+            if (detailConfig.UpdatingForm == null || (!detailConfig.UpdatingForm.UseAddingFormLayout && detailConfig.UpdatingForm.FormFields.Count == 0))
+            {
+                throw new DepException("No Updating form configured for this portal item. Please go Portal Management to complete the configuration.");
+            }
+            if (detailConfig.UpdatingForm.UseAddingFormLayout &&
+                (detailConfig.AddingForm == null || detailConfig.AddingForm.UseCustomForm || detailConfig.AddingForm.FormFields.Count == 0))
+            {
+                throw new DepException("Updating form is configured to use the same configuration of adding form, but no adding form configured. Please go Portal Management to complete the configuration.");
+            }
+
+            var updatingForm = detailConfig.UpdatingForm;
+            if (updatingForm.UseAddingFormLayout)
+            {
+                updatingForm = detailConfig.AddingForm;
+                updatingForm.QueryText = detailConfig.UpdatingForm.QueryText;
+            }
+
+            return updatingForm;
         }
 
         #endregion
