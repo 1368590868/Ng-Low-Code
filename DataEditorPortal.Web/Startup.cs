@@ -109,6 +109,7 @@ namespace DataEditorPortal.Web
             services.AddSingleton<ILicenseService, LicenseService>();
             services.AddScoped<IAttachmentService, AttachmentService>();
             services.AddScoped<IImportDataServcie, ImportDataService>();
+            services.AddScoped<ILookupService, LookupService>();
             #endregion
 
             services.AddMemoryCache();
