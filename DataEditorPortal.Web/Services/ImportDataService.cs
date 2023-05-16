@@ -22,6 +22,7 @@ namespace DataEditorPortal.Web.Services
         Stream GenerateImportTemplate(string name, string type);
         IList<IDictionary<string, object>> GetSourceData(string name, UploadedFileModel uploadedFile, bool removeFile = false);
         IList<IDictionary<string, object>> ValidateImportedData(string name, IList<IDictionary<string, object>> sourceObjs);
+        IList<IDictionary<string, object>> GetTransformedSourceData(string name, UploadedFileModel uploadedFile);
     }
 
     public class ImportDataService : IImportDataServcie
@@ -55,18 +56,20 @@ namespace DataEditorPortal.Web.Services
             _lookupService = lookupService;
         }
 
+        #region Get data from excel
+
         public IList<IDictionary<string, object>> GetSourceData(string name, UploadedFileModel uploadedFile, bool removeFile = false)
         {
             var config = _universalGridService.GetUniversalGridConfiguration(name);
             var formConfig = _universalGridService.GetAddingFormConfig(config);
-            var fields = formConfig.FormFields.Where(x => x.filterType != "linkDataField" && x.filterType != "attachments").ToList();
+            var fields = GetTemplateFields(formConfig);
 
             string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot/FileUploadTemp");
             var tempFilePath = Path.Combine(tempFolder, $"{uploadedFile.FileId} - {uploadedFile.FileName}");
-            if (!System.IO.File.Exists(tempFilePath)) throw new DepException("Uploaded File doesn't exist.");
+            if (!File.Exists(tempFilePath)) throw new DepException("Uploaded File doesn't exist.");
 
             IList<IDictionary<string, object>> sourceObjs = null;
-            using (var stream = System.IO.File.OpenRead(tempFilePath))
+            using (var stream = File.OpenRead(tempFilePath))
             {
                 using (var package = new ExcelPackage(stream))
                 {
@@ -76,23 +79,10 @@ namespace DataEditorPortal.Web.Services
 
                         var dt = worksheet.Cells[worksheet.Dimension.Address].ToDataTable(config =>
                         {
+                            config.PredefinedMappingsOnly = true;
                             fields.ForEach(x =>
                             {
-                                if (removeFile)
-                                {
-                                    if (x.filterType == "boolean")
-                                        config.Mappings.Add(
-                                            fields.IndexOf(x), x.key, typeof(string), true,
-                                            val => val == DBNull.Value || val == null ? null : val.ToString()
-                                            .Replace("Yes", "True", StringComparison.InvariantCultureIgnoreCase)
-                                            .Replace("No", "False", StringComparison.InvariantCultureIgnoreCase)
-                                        );
-                                    else
-                                        config.Mappings.Add(fields.IndexOf(x), x.key, typeof(string), true);
-                                }
-                                else
-                                    config.Mappings.Add(fields.IndexOf(x), x.key, typeof(string), true);
-
+                                config.Mappings.Add(fields.IndexOf(x), x.key, typeof(string), true);
                             });
                         });
                         sourceObjs = GetDataTableDictionaryList(dt).ToList();
@@ -123,79 +113,39 @@ namespace DataEditorPortal.Web.Services
                 ));
         }
 
-        public IList<IDictionary<string, object>> ValidateImportedData(string name, IList<IDictionary<string, object>> sourceObjs)
+        public IList<IDictionary<string, object>> GetTransformedSourceData(string name, UploadedFileModel uploadedFile)
         {
-            if (sourceObjs == null) throw new ArgumentNullException("sourceObjs");
-            if (sourceObjs.Count == 0) throw new DepException("No records in template for importing.");
+            var sourceObjs = GetSourceData(name, uploadedFile, true);
 
             var config = _universalGridService.GetUniversalGridConfiguration(name);
-            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
             var formConfig = _universalGridService.GetAddingFormConfig(config);
-            var fields = formConfig.FormFields.Where(x => x.filterType != "linkDataField" && x.filterType != "attachments").ToList();
+            var fields = GetTemplateFields(formConfig);
 
             foreach (var obj in sourceObjs)
             {
-                var errorMsg = new List<ReviewImportError>();
-                var hasMissingField = false;
-
                 foreach (var field in fields)
                 {
-                    if (obj.ContainsKey(field.key))
+                    if (IsOptionField(field))
                     {
-                        // start to validate.
-                        var value = obj[field.key];
-                        if (value == null || value == DBNull.Value)
+                        var options = GetFieldOptions(field);
+                        if (options != null)
                         {
-                            if (IsRequired(field))
+                            if (obj.ContainsKey(field.key))
                             {
-                                errorMsg.Add(new ReviewImportError() { Field = field.key, ErrorMsg = $"{field.key} is required." });
-                                hasMissingField = true;
-                            }
-                        }
-                        else
-                        {
-                            if (!ValidateValueFormat(field, value))
-                            {
-                                // validate format
-                                errorMsg.Add(new ReviewImportError() { Field = field.key, ErrorMsg = $"Invalid value format." });
-                            }
-                            else
-                            {
-                                // validate value
-                                ValidateValue(field, value).ForEach(error => errorMsg.Add(new ReviewImportError() { Field = field.key, ErrorMsg = error }));
-
-
-                                // todo: value is in datasource, options and options lookup
-
-                                if (!errorMsg.Any())
-                                {
-                                    // todo: validate form value according to config OnValidate.
-                                }
+                                var value = obj[field.key];
+                                var transformed = options.FirstOrDefault(o => string.Compare(o.Label.ToString(), value.ToString(), true) == 0);
+                                if (transformed != null)
+                                    obj[field.key] = transformed.Value;
                             }
                         }
                     }
                 }
-
-                var status = errorMsg.Any() ? ReviewImportStatus.ValidationError : ReviewImportStatus.ReadyToImport;
-                if (hasMissingField) status = ReviewImportStatus.MissingFields;
-
-                obj.Add("__status__", status);
-                obj.Add("__errors__", errorMsg);
-            }
-
-            // todo: validate unique
-            var idColumn = dataSourceConfig.IdColumn;
-            if (sourceObjs[0].ContainsKey(idColumn))
-            {
-                var duplicates = sourceObjs.Where(x => (ReviewImportStatus)x["__status__"] == ReviewImportStatus.ReadyToImport)
-                    .Where(x => sourceObjs.Count(y => y[idColumn] == x[idColumn]) > 1);
-
-                foreach (var item in duplicates)
-                    item["__status__"] = ReviewImportStatus.Duplicate;
             }
 
             return sourceObjs;
         }
+
+        #endregion
 
         #region Download Excel Template
 
@@ -204,17 +154,13 @@ namespace DataEditorPortal.Web.Services
             var config = _universalGridService.GetUniversalGridConfiguration(name);
             var formConfig = _universalGridService.GetAddingFormConfig(config);
 
-            var fields = formConfig.FormFields.Where(x => x.filterType != "linkDataField" && x.filterType != "attachments").ToList();
+            var fields = GetTemplateFields(formConfig);
+            fields.ForEach(f => RemoveMemoryCache(f.key));
 
             var stream = new MemoryStream();
             using (var p = new ExcelPackage(stream))
             {
                 var ws = p.Workbook.Worksheets.Add(config.Name);
-
-                //var ws1 = p.Workbook.Worksheets.Add("options");
-                //ws1.Hidden = eWorkSheetHidden.VeryHidden;
-                //ws1.Cells["A1"].Value = "Yes";
-                //ws1.Cells["A2"].Value = "No";
 
                 var headerRange = ws.Cells[1, 1, 1, fields.Count];
                 headerRange.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -244,9 +190,21 @@ namespace DataEditorPortal.Web.Services
 
         private int SetFieldColumns(FormFieldConfig field, ExcelWorksheet worksheet, int columnIndex)
         {
-            worksheet.Cells[1, columnIndex].Value = field.key;
             worksheet.Column(columnIndex).Width = 30;
             worksheet.Column(columnIndex).AutoFit(30);
+
+            using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+            {
+                var props = doc.RootElement.EnumerateObject();
+
+                var labelProp = props.FirstOrDefault(x => x.Name == "label").Value;
+                if (labelProp.ValueKind == JsonValueKind.String)
+                    worksheet.Cells[1, columnIndex].Value = labelProp.GetString();
+
+                var desProp = props.FirstOrDefault(x => x.Name == "description").Value;
+                if (desProp.ValueKind == JsonValueKind.String)
+                    worksheet.Cells[1, columnIndex].AddComment(desProp.GetString());
+            }
 
             switch (field.filterType)
             {
@@ -363,45 +321,22 @@ namespace DataEditorPortal.Web.Services
 
         private int SetStringColumn(FormFieldConfig field, ExcelWorksheet worksheet, int columnIndex)
         {
-            string reference = null;
-            if (field.props != null)
+            if (IsOptionField(field))
             {
-                using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+                var options = GetFieldOptions(field);
+                if (options != null)
                 {
-                    var props = doc.RootElement.EnumerateObject();
-
-                    var optionsLookupProp = props.FirstOrDefault(x => x.Name == "optionsLookup").Value;
-                    try
+                    var reference = SetExcelDataOptions(worksheet.Workbook, field.key, options.Select(x => x.Value.ToString()).ToList());
+                    if (reference != null)
                     {
-                        if (optionsLookupProp.ValueKind == JsonValueKind.Array)
-                        {
-                            var datas = optionsLookupProp.EnumerateArray().Select(x => x.EnumerateObject().FirstOrDefault(p => p.Name == "label").Value.GetString());
-                            // options is static, generate it in excel
-                            reference = SetExcelDataOptions(worksheet.Workbook, field.key, datas.ToList());
-                        }
-                        else if (optionsLookupProp.ValueKind == JsonValueKind.Object)
-                        {
-                            // options is dynamic, get it from sql database, generate it in excel
-                            var lookupId = optionsLookupProp.EnumerateObject().FirstOrDefault(p => p.Name == "id").Value.GetGuid();
-                            var list = _lookupService.GetLookups(lookupId);
-                            reference = SetExcelDataOptions(worksheet.Workbook, lookupId.ToString(), list.Select(x => x.Value.ToString()).ToList());
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, $"SetStringColumn: {field.key} | {field.props}");
+                        var col = worksheet.Cells[1, columnIndex].Address[0];
+                        var validation = worksheet.DataValidations.AddListValidation($"{col}2:{col}{worksheet.Rows.EndRow}");
+                        validation.AllowBlank = !IsRequired(field);
+                        validation.ShowErrorMessage = true;
+                        validation.ErrorStyle = OfficeOpenXml.DataValidation.ExcelDataValidationWarningStyle.stop;
+                        validation.Formula.ExcelFormula = reference;
                     }
                 }
-            }
-
-            if (reference != null)
-            {
-                var col = worksheet.Cells[1, columnIndex].Address[0];
-                var validation = worksheet.DataValidations.AddListValidation($"{col}2:{col}{worksheet.Rows.EndRow}");
-                validation.AllowBlank = !IsRequired(field);
-                validation.ShowErrorMessage = true;
-                validation.ErrorStyle = OfficeOpenXml.DataValidation.ExcelDataValidationWarningStyle.stop;
-                validation.Formula.ExcelFormula = reference;
             }
 
             return columnIndex + 1;
@@ -440,35 +375,101 @@ namespace DataEditorPortal.Web.Services
 
         #endregion
 
-        private bool IsRequired(FormFieldConfig field)
+        #region Validate Excel data
+
+        public IList<IDictionary<string, object>> ValidateImportedData(string name, IList<IDictionary<string, object>> sourceObjs)
         {
-            if (field.props != null)
+            if (sourceObjs == null) throw new ArgumentNullException("sourceObjs");
+            if (sourceObjs.Count == 0) throw new DepException("No records in template for importing.");
+
+            var config = _universalGridService.GetUniversalGridConfiguration(name);
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            var formConfig = _universalGridService.GetAddingFormConfig(config);
+            var fields = GetTemplateFields(formConfig);
+
+            foreach (var obj in sourceObjs)
             {
-                using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+                var errorMsg = new List<ReviewImportError>();
+                var hasMissingField = false;
+
+                foreach (var field in fields)
                 {
-                    var requiredProp = doc.RootElement.EnumerateObject().FirstOrDefault(x => x.Name == "required").Value;
-                    if (requiredProp.ValueKind == JsonValueKind.True || requiredProp.ValueKind == JsonValueKind.False)
-                        return requiredProp.GetBoolean();
+                    if (obj.ContainsKey(field.key))
+                    {
+                        // start to validate.
+                        var value = obj[field.key];
+                        if (value == null || value == DBNull.Value)
+                        {
+                            if (IsRequired(field))
+                            {
+                                errorMsg.Add(new ReviewImportError() { Field = field.key, ErrorMsg = $"{field.key} is required." });
+                                hasMissingField = true;
+                            }
+                        }
+                        else
+                        {
+                            if (!ValidateValueFormat(field, value))
+                            {
+                                // validate format
+                                errorMsg.Add(new ReviewImportError() { Field = field.key, ErrorMsg = $"Invalid value format." });
+                            }
+                            else
+                            {
+                                // validate value
+                                ValidateValue(field, value).ForEach(error => errorMsg.Add(new ReviewImportError() { Field = field.key, ErrorMsg = error }));
+
+                                // value is in datasource, options and options lookup
+                                if (IsOptionField(field))
+                                    ValidateOptionsValue(field, value).ForEach(error => errorMsg.Add(new ReviewImportError() { Field = field.key, ErrorMsg = error }));
+
+                                if (!errorMsg.Any())
+                                {
+                                    // todo: validate form value according to config OnValidate.
+                                }
+                            }
+                        }
+                    }
                 }
+
+                var status = errorMsg.Any() ? ReviewImportStatus.ValidationError : ReviewImportStatus.ReadyToImport;
+                if (hasMissingField) status = ReviewImportStatus.MissingFields;
+
+                obj.Add("__status__", status);
+                obj.Add("__errors__", errorMsg);
             }
-            return false;
+
+            // todo: validate unique
+            var idColumn = dataSourceConfig.IdColumn;
+            if (sourceObjs[0].ContainsKey(idColumn))
+            {
+                var duplicates = sourceObjs.Where(x => (ReviewImportStatus)x["__status__"] == ReviewImportStatus.ReadyToImport)
+                    .Where(x => sourceObjs.Count(y => y[idColumn] == x[idColumn]) > 1);
+
+                foreach (var item in duplicates)
+                    item["__status__"] = ReviewImportStatus.Duplicate;
+            }
+
+            return sourceObjs;
         }
 
         private List<string> ValidateValue(FormFieldConfig field, object value)
         {
             List<string> errorMsg = new List<string>();
-            var validators = new List<string>();
 
             if (field.validatorConfig != null)
             {
-                using (JsonDocument doc = JsonDocument.Parse(field.validatorConfig.ToString()))
+                var validators = _memoryCache.GetOrCreate($"import_data_validation_{field.key}", entry =>
                 {
-                    validators = doc.RootElement.EnumerateArray()
-                        .Where(x => x.ValueKind == JsonValueKind.String)
-                        .Select(x => x.GetString())
-                        .ToList();
-                }
+                    entry.SetSlidingExpiration(TimeSpan.FromMinutes(60));
 
+                    using (JsonDocument doc = JsonDocument.Parse(field.validatorConfig.ToString()))
+                    {
+                        return doc.RootElement.EnumerateArray()
+                            .Where(x => x.ValueKind == JsonValueKind.String)
+                            .Select(x => x.GetString())
+                            .ToList();
+                    }
+                });
 
                 DateTime dtVal;
                 foreach (var validator in validators)
@@ -555,5 +556,104 @@ namespace DataEditorPortal.Web.Services
                 return true;
         }
 
+        private List<string> ValidateOptionsValue(FormFieldConfig field, object value)
+        {
+            List<string> errorMsg = new List<string>();
+            if (IsOptionField(field))
+            {
+                var options = GetFieldOptions(field);
+                if (options != null)
+                {
+                    if (!options.Any(o => string.Compare(o.Label.ToString(), value.ToString(), true) == 0))
+                        errorMsg.Add("The value is not a valid option");
+                }
+            }
+            return errorMsg;
+        }
+
+        #endregion
+
+        #region Common private methods
+
+        private void RemoveMemoryCache(string fieldKey)
+        {
+            _memoryCache.Remove($"import_data_required_{fieldKey}");
+            _memoryCache.Remove($"import_data_validation_{fieldKey}");
+            _memoryCache.Remove($"import_data_options_{fieldKey}");
+        }
+
+        private List<FormFieldConfig> GetTemplateFields(GridFormLayout formConfig)
+        {
+            return formConfig.FormFields.Where(x => x.filterType != "linkDataField" && x.filterType != "attachments").ToList();
+        }
+
+        private bool IsRequired(FormFieldConfig field)
+        {
+            return _memoryCache.GetOrCreate($"import_data_required_{field.key}", entry =>
+            {
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(60));
+
+                if (field.props != null)
+                {
+                    using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+                    {
+                        var requiredProp = doc.RootElement.EnumerateObject().FirstOrDefault(x => x.Name == "required").Value;
+                        if (requiredProp.ValueKind == JsonValueKind.True || requiredProp.ValueKind == JsonValueKind.False)
+                            return requiredProp.GetBoolean();
+                    }
+                }
+                return false;
+            });
+        }
+
+        private bool IsOptionField(FormFieldConfig field)
+        {
+            return field.filterType == "text"
+                && (field.type == "select" || field.type == "multiSelect" || field.type == "checkboxList" || field.type == "radio")
+                && field.props != null;
+        }
+
+        private List<DropdownOptionsItem> GetFieldOptions(FormFieldConfig field)
+        {
+            return _memoryCache.GetOrCreate($"import_data_options_{field.key}", entry =>
+            {
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(60));
+
+                List<DropdownOptionsItem> options = null;
+                if (field.filterType == "text" && field.props != null)
+                {
+                    using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+                    {
+                        var props = doc.RootElement.EnumerateObject();
+
+                        var optionsLookupProp = props.FirstOrDefault(x => x.Name == "optionsLookup").Value;
+                        try
+                        {
+                            if (optionsLookupProp.ValueKind == JsonValueKind.Array)
+                            {
+                                options = optionsLookupProp.EnumerateArray().Select(x => new DropdownOptionsItem()
+                                {
+                                    Label = x.EnumerateObject().FirstOrDefault(p => p.Name == "label").Value.GetString(),
+                                    Value = x.EnumerateObject().FirstOrDefault(p => p.Name == "value").Value.GetString()
+                                }).ToList();
+                            }
+                            else if (optionsLookupProp.ValueKind == JsonValueKind.Object)
+                            {
+                                var lookupId = optionsLookupProp.EnumerateObject().FirstOrDefault(p => p.Name == "id").Value.GetGuid();
+                                options = _lookupService.GetLookups(lookupId);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"GetFieldOptions: {field.key} | {field.props}");
+                        }
+                    }
+                }
+
+                return options;
+            });
+        }
+
+        #endregion
     }
 }
