@@ -114,6 +114,11 @@ export class EditRecordActionComponent
           this.configFieldExpressions(fields);
           this.configFieldProps(fields);
           this.fields = fields;
+          this.fields.forEach(x => {
+            if (x.type === 'locationEditor' && x.props) {
+              x.props['hideLabel'] = true;
+            }
+          });
           this.onLoadUrlParams();
 
           if (fields.length > 0) this.loadedEvent.emit();
