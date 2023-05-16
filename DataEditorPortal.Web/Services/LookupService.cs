@@ -20,10 +20,10 @@ namespace DataEditorPortal.Web.Services
         LookupItem GetLookup(Guid id);
         Guid Create(LookupItem model);
         Guid Update(Guid id, LookupItem model);
-        public List<DropdownOptionsItem> GetLookup(Guid id, Dictionary<string, object> model = null);
+        public List<DropdownOptionsItem> GetLookups(Guid id, Dictionary<string, object> model = null);
     }
 
-    public class LookupService
+    public class LookupService : ILookupService
     {
         private readonly ILogger<LookupService> _logger;
         private readonly DepDbContext _depDbContext;
@@ -121,7 +121,7 @@ namespace DataEditorPortal.Web.Services
             #endregion
         }
 
-        public List<DropdownOptionsItem> GetLookup(Guid id, Dictionary<string, object> model = null)
+        public List<DropdownOptionsItem> GetLookups(Guid id, Dictionary<string, object> model = null)
         {
             if (model == null) model = new Dictionary<string, object>();
 

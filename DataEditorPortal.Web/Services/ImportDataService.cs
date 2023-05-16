@@ -383,7 +383,7 @@ namespace DataEditorPortal.Web.Services
                         {
                             // options is dynamic, get it from sql database, generate it in excel
                             var lookupId = optionsLookupProp.EnumerateObject().FirstOrDefault(p => p.Name == "id").Value.GetGuid();
-                            var list = _lookupService.GetLookup(lookupId);
+                            var list = _lookupService.GetLookups(lookupId);
                             reference = SetExcelDataOptions(worksheet.Workbook, lookupId.ToString(), list.Select(x => x.Value.ToString()).ToList());
                         }
                     }

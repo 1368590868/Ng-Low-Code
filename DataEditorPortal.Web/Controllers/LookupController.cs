@@ -64,7 +64,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{id}/options")]
         public List<DropdownOptionsItem> GetLookup(Guid id, [FromBody] Dictionary<string, object> model)
         {
-            return _lookupService.GetLookup(id, model);
+            return _lookupService.GetLookups(id, model);
         }
     }
 }
