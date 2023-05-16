@@ -73,13 +73,28 @@ namespace DataEditorPortal.Web.Controllers
             if (entity == null) throw new ApiException("Not Found", 404);
 
             var item = _mapper.Map<ImportHistoryModel>(entity);
-
-            var scheduler = await _schedulerFactory.GetScheduler().ConfigureAwait(true);
-            var jobs = await scheduler.GetCurrentlyExecutingJobs().ConfigureAwait(true);
-            if (jobs != null)
+            if (entity.Status == Data.Common.DataImportResult.InProgress)
             {
+                var scheduler = await _schedulerFactory.GetScheduler().ConfigureAwait(true);
+                var jobs = await scheduler.GetCurrentlyExecutingJobs().ConfigureAwait(true);
                 var job = jobs.FirstOrDefault(x => x.JobDetail.Key.Name == item.Id.ToString());
-                if (job != null) item.Progress = job.JobDetail.JobDataMap.GetDouble("progress");
+
+                if (job == null)
+                {
+                    entity.Status = Data.Common.DataImportResult.Failed;
+                    entity.Result = "Import failed. Background job has been canceled.";
+                    _depDbContext.SaveChanges();
+
+                    item = _mapper.Map<ImportHistoryModel>(entity);
+                }
+                else
+                {
+                    item.Progress = job.JobDetail.JobDataMap.GetDouble("progress");
+                }
+            }
+            else
+            {
+                item.Progress = 100;
             }
 
             return new ApiResponse(item);
