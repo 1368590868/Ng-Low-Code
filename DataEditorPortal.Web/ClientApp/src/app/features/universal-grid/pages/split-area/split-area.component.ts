@@ -14,7 +14,6 @@ import {
 } from '@angular/animations';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { GridTableService } from '../../services/grid-table.service';
 import { ConfigDataService } from 'src/app/shared';
 
 @Component({
@@ -48,7 +47,6 @@ import { ConfigDataService } from 'src/app/shared';
 })
 export class SplitAreaComponent implements OnInit, OnDestroy {
   @ViewChild('splitter') splitterRef: any;
-
   panelSizesPrev = [20, 80];
   stateKey = 'universal-grid-splitter';
   stateStorage = 'session';
@@ -59,7 +57,6 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private gridTableService: GridTableService,
     private changeDetectorRef: ChangeDetectorRef,
     public configDataService: ConfigDataService
   ) {}

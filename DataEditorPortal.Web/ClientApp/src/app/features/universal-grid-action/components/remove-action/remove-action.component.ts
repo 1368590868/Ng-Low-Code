@@ -8,6 +8,7 @@ import {
   AsyncQueryTextActionHandler
 } from '../../services/event-action-handler.service';
 import { UniversalGridService } from '../../services/universal-grid.service';
+import * as qs from 'qs';
 
 @Component({
   selector: 'app-remove-action',
@@ -35,6 +36,21 @@ export class RemoveActionComponent
   ngOnInit(): void {
     this.getEventConfig();
     this.loadedEvent.emit();
+  }
+
+  onUrlParamsChange() {
+    const urlParams = qs.parse(window.location.search, {
+      ignoreQueryPrefix: true
+    });
+
+    if (Object.keys(urlParams).length > 0) {
+      const action = Object.keys(urlParams);
+      action.forEach(key => {
+        if (key === 'delete') {
+          this.deleteGridData();
+        }
+      });
+    }
   }
   getEventConfig() {
     this.gridService

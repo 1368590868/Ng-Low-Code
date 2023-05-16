@@ -18,7 +18,6 @@ import { SearchComponent } from './components/search/search.component';
 import { TableComponent } from './components/table/table.component';
 import { LinkedTableComponent } from './components/linked-table/linked-table.component';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
-import { DataFormatService } from './services/data-format.service';
 import { GridTableService } from './services/grid-table.service';
 import { SharedModule } from 'src/app/shared';
 
@@ -86,7 +85,6 @@ import { ConfirmationService } from 'primeng/api';
   ],
   providers: [
     GridTableService,
-    DataFormatService,
     DatePipe,
     DecimalPipe,
     CurrencyPipe,

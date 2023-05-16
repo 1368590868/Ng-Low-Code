@@ -8,8 +8,10 @@ export class GridActionDirective {
   @Input() selectedRecords: any = [];
   @Input() recordKey!: string;
   @Input() gridName!: string;
+  @Input() initParams: any;
 
   @Output() loadedEvent = new EventEmitter<void>();
   @Output() savedEvent = new EventEmitter<void>();
+  @Output() cancelEvent = new EventEmitter<void>();
   @Output() errorEvent = new EventEmitter<void>();
 }

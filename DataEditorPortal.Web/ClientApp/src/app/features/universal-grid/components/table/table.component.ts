@@ -17,15 +17,15 @@ import { GridColumn, GridConfig, GridData } from '../../models/grid-types';
 import { Table } from 'primeng/table';
 import { ConfirmationService, TableState } from 'primeng/api';
 import { GridParam, SearchParam, UserService } from 'src/app/shared';
-import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
-import { DataFormatService } from '../../services/data-format.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DomHandler } from 'primeng/dom';
+import { UrlParamsService } from '../../services/url-params.service';
 
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
-  styleUrls: ['./table.component.scss']
+  styleUrls: ['./table.component.scss'],
+  providers: [UrlParamsService]
 })
 export class TableComponent implements OnInit, OnDestroy {
   @Input() headerSize: 'compact' | 'normal' = 'normal';
@@ -88,17 +88,13 @@ export class TableComponent implements OnInit, OnDestroy {
 
   firstLoadDone = false;
 
-  formatters?: any;
-
   constructor(
     private gridTableService: GridTableService,
-    private dataFormatService: DataFormatService,
     private userService: UserService,
     private domSanitizer: DomSanitizer,
-    private confirmationService: ConfirmationService
-  ) {
-    this.formatters = this.dataFormatService.getFormatters();
-  }
+    private confirmationService: ConfirmationService,
+    private urlParamsService: UrlParamsService
+  ) {}
 
   ngOnInit() {
     // this.reset();
@@ -138,7 +134,7 @@ export class TableComponent implements OnInit, OnDestroy {
             });
         }
       });
-
+      this.initUrlParams();
       this.loading = false;
     });
 
@@ -151,6 +147,24 @@ export class TableComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe();
+  }
+
+  initUrlParams() {
+    this.urlParamsService.getInitParams(
+      this.gridName,
+      this.tableConfig.dataKey
+    );
+    if (this.urlParamsService.initParams) {
+      this.filters = this.urlParamsService.getIdFilter(
+        this.tableConfig.dataKey
+      );
+
+      this.selection = this.urlParamsService.getTableSelection(
+        this.tableConfig.dataKey
+      );
+
+      this.onFilter({ filters: this.filters });
+    }
   }
 
   ngOnDestroy() {
@@ -187,25 +201,25 @@ export class TableComponent implements OnInit, OnDestroy {
 
   setRowActions() {
     const actions: GridActionOption[] = [];
-    if (this.allowEdit) {
-      const viewWrapper: GridActionWrapperOption = {
-        label: '',
-        icon: 'pi pi-info-circle',
-        class: 'flex',
-        buttonStyleClass: 'p-button-text'
-      };
-      if (this.tableConfig.customViewFormName) {
-        actions.push({
-          name: this.tableConfig.customViewFormName,
-          wrapper: viewWrapper
-        });
-      } else {
-        actions.push({
-          name: 'view-record',
-          wrapper: viewWrapper
-        });
-      }
+    const viewWrapper: GridActionWrapperOption = {
+      label: '',
+      icon: 'pi pi-info-circle',
+      class: 'flex',
+      buttonStyleClass: 'p-button-text'
+    };
+    if (this.tableConfig.customViewFormName) {
+      actions.push({
+        name: this.tableConfig.customViewFormName,
+        wrapper: viewWrapper
+      });
+    } else {
+      actions.push({
+        name: 'view-record',
+        wrapper: viewWrapper
+      });
+    }
 
+    if (this.allowEdit) {
       const editWrapper: GridActionWrapperOption = {
         label: '',
         icon: 'pi pi-file-edit',
@@ -229,7 +243,6 @@ export class TableComponent implements OnInit, OnDestroy {
 
   setTableActions() {
     const actions: GridActionOption[] = [];
-
     if (this.allowAdd) {
       if (this.tableConfig.customAddFormName) {
         actions.push({ name: this.tableConfig.customAddFormName });
@@ -283,6 +296,10 @@ export class TableComponent implements OnInit, OnDestroy {
         tap(res => {
           this.records = res.data;
           this.totalRecords = res.total;
+
+          if (this.urlParamsService.initParams && !this.firstLoadDone) {
+            this.selection = JSON.parse(JSON.stringify(this.selection));
+          }
           this.firstLoadDone = true;
         }),
         tap(() => this.highlightLinkedData(this.table2Id)),
@@ -405,11 +422,6 @@ export class TableComponent implements OnInit, OnDestroy {
     this.table.getStorage().setItem(this.stateKey, JSON.stringify(state));
   }
 
-  calcCustomTemplate(data: any, template: string) {
-    const expression = evalStringExpression(template, ['$rowData', 'Pipes']);
-    return evalExpression(expression, data, [data, this.formatters]);
-  }
-
   // linked features
   table2Id?: any;
   clearHighlighted() {
@@ -478,7 +490,7 @@ export class TableComponent implements OnInit, OnDestroy {
     const visibleColumns: GridColumn[] = [];
     this.columnsConfig.forEach(x => {
       if (this.columnsHiddenState.findIndex(name => x.field === name) < 0) {
-        if (!x.width) x.width = 250; // set default width
+        if (!x.width) x.width = 200; // set default width
         visibleColumns.push(x);
       }
     });
@@ -515,7 +527,7 @@ export class TableComponent implements OnInit, OnDestroy {
     const visibleCols: GridColumn[] = [];
     this.columnsConfig.forEach(x => {
       if (this.columnsHiddenState.findIndex(name => x.field === name) < 0) {
-        if (!x.width) x.width = 250; // set default width
+        if (!x.width) x.width = 200; // set default width
         visibleCols.push(x);
       }
     });

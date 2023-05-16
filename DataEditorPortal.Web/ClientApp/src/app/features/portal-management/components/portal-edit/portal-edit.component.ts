@@ -127,7 +127,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
           routerLink: 'search'
         },
         {
-          label: 'Add / Edit / View',
+          label: 'Add / Edit / Delete',
           routerLink: 'form'
         }
       ];
@@ -161,7 +161,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
           routerLink: 'columns'
         },
         {
-          label: 'Add / Edit / View',
+          label: 'Add / Edit / Delete',
           routerLink: 'form'
         }
       ];

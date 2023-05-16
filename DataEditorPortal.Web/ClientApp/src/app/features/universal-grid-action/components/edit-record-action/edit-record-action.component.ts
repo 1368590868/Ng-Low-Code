@@ -27,6 +27,8 @@ import {
   EventActionHandlerService
 } from '../../services/event-action-handler.service';
 import { UniversalGridService } from '../../services/universal-grid.service';
+import * as qs from 'qs';
+import { GridTableService } from 'src/app/features/universal-grid/services/grid-table.service';
 
 @Component({
   selector: 'app-edit-record-action',
@@ -59,6 +61,7 @@ export class EditRecordActionComponent
     private systemLogService: SystemLogService,
     private datePipe: DatePipe,
     private injector: Injector,
+    private gridTableService: GridTableService,
     @Inject('EVENT_ACTION_CONFIG')
     private EVENT_ACTION_CONFIG: {
       name: string;
@@ -81,6 +84,7 @@ export class EditRecordActionComponent
               }
             });
             this.model = result;
+            this.onLoadUrlParams();
           }),
           tap(() => this.getFormConfig()),
           tap(() => this.getEventConfig())
@@ -89,6 +93,12 @@ export class EditRecordActionComponent
     } else {
       this.getFormConfig();
       this.getEventConfig();
+    }
+  }
+
+  onLoadUrlParams() {
+    if (this.initParams && this.initParams?.payload) {
+      this.model = { ...this.model, ...this.initParams.payload };
     }
   }
 
@@ -104,6 +114,8 @@ export class EditRecordActionComponent
           this.configFieldExpressions(fields);
           this.configFieldProps(fields);
           this.fields = fields;
+          this.onLoadUrlParams();
+
           if (fields.length > 0) this.loadedEvent.emit();
         })
       )

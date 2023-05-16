@@ -45,7 +45,7 @@
         <ng-template #normal>{{ viewData.value }}</ng-template>
         <span
           *ngIf="viewData.template"
-          [innerHTML]="calcCustomTemplate(viewData, viewData.template)">
+          [innerHTML]="selectedRecords[0] | template : viewData.template">
         </span>
       </td>
     </tr>

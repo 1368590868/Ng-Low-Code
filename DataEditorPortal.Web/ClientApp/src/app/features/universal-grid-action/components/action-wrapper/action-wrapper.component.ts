@@ -5,8 +5,11 @@ import {
   ViewContainerRef,
   ComponentRef,
   Output,
-  EventEmitter
+  EventEmitter,
+  OnInit,
+  HostBinding
 } from '@angular/core';
+import { UrlParamsService } from 'src/app/features/universal-grid/services/url-params.service';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { GridActionConfig } from '../../models/grid-config';
 
@@ -15,7 +18,7 @@ import { GridActionConfig } from '../../models/grid-config';
   templateUrl: './action-wrapper.component.html',
   styleUrls: ['./action-wrapper.component.scss']
 })
-export class ActionWrapperComponent {
+export class ActionWrapperComponent implements OnInit {
   @Input() class = 'mr-2';
   @Input() label = 'Add New';
   @Input() icon = 'pi pi-plus';
@@ -24,6 +27,12 @@ export class ActionWrapperComponent {
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
   @Input() dialogStyle = { width: '31.25rem' };
+  @Input() set visible(val: boolean) {
+    if (val) this.display = 'block';
+    else this.display = 'none';
+  }
+  @HostBinding('style.display') display = 'block';
+  @Input() hideFooter = false;
 
   @Input() actionConfig!: GridActionConfig;
 
@@ -33,23 +42,41 @@ export class ActionWrapperComponent {
   viewContainerRef!: ViewContainerRef;
 
   componentRef!: ComponentRef<GridActionDirective>;
-  visible = false;
+  dialogVisible = false;
   isLoading = false;
   buttonDisabled = true;
 
+  initParams?: any;
+
+  constructor(private urlParamsService: UrlParamsService) {}
+
+  ngOnInit(): void {
+    this.initParams = this.urlParamsService.initParams;
+    if (
+      this.initParams &&
+      this.initParams.name === this.actionConfig?.props?.['gridName']
+    ) {
+      if (this.initParams.action === this.actionConfig?.name) {
+        this.showDialog();
+        this.urlParamsService.clearInitParams();
+      }
+    }
+  }
+
   showDialog() {
     this.isLoading = false;
-    this.visible = true;
+    this.dialogVisible = true;
     this.renderAction();
   }
 
   onHide() {
     if (this.hasEventHandler('onCancel'))
       (this.componentRef.instance as any).onCancel();
+    this.viewContainerRef.clear();
   }
 
   onCancel() {
-    this.visible = false;
+    this.dialogVisible = false;
   }
 
   onOk() {
@@ -57,7 +84,7 @@ export class ActionWrapperComponent {
     if (this.hasEventHandler('onSave'))
       (this.componentRef.instance as any).onSave();
     else {
-      this.visible = false;
+      this.dialogVisible = false;
     }
   }
 
@@ -83,14 +110,16 @@ export class ActionWrapperComponent {
       }
     }
 
-    // actionRef.instance.selectedRecords = this.selectedRecords;
-    // actionRef.instance.recordKey = this.recordKey;
-    // actionRef.instance.fetchDataParam = this.fetchDataParam;
+    // assign initParams
+    Object.assign(actionRef.instance, { initParams: this.initParams });
 
     // bind action events
     actionRef.instance.savedEvent.asObservable().subscribe(() => {
-      this.visible = false;
+      this.dialogVisible = false;
       this.savedEvent.emit();
+    });
+    actionRef.instance.cancelEvent.asObservable().subscribe(() => {
+      this.dialogVisible = false;
     });
     actionRef.instance.errorEvent.asObservable().subscribe(() => {
       this.isLoading = false;

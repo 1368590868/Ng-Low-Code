@@ -29,6 +29,8 @@ import { AccordionModule } from 'primeng/accordion';
 import { DividerModule } from 'primeng/divider';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TreeModule } from 'primeng/tree';
+import { FileUploadModule } from 'primeng/fileupload';
+import { TagModule } from 'primeng/tag';
 
 import { GridActionDirective } from './directives/grid-action.directive';
 import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
@@ -41,12 +43,16 @@ import { UserManagerActionComponent } from './components/user-manager-action/use
 import { ManageRoleActionComponent } from './components/manage-role-action/manage-role.component-action';
 import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
 import { UserPermissionActionComponent } from './components/user-permission-action/user-permission-action.component';
+import { ImportStatusComponent } from './components/import-excel-action/import-status.component';
 import { SharedModule } from 'src/app/shared';
 import {
   OnValidateDemoActionHandler,
   OnAfterSavedDemoActionHandler,
   AsyncQueryTextActionHandler
 } from './services/event-action-handler.service';
+import { ImportExcelActionComponent } from './components/import-excel-action/import-excel-action.component';
+
+import { HasErrorPipe } from './components/import-excel-action/import-excel-action.component';
 
 const GRID_ACTION_CONFIG = [
   {
@@ -93,6 +99,20 @@ const GRID_ACTION_CONFIG = [
       header: 'Export to Excel',
       cancelText: 'Cancel',
       okText: 'Export'
+    }
+  },
+  {
+    name: 'import-excel',
+    component: ImportExcelActionComponent,
+    wrapper: {
+      label: 'Impot To Excel',
+      icon: 'pi pi-file-excel',
+      buttonStyleClass: 'p-button-outlined',
+      header: 'Import to Excel',
+      cancelText: 'Cancel',
+      okText: 'Import',
+      dialogStyle: { width: '60rem' },
+      hideFooter: true
     }
   },
   {
@@ -209,7 +229,10 @@ const EVENT_ACTION_CONFIG = [
     UserManagerActionComponent,
     ManageRoleActionComponent,
     UserRoleActionComponent,
-    UserPermissionActionComponent
+    UserPermissionActionComponent,
+    ImportExcelActionComponent,
+    HasErrorPipe,
+    ImportStatusComponent
   ],
   imports: [
     CommonModule,
@@ -239,7 +262,9 @@ const EVENT_ACTION_CONFIG = [
     AccordionModule,
     CheckboxModule,
     DividerModule,
-    TreeModule
+    TreeModule,
+    FileUploadModule,
+    TagModule
   ],
   exports: [UniversalGridActionDirective],
   providers: [

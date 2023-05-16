@@ -242,7 +242,7 @@ export class FormDesignerDirective {
               key: 'min',
               type: 'inputNumber',
               props: {
-                label: 'mMninum Boundary Value',
+                label: 'Mninum Boundary Value',
                 placeholder: 'Set mininum boundary value'
               }
             }

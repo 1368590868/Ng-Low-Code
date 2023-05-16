@@ -219,7 +219,7 @@ export class PortalEditColumnsComponent
               key: x.columnName,
               filterType: x.filterType,
               header: x.columnName,
-              width: 250,
+              width: 200,
               sortable: true
             };
           });
@@ -506,7 +506,7 @@ export class PortalEditColumnsComponent
         field: `TEMPLATE_${index}`,
         filterType: 'none',
         header: `TEMPLATE_${index}`,
-        width: 250,
+        width: 200,
         selected: true
       },
       ...this.targetColumns
@@ -525,7 +525,7 @@ export class PortalEditColumnsComponent
         field: `ATTACHMENT_${index}`,
         filterType: 'attachments',
         header: `ATTACHMENT_${index}`,
-        width: 250,
+        width: 200,
         selected: true
       },
       ...this.targetColumns

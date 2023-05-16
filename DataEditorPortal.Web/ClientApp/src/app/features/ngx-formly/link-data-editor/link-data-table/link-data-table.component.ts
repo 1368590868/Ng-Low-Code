@@ -11,6 +11,7 @@ import { LinkDataTableService } from '../service/link-data-table.service';
 import { forkJoin } from 'rxjs';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { GridParam } from 'src/app/shared';
+import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-link-data-table',

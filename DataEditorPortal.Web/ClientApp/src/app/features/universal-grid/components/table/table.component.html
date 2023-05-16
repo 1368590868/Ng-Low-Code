@@ -55,7 +55,12 @@
             </p>
           </div>
 
-          <div class="table-header flex align-items-center flex-1">
+          <div
+            [class]="
+              tableConfig.helpUrl
+                ? 'table-header flex align-items-center flex-1 mr-5'
+                : 'table-header flex align-items-center flex-1 '
+            ">
             <div class="flex flex-wrap mr-2">
               <ng-template
                 appUniversalGridAction
@@ -81,10 +86,14 @@
               styleClass="p-button-rounded p-button-outlined mr-1"
               (onClick)="resetAndRefresh()"></p-button>
             <p-button
+              pTooltip="Show/Hide columns"
+              tooltipPosition="left"
               icon="pi pi-pause text-lg"
               styleClass="p-button-rounded p-button-outlined mr-1"
               (onClick)="columnSelectorVisible = true"></p-button>
             <p-button
+              pTooltip="Reset table back to original view"
+              tooltipPosition="left"
               icon="pi pi-sync text-lg"
               styleClass="p-button-rounded p-button-outlined"
               (onClick)="confirmResetColumns($event)"></p-button>
@@ -208,7 +217,7 @@
             <ng-template #normal>{{ data[col.field] }}</ng-template>
             <span
               *ngIf="col.template"
-              [innerHTML]="calcCustomTemplate(data, col.template)">
+              [innerHTML]="data | template : col.template">
             </span>
           </td>
         </tr>
