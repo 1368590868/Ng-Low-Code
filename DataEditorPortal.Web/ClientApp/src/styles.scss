@@ -147,6 +147,13 @@ formly-form {
   }
 }
 
+.import-tooltip {
+  .p-tooltip-text {
+    background: var(--red-100);
+    color: var(--red-400);
+  }
+}
+
 .p-datatable {
   .p-datatable-tbody > tr > td {
     padding: 0.625rem;

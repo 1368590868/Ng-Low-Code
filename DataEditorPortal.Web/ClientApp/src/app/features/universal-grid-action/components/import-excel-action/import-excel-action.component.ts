@@ -12,8 +12,10 @@ export class HasErrorPipe implements PipeTransform {
   transform(value: string, errors: { field: string; errorMsg: string }[] = []) {
     const msgList = errors.filter(error => error.field === value);
     if (msgList.length === 0) return null;
-    const msg = msgList.map(msg => msg.errorMsg).join('\r\n');
-    return msg ?? null;
+    const msg = msgList.map(msg => `<li >${msg.errorMsg}</li>`).join('');
+    const html = `<ul style='padding-left:1.5rem'>${msg}</ul>`;
+
+    return html ?? null;
   }
 }
 @Component({
@@ -201,6 +203,9 @@ export class ImportExcelActionComponent
       return false;
     }
     return true;
+  }
+  refresh() {
+    this.initImportFileList();
   }
 
   onOk() {

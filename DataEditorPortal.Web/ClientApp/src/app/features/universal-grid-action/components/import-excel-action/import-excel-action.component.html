@@ -1,16 +1,24 @@
 <div *ngIf="step === 1" class="import-history">
-  <div class="mb-3">
-    <p-button
-      icon="pi pi-file-import"
-      (onClick)="onNewImport('Add')"
-      styleClass="p-button-outlined"
-      label="New Batch Add"></p-button>
-    <p-button
-      class="ml-3"
-      icon="pi pi-file-edit"
-      (onClick)="onNewImport('Update')"
-      styleClass="p-button-outlined"
-      label="New Batch Update"></p-button>
+  <div class="flex justify-content-between mb-3">
+    <div>
+      <p-button
+        icon="pi pi-file-import"
+        (onClick)="onNewImport('Add')"
+        styleClass="p-button-outlined"
+        label="New Batch Add"></p-button>
+      <p-button
+        class="ml-3"
+        icon="pi pi-file-edit"
+        (onClick)="onNewImport('Update')"
+        styleClass="p-button-outlined"
+        label="New Batch Update"></p-button>
+    </div>
+    <div>
+      <p-button
+        icon="pi pi-refresh text-lg"
+        styleClass="p-button-rounded p-button-outlined mr-1"
+        (onClick)="refresh()"></p-button>
+    </div>
   </div>
 
   <p-table
@@ -173,6 +181,7 @@
       *ngIf="innerInfoList && innerInfoList.length > 0"
       (onClick)="onShowInfo(-1)"
       [styleClass]="clickFilterButton === -1 ? '' : 'p-button-outlined'"
+      [badgeClass]="clickFilterButton === -1 ? '' : 'bg-primary'"
       [badge]="innerInfoList.length.toString()"
       label="All"></p-button>
     <p-button
@@ -184,7 +193,9 @@
         clickFilterButton === data['__status__'] ? '' : 'p-button-outlined'
       "
       [badge]="data.data.length"
-      badgeClass="bg-primary"
+      [badgeClass]="
+        clickFilterButton === data['__status__'] ? '' : 'bg-primary'
+      "
       label="{{
         data['__status__'] === 0
           ? 'Ready To Import'
@@ -254,16 +265,16 @@
           </td>
           <ng-container *ngFor="let col of columns">
             <td *ngIf="col.header !== '__status__'">
-              <div
-                [class]="
-                  (col.header | hasError : infoList?.__errors__)
-                    ? 'hasError w-full h-full'
-                    : null
-                "
-                [pTooltip]="
-                  (col.header | hasError : infoList?.__errors__) ?? ''
-                ">
-                {{ infoList[col.header] ?? '&nbsp;' }}
+              <div>
+                <i
+                  *ngIf="col.header | hasError : infoList?.__errors__"
+                  [pTooltip]="
+                    (col.header | hasError : infoList?.__errors__) ?? ''
+                  "
+                  [escape]="false"
+                  tooltipStyleClass="import-tooltip"
+                  class="pi pi-times-circle text-red-500"></i>
+                {{ infoList[col.header] ?? '' }}
               </div>
             </td>
           </ng-container>
