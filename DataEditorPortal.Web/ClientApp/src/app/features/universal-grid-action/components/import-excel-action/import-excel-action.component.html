@@ -2,9 +2,15 @@
   <div class="mb-3">
     <p-button
       icon="pi pi-file"
-      (onClick)="onNewImport()"
+      (onClick)="onNewImport('Add')"
       styleClass="p-button-outlined"
-      label="New Import"></p-button>
+      label="Batch of Add"></p-button>
+    <p-button
+      class="ml-3"
+      icon="pi pi-file"
+      (onClick)="onNewImport('Update')"
+      styleClass="p-button-outlined"
+      label="Batch of Update"></p-button>
   </div>
 
   <p-table
@@ -76,6 +82,10 @@
   </p-table>
 </div>
 
+<div *ngIf="step !== 1">
+  <h2>Batch of {{ stepType }}</h2>
+</div>
+
 <div *ngIf="step === 2" class="overflow-auto p-1">
   <div class="upload-label flex align-items-center mb-3">
     <span
@@ -90,7 +100,7 @@
       icon="pi pi-file"
       (onClick)="onDownloadTemplate()"
       styleClass="p-button-link"
-      label="Template"></p-button>
+      label="Batch {{ stepType }} Template"></p-button>
   </div>
 
   <div class="upload-label flex align-items-center mb-3">
@@ -119,24 +129,37 @@
 </div>
 
 <div *ngIf="step === 3" class="flex flex-column overflow-auto p-1">
-  <p-button
-    *ngFor="let data of statusList"
-    (onClick)="onShowInfo(data.status)"
-    [styleClass]="
-      data.status === 1
-        ? 'p-button-text p-button-success'
-        : data.status === 3
-        ? 'p-button-text p-button-danger'
-        : 'p-button-text p-button-warning'
-    "
-    label="There are {{ data.data.length }} data {{
-      data.status === 0 ? 'Error' : data.status === 1 ? 'Success' : 'Warning'
-    }} in total."></p-button>
-  <p-button
-    *ngIf="infoList && infoList.length > 0"
-    (onClick)="onShowInfo(-1)"
-    styleClass="p-button-text"
-    label="All {{ infoList.length }}  Information."></p-button>
+  <div class="flex align-items-center" *ngIf="statusList.length > 1">
+    <p-button
+      *ngIf="innerInfoList && innerInfoList.length > 0"
+      (onClick)="onShowInfo(-1)"
+      [styleClass]="clickFilterButton === -1 ? '' : 'p-button-outlined'"
+      [badge]="innerInfoList.length.toString()"
+      label="All"></p-button>
+    <p-button
+      class="ml-1"
+      *ngFor="let data of statusList"
+      (onClick)="onShowInfo(data['__status__'])"
+      styleClass="p-button-outlined"
+      [styleClass]="
+        clickFilterButton === data['__status__'] ? '' : 'p-button-outlined'
+      "
+      [badge]="data.data.length"
+      label="{{
+        data['__status__'] === 0
+          ? 'Ready To Import'
+          : data['__status__'] === 1
+          ? 'Duplicate'
+          : data['__status__'] === 2
+          ? 'Missing Fields'
+          : data['__status__'] === 3
+          ? 'Validation Error'
+          : data['__status__'] === 4
+          ? 'Already Exists'
+          : 'Unknown Error'
+      }}"></p-button>
+  </div>
+
   <div *ngIf="infoList && infoList.length > 0">
     <p-divider>Information Data</p-divider>
     <p-table
@@ -148,63 +171,62 @@
       [showCurrentPageReport]="false">
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th
-            *ngFor="let col of columns"
-            [pSortableColumn]="col.header"
-            [style.min-width]="'12rem !important'">
-            <span style="vertical-align: middle">{{ col.header }}</span>
-            <p-sortIcon
-              [field]="col.header"
-              *ngIf="col.header !== 'status'"></p-sortIcon>
-            <p-columnFilter
-              *ngIf="col.header !== 'status'"
-              style="vertical-align: middle"
-              type="text"
-              [field]="col.header"
-              display="menu"
-              [hideOnClear]="true"
-              [showOperator]="false"
-              [showAddButton]="false"
-              [maxFractionDigits]="4"></p-columnFilter>
-          </th>
+          <th [style.min-width]="'12rem !important'">Status</th>
+          <ng-container *ngFor="let col of columns">
+            <th
+              *ngIf="col.header !== '__status__'"
+              [pSortableColumn]="col.header"
+              [style.min-width]="'12rem !important'">
+              <span style="vertical-align: middle">{{ col.header }}</span>
+              <p-sortIcon [field]="col.header"></p-sortIcon>
+              <p-columnFilter
+                style="vertical-align: middle"
+                type="text"
+                [field]="col.header"
+                display="menu"
+                [hideOnClear]="true"
+                [showOperator]="false"
+                [showAddButton]="false"
+                [maxFractionDigits]="4"></p-columnFilter>
+            </th>
+          </ng-container>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-infoList let-columns="columns">
         <tr>
-          <td *ngFor="let col of columns">
-            <ng-container
-              [ngTemplateOutlet]="
-                col.header === 'status' ? status : normal
-              "></ng-container>
-
-            <ng-template #status>
-              <p-tag
-                [severity]="
-                  infoList.status === 3
-                    ? 'danger'
-                    : infoList.status === 1
-                    ? 'success'
-                    : 'warning'
-                "
-                >{{
-                  infoList.status === 3
-                    ? 'Error'
-                    : infoList.status === 1
-                    ? 'Success'
-                    : 'Loading'
-                }}</p-tag
-              >
-            </ng-template>
-            <ng-template #normal
-              ><div
-                [class]="
-                  (col.header | hasError : infoList?.errors) ? 'hasError' : null
-                "
-                [pTooltip]="(col.header | hasError : infoList?.errors) ?? ''">
-                {{ infoList[col.header] }}
-              </div></ng-template
+          <td>
+            <p-tag
+              [severity]="infoList['__status__'] === 0 ? 'success' : 'warning'"
+              >{{
+                infoList['__status__'] === 0
+                  ? 'Ready To Import'
+                  : infoList['__status__'] === 1
+                  ? 'Duplicate'
+                  : infoList['__status__'] === 2
+                  ? 'Missing Fields'
+                  : infoList['__status__'] === 3
+                  ? 'Validation Error'
+                  : infoList['__status__'] === 4
+                  ? 'Already Exists'
+                  : 'Unknown Error'
+              }}</p-tag
             >
           </td>
+          <ng-container *ngFor="let col of columns">
+            <td *ngIf="col.header !== '__status__'">
+              <div
+                [class]="
+                  (col.header | hasError : infoList?.__errors__)
+                    ? 'hasError w-full h-full'
+                    : null
+                "
+                [pTooltip]="
+                  (col.header | hasError : infoList?.__errors__) ?? ''
+                ">
+                {{ infoList[col.header] ?? '&nbsp;' }}
+              </div>
+            </td>
+          </ng-container>
         </tr>
       </ng-template>
     </p-table>

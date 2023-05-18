@@ -10,7 +10,9 @@ import { InfoData } from '../../models/import';
 })
 export class HasErrorPipe implements PipeTransform {
   transform(value: string, errors: { field: string; errorMsg: string }[] = []) {
-    const msg = errors.find(error => error.field === value)?.errorMsg;
+    const msgList = errors.filter(error => error.field === value);
+    if (msgList.length === 0) return null;
+    const msg = msgList.map(msg => msg.errorMsg).join('\r\n');
     return msg ?? null;
   }
 }
@@ -42,6 +44,8 @@ export class ImportExcelActionComponent
   statusList: any[] = [];
   innerInfoList?: InfoData[] = [];
   columns: any[] = [];
+  clickFilterButton = -1;
+  stepType = '';
 
   importFileList: any[] = [];
   infoList?: InfoData[] = [];
@@ -64,17 +68,20 @@ export class ImportExcelActionComponent
     });
   }
 
-  onNewImport() {
+  onNewImport(type: string) {
+    this.stepType = type;
     this.currentStep = 2;
     this.step = 2;
   }
 
   onDownloadTemplate() {
-    const url = `${this.apiUrl}attachment/download-temp-file/af06da4a-1d5f-4eaa-8610-b6e42bf42647/test.xlsx`;
+    const url = `${this.apiUrl}import-data/${
+      this.gridName
+    }/${this.stepType.toLowerCase()}/download-template`;
     const a = document.createElement('a');
     a.href = url;
     a.target = '_black';
-    const fileName = 'template';
+    const fileName = this.stepType;
     a.download = fileName;
     a.click();
     a.remove();
@@ -99,7 +106,7 @@ export class ImportExcelActionComponent
   onUploadExcelTemplate() {
     this.isLoading = true;
     this.importExcelService
-      .getFileInfo(this.file, this.gridName)
+      .getUploadTemplate(this.file, this.gridName, this.stepType.toLowerCase())
       .subscribe(res => {
         if (res?.data) {
           if (res?.data?.length > 0) {
@@ -117,20 +124,18 @@ export class ImportExcelActionComponent
               .map(key => ({
                 header: key
               }))
-              .filter(
-                item =>
-                  item.header !== 'errors' && item.header !== this.recordKey
-              );
+              .filter(item => item.header !== '__errors__');
 
             // group by status
             this.statusList = this.infoList.reduce((acc: any, cur) => {
               const found: { data: InfoData[] } = acc.find(
-                (item: { status: number }) => item.status === cur.status
+                (item: { __status__: number }) =>
+                  item.__status__ === cur['__status__']
               );
               if (found) {
                 found.data.push(cur);
               } else {
-                acc.push({ status: cur.status, data: [cur] });
+                acc.push({ __status__: cur['__status__'], data: [cur] });
               }
               return acc;
             }, []);
@@ -141,9 +146,13 @@ export class ImportExcelActionComponent
   }
 
   onShowInfo(type: number) {
+    this.clickFilterButton = type;
+    // -1 is all
     if (type !== -1) {
       if (this.innerInfoList) {
-        this.infoList = this.innerInfoList.filter(item => item.status === type);
+        this.infoList = this.innerInfoList.filter(
+          item => item['__status__'] === type
+        );
       }
     } else {
       this.infoList = this.innerInfoList;
@@ -158,7 +167,7 @@ export class ImportExcelActionComponent
   onConfirmImport() {
     this.isLoading = true;
     this.importExcelService
-      .confirmImport(this.file, this.gridName)
+      .confirmImport(this.file, this.gridName, this.stepType.toLowerCase())
       .subscribe(res => {
         if (!res.isError) {
           this.file = null;
@@ -185,7 +194,7 @@ export class ImportExcelActionComponent
     }
     if (
       this.innerInfoList &&
-      this.innerInfoList.every(item => item.status !== 0) &&
+      this.innerInfoList.every(item => item['__status__'] === 0) &&
       currentStep === 3 &&
       this.step === 3
     ) {

@@ -19,10 +19,10 @@ export class ImportActionService {
       .pipe(map(res => res.result ?? []));
   }
 
-  getFileInfo(file: any, gridName: string) {
+  getUploadTemplate(file: any, gridName: string, type: string) {
     return this.http
       .post<ApiResponse<InfoList>>(
-        `${this.apiUrl}import-data/${gridName}/upload-excel-template`,
+        `${this.apiUrl}import-data/${gridName}/${type}/upload-excel-template`,
         file
       )
       .pipe(map(res => res.result));
@@ -36,9 +36,9 @@ export class ImportActionService {
       .pipe(map(res => res.result));
   }
 
-  confirmImport(file: any, gridName: string) {
+  confirmImport(file: any, gridName: string, type: string) {
     return this.http.post<ApiResponse<LoadState>>(
-      `${this.apiUrl}import-data/${gridName}/confirm-import`,
+      `${this.apiUrl}import-data/${gridName}/${type}/confirm-import`,
       file
     );
   }
