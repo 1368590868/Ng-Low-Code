@@ -108,7 +108,7 @@ const GRID_ACTION_CONFIG = [
     isCustom: true,
     wrapper: {
       label: 'Impot From Excel',
-      icon: 'pi pi-file-excel',
+      icon: 'pi pi-file-import',
       buttonStyleClass: 'p-button-outlined',
       header: 'Import From Excel',
       cancelText: 'Cancel',
