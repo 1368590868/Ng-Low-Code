@@ -42,17 +42,26 @@ export class LocationConfigurationComponent {
   );
 
   visible = false;
+
+  @Input() locationType!: number;
+  @Input() foreignKeyOptions!: { label: string; value: string }[];
   @Input()
   set value(val: any) {
-    if (JSON.parse(JSON.stringify(val || null))) {
+    if (!val) {
+      this.innerValue = null;
+      return;
+    }
+    this.innerValue = val;
+
+    const newVal = JSON.parse(JSON.stringify(val || null));
+    if (newVal) {
+      console.log(val?.fromVs);
       this.formControlFromVs.setValue(val?.fromVs);
       this.formControlFromMeasure.setValue(val?.fromMeasure);
       this.formControlToVs.setValue(val?.toVs);
       this.formControlToMeasure.setValue(val?.toMeasure);
     }
   }
-  @Input() locationType!: number;
-  @Input() foreignKeyOptions!: { label: string; value: string }[];
   innerValue: any = null;
   writeValue(value: any): void {
     this.value = value;
@@ -87,19 +96,9 @@ export class LocationConfigurationComponent {
     }
   }
   onSave() {
-    if (
-      !this.formControlFromMeasure.valid ||
-      !this.formControlFromVs.valid ||
-      !this.formControlToMeasure.valid ||
-      !this.formControlToVs
-    ) {
-      this.formControlFromMeasure.markAsDirty();
-      this.formControlFromVs.markAsDirty();
-      this.formControlToMeasure.markAsDirty();
-      this.formControlToVs.markAsDirty();
+    if (!this.onValid()) {
       return;
     }
-
     const data = {
       fromVs: this.formControlFromVs.value,
       fromMeasure: this.formControlFromMeasure.value,
@@ -110,6 +109,24 @@ export class LocationConfigurationComponent {
     this.onChange?.(data);
     this.innerValue = data;
     this.visible = false;
+  }
+
+  onValid() {
+    this.formControlFromMeasure.markAsDirty();
+    this.formControlFromVs.markAsDirty();
+    this.formControlToMeasure.markAsDirty();
+    this.formControlToVs.markAsDirty();
+    if (!this.formControlFromMeasure.valid || !this.formControlFromVs.valid) {
+      return false;
+    }
+    if (this.locationType === 3 && !this.formControlToMeasure.valid) {
+      return false;
+    }
+    if (this.locationType === 4) {
+      if (!this.formControlToMeasure.valid || !this.formControlToVs)
+        return false;
+    }
+    return true;
   }
 }
 

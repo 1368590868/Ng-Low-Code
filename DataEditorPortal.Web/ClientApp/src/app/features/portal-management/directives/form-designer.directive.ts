@@ -336,14 +336,15 @@ export class FormDesignerDirective {
             {
               key: 'locationType',
               type: 'select',
+              defaultValue: 2,
               props: {
                 label: 'Location Type',
                 description: 'Select location type',
                 placeholder: 'Select location type',
                 options: [
-                  { label: 'two types', value: 2 },
-                  { label: 'Three types', value: 3 },
-                  { label: 'Four types', value: 4 }
+                  { label: 'Point Location', value: 2 },
+                  { label: 'Linear Location', value: 3 },
+                  { label: 'Linear Multiple', value: 4 }
                 ],
                 change: (field, event) => {
                   if (field && field.parent && field.parent.get) {
