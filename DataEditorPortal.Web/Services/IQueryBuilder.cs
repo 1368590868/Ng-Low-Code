@@ -30,6 +30,7 @@ namespace DataEditorPortal.Web.Services
         string GenerateSqlTextForInsert(DataSourceConfig config);
         string GenerateSqlTextForUpdate(DataSourceConfig config);
         string GenerateSqlTextForDelete(DataSourceConfig config);
+        string GenerateSqlTextForExist(DataSourceConfig config);
 
         string GenerateSqlTextForColumnFilterOption(DataSourceConfig config);
 
@@ -358,6 +359,16 @@ namespace DataEditorPortal.Web.Services
 
                 return queryText;
             }
+        }
+
+        public virtual string GenerateSqlTextForExist(DataSourceConfig config)
+        {
+            var queryText = GenerateSqlTextForList(config);
+            queryText = UseSearches(queryText);
+            queryText = UseFilters(queryText);
+            queryText = RemoveOrderBy(queryText);
+
+            return $@"SELECT {EscapeColumnName(config.IdColumn)} FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} IN {ParameterPrefix}{ParameterName(config.IdColumn)}";
         }
 
         #endregion

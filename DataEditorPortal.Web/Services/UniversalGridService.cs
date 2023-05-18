@@ -57,6 +57,7 @@ namespace DataEditorPortal.Web.Services
         UniversalGridConfiguration GetUniversalGridConfiguration(string name);
         GridFormLayout GetAddingFormConfig(UniversalGridConfiguration config);
         GridFormLayout GetUpdatingFormConfig(UniversalGridConfiguration config);
+        IEnumerable<object> CheckDataExists(string name, object[] ids);
     }
 
     public class UniversalGridService : IUniversalGridService
@@ -376,10 +377,11 @@ namespace DataEditorPortal.Web.Services
                 data.ForEach(item =>
                 {
                     var row = (IDictionary<string, object>)item;
+                    var index = 0;
                     foreach (var key in row.Keys)
                     {
-                        var index = row.Keys.ToList().IndexOf(key);
                         row[key] = _queryBuilder.TransformValue(row[key], schema.Rows[index]);
+                        index++;
                     }
                     output.Data.Add(row);
                 });
@@ -1522,6 +1524,48 @@ namespace DataEditorPortal.Web.Services
 
         #endregion
 
+        public IEnumerable<object> CheckDataExists(string name, object[] ids)
+        {
+            var config = GetUniversalGridConfiguration(name);
+
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            var queryText = _queryBuilder.GenerateSqlTextForExist(dataSourceConfig);
+
+            var param = _queryBuilder.GenerateDynamicParameter(
+                        new List<KeyValuePair<string, object>>() {
+                            new KeyValuePair<string, object>(dataSourceConfig.IdColumn, ids)
+                        }
+                    );
+
+            IEnumerable<object> result = null;
+            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+            {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+                con.Open();
+
+                try
+                {
+                    DataTable schema;
+                    using (var dr = con.ExecuteReader(queryText, param))
+                    {
+                        schema = dr.GetSchemaTable();
+                    }
+                    var data = con.Query(queryText, param);
+                    result = data.Select(x =>
+                    {
+                        var row = (IDictionary<string, object>)x;
+                        return _queryBuilder.TransformValue(row[dataSourceConfig.IdColumn], schema.Rows[0]);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, ex);
+                }
+            }
+
+            return result;
+        }
     }
 
 }

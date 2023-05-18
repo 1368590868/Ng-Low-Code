@@ -21,4 +21,10 @@ namespace DataEditorPortal.Web.Models.ImportData
 
         public double Progress { get; set; }
     }
+
+    public enum ImportType
+    {
+        Add,
+        Update
+    }
 }

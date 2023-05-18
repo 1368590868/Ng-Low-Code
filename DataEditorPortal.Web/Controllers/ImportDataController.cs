@@ -102,14 +102,14 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPost]
-        [Route("{gridName}/upload-excel-template")]
-        public GridData UploadExcelTemplate(string gridName, [FromBody] UploadedFileModel uploadedFile)
+        [Route("{gridName}/{type}/upload-excel-template")]
+        public GridData UploadExcelTemplate(string gridName, ImportType type, [FromBody] UploadedFileModel uploadedFile)
         {
-            var sourceObjs = _importDataServcie.GetSourceData(gridName, uploadedFile);
+            var sourceObjs = _importDataServcie.GetSourceData(gridName, type, uploadedFile);
 
             if (sourceObjs != null)
             {
-                _importDataServcie.ValidateImportedData(gridName, sourceObjs);
+                _importDataServcie.ValidateImportedData(gridName, type, sourceObjs);
             }
 
             var result = new GridData()
@@ -121,14 +121,15 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPost]
-        [Route("{gridName}/confirm-import")]
-        public void ConfirmImport(string gridName, [FromBody] UploadedFileModel uploadedFile)
+        [Route("{gridName}/{type}/confirm-import")]
+        public void ConfirmImport(string gridName, ImportType type, [FromBody] UploadedFileModel uploadedFile)
         {
             var username = AppUser.ParseUsername(User.Identity.Name).Username;
             var currentUserId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
 
             var jobDataMap = new JobDataMap();
             jobDataMap.Add("gridName", gridName);
+            jobDataMap.Add("importType", type);
             jobDataMap.Add("templateFile", uploadedFile);
             jobDataMap.Add("createdById", currentUserId);
             jobDataMap.Add("createdByName", username);
@@ -149,11 +150,11 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{gridName}/download-template")]
+        [Route("{gridName}/{type}/download-template")]
         [AutoWrapIgnore]
-        public IActionResult ExportData(string gridName)
+        public IActionResult DownloadTemplate(string gridName, ImportType type)
         {
-            var fs = _importDataServcie.GenerateImportTemplate(gridName, "");
+            var fs = _importDataServcie.GenerateImportTemplate(gridName, type);
 
             return File(fs, "application/ms-excel", $"{gridName}_import_template.xlsx");
         }

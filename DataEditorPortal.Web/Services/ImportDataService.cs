@@ -1,6 +1,7 @@
 ﻿using DataEditorPortal.Data.Contexts;
-using DataEditorPortal.Web.Common;
+using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
+using DataEditorPortal.Web.Models.ImportData;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
@@ -18,10 +19,10 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IImportDataServcie
     {
-        Stream GenerateImportTemplate(string name, string type);
-        IList<IDictionary<string, object>> GetSourceData(string name, UploadedFileModel uploadedFile, bool removeFile = false);
-        IList<IDictionary<string, object>> ValidateImportedData(string name, IList<IDictionary<string, object>> sourceObjs);
-        IList<IDictionary<string, object>> GetTransformedSourceData(string name, UploadedFileModel uploadedFile);
+        Stream GenerateImportTemplate(string name, ImportType type);
+        IEnumerable<IDictionary<string, object>> GetSourceData(string name, ImportType type, UploadedFileModel uploadedFile, bool removeFile = false);
+        IEnumerable<IDictionary<string, object>> ValidateImportedData(string name, ImportType type, IEnumerable<IDictionary<string, object>> sourceObjs);
+        IEnumerable<IDictionary<string, object>> GetTransformedSourceData(string name, ImportType type, UploadedFileModel uploadedFile);
     }
 
     public class ImportDataService : IImportDataServcie
@@ -51,17 +52,16 @@ namespace DataEditorPortal.Web.Services
 
         #region Get data from excel
 
-        public IList<IDictionary<string, object>> GetSourceData(string name, UploadedFileModel uploadedFile, bool removeFile = false)
+        public IEnumerable<IDictionary<string, object>> GetSourceData(string name, ImportType type, UploadedFileModel uploadedFile, bool removeFile = false)
         {
             var config = _universalGridService.GetUniversalGridConfiguration(name);
-            var formConfig = _universalGridService.GetAddingFormConfig(config);
-            var fields = GetTemplateFields(formConfig);
+            var fields = GetTemplateFields(config, type);
 
             string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot/FileUploadTemp");
             var tempFilePath = Path.Combine(tempFolder, $"{uploadedFile.FileId} - {uploadedFile.FileName}");
-            if (!File.Exists(tempFilePath)) throw new DepException("Uploaded File doesn't exist.");
+            if (!File.Exists(tempFilePath)) throw new Exception("Uploaded File doesn't exist.");
 
-            IList<IDictionary<string, object>> sourceObjs = null;
+            IEnumerable<IDictionary<string, object>> sourceObjs = null;
             using (var stream = File.OpenRead(tempFilePath))
             {
                 using (var package = new ExcelPackage(stream))
@@ -82,7 +82,7 @@ namespace DataEditorPortal.Web.Services
                     }
                     else
                     {
-                        throw new DepException("The uploaded excel should have at least one worksheet.");
+                        throw new Exception("The uploaded excel should have at least one worksheet.");
                     }
                 }
             }
@@ -106,13 +106,12 @@ namespace DataEditorPortal.Web.Services
                 ));
         }
 
-        public IList<IDictionary<string, object>> GetTransformedSourceData(string name, UploadedFileModel uploadedFile)
+        public IEnumerable<IDictionary<string, object>> GetTransformedSourceData(string name, ImportType type, UploadedFileModel uploadedFile)
         {
-            var sourceObjs = GetSourceData(name, uploadedFile, true);
+            var sourceObjs = GetSourceData(name, type, uploadedFile, true);
 
             var config = _universalGridService.GetUniversalGridConfiguration(name);
-            var formConfig = _universalGridService.GetAddingFormConfig(config);
-            var fields = GetTemplateFields(formConfig);
+            var fields = GetTemplateFields(config, type);
 
             foreach (var obj in sourceObjs)
             {
@@ -126,7 +125,11 @@ namespace DataEditorPortal.Web.Services
                         }
                         if (field.filterType == "boolean")
                         {
-                            obj[field.key] = TransformBoolean(obj[field.key].ToString());
+                            obj[field.key] = Convert.ToBoolean(TransformBoolean(obj[field.key].ToString()));
+                        }
+                        if (field.filterType == "numeric")
+                        {
+                            obj[field.key] = TransformNumber(obj[field.key].ToString());
                         }
                     }
                 }
@@ -156,16 +159,20 @@ namespace DataEditorPortal.Web.Services
                     .Replace("N", "False", StringComparison.InvariantCultureIgnoreCase);
         }
 
+        private decimal TransformNumber(object value)
+        {
+            return Convert.ToDecimal(value);
+        }
+
         #endregion
 
         #region Download Excel Template
 
-        public Stream GenerateImportTemplate(string name, string type)
+        public Stream GenerateImportTemplate(string name, ImportType type)
         {
             var config = _universalGridService.GetUniversalGridConfiguration(name);
-            var formConfig = _universalGridService.GetAddingFormConfig(config);
 
-            var fields = GetTemplateFields(formConfig);
+            var fields = GetTemplateFields(config, type);
             fields.ForEach(f => RemoveMemoryCache(f.key));
 
             var stream = new MemoryStream();
@@ -203,18 +210,22 @@ namespace DataEditorPortal.Web.Services
         {
             worksheet.Column(columnIndex).Width = 30;
             worksheet.Column(columnIndex).AutoFit(30);
+            worksheet.Cells[1, columnIndex].Value = field.key;
 
-            using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+            if (field.props != null)
             {
-                var props = doc.RootElement.EnumerateObject();
+                using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+                {
+                    var props = doc.RootElement.EnumerateObject();
 
-                var labelProp = props.FirstOrDefault(x => x.Name == "label").Value;
-                if (labelProp.ValueKind == JsonValueKind.String)
-                    worksheet.Cells[1, columnIndex].Value = labelProp.GetString();
+                    var labelProp = props.FirstOrDefault(x => x.Name == "label").Value;
+                    if (labelProp.ValueKind == JsonValueKind.String)
+                        worksheet.Cells[1, columnIndex].Value = labelProp.GetString();
 
-                var desProp = props.FirstOrDefault(x => x.Name == "description").Value;
-                if (desProp.ValueKind == JsonValueKind.String)
-                    worksheet.Cells[1, columnIndex].AddComment(desProp.GetString());
+                    var desProp = props.FirstOrDefault(x => x.Name == "description").Value;
+                    if (desProp.ValueKind == JsonValueKind.String)
+                        worksheet.Cells[1, columnIndex].AddComment(desProp.GetString());
+                }
             }
 
             switch (field.filterType)
@@ -390,15 +401,16 @@ namespace DataEditorPortal.Web.Services
 
         #region Validate Excel data
 
-        public IList<IDictionary<string, object>> ValidateImportedData(string name, IList<IDictionary<string, object>> sourceObjs)
+        public IEnumerable<IDictionary<string, object>> ValidateImportedData(string name, ImportType type, IEnumerable<IDictionary<string, object>> sourceObjs)
         {
             if (sourceObjs == null) throw new ArgumentNullException("sourceObjs");
-            if (sourceObjs.Count == 0) throw new DepException("No records in template for importing.");
+            if (!sourceObjs.Any()) throw new Exception("No records in template for importing.");
 
             var config = _universalGridService.GetUniversalGridConfiguration(name);
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-            var formConfig = _universalGridService.GetAddingFormConfig(config);
-            var fields = GetTemplateFields(formConfig);
+            var idColumn = dataSourceConfig.IdColumn;
+
+            var fields = GetTemplateFields(config, type);
 
             foreach (var obj in sourceObjs)
             {
@@ -451,15 +463,33 @@ namespace DataEditorPortal.Web.Services
                 obj.Add("__errors__", errorMsg);
             }
 
-            // todo: validate unique
-            var idColumn = dataSourceConfig.IdColumn;
-            if (sourceObjs[0].ContainsKey(idColumn))
+
+            if (sourceObjs.First().ContainsKey(idColumn))
             {
+                // validate duplicate
                 var duplicates = sourceObjs.Where(x => (ReviewImportStatus)x["__status__"] == ReviewImportStatus.ReadyToImport)
                     .Where(x => sourceObjs.Count(y => y[idColumn] == x[idColumn]) > 1);
-
                 foreach (var item in duplicates)
                     item["__status__"] = ReviewImportStatus.Duplicate;
+
+                // check obj exist in db or not
+                // get a batch of ids, and then check
+                var readyItems = sourceObjs.Where(x => (ReviewImportStatus)x["__status__"] == ReviewImportStatus.ReadyToImport);
+                var total = readyItems.Count();
+                var pageSize = 10;
+                for (var i = 0; i <= total / pageSize; i++)
+                {
+                    var batch = readyItems.Skip(pageSize * i).Take(pageSize);
+                    var ids = batch.Select(obj => obj[idColumn]);
+                    var result = _universalGridService.CheckDataExists(name, ids.ToArray());
+                    foreach (var obj in batch)
+                    {
+                        if (result.Any(x => string.Compare(x.ToString(), obj[idColumn].ToString(), true) == 0))
+                        {
+                            obj["__status__"] = ReviewImportStatus.AlreadyExists;
+                        }
+                    }
+                }
             }
 
             return sourceObjs;
@@ -593,8 +623,21 @@ namespace DataEditorPortal.Web.Services
             _memoryCache.Remove($"import_data_options_{fieldKey}");
         }
 
-        private List<FormFieldConfig> GetTemplateFields(GridFormLayout formConfig)
+        private List<FormFieldConfig> GetTemplateFields(UniversalGridConfiguration config, ImportType type)
         {
+            GridFormLayout formConfig = null;
+            if (type == ImportType.Add)
+            {
+                formConfig = _universalGridService.GetAddingFormConfig(config);
+            }
+            else if (type == ImportType.Update)
+            {
+                formConfig = _universalGridService.GetUpdatingFormConfig(config);
+                var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+                var idColumn = dataSourceConfig.IdColumn;
+                if (!formConfig.FormFields.Any(f => f.key == idColumn))
+                    formConfig.FormFields.Insert(0, new FormFieldConfig() { key = idColumn, filterType = "text", props = JsonSerializer.Serialize(new { required = true }) });
+            }
             return formConfig.FormFields.Where(x => x.filterType != "linkDataField" && x.filterType != "attachments").ToList();
         }
 

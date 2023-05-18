@@ -12,6 +12,7 @@
         ReadyToImport,
         Duplicate,
         MissingFields,
-        ValidationError
+        ValidationError,
+        AlreadyExists
     }
 }
