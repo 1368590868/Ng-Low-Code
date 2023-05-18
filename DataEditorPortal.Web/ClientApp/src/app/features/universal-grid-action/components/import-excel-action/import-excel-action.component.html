@@ -1,21 +1,21 @@
 <div *ngIf="step === 1" class="mb-3 overflow-auto">
   <div class="mb-3">
     <p-button
-      icon="pi pi-file"
+      icon="pi pi-file-import"
       (onClick)="onNewImport('Add')"
       styleClass="p-button-outlined"
-      label="Batch of Add"></p-button>
+      label="New Batch Add"></p-button>
     <p-button
       class="ml-3"
-      icon="pi pi-file"
+      icon="pi pi-file-edit"
       (onClick)="onNewImport('Update')"
       styleClass="p-button-outlined"
-      label="Batch of Update"></p-button>
+      label="New Batch Update"></p-button>
   </div>
 
   <p-table
     [value]="importFileList"
-    [paginator]="true"
+    [paginator]="importFileList.length > 0"
     [rows]="5"
     [showCurrentPageReport]="false">
     <ng-template pTemplate="header">
@@ -56,6 +56,18 @@
             [showAddButton]="false"
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
+        <th pSortableColumn="importType">
+          Import Type <p-sortIcon field="importType"></p-sortIcon>
+          <p-columnFilter
+            style="vertical-align: middle"
+            type="text"
+            field="importType"
+            display="menu"
+            [hideOnClear]="true"
+            [showOperator]="false"
+            [showAddButton]="false"
+            [maxFractionDigits]="4"></p-columnFilter>
+        </th>
         <th pSortableColumn="status">Status</th>
       </tr>
     </ng-template>
@@ -64,6 +76,7 @@
         <td>{{ fileList.name }}</td>
         <td>{{ fileList.createByUser }}</td>
         <td>{{ fileList.createdDate | date : 'dd/MM/YYYY HH:mm:ss' }}</td>
+        <td>{{ fileList.importType }}</td>
         <td>
           <app-import-status
             [rowData]="fileList"
@@ -87,15 +100,9 @@
 </div>
 
 <div *ngIf="step === 2" class="overflow-auto p-1">
-  <div class="upload-label flex align-items-center mb-3">
-    <span
-      ><label class="line-height-3">Download Template</label
-      ><i
-        class="pi pi-question-circle ml-2"
-        pTooltip="Please download the template first and then import it."
-        [hideDelay]="500"
-        [escape]="false"></i
-    ></span>
+  <p class="mb-3">Please download the template first and then import it.</p>
+  <div class="upload-label flex flex-column mb-3">
+    <label class="line-height-3">Download Template</label>
     <p-button
       icon="pi pi-file"
       (onClick)="onDownloadTemplate()"
@@ -103,10 +110,10 @@
       label="Batch {{ stepType }} Template"></p-button>
   </div>
 
-  <div class="upload-label flex align-items-center mb-3">
+  <div class="upload-label flex flex-column">
     <span class="line-height-3">Import Excel</span>
     <p-button
-      icon="pi pi-file"
+      icon="pi pi-upload"
       styleClass="p-button-outlined"
       [label]="file?.fileName ?? 'Upload'">
       <p-fileUpload
@@ -145,6 +152,7 @@
         clickFilterButton === data['__status__'] ? '' : 'p-button-outlined'
       "
       [badge]="data.data.length"
+      badgeClass="bg-primary"
       label="{{
         data['__status__'] === 0
           ? 'Ready To Import'
@@ -166,7 +174,7 @@
       class="data-table"
       [value]="infoList"
       [paginator]="true"
-      [rows]="5"
+      [rows]="10"
       [columns]="columns"
       [showCurrentPageReport]="false">
       <ng-template pTemplate="header" let-columns>

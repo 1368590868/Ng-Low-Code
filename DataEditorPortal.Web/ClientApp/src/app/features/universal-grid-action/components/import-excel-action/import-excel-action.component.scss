@@ -5,12 +5,6 @@
   }
 }
 
-.upload-label {
-  span {
-    flex: 0 15rem;
-  }
-}
-
 td:has(.hasError) {
   border: 1px solid var(--red-500) !important;
 }

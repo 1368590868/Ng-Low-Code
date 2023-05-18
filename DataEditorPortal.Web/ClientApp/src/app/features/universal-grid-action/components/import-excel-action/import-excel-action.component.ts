@@ -171,9 +171,9 @@ export class ImportExcelActionComponent
       .subscribe(res => {
         if (!res.isError) {
           this.file = null;
-          this.initImportFileList();
-          this.currentStep = 1;
           setTimeout(() => {
+            this.initImportFileList();
+            this.currentStep = 1;
             this.step = this.currentStep;
             this.isLoading = false;
           }, 1000);
@@ -185,7 +185,7 @@ export class ImportExcelActionComponent
 
   validDisabled(currentStep: number) {
     if (this.step === 3) {
-      this.okLabel = 'Finish';
+      this.okLabel = 'Submit';
     } else {
       this.okLabel = 'Next';
     }
