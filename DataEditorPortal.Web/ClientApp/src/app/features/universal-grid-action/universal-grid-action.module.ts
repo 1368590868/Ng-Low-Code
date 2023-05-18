@@ -103,12 +103,14 @@ const GRID_ACTION_CONFIG = [
   },
   {
     name: 'import-excel',
+    label: 'Import From Excel',
     component: ImportExcelActionComponent,
+    isCustom: true,
     wrapper: {
-      label: 'Impot To Excel',
+      label: 'Impot From Excel',
       icon: 'pi pi-file-excel',
       buttonStyleClass: 'p-button-outlined',
-      header: 'Import to Excel',
+      header: 'Import From Excel',
       cancelText: 'Cancel',
       okText: 'Import',
       dialogStyle: { width: '60rem' },
