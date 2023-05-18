@@ -27,6 +27,7 @@
     [rows]="5"
     [scrollable]="true"
     scrollHeight="flex"
+    [loading]="isLoading"
     [showCurrentPageReport]="false">
     <ng-template pTemplate="header">
       <tr>
@@ -170,7 +171,7 @@
         (onSelect)="onSelect($event, upload)"
         (onUpload)="onUpload($event)"
         (onError)="onUploadError($event, upload)"
-        [chooseLabel]="file?.fileName ?? 'Upload'"></p-fileUpload>
+        [chooseLabel]="file?.fileName ?? 'Upload template'"></p-fileUpload>
     </p-button>
   </div>
 </div>

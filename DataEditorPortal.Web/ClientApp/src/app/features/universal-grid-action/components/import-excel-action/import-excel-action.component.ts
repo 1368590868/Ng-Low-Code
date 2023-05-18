@@ -65,7 +65,9 @@ export class ImportExcelActionComponent
   }
 
   initImportFileList() {
+    this.isLoading = true;
     this.importExcelService.getImportHistories(this.gridName).subscribe(res => {
+      this.isLoading = false;
       this.importFileList = res;
     });
   }
