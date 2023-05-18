@@ -1,4 +1,4 @@
-<div *ngIf="step === 1" class="mb-3 overflow-auto">
+<div *ngIf="step === 1" class="import-history">
   <div class="mb-3">
     <p-button
       icon="pi pi-file-import"
@@ -17,6 +17,8 @@
     [value]="importFileList"
     [paginator]="importFileList.length > 0"
     [rows]="5"
+    [scrollable]="true"
+    scrollHeight="flex"
     [showCurrentPageReport]="false">
     <ng-template pTemplate="header">
       <tr>
@@ -95,27 +97,57 @@
   </p-table>
 </div>
 
-<div *ngIf="step !== 1">
+<!-- <div *ngIf="step !== 1">
   <h2>Batch of {{ stepType }}</h2>
-</div>
+</div> -->
 
-<div *ngIf="step === 2" class="overflow-auto p-1">
-  <p class="mb-3">Please download the template first and then import it.</p>
-  <div class="upload-label flex flex-column mb-3">
-    <label class="line-height-3">Download Template</label>
+<div *ngIf="step === 2" class="overflow-auto pt-4">
+  <p class="mb-3 w-6">
+    To use the Excel Data Import feature, you will need the following:
+  </p>
+  <div class="mb-3 w-6">
+    <ul class="pl-3">
+      <li>
+        To get started quickly, download the template provided, open it in Excel
+        (or equivalent) and edit the file.
+      </li>
+    </ul>
+  </div>
+
+  <div class="upload-label flex flex-column mb-3 pl-3">
+    <!-- <label class="line-height-3">Download Template</label> -->
     <p-button
       icon="pi pi-file"
       (onClick)="onDownloadTemplate()"
       styleClass="p-button-link"
-      label="Batch {{ stepType }} Template"></p-button>
+      label="Download template for Batch {{ stepType }}"></p-button>
   </div>
 
-  <div class="upload-label flex flex-column">
-    <span class="line-height-3">Import Excel</span>
+  <div class="mb-6 w-6">
+    <ul class="pl-3">
+      <li class="mb-3">
+        When you have completely filled in details, please save the file and
+        upload it.
+      </li>
+      <li class="mb-3">
+        Once you click "Next", The system will start reading the data from the
+        Excel file and verfiy it, Depending on the size of the file and the
+        complexity of the data, this process may take some time.
+      </li>
+      <li class="mb-3">
+        Review the data and fix any validation errors. Once fixed, you need to
+        repeat the import process with necessary adjustments to rectify any
+        errors.
+      </li>
+    </ul>
+  </div>
+
+  <div class="upload-label flex flex-column pl-3">
+    <!-- <span class="line-height-3">Import Excel</span> -->
     <p-button
       icon="pi pi-upload"
       styleClass="p-button-outlined"
-      [label]="file?.fileName ?? 'Upload'">
+      [label]="file?.fileName ?? 'Upload template'">
       <p-fileUpload
         [style]="{ position: 'absolute', top: 0, left: 0, opacity: 0 }"
         #upload
@@ -168,13 +200,13 @@
       }}"></p-button>
   </div>
 
-  <div *ngIf="infoList && infoList.length > 0">
+  <div *ngIf="infoList && infoList.length > 0" class="preview-data">
     <p-divider>Information Data</p-divider>
     <p-table
       class="data-table"
       [value]="infoList"
-      [paginator]="true"
-      [rows]="10"
+      [scrollable]="true"
+      scrollHeight="flex"
       [columns]="columns"
       [showCurrentPageReport]="false">
       <ng-template pTemplate="header" let-columns>
@@ -241,10 +273,11 @@
   </div>
 </div>
 
-<div class="dialog-footer flex justify-content-between">
+<div
+  class="dialog-footer flex justify-content-between mt-auto"
+  *ngIf="step !== 1">
   <div class="ml-1">
     <p-button
-      *ngIf="step !== 1"
       icon="pi pi-angle-left"
       (onClick)="onBack()"
       label="Back"
@@ -252,13 +285,11 @@
   </div>
   <div>
     <p-button
-      *ngIf="step !== 1"
       icon="pi pi-times"
       (onClick)="onCancel()"
       label="Cancel"
       styleClass="p-button-text"></p-button>
     <p-button
-      *ngIf="step !== 1"
       [disabled]="validDisabled(currentStep) || isLoading"
       icon="pi pi-check"
       (onClick)="onOk()"

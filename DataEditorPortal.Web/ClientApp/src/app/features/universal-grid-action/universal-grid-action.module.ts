@@ -113,7 +113,7 @@ const GRID_ACTION_CONFIG = [
       header: 'Import From Excel',
       cancelText: 'Cancel',
       okText: 'Import',
-      dialogStyle: { width: '60rem' },
+      dialogStyle: { width: '90rem', height: '50.625rem' },
       hideFooter: true
     }
   },

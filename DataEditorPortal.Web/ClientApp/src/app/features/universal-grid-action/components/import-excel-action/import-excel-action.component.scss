@@ -3,6 +3,7 @@
   p-button + p-button {
     margin-left: 0.5rem;
   }
+  border-top: 1px solid var(--surface-c);
 }
 
 td:has(.hasError) {
@@ -13,6 +14,24 @@ td:has(.hasError) {
   ::ng-deep {
     .p-datatable-wrapper {
       overflow-x: auto;
+    }
+  }
+}
+
+@mixin flex-column-grow-1 {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: auto;
+}
+
+:host {
+  @include flex-column-grow-1;
+  div.import-history,
+  div.preview-data {
+    @include flex-column-grow-1;
+    p-table {
+      @include flex-column-grow-1;
     }
   }
 }
