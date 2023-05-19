@@ -151,28 +151,34 @@
     </ul>
   </div>
 
-  <div class="upload-label flex flex-column pl-3">
-    <!-- <span class="line-height-3">Import Excel</span> -->
-    <p-button
-      icon="pi pi-upload"
+  <div class="upload-label flex pl-3 py-3">
+    <p-fileUpload
+      #upload
+      name="files"
       styleClass="p-button-outlined"
-      [label]="file?.fileName ?? 'Upload template'">
-      <p-fileUpload
-        [style]="{ position: 'absolute', top: 0, left: 0, opacity: 0 }"
-        #upload
-        name="files"
-        styleClass="w-auto"
-        [url]="apiUrl + 'attachment/upload-temp-file'"
-        mode="basic"
-        [auto]="false"
-        [maxFileSize]="5000000"
-        [fileLimit]="1"
-        accept=".xls,.xlsx,.xlsm,.xlsb,.xml,.csv"
-        (onSelect)="onSelect($event, upload)"
-        (onUpload)="onUpload($event)"
-        (onError)="onUploadError($event, upload)"
-        [chooseLabel]="file?.fileName ?? 'Upload template'"></p-fileUpload>
-    </p-button>
+      chooseIcon="pi pi-upload"
+      mode="basic"
+      accept=".xls,.xlsx"
+      [url]="apiUrl + 'attachment/upload-temp-file'"
+      [auto]="true"
+      [maxFileSize]="20 * 1000 * 1000"
+      (onProgress)="onFileUploadProgress($event)"
+      (onSelect)="onSelect($event)"
+      (onUpload)="onUpload($event)"
+      (onError)="onUploadError($event, upload)"
+      [chooseLabel]="'Select file'">
+    </p-fileUpload>
+
+    <p-progressBar
+      *ngIf="progress > 0 && !file?.fileName"
+      [value]="progress"
+      class="w-15rem ml-2"
+      styleClass="h-full"></p-progressBar>
+    <p-button
+      *ngIf="file?.fileName"
+      icon="pi pi-file"
+      styleClass="p-button-link"
+      [label]="file?.fileName"></p-button>
   </div>
 </div>
 
@@ -213,7 +219,11 @@
   </div>
 
   <div *ngIf="infoList && infoList.length > 0" class="preview-data">
-    <p-divider>Information Data</p-divider>
+    <p class="mb-3">
+      Review the data and fix any validation errors. Once fixed, you need to
+      repeat the import process with necessary adjustments to rectify any
+      errors.
+    </p>
     <p-table
       class="data-table"
       [value]="infoList"

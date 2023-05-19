@@ -43,6 +43,7 @@ export class ImportExcelActionComponent
   step = 1;
   currentStep = 1;
   file: any = null;
+  progress = 0;
   statusList: any[] = [];
   innerInfoList?: InfoData[] = [];
   columns: any[] = [];
@@ -91,8 +92,9 @@ export class ImportExcelActionComponent
     a.remove();
   }
 
-  onSelect(event: any, uploadRef: any) {
-    uploadRef.upload();
+  onSelect(event: any) {
+    this.progress = 0;
+    this.file = null;
   }
 
   onUpload(event: any) {
@@ -161,6 +163,10 @@ export class ImportExcelActionComponent
     } else {
       this.infoList = this.innerInfoList;
     }
+  }
+
+  onFileUploadProgress(event: any) {
+    this.progress = event.progress;
   }
 
   onUploadError(event: any, upload: any) {

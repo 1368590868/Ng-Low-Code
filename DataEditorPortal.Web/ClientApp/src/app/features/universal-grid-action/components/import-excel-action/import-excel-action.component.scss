@@ -34,4 +34,20 @@ td:has(.hasError) {
       @include flex-column-grow-1;
     }
   }
+
+  ::ng-deep {
+    .p-fileupload-choose:not(.p-disabled):hover {
+      background: rgba(33, 150, 243, 0.04);
+      color: var(--primary-color);
+      border: 1px solid;
+    }
+    .p-fileupload-choose:not(.p-disabled):active {
+      background: rgba(33, 150, 243, 0.16);
+      color: var(--primary-color);
+      border: 1px solid;
+    }
+    .p-progressbar-determinate .p-progressbar-value-animate {
+      transition: width 0.2s;
+    }
+  }
 }
