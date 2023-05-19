@@ -95,6 +95,7 @@ export class ImportExcelActionComponent
   onSelect(event: any) {
     this.progress = 0;
     this.file = null;
+    this.currentStep = 2;
   }
 
   onUpload(event: any) {

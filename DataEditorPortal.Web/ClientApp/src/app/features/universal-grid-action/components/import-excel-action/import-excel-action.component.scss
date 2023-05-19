@@ -49,5 +49,10 @@ td:has(.hasError) {
     .p-progressbar-determinate .p-progressbar-value-animate {
       transition: width 0.2s;
     }
+    .p-fileupload-basic {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: flex-start;
+    }
   }
 }
