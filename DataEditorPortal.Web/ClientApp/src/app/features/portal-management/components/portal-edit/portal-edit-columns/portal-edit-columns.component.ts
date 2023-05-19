@@ -141,10 +141,6 @@ export class PortalEditColumnsComponent
                 label: 'Attachments',
                 value: 'attachments'
               },
-              {
-                label: 'Location',
-                value: 'location'
-              }
             ]
           }
         },

@@ -9,8 +9,7 @@ import {
 export interface FormlyFieldProps extends CoreFormlyFieldProps {
   hideRequiredMarker?: boolean;
   hideLabel?: boolean;
-  minNum?: number;
-  maxNum?: number;
+  helperText?: string;
 }
 
 @Component({
@@ -43,10 +42,10 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
       </small>
 
       <small
-        *ngIf="!showError && props?.minNum !== undefined && props?.maxNum"
+        *ngIf="!showError && props?.helperText !== undefined"
         class="p-always">
         <span class="ui-message-text"
-          >Valid Range:{{ props.minNum }} to {{ props.maxNum }}</span
+          >{{props.helperText}}</span
         >
       </small>
     </div>
@@ -73,4 +72,4 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
 })
 export class FormlyWrapperFormFieldComponent extends FieldWrapper<
   FormlyFieldConfig<FormlyFieldProps>
-> {}
+> { }

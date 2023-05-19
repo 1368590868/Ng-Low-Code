@@ -66,11 +66,12 @@ export class LocationEditorComponent {
           );
           if (field && field.parent && field.parent.get) {
             const fromMeasure = field.parent.get('fromMeasure');
+            fromMeasure.props!['helperText'] = `Valid Range:${record?.value1} to ${record?.value2 }`
             fromMeasure.props!['minNum'] = record?.value1;
             fromMeasure.props!['maxNum'] = record?.value2;
-
             if (this.locationType === 3) {
               const toMeasure = field.parent.get('toMeasure');
+              toMeasure.props!['helperText'] = `Valid Range:${record?.value1} to ${record?.value2}`
               toMeasure.props!['minNum'] = record?.value1;
               toMeasure.props!['maxNum'] = record?.value2;
             }
