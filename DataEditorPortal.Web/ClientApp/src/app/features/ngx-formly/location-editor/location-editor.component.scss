@@ -1,0 +1,11 @@
+:host {
+  ::ng-deep {
+    .p-field {
+      margin: 0.5rem !important;
+    }
+
+    label {
+      padding-left: 1.5rem;
+    }
+  }
+}

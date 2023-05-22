@@ -1,16 +1,33 @@
-<div *ngIf="step === 1" class="mb-3 overflow-auto">
-  <div class="mb-3">
-    <p-button
-      icon="pi pi-file"
-      (onClick)="onNewImport()"
-      styleClass="p-button-outlined"
-      label="New Import"></p-button>
+<div *ngIf="step === 1" class="import-history">
+  <div class="flex justify-content-between mb-3">
+    <div>
+      <p-button
+        icon="pi pi-file-import"
+        (onClick)="onNewImport('Add')"
+        styleClass="p-button-outlined"
+        label="New Batch Add"></p-button>
+      <p-button
+        class="ml-3"
+        icon="pi pi-file-edit"
+        (onClick)="onNewImport('Update')"
+        styleClass="p-button-outlined"
+        label="New Batch Update"></p-button>
+    </div>
+    <div>
+      <p-button
+        icon="pi pi-refresh text-lg"
+        styleClass="p-button-rounded p-button-outlined mr-1"
+        (onClick)="refresh()"></p-button>
+    </div>
   </div>
 
   <p-table
     [value]="importFileList"
-    [paginator]="true"
+    [paginator]="importFileList.length > 0"
     [rows]="5"
+    [scrollable]="true"
+    scrollHeight="flex"
+    [loading]="isLoading"
     [showCurrentPageReport]="false">
     <ng-template pTemplate="header">
       <tr>
@@ -50,6 +67,18 @@
             [showAddButton]="false"
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
+        <th pSortableColumn="importType">
+          Import Type <p-sortIcon field="importType"></p-sortIcon>
+          <p-columnFilter
+            style="vertical-align: middle"
+            type="text"
+            field="importType"
+            display="menu"
+            [hideOnClear]="true"
+            [showOperator]="false"
+            [showAddButton]="false"
+            [maxFractionDigits]="4"></p-columnFilter>
+        </th>
         <th pSortableColumn="status">Status</th>
       </tr>
     </ng-template>
@@ -58,6 +87,7 @@
         <td>{{ fileList.name }}</td>
         <td>{{ fileList.createByUser }}</td>
         <td>{{ fileList.createdDate | date : 'dd/MM/YYYY HH:mm:ss' }}</td>
+        <td>{{ fileList.importType }}</td>
         <td>
           <app-import-status
             [rowData]="fileList"
@@ -76,145 +106,200 @@
   </p-table>
 </div>
 
-<div *ngIf="step === 2" class="overflow-auto p-1">
-  <div class="upload-label flex align-items-center mb-3">
-    <span
-      ><label class="line-height-3">Download Template</label
-      ><i
-        class="pi pi-question-circle ml-2"
-        pTooltip="Please download the template first and then import it."
-        [hideDelay]="500"
-        [escape]="false"></i
-    ></span>
+<!-- <div *ngIf="step !== 1">
+  <h2>Batch of {{ stepType }}</h2>
+</div> -->
+
+<div *ngIf="step === 2" class="overflow-auto pt-4">
+  <p class="mb-3 w-6">
+    To use the Excel Data Import feature, you will need the following:
+  </p>
+  <div class="mb-3 w-6">
+    <ul class="pl-3">
+      <li>
+        To get started quickly, download the template provided, open it in Excel
+        (or equivalent) and edit the file.
+      </li>
+    </ul>
+  </div>
+
+  <div class="upload-label flex flex-column mb-3 pl-3">
+    <!-- <label class="line-height-3">Download Template</label> -->
     <p-button
       icon="pi pi-file"
       (onClick)="onDownloadTemplate()"
       styleClass="p-button-link"
-      label="Template"></p-button>
+      label="Download template for Batch {{ stepType }}"></p-button>
   </div>
 
-  <div class="upload-label flex align-items-center mb-3">
-    <span class="line-height-3">Import Excel</span>
-    <p-button
-      icon="pi pi-file"
+  <div class="mb-4 w-6">
+    <ul class="pl-3">
+      <li class="mb-3">
+        When you have completely filled in details, please save the file and
+        upload it.
+      </li>
+      <li class="mb-3">
+        Once you click "Next", The system will start reading the data from the
+        Excel file and verfiy it, Depending on the size of the file and the
+        complexity of the data, this process may take some time.
+      </li>
+      <li class="mb-3">
+        Review the data and fix any validation errors. Once fixed, you need to
+        repeat the import process with necessary adjustments to rectify any
+        errors.
+      </li>
+    </ul>
+  </div>
+
+  <div class="upload-label flex pl-3 py-3">
+    <p-fileUpload
+      #upload
+      name="files"
       styleClass="p-button-outlined"
-      [label]="file?.fileName ?? 'Upload'">
-      <p-fileUpload
-        [style]="{ position: 'absolute', top: 0, left: 0, opacity: 0 }"
-        #upload
-        name="files"
-        styleClass="w-auto"
-        [url]="apiUrl + 'attachment/upload-temp-file'"
-        mode="basic"
-        [auto]="false"
-        [maxFileSize]="5000000"
-        [fileLimit]="1"
-        accept=".xls,.xlsx,.xlsm,.xlsb,.xml,.csv"
-        (onSelect)="onSelect($event, upload)"
-        (onUpload)="onUpload($event)"
-        (onError)="onUploadError($event, upload)"
-        [chooseLabel]="file?.fileName ?? 'Upload'"></p-fileUpload>
-    </p-button>
+      chooseIcon="pi pi-upload"
+      mode="basic"
+      accept=".xls,.xlsx"
+      [url]="apiUrl + 'attachment/upload-temp-file'"
+      [auto]="true"
+      [maxFileSize]="20 * 1000 * 1000"
+      (onProgress)="onFileUploadProgress($event)"
+      (onSelect)="onSelect($event)"
+      (onUpload)="onUpload($event)"
+      (onError)="onUploadError($event, upload)"
+      [chooseLabel]="'Select file'">
+    </p-fileUpload>
+
+    <p-progressBar
+      *ngIf="progress > 0 && !file?.fileName"
+      [value]="progress"
+      class="w-15rem ml-2"
+      styleClass="h-full"></p-progressBar>
+    <p-button
+      *ngIf="file?.fileName"
+      icon="pi pi-file"
+      styleClass="p-button-link"
+      [label]="file?.fileName"></p-button>
   </div>
 </div>
 
 <div *ngIf="step === 3" class="flex flex-column overflow-auto p-1">
-  <p-button
-    *ngFor="let data of statusList"
-    (onClick)="onShowInfo(data.status)"
-    [styleClass]="
-      data.status === 1
-        ? 'p-button-text p-button-success'
-        : data.status === 3
-        ? 'p-button-text p-button-danger'
-        : 'p-button-text p-button-warning'
-    "
-    label="There are {{ data.data.length }} data {{
-      data.status === 0 ? 'Error' : data.status === 1 ? 'Success' : 'Warning'
-    }} in total."></p-button>
-  <p-button
-    *ngIf="infoList && infoList.length > 0"
-    (onClick)="onShowInfo(-1)"
-    styleClass="p-button-text"
-    label="All {{ infoList.length }}  Information."></p-button>
-  <div *ngIf="infoList && infoList.length > 0">
-    <p-divider>Information Data</p-divider>
+  <div class="flex align-items-center" *ngIf="statusList.length > 1">
+    <p-button
+      *ngIf="innerInfoList && innerInfoList.length > 0"
+      (onClick)="onShowInfo(-1)"
+      [styleClass]="clickFilterButton === -1 ? '' : 'p-button-outlined'"
+      [badgeClass]="clickFilterButton === -1 ? '' : 'bg-primary'"
+      [badge]="innerInfoList.length.toString()"
+      label="All"></p-button>
+    <p-button
+      class="ml-1"
+      *ngFor="let data of statusList"
+      (onClick)="onShowInfo(data['__status__'])"
+      styleClass="p-button-outlined"
+      [styleClass]="
+        clickFilterButton === data['__status__'] ? '' : 'p-button-outlined'
+      "
+      [badge]="data.data.length"
+      [badgeClass]="
+        clickFilterButton === data['__status__'] ? '' : 'bg-primary'
+      "
+      label="{{
+        data['__status__'] === 0
+          ? 'Ready To Import'
+          : data['__status__'] === 1
+          ? 'Duplicate'
+          : data['__status__'] === 2
+          ? 'Missing Fields'
+          : data['__status__'] === 3
+          ? 'Validation Error'
+          : data['__status__'] === 4
+          ? 'Already Exists'
+          : 'Unknown Error'
+      }}"></p-button>
+  </div>
+
+  <div *ngIf="infoList && infoList.length > 0" class="preview-data">
+    <p class="mb-3">
+      Review the data and fix any validation errors. Once fixed, you need to
+      repeat the import process with necessary adjustments to rectify any
+      errors.
+    </p>
     <p-table
       class="data-table"
       [value]="infoList"
-      [paginator]="true"
-      [rows]="5"
+      [scrollable]="true"
+      scrollHeight="flex"
       [columns]="columns"
       [showCurrentPageReport]="false">
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th
-            *ngFor="let col of columns"
-            [pSortableColumn]="col.header"
-            [style.min-width]="'12rem !important'">
-            <span style="vertical-align: middle">{{ col.header }}</span>
-            <p-sortIcon
-              [field]="col.header"
-              *ngIf="col.header !== 'status'"></p-sortIcon>
-            <p-columnFilter
-              *ngIf="col.header !== 'status'"
-              style="vertical-align: middle"
-              type="text"
-              [field]="col.header"
-              display="menu"
-              [hideOnClear]="true"
-              [showOperator]="false"
-              [showAddButton]="false"
-              [maxFractionDigits]="4"></p-columnFilter>
-          </th>
+          <th [style.min-width]="'12rem !important'">Status</th>
+          <ng-container *ngFor="let col of columns">
+            <th
+              *ngIf="col.header !== '__status__'"
+              [pSortableColumn]="col.header"
+              [style.min-width]="'12rem !important'">
+              <span style="vertical-align: middle">{{ col.header }}</span>
+              <p-sortIcon [field]="col.header"></p-sortIcon>
+              <p-columnFilter
+                style="vertical-align: middle"
+                type="text"
+                [field]="col.header"
+                display="menu"
+                [hideOnClear]="true"
+                [showOperator]="false"
+                [showAddButton]="false"
+                [maxFractionDigits]="4"></p-columnFilter>
+            </th>
+          </ng-container>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-infoList let-columns="columns">
         <tr>
-          <td *ngFor="let col of columns">
-            <ng-container
-              [ngTemplateOutlet]="
-                col.header === 'status' ? status : normal
-              "></ng-container>
-
-            <ng-template #status>
-              <p-tag
-                [severity]="
-                  infoList.status === 3
-                    ? 'danger'
-                    : infoList.status === 1
-                    ? 'success'
-                    : 'warning'
-                "
-                >{{
-                  infoList.status === 3
-                    ? 'Error'
-                    : infoList.status === 1
-                    ? 'Success'
-                    : 'Loading'
-                }}</p-tag
-              >
-            </ng-template>
-            <ng-template #normal
-              ><div
-                [class]="
-                  (col.header | hasError : infoList?.errors) ? 'hasError' : null
-                "
-                [pTooltip]="(col.header | hasError : infoList?.errors) ?? ''">
-                {{ infoList[col.header] }}
-              </div></ng-template
+          <td>
+            <p-tag
+              [severity]="infoList['__status__'] === 0 ? 'success' : 'warning'"
+              >{{
+                infoList['__status__'] === 0
+                  ? 'Ready To Import'
+                  : infoList['__status__'] === 1
+                  ? 'Duplicate'
+                  : infoList['__status__'] === 2
+                  ? 'Missing Fields'
+                  : infoList['__status__'] === 3
+                  ? 'Validation Error'
+                  : infoList['__status__'] === 4
+                  ? 'Already Exists'
+                  : 'Unknown Error'
+              }}</p-tag
             >
           </td>
+          <ng-container *ngFor="let col of columns">
+            <td *ngIf="col.header !== '__status__'">
+              <div>
+                <i
+                  *ngIf="col.header | hasError : infoList?.__errors__"
+                  [pTooltip]="
+                    (col.header | hasError : infoList?.__errors__) ?? ''
+                  "
+                  [escape]="false"
+                  tooltipStyleClass="import-tooltip"
+                  class="pi pi-times-circle text-red-500"></i>
+                {{ infoList[col.header] ?? '' }}
+              </div>
+            </td>
+          </ng-container>
         </tr>
       </ng-template>
     </p-table>
   </div>
 </div>
 
-<div class="dialog-footer flex justify-content-between">
+<div
+  class="dialog-footer flex justify-content-between mt-auto"
+  *ngIf="step !== 1">
   <div class="ml-1">
     <p-button
-      *ngIf="step !== 1"
       icon="pi pi-angle-left"
       (onClick)="onBack()"
       label="Back"
@@ -222,13 +307,11 @@
   </div>
   <div>
     <p-button
-      *ngIf="step !== 1"
       icon="pi pi-times"
       (onClick)="onCancel()"
       label="Cancel"
       styleClass="p-button-text"></p-button>
     <p-button
-      *ngIf="step !== 1"
       [disabled]="validDisabled(currentStep) || isLoading"
       icon="pi pi-check"
       (onClick)="onOk()"

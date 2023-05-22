@@ -16,6 +16,7 @@ import { UniversalRegexpModule } from './universalregexp';
 import { FormlyFileUploadModule } from './file-upload/file-upload.modules';
 import { FormlyFormFieldModule } from './form-field/form-field.module';
 import { FormlyLinkDataEditorModule } from './link-data-editor';
+import { FormlyLocationEditorModule } from './location-editor/location-editor.modules';
 
 @NgModule({
   imports: [
@@ -35,7 +36,9 @@ import { FormlyLinkDataEditorModule } from './link-data-editor';
     UniversalRegexpModule,
     FormlyFileUploadModule,
     FormlyFormFieldModule,
-    FormlyLinkDataEditorModule
-  ]
+    FormlyLinkDataEditorModule,
+    FormlyLocationEditorModule
+  ],
+  declarations: []
 })
 export class FormlyCustomTypeModule {}

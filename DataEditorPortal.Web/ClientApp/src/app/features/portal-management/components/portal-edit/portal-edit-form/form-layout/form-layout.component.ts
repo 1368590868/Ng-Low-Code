@@ -82,6 +82,7 @@ export class FormLayoutComponent {
 
   sourceColumns: GridFormField[] = [];
   targetColumns: GridFormField[] = [];
+  foreignKeyOptions: { label: string; value: string }[] = [];
   @ViewChild('pickList') pickList!: PickList;
 
   model: any = {};
@@ -148,6 +149,10 @@ export class FormLayoutComponent {
           selected: false
         };
       });
+    this.foreignKeyOptions = this._dbColumns.map(x => ({
+      label: x.columnName,
+      value: x.columnName
+    }));
   }
 
   onMoveToTarget({ items }: { items: GridFormField[] }) {

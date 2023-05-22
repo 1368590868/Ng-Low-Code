@@ -71,7 +71,9 @@ import {
   PortalEditLinkTableComponent,
   AdvancedDialogComponent,
   FileUploadConfigurationComponent,
-  FormlyFieldFileUploadConfigurationComponent
+  FormlyFieldFileUploadConfigurationComponent,
+  LocationConfigurationComponent,
+  FormlyFieldLocationConfigurationComponent
 } from './components';
 import { FROM_DESIGNER_CONTROLS } from './directives/form-designer.directive';
 import { MonacoEditorConfig } from './monaco-editor-config';
@@ -110,7 +112,9 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
     PortalEditLinkTableComponent,
     AdvancedDialogComponent,
     FileUploadConfigurationComponent,
-    FormlyFieldFileUploadConfigurationComponent
+    FormlyFieldFileUploadConfigurationComponent,
+    LocationConfigurationComponent,
+    FormlyFieldLocationConfigurationComponent
   ],
   imports: [
     CommonModule,
@@ -144,6 +148,11 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
         {
           name: 'fileUploadConfig',
           component: FormlyFieldFileUploadConfigurationComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'locationConfig',
+          component: FormlyFieldLocationConfigurationComponent,
           wrappers: ['form-field']
         }
       ]

@@ -1,4 +1,21 @@
-<p-toast [baseZIndex]="99999"></p-toast>
+<p-toast [baseZIndex]="99999">
+  <ng-template let-message pTemplate="message">
+    <span
+      [class]="
+        'p-toast-message-icon pi' + (message.icon ? ' ' + message.icon : '')
+      "
+      [ngClass]="{
+        'pi-info-circle': message.severity === 'info',
+        'pi-exclamation-triangle': message.severity === 'warn',
+        'pi-times-circle': message.severity === 'error',
+        'pi-check': message.severity === 'success'
+      }"></span>
+    <div class="p-toast-message-text">
+      <div class="p-toast-summary">{{ message.summary }}</div>
+      <div class="p-toast-detail" [innerHTML]="message.detail"></div>
+    </div>
+  </ng-template>
+</p-toast>
 <app-header></app-header>
 <app-nav-menu></app-nav-menu>
 <router-outlet></router-outlet>

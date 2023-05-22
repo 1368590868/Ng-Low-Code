@@ -64,6 +64,11 @@ export const FROM_DESIGNER_CONTROLS: {
     label: 'Link Data Editor',
     value: 'linkDataEditor',
     filterType: 'linkDataField'
+  },
+  {
+    label: 'Location Editor',
+    value: 'locationEditor',
+    filterType: 'text'
   }
 ];
 
@@ -212,7 +217,7 @@ export class FormDesignerDirective {
             }
           ],
           expressions: {
-            hide: `['select', 'checkboxList', 'radio', 'multiSelect'].indexOf(field.parent.parent.model.type) < 0`
+            hide: `['select', 'checkboxList', 'radio', 'multiSelect' , 'locationEditor'].indexOf(field.parent.parent.model.type) < 0`
           }
         },
         // props for inputNumber
@@ -325,6 +330,64 @@ export class FormDesignerDirective {
             hide: `'fileUpload' !== field.parent.parent.model.type`
           }
         },
+        // props for location
+        {
+          fieldGroup: [
+            {
+              key: 'locationType',
+              type: 'select',
+              defaultValue: 2,
+              props: {
+                label: 'Location Type',
+                description: 'Select location type',
+                placeholder: 'Select location type',
+                options: [
+                  { label: 'Point Location', value: 2 },
+                  { label: 'Linear Location', value: 3 },
+                  { label: 'Linear Multiple', value: 4 }
+                ],
+                change: (field, event) => {
+                  if (field && field.parent && field.parent.get) {
+                    const locationConfig = field.parent.get('locationConfig');
+                    if (event.value) {
+                      locationConfig.props!['locationType'] = event.value;
+                    }
+                  }
+                }
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (field && field.parent && field.parent.get) {
+                    const locationConfig = field.parent.get('locationConfig');
+                    if (field.formControl.value) {
+                      locationConfig.props!['locationType'] =
+                        field.formControl.value;
+                    }
+                  }
+                }
+              }
+            },
+            {
+              key: 'locationConfig',
+              type: 'locationConfig',
+              props: {
+                label: 'Location Configuration',
+                description: 'Set location configuration',
+                locationType: 2
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.foreignKeyOptions) {
+                    field.props.foreignKeyOptions = this.foreignKeyOptions;
+                  }
+                }
+              }
+            }
+          ],
+          expressions: {
+            hide: `'locationEditor' !== field.parent.parent.model.type`
+          }
+        },
         {
           key: 'required',
           type: 'checkbox',
@@ -372,6 +435,7 @@ export class FormDesignerDirective {
       this.model = val;
     }
   }
+  @Input() foreignKeyOptions: { label: string; value: string }[] = [];
 
   @Output() configChange = new EventEmitter<GridFormField>();
 

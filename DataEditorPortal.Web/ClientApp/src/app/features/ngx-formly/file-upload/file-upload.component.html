@@ -61,26 +61,25 @@
 <div class="flex">
   <p-fileUpload
     *ngIf="(newAttachments | filter) < this.fileLimit"
-    #AttachmentsRef
     styleClass="p-button-outlined"
     name="files"
+    mode="basic"
     [url]="apiUrl + 'attachment/upload-temp-file'"
     [multiple]="multiple"
     [auto]="false"
-    [maxFileSize]="maxFileSize"
-    [fileLimit]="fileLimit"
     (onProgress)="onFileUploadProgress($event)"
-    (onSelect)="onFileUploadSelect($event, AttachmentsRef)"
-    mode="basic"
+    (onSelect)="onFileUploadSelect($event)"
     [chooseLabel]="chooseLabel"
+    [uploadLabel]="chooseLabel"
+    [maxFileSize]="maxFileSize"
     [accept]="accept"
     [disabled]="progress > 0 && progress < 100"
     (onUpload)="onUpload($event)"
-    (onError)="onUploadError($event, AttachmentsRef)">
+    (onError)="onUploadError($event)">
   </p-fileUpload>
   <p-progressBar
-    *ngIf="progress > 0 && progress < 100"
+    *ngIf="progress > 0 && progress <= 100"
     [value]="progress"
-    class="w-15rem ml-2"
+    class="ml-2 flex-grow-1"
     styleClass="h-full"></p-progressBar>
 </div>

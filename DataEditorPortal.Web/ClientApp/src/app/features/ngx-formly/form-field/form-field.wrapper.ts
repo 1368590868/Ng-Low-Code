@@ -9,6 +9,7 @@ import {
 export interface FormlyFieldProps extends CoreFormlyFieldProps {
   hideRequiredMarker?: boolean;
   hideLabel?: boolean;
+  helperText?: string;
 }
 
 @Component({
@@ -39,6 +40,14 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
           class="ui-message-text"
           [field]="field"></formly-validation-message>
       </small>
+
+      <small
+        *ngIf="!showError && props?.helperText !== undefined"
+        class="p-always">
+        <span class="ui-message-text"
+          >{{props.helperText}}</span
+        >
+      </small>
     </div>
   `,
   animations: [
@@ -49,8 +58,18 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
       ]),
       transition(':leave', [animate('200ms', style({ opacity: 0 }))])
     ])
+  ],
+  styles: [
+    `
+      :host {
+        .p-always {
+          color: var(--primary-color);
+          margin-left: 40%;
+        }
+      }
+    `
   ]
 })
 export class FormlyWrapperFormFieldComponent extends FieldWrapper<
   FormlyFieldConfig<FormlyFieldProps>
-> {}
+> { }
