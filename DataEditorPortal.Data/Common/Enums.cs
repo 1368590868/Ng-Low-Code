@@ -26,4 +26,10 @@
         InProgress,
         Failed
     }
+
+    public enum ImportType
+    {
+        Add,
+        Update
+    }
 }

@@ -9,6 +9,8 @@ namespace DataEditorPortal.Web.Models.ImportData
         public Guid Id { get; set; }
 
         public string Name { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ImportType ImportType { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public DataImportResult Status { get; set; }
@@ -20,11 +22,5 @@ namespace DataEditorPortal.Web.Models.ImportData
         public DateTime CreatedDate { get; set; }
 
         public double Progress { get; set; }
-    }
-
-    public enum ImportType
-    {
-        Add,
-        Update
     }
 }

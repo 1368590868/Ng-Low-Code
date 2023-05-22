@@ -13,6 +13,7 @@
         Duplicate,
         MissingFields,
         ValidationError,
-        AlreadyExists
+        AlreadyExists,
+        NotExists
     }
 }

@@ -109,7 +109,7 @@ namespace DataEditorPortal.Web.Controllers
 
                 return File(stream, "application/octet-stream", fileName);
             }
-            catch (Exception ex)
+            catch
             {
                 return new ContentResult
                 {
@@ -139,7 +139,7 @@ namespace DataEditorPortal.Web.Controllers
 
                 return File(result.stream, result.contentType, result.fileName);
             }
-            catch (Exception ex)
+            catch
             {
                 return new ContentResult
                 {

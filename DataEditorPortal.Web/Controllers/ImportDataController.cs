@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoWrapper.Filters;
 using AutoWrapper.Wrappers;
+using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Jobs;
 using DataEditorPortal.Web.Models;

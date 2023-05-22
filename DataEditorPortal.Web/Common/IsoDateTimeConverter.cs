@@ -14,8 +14,8 @@ namespace DataEditorPortal.Web.Common
         private const string DefaultDateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK";
 
         private DateTimeStyles _dateTimeStyles = DateTimeStyles.AdjustToUniversal;
-        private string? _dateTimeFormat;
-        private CultureInfo? _culture;
+        private string _dateTimeFormat;
+        private CultureInfo _culture;
 
         /// <summary>
         /// Gets or sets the date time styles used when converting a date to and from JSON.
@@ -31,7 +31,7 @@ namespace DataEditorPortal.Web.Common
         /// Gets or sets the date time format used when converting a date to and from JSON.
         /// </summary>
         /// <value>The date time format used when converting a date to and from JSON.</value>
-        public string? DateTimeFormat
+        public string DateTimeFormat
         {
             get => _dateTimeFormat ?? string.Empty;
             set => _dateTimeFormat = (string.IsNullOrEmpty(value)) ? null : value;

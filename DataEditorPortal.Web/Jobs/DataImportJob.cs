@@ -1,7 +1,7 @@
-﻿using DataEditorPortal.Data.Contexts;
+﻿using DataEditorPortal.Data.Common;
+using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
-using DataEditorPortal.Web.Models.ImportData;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
 using Microsoft.Extensions.Logging;
@@ -57,8 +57,9 @@ namespace DataEditorPortal.Web.Jobs
             entity.CreatedDate = DateTime.UtcNow;
             entity.Name = uploadedFile.FileName;
             entity.CreatedById = createdById;
-            entity.Status = Data.Common.DataImportResult.InProgress;
+            entity.Status = DataImportResult.InProgress;
             entity.GridConfigurationId = config.Id;
+            entity.ImportType = importType;
             _depDbContext.DataImportHistories.Add(entity);
             _depDbContext.SaveChanges();
 

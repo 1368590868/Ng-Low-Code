@@ -1,7 +1,7 @@
-﻿using DataEditorPortal.Data.Contexts;
+﻿using DataEditorPortal.Data.Common;
+using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
-using DataEditorPortal.Web.Models.ImportData;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
@@ -208,8 +208,8 @@ namespace DataEditorPortal.Web.Services
 
         private int SetFieldColumns(FormFieldConfig field, ExcelWorksheet worksheet, int columnIndex)
         {
-            worksheet.Column(columnIndex).Width = 30;
-            worksheet.Column(columnIndex).AutoFit(30);
+            worksheet.Column(columnIndex).Width = 20;
+            worksheet.Column(columnIndex).AutoFit(20);
             worksheet.Cells[1, columnIndex].Value = field.key;
 
             if (field.props != null)
@@ -484,9 +484,14 @@ namespace DataEditorPortal.Web.Services
                     var result = _universalGridService.CheckDataExists(name, ids.ToArray());
                     foreach (var obj in batch)
                     {
-                        if (result.Any(x => string.Compare(x.ToString(), obj[idColumn].ToString(), true) == 0))
+                        var exists = result.Any(x => string.Compare(x.ToString(), obj[idColumn].ToString(), true) == 0);
+                        if (type == ImportType.Add && exists)
                         {
                             obj["__status__"] = ReviewImportStatus.AlreadyExists;
+                        }
+                        if (type == ImportType.Update && !exists)
+                        {
+                            obj["__status__"] = ReviewImportStatus.NotExists;
                         }
                     }
                 }

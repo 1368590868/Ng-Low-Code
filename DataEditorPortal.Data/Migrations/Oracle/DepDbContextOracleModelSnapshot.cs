@@ -71,6 +71,10 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnType("RAW(16)")
                         .HasColumnName("GRID_COINFG_ID");
 
+                    b.Property<int>("ImportType")
+                        .HasColumnType("NUMBER(10)")
+                        .HasColumnName("IMPORT_TYPE");
+
                     b.Property<string>("Name")
                         .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("NAME");

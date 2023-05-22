@@ -479,26 +479,27 @@ namespace DataEditorPortal.Web.Services
                 headerRange.Style.WrapText = true;
                 ws.Row(1).Height = 30;
 
-                var columnIndex = 1;
-                foreach (var column in columns)
-                {
-                    ws.Column(columnIndex).Width = 20;
-                    ws.Column(columnIndex).AutoFit(20);
-                    ws.Cells[1, columnIndex].Value = column.header;
-                    columnIndex++;
-                }
-
-                columnIndex = 1;
-                var rowIndex = 2; // first row is header;
+                var rowIndex = 1;
                 foreach (var row in result.Data)
                 {
+                    var columnIndex = 1;
                     foreach (var column in columns)
                     {
-                        SetExcelCellValue(ws.Cells[rowIndex, columnIndex], column, row[column.field]);
+                        if (rowIndex == 1)
+                        {
+                            ws.Column(columnIndex).Width = 20;
+                            ws.Column(columnIndex).AutoFit(20);
+                            ws.Cells[rowIndex, columnIndex].Value = column.header;
+                        }
+
+                        SetExcelCellValue(ws.Cells[rowIndex + 1, columnIndex], column, row[column.field]);
                         columnIndex++;
                     }
                     rowIndex++;
                 }
+
+                var range = ws.Cells[1, 1, result.Data.Count, columns.Count];
+                range.AutoFilter = true;
 
                 ws.View.ShowGridLines = true;
                 ws.View.FreezePanes(2, 1);
@@ -516,6 +517,7 @@ namespace DataEditorPortal.Web.Services
             if (column.filterType == "boolean")
             {
                 range.Value = (bool)value ? "Yes" : "No";
+                range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
             }
             else if (column.filterType == "numeric")
             {

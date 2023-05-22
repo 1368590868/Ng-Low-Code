@@ -14,6 +14,8 @@ namespace DataEditorPortal.Data.Models
 
         [Column("NAME")]
         public string Name { get; set; }
+        [Column("IMPORT_TYPE")]
+        public ImportType ImportType { get; set; }
 
         [Column("GRID_COINFG_ID")]
         public Guid GridConfigurationId { get; set; }
