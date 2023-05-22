@@ -231,6 +231,7 @@ export class ImportExcelActionComponent
     this.step -= 1;
     if (this.step === 1) {
       this.file = null;
+      this.progress = 0;
     }
   }
 
