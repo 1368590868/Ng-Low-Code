@@ -91,7 +91,7 @@ export class FileUploadComponent implements ControlValueAccessor {
   }
 
   onFileUploadSelect(event: any) {
-    const files = event.files;
+    const files = event.currentFiles;
 
     // check fileType
     let errorFile = [];
