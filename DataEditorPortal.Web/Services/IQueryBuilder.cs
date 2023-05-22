@@ -211,8 +211,9 @@ namespace DataEditorPortal.Web.Services
             else if (jsonElement.ValueKind == JsonValueKind.False) return 0;
             else if (jsonElement.ValueKind == JsonValueKind.String)
             {
+                var formats = new string[] { "yyyy-MM-ddTHH:mm:ss.FFFFFFFK", "", "" };
                 DateTime date;
-                if (DateTime.TryParse(jsonElement.GetString(), out date))
+                if (DateTime.TryParseExact(jsonElement.GetString(), formats, null, System.Globalization.DateTimeStyles.None, out date))
                 {
                     return date;
                 }
