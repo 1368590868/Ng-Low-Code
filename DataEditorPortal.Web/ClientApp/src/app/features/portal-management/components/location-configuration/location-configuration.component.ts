@@ -123,7 +123,7 @@ export class LocationConfigurationComponent {
       return false;
     }
     if (this.locationType === 4) {
-      if (!this.formControlToMeasure.valid || !this.formControlToVs)
+      if (!this.formControlToMeasure.valid || !this.formControlToVs.valid)
         return false;
     }
     return true;

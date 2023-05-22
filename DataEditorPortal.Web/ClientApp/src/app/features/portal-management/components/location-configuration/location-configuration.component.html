@@ -3,13 +3,13 @@
     <p-message
       *ngIf="!innerValue"
       class="cursor-pointer"
-      severity="info"
-      text="Use default Mapping"></p-message>
+      severity="warn"
+      text="No Configuration"></p-message>
     <p-message
       *ngIf="innerValue"
       class="cursor-pointer"
-      severity="info"
-      text="Use existing table"
+      severity="success"
+      text="Have Configuration"
       (click)="showDialog()"></p-message>
 
     <p-button
@@ -34,63 +34,128 @@
   appendTo="body"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0">
   <div #container class="dialog-content">
+    <p-divider styleClass="mb-4">Fields Mapping</p-divider>
+
     <div class="flex justify-content-between">
       <div class="flex flex-column mb-3">
-        <label class="mb-1">{{ locationType === 2 ? 'VS' : 'From VS' }} </label>
+        <label for="" class="mb-1">Field Name</label>
         <div class="flex align-items-center">
-          <p-dropdown
-            [formControl]="formControlFromVs"
-            class="mr-1 flex-grow-1"
-            [style]="{ minWidth: '20rem' }"
-            appendTo="body"
-            placeholder="Please Select"
-            [showClear]="true"
-            [options]="foreignKeyOptions">
-          </p-dropdown>
+          <input
+            type="text"
+            pInputText
+            [ngModel]="locationType === 2 ? 'VS' : 'From VS'"
+            [disabled]="true"
+            [style]="{ minWidth: '20rem' }" />
         </div>
       </div>
       <div class="flex flex-column mb-3">
-        <label class="mb-1">
-          {{ locationType === 2 ? 'Measure' : ' From Measure' }}
-        </label>
-        <div class="flex align-items-center">
-          <p-dropdown
-            [formControl]="formControlFromMeasure"
-            class="mr-1 flex-grow-1"
-            [style]="{ minWidth: '20rem' }"
-            appendTo="body"
-            placeholder="Please Select"
-            [showClear]="true"
-            [options]="foreignKeyOptions">
-          </p-dropdown>
-        </div>
+        <ng-container>
+          <label for="tableName" class="mb-1">Map To</label>
+          <div class="flex align-items-center">
+            <p-dropdown
+              [formControl]="formControlFromVs"
+              class="mr-1 flex-grow-1"
+              [style]="{ minWidth: '20rem' }"
+              appendTo="body"
+              placeholder="Please Select"
+              [showClear]="true"
+              [options]="foreignKeyOptions">
+            </p-dropdown>
+          </div>
+        </ng-container>
       </div>
     </div>
 
     <div class="flex justify-content-between">
-      <div class="flex flex-column mb-3" *ngIf="locationType === 4">
-        <label class="mb-1"> To VS </label>
-        <p-dropdown
-          [formControl]="formControlToVs"
-          class="mr-1 flex-grow-1"
-          [style]="{ minWidth: '20rem' }"
-          appendTo="body"
-          placeholder="Please Select"
-          [showClear]="true"
-          [options]="foreignKeyOptions">
-        </p-dropdown>
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1"></label>
+        <div class="flex align-items-center">
+          <input
+            type="text"
+            pInputText
+            [ngModel]="locationType === 2 ? 'Measure' : ' From Measure'"
+            [disabled]="true"
+            [style]="{ minWidth: '20rem' }" />
+        </div>
       </div>
-      <div class="flex flex-column mb-3" *ngIf="locationType !== 2">
-        <label class="mb-1"> To Measure </label>
-        <p-dropdown
-          [formControl]="formControlToMeasure"
-          class="mr-1 flex-grow-1"
-          [style]="{ minWidth: '20rem' }"
-          appendTo="body"
-          placeholder="Please Select"
-          [showClear]="true"
-          [options]="foreignKeyOptions">
-        </p-dropdown>
+      <div class="flex flex-column mb-3">
+        <ng-container>
+          <label for="tableName" class="mb-1"></label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              [formControl]="formControlFromMeasure"
+              class="mr-1 flex-grow-1"
+              [style]="{ minWidth: '20rem' }"
+              appendTo="body"
+              placeholder="Please Select"
+              [showClear]="true"
+              [options]="foreignKeyOptions">
+            </p-dropdown>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="flex justify-content-between" *ngIf="locationType === 4">
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1"></label>
+        <div class="flex align-items-center">
+          <input
+            type="text"
+            pInputText
+            [ngModel]="'To VS'"
+            [disabled]="true"
+            [style]="{ minWidth: '20rem' }" />
+        </div>
+      </div>
+      <div class="flex flex-column mb-3">
+        <ng-container>
+          <label for="tableName" class="mb-1"></label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              [formControl]="formControlToVs"
+              class="mr-1 flex-grow-1"
+              [style]="{ minWidth: '20rem' }"
+              appendTo="body"
+              placeholder="Please Select"
+              [showClear]="true"
+              [options]="foreignKeyOptions">
+            </p-dropdown>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="flex justify-content-between" *ngIf="locationType !== 2">
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1"></label>
+        <div class="flex align-items-center">
+          <input
+            type="text"
+            pInputText
+            [ngModel]="'To Measure'"
+            [disabled]="true"
+            [style]="{ minWidth: '20rem' }" />
+        </div>
+      </div>
+      <div class="flex flex-column mb-3">
+        <ng-container>
+          <label for="tableName" class="mb-1"></label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              [formControl]="formControlToMeasure"
+              class="mr-1 flex-grow-1"
+              [style]="{ minWidth: '20rem' }"
+              appendTo="body"
+              placeholder="Please Select"
+              [showClear]="true"
+              [options]="foreignKeyOptions">
+            </p-dropdown>
+          </div>
+        </ng-container>
       </div>
     </div>
   </div>
