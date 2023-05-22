@@ -43,12 +43,12 @@
             [showAddButton]="false"
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
-        <th pSortableColumn="createByUser">
-          Create By User <p-sortIcon field="createByUser"></p-sortIcon>
+        <th pSortableColumn="createdByUser">
+          Created By<p-sortIcon field="createdByUser"></p-sortIcon>
           <p-columnFilter
             style="vertical-align: middle"
             type="text"
-            field="createByUser"
+            field="createdByUser"
             display="menu"
             [hideOnClear]="true"
             [showOperator]="false"
@@ -56,7 +56,7 @@
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
         <th pSortableColumn="createdDate">
-          Create Date <p-sortIcon field="createdDate"></p-sortIcon>
+          Created Date <p-sortIcon field="createdDate"></p-sortIcon>
           <p-columnFilter
             style="vertical-align: middle"
             type="text"
@@ -85,7 +85,7 @@
     <ng-template pTemplate="body" let-fileList>
       <tr>
         <td>{{ fileList.name }}</td>
-        <td>{{ fileList.createByUser }}</td>
+        <td>{{ fileList.createdByUser }}</td>
         <td>{{ fileList.createdDate | date : 'dd/MM/YYYY HH:mm:ss' }}</td>
         <td>{{ fileList.importType }}</td>
         <td>
