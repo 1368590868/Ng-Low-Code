@@ -147,10 +147,17 @@ formly-form {
   }
 }
 
-.import-tooltip {
+.tooltip-error {
   .p-tooltip-text {
     background: var(--red-100);
     color: var(--red-400);
+  }
+}
+
+.tooltip-success {
+  .p-tooltip-text {
+    background: var(--green-100);
+    color: var(--green-400);
   }
 }
 
