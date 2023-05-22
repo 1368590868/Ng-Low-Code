@@ -2,7 +2,7 @@ import { Directive, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { startWith, distinctUntilChanged, tap } from 'rxjs';
-import { GridFormField } from '../models/portal-item';
+import { DataSourceTableColumn, GridFormField } from '../models/portal-item';
 import { PortalItemService } from '../services/portal-item.service';
 
 export const FROM_DESIGNER_CONTROLS: {
@@ -369,8 +369,8 @@ export class FormDesignerDirective {
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.foreignKeyOptions) {
-                    field.props.foreignKeyOptions = this.foreignKeyOptions;
+                  if (this.mappingColumns) {
+                    field.props.mappingColumns = this.mappingColumns;
                   }
                 }
               }
@@ -427,7 +427,7 @@ export class FormDesignerDirective {
       this.model = val;
     }
   }
-  @Input() foreignKeyOptions: { label: string; value: string }[] = [];
+  @Input() mappingColumns: DataSourceTableColumn[] = [];
 
   @Output() configChange = new EventEmitter<GridFormField>();
 
