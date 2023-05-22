@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, ViewChild } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,6 +12,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { ConfirmationService } from 'primeng/api';
+import { FileUpload } from 'primeng/fileupload';
 import { startWith } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 @Pipe({
@@ -42,6 +43,7 @@ export class FilterPipe implements PipeTransform {
   ]
 })
 export class FileUploadComponent implements ControlValueAccessor {
+  @ViewChild(FileUpload) fileUpload!: FileUpload;
   @Input() gridName = '';
   @Input() fieldName: any;
   @Input() accept = '.dwg,.dxf,.dgn,.pdf,.ppt,.docx,.doc,.xlsx,.xls,image/*';
@@ -88,17 +90,64 @@ export class FileUploadComponent implements ControlValueAccessor {
     this.apiUrl = apiUrl;
   }
 
-  onFileUploadSelect(event: any, AttachmentsRef: any) {
-    const isNotDeletedFile = this.filterPipe.transform(this.newAttachments);
-    if (event.currentFiles.length + isNotDeletedFile > this.fileLimit) {
-      this.notifyService.notifyError('Error', 'File Limit Exceeded');
-      AttachmentsRef.clear();
-    } else {
-      AttachmentsRef.upload();
+  onFileUploadSelect(event: any) {
+    const files = event.files;
+
+    // check fileType
+    let errorFile = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (this.accept && (this.fileUpload as any).isFileTypeValid(file)) {
+        errorFile.push(file);
+      }
     }
+    if (errorFile.length > 0) {
+      this.notifyService.notifyError(
+        'Invalid file type',
+        `<ul class="pl-3"><li class="py-1">${errorFile
+          .map(f => f.name)
+          .join('</li><li class="py-1">')}</li></ul>`
+      );
+      this.fileUpload.clear();
+      return;
+    }
+
+    // check maxFileSize
+    errorFile = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (this.maxFileSize && file.size > this.maxFileSize) {
+        errorFile.push(file);
+      }
+    }
+    if (errorFile.length > 0) {
+      this.notifyService.notifyError(
+        'Maximum upload size exceeded',
+        `<ul class="pl-3"><li>${errorFile
+          .map(f => f.name)
+          .join('</li><li>')}</li></ul>`
+      );
+    }
+
+    // check filelimit
+    if (this.fileLimit) {
+      const isNotDeletedFile = this.filterPipe.transform(this.newAttachments);
+      if (files.length + isNotDeletedFile > this.fileLimit) {
+        this.notifyService.notifyError(
+          'Error',
+          `Maximum number of files exceeded, limit is ${this.fileLimit} at most.`
+        );
+        this.fileUpload.clear();
+        return;
+      }
+    }
+
+    // no errors, start to upload.
+    this.fileUpload.upload();
   }
 
   onUpload(event: any) {
+    this.progress = 0;
     if (event?.originalEvent?.body?.result) {
       for (const file of event.originalEvent.body.result) {
         this.newAttachments.push(file);
@@ -108,15 +157,13 @@ export class FileUploadComponent implements ControlValueAccessor {
     }
   }
 
-  onUploadError(event: any, fileUpload: any) {
-    fileUpload.clear();
+  onUploadError(event: any) {
+    this.fileUpload.clear();
     this.notifyService.notifyError('Error', 'File Upload Failed');
   }
 
   onFileUploadProgress(event: any) {
-    this.progress = Math.round(
-      (event.originalEvent.loaded * 100) / event.originalEvent.total
-    );
+    this.progress = event.progress;
   }
 
   onEditComments() {
@@ -197,14 +244,14 @@ export class FormlyFieldFileUploadComponent
   >
   implements OnInit
 {
-  @HostBinding('style.width') width = 'auto';
+  @HostBinding('style.width') width = '';
   @HostBinding('style.margin-top') marginTop = '0';
 
   ngOnInit(): void {
     this.formControl.valueChanges
       .pipe(startWith(this.formControl.value))
       .subscribe(val => {
-        this.width = val && val !== '[]' ? '100% !important' : 'auto';
+        this.width = val && val !== '[]' ? '100% !important' : '';
         this.marginTop = val && val !== '[]' ? '0.25rem' : '0';
       });
   }
