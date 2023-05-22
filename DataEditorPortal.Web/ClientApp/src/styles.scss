@@ -189,3 +189,9 @@ formly-form {
     line-height: 1;
   }
 }
+
+.p-toast {
+  .p-toast-detail {
+    overflow-wrap: anywhere;
+  }
+}
