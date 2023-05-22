@@ -43,6 +43,18 @@
             [showAddButton]="false"
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
+        <th pSortableColumn="importType">
+          Import Type <p-sortIcon field="importType"></p-sortIcon>
+          <p-columnFilter
+            style="vertical-align: middle"
+            type="text"
+            field="importType"
+            display="menu"
+            [hideOnClear]="true"
+            [showOperator]="false"
+            [showAddButton]="false"
+            [maxFractionDigits]="4"></p-columnFilter>
+        </th>
         <th pSortableColumn="createdByUser">
           Created By<p-sortIcon field="createdByUser"></p-sortIcon>
           <p-columnFilter
@@ -67,27 +79,18 @@
             [showAddButton]="false"
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
-        <th pSortableColumn="importType">
-          Import Type <p-sortIcon field="importType"></p-sortIcon>
-          <p-columnFilter
-            style="vertical-align: middle"
-            type="text"
-            field="importType"
-            display="menu"
-            [hideOnClear]="true"
-            [showOperator]="false"
-            [showAddButton]="false"
-            [maxFractionDigits]="4"></p-columnFilter>
-        </th>
+
         <th pSortableColumn="status">Status</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-fileList>
       <tr>
         <td>{{ fileList.name }}</td>
+        <td>
+          <p-tag>{{ fileList.importType }}</p-tag>
+        </td>
         <td>{{ fileList.createdByUser }}</td>
         <td>{{ fileList.createdDate | date : 'dd/MM/YYYY HH:mm:ss' }}</td>
-        <td>{{ fileList.importType }}</td>
         <td>
           <app-import-status
             [rowData]="fileList"
