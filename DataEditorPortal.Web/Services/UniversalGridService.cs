@@ -3,7 +3,6 @@ using Dapper;
 using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
-using DataEditorPortal.ExcelExport;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
@@ -12,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -410,73 +410,6 @@ namespace DataEditorPortal.Web.Services
             return output;
         }
 
-        public MemoryStream ExportExcel(string name, ExportParam param)
-        {
-            var columns = GetGridColumnsConfig(name).Where(x => x.type == "DataBaseField").ToList();
-
-            var result = GetGridData(name, param);
-
-            List<DataParam> sheetData = new List<DataParam>();
-
-            var sheet = new SheetParam() { Name = "Data", ID = 1, ColumnParams = new List<ColumnOptions>() };
-
-            #region add header
-            var colIndex = 0;
-            foreach (var item in columns)
-            {
-                colIndex++;
-                DataParam header = new DataParam()
-                {
-                    C2 = colIndex,
-                    R2 = 1,
-                    Text = item.header,
-                    Type = "String",
-                    FormatCell = new FormatOptions() { WrapText = true, BackGroundColor = "cccccc" }
-                };
-                sheet.ColumnParams.Add(new ColumnOptions() { Index2 = colIndex, Width = 20 });
-                sheetData.Add(header);
-            }
-            #endregion
-
-            #region add data
-            var rowIndex = 1;
-            foreach (var row in result.Data)
-            {
-                colIndex = 0;
-                rowIndex++;
-                foreach (var item in columns)
-                {
-                    colIndex++;
-                    DataParam data = new DataParam()
-                    {
-                        C2 = colIndex,
-                        R2 = rowIndex,
-                        Text = (string)FormatExportedValue(item, row[item.field]),
-                        Type = item.filterType
-                    };
-                    sheetData.Add(data);
-                }
-            }
-            #endregion
-
-            sheet.FilterParam = new List<AutoFilterOptions>
-            {
-                new AutoFilterOptions()
-                {
-                    FromRow = 1,
-                    ToRow = rowIndex,
-                    FromColumn = 1,
-                    ToColumn = sheet.ColumnParams.Count
-                }
-            };
-
-            var stream = new MemoryStream();
-            var exp = new Exporters();
-            exp.Addsheet(sheet, sheetData, stream);
-            stream.Seek(0, SeekOrigin.Begin);
-            return stream;
-        }
-
         public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column)
         {
             var config = GetUniversalGridConfiguration(name);
@@ -523,16 +456,102 @@ namespace DataEditorPortal.Web.Services
                 .ToList();
         }
 
-        private object FormatExportedValue(GridColConfig column, object value)
+        #endregion
+
+        #region Export Grid Data
+
+        public MemoryStream ExportExcel(string name, ExportParam param)
         {
-            if (value == null) return "";
+            var columns = GetGridColumnsConfig(name).Where(x => x.type == "DataBaseField").ToList();
+            var result = GetGridData(name, param);
+
+            var stream = new MemoryStream();
+            using (var p = new ExcelPackage(stream))
+            {
+                var ws = p.Workbook.Worksheets.Add("Data");
+
+                var headerRange = ws.Cells[1, 1, 1, columns.Count];
+                headerRange.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                headerRange.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml($"#ccc"));
+                headerRange.Style.Font.Size = 11;
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.WrapText = true;
+                ws.Row(1).Height = 30;
+
+                var columnIndex = 1;
+                foreach (var column in columns)
+                {
+                    ws.Column(columnIndex).Width = 20;
+                    ws.Column(columnIndex).AutoFit(20);
+                    ws.Cells[1, columnIndex].Value = column.header;
+                    columnIndex++;
+                }
+
+                columnIndex = 1;
+                var rowIndex = 2; // first row is header;
+                foreach (var row in result.Data)
+                {
+                    foreach (var column in columns)
+                    {
+                        SetExcelCellValue(ws.Cells[rowIndex, columnIndex], column, row[column.field]);
+                        columnIndex++;
+                    }
+                    rowIndex++;
+                }
+
+                ws.View.ShowGridLines = true;
+                ws.View.FreezePanes(2, 1);
+
+                p.Save();
+                p.Dispose();
+            }
+
+            stream.Seek(0, SeekOrigin.Begin);
+            return stream;
+        }
+
+        private void SetExcelCellValue(ExcelRange range, GridColConfig column, object value)
+        {
             if (column.filterType == "boolean")
             {
-                return (bool)value ? "Yes" : "No";
+                range.Value = (bool)value ? "Yes" : "No";
+            }
+            else if (column.filterType == "numeric")
+            {
+                if (value != null)
+                {
+                    decimal tmpVal;
+                    if (decimal.TryParse(value.ToString(), out tmpVal))
+                    {
+                        range.Value = tmpVal;
+
+                        var maxFractionDigits = 2;
+                        if (!string.IsNullOrEmpty(column.format))
+                        {
+                            var format = column.format.Split(new char[] { '.', '-', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            if (format.Length == 2) int.TryParse(format[format.Length - 1], out maxFractionDigits);
+                        }
+                        var digits = "".PadRight(maxFractionDigits, '0');
+                        range.Style.Numberformat.Format = digits.Length > 0 ? $"#,##0.{digits}" : "#,##0";
+                    }
+                }
+            }
+            else if (column.filterType == "date")
+            {
+                if (value != null)
+                {
+                    DateTime tmpVal;
+                    if (DateTime.TryParse(value.ToString(), out tmpVal))
+                    {
+                        range.Value = tmpVal.ToOADate();
+                        range.Style.Numberformat.Format = "mm-dd-yyyy"; //or m/d/yy h:mm
+                    }
+                }
             }
             else
             {
-                return value.ToString();
+                range.Value = value;
             }
         }
 

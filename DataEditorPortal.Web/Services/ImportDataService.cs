@@ -315,7 +315,7 @@ namespace DataEditorPortal.Web.Services
         {
             var col = worksheet.Cells[1, columnIndex].Address[0];
 
-            worksheet.Column(columnIndex).Style.Numberformat.Format = "d-mmm-yy";
+            worksheet.Column(columnIndex).Style.Numberformat.Format = "mm-dd-yyyy";
             var validation = worksheet.DataValidations.AddDateTimeValidation($"{col}2:{col}{worksheet.Rows.EndRow}");
             validation.AllowBlank = !IsRequired(field);
             validation.ShowErrorMessage = true;
