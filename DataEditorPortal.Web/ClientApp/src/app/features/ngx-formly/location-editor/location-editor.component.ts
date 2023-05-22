@@ -38,7 +38,7 @@ export class LocationEditorComponent {
   }
   @Input() label!: string;
   @Input() locationType!: number;
-  @Input() optionsLookup!: { label: string; value: string }[] | { id: string };
+  @Input() system!: { label: string; value: string }[] | { id: string };
 
   onChange?: any;
   onTouch?: any;
@@ -66,12 +66,16 @@ export class LocationEditorComponent {
           );
           if (field && field.parent && field.parent.get) {
             const fromMeasure = field.parent.get('fromMeasure');
-            fromMeasure.props!['helperText'] = `Valid Range:${record?.value1} to ${record?.value2 }`
+            fromMeasure.props![
+              'helperText'
+            ] = `Valid Range:${record?.value1} to ${record?.value2}`;
             fromMeasure.props!['minNum'] = record?.value1;
             fromMeasure.props!['maxNum'] = record?.value2;
             if (this.locationType === 3) {
               const toMeasure = field.parent.get('toMeasure');
-              toMeasure.props!['helperText'] = `Valid Range:${record?.value1} to ${record?.value2}`
+              toMeasure.props![
+                'helperText'
+              ] = `Valid Range:${record?.value1} to ${record?.value2}`;
               toMeasure.props!['minNum'] = record?.value1;
               toMeasure.props!['maxNum'] = record?.value2;
             }
@@ -88,17 +92,17 @@ export class LocationEditorComponent {
       },
       hooks: {
         onInit: (field: FormlyFieldConfig & any) => {
-          if (!Array.isArray(this.optionsLookup)) {
+          if (!Array.isArray(this.system)) {
             this.locationEditorService
-              .getPipeOptions(this.optionsLookup?.id)
+              .getPipeOptions(this.system?.id)
               .subscribe(res => {
                 this.locationOptions = res;
                 field.props.options = res;
                 field.parent.get('toVs').props.options = res;
               });
           } else {
-            field.props.options = this.optionsLookup;
-            field.parent.get('toVs').props.options = this.optionsLookup;
+            field.props.options = this.system;
+            field.parent.get('toVs').props.options = this.system;
           }
 
           if (this.locationType === 2) {
@@ -222,7 +226,7 @@ export class LocationEditorComponent {
     [formlyAttributes]="field"
     [label]="props.label || 'Location'"
     [locationType]="props.locationType || 2"
-    [optionsLookup]="props.optionsLookup || []"></app-location-editor>`,
+    [system]="props.system || []"></app-location-editor>`,
   styles: [
     `
       :host {
@@ -237,7 +241,7 @@ export class FormlyFieldLocationEditorComponent extends FieldType<
     FormlyFieldProps & {
       label: string;
       locationType: number;
-      optionsLookup: { label: string; value: string }[];
+      system: { label: string; value: string }[];
     }
   >
 > {}

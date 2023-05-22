@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import {
   FormControl,
   ControlValueAccessor,
@@ -28,6 +28,7 @@ interface OptionItem {
   ]
 })
 export class OptionDialogComponent implements ControlValueAccessor {
+  @Input() commonAdvanced!: boolean;
   isAdvanced = false;
   optionsLookup?: string;
   options: any[] = [];
@@ -152,7 +153,8 @@ export class OptionDialogComponent implements ControlValueAccessor {
 
   showDialog() {
     this.isAdvanced =
-      (!this.options || this.options.length === 0) && !!this.optionsLookup;
+      ((!this.options || this.options.length === 0) && !!this.optionsLookup) ||
+      this.commonAdvanced;
     if (this.isAdvanced) {
       this.getOptionQueryDetail();
       this.visible = true;
@@ -263,9 +265,8 @@ export class OptionDialogComponent implements ControlValueAccessor {
     <app-option-dialog
       [formControl]="formControl"
       [formlyAttributes]="field"
-      (onChange)="
-        props.change && props.change(field, $event)
-      "></app-option-dialog>
+      (onChange)="props.change && props.change(field, $event)"
+      [commonAdvanced]="props.commonAdvanced || false"></app-option-dialog>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

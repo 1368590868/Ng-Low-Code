@@ -217,7 +217,7 @@ export class FormDesignerDirective {
             }
           ],
           expressions: {
-            hide: `['select', 'checkboxList', 'radio', 'multiSelect' , 'locationEditor'].indexOf(field.parent.parent.model.type) < 0`
+            hide: `['select', 'checkboxList', 'radio', 'multiSelect' ].indexOf(field.parent.parent.model.type) < 0`
           }
         },
         // props for inputNumber
@@ -334,6 +334,14 @@ export class FormDesignerDirective {
         {
           fieldGroup: [
             {
+              key: 'system',
+              type: 'optionsEditor',
+              props: {
+                label: 'Pressure System',
+                commonAdvanced: true
+              }
+            },
+            {
               key: 'locationType',
               type: 'select',
               defaultValue: 2,
@@ -345,26 +353,7 @@ export class FormDesignerDirective {
                   { label: 'Point Location', value: 2 },
                   { label: 'Linear Location', value: 3 },
                   { label: 'Linear Multiple', value: 4 }
-                ],
-                change: (field, event) => {
-                  if (field && field.parent && field.parent.get) {
-                    const locationConfig = field.parent.get('locationConfig');
-                    if (event.value) {
-                      locationConfig.props!['locationType'] = event.value;
-                    }
-                  }
-                }
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (field && field.parent && field.parent.get) {
-                    const locationConfig = field.parent.get('locationConfig');
-                    if (field.formControl.value) {
-                      locationConfig.props!['locationType'] =
-                        field.formControl.value;
-                    }
-                  }
-                }
+                ]
               }
             },
             {
@@ -374,6 +363,9 @@ export class FormDesignerDirective {
                 label: 'Location Configuration',
                 description: 'Set location configuration',
                 locationType: 2
+              },
+              expressions: {
+                'props.locationType': `field.parent.model.locationType`
               },
               hooks: {
                 onInit: (field: any) => {
