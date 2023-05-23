@@ -370,8 +370,8 @@ export class FormDesignerDirective {
               },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.mappingColumns) {
-                    field.props.mappingColumns = this.mappingColumns;
+                  if (this.dbColumns) {
+                    field.props.mappingColumns = this.dbColumns;
                   }
                 }
               }
@@ -428,7 +428,7 @@ export class FormDesignerDirective {
       this.model = val;
     }
   }
-  @Input() mappingColumns: DataSourceTableColumn[] = [];
+  @Input() dbColumns: DataSourceTableColumn[] = [];
 
   @Output() configChange = new EventEmitter<GridFormField>();
 

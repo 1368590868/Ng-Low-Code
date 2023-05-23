@@ -77,14 +77,12 @@ export class FormLayoutComponent {
   set dbColumns(val: DataSourceTableColumn[]) {
     this._dbColumns = val;
     this.updateSourceColumns();
-    this.mappingColumns = this._dbColumns;
   }
 
   @Input() queryTextRequired = false;
 
   sourceColumns: GridFormField[] = [];
   targetColumns: GridFormField[] = [];
-  mappingColumns: DataSourceTableColumn[] = [];
   @ViewChild('pickList') pickList!: PickList;
 
   model: any = {};
