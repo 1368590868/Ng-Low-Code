@@ -186,7 +186,11 @@
 </div>
 
 <div *ngIf="step === 3" class="flex flex-column overflow-auto p-1">
-  <div class="flex align-items-center" *ngIf="statusList.length > 1">
+  <p class="mb-3">
+    Review the data and fix any validation errors. Once fixed, you need to
+    repeat the import process with necessary adjustments to rectify any errors.
+  </p>
+  <div class="flex align-items-center mb-3" *ngIf="statusList.length > 1">
     <p-button
       *ngIf="innerInfoList && innerInfoList.length > 0"
       (onClick)="onShowInfo(-1)"
@@ -222,13 +226,7 @@
           : 'Unknown Error'
       }}"></p-button>
   </div>
-
   <div *ngIf="infoList && infoList.length > 0" class="preview-data">
-    <p class="mb-3">
-      Review the data and fix any validation errors. Once fixed, you need to
-      repeat the import process with necessary adjustments to rectify any
-      errors.
-    </p>
     <p-table
       class="data-table"
       [value]="infoList"
