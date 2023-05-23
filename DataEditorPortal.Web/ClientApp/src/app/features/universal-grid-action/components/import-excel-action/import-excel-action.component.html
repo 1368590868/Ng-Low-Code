@@ -217,6 +217,8 @@
           ? 'Validation Error'
           : data['__status__'] === 4
           ? 'Already Exists'
+          : data['__status__'] === 5
+          ? 'Not Exists'
           : 'Unknown Error'
       }}"></p-button>
   </div>
@@ -273,6 +275,8 @@
                   ? 'Validation Error'
                   : infoList['__status__'] === 4
                   ? 'Already Exists'
+                  : infoList['__status__'] === 5
+                  ? 'Not Exists'
                   : 'Unknown Error'
               }}</p-tag
             >
