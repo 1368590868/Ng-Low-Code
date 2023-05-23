@@ -338,7 +338,8 @@ export class FormDesignerDirective {
               type: 'optionsEditor',
               props: {
                 label: 'Pressure System',
-                commonAdvanced: true
+                onlyAdvanced: true,
+                dialogTitle: 'Pressure System'
               }
             },
             {

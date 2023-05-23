@@ -28,7 +28,8 @@ interface OptionItem {
   ]
 })
 export class OptionDialogComponent implements ControlValueAccessor {
-  @Input() commonAdvanced!: boolean;
+  @Input() onlyAdvanced!: boolean;
+  @Input() dialogTitle!: string;
   isAdvanced = false;
   optionsLookup?: string;
   options: any[] = [];
@@ -154,7 +155,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
   showDialog() {
     this.isAdvanced =
       ((!this.options || this.options.length === 0) && !!this.optionsLookup) ||
-      this.commonAdvanced;
+      this.onlyAdvanced;
     if (this.isAdvanced) {
       this.getOptionQueryDetail();
       this.visible = true;
@@ -266,7 +267,8 @@ export class OptionDialogComponent implements ControlValueAccessor {
       [formControl]="formControl"
       [formlyAttributes]="field"
       (onChange)="props.change && props.change(field, $event)"
-      [commonAdvanced]="props.commonAdvanced || false"></app-option-dialog>
+      [dialogTitle]="props.dialogTitle || 'Options'"
+      [onlyAdvanced]="props.onlyAdvanced || false"></app-option-dialog>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
