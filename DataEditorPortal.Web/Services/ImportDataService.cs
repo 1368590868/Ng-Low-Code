@@ -1,6 +1,7 @@
 ﻿using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.Extensions.Caching.Memory;
@@ -59,7 +60,7 @@ namespace DataEditorPortal.Web.Services
 
             string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot/FileUploadTemp");
             var tempFilePath = Path.Combine(tempFolder, $"{uploadedFile.FileId} - {uploadedFile.FileName}");
-            if (!File.Exists(tempFilePath)) throw new Exception("Uploaded File doesn't exist.");
+            if (!File.Exists(tempFilePath)) throw new DepException("Uploaded File doesn't exist.");
 
             IEnumerable<IDictionary<string, object>> sourceObjs = null;
             using (var stream = File.OpenRead(tempFilePath))
@@ -70,19 +71,26 @@ namespace DataEditorPortal.Web.Services
                     {
                         var worksheet = package.Workbook.Worksheets[0];
 
-                        var dt = worksheet.Cells[worksheet.Dimension.Address].ToDataTable(config =>
+                        try
                         {
-                            config.PredefinedMappingsOnly = true;
-                            fields.ForEach(x =>
+                            var dt = worksheet.Cells[worksheet.Dimension.Address].ToDataTable(config =>
                             {
-                                config.Mappings.Add(fields.IndexOf(x), x.key, typeof(string), true);
+                                config.PredefinedMappingsOnly = true;
+                                fields.ForEach(x =>
+                                {
+                                    config.Mappings.Add(fields.IndexOf(x), x.key, typeof(string), true);
+                                });
                             });
-                        });
-                        sourceObjs = GetDataTableDictionaryList(dt).ToList();
+                            sourceObjs = GetDataTableDictionaryList(dt).ToList();
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new DepException(ex.Message);
+                        }
                     }
                     else
                     {
-                        throw new Exception("The uploaded excel should have at least one worksheet.");
+                        throw new DepException("The uploaded excel should have at least one worksheet.");
                     }
                 }
             }
@@ -404,7 +412,7 @@ namespace DataEditorPortal.Web.Services
         public IEnumerable<IDictionary<string, object>> ValidateImportedData(string name, ImportType type, IEnumerable<IDictionary<string, object>> sourceObjs)
         {
             if (sourceObjs == null) throw new ArgumentNullException("sourceObjs");
-            if (!sourceObjs.Any()) throw new Exception("No records in template for importing.");
+            if (!sourceObjs.Any()) throw new DepException("No records in template for importing.");
 
             var config = _universalGridService.GetUniversalGridConfiguration(name);
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
@@ -433,7 +441,7 @@ namespace DataEditorPortal.Web.Services
                         }
                         else
                         {
-                            if (!ValidateValueFormat(field, value))
+                            if (!ValidateValueFormat(field, obj))
                             {
                                 // validate format
                                 errorMsg.Add(new ReviewImportError() { Field = field.key, ErrorMsg = $"Invalid value format." });
@@ -557,34 +565,44 @@ namespace DataEditorPortal.Web.Services
             return errorMsg;
         }
 
-        private bool ValidateValueFormat(FormFieldConfig field, object value)
+        private bool ValidateValueFormat(FormFieldConfig field, IDictionary<string, object> obj)
         {
-            if (value == null) throw new ArgumentNullException("value");
+            if (obj == null) throw new ArgumentNullException("obj");
+            var value = obj[field.key];
+            if (value == null) throw new NullReferenceException("value");
 
             var type = value.GetType();
             var filterType = field.filterType;
             if (filterType == "numeric")
             {
-                if (type == typeof(int) || type == typeof(uint) || type == typeof(short) || type == typeof(ushort) ||
-                    type == typeof(long) || type == typeof(float) || type == typeof(decimal) || type == typeof(double))
+                var digits = GetFieldFractionDigits(field);
+                decimal tempValue;
+                if (decimal.TryParse(value.ToString(), out tempValue))
                 {
+                    obj[field.key] = tempValue.ToString($"N{digits}");
                     return true;
                 }
                 else
-                {
-                    return decimal.TryParse(value.ToString(), out _);
-                }
+                    return false;
+
             }
             else if (filterType == "date")
             {
-                if (type == typeof(DateTime))
+                try
                 {
+                    obj[field.key] = DateTime.FromOADate(Convert.ToDouble(value)).ToString("MM-dd-yyyy");
                     return true;
                 }
-                else
+                catch
                 {
-                    return DateTime.TryParse(value.ToString(), out _);
                 }
+                DateTime tempDate;
+                if (DateTime.TryParse(value.ToString(), out tempDate))
+                {
+                    obj[field.key] = tempDate.ToString("MM-dd-yyyy");
+                    return true;
+                }
+                return false;
             }
             else if (filterType == "boolean")
             {
@@ -626,6 +644,7 @@ namespace DataEditorPortal.Web.Services
             _memoryCache.Remove($"import_data_required_{fieldKey}");
             _memoryCache.Remove($"import_data_validation_{fieldKey}");
             _memoryCache.Remove($"import_data_options_{fieldKey}");
+            _memoryCache.Remove($"import_data_fraction_{fieldKey}");
         }
 
         private List<FormFieldConfig> GetTemplateFields(UniversalGridConfiguration config, ImportType type)
@@ -710,6 +729,30 @@ namespace DataEditorPortal.Web.Services
                 }
 
                 return options;
+            });
+        }
+
+        private int GetFieldFractionDigits(FormFieldConfig field)
+        {
+            return _memoryCache.GetOrCreate($"import_data_fraction_{field.key}", entry =>
+            {
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(60));
+
+                int maxFractionDigits = 2;
+
+                if (field.props != null)
+                {
+                    using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+                    {
+                        var props = doc.RootElement.EnumerateObject();
+
+                        var maxFractionDigitsProp = props.FirstOrDefault(x => x.Name == "maxFractionDigits").Value;
+                        if (maxFractionDigitsProp.ValueKind == JsonValueKind.Number)
+                            maxFractionDigits = maxFractionDigitsProp.GetInt32();
+                    }
+                }
+
+                return maxFractionDigits;
             });
         }
 
