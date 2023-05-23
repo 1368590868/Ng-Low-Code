@@ -68,7 +68,7 @@ export const FROM_DESIGNER_CONTROLS: {
   {
     label: 'Location Editor',
     value: 'locationEditor',
-    filterType: 'text'
+    filterType: 'locationField'
   }
 ];
 
