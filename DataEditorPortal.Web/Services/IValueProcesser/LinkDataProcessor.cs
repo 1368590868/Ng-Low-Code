@@ -48,6 +48,12 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
+        public override void FetchValue(UniversalGridConfiguration config, FormFieldConfig field, object dataId, IDictionary<string, object> model)
+        {
+            _config = config;
+            model.Add(Constants.LINK_DATA_FIELD_NAME, GetLinkDataModelForForm(_config.Name, dataId));
+        }
+
         private List<RelationDataModel> ProcessLinkDataField(IDictionary<string, object> model)
         {
             List<RelationDataModel> result = null;
@@ -69,7 +75,7 @@ namespace DataEditorPortal.Web.Services
         {
             var service = _serviceProvider.GetRequiredService<IUniversalGridService>();
 
-            var existingModel = service.GetLinkDataModelForForm(table1Name, table1Id);
+            var existingModel = GetLinkDataModelForForm(table1Name, table1Id);
 
             var linkedTableInfo = service.GetLinkedTableInfo(table1Name);
 
@@ -134,6 +140,34 @@ namespace DataEditorPortal.Web.Services
                     throw;
                 }
             }
+        }
+
+        private List<RelationDataModel> GetLinkDataModelForForm(string table1Name, object table1Id)
+        {
+            var service = _serviceProvider.GetRequiredService<IUniversalGridService>();
+            var linkedTableInfo = service.GetLinkedTableInfo(table1Name);
+
+            List<RelationDataModel> relationData = new List<RelationDataModel>();
+            if (table1Id != null)
+            {
+                var filters = new List<FilterParam>() {
+                    new FilterParam() {
+                        field = linkedTableInfo.Table1MappingField,
+                        value = table1Id,
+                        matchMode = "equals"
+                    }
+                };
+
+                var linkedData = service.GetGridData(linkedTableInfo.Name, new GridParam() { IndexCount = -1, Filters = filters });
+                relationData = linkedData.Data.Select(x => new RelationDataModel()
+                {
+                    Id = x[linkedTableInfo.LinkedTable.IdColumn],
+                    Table1Id = table1Id,
+                    Table2Id = x[linkedTableInfo.Table2MappingField]
+                }).ToList();
+            }
+
+            return relationData;
         }
     }
 }

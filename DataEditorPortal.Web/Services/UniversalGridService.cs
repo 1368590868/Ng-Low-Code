@@ -53,7 +53,6 @@ namespace DataEditorPortal.Web.Services
         dynamic GetLinkedTableConfigForFieldControl(string tableName);
         IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id);
         LinkedTableInfo GetLinkedTableInfo(string table1Name);
-        List<RelationDataModel> GetLinkDataModelForForm(string table1Name, object table1Id);
 
         // utility
         UniversalGridConfiguration GetUniversalGridConfiguration(string name);
@@ -576,7 +575,7 @@ namespace DataEditorPortal.Web.Services
             if (attachmentCols.Any())
                 queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
 
-            IDictionary<string, object> result = new Dictionary<string, object>();
+            IDictionary<string, object> details = new Dictionary<string, object>();
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
@@ -593,11 +592,11 @@ namespace DataEditorPortal.Web.Services
                     {
                         schema = dr.GetSchemaTable();
                     }
-                    result = (IDictionary<string, object>)con.QueryFirst(queryText, param);
-                    foreach (var key in result.Keys)
+                    details = (IDictionary<string, object>)con.QueryFirst(queryText, param);
+                    foreach (var key in details.Keys)
                     {
-                        var index = result.Keys.ToList().IndexOf(key);
-                        result[key] = _queryBuilder.TransformValue(result[key], schema.Rows[index]);
+                        var index = details.Keys.ToList().IndexOf(key);
+                        details[key] = _queryBuilder.TransformValue(details[key], schema.Rows[index]);
                     }
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param);
@@ -610,14 +609,20 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
-            if (config.ItemType == GridItemType.LINKED_SINGLE)
+            // process value if required
+            var result = details.AsList().ToDictionary(x => x.Key, x => x.Value);
+            var formLayout = GetUpdatingFormConfig(config);
+            var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+            foreach (var field in formLayout.FormFields)
             {
-                var list = result.AsList();
-                list.Add(new KeyValuePair<string, object>(Constants.LINK_DATA_FIELD_NAME, GetLinkDataModelForForm(config.Name, id)));
-                return list.ToDictionary(x => x.Key, x => x.Value);
+                var processor = factory.CreateValueProcessor(field.filterType);
+                if (processor != null)
+                {
+                    processor.FetchValue(config, field, id, result);
+                }
             }
-            else
-                return result;
+
+            return result;
         }
 
         public bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model)
@@ -1236,32 +1241,7 @@ namespace DataEditorPortal.Web.Services
                 return result;
             });
         }
-        public List<RelationDataModel> GetLinkDataModelForForm(string table1Name, object table1Id)
-        {
-            var linkedTableInfo = GetLinkedTableInfo(table1Name);
 
-            List<RelationDataModel> relationData = new List<RelationDataModel>();
-            if (table1Id != null)
-            {
-                var filters = new List<FilterParam>() {
-                    new FilterParam() {
-                        field = linkedTableInfo.Table1MappingField,
-                        value = table1Id,
-                        matchMode = "equals"
-                    }
-                };
-
-                var linkedData = GetGridData(linkedTableInfo.Name, new GridParam() { IndexCount = -1, Filters = filters });
-                relationData = linkedData.Data.Select(x => new RelationDataModel()
-                {
-                    Id = x[linkedTableInfo.LinkedTable.IdColumn],
-                    Table1Id = table1Id,
-                    Table2Id = x[linkedTableInfo.Table2MappingField]
-                }).ToList();
-            }
-
-            return relationData;
-        }
         private void RemoveLinkedData(string table1Name, object[] table1Ids)
         {
             var linkedTableInfo = GetLinkedTableInfo(table1Name);

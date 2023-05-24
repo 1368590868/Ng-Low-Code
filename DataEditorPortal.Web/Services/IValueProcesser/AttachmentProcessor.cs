@@ -36,6 +36,11 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
+        public override void FetchValue(UniversalGridConfiguration config, FormFieldConfig field, object dataId, IDictionary<string, object> model)
+        {
+            return;
+        }
+
         private void ProcessFileUploadFileds(FormFieldConfig field, IDictionary<string, object> model)
         {
             var service = _serviceProvider.GetRequiredService<IUniversalGridService>();
@@ -66,6 +71,5 @@ namespace DataEditorPortal.Web.Services
             var attachmentService = _serviceProvider.GetRequiredService<IAttachmentService>();
             attachmentService.SaveUploadedFiles(_uploadeFiledMeta, dataId, _config.Name);
         }
-
     }
 }
