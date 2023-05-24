@@ -713,6 +713,10 @@ namespace DataEditorPortal.Web.Services
                 con.Open();
 
                 #region prepair values and params
+                // drop the keyvalue which not in formfield defination
+                model = model.ToList()
+                    .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
+                    .ToDictionary(x => x.Key, x => x.Value);
 
                 // use value processor to convert values in model
                 var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
@@ -736,7 +740,7 @@ namespace DataEditorPortal.Web.Services
                     IdColumn = dataSourceConfig.IdColumn,
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
-                    Columns = formLayout.FormFields.Select(x => x.key).Where(x => model.Keys.Contains(x) && model[x] != null).ToList(),
+                    Columns = model.ToList().Where(kv => kv.Value != null).Select(kv => kv.Key).ToList(),
                     QueryText = formLayout.QueryText
                 });
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
@@ -806,6 +810,10 @@ namespace DataEditorPortal.Web.Services
                 con.Open();
 
                 #region prepair values and paramsters
+                // drop the keyvalue which not in formfield defination
+                model = model.ToList()
+                    .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
+                    .ToDictionary(x => x.Key, x => x.Value);
 
                 // use value processor to convert values in model
                 var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
@@ -829,7 +837,7 @@ namespace DataEditorPortal.Web.Services
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
                     IdColumn = dataSourceConfig.IdColumn,
-                    Columns = formLayout.FormFields.Select(x => x.key).Where(x => model.Keys.Contains(x) && model[x] != null).ToList(),
+                    Columns = model.ToList().Where(kv => kv.Value != null).Select(kv => kv.Key).ToList(),
                     QueryText = formLayout.QueryText
                 });
 
