@@ -1,16 +1,25 @@
 import {
+  AfterViewInit,
   CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   Input,
+  OnInit,
   forwardRef
 } from '@angular/core';
-import { AbstractControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  FormGroup,
+  NG_VALUE_ACCESSOR
+} from '@angular/forms';
 import {
   FieldType,
   FieldTypeConfig,
   FormlyFieldConfig,
-  FormlyFieldProps
+  FormlyFieldProps,
+  FormlyFormOptions
 } from '@ngx-formly/core';
 import { LocationEditorService } from './service/location-editor.service';
 
@@ -29,16 +38,27 @@ import { LocationEditorService } from './service/location-editor.service';
       useExisting: forwardRef(() => LocationEditorComponent),
       multi: true
     }
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LocationEditorComponent {
+export class LocationEditorComponent implements ControlValueAccessor {
   @Input()
   set value(val: any) {
-    if (val) console.log;
+    if (val) {
+      setTimeout(() => {
+        this.model = { ...this.model, ...val };
+        this.changeDetectorRef.detectChanges();
+      }, 100);
+    }
   }
   @Input() label!: string;
   @Input() locationType!: number;
   @Input() system!: { label: string; value: string }[] | { id: string };
+  @Input() mappingColumns!: any;
+  @Input() formControl!: AbstractControl;
+
+  form = new FormGroup({});
+  options: FormlyFormOptions = {};
 
   onChange?: any;
   onTouch?: any;
@@ -69,26 +89,18 @@ export class LocationEditorComponent {
             fromMeasure.props![
               'helperText'
             ] = `Valid Range:${record?.value1} to ${record?.value2}`;
-            fromMeasure.props!['minNum'] = record?.value1;
-            fromMeasure.props!['maxNum'] = record?.value2;
+            fromMeasure.props!['min'] = record?.value1;
+            fromMeasure.props!['max'] = record?.value2;
             if (this.locationType === 3) {
               const toMeasure = field.parent.get('toMeasure');
               toMeasure.props![
                 'helperText'
               ] = `Valid Range:${record?.value1} to ${record?.value2}`;
-              toMeasure.props!['minNum'] = record?.value1;
-              toMeasure.props!['maxNum'] = record?.value2;
-            }
-
-            if (fromMeasure.formControl?.value) {
-              fromMeasure.formControl.markAsTouched();
-              fromMeasure.formControl.updateValueAndValidity();
+              toMeasure.props!['min'] = record?.value1;
+              toMeasure.props!['max'] = record?.value2;
             }
           }
         }
-      },
-      modelOptions: {
-        updateOn: 'blur'
       },
       hooks: {
         onInit: (field: FormlyFieldConfig & any) => {
@@ -100,9 +112,6 @@ export class LocationEditorComponent {
                 field.props.options = res;
                 field.parent.get('toVs').props.options = res;
               });
-          } else {
-            field.props.options = this.system;
-            field.parent.get('toVs').props.options = this.system;
           }
 
           if (this.locationType === 2) {
@@ -117,22 +126,23 @@ export class LocationEditorComponent {
       type: 'inputNumber',
       props: {
         label: 'From Measure',
-        placeholder: 'Please enter'
+        placeholder: 'Please enter',
+        required: true
       },
       validators: {
         validRange: {
           expression: (control: AbstractControl, field: any, msg: any) => {
-            const { minNum, maxNum } = field.props;
-            if (control.value < minNum || control.value > maxNum) {
+            const { min, max } = field.props;
+            if (control.value < min || control.value > max) {
               return false;
             }
             return true;
           },
           message: (
             error: any,
-            field: { props: { minNum: number; maxNum: number } }
+            field: { props: { min: number; max: number } }
           ) => {
-            return `Valid Range: ${field.props.minNum} to ${field.props.maxNum}`;
+            return `Valid Range: ${field.props.min} to ${field.props.max}`;
           }
         }
       }
@@ -152,13 +162,34 @@ export class LocationEditorComponent {
           );
           if (field && field.parent && field.parent.get) {
             const toMeasure = field.parent.get('toMeasure');
-            toMeasure.props!['minNum'] = record?.value1;
-            toMeasure.props!['maxNum'] = record?.value2;
-
-            if (toMeasure.formControl?.value) {
-              toMeasure.formControl.markAsTouched();
-              toMeasure.formControl.updateValueAndValidity();
+            toMeasure.props![
+              'helperText'
+            ] = `Valid Range:${record?.value1} to ${record?.value2}`;
+            toMeasure.props!['min'] = record?.value1;
+            toMeasure.props!['max'] = record?.value2;
+          }
+        }
+      },
+      validators: {
+        validRange: {
+          expression: (control: AbstractControl, field: any) => {
+            const fromVsValue = field.parent.get('fromVs').formControl?.value;
+            if (fromVsValue) {
+              const fIndex = this.locationOptions.findIndex(
+                x => x.value === fromVsValue
+              );
+              const tIndex = this.locationOptions.findIndex(
+                x => x.value === control.value
+              );
+              // current index eq fromMeasureValue otherwise To measure > From measure
+              if (tIndex < fIndex) {
+                return false;
+              }
             }
+            return true;
+          },
+          message: () => {
+            return `Valid Select`;
           }
         }
       },
@@ -168,23 +199,24 @@ export class LocationEditorComponent {
       key: 'toMeasure',
       type: 'inputNumber',
       props: {
+        required: true,
         label: 'To Measure',
         placeholder: 'Please enter'
       },
       validators: {
         validRange: {
           expression: (control: AbstractControl, field: any, msg: any) => {
-            const { minNum, maxNum } = field.props;
-            if (control.value < minNum || control.value > maxNum) {
+            const { min, max } = field.props;
+            if (control.value < min || control.value > max) {
               return false;
             }
             return true;
           },
           message: (
             error: any,
-            field: { props: { minNum: number; maxNum: number } }
+            field: { props: { min: number; max: number } }
           ) => {
-            return `Valid Range: ${field.props.minNum} to ${field.props.maxNum}`;
+            return `Valid Range: ${field.props.min} to ${field.props.max}`;
           }
         },
         validLocationTypeEq3: {
@@ -203,7 +235,18 @@ export class LocationEditorComponent {
     }
   ];
 
-  constructor(private locationEditorService: LocationEditorService) {}
+  constructor(
+    private locationEditorService: LocationEditorService,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
+
+  modelChange($event: any) {
+    if (this.form.valid) {
+      this.onChange?.($event);
+    } else {
+      this.onChange?.(null);
+    }
+  }
 
   writeValue(value: any): void {
     this.value = value;
@@ -226,6 +269,7 @@ export class LocationEditorComponent {
     [formlyAttributes]="field"
     [label]="props.label || 'Location'"
     [locationType]="props.locationType || 2"
+    [mappingColumns]="props.mappingColumns || []"
     [system]="props.system || []"></app-location-editor>`,
   styles: [
     `
@@ -242,6 +286,7 @@ export class FormlyFieldLocationEditorComponent extends FieldType<
       label: string;
       locationType: number;
       system: { label: string; value: string }[];
+      mappingColumns: { label: string; value: string }[];
     }
   >
 > {}

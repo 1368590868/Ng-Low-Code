@@ -1,6 +1,9 @@
 <form #editForm="ngForm">
   <formly-form
+    [form]="form"
     [fields]="fields"
     [model]="model"
+    [options]="options"
+    (modelChange)="modelChange($event)"
     class="location-wrapper"></formly-form>
 </form>

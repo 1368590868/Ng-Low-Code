@@ -358,7 +358,7 @@ export class FormDesignerDirective {
               }
             },
             {
-              key: 'locationConfig',
+              key: 'mappingColumns',
               type: 'locationConfig',
               props: {
                 label: 'Location Configuration',

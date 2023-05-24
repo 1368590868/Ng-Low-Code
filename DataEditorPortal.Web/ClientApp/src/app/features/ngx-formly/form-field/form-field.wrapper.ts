@@ -41,12 +41,8 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
           [field]="field"></formly-validation-message>
       </small>
 
-      <small
-        *ngIf="!showError && props?.helperText !== undefined"
-        class="p-always">
-        <span class="ui-message-text"
-          >{{props.helperText}}</span
-        >
+      <small *ngIf="props?.helperText !== undefined" class="p-always">
+        <span class="ui-message-text">{{ props.helperText }}</span>
       </small>
     </div>
   `,
@@ -72,4 +68,4 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
 })
 export class FormlyWrapperFormFieldComponent extends FieldWrapper<
   FormlyFieldConfig<FormlyFieldProps>
-> { }
+> {}
