@@ -1,11 +1,9 @@
 import {
-  AfterViewInit,
   CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   Input,
-  OnInit,
   forwardRef
 } from '@angular/core';
 import {
@@ -91,6 +89,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
             ] = `Valid Range:${record?.value1} to ${record?.value2}`;
             fromMeasure.props!['min'] = record?.value1;
             fromMeasure.props!['max'] = record?.value2;
+
+            // location Type 3 , show toMeasure helper text
             if (this.locationType === 3) {
               const toMeasure = field.parent.get('toMeasure');
               toMeasure.props![
@@ -98,6 +98,20 @@ export class LocationEditorComponent implements ControlValueAccessor {
               ] = `Valid Range:${record?.value1} to ${record?.value2}`;
               toMeasure.props!['min'] = record?.value1;
               toMeasure.props!['max'] = record?.value2;
+            }
+
+            const toVs = field.parent.get('toVs').formControl;
+            if (toVs?.value) {
+              const fIndex = this.locationOptions.findIndex(
+                x => x.value === event.value
+              );
+              const tIndex = this.locationOptions.findIndex(
+                x => x.value === toVs.value
+              );
+              // current index must be less than ToVs index
+              if (tIndex <= fIndex) {
+                toVs.setValue(toVs.value);
+              }
             }
           }
         }
@@ -128,6 +142,18 @@ export class LocationEditorComponent implements ControlValueAccessor {
         label: 'From Measure',
         placeholder: 'Please enter',
         required: true
+      },
+      hooks: {
+        onInit: (field: FormlyFieldConfig & any) => {
+          field.formControl.valueChanges.subscribe(() => {
+            if (field && field.parent && field.parent.get) {
+              const toMeasure = field.parent.get('toMeasure').formControl;
+              if (toMeasure?.value) {
+                toMeasure?.setValue(toMeasure.value);
+              }
+            }
+          });
+        }
       },
       validators: {
         validRange: {
@@ -181,7 +207,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
               const tIndex = this.locationOptions.findIndex(
                 x => x.value === control.value
               );
-              // current index eq fromMeasureValue otherwise To measure > From measure
+              // current index must be greater than FromSV
               if (tIndex < fIndex) {
                 return false;
               }
@@ -220,7 +246,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
           }
         },
         validLocationTypeEq3: {
-          expression: (control: AbstractControl, field: any, msg: any) => {
+          expression: (control: AbstractControl, field: any) => {
             const fromMeasure =
               field.parent.get('fromMeasure').formControl.value;
             if (control.value <= fromMeasure) {
@@ -242,7 +268,11 @@ export class LocationEditorComponent implements ControlValueAccessor {
 
   modelChange($event: any) {
     if (this.form.valid) {
-      this.onChange?.($event);
+      if (this.locationType === 3) {
+        this.onChange?.({ ...$event, toVs: $event.fromVs });
+      } else {
+        this.onChange?.($event);
+      }
     } else {
       this.onChange?.(null);
     }
