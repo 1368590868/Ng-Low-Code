@@ -168,14 +168,14 @@ namespace DataEditorPortal.Web.Services
                                         '""fileId"":""' + {EscapeColumnName(config.GetMappedColumn("ID"))} + '"",' +
                                         '""fileName"":""' + {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))} + '"",' +
                                         '""contentType"":""' + {EscapeColumnName(config.GetMappedColumn("CONTENT_TYPE"))} + '"",' +
-                                        '""comments"":""' + {EscapeColumnName(config.GetMappedColumn("COMMENTS"))} + '"",' +
+                                        '""comments"":""' + ISNULL({EscapeColumnName(config.GetMappedColumn("COMMENTS"))}, '') + '"",' +
                                         '""status"":""' + {EscapeColumnName(config.GetMappedColumn("STATUS"))} + '""' +
                                     '}}' 
-                                FROM {config.TableSchema}.{config.TableName} FOR XML PATH (''))
+                                FROM {config.TableSchema}.{config.TableName} WHERE {EscapeColumnName(config.GetMappedColumn("DATA_ID"))} = A.{EscapeColumnName(config.GetMappedColumn("DATA_ID"))} FOR XML PATH (''))
                                 , 1, 1, ''
                             ) + 
                         ']' AS ATTACHMENTS
-                    FROM {config.TableSchema}.{config.TableName}
+                    FROM {config.TableSchema}.{config.TableName} A
                     GROUP BY {EscapeColumnName(config.GetMappedColumn("DATA_ID"))}
                 ) {col.field}_ATTACHMENTS ON ALL_DATA.{EscapeColumnName(config.ForeignKeyName)} = {col.field}_ATTACHMENTS.{EscapeColumnName(config.GetMappedColumn("DATA_ID"))}
                 ";

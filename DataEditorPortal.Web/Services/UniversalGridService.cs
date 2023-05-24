@@ -52,6 +52,8 @@ namespace DataEditorPortal.Web.Services
         GridData GetLinkedTableDataForFieldControl(string table1Name, GridParam param);
         dynamic GetLinkedTableConfigForFieldControl(string tableName);
         IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id);
+        LinkedTableInfo GetLinkedTableInfo(string table1Name);
+        List<RelationDataModel> GetLinkDataModelForForm(string table1Name, object table1Id);
 
         // utility
         UniversalGridConfiguration GetUniversalGridConfiguration(string name);
@@ -699,21 +701,7 @@ namespace DataEditorPortal.Web.Services
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
 
             // get detail config
-            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-            if (detailConfig.AddingForm != null && detailConfig.AddingForm.UseCustomForm)
-            {
-                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
-            }
-            if (detailConfig.AddingForm == null || detailConfig.AddingForm.FormFields.Count == 0)
-            {
-                throw new DepException("No adding form configured for this portal item. Please go Portal Management to complete the configuration.");
-            }
-            if (detailConfig.AddingForm.UseCustomForm)
-            {
-                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
-            }
-
-            var formLayout = detailConfig.AddingForm;
+            var formLayout = GetAddingFormConfig(config);
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
@@ -721,14 +709,17 @@ namespace DataEditorPortal.Web.Services
 
                 #region prepair values and params
 
-                // process file upload, store json string
-                var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
-
-                List<RelationDataModel> relationData = null;
-                if (config.ItemType == GridItemType.LINKED_SINGLE)
+                // use value processor to convert values in model
+                var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+                var valueProcessors = new List<ValueProcessorBase>();
+                foreach (var field in formLayout.FormFields)
                 {
-                    // process link data field, get meta data and clear value in model
-                    relationData = ProcessLinkDataField(model);
+                    var processor = factory.CreateValueProcessor(field.filterType);
+                    if (processor != null)
+                    {
+                        processor.PreProcess(config, field, model);
+                        valueProcessors.Add(processor);
+                    }
                 }
 
                 // calculate the computed field values
@@ -758,18 +749,10 @@ namespace DataEditorPortal.Web.Services
                     var affected = con.Execute(queryText, dynamicParameters, trans);
                     var returnedId = dynamicParameters.Get<object>(paramReturnId);
 
-                    if (uploadedFieldsMeta.Any())
+                    // use value processors to execute extra operations
+                    foreach (var processor in valueProcessors)
                     {
-                        // assign fileUploadConfig and save files
-                        var attachmentCols = GetAttachmentCols(config);
-                        uploadedFieldsMeta.ForEach(x => x.FileUploadConfig = attachmentCols.FirstOrDefault(c => c.field == x.FieldName).fileUploadConfig);
-                        SaveUploadedFiles(uploadedFieldsMeta, returnedId, config.Name);
-                    }
-
-                    if (relationData != null)
-                    {
-                        // update linked data
-                        UpdateLinkData(config.Name, returnedId, relationData);
+                        processor.PostProcess(returnedId);
                     }
 
                     trans.Commit();
@@ -810,30 +793,7 @@ namespace DataEditorPortal.Web.Services
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
 
             // get detail config
-            var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
-
-            if (detailConfig.UpdatingForm != null && detailConfig.UpdatingForm.UseCustomForm)
-            {
-                throw new DepException("This universal detail api doesn't support custom action. Please use custom api in custom action.");
-            }
-            if (detailConfig.UpdatingForm == null || (!detailConfig.UpdatingForm.UseAddingFormLayout && detailConfig.UpdatingForm.FormFields.Count == 0))
-            {
-                throw new DepException("No Updating form configured for this portal item. Please go Portal Management to complete the configuration.");
-            }
-            if (detailConfig.UpdatingForm.UseAddingFormLayout &&
-                (detailConfig.AddingForm == null || detailConfig.AddingForm.UseCustomForm || detailConfig.AddingForm.FormFields.Count == 0))
-            {
-                throw new DepException("Updating form is configured to use the same configuration of adding form, but no adding form configured. Please go Portal Management to complete the configuration.");
-            }
-
-            var updatingForm = detailConfig.UpdatingForm;
-            if (updatingForm.UseAddingFormLayout)
-            {
-                updatingForm = detailConfig.AddingForm;
-                updatingForm.QueryText = detailConfig.UpdatingForm.QueryText;
-            }
-
-            var formLayout = updatingForm;
+            var formLayout = GetUpdatingFormConfig(config);
 
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
@@ -842,14 +802,17 @@ namespace DataEditorPortal.Web.Services
 
                 #region prepair values and paramsters
 
-                // process file upload, store json string
-                var uploadedFieldsMeta = ProcessFileUploadFileds(formLayout.FormFields, model);
-
-                List<RelationDataModel> relationData = null;
-                if (config.ItemType == GridItemType.LINKED_SINGLE)
+                // use value processor to convert values in model
+                var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+                var valueProcessors = new List<ValueProcessorBase>();
+                foreach (var field in formLayout.FormFields)
                 {
-                    // process link data field, get meta data and clear value in model
-                    relationData = ProcessLinkDataField(model);
+                    var processor = factory.CreateValueProcessor(field.filterType);
+                    if (processor != null)
+                    {
+                        processor.PreProcess(config, field, model);
+                        valueProcessors.Add(processor);
+                    }
                 }
 
                 // calculate the computed field values
@@ -880,18 +843,10 @@ namespace DataEditorPortal.Web.Services
                 {
                     var affected = con.Execute(queryText, param, trans);
 
-                    if (uploadedFieldsMeta.Any())
+                    // use value processors to execute extra operations
+                    foreach (var processor in valueProcessors)
                     {
-                        // assign fileUploadConfig and save files
-                        var attachmentCols = GetAttachmentCols(config);
-                        uploadedFieldsMeta.ForEach(x => x.FileUploadConfig = attachmentCols.FirstOrDefault(c => c.field == x.FieldName).fileUploadConfig);
-                        SaveUploadedFiles(uploadedFieldsMeta, id, config.Name);
-                    }
-
-                    if (relationData != null)
-                    {
-                        // update linked data
-                        UpdateLinkData(config.Name, id, relationData);
+                        processor.PostProcess(id);
                     }
 
                     trans.Commit();
@@ -1150,39 +1105,6 @@ namespace DataEditorPortal.Web.Services
 
         #region File upload API
 
-        private List<UploadedFileMeta> ProcessFileUploadFileds(List<FormFieldConfig> formFields, IDictionary<string, object> model)
-        {
-            var result = new List<UploadedFileMeta>();
-            var fileUploadFields = formFields.Where(x => x.filterType == "attachments").ToList();
-            foreach (var field in fileUploadFields)
-            {
-                if (model.ContainsKey(field.key))
-                {
-                    var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                    var jsonElement = (JsonElement)model[field.key];
-                    if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
-                    {
-                        result.Add(new UploadedFileMeta()
-                        {
-                            FieldName = field.key,
-                            UploadedFiles = JsonSerializer.Deserialize<List<UploadedFileModel>>(jsonElement.ToString(), jsonOptions)
-                        });
-                    }
-                    model.Remove(field.key);
-                }
-            }
-            return result;
-        }
-
-        private void SaveUploadedFiles(List<UploadedFileMeta> uploadedFileMeta, object dataId, string gridName)
-        {
-            var attachmentService = _serviceProvider.GetRequiredService<IAttachmentService>();
-            foreach (var meta in uploadedFileMeta)
-            {
-                attachmentService.SaveUploadedFiles(meta, dataId, gridName);
-            }
-        }
-
         public IEnumerable<GridColConfig> GetAttachmentCols(UniversalGridConfiguration config)
         {
             return _memoryCache.GetOrCreate($"grid.{config.Name}.attachment.cols", entry =>
@@ -1271,7 +1193,7 @@ namespace DataEditorPortal.Web.Services
             };
         }
 
-        private LinkedTableInfo GetLinkedTableInfo(string table1Name)
+        public LinkedTableInfo GetLinkedTableInfo(string table1Name)
         {
             return _memoryCache.GetOrCreate($"grid.{table1Name}.linked.table.info", entry =>
             {
@@ -1314,7 +1236,7 @@ namespace DataEditorPortal.Web.Services
                 return result;
             });
         }
-        private List<RelationDataModel> GetLinkDataModelForForm(string table1Name, object table1Id)
+        public List<RelationDataModel> GetLinkDataModelForForm(string table1Name, object table1Id)
         {
             var linkedTableInfo = GetLinkedTableInfo(table1Name);
 
@@ -1339,90 +1261,6 @@ namespace DataEditorPortal.Web.Services
             }
 
             return relationData;
-        }
-        private List<RelationDataModel> ProcessLinkDataField(IDictionary<string, object> model)
-        {
-            List<RelationDataModel> result = null;
-            if (model.ContainsKey(Constants.LINK_DATA_FIELD_NAME) && model[Constants.LINK_DATA_FIELD_NAME] != null)
-            {
-                var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                var jsonElement = (JsonElement)model[Constants.LINK_DATA_FIELD_NAME];
-                if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
-                {
-                    var valueStr = jsonElement.ToString();
-                    result = JsonSerializer.Deserialize<List<RelationDataModel>>(valueStr, jsonOptions);
-                    model.Remove(Constants.LINK_DATA_FIELD_NAME);
-                }
-            }
-            return result;
-        }
-        private void UpdateLinkData(string table1Name, object table1Id, List<RelationDataModel> inputModel)
-        {
-            var existingModel = GetLinkDataModelForForm(table1Name, table1Id);
-
-            var linkedTableInfo = GetLinkedTableInfo(table1Name);
-
-            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
-            {
-                con.ConnectionString = linkedTableInfo.ConnectionString;
-                //var trans = con.BeginTransaction();
-
-                try
-                {
-                    var toAdd = inputModel
-                        .Where(input => existingModel.All(existing => !(existing.Table1Id == input.Table1Id && existing.Table2Id == input.Table2Id)))
-                        .Select(x => x.Table2Id);
-                    if (toAdd.Any())
-                    {
-                        var queryToGetId = linkedTableInfo.LinkedTable.QueryToGetId;
-                        var columns = new List<string>() { linkedTableInfo.Table1MappingField, linkedTableInfo.Table2MappingField };
-                        if (queryToGetId != null && !string.IsNullOrEmpty(queryToGetId.queryText))
-                        {
-                            columns.Add(linkedTableInfo.LinkedTable.IdColumn);
-                        }
-                        linkedTableInfo.LinkedTable.Columns = columns;
-                        var sql = _queryBuilder.GenerateSqlTextForInsert(linkedTableInfo.LinkedTable);
-
-                        foreach (var table2Id in toAdd)
-                        {
-                            var value = new List<KeyValuePair<string, object>>();
-                            // if queryToGetId configured, get id first.
-                            if (queryToGetId != null && !string.IsNullOrEmpty(queryToGetId.queryText))
-                            {
-                                var idValue = con.ExecuteScalar(queryToGetId.queryText, null, null, null, queryToGetId.type);
-                                value.Add(new KeyValuePair<string, object>(linkedTableInfo.LinkedTable.IdColumn, idValue));
-                            }
-                            value.Add(new KeyValuePair<string, object>(linkedTableInfo.Table1MappingField, table1Id));
-                            value.Add(new KeyValuePair<string, object>(linkedTableInfo.Table2MappingField, table2Id));
-                            var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
-                            var paramReturnId = _queryBuilder.ParameterName($"RETURNED_{linkedTableInfo.LinkedTable.IdColumn}");
-                            dynamicParameters.Add(paramReturnId, dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
-
-                            con.Execute(sql, dynamicParameters);
-                        }
-                    }
-
-                    var toDelete = existingModel
-                        .Where(existing => inputModel.All(input => !(input.Table1Id == existing.Table1Id && input.Table2Id == existing.Table2Id)))
-                        .Select(x => x.Id);
-                    if (toDelete.Any())
-                    {
-                        var deleteSql = _queryBuilder.GenerateSqlTextForDelete(linkedTableInfo.LinkedTable);
-                        var deleteParam = _queryBuilder.GenerateDynamicParameter(
-                            new List<KeyValuePair<string, object>>() {
-                        new KeyValuePair<string, object>(linkedTableInfo.LinkedTable.IdColumn, toDelete)
-                            });
-                        con.Execute(deleteSql, deleteParam);
-                    }
-                    //trans.Commit();
-                }
-                catch (Exception ex)
-                {
-                    //trans.Rollback();
-                    _logger.LogError(ex.Message, ex);
-                    throw;
-                }
-            }
         }
         private void RemoveLinkedData(string table1Name, object[] table1Ids)
         {
@@ -1463,21 +1301,6 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        class LinkedTableInfo
-        {
-            public string Table2Name { get; set; }
-            public Guid Table2Id { get; set; }
-            public string Table2DataSource { get; set; }
-            public string Name { get; set; }
-            public Guid Id { get; set; }
-
-            public string ConnectionString { get; set; }
-            public DataSourceConfig LinkedTable { get; set; }
-            public string DataSourceConfig { get; set; }
-            public string Table2MappingField { get; set; }
-            public string Table1MappingField { get; set; }
-        }
-
         #endregion
 
         #region utility methods
@@ -1514,8 +1337,6 @@ namespace DataEditorPortal.Web.Services
 
         public GridFormLayout GetUpdatingFormConfig(UniversalGridConfiguration config)
         {
-            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-
             // get detail config
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
 
