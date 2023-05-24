@@ -1,5 +1,7 @@
 ﻿using DataEditorPortal.Data.Contexts;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -25,14 +27,17 @@ namespace DataEditorPortal.Web.Common
         private readonly string _publicKey = "PFJTQUtleVZhbHVlPjxNb2R1bHVzPnRZbWRDOU5jRGhtQTBWSlE4QWpjcllRVWp1bU54WXZFNVRzOU84VENBMEdYaEhqeEFuZ0RxdkY5SUxobUg3U3ErZEQvSUgraVlBQitJZ0UvTmxMOS83OWxEcjljN3d4SS9PZXAyc3BHTExYelVwN1pxWElwMjZmS3dYWEpmVGJhdHFwUldkYUp1ZGNIc0lCMHZFREV3cUNEZ3NVYVFGUVppdU1yOTBNMlVDVT08L01vZHVsdXM+PEV4cG9uZW50PkFRQUI8L0V4cG9uZW50PjwvUlNBS2V5VmFsdWU+";
         private string _license;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IWebHostEnvironment _env;
 
-        public LicenseService(IServiceProvider serviceProvider)
+        public LicenseService(IServiceProvider serviceProvider, IWebHostEnvironment env)
         {
             _serviceProvider = serviceProvider;
+            _env = env;
         }
 
         public bool IsValid(string license)
         {
+            if (_env.IsDevelopment()) return true;
             if (string.IsNullOrEmpty(license)) return false;
 
             RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
@@ -51,6 +56,7 @@ namespace DataEditorPortal.Web.Common
 
         public bool IsExpired(string license)
         {
+            if (_env.IsDevelopment()) return false;
             if (!IsValid(license)) return true;
 
             var RegExLineEnd = new Regex("\\r?\\n");
@@ -67,13 +73,18 @@ namespace DataEditorPortal.Web.Common
         {
             if (string.IsNullOrEmpty(_license))
             {
-                using (var scope = _serviceProvider.CreateScope())
+                if (_env.IsDevelopment())
+                    _license = "development mode";
+                else
                 {
-                    var depDbContext = scope.ServiceProvider.GetRequiredService<DepDbContext>();
-                    var siteSetting = depDbContext.SiteSettings.FirstOrDefault();
-                    _license = siteSetting.License;
-                    depDbContext.SaveChanges();
-                    depDbContext.DisposeAsync();
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        var depDbContext = scope.ServiceProvider.GetRequiredService<DepDbContext>();
+                        var siteSetting = depDbContext.SiteSettings.FirstOrDefault();
+                        _license = siteSetting.License;
+                        depDbContext.SaveChanges();
+                        depDbContext.DisposeAsync();
+                    }
                 }
             }
             return _license;
