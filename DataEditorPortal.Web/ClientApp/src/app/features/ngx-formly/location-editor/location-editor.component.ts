@@ -5,8 +5,7 @@ import {
   Component,
   Input,
   forwardRef,
-  OnInit,
-  OnDestroy
+  OnInit
 } from '@angular/core';
 import {
   AbstractControl,
@@ -21,7 +20,6 @@ import {
   FormlyFieldProps,
   FormlyFormOptions
 } from '@ngx-formly/core';
-import { Subscription } from 'rxjs';
 import { LocationEditorService } from './service/location-editor.service';
 
 @Component({
@@ -49,12 +47,14 @@ export class LocationEditorComponent implements ControlValueAccessor {
     else this.fields.forEach(x => x.formControl?.markAsPristine());
   }
 
+  _value: any;
   @Input()
   set value(val: any) {
     if (val) {
       this.model = { ...this.model, ...val };
       this.changeDetectorRef.markForCheck();
     }
+    this._value = val;
   }
   @Input() label!: string;
   @Input() locationType!: number;
@@ -286,13 +286,21 @@ export class LocationEditorComponent implements ControlValueAccessor {
   ) {}
 
   modelChange($event: any) {
+    let val: any;
     if (this.form.valid) {
       if (this.locationType === 3) {
-        this.onChange?.({ ...$event, toVs: $event.fromVs });
+        val = { ...$event, toVs: $event.fromVs };
       } else {
-        this.onChange?.($event);
+        val = { ...$event };
       }
-    } else this.onChange?.(null);
+    } else {
+      val = null;
+      // this.formControl.setErrors({ invalid: { message: 'test' } });
+    }
+    if (this._value !== val) {
+      this._value = val;
+      this.onChange?.(val);
+    }
   }
 
   writeValue(value: any): void {
@@ -340,17 +348,11 @@ export class FormlyFieldLocationEditorComponent
       }
     >
   >
-  implements OnInit, OnDestroy
+  implements OnInit
 {
-  subscription: Subscription | undefined;
-
-  ngOnDestroy(): void {
-    if (this.subscription) this.subscription.unsubscribe();
-  }
-
   ngOnInit(): void {
-    this.subscription = this.formControl.valueChanges.subscribe(val => {
-      if (!val) this.formControl.markAsPristine();
-    });
+    this.field.validation = {
+      messages: { required: ' ' }
+    };
   }
 }
