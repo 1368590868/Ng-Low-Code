@@ -234,7 +234,9 @@ export class LocationEditorComponent implements ControlValueAccessor {
           }
         }
       },
-      hideExpression: () => this.locationType === 3 || this.locationType === 2
+      expressions: {
+        hide: () => this.locationType === 3 || this.locationType === 2
+      }
     },
     {
       key: 'toMeasure',
@@ -272,7 +274,9 @@ export class LocationEditorComponent implements ControlValueAccessor {
           message: `To Measure should be greater than From Measure`
         }
       },
-      hideExpression: () => this.locationType === 2
+      expressions: {
+        hide: () => this.locationType === 2
+      }
     }
   ];
 
