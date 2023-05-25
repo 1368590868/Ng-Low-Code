@@ -41,12 +41,16 @@ import { LocationEditorService } from './service/location-editor.service';
 })
 export class LocationEditorComponent implements ControlValueAccessor {
   @Input()
+  set dirty(val: boolean) {
+    if (val) this.fields.forEach(x => x.formControl?.markAsDirty());
+    else this.fields.forEach(x => x.formControl?.markAsPristine());
+  }
+
+  @Input()
   set value(val: any) {
     if (val) {
-      setTimeout(() => {
-        this.model = { ...this.model, ...val };
-        this.changeDetectorRef.detectChanges();
-      }, 100);
+      this.model = { ...this.model, ...val };
+      this.changeDetectorRef.markForCheck();
     }
   }
   @Input() label!: string;
@@ -72,7 +76,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
     {
       key: 'fromVs',
       type: 'select',
-      className: 'mb-2',
       props: {
         label: 'From VS',
         placeholder: 'Please select',
@@ -124,7 +127,10 @@ export class LocationEditorComponent implements ControlValueAccessor {
               .subscribe(res => {
                 this.locationOptions = res;
                 field.props.options = res;
+                this.options?.detectChanges?.(field);
+
                 field.parent.get('toVs').props.options = res;
+                this.options?.detectChanges?.(field.parent.get('toVs'));
               });
           }
 
@@ -273,9 +279,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       } else {
         this.onChange?.($event);
       }
-    } else {
-      this.onChange?.(null);
-    }
+    } else this.onChange?.(null);
   }
 
   writeValue(value: any): void {
@@ -297,6 +301,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
   template: `<app-location-editor
     [formControl]="formControl"
     [formlyAttributes]="field"
+    [dirty]="formControl.dirty"
     [label]="props.label || 'Location'"
     [locationType]="props.locationType || 2"
     [mappingColumns]="props.mappingColumns || []"
@@ -313,6 +318,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
 export class FormlyFieldLocationEditorComponent extends FieldType<
   FieldTypeConfig<
     FormlyFieldProps & {
+      dirty: boolean;
       label: string;
       locationType: number;
       system: { label: string; value: string }[];
