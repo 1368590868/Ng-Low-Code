@@ -4,7 +4,9 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
-  forwardRef
+  forwardRef,
+  OnInit,
+  OnDestroy
 } from '@angular/core';
 import {
   AbstractControl,
@@ -19,6 +21,7 @@ import {
   FormlyFieldProps,
   FormlyFormOptions
 } from '@ngx-formly/core';
+import { Subscription } from 'rxjs';
 import { LocationEditorService } from './service/location-editor.service';
 
 @Component({
@@ -321,14 +324,29 @@ export class LocationEditorComponent implements ControlValueAccessor {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldLocationEditorComponent extends FieldType<
-  FieldTypeConfig<
-    FormlyFieldProps & {
-      dirty: boolean;
-      label: string;
-      locationType: number;
-      system: { label: string; value: string }[];
-      mappingColumns: { label: string; value: string }[];
-    }
+export class FormlyFieldLocationEditorComponent
+  extends FieldType<
+    FieldTypeConfig<
+      FormlyFieldProps & {
+        dirty: boolean;
+        label: string;
+        locationType: number;
+        system: { label: string; value: string }[];
+        mappingColumns: { label: string; value: string }[];
+      }
+    >
   >
-> {}
+  implements OnInit, OnDestroy
+{
+  subscription: Subscription | undefined;
+
+  ngOnDestroy(): void {
+    if (this.subscription) this.subscription.unsubscribe();
+  }
+
+  ngOnInit(): void {
+    this.subscription = this.formControl.valueChanges.subscribe(val => {
+      if (!val) this.formControl.markAsPristine();
+    });
+  }
+}
