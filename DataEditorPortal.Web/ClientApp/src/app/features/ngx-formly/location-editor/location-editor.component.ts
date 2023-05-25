@@ -295,7 +295,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
       }
     } else {
       val = null;
-      // this.formControl.setErrors({ invalid: { message: 'test' } });
     }
     if (this._value !== val) {
       this._value = val;
