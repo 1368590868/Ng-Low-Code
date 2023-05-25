@@ -86,21 +86,25 @@ export class LocationEditorComponent implements ControlValueAccessor {
             x => x.value === event.value
           );
           if (field && field.parent && field.parent.get) {
-            const fromMeasure = field.parent.get('fromMeasure');
-            fromMeasure.props![
-              'helperText'
-            ] = `Valid Range:${record?.value1} to ${record?.value2}`;
-            fromMeasure.props!['min'] = record?.value1;
-            fromMeasure.props!['max'] = record?.value2;
+            const fromMeasureProps = field.parent.get('fromMeasure').props;
+            if (fromMeasureProps) {
+              fromMeasureProps[
+                'helperText'
+              ] = `Valid Range:${record?.value1} to ${record?.value2}`;
+              fromMeasureProps['min'] = record?.value1;
+              fromMeasureProps['max'] = record?.value2;
+            }
 
             // location Type 3 , show toMeasure helper text
             if (this.locationType === 3) {
-              const toMeasure = field.parent.get('toMeasure');
-              toMeasure.props![
-                'helperText'
-              ] = `Valid Range:${record?.value1} to ${record?.value2}`;
-              toMeasure.props!['min'] = record?.value1;
-              toMeasure.props!['max'] = record?.value2;
+              const toMeasureProps = field.parent.get('toMeasure').props;
+              if (toMeasureProps) {
+                toMeasureProps[
+                  'helperText'
+                ] = `Valid Range:${record?.value1} to ${record?.value2}`;
+                toMeasureProps['min'] = record?.value1;
+                toMeasureProps['max'] = record?.value2;
+              }
             }
 
             const toVs = field.parent.get('toVs').formControl;
@@ -163,7 +167,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       },
       validators: {
         validRange: {
-          expression: (control: AbstractControl, field: any, msg: any) => {
+          expression: (control: AbstractControl, field: any) => {
             const { min, max } = field.props;
             if (control.value < min || control.value > max) {
               return false;
@@ -193,12 +197,14 @@ export class LocationEditorComponent implements ControlValueAccessor {
             x => x.value === event.value
           );
           if (field && field.parent && field.parent.get) {
-            const toMeasure = field.parent.get('toMeasure');
-            toMeasure.props![
-              'helperText'
-            ] = `Valid Range:${record?.value1} to ${record?.value2}`;
-            toMeasure.props!['min'] = record?.value1;
-            toMeasure.props!['max'] = record?.value2;
+            const toMeasureProps = field.parent.get('toMeasure').props;
+            if (toMeasureProps) {
+              toMeasureProps[
+                'helperText'
+              ] = `Valid Range:${record?.value1} to ${record?.value2}`;
+              toMeasureProps['min'] = record?.value1;
+              toMeasureProps['max'] = record?.value2;
+            }
           }
         }
       },
