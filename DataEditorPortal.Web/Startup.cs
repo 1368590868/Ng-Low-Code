@@ -3,6 +3,7 @@ using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Common.Install;
 using DataEditorPortal.Web.Common.License;
+using DataEditorPortal.Web.Jobs;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
@@ -148,7 +149,17 @@ namespace DataEditorPortal.Web
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            services.AddQuartz(q => { q.UseMicrosoftDependencyInjectionJobFactory(); });
+            services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+
+                q.ScheduleJob<ClearTempFileJob>(trigger => trigger
+                    .WithIdentity("ClearTempFileJob")
+                    .StartAt(DateBuilder.EvenMinuteDateAfterNow())
+                    //.WithSimpleSchedule(x => x.WithIntervalInMinutes(1).RepeatForever())
+                    .WithDailyTimeIntervalSchedule(x => x.StartingDailyAt(new TimeOfDay(0, 0)).InTimeZone(TimeZoneInfo.Utc).EndingDailyAfterCount(1))
+                    .WithDescription("ClearTempFileJob"));
+            });
             services.AddQuartzServer(options => { options.WaitForJobsToComplete = true; });
         }
 
