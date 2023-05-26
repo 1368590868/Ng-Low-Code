@@ -43,30 +43,6 @@
             [showAddButton]="false"
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
-        <th pSortableColumn="createByUser">
-          Create By User <p-sortIcon field="createByUser"></p-sortIcon>
-          <p-columnFilter
-            style="vertical-align: middle"
-            type="text"
-            field="createByUser"
-            display="menu"
-            [hideOnClear]="true"
-            [showOperator]="false"
-            [showAddButton]="false"
-            [maxFractionDigits]="4"></p-columnFilter>
-        </th>
-        <th pSortableColumn="createdDate">
-          Create Date <p-sortIcon field="createdDate"></p-sortIcon>
-          <p-columnFilter
-            style="vertical-align: middle"
-            type="text"
-            field="createdDate"
-            display="menu"
-            [hideOnClear]="true"
-            [showOperator]="false"
-            [showAddButton]="false"
-            [maxFractionDigits]="4"></p-columnFilter>
-        </th>
         <th pSortableColumn="importType">
           Import Type <p-sortIcon field="importType"></p-sortIcon>
           <p-columnFilter
@@ -79,15 +55,42 @@
             [showAddButton]="false"
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
+        <th pSortableColumn="createdByUser">
+          Created By<p-sortIcon field="createdByUser"></p-sortIcon>
+          <p-columnFilter
+            style="vertical-align: middle"
+            type="text"
+            field="createdByUser"
+            display="menu"
+            [hideOnClear]="true"
+            [showOperator]="false"
+            [showAddButton]="false"
+            [maxFractionDigits]="4"></p-columnFilter>
+        </th>
+        <th pSortableColumn="createdDate">
+          Created Date <p-sortIcon field="createdDate"></p-sortIcon>
+          <p-columnFilter
+            style="vertical-align: middle"
+            type="text"
+            field="createdDate"
+            display="menu"
+            [hideOnClear]="true"
+            [showOperator]="false"
+            [showAddButton]="false"
+            [maxFractionDigits]="4"></p-columnFilter>
+        </th>
+
         <th pSortableColumn="status">Status</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-fileList>
       <tr>
         <td>{{ fileList.name }}</td>
-        <td>{{ fileList.createByUser }}</td>
+        <td>
+          <p-tag>{{ fileList.importType }}</p-tag>
+        </td>
+        <td>{{ fileList.createdByUser }}</td>
         <td>{{ fileList.createdDate | date : 'dd/MM/YYYY HH:mm:ss' }}</td>
-        <td>{{ fileList.importType }}</td>
         <td>
           <app-import-status
             [rowData]="fileList"
@@ -183,7 +186,11 @@
 </div>
 
 <div *ngIf="step === 3" class="flex flex-column overflow-auto p-1">
-  <div class="flex align-items-center" *ngIf="statusList.length > 1">
+  <p class="mb-3">
+    Review the data and fix any validation errors. Once fixed, you need to
+    repeat the import process with necessary adjustments to rectify any errors.
+  </p>
+  <div class="flex align-items-center mb-3" *ngIf="statusList.length > 1">
     <p-button
       *ngIf="innerInfoList && innerInfoList.length > 0"
       (onClick)="onShowInfo(-1)"
@@ -214,16 +221,12 @@
           ? 'Validation Error'
           : data['__status__'] === 4
           ? 'Already Exists'
+          : data['__status__'] === 5
+          ? 'Not Exists'
           : 'Unknown Error'
       }}"></p-button>
   </div>
-
   <div *ngIf="infoList && infoList.length > 0" class="preview-data">
-    <p class="mb-3">
-      Review the data and fix any validation errors. Once fixed, you need to
-      repeat the import process with necessary adjustments to rectify any
-      errors.
-    </p>
     <p-table
       class="data-table"
       [value]="infoList"
@@ -270,6 +273,8 @@
                   ? 'Validation Error'
                   : infoList['__status__'] === 4
                   ? 'Already Exists'
+                  : infoList['__status__'] === 5
+                  ? 'Not Exists'
                   : 'Unknown Error'
               }}</p-tag
             >
@@ -283,7 +288,7 @@
                     (col.header | hasError : infoList?.__errors__) ?? ''
                   "
                   [escape]="false"
-                  tooltipStyleClass="import-tooltip"
+                  tooltipStyleClass="tooltip-error"
                   class="pi pi-times-circle text-red-500"></i>
                 {{ infoList[col.header] ?? '' }}
               </div>

@@ -14,6 +14,9 @@ import { Subject, repeat, takeUntil } from 'rxjs';
           ? 'success'
           : 'warning'
       "
+      [tooltipStyleClass]="
+        rowData.status === 'Failed' ? 'tooltip-error' : 'tooltip-success'
+      "
       >{{
         rowData.status === 'Failed'
           ? 'Failed'

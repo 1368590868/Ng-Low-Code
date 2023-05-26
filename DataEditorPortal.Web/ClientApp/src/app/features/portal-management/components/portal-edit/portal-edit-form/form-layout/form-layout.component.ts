@@ -6,6 +6,7 @@ import {
   ViewChildren
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MenuItem } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
 import {
   GridFormConfig,
@@ -82,7 +83,6 @@ export class FormLayoutComponent {
 
   sourceColumns: GridFormField[] = [];
   targetColumns: GridFormField[] = [];
-  foreignKeyOptions: { label: string; value: string }[] = [];
   @ViewChild('pickList') pickList!: PickList;
 
   model: any = {};
@@ -97,6 +97,16 @@ export class FormLayoutComponent {
   formControlQueryText = new FormControl();
   formControlOnValidateConfig = new FormControl();
   formControlOnAfterSavedConfig = new FormControl();
+
+  addCustomControlModel: MenuItem[] = [
+    {
+      label: 'Location Editor',
+      icon: 'pi pi-fw pi-bars',
+      command: () => {
+        this.onAddCustomControl('locationField');
+      }
+    }
+  ];
 
   constructor(
     private notifyService: NotifyService,
@@ -149,10 +159,6 @@ export class FormLayoutComponent {
           selected: false
         };
       });
-    this.foreignKeyOptions = this._dbColumns.map(x => ({
-      label: x.columnName,
-      value: x.columnName
-    }));
   }
 
   onMoveToTarget({ items }: { items: GridFormField[] }) {
@@ -304,5 +310,36 @@ export class FormLayoutComponent {
       return !dbCol.allowDBNull && !(dbCol.isAutoIncrement || dbCol.isIdentity);
     }
     return true;
+  }
+
+  onAddCustomControl(filterType: string) {
+    let index = 1;
+    for (index = 1; index <= 100; index++) {
+      if (!this.targetColumns.find(x => x.key === `CUSTOM_CONTROL_${index}`))
+        break;
+    }
+    const key = `CUSTOM_CONTROL_${index}`;
+    const result = this.controls.filter(c => c.filterType === filterType);
+    const model = {
+      key: key,
+      type: result[0].value,
+      props: {
+        label: key
+      },
+      filterType: filterType,
+      selected: true
+    };
+    this.targetColumns = [model, ...this.targetColumns];
+  }
+
+  onRemoveCustomControl(event: MouseEvent, field: GridFormField) {
+    event.stopPropagation();
+    const index = this.targetColumns.findIndex(x => x.key === field.key);
+    if (index >= 0) {
+      this.targetColumns.splice(index, 1);
+      if (field.key === this.model.key) {
+        this.model = {};
+      }
+    }
   }
 }

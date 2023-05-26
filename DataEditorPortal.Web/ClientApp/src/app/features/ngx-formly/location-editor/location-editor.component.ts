@@ -1,16 +1,24 @@
 import {
   CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   Input,
-  forwardRef
+  forwardRef,
+  OnInit
 } from '@angular/core';
-import { AbstractControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  FormGroup,
+  NG_VALUE_ACCESSOR
+} from '@angular/forms';
 import {
   FieldType,
   FieldTypeConfig,
   FormlyFieldConfig,
-  FormlyFieldProps
+  FormlyFieldProps,
+  FormlyFormOptions
 } from '@ngx-formly/core';
 import { LocationEditorService } from './service/location-editor.service';
 
@@ -29,16 +37,33 @@ import { LocationEditorService } from './service/location-editor.service';
       useExisting: forwardRef(() => LocationEditorComponent),
       multi: true
     }
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LocationEditorComponent {
+export class LocationEditorComponent implements ControlValueAccessor {
+  @Input()
+  set dirty(val: boolean) {
+    if (val) this.fields.forEach(x => x.formControl?.markAsDirty());
+    else this.fields.forEach(x => x.formControl?.markAsPristine());
+  }
+
+  _value: any;
   @Input()
   set value(val: any) {
-    if (val) console.log;
+    if (val) {
+      this.model = { ...this.model, ...val };
+      this.changeDetectorRef.markForCheck();
+    }
+    this._value = val;
   }
   @Input() label!: string;
   @Input() locationType!: number;
-  @Input() optionsLookup!: { label: string; value: string }[] | { id: string };
+  @Input() system!: { label: string; value: string }[] | { id: string };
+  @Input() mappingColumns!: any;
+  @Input() formControl!: AbstractControl;
+
+  form = new FormGroup({});
+  options: FormlyFormOptions = {};
 
   onChange?: any;
   onTouch?: any;
@@ -54,7 +79,6 @@ export class LocationEditorComponent {
     {
       key: 'fromVs',
       type: 'select',
-      className: 'mb-2',
       props: {
         label: 'From VS',
         placeholder: 'Please select',
@@ -65,40 +89,56 @@ export class LocationEditorComponent {
             x => x.value === event.value
           );
           if (field && field.parent && field.parent.get) {
-            const fromMeasure = field.parent.get('fromMeasure');
-            fromMeasure.props!['helperText'] = `Valid Range:${record?.value1} to ${record?.value2 }`
-            fromMeasure.props!['minNum'] = record?.value1;
-            fromMeasure.props!['maxNum'] = record?.value2;
-            if (this.locationType === 3) {
-              const toMeasure = field.parent.get('toMeasure');
-              toMeasure.props!['helperText'] = `Valid Range:${record?.value1} to ${record?.value2}`
-              toMeasure.props!['minNum'] = record?.value1;
-              toMeasure.props!['maxNum'] = record?.value2;
+            const fromMeasureProps = field.parent.get('fromMeasure').props;
+            if (fromMeasureProps) {
+              fromMeasureProps[
+                'helperText'
+              ] = `Valid Range:${record?.value1} to ${record?.value2}`;
+              fromMeasureProps['min'] = record?.value1;
+              fromMeasureProps['max'] = record?.value2;
             }
 
-            if (fromMeasure.formControl?.value) {
-              fromMeasure.formControl.markAsTouched();
-              fromMeasure.formControl.updateValueAndValidity();
+            // location Type 3 , show toMeasure helper text
+            if (this.locationType === 3) {
+              const toMeasureProps = field.parent.get('toMeasure').props;
+              if (toMeasureProps) {
+                toMeasureProps[
+                  'helperText'
+                ] = `Valid Range:${record?.value1} to ${record?.value2}`;
+                toMeasureProps['min'] = record?.value1;
+                toMeasureProps['max'] = record?.value2;
+              }
+            }
+
+            const toVs = field.parent.get('toVs').formControl;
+            if (toVs?.value) {
+              const fIndex = this.locationOptions.findIndex(
+                x => x.value === event.value
+              );
+              const tIndex = this.locationOptions.findIndex(
+                x => x.value === toVs.value
+              );
+              // current index must be less than ToVs index
+              if (tIndex <= fIndex) {
+                toVs.setValue(toVs.value);
+              }
             }
           }
         }
       },
-      modelOptions: {
-        updateOn: 'blur'
-      },
       hooks: {
         onInit: (field: FormlyFieldConfig & any) => {
-          if (!Array.isArray(this.optionsLookup)) {
+          if (!Array.isArray(this.system)) {
             this.locationEditorService
-              .getPipeOptions(this.optionsLookup?.id)
+              .getPipeOptions(this.system?.id)
               .subscribe(res => {
                 this.locationOptions = res;
                 field.props.options = res;
+                this.options?.detectChanges?.(field);
+
                 field.parent.get('toVs').props.options = res;
+                this.options?.detectChanges?.(field.parent.get('toVs'));
               });
-          } else {
-            field.props.options = this.optionsLookup;
-            field.parent.get('toVs').props.options = this.optionsLookup;
           }
 
           if (this.locationType === 2) {
@@ -113,22 +153,35 @@ export class LocationEditorComponent {
       type: 'inputNumber',
       props: {
         label: 'From Measure',
-        placeholder: 'Please enter'
+        placeholder: 'Please enter',
+        required: true
+      },
+      hooks: {
+        onInit: (field: FormlyFieldConfig & any) => {
+          field.formControl.valueChanges.subscribe(() => {
+            if (field && field.parent && field.parent.get) {
+              const toMeasure = field.parent.get('toMeasure').formControl;
+              if (toMeasure?.value) {
+                toMeasure?.setValue(toMeasure.value);
+              }
+            }
+          });
+        }
       },
       validators: {
         validRange: {
-          expression: (control: AbstractControl, field: any, msg: any) => {
-            const { minNum, maxNum } = field.props;
-            if (control.value < minNum || control.value > maxNum) {
+          expression: (control: AbstractControl, field: any) => {
+            const { min, max } = field.props;
+            if (control.value < min || control.value > max) {
               return false;
             }
             return true;
           },
           message: (
             error: any,
-            field: { props: { minNum: number; maxNum: number } }
+            field: { props: { min: number; max: number } }
           ) => {
-            return `Valid Range: ${field.props.minNum} to ${field.props.maxNum}`;
+            return `Valid Range: ${field.props.min} to ${field.props.max}`;
           }
         }
       }
@@ -147,44 +200,70 @@ export class LocationEditorComponent {
             x => x.value === event.value
           );
           if (field && field.parent && field.parent.get) {
-            const toMeasure = field.parent.get('toMeasure');
-            toMeasure.props!['minNum'] = record?.value1;
-            toMeasure.props!['maxNum'] = record?.value2;
-
-            if (toMeasure.formControl?.value) {
-              toMeasure.formControl.markAsTouched();
-              toMeasure.formControl.updateValueAndValidity();
+            const toMeasureProps = field.parent.get('toMeasure').props;
+            if (toMeasureProps) {
+              toMeasureProps[
+                'helperText'
+              ] = `Valid Range:${record?.value1} to ${record?.value2}`;
+              toMeasureProps['min'] = record?.value1;
+              toMeasureProps['max'] = record?.value2;
             }
           }
         }
       },
-      hideExpression: () => this.locationType === 3 || this.locationType === 2
+      validators: {
+        validRange: {
+          expression: (control: AbstractControl, field: any) => {
+            const fromVsValue = field.parent.get('fromVs').formControl?.value;
+            if (fromVsValue) {
+              const fIndex = this.locationOptions.findIndex(
+                x => x.value === fromVsValue
+              );
+              const tIndex = this.locationOptions.findIndex(
+                x => x.value === control.value
+              );
+              // current index must be greater than FromSV
+              if (tIndex < fIndex) {
+                return false;
+              }
+            }
+            return true;
+          },
+          message: () => {
+            return `Valid Select`;
+          }
+        }
+      },
+      expressions: {
+        hide: () => this.locationType === 3 || this.locationType === 2
+      }
     },
     {
       key: 'toMeasure',
       type: 'inputNumber',
       props: {
+        required: true,
         label: 'To Measure',
         placeholder: 'Please enter'
       },
       validators: {
         validRange: {
           expression: (control: AbstractControl, field: any, msg: any) => {
-            const { minNum, maxNum } = field.props;
-            if (control.value < minNum || control.value > maxNum) {
+            const { min, max } = field.props;
+            if (control.value < min || control.value > max) {
               return false;
             }
             return true;
           },
           message: (
             error: any,
-            field: { props: { minNum: number; maxNum: number } }
+            field: { props: { min: number; max: number } }
           ) => {
-            return `Valid Range: ${field.props.minNum} to ${field.props.maxNum}`;
+            return `Valid Range: ${field.props.min} to ${field.props.max}`;
           }
         },
         validLocationTypeEq3: {
-          expression: (control: AbstractControl, field: any, msg: any) => {
+          expression: (control: AbstractControl, field: any) => {
             const fromMeasure =
               field.parent.get('fromMeasure').formControl.value;
             if (control.value <= fromMeasure) {
@@ -195,11 +274,33 @@ export class LocationEditorComponent {
           message: `To Measure should be greater than From Measure`
         }
       },
-      hideExpression: () => this.locationType === 2
+      expressions: {
+        hide: () => this.locationType === 2
+      }
     }
   ];
 
-  constructor(private locationEditorService: LocationEditorService) {}
+  constructor(
+    private locationEditorService: LocationEditorService,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
+
+  modelChange($event: any) {
+    let val: any;
+    if (this.form.valid) {
+      if (this.locationType === 3) {
+        val = { ...$event, toVs: $event.fromVs };
+      } else {
+        val = { ...$event };
+      }
+    } else {
+      val = null;
+    }
+    if (this._value !== val) {
+      this._value = val;
+      this.onChange?.(val);
+    }
+  }
 
   writeValue(value: any): void {
     this.value = value;
@@ -220,9 +321,11 @@ export class LocationEditorComponent {
   template: `<app-location-editor
     [formControl]="formControl"
     [formlyAttributes]="field"
+    [dirty]="formControl.dirty"
     [label]="props.label || 'Location'"
     [locationType]="props.locationType || 2"
-    [optionsLookup]="props.optionsLookup || []"></app-location-editor>`,
+    [mappingColumns]="props.mappingColumns || []"
+    [system]="props.system || []"></app-location-editor>`,
   styles: [
     `
       :host {
@@ -232,12 +335,23 @@ export class LocationEditorComponent {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldLocationEditorComponent extends FieldType<
-  FieldTypeConfig<
-    FormlyFieldProps & {
-      label: string;
-      locationType: number;
-      optionsLookup: { label: string; value: string }[];
-    }
+export class FormlyFieldLocationEditorComponent
+  extends FieldType<
+    FieldTypeConfig<
+      FormlyFieldProps & {
+        dirty: boolean;
+        label: string;
+        locationType: number;
+        system: { label: string; value: string }[];
+        mappingColumns: { label: string; value: string }[];
+      }
+    >
   >
-> {}
+  implements OnInit
+{
+  ngOnInit(): void {
+    this.field.validation = {
+      messages: { required: ' ' }
+    };
+  }
+}

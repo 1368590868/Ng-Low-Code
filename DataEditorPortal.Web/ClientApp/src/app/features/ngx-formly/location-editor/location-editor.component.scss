@@ -1,11 +1,24 @@
 :host {
-  ::ng-deep {
-    .p-field {
-      margin: 0.5rem !important;
-    }
+  form > formly-form.location-wrapper {
+    ::ng-deep {
+      & > formly-field > formly-group > formly-field {
+        .p-field {
+          margin-bottom: 1rem !important;
+        }
+      }
+      & > formly-field > formly-group > formly-field:last-child {
+        .p-field {
+          margin-bottom: 0rem !important;
+        }
+      }
 
-    label {
-      padding-left: 1.5rem;
+      label {
+        padding-left: 1.5rem;
+      }
+
+      formly-validation-message {
+        display: none;
+      }
     }
   }
 }

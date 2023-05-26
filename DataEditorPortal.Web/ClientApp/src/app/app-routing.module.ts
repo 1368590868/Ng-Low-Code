@@ -13,16 +13,14 @@ import {
 import { AdminPermissionGuard, AuthRouterGuard } from './shared';
 
 const routes: Routes = [
-  { path: '', component: TileComponent, canActivate: [AuthRouterGuard] },
+  { path: '', component: TileComponent },
   {
     path: 'about',
-    component: AboutComponent,
-    canActivate: [AuthRouterGuard]
+    component: AboutComponent
   },
   {
     path: 'contact',
-    component: ContactComponent,
-    canActivate: [AuthRouterGuard]
+    component: ContactComponent
   },
   { path: 'login', component: LoginComponent },
   {

@@ -113,7 +113,7 @@ export class EditRecordActionComponent
           this.configFieldValidator(fields);
           this.configFieldExpressions(fields);
           this.configFieldProps(fields);
-          this.fields = fields;
+            this.fields = fields;
           this.onLoadUrlParams();
 
           if (fields.length > 0) this.loadedEvent.emit();
@@ -214,7 +214,8 @@ export class EditRecordActionComponent
       .forEach((x: any) => {
         x.expressions = {};
         Object.keys(x.expressionsConfig).forEach(key => {
-          x.expressions[key.replace('_', '.')] = x.expressionsConfig[key];
+          if (x.expressionsConfig[key])
+            x.expressions[key.replace('_', '.')] = x.expressionsConfig[key];
         });
         x.expressionsConfig = undefined;
       });

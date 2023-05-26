@@ -145,12 +145,24 @@ formly-form {
   a {
     color: #fff;
   }
-}
+  &.tooltip-error {
+    .p-tooltip-text {
+      background: var(--red-100);
+      color: var(--red-400);
+    }
+    .p-tooltip-arrow {
+      display: none;
+    }
+  }
 
-.import-tooltip {
-  .p-tooltip-text {
-    background: var(--red-100);
-    color: var(--red-400);
+  &.tooltip-success {
+    .p-tooltip-text {
+      background: var(--green-100);
+      color: var(--green-400);
+    }
+    .p-tooltip-arrow {
+      display: none;
+    }
   }
 }
 
@@ -180,5 +192,11 @@ formly-form {
 .p-inputnumber {
   .p-inputnumber-button {
     line-height: 1;
+  }
+}
+
+.p-toast {
+  .p-toast-detail {
+    overflow-wrap: anywhere;
   }
 }

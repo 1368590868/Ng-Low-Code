@@ -51,6 +51,23 @@
         (onMoveAllToTarget)="onMoveToTarget($event)"
         (onMoveAllToSource)="onMoveToSource($event)"
         (onTargetSelect)="onTargetSelect($event)">
+        <ng-template pTemplate="targetHeader">
+          <div
+            class="p-picklist-title flex align-items-center justify-content-between">
+            <span>Form Fields</span>
+            <p-menu
+              #addNewMenu
+              [popup]="true"
+              [model]="addCustomControlModel"
+              appendTo="body"
+              styleClass="mt-2"
+              [style]="{ width: 'auto', minWidth: '12.5833rem' }"></p-menu>
+            <p-button
+              label="Add Custom Control"
+              styleClass="p-button-sm p-button-text"
+              (onClick)="addNewMenu.toggle($event)"></p-button>
+          </div>
+        </ng-template>
         <ng-template let-column pTemplate="item">
           <div *ngIf="!column.selected">
             [{{ column.key }}]<span
@@ -70,6 +87,13 @@
             <label style="width: 40%">{{ column.props.label }}</label>
             <p-tag severity="warning">Computed Field</p-tag>
           </div>
+
+          <p-button
+            *ngIf="column.key.indexOf('CUSTOM_CONTROL_') === 0"
+            icon="pi pi-trash"
+            class="remove-btn"
+            styleClass="p-button-text p-button-rounded"
+            (onClick)="onRemoveCustomControl($event, column)"></p-button>
         </ng-template>
         <ng-template pTemplate="emptymessagetarget">
           <div class="w-full relative">
@@ -84,7 +108,7 @@
         <div class="p-picklist-list flex-grow-1">
           <div *ngIf="this.model && this.model.key; else emptyMessage">
             <app-form-designer-config
-              [foreignKeyOptions]="foreignKeyOptions"
+              [dbColumns]="_dbColumns"
               [config]="model"
               (configChange)="configChange($event)"></app-form-designer-config>
           </div>

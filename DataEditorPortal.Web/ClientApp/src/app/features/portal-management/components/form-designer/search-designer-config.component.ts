@@ -14,7 +14,20 @@ import { FormDesignerDirective } from '../../directives/form-designer.directive'
         (modelChange)="modelChange($event)"
         class="p-fluid"></formly-form>
     </form>
-  `
+  `,
+  styles: [
+    `
+      :host {
+        ::ng-deep {
+          formly-form > formly-field > formly-group > formly-field {
+            .p-field {
+              margin-bottom: 0rem !important;
+            }
+          }
+        }
+      }
+    `
+  ]
 })
 export class SearchDesignerConfigComponent
   extends FormDesignerDirective

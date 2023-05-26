@@ -2,7 +2,7 @@ import { Directive, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { startWith, distinctUntilChanged, tap } from 'rxjs';
-import { GridFormField } from '../models/portal-item';
+import { DataSourceTableColumn, GridFormField } from '../models/portal-item';
 import { PortalItemService } from '../services/portal-item.service';
 
 export const FROM_DESIGNER_CONTROLS: {
@@ -68,7 +68,7 @@ export const FROM_DESIGNER_CONTROLS: {
   {
     label: 'Location Editor',
     value: 'locationEditor',
-    filterType: 'text'
+    filterType: 'locationField'
   }
 ];
 
@@ -217,7 +217,7 @@ export class FormDesignerDirective {
             }
           ],
           expressions: {
-            hide: `['select', 'checkboxList', 'radio', 'multiSelect' , 'locationEditor'].indexOf(field.parent.parent.model.type) < 0`
+            hide: `['select', 'checkboxList', 'radio', 'multiSelect' ].indexOf(field.parent.parent.model.type) < 0`
           }
         },
         // props for inputNumber
@@ -334,6 +334,15 @@ export class FormDesignerDirective {
         {
           fieldGroup: [
             {
+              key: 'system',
+              type: 'optionsEditor',
+              props: {
+                label: 'Pressure System',
+                onlyAdvanced: true,
+                dialogTitle: 'Pressure System'
+              }
+            },
+            {
               key: 'locationType',
               type: 'select',
               defaultValue: 2,
@@ -345,40 +354,24 @@ export class FormDesignerDirective {
                   { label: 'Point Location', value: 2 },
                   { label: 'Linear Location', value: 3 },
                   { label: 'Linear Multiple', value: 4 }
-                ],
-                change: (field, event) => {
-                  if (field && field.parent && field.parent.get) {
-                    const locationConfig = field.parent.get('locationConfig');
-                    if (event.value) {
-                      locationConfig.props!['locationType'] = event.value;
-                    }
-                  }
-                }
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (field && field.parent && field.parent.get) {
-                    const locationConfig = field.parent.get('locationConfig');
-                    if (field.formControl.value) {
-                      locationConfig.props!['locationType'] =
-                        field.formControl.value;
-                    }
-                  }
-                }
+                ]
               }
             },
             {
-              key: 'locationConfig',
+              key: 'mappingColumns',
               type: 'locationConfig',
               props: {
                 label: 'Location Configuration',
                 description: 'Set location configuration',
                 locationType: 2
               },
+              expressions: {
+                'props.locationType': `field.parent.model.locationType`
+              },
               hooks: {
                 onInit: (field: any) => {
-                  if (this.foreignKeyOptions) {
-                    field.props.foreignKeyOptions = this.foreignKeyOptions;
+                  if (this.dbColumns) {
+                    field.props.mappingColumns = this.dbColumns;
                   }
                 }
               }
@@ -435,7 +428,7 @@ export class FormDesignerDirective {
       this.model = val;
     }
   }
-  @Input() foreignKeyOptions: { label: string; value: string }[] = [];
+  @Input() dbColumns: DataSourceTableColumn[] = [];
 
   @Output() configChange = new EventEmitter<GridFormField>();
 

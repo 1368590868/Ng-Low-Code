@@ -24,8 +24,8 @@
   contentStyleClass="border-top-1 surface-border pt-4 pb-0">
   <ng-template pTemplate="header">
     <span class="p-dialog-title"
-      >Options Editor
-      <a (click)="changeMode()">{{
+      >{{ dialogTitle }} Editor
+      <a (click)="changeMode()" *ngIf="!onlyAdvanced">{{
         !isAdvanced ? 'Advance Mode' : 'Simple Mode'
       }}</a></span
     >

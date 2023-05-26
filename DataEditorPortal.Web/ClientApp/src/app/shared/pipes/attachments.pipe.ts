@@ -1,16 +1,20 @@
 import { Inject, Pipe, PipeTransform } from '@angular/core';
-
+import { DomSanitizer } from '@angular/platform-browser';
 type AttachmentType = {
   fileId?: string;
   fileName?: string;
   status?: string;
   contentType?: string;
+  comments?: string;
 };
 
 @Pipe({ name: 'attachments' })
 export class AttachmentsPipe implements PipeTransform {
   private _apiUrl: string;
-  constructor(@Inject('API_URL') apiUrl: string) {
+  constructor(
+    @Inject('API_URL') apiUrl: string,
+    private sanitizer: DomSanitizer
+  ) {
     this._apiUrl = apiUrl;
   }
   transform(
@@ -18,7 +22,7 @@ export class AttachmentsPipe implements PipeTransform {
     gridName: string,
     fieldName: string,
     isShowAll = false
-  ): string {
+  ) {
     let parseVal: AttachmentType[] = [];
     if (!value) return '';
     try {
@@ -35,13 +39,16 @@ export class AttachmentsPipe implements PipeTransform {
         }attachment/download-file/${gridName}/${fieldName}/${
           item.fileId
         }/${encodeURIComponent(item.fileName || '')}`;
-        const html = `<a href=${url} target="_blank" class="no-underline cursor-pointer text-primary">${item.fileName}</a>`;
+        const html = ` <a href=${url} target="_blank" title="${item?.comments}"  class="no-underline cursor-pointer text-primary"  > ${item.fileName}</a>`;
         return html;
       })
       .join('|');
 
     if (isShowAll) {
-      if (filterArray.length > 0) return result.split('|').join('');
+      if (filterArray.length > 0)
+        return this.sanitizer.bypassSecurityTrustHtml(
+          result.split('|').join('')
+        );
       else return '';
     } else {
       if (filterArray.length === 1) return result;

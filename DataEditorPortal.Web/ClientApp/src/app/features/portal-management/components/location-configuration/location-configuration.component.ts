@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
+import { DataSourceTableColumn } from '../../models/portal-item';
 
 @Component({
   selector: 'app-location-configuration',
@@ -44,7 +45,15 @@ export class LocationConfigurationComponent {
   visible = false;
 
   @Input() locationType!: number;
-  @Input() foreignKeyOptions!: { label: string; value: string }[];
+  @Input()
+  set mappingColumns(val: DataSourceTableColumn[]) {
+    this.filedMapping = val.map(x => {
+      return {
+        label: x.columnName,
+        value: x.columnName
+      };
+    });
+  }
   @Input()
   set value(val: any) {
     if (!val) {
@@ -62,6 +71,8 @@ export class LocationConfigurationComponent {
       this.formControlToMeasure.setValue(val?.toMeasure);
     }
   }
+  filedMapping!: { label: string; value: string }[];
+
   innerValue: any = null;
   writeValue(value: any): void {
     this.value = value;
@@ -123,7 +134,7 @@ export class LocationConfigurationComponent {
       return false;
     }
     if (this.locationType === 4) {
-      if (!this.formControlToMeasure.valid || !this.formControlToVs)
+      if (!this.formControlToMeasure.valid || !this.formControlToVs.valid)
         return false;
     }
     return true;
@@ -136,8 +147,8 @@ export class LocationConfigurationComponent {
     [formControl]="formControl"
     [formlyAttributes]="field"
     [locationType]="props.locationType || 2"
-    [foreignKeyOptions]="
-      props.foreignKeyOptions || []
+    [mappingColumns]="
+      props.mappingColumns || []
     "></app-location-configuration>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -145,7 +156,7 @@ export class FormlyFieldLocationConfigurationComponent extends FieldType<
   FieldTypeConfig<
     FormlyFieldProps & {
       locationType: number;
-      foreignKeyOptions: { label: string; value: string }[];
+      mappingColumns: DataSourceTableColumn[];
     }
   >
 > {}

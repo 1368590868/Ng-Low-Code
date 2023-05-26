@@ -7,7 +7,20 @@ import { GridFormField } from '../../models/portal-item';
   selector: 'app-form-designer-view',
   template: `<formly-form
     [fields]="fields"
-    class="p-fluid {{ layout }}"></formly-form>`
+    class="p-fluid {{ layout }}"></formly-form>`,
+  styles: [
+    `
+      :host {
+        ::ng-deep {
+          formly-form > formly-field > formly-group > formly-field {
+            .p-field {
+              margin-bottom: 0rem !important;
+            }
+          }
+        }
+      }
+    `
+  ]
 })
 export class FormDesignerViewComponent {
   @Input() layout: 'vertical' | 'horizontal' = 'vertical';
