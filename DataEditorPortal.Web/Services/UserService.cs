@@ -116,7 +116,7 @@ namespace DataEditorPortal.Web.Services
 
             var dep_user = new User();
             dep_user.Id = Guid.NewGuid();
-            dep_user.Name = model.Name;
+            dep_user.Name = string.IsNullOrEmpty(model.Name) ? model.Username : model.Name;
             dep_user.Username = model.Username;
             dep_user.Employer = model.Employer;
             dep_user.Vendor = model.Vendor;
