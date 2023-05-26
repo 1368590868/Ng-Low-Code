@@ -139,6 +139,10 @@ namespace DataEditorPortal.Web.Services
                         {
                             obj[field.key] = TransformNumber(obj[field.key].ToString());
                         }
+                        if (field.filterType == "date")
+                        {
+                            obj[field.key] = TransformDate(obj[field.key].ToString());
+                        }
                     }
                 }
             }
@@ -170,6 +174,18 @@ namespace DataEditorPortal.Web.Services
         private decimal TransformNumber(object value)
         {
             return Convert.ToDecimal(value);
+        }
+
+        private DateTime TransformDate(object value)
+        {
+            try
+            {
+                return DateTime.FromOADate(Convert.ToDouble(value));
+            }
+            catch
+            {
+            }
+            return DateTime.Parse(value.ToString());
         }
 
         #endregion
