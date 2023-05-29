@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { tap } from 'rxjs';
+import { skip, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
@@ -15,8 +15,11 @@ import { PortalEditStepDirective } from '../../../directives/portal-edit-step.di
 })
 export class PortalEditBasicComponent
   extends PortalEditStepDirective
-  implements OnInit {
+  implements OnInit
+{
   @ViewChild('editForm') editForm!: NgForm;
+
+  timer: any;
 
   isLoading = true;
   isSaving = false;
@@ -33,24 +36,22 @@ export class PortalEditBasicComponent
       props: {
         label: 'Menu Label',
         placeholder: 'Menu Label',
-        required: true,
-        change: (field: FormlyFieldConfig, event: any) => {
-          console.log(event)
-        }
+        required: true
       },
       modelOptions: {
         updateOn: 'blur'
       },
       hooks: {
         onInit: field => {
-          field.formControl?.valueChanges.subscribe(val => {
-            this.portalItemService.getCodeName(val).subscribe(res => {
+          field.formControl?.valueChanges
+            .pipe(skip(this.itemId ? 1 : 0))
+            .subscribe(val => {
+              if (!val) return;
               if (field && field.parent && field.parent.get) {
-                field.parent?.get('name').formControl?.setValue(res.result);
-
+                const control = field.parent?.get('name').formControl;
+                control?.setValue(val);
               }
             });
-          });
         }
       }
     },
@@ -59,7 +60,7 @@ export class PortalEditBasicComponent
       type: 'input',
       props: {
         label: 'Name',
-        placeholder: 'Menu Name',
+        placeholder: 'Name',
         required: true
       },
       modelOptions: {
@@ -68,13 +69,15 @@ export class PortalEditBasicComponent
       asyncValidators: {
         exist: {
           expression: (c: AbstractControl) => {
+            if (this.timer) clearTimeout(this.timer);
             return new Promise((resolve, reject) => {
-              this.portalItemService
-                .nameExists(c.value, this.itemId)
-                .subscribe(res => {
-                  !res.isError ? resolve(!res.result) : reject(res.message)
-                }
-                );
+              this.timer = setTimeout(() => {
+                this.portalItemService
+                  .nameExists(c.value, this.itemId)
+                  .subscribe(res => {
+                    !res.isError ? resolve(!res.result) : reject(res.message);
+                  });
+              }, 100);
             });
           },
           message: () => {
@@ -83,10 +86,11 @@ export class PortalEditBasicComponent
         }
       },
       hooks: {
-        onInit: field => { 
+        onInit: field => {
           field.formControl?.valueChanges.subscribe(val => {
             this.portalItemService.getCodeName(val).subscribe(res => {
               field.formControl?.setValue(res.result, { emitEvent: false });
+              field.formControl?.markAsDirty();
             });
           });
         }

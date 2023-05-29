@@ -161,7 +161,10 @@
       </ng-template>
 
       <ng-template pTemplate="body" let-data let-columns="columns">
-        <tr [pSelectableRow]="data" [class]="data['linked_highlighted']">
+        <tr
+          *ngIf="columns && columns.length > 0"
+          [pSelectableRow]="data"
+          [class]="data['linked_highlighted']">
           <td *ngIf="selectionMode === 'multiple'">
             <p-tableCheckbox
               [value]="data"
@@ -223,7 +226,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage" let-columns>
-        <tr>
+        <tr *ngIf="columns && columns.length > 0">
           <td class="text-lg" [attr.colspan]="columns.length + 2">
             {{
               this.firstLoadDone
