@@ -160,6 +160,18 @@ export class PortalEditLinkComponent
     this.customActions.showDialog();
   }
 
+  onEditTable(tableId: string) {
+    this.onSave();
+    this.router.navigate([`./edit/${tableId}`], {
+      relativeTo: this.route
+    });
+  }
+
+  onAddPrimaryTable() {
+    this.onSave();
+    this.router.navigate(['./add'], { relativeTo: this.route });
+  }
+
   onAddSecondaryTable() {
     if (this.dataSourceConfig.primaryTable == null) {
       this.notifyService.notifyWarning(
@@ -167,6 +179,7 @@ export class PortalEditLinkComponent
         'Please select primary table first.'
       );
     } else {
+      this.onSave();
       this.router.navigate(['./add'], { relativeTo: this.route });
     }
   }
