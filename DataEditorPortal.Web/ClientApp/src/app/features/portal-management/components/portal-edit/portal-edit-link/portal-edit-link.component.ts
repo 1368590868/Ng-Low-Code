@@ -211,9 +211,7 @@ export class PortalEditLinkComponent
 
   onSaveAndExit() {
     this.isSavingAndExit = true;
-    if (this.valid()) {
-      this.onSave();
-    }
+    this.onSave();
   }
 
   onSave() {
@@ -230,16 +228,20 @@ export class PortalEditLinkComponent
     }
     this.portalItemService
       .saveLinkedDatasource({
-        primaryTable: {
-          id: this.dataSourceConfig.primaryTable?.id,
-          columnsForLinkedField: this.primarySelected,
-          mapToLinkedTableField: this.formControlPrimaryMap.value
-        },
-        secondaryTable: {
-          id: this.dataSourceConfig.secondaryTable?.id,
-          columnsForLinkedField: this.secondarySelected,
-          mapToLinkedTableField: this.formControlSecondaryMap.value
-        },
+        primaryTable: this.dataSourceConfig.primaryTable?.id
+          ? {
+              id: this.dataSourceConfig.primaryTable?.id,
+              columnsForLinkedField: this.primarySelected,
+              mapToLinkedTableField: this.formControlPrimaryMap.value
+            }
+          : null,
+        secondaryTable: this.dataSourceConfig.secondaryTable?.id
+          ? {
+              id: this.dataSourceConfig.secondaryTable?.id,
+              columnsForLinkedField: this.secondarySelected,
+              mapToLinkedTableField: this.formControlSecondaryMap.value
+            }
+          : null,
         linkedTable: data
       })
       .subscribe(res => {
