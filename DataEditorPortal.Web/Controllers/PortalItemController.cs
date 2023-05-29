@@ -107,7 +107,16 @@ namespace DataEditorPortal.Web.Controllers
         [Route("name-exists")]
         public bool ExistName([FromQuery] string name, [FromQuery] Guid? id)
         {
+            if (string.IsNullOrEmpty(name)) return true;
+
             return _portalItemService.ExistName(name, id);
+        }
+
+        [HttpGet]
+        [Route("get-code-name")]
+        public string GetCodeNamme([FromQuery] string name)
+        {
+            return _portalItemService.GetCodeName(name);
         }
 
         #region Simple Menu
