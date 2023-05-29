@@ -15,8 +15,7 @@ import { PortalEditStepDirective } from '../../../directives/portal-edit-step.di
 })
 export class PortalEditBasicComponent
   extends PortalEditStepDirective
-  implements OnInit
-{
+  implements OnInit {
   @ViewChild('editForm') editForm!: NgForm;
 
   isLoading = true;
@@ -34,6 +33,33 @@ export class PortalEditBasicComponent
       props: {
         label: 'Menu Label',
         placeholder: 'Menu Label',
+        required: true,
+        change: (field: FormlyFieldConfig, event: any) => {
+          console.log(event)
+        }
+      },
+      modelOptions: {
+        updateOn: 'blur'
+      },
+      hooks: {
+        onInit: field => {
+          field.formControl?.valueChanges.subscribe(val => {
+            this.portalItemService.getCodeName(val).subscribe(res => {
+              if (field && field.parent && field.parent.get) {
+                field.parent?.get('name').formControl?.setValue(res.result);
+
+              }
+            });
+          });
+        }
+      }
+    },
+    {
+      key: 'name',
+      type: 'input',
+      props: {
+        label: 'Name',
+        placeholder: 'Menu Name',
         required: true
       },
       modelOptions: {
@@ -45,14 +71,24 @@ export class PortalEditBasicComponent
             return new Promise((resolve, reject) => {
               this.portalItemService
                 .nameExists(c.value, this.itemId)
-                .subscribe(res =>
+                .subscribe(res => {
                   !res.isError ? resolve(!res.result) : reject(res.message)
+                }
                 );
             });
           },
           message: () => {
             return 'The Portal Name has already been exist.';
           }
+        }
+      },
+      hooks: {
+        onInit: field => { 
+          field.formControl?.valueChanges.subscribe(val => {
+            this.portalItemService.getCodeName(val).subscribe(res => {
+              field.formControl?.setValue(res.result, { emitEvent: false });
+            });
+          });
         }
       }
     },
@@ -68,7 +104,6 @@ export class PortalEditBasicComponent
     {
       key: 'parentId',
       type: 'select',
-      className: 'w-full',
       props: {
         label: 'Parent Folder',
         placeholder: 'Please Select',
