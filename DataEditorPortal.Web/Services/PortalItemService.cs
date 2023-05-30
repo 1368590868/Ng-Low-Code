@@ -108,7 +108,9 @@ namespace DataEditorPortal.Web.Services
 
         public Guid Create(PortalItemData model)
         {
-            model.Name = GetCodeName(model.Label);
+            if (string.IsNullOrEmpty(model.Name))
+                model.Name = GetCodeName(model.Label);
+            if (ExistName(model.Name, null)) throw new DepException("Portal Name does already exist.");
 
             var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
             var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
@@ -164,7 +166,9 @@ namespace DataEditorPortal.Web.Services
                 throw new ApiException("Not Found", 404);
             }
 
-            model.Name = GetCodeName(model.Label);
+            if (string.IsNullOrEmpty(model.Name))
+                model.Name = GetCodeName(model.Label);
+            if (ExistName(model.Name, id)) throw new DepException("Portal Name does already exist.");
 
             // update permissions
             var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"Portal Item: { siteMenu.Label }").ToList();
@@ -369,7 +373,7 @@ namespace DataEditorPortal.Web.Services
                         from u in _depDbContext.UniversalGridConfigurations
                         join mp in _depDbContext.SiteMenus on u.Name equals mp.Name
                         join mc in _depDbContext.SiteMenus on mp.Id equals mc.ParentId
-                        where mc.Id == config.Id
+                        where mc.Id == id
                         select u.DataSourceConnectionId
                     ).FirstOrDefault();
                     if (datasourceConnectionId.HasValue)
@@ -635,18 +639,17 @@ namespace DataEditorPortal.Web.Services
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
-            if (string.IsNullOrEmpty(config.DataSourceConfig))
+            var dsConfig = JsonSerializer.Deserialize<LinkedDataSourceConfig>(!string.IsNullOrEmpty(config.DataSourceConfig) ? config.DataSourceConfig : "{}");
+            if (dsConfig.PrimaryTable == null || dsConfig.SecondaryTable == null)
             {
                 var result = new LinkedDataSourceConfig();
                 var ids = _depDbContext.SiteMenus.Where(x => x.ParentId == siteMenu.Id).OrderBy(x => x.Order).Select(x => x.Id).ToList();
-                if (ids.Count >= 1)
-                    result.PrimaryTable = new LinkedTableConfig() { Id = ids[0] };
-                if (ids.Count >= 2)
-                    result.SecondaryTable = new LinkedTableConfig() { Id = ids[1] };
-                return result;
+                if (dsConfig.PrimaryTable == null && ids.Count >= 1)
+                    dsConfig.PrimaryTable = new LinkedTableConfig() { Id = ids[0] };
+                if (dsConfig.SecondaryTable == null && ids.Count >= 2)
+                    dsConfig.SecondaryTable = new LinkedTableConfig() { Id = ids[1] };
             }
-            else
-                return JsonSerializer.Deserialize<LinkedDataSourceConfig>(config.DataSourceConfig);
+            return dsConfig;
         }
 
         public bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model)
@@ -656,6 +659,9 @@ namespace DataEditorPortal.Web.Services
             {
                 throw new ApiException("Not Found", 404);
             }
+
+            if (model.PrimaryTable != null && model.PrimaryTable.Id == Guid.Empty) model.PrimaryTable = null;
+            if (model.SecondaryTable != null && model.SecondaryTable.Id == Guid.Empty) model.SecondaryTable = null;
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
