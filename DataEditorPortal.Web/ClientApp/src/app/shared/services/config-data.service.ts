@@ -60,7 +60,7 @@ export class ConfigDataService {
     return this.http
       .get<{
         result: HeaderText;
-      }>(`${this._apiUrl}site/settings`)
+      }>(`${this._apiUrl}site/env`)
       .pipe(
         tap(res => {
           this.headerText = res.result;
