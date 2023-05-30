@@ -106,6 +106,23 @@ namespace DataEditorPortal.Web.Controllers
             };
         }
 
+        [HttpGet]
+        [Route("env")]
+        [AllowAnonymous]
+        [NoLicenseCheck]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public dynamic GetSiteEnv()
+        {
+            var section = _config.GetSection("SiteEvnironment");
+            if (section == null) return null;
+
+            return new
+            {
+                WebHeaderMessage = section.GetValue<string>("WebHeaderMessage"),
+                WebHeaderDescription = section.GetValue<string>("WebHeaderDescription")
+            };
+        }
+
         #endregion
 
         [HttpPost]

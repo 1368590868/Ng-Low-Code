@@ -43,7 +43,8 @@ namespace DataEditorPortal.Web.Services
 
             var user = _httpContextAccessor.HttpContext.User;
             var username = AppUser.ParseUsername(user.Identity.Name).Username;
-            var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+            var userEntity = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
+            var userId = userEntity != null ? userEntity.Id : Guid.Empty;
 
             if (IsAdmin(username))
             {
