@@ -22,6 +22,6 @@
     >
   </ng-container>
   <ng-container *ngIf="!showAll && fileList.length > 1">
-    {{ fileList.length }} attachments
+    <span [pTooltip]="tooltipList"> {{ fileList.length }} attachments </span>
   </ng-container>
 </div>

@@ -24,12 +24,24 @@ export class AttachmentsComponent {
     }
 
     this.fileList = parseVal.filter(item => item?.status !== 'Deleted');
+    this.tooltipList = parseVal
+      .map(item => {
+        const comments = item?.comments;
+        if (!comments) return '';
+        const commentsList = comments.split('\n');
+        return commentsList.map(comment => {
+          if (comment === '') return '';
+          return `${item.fileName} : ${comment} \n`;
+        });
+      })
+      .join('');
   }
 
   @Input() gridName = '';
   @Input() fieldName = '';
   @Input() showAll = false;
 
+  tooltipList: any = [];
   fileList: AttachmentType[] = [];
 
   constructor(@Inject('API_URL') public apiUrl: string) {}
