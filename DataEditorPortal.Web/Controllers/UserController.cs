@@ -48,6 +48,7 @@ namespace DataEditorPortal.Web.Controllers
             {
                 dep_user = new Data.Models.User();
                 dep_user.Username = user.Username;
+                dep_user.Name = user.DisplayName;
                 dep_user.AutoEmail = true;
 
                 // check site has admin
