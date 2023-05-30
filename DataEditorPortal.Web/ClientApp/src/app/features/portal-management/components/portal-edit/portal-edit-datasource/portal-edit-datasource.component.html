@@ -17,6 +17,7 @@
           [style]="{ minWidth: '20rem' }"
           appendTo="body"></p-dropdown>
         <p-button
+          *ngIf="!dbConnectionDisabled"
           class="ml-1"
           pTooltip="Create new Connection"
           styleClass="p-button-text p-button-rounded"

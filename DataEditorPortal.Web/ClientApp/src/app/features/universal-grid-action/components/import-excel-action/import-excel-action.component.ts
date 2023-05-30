@@ -185,6 +185,7 @@ export class ImportExcelActionComponent
           setTimeout(() => {
             this.initImportFileList();
             this.currentStep = 1;
+            this.progress = 0;
             this.step = this.currentStep;
             this.isLoading = false;
           }, 1000);

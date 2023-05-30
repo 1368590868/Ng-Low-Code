@@ -162,10 +162,20 @@ export class PortalItemService {
       .pipe(tap(() => this.refreshMenu()));
   }
 
-  nameExists(name: string, id?: string): Observable<ApiResponse<boolean>> {
+  getCodeName(name: string): Observable<ApiResponse<string>> {
+    let params = new HttpParams().set('name', name);
+    return this.http.get<ApiResponse<string>>(
+      `${this._apiUrl}portal-item/get-code-name`,
+      {
+        params
+      }
+    );
+  }
+
+  nameExists(name: string, id?: string): Observable<ApiResponse<any>> {
     let params = new HttpParams().set('name', name);
     if (id) params = params.set('id', id);
-    return this.http.get<ApiResponse<boolean>>(
+    return this.http.get<ApiResponse<any>>(
       `${this._apiUrl}portal-item/name-exists`,
       {
         params

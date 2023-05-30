@@ -161,7 +161,7 @@
                       ? 'Continue Editing'
                       : 'Edit'
                   "
-                  [routerLink]="'./edit/' + primary.id"
+                  (click)="onEditTable(primary.id)"
                   class="p-button-text"></button>
                 <button
                   *ngIf="primary?.configCompleted"
@@ -239,7 +239,7 @@
         icon="pi pi-plus"
         class="mt-1 ml-4"
         styleClass="p-button-text p-button-sm"
-        [routerLink]="'./add'"></p-button>
+        (onClick)="onAddPrimaryTable()"></p-button>
     </div>
     <p-divider styleClass="w-6 mt-4">Secondary Table</p-divider>
     <div class="w-6 mb-2">
@@ -279,7 +279,7 @@
                       ? 'Continue Editing'
                       : 'Edit'
                   "
-                  [routerLink]="'./edit/' + secondary.id"
+                  (click)="onEditTable(secondary.id)"
                   class="p-button-text"></button>
 
                 <button

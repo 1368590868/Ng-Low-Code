@@ -160,6 +160,18 @@ export class PortalEditLinkComponent
     this.customActions.showDialog();
   }
 
+  onEditTable(tableId: string) {
+    this.onSave();
+    this.router.navigate([`./edit/${tableId}`], {
+      relativeTo: this.route
+    });
+  }
+
+  onAddPrimaryTable() {
+    this.onSave();
+    this.router.navigate(['./add'], { relativeTo: this.route });
+  }
+
   onAddSecondaryTable() {
     if (this.dataSourceConfig.primaryTable == null) {
       this.notifyService.notifyWarning(
@@ -167,6 +179,7 @@ export class PortalEditLinkComponent
         'Please select primary table first.'
       );
     } else {
+      this.onSave();
       this.router.navigate(['./add'], { relativeTo: this.route });
     }
   }
@@ -211,9 +224,7 @@ export class PortalEditLinkComponent
 
   onSaveAndExit() {
     this.isSavingAndExit = true;
-    if (this.valid()) {
-      this.onSave();
-    }
+    this.onSave();
   }
 
   onSave() {
@@ -230,16 +241,20 @@ export class PortalEditLinkComponent
     }
     this.portalItemService
       .saveLinkedDatasource({
-        primaryTable: {
-          id: this.dataSourceConfig.primaryTable?.id,
-          columnsForLinkedField: this.primarySelected,
-          mapToLinkedTableField: this.formControlPrimaryMap.value
-        },
-        secondaryTable: {
-          id: this.dataSourceConfig.secondaryTable?.id,
-          columnsForLinkedField: this.secondarySelected,
-          mapToLinkedTableField: this.formControlSecondaryMap.value
-        },
+        primaryTable: this.dataSourceConfig.primaryTable?.id
+          ? {
+              id: this.dataSourceConfig.primaryTable?.id,
+              columnsForLinkedField: this.primarySelected,
+              mapToLinkedTableField: this.formControlPrimaryMap.value
+            }
+          : null,
+        secondaryTable: this.dataSourceConfig.secondaryTable?.id
+          ? {
+              id: this.dataSourceConfig.secondaryTable?.id,
+              columnsForLinkedField: this.secondarySelected,
+              mapToLinkedTableField: this.formControlSecondaryMap.value
+            }
+          : null,
         linkedTable: data
       })
       .subscribe(res => {
