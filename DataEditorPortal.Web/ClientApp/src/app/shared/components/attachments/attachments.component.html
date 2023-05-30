@@ -1,0 +1,27 @@
+<div class="inline-flex flex-column">
+  <ng-container *ngIf="showAll">
+    <a
+      class="no-underline cursor-pointer text-primary"
+      *ngFor="let file of fileList"
+      href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
+        fieldName
+      }}/{{ file.fileId }}/{{ file.fileName || '' }}"
+      pTooltip="{{ file.comments || '' }}"
+      >{{ file.fileName }}</a
+    >
+  </ng-container>
+  <ng-container *ngIf="!showAll && fileList.length === 1">
+    <a
+      class="no-underline cursor-pointer text-primary"
+      *ngFor="let file of fileList"
+      href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
+        fieldName
+      }}/{{ file.fileId }}/{{ file.fileName || '' }}"
+      pTooltip="{{ file.comments || '' }}"
+      >{{ file.fileName }}</a
+    >
+  </ng-container>
+  <ng-container *ngIf="!showAll && fileList.length > 1">
+    {{ fileList.length }} attachments
+  </ng-container>
+</div>

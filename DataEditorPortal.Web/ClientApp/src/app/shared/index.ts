@@ -7,6 +7,7 @@ import { FormlyModule } from '@ngx-formly/core';
 
 // primeNG components
 import { MessageService } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
@@ -15,6 +16,9 @@ import { BooleanTextPipe } from './pipes/boolean-text.pipe';
 import { AttachmentsPipe } from './pipes/attachments.pipe';
 import { TemplatePipe } from './pipes/template.pipe';
 import { DataFormatService } from './services/data-format.service';
+
+// public components
+import { AttachmentsComponent } from './components/attachments/attachments.component';
 
 export { AuthRouterGuard } from './guards/auth-router.guard';
 export { AdminPermissionGuard } from './guards/admin-permission.guard';
@@ -38,14 +42,22 @@ export { SystemLogData } from '../shared/models/system-log';
     PermissionDirective,
     BooleanTextPipe,
     AttachmentsPipe,
-    TemplatePipe
+    TemplatePipe,
+    AttachmentsComponent
   ],
-  imports: [CommonModule, FormsModule, HttpClientModule, FormlyModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    FormlyModule,
+    TooltipModule
+  ],
   exports: [
     PermissionDirective,
     BooleanTextPipe,
     AttachmentsPipe,
-    TemplatePipe
+    TemplatePipe,
+    AttachmentsComponent
   ],
   providers: [
     {
