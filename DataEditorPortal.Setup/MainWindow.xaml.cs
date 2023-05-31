@@ -51,7 +51,8 @@ namespace Setup
             connectionWindow.DatabaseProvider = DatabaseProvider.Value;
             connectionWindow.DatabaseConnection = new DatabaseConnection()
             {
-                Authentication = DatabaseProvider.Value == "SqlConnection" ? "SqlServerAuthentication" : ""
+                ConnectionName = ("New Connection " + ConnectionList.Count(c => c.ConnectionName.StartsWith("New Connection"))).Replace(" 0", ""),
+                Authentication = DatabaseProvider.Value == "SqlConnection" ? "Sql Server Authentication" : "Oracle Database Native"
             };
             connectionWindow.ShowDialog();
             if (connectionWindow.DialogResult.HasValue && connectionWindow.DialogResult.Value)
@@ -98,7 +99,7 @@ namespace Setup
                 {
                     ConnectionName = data.ConnectionName,
                     ConnectionString = data.ConnectionString,
-                    Authentication = data.Authentication,
+                    Authentication = DatabaseProvider.Value == "SqlConnection" ? "Sql Server Authentication" : "Oracle Database Native",
                     ServerName = data.ServerName,
                     Username = data.Username,
                     Password = data.Password,

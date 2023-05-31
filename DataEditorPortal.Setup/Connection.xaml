@@ -41,9 +41,7 @@
             </TextBox>
 
             <Label x:Name="label3" Content="Authentication:" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
-            <ComboBox x:Name="cmbAuthentication" Margin="106,115,11,0" VerticalAlignment="Top" IsTextSearchEnabled="False" SelectedIndex="0" SelectedValuePath="Tag" Height="20" Padding="6,1,5,0" SelectionChanged="comboBox_SelectionChanged">
-                <ComboBoxItem Content="Sql Server Authentication" Tag="SqlServerAuthentication" />
-                <ComboBoxItem Content="Windows Authentication" Tag="WindowsAuthentication"/>
+            <ComboBox x:Name="cmbAuthentication" Margin="106,115,11,0" VerticalAlignment="Top" IsTextSearchEnabled="False" SelectedIndex="0" SelectedValuePath="Content" Height="20" Padding="6,1,5,0" SelectionChanged="comboBox_SelectionChanged">
                 <ComboBox.SelectedValue>
                     <Binding Path="DatabaseConnection.Authentication" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
                         <Binding.ValidationRules>
@@ -53,7 +51,7 @@
                 </ComboBox.SelectedValue>
             </ComboBox>
 
-            <Label x:Name="label4" Content="User Name:" HorizontalAlignment="Left" Margin="10,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
+            <Label x:Name="label4" Content="Username:" HorizontalAlignment="Left" Margin="10,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
             <TextBox x:Name="textUsername" Margin="106,143,11,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Style="{DynamicResource ValidatingControl}" 
                      IsEnabled="{Binding DatabaseConnection.IsNotWindowsAuth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Connection}}}">
                 <TextBox.Text>
@@ -79,7 +77,7 @@
                 </local:PasswordHelper.Password>
             </PasswordBox>
             <Label x:Name="label6" Content="Database Name:" HorizontalAlignment="Left" Margin="10,199,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
-            <ComboBox x:Name="cmbDataBaseName" Margin="106,199,11,0" VerticalAlignment="Top" local:ComboBoxHelper.BindSelectedValueAndText="true"  IsTextSearchEnabled="False" SelectedIndex="0" SelectedValuePath="Tag" Height="20" Padding="6,1,5,0" IsEditable="True">
+            <ComboBox x:Name="cmbDataBaseName" Margin="106,199,11,0" VerticalAlignment="Top" local:ComboBoxHelper.BindSelectedValueAndText="true" IsTextSearchEnabled="True" SelectedIndex="0" SelectedValuePath="Tag" Height="20" Padding="6,1,5,0" IsEditable="True">
                 <local:ComboBoxHelper.SelectedValueAndText>
                     <Binding Path="DatabaseConnection.DatabaseName" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
                         <Binding.ValidationRules>

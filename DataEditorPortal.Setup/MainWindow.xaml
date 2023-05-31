@@ -63,15 +63,15 @@
                     </Binding>
                 </TextBox.Text>
             </TextBox>
-            <TextBox x:Name="textPassword" Margin="98,115,164,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Style="{DynamicResource ValidatingControl}">
-                <TextBox.Text>
+            <PasswordBox x:Name="textPassword" Margin="98,115,164,0" VerticalAlignment="Top" Height="20" local:PasswordHelper.BindPassword="True" Style="{DynamicResource ValidatingControl}">
+                <local:PasswordHelper.Password>
                     <Binding Path="Administrator.Password" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}">
                         <Binding.ValidationRules>
                             <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
                         </Binding.ValidationRules>
                     </Binding>
-                </TextBox.Text>
-            </TextBox>
+                </local:PasswordHelper.Password>
+            </PasswordBox>
             <Button x:Name="btnAdminBack" Content="Back" Margin="10,0,0,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="50" Click="btnAdminBack_Click"/>
             <Button x:Name="btnAdminNext" Content="Next" Margin="0,0,10,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="50" Click="btnAdminNext_Click">
                 <Button.Style>

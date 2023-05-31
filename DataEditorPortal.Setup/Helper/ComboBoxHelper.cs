@@ -48,17 +48,56 @@ namespace Setup
         {
             if (d is ComboBox comboBox)
             {
-                bool bindPassword = (bool)e.NewValue;
+                bool bindSelectedValueAndText = (bool)e.NewValue;
 
-                if (bindPassword)
+                if (bindSelectedValueAndText)
                 {
-                    comboBox.SelectionChanged += ComboBox_SelectionChanged;
-                    comboBox.PreviewTextInput += ComboBox_PreviewTextInput;
+                    comboBox.Loaded += ComboBox_Loaded;
+                    comboBox.Unloaded += ComboBox_Unloaded;
                 }
                 else
                 {
-                    comboBox.SelectionChanged -= ComboBox_SelectionChanged;
-                    comboBox.PreviewTextInput -= ComboBox_PreviewTextInput;
+                    comboBox.Loaded -= ComboBox_Loaded;
+                    comboBox.Unloaded -= ComboBox_Unloaded;
+                }
+            }
+        }
+
+        private static void ComboBox_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ComboBox comboBox)
+            {
+                var textBox = GetComboBoxTextBox(comboBox);
+                if (textBox != null) textBox.TextChanged -= TextBox_TextChanged;
+
+                comboBox.SelectionChanged -= ComboBox_SelectionChanged;
+            }
+        }
+
+        private static void ComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ComboBox comboBox)
+            {
+                var textBox = GetComboBoxTextBox(comboBox);
+                if (textBox != null)
+                {
+                    textBox.Tag = comboBox;
+                    textBox.TextChanged += TextBox_TextChanged;
+                }
+
+                comboBox.SelectionChanged += ComboBox_SelectionChanged;
+            }
+        }
+
+        private static void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                if (textBox.Tag is ComboBox comboBox && !GetIsUpdating(comboBox))
+                {
+                    SetIsUpdating(comboBox, true);
+                    SetSelectedValueAndText(comboBox, comboBox.Text);
+                    SetIsUpdating(comboBox, false);
                 }
             }
         }
@@ -70,13 +109,14 @@ namespace Setup
                 if (!comboBox.IsDropDownOpen)
                 {
                     comboBox.SelectionChanged -= ComboBox_SelectionChanged;
-                    comboBox.PreviewTextInput -= ComboBox_PreviewTextInput;
+                    var textBox = GetComboBoxTextBox(comboBox);
+                    if (textBox != null) textBox.TextChanged -= TextBox_TextChanged;
 
                     comboBox.SelectedValue = e.NewValue;
                     comboBox.Text = e.NewValue?.ToString();
 
                     comboBox.SelectionChanged += ComboBox_SelectionChanged;
-                    comboBox.PreviewTextInput += ComboBox_PreviewTextInput;
+                    if (textBox != null) textBox.TextChanged += TextBox_TextChanged;
                 }
             }
         }
@@ -91,16 +131,16 @@ namespace Setup
             }
         }
 
-        private static void ComboBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        // Helper method to find the TextBox inside the ComboBox
+        private static TextBox GetComboBoxTextBox(ComboBox comboBox)
         {
-            if (sender is ComboBox comboBox && !GetIsUpdating(comboBox))
+            var comboBoxTemplate = comboBox.Template;
+            if (comboBoxTemplate != null)
             {
-                SetIsUpdating(comboBox, true);
-                string newText = comboBox.Text + e.Text;
-                SetSelectedValueAndText(comboBox, newText);
-                SetIsUpdating(comboBox, false);
+                var textBox = (TextBox)comboBoxTemplate.FindName("PART_EditableTextBox", comboBox);
+                return textBox;
             }
+            return null;
         }
     }
-
 }

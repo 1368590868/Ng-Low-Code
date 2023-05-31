@@ -19,7 +19,21 @@ namespace Setup
             InitializeComponent();
         }
 
-        public string DatabaseProvider { get; set; }
+        private string _databaseProvider;
+        public string DatabaseProvider
+        {
+            get { return _databaseProvider; }
+            set
+            {
+                _databaseProvider = value;
+                label2.Content = DatabaseProvider == "SqlConnection" ? "Server Name:" : "Host:";
+                label6.Content = DatabaseProvider == "SqlConnection" ? "Database Name:" : "Service Name:";
+
+                cmbAuthentication.Items.Add(new ComboBoxItem() { Content = DatabaseProvider == "SqlConnection" ? "Sql Server Authentication" : "Oracle Database Native", IsSelected = true });
+                cmbAuthentication.Items.Add(new ComboBoxItem() { Content = DatabaseProvider == "SqlConnection" ? "Windows Authentication" : "OS Authentication" });
+            }
+        }
+
         public DatabaseConnection DatabaseConnection { get; set; } = new DatabaseConnection() { };
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -71,7 +85,7 @@ namespace Setup
                 var builder = new SqlConnectionStringBuilder();
                 builder.DataSource = con.ServerName;
 
-                if (con.Authentication == "WindowsAuthentication")
+                if (con.Authentication == "Windows Authentication")
                 {
                     builder.IntegratedSecurity = true;
                 }

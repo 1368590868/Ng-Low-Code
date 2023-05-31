@@ -89,7 +89,7 @@ namespace Setup.Models
 
         public bool IsNotWindowsAuth
         {
-            get { return _authentication != "WindowsAuthentication"; }
+            get { return _authentication != "Windows Authentication" && _authentication != "OS Authentication"; }
         }
 
         public string Error { get { return null; } }
