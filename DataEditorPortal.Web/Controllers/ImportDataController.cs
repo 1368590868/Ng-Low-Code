@@ -104,19 +104,20 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("{gridName}/{type}/upload-excel-template")]
-        public GridData UploadExcelTemplate(string gridName, ImportType type, [FromBody] UploadedFileModel uploadedFile)
+        public dynamic UploadExcelTemplate(string gridName, ImportType type, [FromBody] UploadedFileModel uploadedFile)
         {
             var sourceObjs = _importDataServcie.GetSourceData(gridName, type, uploadedFile);
 
+            IList<FormFieldConfig> fields = null;
             if (sourceObjs != null)
             {
-                _importDataServcie.ValidateImportedData(gridName, type, sourceObjs);
+                fields = _importDataServcie.ValidateImportedData(gridName, type, sourceObjs);
             }
 
-            var result = new GridData()
+            var result = new
             {
                 Data = sourceObjs.ToList(),
-                Total = sourceObjs.Count()
+                fields = fields.Select(f => new { f.key, f.filterType, f.props }),
             };
             return result;
         }

@@ -24,7 +24,7 @@ namespace DataEditorPortal.Web.Services
         public override void PreProcess(UniversalGridConfiguration config, FormFieldConfig field, IDictionary<string, object> model)
         {
             _config = config;
-            ProcessLocationFiled(field, model);
+            ProcessLocationField(field, model);
         }
 
         public override void PostProcess(object dataId)
@@ -59,7 +59,7 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        private void ProcessLocationFiled(FormFieldConfig field, IDictionary<string, object> model)
+        private void ProcessLocationField(FormFieldConfig field, IDictionary<string, object> model)
         {
             if (field.props == null) return;
 
@@ -67,23 +67,26 @@ namespace DataEditorPortal.Web.Services
             {
                 if (model.ContainsKey(field.key))
                 {
-                    using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+                    if (model[field.key] != null)
                     {
-                        var props = doc.RootElement.EnumerateObject();
-
-                        var mappingProp = props.FirstOrDefault(x => x.Name == "mappingColumns").Value;
-                        if (mappingProp.ValueKind == JsonValueKind.Object)
+                        using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
                         {
-                            var jsonElement = (JsonElement)model[field.key];
-                            foreach (var mapping in mappingProp.EnumerateObject())
-                            {
-                                var key = mapping.Value.GetString();
-                                var value = jsonElement.EnumerateObject().FirstOrDefault(x => x.Name == mapping.Name).Value;
+                            var props = doc.RootElement.EnumerateObject();
 
-                                if (model.ContainsKey(key))
-                                    model[key] = value;
-                                else
-                                    model.Add(key, value);
+                            var mappingProp = props.FirstOrDefault(x => x.Name == "mappingColumns").Value;
+                            if (mappingProp.ValueKind == JsonValueKind.Object)
+                            {
+                                var jsonElement = (JsonElement)model[field.key];
+                                foreach (var mapping in mappingProp.EnumerateObject())
+                                {
+                                    var key = mapping.Value.GetString();
+                                    var value = jsonElement.EnumerateObject().FirstOrDefault(x => x.Name == mapping.Name).Value;
+
+                                    if (model.ContainsKey(key))
+                                        model[key] = value;
+                                    else
+                                        model.Add(key, value);
+                                }
                             }
                         }
                     }
