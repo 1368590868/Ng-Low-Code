@@ -4,7 +4,7 @@
   *ngIf="newAttachments.length > 0">
   <ng-template pTemplate="header">
     <tr>
-      <th style="width: 40%">Name</th>
+      <th class="w-5">Name</th>
       <th>Comment</th>
       <th style="width: 50px"></th>
     </tr>
@@ -12,15 +12,17 @@
   <ng-template pTemplate="body" let-file>
     <tr>
       <td [class]="file.status === 'Deleted' ? 'line-through' : null">
-        <span *ngIf="file.status === 'Deleted'; else download">{{
-          file.fileName
-        }}</span>
+        <div
+          class="white-space-nowrap overflow-hidden overflow-ellipsis"
+          *ngIf="file.status === 'Deleted'; else download">
+          {{ file.fileName }}
+        </div>
         <ng-template #download>
-          <a
-            class="cursor-pointer text-primary"
+          <div
+            class="cursor-pointer text-primary white-space-nowrap overflow-hidden overflow-ellipsis"
             (click)="tempAttachmentDownload(file)">
             {{ file.fileName }}
-          </a>
+          </div>
         </ng-template>
       </td>
       <td [class]="file.status === 'Deleted' ? 'line-through' : null">
