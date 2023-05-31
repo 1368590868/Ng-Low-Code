@@ -1,12 +1,13 @@
 <div class="inline-flex flex-column">
   <ng-container *ngIf="showAll">
     <a
-      class="no-underline cursor-pointer text-primary"
+      class="no-underline cursor-pointer text-primary flex flex-shrink-0"
       *ngFor="let file of fileList"
       href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
         fieldName
       }}/{{ file.fileId }}/{{ file.fileName || '' }}"
       pTooltip="{{ file.comments || '' }}"
+      tooltipPosition="bottom"
       >{{ file.fileName }}</a
     >
   </ng-container>
@@ -18,10 +19,13 @@
         fieldName
       }}/{{ file.fileId }}/{{ file.fileName || '' }}"
       pTooltip="{{ file.comments || '' }}"
+      tooltipPosition="bottom"
       >{{ file.fileName }}</a
     >
   </ng-container>
   <ng-container *ngIf="!showAll && fileList.length > 1">
-    <span [pTooltip]="tooltipList"> {{ fileList.length }} attachments </span>
+    <span [pTooltip]="tooltipList" [escape]="false" tooltipPosition="bottom">
+      {{ fileList.length }} attachments
+    </span>
   </ng-container>
 </div>

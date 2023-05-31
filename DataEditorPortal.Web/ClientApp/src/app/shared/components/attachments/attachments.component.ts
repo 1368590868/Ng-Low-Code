@@ -24,17 +24,19 @@ export class AttachmentsComponent {
     }
 
     this.fileList = parseVal.filter(item => item?.status !== 'Deleted');
-    this.tooltipList = parseVal
+    const msg = parseVal
       .map(item => {
         const comments = item?.comments;
         if (!comments) return '';
         const commentsList = comments.split('\n');
         return commentsList.map(comment => {
           if (comment === '') return '';
-          return `${item.fileName} : ${comment} \n`;
+          return `<li >${item.fileName}</li>`;
         });
       })
       .join('');
+    const html = `<ul style='padding-left:1.5rem'>${msg}</ul>`;
+    this.tooltipList = html;
   }
 
   @Input() gridName = '';
