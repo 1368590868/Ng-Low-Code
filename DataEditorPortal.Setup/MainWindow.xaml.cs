@@ -49,6 +49,10 @@ namespace Setup
             var connectionWindow = new Connection();
             connectionWindow.Owner = this;
             connectionWindow.DatabaseProvider = DatabaseProvider.Value;
+            connectionWindow.DatabaseConnection = new DatabaseConnection()
+            {
+                Authentication = DatabaseProvider.Value == "SqlConnection" ? "SqlServerAuthentication" : ""
+            };
             connectionWindow.ShowDialog();
             if (connectionWindow.DialogResult.HasValue && connectionWindow.DialogResult.Value)
             {
@@ -93,7 +97,12 @@ namespace Setup
                 connectionWindow.DatabaseConnection = new DatabaseConnection()
                 {
                     ConnectionName = data.ConnectionName,
-                    ConnectionString = data.ConnectionString
+                    ConnectionString = data.ConnectionString,
+                    Authentication = data.Authentication,
+                    ServerName = data.ServerName,
+                    Username = data.Username,
+                    Password = data.Password,
+                    DatabaseName = data.DatabaseName
                 };
                 connectionWindow.ShowDialog();
                 if (connectionWindow.DialogResult.HasValue && connectionWindow.DialogResult.Value)
@@ -104,6 +113,11 @@ namespace Setup
                         var result = connectionWindow.DatabaseConnection;
                         item.ConnectionName = result.ConnectionName;
                         item.ConnectionString = result.ConnectionString;
+                        item.Authentication = result.Authentication;
+                        item.ServerName = result.ServerName;
+                        item.Username = result.Username;
+                        item.Password = result.Password;
+                        item.DatabaseName = result.DatabaseName;
                     }
                 }
             }

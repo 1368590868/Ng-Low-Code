@@ -26,7 +26,20 @@
                 </DataGrid.RowStyle>
                 <DataGrid.Columns>
                     <DataGridTextColumn CanUserSort="False" CanUserResize="False" CanUserReorder="False" Header="Name" Binding="{Binding ConnectionName}" IsReadOnly="True" Width="Auto" MinWidth="100"/>
-                    <DataGridTextColumn CanUserSort="False" CanUserResize="False" CanUserReorder="False" Header="Connection String" Binding="{Binding ConnectionString}" IsReadOnly="True" MinWidth="300"/>
+                    <DataGridTemplateColumn CanUserSort="False" CanUserResize="False" CanUserReorder="False" Header="Connection String" IsReadOnly="True" MinWidth="300">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ConnectionString}"
+                               TextTrimming="CharacterEllipsis">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip Content="{Binding ConnectionString}" 
+                                     Placement="Mouse" 
+                                     HorizontalAlignment="Center"/>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
             <Button x:Name="btnConnectionNext" Content="Next" Margin="0,0,10,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="50" Click="btnConnectionNext_Click"/>
