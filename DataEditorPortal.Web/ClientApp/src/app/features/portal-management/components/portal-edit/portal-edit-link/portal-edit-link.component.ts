@@ -114,6 +114,12 @@ export class PortalEditLinkComponent
               .getLinkedSingleTableConfig(result.primaryTable.id)
               .subscribe(item => {
                 this.primaryTableConfig = item;
+                const filteredData = this.primarySelected.filter(
+                  x => !!item.columns.find(y => y === x)
+                );
+                if (filteredData.length < this.primarySelected.length) {
+                  this.primarySelected = filteredData;
+                }
               });
           }
 
@@ -122,6 +128,12 @@ export class PortalEditLinkComponent
               .getLinkedSingleTableConfig(result.secondaryTable.id)
               .subscribe(item => {
                 this.secondaryTableConfig = item;
+                const filteredData = this.secondarySelected.filter(
+                  x => !!item.columns.find(y => y === x)
+                );
+                if (filteredData.length < this.secondarySelected.length) {
+                  this.secondarySelected = filteredData;
+                }
               });
           }
 

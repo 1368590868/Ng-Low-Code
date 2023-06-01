@@ -21,7 +21,7 @@ export class ImportActionService {
 
   getUploadTemplate(file: any, gridName: string, type: string) {
     return this.http
-      .post<ApiResponse<InfoList>>(
+      .post<ApiResponse<any>>(
         `${this.apiUrl}import-data/${gridName}/${type}/upload-excel-template`,
         file
       )

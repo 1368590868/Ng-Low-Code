@@ -133,6 +133,19 @@ export class ImportExcelActionComponent
               }))
               .filter(item => item.header !== '__errors__');
 
+            this.columns = this.columns
+              .map(item => {
+                const fieldData = res.fields.find(
+                  (field: any) => field.key === item.header
+                );
+                return {
+                  header: fieldData?.props?.label || fieldData?.key,
+                  key: fieldData?.key,
+                  filterType: fieldData?.filterType
+                };
+              })
+              .filter(item => item.header !== undefined);
+
             // group by status
             this.statusList = this.infoList.reduce((acc: any, cur) => {
               const found: { data: InfoData[] } = acc.find(

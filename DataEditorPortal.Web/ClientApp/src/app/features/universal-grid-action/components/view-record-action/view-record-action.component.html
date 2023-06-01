@@ -35,12 +35,12 @@
           viewData.value
             | number : (viewData.format === '' ? undefined : viewData.format)
         }}</ng-template>
-        <ng-template #attachments
-          ><div
-            [innerHTML]="
-              viewData.value | attachments : gridName : viewData.name : true
-            "
-            class="flex flex-column"></div>
+        <ng-template #attachments>
+          <app-attachments
+            [data]="viewData.value"
+            [gridName]="gridName"
+            [fieldName]="viewData.name"
+            [showAll]="true"></app-attachments>
         </ng-template>
         <ng-template #normal>{{ viewData.value }}</ng-template>
         <span

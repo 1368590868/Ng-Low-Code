@@ -11,7 +11,8 @@ import {
   AbstractControl,
   ControlValueAccessor,
   FormGroup,
-  NG_VALUE_ACCESSOR
+  NG_VALUE_ACCESSOR,
+  ValidationErrors
 } from '@angular/forms';
 import {
   FieldType,
@@ -50,7 +51,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
   _value: any;
   @Input()
   set value(val: any) {
-    if (val) {
+    if (val && val !== 'error') {
       this.model = { ...this.model, ...val };
       this.changeDetectorRef.markForCheck();
     }
@@ -294,7 +295,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
         val = { ...$event };
       }
     } else {
-      val = null;
+      val = 'error';
     }
     if (this._value !== val) {
       this._value = val;
@@ -351,7 +352,16 @@ export class FormlyFieldLocationEditorComponent
 {
   ngOnInit(): void {
     this.field.validation = {
-      messages: { required: ' ' }
+      messages: { required: ' ', errorData: ' ' }
     };
+    this.field.formControl.addValidators(
+      (control: AbstractControl): ValidationErrors | null => {
+        if (control.value === 'error') {
+          control.markAsPristine();
+          return { errorData: true };
+        }
+        return null;
+      }
+    );
   }
 }

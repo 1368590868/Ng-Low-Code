@@ -211,12 +211,12 @@
               data[col.field]
                 | number : (col.format === '' ? undefined : col.format)
             }}</ng-template>
-            <ng-template #attachments
-              ><span
-                [innerHTML]="
-                  data[col.field] | attachments : gridName : col.field
-                "></span
-            ></ng-template>
+            <ng-template #attachments>
+              <app-attachments
+                [data]="data[col.field]"
+                [gridName]="gridName"
+                [fieldName]="col.field"></app-attachments>
+            </ng-template>
             <ng-template #normal>{{ data[col.field] }}</ng-template>
             <span
               *ngIf="col.template"
