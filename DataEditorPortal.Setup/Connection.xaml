@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Setup"
         xmlns:Models="clr-namespace:Setup.Models" x:Class="Setup.Connection"
         mc:Ignorable="d"
-        Title="Connection" Height="300" Width="397" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
+        Title="Connection" Height="360" Width="500" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type FrameworkElement}" x:Key="ValidatingControl">
@@ -17,6 +17,14 @@
                 </Style.Triggers>
             </Style>
         </Grid.Resources>
+        <Grid.LayoutTransform>
+            <TransformGroup>
+                <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                <SkewTransform/>
+                <RotateTransform/>
+                <TranslateTransform/>
+            </TransformGroup>
+        </Grid.LayoutTransform>
         <Grid x:Name="panelSqlServer" Visibility="Visible" Height="284" VerticalAlignment="Bottom">
             <Label x:Name="label" Content="Connection Key:" Margin="10,40,0,0" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Padding="0,0,0,0"/>
             <TextBox x:Name="textName" Margin="106,40,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="{Binding DatabaseConnection.IsConnectionNameEnabled, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Connection}}}" Height="20" Style="{DynamicResource ValidatingControl}">

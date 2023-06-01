@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:Setup"
     x:Class="Setup.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="316" Width="482" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+        Title="MainWindow" Height="450" Width="600" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type FrameworkElement}" x:Key="ValidatingControl">
@@ -17,6 +17,14 @@
                 </Style.Triggers>
             </Style>
         </Grid.Resources>
+        <Grid.LayoutTransform>
+            <TransformGroup>
+                <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                <SkewTransform/>
+                <RotateTransform/>
+                <TranslateTransform/>
+            </TransformGroup>
+        </Grid.LayoutTransform>
         <Grid x:Name="containerConnection" Visibility="Visible">
             <DataGrid x:Name="dataGridConnection" ItemsSource="{Binding}" Margin="10,87,10,40" AutoGenerateColumns="False" ColumnWidth="SizeToHeader" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="Gainsboro" CanUserAddRows="False">
                 <DataGrid.RowStyle>
