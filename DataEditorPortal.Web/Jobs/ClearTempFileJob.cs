@@ -34,6 +34,8 @@ namespace DataEditorPortal.Web.Jobs
                     {
                         file.Delete();
                     }
+
+                    _logger.LogInformation($"{files.Count()} files are deleted.");
                 }
 
                 return Task.CompletedTask;

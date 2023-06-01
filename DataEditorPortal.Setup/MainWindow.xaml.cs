@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -29,7 +30,6 @@ namespace Setup
         public UserModel Administrator { get; set; } = new UserModel();
         public SitePublishModel SitePublishModel { get; set; } = new SitePublishModel();
         public ConsoleOutputModel ConsoleOutput { get; set; } = new ConsoleOutputModel();
-
         public ComboBoxModel SiteNamesModel { get; set; } = new ComboBoxModel();
 
         public MainWindow()
@@ -39,6 +39,11 @@ namespace Setup
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!IsIISInstalled())
+            {
+                this.Close();
+            }
+
             dataGridConnection.DataContext = ConnectionList;
 
             SitePublishModel.TargetFolder = $@"C:\inetpub\DataEditorPortal";
@@ -192,7 +197,7 @@ namespace Setup
             }
         }
 
-        private void btnInstall_Click(object sender, RoutedEventArgs e)
+        private async void btnInstall_Click(object sender, RoutedEventArgs e)
         {
             var sourcePath = AppDomain.CurrentDomain.BaseDirectory;
             var targetPath = SitePublishModel.TargetFolder;
@@ -214,30 +219,90 @@ namespace Setup
             containerPublish.Visibility = Visibility.Hidden;
             containerOutput.Visibility = Visibility.Visible;
 
-            var process = new Process();
-            process.StartInfo.WorkingDirectory = Path.Combine(sourcePath);
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            process.StartInfo.FileName = "cmd.exe";
-            //process.StartInfo.Arguments = $@"/C {cmd} ";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardInput = true;
-
-            process.EnableRaisingEvents = true;
-            process.OutputDataReceived += Process_OutputDataReceived;
-            process.ErrorDataReceived += Process_ErrorDataReceived;
-            process.Exited += Process_Exited;
-            process.Start();
-            process.BeginOutputReadLine();
-
-            using (StreamWriter sw = process.StandardInput)
+            await Task.Run(() =>
             {
-                if (sw.BaseStream.CanWrite)
+                using (StreamWriter sw = File.AppendText("info.log"))
                 {
-                    sw.WriteLine($@"xcopy ""{sourcePath}\web"" ""{targetPath}"" /I /R /Y /S /E");
-                    sw.WriteLine(@"cd %systemroot%\System32\inetsrv");
-                    sw.WriteLine($@"appcmd add app /site.name:""{siteName}"" /path:""/{appPath}"" /physicalPath:""{targetPath}""");
+                    CopyFiles($"{sourcePath}\\web", targetPath, sw);
+                }
+            });
+
+            try
+            {
+                using (StreamWriter sw = File.AppendText("info.log"))
+                {
+                    // update connection string.
+                    sw.WriteLine("Update connection string");
+
+                    var filePath = Path.Combine(targetPath, "appSettings.json");
+                    string json = File.ReadAllText(filePath);
+                    var resultJson = "";
+                    using (MemoryStream memoryStream1 = new MemoryStream())
+                    {
+                        using (Utf8JsonWriter utf8JsonWriter1 = new Utf8JsonWriter(memoryStream1, new JsonWriterOptions() { Indented = true }))
+                        {
+                            using (JsonDocument jsonDocument = JsonDocument.Parse(json))
+                            {
+                                utf8JsonWriter1.WriteStartObject();
+
+                                foreach (var element in jsonDocument.RootElement.EnumerateObject())
+                                {
+                                    if (element.Name == "ConnectionStrings")
+                                    {
+                                        utf8JsonWriter1.WritePropertyName(element.Name);
+
+                                        // Staring new object
+                                        utf8JsonWriter1.WriteStartObject();
+
+                                        foreach (var con in ConnectionList)
+                                        {
+                                            utf8JsonWriter1.WritePropertyName(con.ConnectionName);
+                                            utf8JsonWriter1.WriteStringValue(con.ConnectionString);
+                                        }
+
+                                        utf8JsonWriter1.WriteEndObject();
+                                    }
+                                    else if (element.Name == "DatabaseProvider")
+                                    {
+                                        utf8JsonWriter1.WritePropertyName(element.Name);
+                                        utf8JsonWriter1.WriteStringValue(DatabaseProvider.Value);
+                                    }
+                                    else
+                                    {
+                                        element.WriteTo(utf8JsonWriter1);
+                                    }
+                                }
+
+                                utf8JsonWriter1.WriteEndObject();
+                            }
+                        }
+
+                        resultJson = Encoding.UTF8.GetString(memoryStream1.ToArray());
+                    }
+                    File.WriteAllText(filePath, resultJson);
+
+                    // set the base url
+                    sw.WriteLine($"Set the base url: {appPath}");
+                    filePath = Path.Combine(targetPath, "ClientApp/dist/index.html");
+                    SetBaseElementValue(filePath, $"/{appPath}/");
+
+                    //CreateIISApplication
+                    sw.WriteLine($"Create IIS Application: {siteName}, {appPath}, {targetPath}");
+                    CreateIISApplication(siteName, appPath, targetPath);
+
+                    MessageBox.Show("Publish Complete.");
+
+                    // start the website
+                    StartWebsite(siteName, appPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+
+                using (StreamWriter sw = File.AppendText("info.log"))
+                {
+                    sw.WriteLine(ex.Message);
                 }
             }
         }
@@ -246,95 +311,6 @@ namespace Setup
         {
             containerAdmin.Visibility = Visibility.Visible;
             containerPublish.Visibility = Visibility.Hidden;
-        }
-
-        private void Process_Exited(object sender, EventArgs e)
-        {
-            // update connection string.
-            var filePath = Path.Combine(SitePublishModel.TargetFolder, "appSettings.json");
-            string json = File.ReadAllText(filePath);
-
-            var resultJson = "";
-            using (MemoryStream memoryStream1 = new MemoryStream())
-            {
-                using (Utf8JsonWriter utf8JsonWriter1 = new Utf8JsonWriter(memoryStream1, new JsonWriterOptions() { Indented = true }))
-                {
-                    using (JsonDocument jsonDocument = JsonDocument.Parse(json))
-                    {
-                        utf8JsonWriter1.WriteStartObject();
-
-                        foreach (var element in jsonDocument.RootElement.EnumerateObject())
-                        {
-                            if (element.Name == "ConnectionStrings")
-                            {
-                                utf8JsonWriter1.WritePropertyName(element.Name);
-
-                                // Staring new object
-                                utf8JsonWriter1.WriteStartObject();
-
-                                foreach (var con in ConnectionList)
-                                {
-                                    utf8JsonWriter1.WritePropertyName(con.ConnectionName);
-                                    utf8JsonWriter1.WriteStringValue(con.ConnectionString);
-                                }
-
-                                utf8JsonWriter1.WriteEndObject();
-                            }
-                            else if (element.Name == "DatabaseProvider")
-                            {
-                                utf8JsonWriter1.WritePropertyName(element.Name);
-                                utf8JsonWriter1.WriteStringValue(DatabaseProvider.Value);
-                            }
-                            else
-                            {
-                                element.WriteTo(utf8JsonWriter1);
-                            }
-                        }
-
-                        utf8JsonWriter1.WriteEndObject();
-                    }
-                }
-
-                resultJson = Encoding.UTF8.GetString(memoryStream1.ToArray());
-            }
-            File.WriteAllText(filePath, resultJson);
-
-            // set the base url
-            filePath = Path.Combine(SitePublishModel.TargetFolder, "ClientApp/dist/index.html");
-            SetBaseElementValue(filePath, $"/{SitePublishModel.AppPath}/");
-
-            MessageBox.Show("Publish Complete.");
-
-            // start the website
-            StartWebsite(SitePublishModel.SiteName, SitePublishModel.AppPath);
-        }
-
-        private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (e.Data != null)
-            {
-                ConsoleOutput.Text += $"{e.Data}\r\n";
-                scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
-
-                using (StreamWriter sw = File.AppendText("error.log"))
-                {
-                    sw.WriteLine(e.Data);
-                }
-            }
-        }
-
-        private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (e.Data != null)
-            {
-                ConsoleOutput.Text += $"{e.Data}\r\n";
-                scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
-
-                using (StreamWriter sw = File.AppendText("info.log"))
-                {
-                    sw.WriteLine(e.Data);
-                }
-            }
         }
 
         private List<string> GetAllSitesInIIS()
@@ -429,7 +405,7 @@ namespace Setup
             }
         }
 
-        public void SetBaseElementValue(string filePath, string baseValue)
+        private void SetBaseElementValue(string filePath, string baseValue)
         {
             // Read the contents of the HTML file
             string html = File.ReadAllText(filePath);
@@ -460,8 +436,100 @@ namespace Setup
             File.WriteAllText(filePath, html);
         }
 
-        #endregion
+        public void CopyFiles(string sourceFolder, string destinationFolder, StreamWriter sw)
+        {
+            DirectoryInfo sourceDir = new DirectoryInfo(sourceFolder);
+            DirectoryInfo destinationDir = new DirectoryInfo(destinationFolder);
 
+            if (!sourceDir.Exists)
+            {
+                throw new DirectoryNotFoundException($"Source folder '{sourceFolder}' does not exist.");
+            }
+
+            if (!destinationDir.Exists)
+            {
+                destinationDir.Create();
+            }
+
+            FileInfo[] files = sourceDir.GetFiles();
+
+            foreach (FileInfo file in files)
+            {
+                string destinationFilePath = Path.Combine(destinationDir.FullName, file.Name);
+                file.CopyTo(destinationFilePath, true);
+
+                sw.WriteLine(destinationFilePath);
+                ConsoleOutput.Text += $"{destinationFilePath}\r\n";
+                scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+            }
+
+            DirectoryInfo[] subDirectories = sourceDir.GetDirectories();
+
+            foreach (DirectoryInfo subDirectory in subDirectories)
+            {
+                string newDestinationFolder = Path.Combine(destinationDir.FullName, subDirectory.Name);
+                CopyFiles(subDirectory.FullName, newDestinationFolder, sw);
+            }
+        }
+
+        private void CreateIISApplication(string siteName, string appPath, string targetPath)
+        {
+            using (ServerManager serverManager = new ServerManager())
+            {
+                Site site = serverManager.Sites.FirstOrDefault(s => s.Name.Equals(siteName, StringComparison.OrdinalIgnoreCase));
+
+                if (site != null)
+                {
+                    string appPathWithSlash = appPath.StartsWith("/") ? appPath : $"/{appPath}";
+                    string physicalPath = targetPath.TrimEnd('\\');
+
+                    Microsoft.Web.Administration.Application application = site.Applications.Add(appPathWithSlash, physicalPath);
+                    application.ApplicationPoolName = site.Applications["/"].ApplicationPoolName;
+
+                    serverManager.CommitChanges();
+                }
+            }
+        }
+
+        private bool IsIISInstalled()
+        {
+            try
+            {
+                using (ServerManager serverManager = new ServerManager())
+                {
+                    // Accessing the Sites collection to check if IIS is installed
+                    // If IIS is installed, accessing the Sites collection should succeed
+                    SiteCollection sites = serverManager.Sites;
+
+                    using (StreamWriter sw = File.AppendText("error.log"))
+                    {
+                        sw.WriteLine("IIS Installed");
+                    }
+
+                    // If the Sites collection is accessible, IIS is installed
+                    return true;
+                }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                MessageBox.Show("Please run with administrative privileges.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                using (StreamWriter sw = File.AppendText("error.log"))
+                {
+                    sw.WriteLine(ex.Message);
+                }
+                // If an exception occurs while accessing the Sites collection, IIS is not installed
+
+                MessageBox.Show("IIS is not installed. Please install it first.");
+
+                return false;
+            }
+        }
+
+        #endregion
     }
 
     public class ConsoleOutputModel : NotifyPropertyObject
