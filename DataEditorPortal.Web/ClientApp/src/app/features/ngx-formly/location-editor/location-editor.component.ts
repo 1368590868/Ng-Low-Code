@@ -51,7 +51,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
   _value: any;
   @Input()
   set value(val: any) {
-    if (val) {
+    if (val && val !== 'error') {
       this.model = { ...this.model, ...val };
       this.changeDetectorRef.markForCheck();
     }
@@ -357,6 +357,7 @@ export class FormlyFieldLocationEditorComponent
     this.field.formControl.addValidators(
       (control: AbstractControl): ValidationErrors | null => {
         if (control.value === 'error') {
+          control.markAsPristine();
           return { errorData: true };
         }
         return null;
