@@ -60,6 +60,21 @@ namespace Setup.Models
             }
         }
 
+        private string _appPath;
+        public string AppPath
+        {
+            get
+            {
+                return _appPath;
+            }
+            set
+            {
+                _appPath = value;
+                OnPropertyChanged("AppPath");
+            }
+        }
+
+
         public string Error { get { return null; } }
 
         public string this[string columnName]
@@ -85,6 +100,11 @@ namespace Setup.Models
                 {
                     if (string.IsNullOrEmpty(SitePort))
                         return "Site port is Required";
+                }
+                if (columnName == "AppPath")
+                {
+                    if (string.IsNullOrEmpty(AppPath))
+                        return "Application Path is Required";
                 }
 
 

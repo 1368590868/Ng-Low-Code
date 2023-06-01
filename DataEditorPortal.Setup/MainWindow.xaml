@@ -100,17 +100,19 @@
             <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,20,0,0" Text="Setup Administrator" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.881,0.559" FontSize="16"/>
         </Grid>
         <Grid x:Name="containerPublish" Visibility="Hidden">
-            <Label x:Name="label2" Content="Target folder:" HorizontalAlignment="Left" Margin="19,87,0,0" VerticalAlignment="Top" Padding="0,0,0,0" Height="20"/>
-            <Label x:Name="label3" Content="Site name:" HorizontalAlignment="Left" Margin="36,115,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
-            <Label x:Name="label4" Content="Site port:" HorizontalAlignment="Left" Margin="43,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
-            <Label x:Name="label5" Content="Site domain:" HorizontalAlignment="Left" Margin="25,171,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
+            <Label x:Name="label2" Content="Physical path:" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top" Padding="0,0,0,0" Height="20"/>
+            <Label x:Name="label3" Content="Site name:" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
+            <Label x:Name="label5" Content="Appliation Alias:" HorizontalAlignment="Left" Margin="10,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
 
-            <TextBox x:Name="textTargetFolder" Margin="98,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding SitePublishModel.TargetFolder, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Height="20" HorizontalAlignment="Left" Width="220" IsReadOnly="True" Style="{DynamicResource ValidatingControl}"/>
-            <Button x:Name="btnBrowse" Content="Browse" Margin="323,87,0,0" Height="20" VerticalAlignment="Top" Click="btnBrowse_Click" HorizontalAlignment="Left" Width="50"/>
+            <TextBox x:Name="textTargetFolder" Margin="103,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding SitePublishModel.TargetFolder, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Height="20" HorizontalAlignment="Left" Width="220" IsReadOnly="True" Style="{DynamicResource ValidatingControl}"/>
+            <Button x:Name="btnBrowse" Content="Browse" Margin="328,87,0,0" Height="20" VerticalAlignment="Top" Click="btnBrowse_Click" HorizontalAlignment="Left" Width="50"/>
 
-            <TextBox x:Name="textSiteName" Margin="98,115,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding SitePublishModel.SiteName, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Height="20" HorizontalAlignment="Left" Width="220" Style="{DynamicResource ValidatingControl}"/>
-            <TextBox x:Name="textSitePort" Margin="98,143,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding SitePublishModel.SitePort, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Height="20" HorizontalAlignment="Left" Width="220" Style="{DynamicResource ValidatingControl}"/>
-            <TextBox x:Name="textSiteDomain" Margin="98,171,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding SitePublishModel.SiteDomain, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Height="20" HorizontalAlignment="Left" Width="220" Style="{DynamicResource ValidatingControl}"/>
+            <ComboBox x:Name="cmbSiteName" Margin="103,115,0,0" VerticalAlignment="Top" IsTextSearchEnabled="False" SelectedIndex="0" Height="20" Width="220" HorizontalAlignment="Left" Padding="6,1,5,0"
+                      SelectedValue="{Binding SitePublishModel.SiteName, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                      ItemsSource="{Binding SiteNamesModel.SiteNames, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}">
+            </ComboBox>
+            
+            <TextBox x:Name="textApplicationPath" Margin="103,143,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding SitePublishModel.AppPath, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Height="20" HorizontalAlignment="Left" Width="220" Style="{DynamicResource ValidatingControl}"/>
             <Button x:Name="btnPublishBack" Content="Back" Margin="10,0,0,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="50" Click="btnPublishBack_Click"/>
             <Button x:Name="btnInstall" Content="Install" Margin="0,0,10,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="50" Click="btnInstall_Click">
                 <Button.Style>
@@ -119,9 +121,7 @@
                         <Style.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textSitePort}" Value="False"></Condition>
-                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textSiteDomain}" Value="False"></Condition>
-                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textSiteName}" Value="False"></Condition>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textApplicationPath}" Value="False"></Condition>
                                     <Condition Binding="{Binding Path=(Validation.HasError), ElementName=textTargetFolder}" Value="False"></Condition>
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="IsEnabled" Value="True"></Setter>

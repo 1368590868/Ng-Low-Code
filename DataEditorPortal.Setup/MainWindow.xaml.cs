@@ -1,11 +1,14 @@
-﻿using Setup.Models;
+﻿using Microsoft.Web.Administration;
+using Setup.Models;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -27,6 +30,8 @@ namespace Setup
         public SitePublishModel SitePublishModel { get; set; } = new SitePublishModel();
         public ConsoleOutputModel ConsoleOutput { get; set; } = new ConsoleOutputModel();
 
+        public ComboBoxModel SiteNamesModel { get; set; } = new ComboBoxModel();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -37,9 +42,9 @@ namespace Setup
             dataGridConnection.DataContext = ConnectionList;
 
             SitePublishModel.TargetFolder = $@"C:\inetpub\DataEditorPortal";
-            SitePublishModel.SiteName = "Data Editor Portal";
-            SitePublishModel.SitePort = "80";
-            SitePublishModel.SiteDomain = "localhost";
+            SitePublishModel.AppPath = "Data Editor Portal";
+
+            SiteNamesModel.SiteNames = GetAllSitesInIIS();
         }
 
         #region Connections
@@ -167,7 +172,7 @@ namespace Setup
         private bool IsAdministratorValid()
         {
             textUsername.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-            textPassword.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            textPassword.GetBindingExpression(PasswordHelper.PasswordProperty).UpdateSource();
             return !Validation.GetHasError(textUsername) && !Validation.GetHasError(textPassword);
         }
 
@@ -189,19 +194,25 @@ namespace Setup
 
         private void btnInstall_Click(object sender, RoutedEventArgs e)
         {
-            containerPublish.Visibility = Visibility.Hidden;
-            containerOutput.Visibility = Visibility.Visible;
-
             var sourcePath = AppDomain.CurrentDomain.BaseDirectory;
             var targetPath = SitePublishModel.TargetFolder;
             var siteName = SitePublishModel.SiteName;
-            var sitePort = SitePublishModel.SitePort;
+            var appPath = SitePublishModel.AppPath;
 
-            var bindings = $@"http://localhost:{sitePort}";
-            if (!string.IsNullOrEmpty(SitePublishModel.SiteDomain) && SitePublishModel.SiteDomain != "localhost")
+            if (!IsValidApplicationPath($@"/{appPath}"))
             {
-                bindings += $@",http://{SitePublishModel.SiteDomain}:{sitePort}";
+                MessageBox.Show("The application path can not contain the following character:\n\\ ? ; : @ & = + $ , | ' < > *");
+                return;
             }
+
+            if (IsIisApplicationExists(siteName, $@"/{appPath}"))
+            {
+                MessageBox.Show("The Application Alias exists.");
+                return;
+            }
+
+            containerPublish.Visibility = Visibility.Hidden;
+            containerOutput.Visibility = Visibility.Visible;
 
             var process = new Process();
             process.StartInfo.WorkingDirectory = Path.Combine(sourcePath);
@@ -226,10 +237,7 @@ namespace Setup
                 {
                     sw.WriteLine($@"xcopy ""{sourcePath}\web"" ""{targetPath}"" /I /R /Y /S /E");
                     sw.WriteLine(@"cd %systemroot%\System32\inetsrv");
-                    sw.WriteLine($@"appcmd add apppool /name:""{siteName}""");
-                    sw.WriteLine($@"appcmd add site /name:""{siteName}"" /physicalPath:""{targetPath}"" /bindings:""{bindings}""");
-                    sw.WriteLine($@"appcmd set site ""{siteName}"" /[path='/'].applicationPool:""{siteName}""");
-                    sw.WriteLine($@"appcmd set config ""{siteName}"" /section:windowsAuthentication /enabled:true /commit:apphost");
+                    sw.WriteLine($@"appcmd add app /site.name:""{siteName}"" /path:""/{appPath}"" /physicalPath:""{targetPath}""");
                 }
             }
         }
@@ -291,9 +299,14 @@ namespace Setup
             }
             File.WriteAllText(filePath, resultJson);
 
+            // set the base url
+            filePath = Path.Combine(SitePublishModel.TargetFolder, "ClientApp/dist/index.html");
+            SetBaseElementValue(filePath, $"/{SitePublishModel.AppPath}/");
+
             MessageBox.Show("Publish Complete.");
 
-            Process.Start(new ProcessStartInfo("cmd.exe", $"/c start http://{SitePublishModel.SiteDomain}:{SitePublishModel.SitePort}") { CreateNoWindow = true });
+            // start the website
+            StartWebsite(SitePublishModel.SiteName, SitePublishModel.AppPath);
         }
 
         private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
@@ -302,6 +315,11 @@ namespace Setup
             {
                 ConsoleOutput.Text += $"{e.Data}\r\n";
                 scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+
+                using (StreamWriter sw = File.AppendText("error.log"))
+                {
+                    sw.WriteLine(e.Data);
+                }
             }
         }
 
@@ -311,9 +329,136 @@ namespace Setup
             {
                 ConsoleOutput.Text += $"{e.Data}\r\n";
                 scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+
+                using (StreamWriter sw = File.AppendText("info.log"))
+                {
+                    sw.WriteLine(e.Data);
+                }
             }
         }
 
+        private List<string> GetAllSitesInIIS()
+        {
+            List<string> siteNames = new List<string>();
+
+            using (ServerManager serverManager = new ServerManager())
+            {
+                SiteCollection sites = serverManager.Sites;
+
+                foreach (Site site in sites)
+                {
+                    siteNames.Add(site.Name);
+                }
+            }
+
+            return siteNames;
+        }
+
+        private bool IsIisApplicationExists(string siteName, string applicationPath)
+        {
+            using (ServerManager serverManager = new ServerManager())
+            {
+                Site site = serverManager.Sites.FirstOrDefault(s => s.Name.Equals(siteName, StringComparison.OrdinalIgnoreCase));
+
+                if (site != null)
+                {
+                    ApplicationCollection applications = site.Applications;
+
+                    foreach (Microsoft.Web.Administration.Application application in applications)
+                    {
+                        if (string.Equals(application.Path, applicationPath, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsValidApplicationPath(string applicationPath)
+        {
+            // Basic validation: Check if the application path starts with a forward slash '/'
+            // and does not contain any invalid characters
+            if (!applicationPath.StartsWith("/") || !Regex.IsMatch(applicationPath, @"^/[\w\s\-.]*$"))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void StartWebsite(string siteName, string appPath)
+        {
+            using (ServerManager serverManager = new ServerManager())
+            {
+                Site site = serverManager.Sites.FirstOrDefault(s => s.Name == siteName);
+                if (site != null)
+                {
+                    Microsoft.Web.Administration.Application application = site.Applications.FirstOrDefault(a => a.Path.Trim('/') == appPath.Trim('/'));
+                    if (application != null)
+                    {
+                        Binding binding = site.Bindings.FirstOrDefault();
+                        if (binding != null)
+                        {
+                            string protocol = binding.Protocol;
+                            string host = string.IsNullOrEmpty(binding.Host) ? "localhost" : binding.Host;
+                            string port = binding.EndPoint.Port.ToString();
+
+                            string encodedAppPath = Uri.EscapeDataString(appPath);
+                            string url = $"{protocol}://{host}:{port}/{encodedAppPath}";
+
+                            // Start a new browser window that opens the URL
+                            Process.Start(new ProcessStartInfo("cmd.exe", $"/c start {url}") { CreateNoWindow = true });
+                        }
+                        else
+                        {
+                            Console.WriteLine($"No binding found for site '{siteName}'.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Application '{appPath}' not found in site '{siteName}'.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Site '{siteName}' not found.");
+                }
+            }
+        }
+
+        public void SetBaseElementValue(string filePath, string baseValue)
+        {
+            // Read the contents of the HTML file
+            string html = File.ReadAllText(filePath);
+
+            // Find the start and end positions of the <base> tag
+            int startIndex = html.IndexOf("<base");
+            int endIndex = html.IndexOf(">", startIndex);
+
+            if (startIndex != -1 && endIndex != -1)
+            {
+                // Extract the existing base tag content
+                string baseTag = html.Substring(startIndex, endIndex - startIndex + 1);
+
+                // Replace the href attribute value
+                baseTag = Regex.Replace(baseTag, @"href\s*=\s*""([^""]*)""", $"href=\"{baseValue}\"");
+
+                // Replace the original base tag with the updated one
+                html = html.Remove(startIndex, endIndex - startIndex + 1).Insert(startIndex, baseTag);
+            }
+            else
+            {
+                // If the <base> tag doesn't exist, create a new one
+                string newBaseTag = $"<base href=\"{baseValue}\">";
+                html = html.Insert(html.IndexOf("<head>") + 6, newBaseTag);
+            }
+
+            // Save the modified HTML back to the file
+            File.WriteAllText(filePath, html);
+        }
 
         #endregion
 
