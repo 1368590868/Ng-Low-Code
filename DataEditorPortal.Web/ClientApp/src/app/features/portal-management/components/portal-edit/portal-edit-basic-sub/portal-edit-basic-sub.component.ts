@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm, FormGroup, AbstractControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { tap } from 'rxjs';
+import { skip, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import { PortalItemData } from '../../../models/portal-item';
@@ -18,6 +18,8 @@ export class PortalEditBasicSubComponent
   implements OnInit
 {
   @ViewChild('editForm') editForm!: NgForm;
+
+  timer: any;
 
   isLoading = true;
   isSaving = false;
@@ -39,20 +41,58 @@ export class PortalEditBasicSubComponent
       modelOptions: {
         updateOn: 'blur'
       },
+      hooks: {
+        onInit: field => {
+          field.formControl?.valueChanges
+            .pipe(skip(this.itemId ? 1 : 0))
+            .subscribe(val => {
+              if (!val) return;
+              if (field && field.parent && field.parent.get) {
+                const control = field.parent?.get('name').formControl;
+                control?.setValue(val);
+              }
+            });
+        }
+      }
+    },
+    {
+      key: 'name',
+      type: 'input',
+      props: {
+        label: 'Name',
+        placeholder: 'Name',
+        required: true
+      },
+      modelOptions: {
+        updateOn: 'blur'
+      },
       asyncValidators: {
         exist: {
           expression: (c: AbstractControl) => {
+            if (this.timer) clearTimeout(this.timer);
             return new Promise((resolve, reject) => {
-              this.portalItemService
-                .nameExists(c.value, this.itemId)
-                .subscribe(res =>
-                  !res.isError ? resolve(!res.result) : reject(res.message)
-                );
+              this.timer = setTimeout(() => {
+                this.portalItemService
+                  .nameExists(c.value, this.itemId)
+                  .subscribe(res => {
+                    !res.isError ? resolve(!res.result) : reject(res.message);
+                  });
+              }, 100);
             });
           },
           message: () => {
             return 'The Portal Name has already been exist.';
           }
+        }
+      },
+      hooks: {
+        onInit: field => {
+          field.formControl?.valueChanges.subscribe(val => {
+            this.portalItemService.getCodeName(val).subscribe(res => {
+              field.formControl?.setValue(res.result, { emitEvent: false });
+              field.formControl?.markAsDirty();
+            });
+          });
         }
       }
     },
