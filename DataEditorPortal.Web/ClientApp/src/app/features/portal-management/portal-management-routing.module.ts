@@ -9,7 +9,7 @@ import {
   PortalEditSearchComponent,
   PortalEditFormComponent,
   PortalEditLinkComponent,
-  PortalEditLinkTableComponent
+  PortalEditBasicSubComponent
 } from './components';
 
 const routes: Routes = [
@@ -56,14 +56,14 @@ const routes: Routes = [
     path: 'edit-linked/:parentId/datasource/add',
     component: PortalEditComponent,
     data: { type: 'linked-single' },
-    children: [{ path: 'basic', component: PortalEditLinkTableComponent }]
+    children: [{ path: 'basic', component: PortalEditBasicSubComponent }]
   },
   {
     path: 'edit-linked/:parentId/datasource/edit/:id',
     component: PortalEditComponent,
     data: { type: 'linked-single' },
     children: [
-      { path: 'basic', component: PortalEditLinkTableComponent },
+      { path: 'basic', component: PortalEditBasicSubComponent },
       { path: 'datasource', component: PortalEditDatasourceComponent },
       { path: 'columns', component: PortalEditColumnsComponent },
       { path: 'search', component: PortalEditSearchComponent },

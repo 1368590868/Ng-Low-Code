@@ -9,11 +9,11 @@ import { PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
-  selector: 'app-portal-edit-link-table',
-  templateUrl: './portal-edit-link-table.component.html',
-  styleUrls: ['./portal-edit-link-table.component.scss']
+  selector: 'app-portal-edit-basic-sub',
+  templateUrl: './portal-edit-basic-sub.component.html',
+  styleUrls: ['./portal-edit-basic-sub.component.scss']
 })
-export class PortalEditLinkTableComponent
+export class PortalEditBasicSubComponent
   extends PortalEditStepDirective
   implements OnInit
 {
