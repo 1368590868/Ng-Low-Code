@@ -67,29 +67,38 @@ namespace DataEditorPortal.Web.Services
             {
                 if (model.ContainsKey(field.key))
                 {
-                    if (model[field.key] != null)
+                    using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
                     {
-                        using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+                        var props = doc.RootElement.EnumerateObject();
+
+                        var mappingProp = props.FirstOrDefault(x => x.Name == "mappingColumns").Value;
+                        if (mappingProp.ValueKind == JsonValueKind.Object)
                         {
-                            var props = doc.RootElement.EnumerateObject();
+                            IEnumerable<JsonProperty> fieldValues = null;
+                            // if value is null, initial a JsonElement of undefined.
+                            var jsonElement = model[field.key] != null ? (JsonElement)model[field.key] : new JsonElement();
+                            if (jsonElement.ValueKind == JsonValueKind.Object)
+                                fieldValues = jsonElement.EnumerateObject();
 
-                            var mappingProp = props.FirstOrDefault(x => x.Name == "mappingColumns").Value;
-                            if (mappingProp.ValueKind == JsonValueKind.Object)
+                            // only get the mappings that already configed.
+                            var mappings = mappingProp.EnumerateObject().Where(m => m.Value.GetString() != null);
+
+                            foreach (var mapping in mappings)
                             {
-                                var jsonElement = (JsonElement)model[field.key];
-                                foreach (var mapping in mappingProp.EnumerateObject())
-                                {
-                                    var key = mapping.Value.GetString();
-                                    var value = jsonElement.EnumerateObject().FirstOrDefault(x => x.Name == mapping.Name).Value;
+                                var key = mapping.Value.GetString();
 
-                                    if (model.ContainsKey(key))
-                                        model[key] = value;
-                                    else
-                                        model.Add(key, value);
-                                }
+                                object value = null;
+                                if (fieldValues != null)
+                                    value = fieldValues.FirstOrDefault(x => x.Name == mapping.Name).Value;
+
+                                if (model.ContainsKey(key))
+                                    model[key] = value;
+                                else
+                                    model.Add(key, value);
                             }
                         }
                     }
+
                     model.Remove(field.key);
                 }
             }
