@@ -104,7 +104,7 @@ export interface GridEventConfig {
 }
 
 export interface GridFormConfig {
-  sameAsAdd?: boolean;
+  useAddingFormLayout?: boolean;
   useCustomForm?: boolean;
   customFormName?: string;
   formFields?: GridFormField[];

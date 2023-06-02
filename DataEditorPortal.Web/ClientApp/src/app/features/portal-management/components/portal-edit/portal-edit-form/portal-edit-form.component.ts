@@ -59,10 +59,22 @@ export class PortalEditFormComponent
         this.portalItemService.getDataSourceConfig()
       ]).subscribe(res => {
         this.isLoading = false;
-        this.addingFormConfig = res[0].addingForm || {};
-        this.deleteFormConfig = res[0].deletingForm || {};
-        this.updatingFormConfig = res[0].updatingForm || { sameAsAdd: true };
-        this.infoFormConfig = res[0].infoForm || {};
+
+        if (res[0].addingForm && res[0].addingForm.formFields)
+          res[0].addingForm.formFields = res[0].addingForm?.formFields.filter(
+            c =>
+              res[1].find(
+                s => s.columnName === c.key && s.filterType === c.filterType
+              )
+          );
+
+        this.addingFormConfig = this.buildFields(res[0].addingForm, res[1]);
+        this.deleteFormConfig = this.buildFields(res[0].deletingForm, res[1]);
+        this.updatingFormConfig = this.buildFields(
+          res[0].updatingForm || { useAddingFormLayout: true },
+          res[1]
+        );
+        this.infoFormConfig = this.buildFields(res[0].infoForm, res[1]);
 
         // if itemType is 'linked-single', we should always add linkedTableField to the source dbColumns
         if (this.itemType === 'linked-single') {
@@ -86,6 +98,20 @@ export class PortalEditFormComponent
 
       this.portalItemService.saveCurrentStep('form');
     }
+  }
+
+  buildFields(
+    config: GridFormConfig | undefined,
+    dbCols: DataSourceTableColumn[]
+  ) {
+    if (config && config.formFields) {
+      config.formFields = config.formFields.filter(c =>
+        dbCols.find(
+          s => s.columnName === c.key && s.filterType === c.filterType
+        )
+      );
+    }
+    return config || {};
   }
 
   valid() {
