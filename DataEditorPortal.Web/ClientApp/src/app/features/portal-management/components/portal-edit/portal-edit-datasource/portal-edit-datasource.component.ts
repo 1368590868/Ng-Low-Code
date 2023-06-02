@@ -354,8 +354,9 @@ export class PortalEditDatasourceComponent
       this.confirmationService.confirm({
         message:
           'You are going to change the <b>Data Source</b>.<br><br>' +
-          'The column settings, search settings and form settings based on previous data source will be removed, ' +
-          'and you need to complete them before preview this portal item. <br> <br>' +
+          'The column settings, search settings and form settings based on previous data source may not work any more, ' +
+          'the fields that do not exist will be removed, ' +
+          'and you need to review the settings before preview this portal item. <br> <br>' +
           'Are you sure that you want to perform this action?',
         accept: save
       });

@@ -140,7 +140,7 @@ export class PortalEditColumnsComponent
               {
                 label: 'Attachments',
                 value: 'attachments'
-              },
+              }
             ]
           }
         },
@@ -200,13 +200,19 @@ export class PortalEditColumnsComponent
         this.portalItemService.getDataSourceTableColumnsByPortalId()
       ]).subscribe(res => {
         this.isLoading = false;
-        this.targetColumns = res[0].map<GridColumn>(x => {
-          return {
-            ...x,
-            key: x.field,
-            selected: true
-          };
-        });
+        this.targetColumns = res[0]
+          .filter(c =>
+            res[1].find(
+              s => s.columnName === c.field && s.filterType === c.filterType
+            )
+          )
+          .map<GridColumn>(x => {
+            return {
+              ...x,
+              key: x.field,
+              selected: true
+            };
+          });
         this.options.formState.foreignKeyOptions = res[1].map(x => {
           return { label: x.columnName, value: x.columnName };
         });

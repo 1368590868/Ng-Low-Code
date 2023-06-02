@@ -39,7 +39,7 @@ export class FormLayoutComponent {
     '-- INSERT INTO DEMO_TABLE (ID, NAME, FIRST_NAME, TOTAL, CREATED_DATE) VALUES (NEWID(), ##NAME##, ##FIRST_NAME##, ##TOTAL##, GETDATE())';
 
   _formConfig: GridFormConfig = {
-    sameAsAdd: true
+    useAddingFormLayout: true
   };
   @Input()
   set config(val: GridFormConfig) {
@@ -243,7 +243,7 @@ export class FormLayoutComponent {
       }
       if (this._type === 'UPDATE') {
         if (
-          !this._formConfig.sameAsAdd &&
+          !this._formConfig.useAddingFormLayout &&
           (!this.targetColumns || this.targetColumns.length === 0)
         ) {
           this.notifyService.notifyWarning(
