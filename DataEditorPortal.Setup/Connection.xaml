@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Setup"
         xmlns:Models="clr-namespace:Setup.Models" x:Class="Setup.Connection"
         mc:Ignorable="d"
-        Title="Connection" Height="300" Width="397" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
+        Title="Connection" Height="360" Width="500" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type FrameworkElement}" x:Key="ValidatingControl">
@@ -17,26 +17,85 @@
                 </Style.Triggers>
             </Style>
         </Grid.Resources>
-        <Label x:Name="label" Content="Name:" Margin="5,3,0,0" HorizontalAlignment="Left" Width="44" Height="26" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox" Margin="10,28,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="{Binding DatabaseConnection.IsConnectionNameEnabled, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Connection}}}" Height="20" Style="{DynamicResource ValidatingControl}">
-            <TextBox.Text>
-                <Binding Path="DatabaseConnection.ConnectionName" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
-                    <Binding.ValidationRules>
-                        <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
-                    </Binding.ValidationRules>
-                </Binding>
-            </TextBox.Text>
-        </TextBox>
-        <Label x:Name="label1" Content="Connection String:" HorizontalAlignment="Left" Margin="5,47,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox1" Margin="10,71,10,36" TextWrapping="Wrap" Style="{DynamicResource ValidatingControl}">
-            <TextBox.Text>
-                <Binding Path="DatabaseConnection.ConnectionString" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
-                    <Binding.ValidationRules>
-                        <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
-                    </Binding.ValidationRules>
-                </Binding>
-            </TextBox.Text>
-        </TextBox>
+        <Grid.LayoutTransform>
+            <TransformGroup>
+                <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                <SkewTransform/>
+                <RotateTransform/>
+                <TranslateTransform/>
+            </TransformGroup>
+        </Grid.LayoutTransform>
+        <Grid x:Name="panelSqlServer" Visibility="Visible" Height="284" VerticalAlignment="Bottom">
+            <Label x:Name="label" Content="Connection Key:" Margin="10,40,0,0" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Padding="0,0,0,0"/>
+            <TextBox x:Name="textName" Margin="106,40,10,0" TextWrapping="Wrap" VerticalAlignment="Top" IsEnabled="{Binding DatabaseConnection.IsConnectionNameEnabled, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Connection}}}" Height="20" Style="{DynamicResource ValidatingControl}" Padding="3,1,3,0">
+                <TextBox.Text>
+                    <Binding Path="DatabaseConnection.ConnectionName" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
+                        <Binding.ValidationRules>
+                            <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+
+            <Label x:Name="label2" Content="Server Name:" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top" Padding="0,0,0,0" Height="20"/>
+            <TextBox x:Name="textHost" Margin="106,87,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Style="{DynamicResource ValidatingControl}" Padding="3,1,3,0">
+                <TextBox.Text>
+                    <Binding Path="DatabaseConnection.ServerName" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
+                        <Binding.ValidationRules>
+                            <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+
+            <Label x:Name="label3" Content="Authentication:" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
+            <ComboBox x:Name="cmbAuthentication" Margin="106,115,11,0" VerticalAlignment="Top" IsTextSearchEnabled="False" SelectedIndex="0" SelectedValuePath="Content" Height="20" Padding="6,1,5,0" SelectionChanged="comboBox_SelectionChanged">
+                <ComboBox.SelectedValue>
+                    <Binding Path="DatabaseConnection.Authentication" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
+                        <Binding.ValidationRules>
+                            <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </ComboBox.SelectedValue>
+            </ComboBox>
+
+            <Label x:Name="label4" Content="Username:" HorizontalAlignment="Left" Margin="10,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
+            <TextBox x:Name="textUsername" Margin="106,143,11,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Style="{DynamicResource ValidatingControl}" 
+                     IsEnabled="{Binding DatabaseConnection.IsNotWindowsAuth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Connection}}}" Padding="3,1,3,0">
+                <TextBox.Text>
+                    <Binding Path="DatabaseConnection.Username" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
+                        <Binding.ValidationRules>
+                            <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+
+            <Label x:Name="label5" Content="Password:" HorizontalAlignment="Left" Margin="10,171,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
+            <PasswordBox x:Name="textPassword" Margin="106,171,10,0" VerticalAlignment="Top"
+              Height="20" local:PasswordHelper.BindPassword="True"
+              Style="{DynamicResource ValidatingControl}" 
+              IsEnabled="{Binding DatabaseConnection.IsNotWindowsAuth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Connection}}}" Padding="3,0,3,0">
+                <local:PasswordHelper.Password>
+                    <Binding Path="DatabaseConnection.Password" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
+                            <Binding.ValidationRules>
+                                <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
+                            </Binding.ValidationRules>
+                        </Binding>
+                </local:PasswordHelper.Password>
+            </PasswordBox>
+            <Label x:Name="label6" Content="Database Name:" HorizontalAlignment="Left" Margin="10,199,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
+            <ComboBox x:Name="cmbDataBaseName" Margin="106,199,11,0" VerticalAlignment="Top" local:ComboBoxHelper.BindSelectedValueAndText="true" IsTextSearchEnabled="True" SelectedIndex="0" SelectedValuePath="Tag" Height="20" Padding="4,1,5,0" IsEditable="True">
+                <local:ComboBoxHelper.SelectedValueAndText>
+                    <Binding Path="DatabaseConnection.DatabaseName" UpdateSourceTrigger="PropertyChanged" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:Connection}">
+                        <Binding.ValidationRules>
+                            <DataErrorValidationRule ValidatesOnTargetUpdated="False"></DataErrorValidationRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </local:ComboBoxHelper.SelectedValueAndText>
+            </ComboBox>
+        </Grid>
+
         <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Right" Margin="0,0,10,10" Width="50" Click="btnSave_Click" Height="20" VerticalAlignment="Bottom">
             <Button.Style>
                 <Style TargetType="Button">
@@ -44,8 +103,11 @@
                     <Style.Triggers>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding ElementName=textBox, Path=(Validation.HasError)}" Value="False"/>
-                                <Condition Binding="{Binding ElementName=textBox1, Path=(Validation.HasError)}" Value="False"/>
+                                <Condition Binding="{Binding ElementName=textName, Path=(Validation.HasError)}" Value="False"/>
+                                <Condition Binding="{Binding ElementName=textHost, Path=(Validation.HasError)}" Value="False"/>
+                                <Condition Binding="{Binding ElementName=textUsername, Path=(Validation.HasError)}" Value="False"/>
+                                <Condition Binding="{Binding ElementName=textPassword, Path=(Validation.HasError)}" Value="False"/>
+                                <Condition Binding="{Binding ElementName=cmbDataBaseName, Path=(Validation.HasError)}" Value="False"/>
                             </MultiDataTrigger.Conditions>
                             <Setter Property="IsEnabled" Value="True"></Setter>
                         </MultiDataTrigger>

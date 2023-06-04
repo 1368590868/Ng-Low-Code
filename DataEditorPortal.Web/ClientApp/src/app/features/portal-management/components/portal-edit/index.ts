@@ -9,6 +9,6 @@ export * from './portal-edit-form/portal-edit-form.component';
 export * from './portal-edit-form/form-layout/form-layout.component';
 export * from './portal-edit-form/form-layout/form-layout-delete/form-layout-delete.component';
 export * from './portal-edit-form/form-layout/event-config/event-config.component';
-export * from './portal-edit-link/portal-edit-link.component';
-export * from './portal-edit-link-table/portal-edit-link-table.component';
+export * from './portal-edit-link-config/portal-edit-link.component';
+export * from './portal-edit-basic-sub/portal-edit-basic-sub.component';
 export * from './svg-drag.component';

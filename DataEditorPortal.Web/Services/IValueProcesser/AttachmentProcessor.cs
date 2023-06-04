@@ -50,16 +50,19 @@ namespace DataEditorPortal.Web.Services
             {
                 if (model.ContainsKey(field.key))
                 {
-                    var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                    var jsonElement = (JsonElement)model[field.key];
-                    if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
+                    if (model[field.key] != null)
                     {
-                        _uploadeFiledMeta = new UploadedFileMeta()
+                        var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                        var jsonElement = (JsonElement)model[field.key];
+                        if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
                         {
-                            FieldName = field.key,
-                            UploadedFiles = JsonSerializer.Deserialize<List<UploadedFileModel>>(jsonElement.ToString(), jsonOptions),
-                            FileUploadConfig = attachmentCols.FirstOrDefault(c => c.field == field.key).fileUploadConfig
-                        };
+                            _uploadeFiledMeta = new UploadedFileMeta()
+                            {
+                                FieldName = field.key,
+                                UploadedFiles = JsonSerializer.Deserialize<List<UploadedFileModel>>(jsonElement.ToString(), jsonOptions),
+                                FileUploadConfig = attachmentCols.FirstOrDefault(c => c.field == field.key).fileUploadConfig
+                            };
+                        }
                     }
                     model.Remove(field.key);
                 }

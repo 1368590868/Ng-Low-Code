@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.90" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
@@ -19,10 +20,10 @@
       <Exec Command="dotnet publish &quot;$(SolutionDir)\DataEditorPortal.Web\DataEditorPortal.Web.csproj&quot; --configuration Release /p:PublishProfile=Production --output &quot;$(ProjectDir)\web&quot;" />
       
       <Exec Command="dotnet build &quot;$(SolutionDir)LicenseGenerator\LicenseGenerator.csproj&quot; --configuration Release"></Exec>
-      <Exec Command="LicenseGenerator.exe /free-trial" WorkingDirectory="$(SolutionDir)LicenseGenerator/bin/Release/net5.0" ConsoleToMsBuild="true" >
-          <Output TaskParameter="ConsoleOutput" ItemName="license"/>
+      <Exec Command="LicenseGenerator.exe /free-trial" WorkingDirectory="$(SolutionDir)LicenseGenerator/bin/Release/net5.0" ConsoleToMsBuild="true">
+          <Output TaskParameter="ConsoleOutput" ItemName="license" />
       </Exec>
-      <WriteLinesToFile File="web\license.dat" Lines="@(license)" Overwrite="true" Encoding="ASCII"/>
+      <WriteLinesToFile File="web\license.dat" Lines="@(license)" Overwrite="true" Encoding="ASCII" />
       
       <ItemGroup>
           <WebFiles Include="web\**" />

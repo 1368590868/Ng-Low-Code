@@ -22,7 +22,7 @@ namespace DataEditorPortal.Web.Services
     {
         Stream GenerateImportTemplate(string name, ImportType type);
         IEnumerable<IDictionary<string, object>> GetSourceData(string name, ImportType type, UploadedFileModel uploadedFile, bool removeFile = false);
-        IEnumerable<IDictionary<string, object>> ValidateImportedData(string name, ImportType type, IEnumerable<IDictionary<string, object>> sourceObjs);
+        IList<FormFieldConfig> ValidateImportedData(string name, ImportType type, IEnumerable<IDictionary<string, object>> sourceObjs);
         IEnumerable<IDictionary<string, object>> GetTransformedSourceData(string name, ImportType type, UploadedFileModel uploadedFile);
     }
 
@@ -425,7 +425,7 @@ namespace DataEditorPortal.Web.Services
 
         #region Validate Excel data
 
-        public IEnumerable<IDictionary<string, object>> ValidateImportedData(string name, ImportType type, IEnumerable<IDictionary<string, object>> sourceObjs)
+        public IList<FormFieldConfig> ValidateImportedData(string name, ImportType type, IEnumerable<IDictionary<string, object>> sourceObjs)
         {
             if (sourceObjs == null) throw new ArgumentNullException("sourceObjs");
             if (!sourceObjs.Any()) throw new DepException("No records in template for importing.");
@@ -521,7 +521,7 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
-            return sourceObjs;
+            return fields;
         }
 
         private List<string> ValidateValue(FormFieldConfig field, object value)

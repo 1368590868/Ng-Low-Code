@@ -57,16 +57,19 @@ namespace DataEditorPortal.Web.Services
         private List<RelationDataModel> ProcessLinkDataField(IDictionary<string, object> model)
         {
             List<RelationDataModel> result = null;
-            if (model.ContainsKey(Constants.LINK_DATA_FIELD_NAME) && model[Constants.LINK_DATA_FIELD_NAME] != null)
+            if (model.ContainsKey(Constants.LINK_DATA_FIELD_NAME))
             {
-                var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                var jsonElement = (JsonElement)model[Constants.LINK_DATA_FIELD_NAME];
-                if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
+                if (model[Constants.LINK_DATA_FIELD_NAME] != null)
                 {
-                    var valueStr = jsonElement.ToString();
-                    result = JsonSerializer.Deserialize<List<RelationDataModel>>(valueStr, jsonOptions);
-                    model.Remove(Constants.LINK_DATA_FIELD_NAME);
+                    var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                    var jsonElement = (JsonElement)model[Constants.LINK_DATA_FIELD_NAME];
+                    if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
+                    {
+                        var valueStr = jsonElement.ToString();
+                        result = JsonSerializer.Deserialize<List<RelationDataModel>>(valueStr, jsonOptions);
+                    }
                 }
+                model.Remove(Constants.LINK_DATA_FIELD_NAME);
             }
             return result;
         }

@@ -7,7 +7,7 @@ export const MonacoEditorConfig: NgxMonacoEditorConfig = {
     lineNumbers: 'off',
     roundedSelection: true,
     minimap: { enabled: false },
-    wordWrap: true,
+    wordWrap: false,
     fixedOverflowWidgets: true,
     contextmenu: false,
     glyphMargin: false,
