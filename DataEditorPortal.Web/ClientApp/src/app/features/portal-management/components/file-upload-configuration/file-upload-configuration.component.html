@@ -98,6 +98,21 @@
       </div>
 
       <div class="flex flex-column mb-3">
+        <label for="" class="mb-1">Attachment Template</label>
+        <div class="flex align-items-center">
+          <input
+            pInputText
+            #dropdownList="ngModel"
+            [required]="true"
+            [(ngModel)]="pathTemplate"
+            placeholder=""
+            [style]="{ minWidth: '20rem' }" />
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-content-between">
+      <div class="flex flex-column mb-3">
         <label for="" class="mb-1">Foreign Key</label>
         <div class="flex align-items-center">
           <p-dropdown
@@ -197,7 +212,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               #dropdownList="ngModel"
-              [required]="true"
+              [required]="false"
               [(ngModel)]="commentsColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -229,7 +244,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               #dropdownList="ngModel"
-              [required]="true"
+              [required]="false"
               [(ngModel)]="contentTypeColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -324,7 +339,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               #dropdownList="ngModel"
-              [required]="true"
+              [required]="false"
               [(ngModel)]="filePathColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"

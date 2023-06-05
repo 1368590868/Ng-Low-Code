@@ -61,6 +61,7 @@ export class FileUploadConfigurationComponent
     tableSchema: string;
     fileStorageType: string;
     foreignKeyName?: string;
+    pathTemplate?: string;
     fieldMapping?: {
       [key: string]: string | null;
     };
@@ -85,6 +86,7 @@ export class FileUploadConfigurationComponent
   fileNameColumn: null | string = null;
   storageTypeColumn: null | string = null;
   foreignKeyNameColumn: null | string = null;
+  pathTemplate: null | string = null;
   commentsColumn: null | string = null;
   dataIdColumn: null | string = null;
   filePathColumn: null | string = null;
@@ -223,18 +225,20 @@ export class FileUploadConfigurationComponent
     this.dropdownList.forEach(x => {
       x.control.markAsDirty();
     });
+    console.log(this.valid());
     if (this.valid()) {
       if (this.storageTypeColumn === 'SqlBinary') {
         if (this.fileBytesColumn == null) {
           return;
         }
       } else {
-        if (this.filePathColumn == null) {
-          return;
-        }
+        // if (this.filePathColumn == null) {
+        //   return;
+        // }
       }
       this.dsConfig.fileStorageType = this.storageTypeColumn || '';
       this.dsConfig.foreignKeyName = this.foreignKeyNameColumn || '';
+      this.dsConfig.pathTemplate = this.pathTemplate || '';
       this.dsConfig.fieldMapping = {
         ID: this.idColumn,
         CONTENT_TYPE: this.contentTypeColumn,
@@ -265,10 +269,8 @@ export class FileUploadConfigurationComponent
     if (
       this.dsConfig.dataSourceConnectionId == null ||
       this.idColumn == null ||
-      this.contentTypeColumn == null ||
       this.statusColumn == null ||
       this.storageTypeColumn == null ||
-      this.commentsColumn == null ||
       this.dataIdColumn == null ||
       this.foreignKeyNameColumn == null
     ) {
