@@ -1,6 +1,7 @@
 <div class="layout-content flex flex-column p-card">
   <div class="flex-grow-1">
     <p-table
+      [loading]="loading"
       styleClass="p-datatable-striped"
       [value]="data"
       [rowHover]="true"

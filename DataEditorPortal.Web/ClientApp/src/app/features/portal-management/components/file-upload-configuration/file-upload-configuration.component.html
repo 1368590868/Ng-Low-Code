@@ -97,18 +97,71 @@
         </ng-container>
       </div>
 
-      <div class="flex flex-column mb-3">
-        <label for="" class="mb-1">Foreign Key</label>
+      <div
+        class="flex flex-column mb-3"
+        *ngIf="storageTypeColumn === 'FileSystem'">
+        <label for="" class="mb-1">Base Path</label>
+        <div class="flex align-items-center">
+          <input
+            pInputText
+            #dropdownList="ngModel"
+            [required]="true"
+            [(ngModel)]="basePathColumn"
+            placeholder=""
+            [style]="{ minWidth: '20rem' }" />
+        </div>
+      </div>
+
+      <div
+        class="flex flex-column mb-3"
+        *ngIf="storageTypeColumn !== 'FileSystem'">
+        <label for="" class="mb-1">Reference Data Key</label>
         <div class="flex align-items-center">
           <p-dropdown
             #dropdownList="ngModel"
             [required]="true"
-            [(ngModel)]="foreignKeyNameColumn"
+            [(ngModel)]="referenceDataKeyColumn"
             [options]="foreignKeyOptions"
             placeholder="Please Select"
             [style]="{ minWidth: '20rem' }"
             appendTo="body"></p-dropdown>
         </div>
+      </div>
+    </div>
+
+    <div class="flex justify-content-between">
+      <div
+        class="flex flex-column mb-3"
+        *ngIf="storageTypeColumn === 'FileSystem'">
+        <label for="" class="mb-1">Reference Data Key</label>
+        <div class="flex align-items-center">
+          <p-dropdown
+            #dropdownList="ngModel"
+            [required]="true"
+            [(ngModel)]="referenceDataKeyColumn"
+            [options]="foreignKeyOptions"
+            placeholder="Please Select"
+            [style]="{ minWidth: '20rem' }"
+            appendTo="body"></p-dropdown>
+        </div>
+      </div>
+      <div class="flex flex-column mb-3">
+        <ng-container>
+          <label for="tableName" class="mb-1">Foreign Key</label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              #dropdownList="ngModel"
+              [required]="true"
+              [(ngModel)]="foreignKeyColumn"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
+        </ng-container>
       </div>
     </div>
 
@@ -185,7 +238,7 @@
           <input
             type="text"
             pInputText
-            [ngModel]="'COMMENTS'"
+            [ngModel]="'STATUS'"
             [disabled]="true"
             [style]="{ minWidth: '20rem' }" />
         </div>
@@ -198,71 +251,7 @@
             <p-dropdown
               #dropdownList="ngModel"
               [required]="true"
-              [(ngModel)]="commentsColumn"
-              [options]="dbTableColumns"
-              placeholder="Please Select"
-              [style]="{ minWidth: '20rem' }"
-              optionLabel="columnName"
-              optionValue="columnName"
-              appendTo="body"></p-dropdown>
-          </div>
-        </ng-container>
-      </div>
-    </div>
-
-    <div class="flex justify-content-between">
-      <div class="flex flex-column mb-3">
-        <label for="" class="mb-1"></label>
-        <div class="flex align-items-center">
-          <input
-            type="text"
-            pInputText
-            [ngModel]="'CONTENT_TYPE'"
-            [disabled]="true"
-            [style]="{ minWidth: '20rem' }" />
-        </div>
-      </div>
-      <div class="flex flex-column mb-3">
-        <ng-container>
-          <label for="tableName" class="mb-1"></label>
-
-          <div class="flex align-items-center">
-            <p-dropdown
-              #dropdownList="ngModel"
-              [required]="true"
-              [(ngModel)]="contentTypeColumn"
-              [options]="dbTableColumns"
-              placeholder="Please Select"
-              [style]="{ minWidth: '20rem' }"
-              optionLabel="columnName"
-              optionValue="columnName"
-              appendTo="body"></p-dropdown>
-          </div>
-        </ng-container>
-      </div>
-    </div>
-
-    <div class="flex justify-content-between">
-      <div class="flex flex-column mb-3">
-        <label for="" class="mb-1"></label>
-        <div class="flex align-items-center">
-          <input
-            type="text"
-            pInputText
-            [ngModel]="'DATA_ID'"
-            [disabled]="true"
-            [style]="{ minWidth: '20rem' }" />
-        </div>
-      </div>
-      <div class="flex flex-column mb-3">
-        <ng-container>
-          <label for="tableName" class="mb-1"></label>
-
-          <div class="flex align-items-center">
-            <p-dropdown
-              #dropdownList="ngModel"
-              [required]="true"
-              [(ngModel)]="dataIdColumn"
+              [(ngModel)]="statusColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
               [style]="{ minWidth: '20rem' }"
@@ -324,7 +313,7 @@
           <div class="flex align-items-center">
             <p-dropdown
               #dropdownList="ngModel"
-              [required]="true"
+              [required]="false"
               [(ngModel)]="filePathColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -344,7 +333,7 @@
           <input
             type="text"
             pInputText
-            [ngModel]="'STATUS'"
+            [ngModel]="'COMMENTS'"
             [disabled]="true"
             [style]="{ minWidth: '20rem' }" />
         </div>
@@ -356,8 +345,168 @@
           <div class="flex align-items-center">
             <p-dropdown
               #dropdownList="ngModel"
-              [required]="true"
-              [(ngModel)]="statusColumn"
+              [required]="false"
+              [(ngModel)]="commentsColumn"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="flex justify-content-between">
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1"></label>
+        <div class="flex align-items-center">
+          <input
+            type="text"
+            pInputText
+            [ngModel]="'CONTENT_TYPE'"
+            [disabled]="true"
+            [style]="{ minWidth: '20rem' }" />
+        </div>
+      </div>
+      <div class="flex flex-column mb-3">
+        <ng-container>
+          <label for="tableName" class="mb-1"></label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              #dropdownList="ngModel"
+              [required]="false"
+              [(ngModel)]="contentTypeColumn"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="flex justify-content-between">
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1"></label>
+        <div class="flex align-items-center">
+          <input
+            type="text"
+            pInputText
+            [ngModel]="'CREATEED BY'"
+            [disabled]="true"
+            [style]="{ minWidth: '20rem' }" />
+        </div>
+      </div>
+      <div class="flex flex-column mb-3">
+        <ng-container>
+          <label for="tableName" class="mb-1"></label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              #dropdownList="ngModel"
+              [required]="false"
+              [(ngModel)]="createdByColumn"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="flex justify-content-between">
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1"></label>
+        <div class="flex align-items-center">
+          <input
+            type="text"
+            pInputText
+            [ngModel]="'CREATED DATE'"
+            [disabled]="true"
+            [style]="{ minWidth: '20rem' }" />
+        </div>
+      </div>
+      <div class="flex flex-column mb-3">
+        <ng-container>
+          <label for="tableName" class="mb-1"></label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              #dropdownList="ngModel"
+              [required]="false"
+              [(ngModel)]="createdDateColumn"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="flex justify-content-between">
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1"></label>
+        <div class="flex align-items-center">
+          <input
+            type="text"
+            pInputText
+            [ngModel]="'MODIFIED BY'"
+            [disabled]="true"
+            [style]="{ minWidth: '20rem' }" />
+        </div>
+      </div>
+      <div class="flex flex-column mb-3">
+        <ng-container>
+          <label for="tableName" class="mb-1"></label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              #dropdownList="ngModel"
+              [required]="false"
+              [(ngModel)]="modifiedByColumn"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="flex justify-content-between">
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1"></label>
+        <div class="flex align-items-center">
+          <input
+            type="text"
+            pInputText
+            [ngModel]="'MODIFIED DATE'"
+            [disabled]="true"
+            [style]="{ minWidth: '20rem' }" />
+        </div>
+      </div>
+      <div class="flex flex-column mb-3">
+        <ng-container>
+          <label for="tableName" class="mb-1"></label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              #dropdownList="ngModel"
+              [required]="false"
+              [(ngModel)]="modifiedDateColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
               [style]="{ minWidth: '20rem' }"
