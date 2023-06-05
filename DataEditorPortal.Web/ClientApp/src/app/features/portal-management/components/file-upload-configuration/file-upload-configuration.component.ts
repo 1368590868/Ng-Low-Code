@@ -113,9 +113,10 @@ export class FileUploadConfigurationComponent
       this.storageTypeColumn = newVal.fileStorageType;
       this.referenceDataKeyColumn = newVal.referenceDataKeyColumn;
       this.commentsColumn = newVal.fieldMapping.COMMENTS;
-      this.foreignKeyColumn = newVal.fieldMapping.DATA_ID;
+      this.foreignKeyColumn = newVal.fieldMapping.FOREIGN_KEY;
       this.filePathColumn = newVal.fieldMapping.FILE_PATH;
       this.fileBytesColumn = newVal.fieldMapping.FILE_BYTES;
+      this.basePathColumn = newVal.basePath;
 
       this.createdDateColumn = newVal.fieldMapping?.CREATED_DATE;
       this.createdByColumn = newVal.fieldMapping?.CREATED_BY;
@@ -217,7 +218,6 @@ export class FileUploadConfigurationComponent
     this.storageTypeColumn = null;
     this.commentsColumn = null;
     this.referenceDataKeyColumn = null;
-    this.foreignKeyColumn = null;
     this.filePathColumn = null;
     this.fileBytesColumn = null;
     this.foreignKeyColumn = null;
@@ -239,7 +239,6 @@ export class FileUploadConfigurationComponent
     this.dropdownList.forEach(x => {
       x.control.markAsDirty();
     });
-    console.log(this.valid());
     if (this.valid()) {
       if (this.storageTypeColumn === 'SqlBinary') {
         if (this.fileBytesColumn == null) {
@@ -254,7 +253,6 @@ export class FileUploadConfigurationComponent
         STATUS: this.statusColumn,
         FILE_NAME: this.fileNameColumn,
         COMMENTS: this.commentsColumn,
-        DATA_ID: this.foreignKeyColumn,
         FILE_PATH: this.filePathColumn,
         FILE_BYTES: this.fileBytesColumn,
         CREATED_DATE: this.createdDateColumn,
