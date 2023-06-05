@@ -75,6 +75,41 @@
         </ng-container>
       </div>
     </div>
+
+    <div class="flex justify-content-between">
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1">Reference Data Key</label>
+        <div class="flex align-items-center">
+          <p-dropdown
+            #dropdownList="ngModel"
+            [required]="true"
+            [(ngModel)]="referenceDataKeyColumn"
+            [options]="foreignKeyOptions"
+            placeholder="Please Select"
+            [style]="{ minWidth: '20rem' }"
+            appendTo="body"></p-dropdown>
+        </div>
+      </div>
+      <div class="flex flex-column mb-3">
+        <ng-container>
+          <label for="tableName" class="mb-1">Foreign Key</label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              #dropdownList="ngModel"
+              [required]="true"
+              [(ngModel)]="foreignKeyColumn"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
     <div class="flex justify-content-between">
       <div class="flex flex-column mb-3">
         <ng-container>
@@ -110,58 +145,6 @@
             placeholder=""
             [style]="{ minWidth: '20rem' }" />
         </div>
-      </div>
-
-      <div
-        class="flex flex-column mb-3"
-        *ngIf="storageTypeColumn !== 'FileSystem'">
-        <label for="" class="mb-1">Reference Data Key</label>
-        <div class="flex align-items-center">
-          <p-dropdown
-            #dropdownList="ngModel"
-            [required]="true"
-            [(ngModel)]="referenceDataKeyColumn"
-            [options]="foreignKeyOptions"
-            placeholder="Please Select"
-            [style]="{ minWidth: '20rem' }"
-            appendTo="body"></p-dropdown>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex justify-content-between">
-      <div
-        class="flex flex-column mb-3"
-        *ngIf="storageTypeColumn === 'FileSystem'">
-        <label for="" class="mb-1">Reference Data Key</label>
-        <div class="flex align-items-center">
-          <p-dropdown
-            #dropdownList="ngModel"
-            [required]="true"
-            [(ngModel)]="referenceDataKeyColumn"
-            [options]="foreignKeyOptions"
-            placeholder="Please Select"
-            [style]="{ minWidth: '20rem' }"
-            appendTo="body"></p-dropdown>
-        </div>
-      </div>
-      <div class="flex flex-column mb-3">
-        <ng-container>
-          <label for="tableName" class="mb-1">Foreign Key</label>
-
-          <div class="flex align-items-center">
-            <p-dropdown
-              #dropdownList="ngModel"
-              [required]="true"
-              [(ngModel)]="foreignKeyColumn"
-              [options]="dbTableColumns"
-              placeholder="Please Select"
-              [style]="{ minWidth: '20rem' }"
-              optionLabel="columnName"
-              optionValue="columnName"
-              appendTo="body"></p-dropdown>
-          </div>
-        </ng-container>
       </div>
     </div>
 
