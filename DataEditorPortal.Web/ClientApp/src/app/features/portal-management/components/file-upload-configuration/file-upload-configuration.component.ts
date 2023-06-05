@@ -61,7 +61,7 @@ export class FileUploadConfigurationComponent
     tableSchema: string;
     fileStorageType: string;
     foreignKeyName?: string;
-    pathTemplate?: string;
+    basePath?: string;
     fieldMapping?: {
       [key: string]: string | null;
     };
@@ -86,7 +86,7 @@ export class FileUploadConfigurationComponent
   fileNameColumn: null | string = null;
   storageTypeColumn: null | string = null;
   foreignKeyNameColumn: null | string = null;
-  pathTemplate: null | string = null;
+  basePathColumn: null | string = null;
   commentsColumn: null | string = null;
   dataIdColumn: null | string = null;
   filePathColumn: null | string = null;
@@ -241,14 +241,10 @@ export class FileUploadConfigurationComponent
         if (this.fileBytesColumn == null) {
           return;
         }
-      } else {
-        // if (this.filePathColumn == null) {
-        //   return;
-        // }
       }
       this.dsConfig.fileStorageType = this.storageTypeColumn || '';
       this.dsConfig.foreignKeyName = this.foreignKeyNameColumn || '';
-      this.dsConfig.pathTemplate = this.pathTemplate || '';
+      this.dsConfig.basePath = this.basePathColumn || '';
       this.dsConfig.fieldMapping = {
         ID: this.idColumn,
         CONTENT_TYPE: this.contentTypeColumn,
