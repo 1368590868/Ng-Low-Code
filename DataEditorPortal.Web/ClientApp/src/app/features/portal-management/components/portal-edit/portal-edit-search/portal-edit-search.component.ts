@@ -102,7 +102,9 @@ export class PortalEditSearchComponent
         this.targetColumns = res[0]
           .filter(c =>
             res[1].find(
-              s => s.columnName === c.key && s.filterType === c.filterType
+              s =>
+                c.type !== 'DataBaseField' ||
+                (s.columnName === c.key && s.filterType === c.filterType)
             )
           )
           .map<GridSearchField>(x => {
