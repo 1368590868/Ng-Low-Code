@@ -97,7 +97,9 @@
         </ng-container>
       </div>
 
-      <div class="flex flex-column mb-3">
+      <div
+        class="flex flex-column mb-3"
+        *ngIf="storageTypeColumn === 'FileSystem'">
         <label for="" class="mb-1">Attachment Template</label>
         <div class="flex align-items-center">
           <input
@@ -109,9 +111,27 @@
             [style]="{ minWidth: '20rem' }" />
         </div>
       </div>
+
+      <div
+        class="flex flex-column mb-3"
+        *ngIf="storageTypeColumn !== 'FileSystem'">
+        <label for="" class="mb-1">Foreign Key</label>
+        <div class="flex align-items-center">
+          <p-dropdown
+            #dropdownList="ngModel"
+            [required]="true"
+            [(ngModel)]="foreignKeyNameColumn"
+            [options]="foreignKeyOptions"
+            placeholder="Please Select"
+            [style]="{ minWidth: '20rem' }"
+            appendTo="body"></p-dropdown>
+        </div>
+      </div>
     </div>
 
-    <div class="flex justify-content-between">
+    <div
+      class="flex justify-content-between"
+      *ngIf="storageTypeColumn === 'FileSystem'">
       <div class="flex flex-column mb-3">
         <label for="" class="mb-1">Foreign Key</label>
         <div class="flex align-items-center">
