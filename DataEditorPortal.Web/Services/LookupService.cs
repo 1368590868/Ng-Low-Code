@@ -54,14 +54,14 @@ namespace DataEditorPortal.Web.Services
             {
                 Id = item.Id,
                 QueryText = item.QueryText,
-                ConnectionId = item.DataSourceConnectionId,
+                ConnectionName = item.DataSourceConnectionName,
                 Name = item.Name
             };
         }
 
         public Guid Create(LookupItem model)
         {
-            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.QueryText) || model.ConnectionId == Guid.Empty)
+            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.QueryText) || string.IsNullOrEmpty(model.ConnectionName))
                 throw new ArgumentNullException();
 
             ValidateLookupItem(model);
@@ -70,7 +70,7 @@ namespace DataEditorPortal.Web.Services
             {
                 Name = model.Name,
                 QueryText = model.QueryText,
-                DataSourceConnectionId = model.ConnectionId
+                DataSourceConnectionName = model.ConnectionName
             };
             _depDbContext.Lookups.Add(item);
             _depDbContext.SaveChanges();
@@ -80,7 +80,7 @@ namespace DataEditorPortal.Web.Services
 
         public Guid Update(Guid id, LookupItem model)
         {
-            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.QueryText) || model.ConnectionId == Guid.Empty)
+            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.QueryText) || string.IsNullOrEmpty(model.ConnectionName))
                 throw new ArgumentNullException();
 
             var item = _depDbContext.Lookups.FirstOrDefault(x => x.Id == id);
@@ -93,7 +93,7 @@ namespace DataEditorPortal.Web.Services
 
             item.Name = model.Name;
             item.QueryText = model.QueryText;
-            item.DataSourceConnectionId = model.ConnectionId;
+            item.DataSourceConnectionName = model.ConnectionName;
 
             _depDbContext.SaveChanges();
 
@@ -105,7 +105,7 @@ namespace DataEditorPortal.Web.Services
             #region validate connection and query text
             try
             {
-                var connection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Id == model.ConnectionId);
+                var connection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == model.ConnectionName);
                 var query = _queryBuilder.ProcessQueryWithParamters(model.QueryText, new Dictionary<string, object>());
 
                 using (var con = _serviceProvider.GetRequiredService<DbConnection>())

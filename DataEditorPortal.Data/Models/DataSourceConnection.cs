@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,8 +8,6 @@ namespace DataEditorPortal.Data.Models
     public class DataSourceConnection
     {
         [Key]
-        [Column("ID")]
-        public Guid Id { get; set; }
         [Column("NAME")]
         public string Name { get; set; }
         [Column("CONNECTION_STRING")]

@@ -86,7 +86,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class DataSourceConfig
     {
-        public Guid DataSourceConnectionId { get; set; }
+        public string DataSourceConnectionName { get; set; }
         public string TableName { get; set; }
         public string TableSchema { get; set; }
         public string IdColumn { get; set; }
@@ -152,7 +152,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class FileUploadConfig
     {
-        public Guid DataSourceConnectionId { get; set; }
+        public string DataSourceConnectionName { get; set; }
         public string TableName { get; set; }
         public string TableSchema { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]

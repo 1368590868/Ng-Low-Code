@@ -32,8 +32,8 @@ namespace DataEditorPortal.Data.Models
         public Guid CreatedBy { get; set; }
         [Column("CREATED_DATE")]
         public DateTime CreatedDate { get; set; }
-        [Column("DATA_SOURCE_CONNECTION_ID")]
-        public Guid? DataSourceConnectionId { get; set; }
+        [Column("DATA_SOURCE_CONNECTION_NAME")]
+        public string DataSourceConnectionName { get; set; }
         public virtual DataSourceConnection DataSourceConnection { get; set; }
     }
 }

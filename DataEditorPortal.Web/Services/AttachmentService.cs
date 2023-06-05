@@ -33,7 +33,7 @@ namespace DataEditorPortal.Web.Services
 
         private FileUploadConfig DEFAULT_CONFIG = new FileUploadConfig()
         {
-            DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+            DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
             TableName = "UPLOADED_FILE",
             TableSchema = Constants.DEFAULT_SCHEMA,
             FieldMapping = new Dictionary<string, string>() {
@@ -150,7 +150,7 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
-            var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Id == config.DataSourceConnectionId);
+            var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == config.DataSourceConnectionName);
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = dsConnection.ConnectionString;

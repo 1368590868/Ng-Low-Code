@@ -14,8 +14,8 @@ namespace DataEditorPortal.Data.Models
         public string Name { get; set; }
         [Column("QUERY_TEXT")]
         public string QueryText { get; set; }
-        [Column("DATA_SOURCE_CONNECTION_ID")]
-        public Guid DataSourceConnectionId { get; set; }
+        [Column("DATA_SOURCE_CONNECTION_NAME")]
+        public string DataSourceConnectionName { get; set; }
         public virtual DataSourceConnection DataSourceConnection { get; set; }
     }
 }

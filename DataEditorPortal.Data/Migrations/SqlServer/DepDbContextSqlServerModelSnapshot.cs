@@ -98,20 +98,15 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DataSourceConnection", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ID");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("NAME");
 
                     b.Property<string>("ConnectionString")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("CONNECTION_STRING");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("NAME");
-
-                    b.HasKey("Id");
+                    b.HasKey("Name");
 
                     b.ToTable("DATA_SOURCE_CONNECTIONS");
                 });
@@ -388,9 +383,9 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("ID");
 
-                    b.Property<Guid>("DataSourceConnectionId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("DATA_SOURCE_CONNECTION_ID");
+                    b.Property<string>("DataSourceConnectionName")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("DATA_SOURCE_CONNECTION_NAME");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)")
@@ -402,7 +397,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DataSourceConnectionId");
+                    b.HasIndex("DataSourceConnectionName");
 
                     b.ToTable("LOOKUPS");
                 });
@@ -620,9 +615,9 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DATA_SOURCE_CONFIG");
 
-                    b.Property<Guid?>("DataSourceConnectionId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("DATA_SOURCE_CONNECTION_ID");
+                    b.Property<string>("DataSourceConnectionName")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("DATA_SOURCE_CONNECTION_NAME");
 
                     b.Property<string>("DetailConfig")
                         .HasColumnType("nvarchar(max)")
@@ -642,7 +637,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DataSourceConnectionId");
+                    b.HasIndex("DataSourceConnectionName");
 
                     b.ToTable("UNIVERSAL_GRID_CONFIGURATIONS");
                 });
@@ -800,9 +795,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.HasOne("DataEditorPortal.Data.Models.DataSourceConnection", "DataSourceConnection")
                         .WithMany()
-                        .HasForeignKey("DataSourceConnectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DataSourceConnectionName");
 
                     b.Navigation("DataSourceConnection");
                 });
@@ -839,7 +832,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.HasOne("DataEditorPortal.Data.Models.DataSourceConnection", "DataSourceConnection")
                         .WithMany("UniversalGridConfigurations")
-                        .HasForeignKey("DataSourceConnectionId");
+                        .HasForeignKey("DataSourceConnectionName");
 
                     b.Navigation("DataSourceConnection");
                 });

@@ -415,7 +415,6 @@ namespace DataEditorPortal.Web.Controllers
                 .Include(x => x.UniversalGridConfigurations)
                 .Select(x => new DataSourceConnection()
                 {
-                    Id = x.Id,
                     Name = x.Name,
                     ConnectionString = x.ConnectionString,
                     UsedCount = x.UniversalGridConfigurations.Count()
@@ -425,7 +424,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("datasource/connections/create")]
-        public Guid CreateDataSourceConnection([FromBody] DataSourceConnection model)
+        public string CreateDataSourceConnection([FromBody] DataSourceConnection model)
         {
             if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.ConnectionString))
                 throw new ArgumentNullException();
@@ -449,17 +448,17 @@ namespace DataEditorPortal.Web.Controllers
             _depDbContext.DataSourceConnections.Add(model);
             _depDbContext.SaveChanges();
 
-            return model.Id;
+            return model.Name;
         }
 
         [HttpPut]
-        [Route("datasource/connections/{id}/update")]
-        public Guid UpdateDataSourceConnection(Guid id, [FromBody] DataSourceConnection model)
+        [Route("datasource/connections/{name}/update")]
+        public string UpdateDataSourceConnection(string name, [FromBody] DataSourceConnection model)
         {
             if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.ConnectionString))
                 throw new ArgumentNullException();
 
-            var dsc = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Id == id);
+            var dsc = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == name);
             if (dsc == null)
                 throw new ApiException("Not Found", 404);
             try
@@ -482,7 +481,7 @@ namespace DataEditorPortal.Web.Controllers
             dsc.ConnectionString = model.ConnectionString;
             _depDbContext.SaveChanges();
 
-            return model.Id;
+            return model.Name;
         }
 
         #endregion
@@ -491,30 +490,30 @@ namespace DataEditorPortal.Web.Controllers
         [Route("datasource/connections")]
         public List<DataSourceConnection> GetDataSourceConnections()
         {
-            return _depDbContext.DataSourceConnections.Select(x => new DataSourceConnection() { Name = x.Name, Id = x.Id }).ToList();
+            return _depDbContext.DataSourceConnections.Select(x => new DataSourceConnection() { Name = x.Name }).ToList();
         }
 
         [HttpGet]
-        [Route("datasource/{connectionId}/tables")]
-        public List<DataSourceTable> GetDataSourceTables(Guid connectionId)
+        [Route("datasource/{connectionName}/tables")]
+        public List<DataSourceTable> GetDataSourceTables(string connectionName)
         {
-            return _portalItemService.GetDataSourceTables(connectionId);
+            return _portalItemService.GetDataSourceTables(connectionName);
         }
 
         [HttpGet]
-        [Route("datasource/{connectionId}/table-columns")]
-        public List<DataSourceTableColumn> GetDataSourceTableColumns(Guid connectionId, [FromQuery] string tableSchema, [FromQuery] string tableName)
+        [Route("datasource/{connectionName}/table-columns")]
+        public List<DataSourceTableColumn> GetDataSourceTableColumns(string connectionName, [FromQuery] string tableSchema, [FromQuery] string tableName)
         {
             var sqlText = _queryBuilder.GetSqlTextForDatabaseSource(new DataSourceConfig() { TableName = tableName, TableSchema = tableSchema });
-            return _portalItemService.GetDataSourceTableColumns(connectionId, sqlText);
+            return _portalItemService.GetDataSourceTableColumns(connectionName, sqlText);
         }
 
         [HttpPost]
-        [Route("datasource/{connectionId}/query-columns")]
-        public List<DataSourceTableColumn> GetDataSourceQueryColumns(Guid connectionId, DataSourceConfig dsConfig)
+        [Route("datasource/{connectionName}/query-columns")]
+        public List<DataSourceTableColumn> GetDataSourceQueryColumns(string connectionName, DataSourceConfig dsConfig)
         {
             var sqlText = _queryBuilder.GetSqlTextForDatabaseSource(dsConfig);
-            return _portalItemService.GetDataSourceTableColumns(connectionId, sqlText);
+            return _portalItemService.GetDataSourceTableColumns(connectionName, sqlText);
         }
 
         [HttpGet]

@@ -196,7 +196,6 @@ namespace DataEditorPortal.Web.Common.Install
                     Name = con.Key,
                     ConnectionString = con.Value
                 };
-                if (con.Key == "Default") connection.Id = Constants.DEFAULT_CONNECTION_ID;
                 _depDbContext.DataSourceConnections.Add(connection);
             }
 
@@ -296,28 +295,28 @@ namespace DataEditorPortal.Web.Common.Install
                     Id = Guid.Parse("727052BA-0033-42C9-A39C-06A103E4B021"),
                     Name = "Roles",
                     QueryText = $"SELECT sr.ROLE_NAME AS LABEL, sr.ID AS VALUE FROM {Constants.DEFAULT_SCHEMA}.SITE_ROLES sr ORDER BY sr.ROLE_NAME",
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("E1F3E2C7-25CA-4D69-9405-ABC54923864D"),
                     Name = "Vendors",
                     QueryText = $"SELECT dd.LABEL, dd.VALUE FROM {Constants.DEFAULT_SCHEMA}.DATA_DICTIONARIES dd WHERE dd.CATEGORY = 'Vendor' ORDER BY dd.LABEL",
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("704A3D00-62DF-4C62-A4BD-457C4DC242CA"),
                     Name = "Employers",
                     QueryText = $"SELECT dd.LABEL, dd.VALUE, dd.VALUE1, dd.VALUE2 FROM {Constants.DEFAULT_SCHEMA}.DATA_DICTIONARIES dd WHERE dd.CATEGORY = 'Employer' {{{{ AND dd.VALUE1 IN ##VENDOR## }}}} ORDER BY dd.LABEL",
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("8BE7B1D6-F09A-4EEE-B8EC-4DFCF689005B"),
                     Name = "Employers in Editing Form",
                     QueryText = $"SELECT dd.LABEL, dd.VALUE, dd.VALUE1, dd.VALUE2 FROM {Constants.DEFAULT_SCHEMA}.DATA_DICTIONARIES dd WHERE dd.CATEGORY = 'Employer' {{{{ AND dd.VALUE1 = ##VENDOR## }}}} ORDER BY dd.LABEL",
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 }
             };
             foreach (var item in lookups)
@@ -330,12 +329,12 @@ namespace DataEditorPortal.Web.Common.Install
                 Id = Guid.Parse("071f5419-85b8-11ed-a86f-0242ac130004"),
                 Name = "user-management",
                 ConfigCompleted = true,
-                DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+                DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                 ItemType = GridItemType.SINGLE,
 
                 DataSourceConfig = JsonSerializer.Serialize(new DataSourceConfig
                 {
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                     TableName = "USERS",
                     TableSchema = Constants.DEFAULT_SCHEMA,
                     IdColumn = "ID",
@@ -506,12 +505,12 @@ namespace DataEditorPortal.Web.Common.Install
                 Id = Guid.Parse("82CFA0D5-1033-4A08-8294-4D4BC2DE3D6B"),
                 Name = "demo-item",
                 ConfigCompleted = true,
-                DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+                DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                 ItemType = GridItemType.SINGLE,
 
                 DataSourceConfig = JsonSerializer.Serialize(new DataSourceConfig
                 {
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                     TableName = "DEMO_TABLE",
                     TableSchema = Constants.DEFAULT_SCHEMA,
                     IdColumn = "ID",
@@ -811,35 +810,35 @@ namespace DataEditorPortal.Web.Common.Install
                     Id = Guid.Parse("140FEA8D-DEA8-4314-8B29-6F1BD140C79A"),
                     Name = "LPA DOT Operators",
                     QueryText = $"SELECT DISTINCT DOT_OPERATOR_NAME AS LABEL, DOT_OPERATOR_NAME AS VALUE FROM {Constants.DEFAULT_SCHEMA}.GFORM_SITE_HIERARCHY_MV ORDER BY DOT_OPERATOR_NAME",
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("EF604385-873D-4229-9685-1D14BE1B484C"),
                     Name = "LPA Divisions",
                     QueryText = "SELECT DISTINCT DIVISION_NAME AS LABEL, DIVISION_NAME AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".GFORM_SITE_HIERARCHY_MV WHERE 1=1 {{AND DOT_OPERATOR_NAME = ##DOT_OPERATOR_NAME##}} ORDER BY DIVISION_NAME",
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("44A5D080-876C-42B4-8243-739D2BCEA013"),
                     Name = "LPA areas",
                     QueryText = "SELECT DISTINCT AREA_NAME AS LABEL, AREA_NAME AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".GFORM_SITE_HIERARCHY_MV WHERE 1=1 {{AND DOT_OPERATOR_NAME = ##DOT_OPERATOR_NAME##}} {{AND DIVISION_NAME = ##DIVISION_NAME##}} ORDER BY AREA_NAME",
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("4F584448-9877-4037-AF0D-1AD2B17AD9F1"),
                     Name = "LPA locations",
                     QueryText = "SELECT DISTINCT LOCATION AS LABEL, LOCATION AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".GFORM_SITE_HIERARCHY_MV WHERE 1=1 {{AND DOT_OPERATOR_NAME = ##DOT_OPERATOR_NAME##}} {{AND DIVISION_NAME = ##DIVISION_NAME##}} {{AND AREA_NAME = ##AREA_NAME##}} ORDER BY LOCATION",
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("901B664B-B443-45C1-8F49-B585A845E321"),
                     Name = "LPA SiteName",
                     QueryText = "SELECT DISTINCT SITENAME AS LABEL, SITENAME AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".GFORM_SITE_HIERARCHY_MV WHERE 1=1 {{AND DOT_OPERATOR_NAME = ##DOT_OPERATOR_NAME##}} {{AND DIVISION_NAME = ##DIVISION_NAME##}} {{AND AREA_NAME = ##AREA_NAME##}} {{AND LOCATION = ##LOCATION##}} ORDER BY SITENAME",
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 }
             };
             foreach (var item in lpaLookups)
@@ -897,14 +896,14 @@ namespace DataEditorPortal.Web.Common.Install
                 Id = Guid.NewGuid(),
                 Name = "lpa-site",
                 ConfigCompleted = true,
-                DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+                DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                 ItemType = GridItemType.LINKED,
 
                 DataSourceConfig = JsonSerializer.Serialize(new LinkedDataSourceConfig
                 {
                     LinkedTable = new DataSourceConfig()
                     {
-                        DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+                        DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                         TableName = "LPASITE_RELATION",
                         TableSchema = Constants.DEFAULT_SCHEMA,
                         IdColumn = "OBJECTID"
@@ -1044,12 +1043,12 @@ namespace DataEditorPortal.Web.Common.Install
                 Id = new Guid("D13087B3-F5DD-466D-AAFC-C73582C31473"),
                 Name = "site-lpa-s",
                 ConfigCompleted = true,
-                DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+                DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                 ItemType = GridItemType.LINKED_SINGLE,
 
                 DataSourceConfig = JsonSerializer.Serialize(new DataSourceConfig
                 {
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                     QueryText = $"SELECT * FROM {Constants.DEFAULT_SCHEMA}.LPASITE l \nLEFT JOIN {Constants.DEFAULT_SCHEMA}.GFORM_SITE_HIERARCHY_MV gshm ON l.BOUNDARYGLOBALID = gshm.HIERARCHY_GLOBALID \nWHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##",
                     IdColumn = "OBJECTID",
                     SortBy = new List<SortParam>() { new SortParam { field = "LPANAME", order = 1 } }
@@ -1375,12 +1374,12 @@ namespace DataEditorPortal.Web.Common.Install
                 Id = new Guid("8797B3BB-E6C5-4E54-83C2-88D78E8AAA05"),
                 Name = "remediation-activities",
                 ConfigCompleted = true,
-                DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+                DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                 ItemType = GridItemType.LINKED_SINGLE,
 
                 DataSourceConfig = JsonSerializer.Serialize(new DataSourceConfig
                 {
-                    DataSourceConnectionId = Constants.DEFAULT_CONNECTION_ID,
+                    DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                     QueryText = $"SELECT * FROM {Constants.DEFAULT_SCHEMA}.LPAREMEDIATIONACTSITE l \nLEFT JOIN {Constants.DEFAULT_SCHEMA}.GFORM_SITE_HIERARCHY_MV gshm ON l.BOUNDARYGLOBALID = gshm.HIERARCHY_GLOBALID \nWHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##",
                     IdColumn = "OBJECTID",
                     PageSize = 100,
