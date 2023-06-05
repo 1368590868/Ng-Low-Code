@@ -60,7 +60,6 @@ export class FileUploadConfigurationComponent
     tableName: string;
     tableSchema: string;
     fileStorageType: string;
-    foreignKeyName?: string;
     basePath?: string;
     fieldMapping?: {
       [key: string]: string | null;
@@ -68,7 +67,6 @@ export class FileUploadConfigurationComponent
   } = {
     idColumn: undefined,
     dataSourceConnectionId: '',
-    foreignKeyName: '',
     tableName: '',
     tableSchema: '',
     fileStorageType: '',
@@ -85,10 +83,10 @@ export class FileUploadConfigurationComponent
   statusColumn: null | string = null;
   fileNameColumn: null | string = null;
   storageTypeColumn: null | string = null;
-  foreignKeyNameColumn: null | string = null;
+  referenceDataKeyColumn: null | string = null;
   basePathColumn: null | string = null;
   commentsColumn: null | string = null;
-  dataIdColumn: null | string = null;
+  foreignKeyColumn: null | string = null;
   filePathColumn: null | string = null;
   fileBytesColumn: null | string = null;
 
@@ -113,9 +111,9 @@ export class FileUploadConfigurationComponent
       this.statusColumn = newVal.fieldMapping.STATUS;
       this.fileNameColumn = newVal.fieldMapping.FILE_NAME;
       this.storageTypeColumn = newVal.fileStorageType;
-      this.foreignKeyNameColumn = newVal.foreignKeyName;
+      this.referenceDataKeyColumn = newVal.referenceDataKeyColumn;
       this.commentsColumn = newVal.fieldMapping.COMMENTS;
-      this.dataIdColumn = newVal.fieldMapping.DATA_ID;
+      this.foreignKeyColumn = newVal.fieldMapping.DATA_ID;
       this.filePathColumn = newVal.fieldMapping.FILE_PATH;
       this.fileBytesColumn = newVal.fieldMapping.FILE_BYTES;
 
@@ -218,10 +216,16 @@ export class FileUploadConfigurationComponent
     this.fileNameColumn = null;
     this.storageTypeColumn = null;
     this.commentsColumn = null;
-    this.foreignKeyNameColumn = null;
-    this.dataIdColumn = null;
+    this.referenceDataKeyColumn = null;
+    this.foreignKeyColumn = null;
     this.filePathColumn = null;
     this.fileBytesColumn = null;
+    this.foreignKeyColumn = null;
+    this.createdByColumn = null;
+    this.createdDateColumn = null;
+    this.modifiedByColumn = null;
+    this.modifiedDateColumn = null;
+    this.basePathColumn = null;
   }
 
   removeConfig() {
@@ -243,7 +247,6 @@ export class FileUploadConfigurationComponent
         }
       }
       this.dsConfig.fileStorageType = this.storageTypeColumn || '';
-      this.dsConfig.foreignKeyName = this.foreignKeyNameColumn || '';
       this.dsConfig.basePath = this.basePathColumn || '';
       this.dsConfig.fieldMapping = {
         ID: this.idColumn,
@@ -251,13 +254,15 @@ export class FileUploadConfigurationComponent
         STATUS: this.statusColumn,
         FILE_NAME: this.fileNameColumn,
         COMMENTS: this.commentsColumn,
-        DATA_ID: this.dataIdColumn,
+        DATA_ID: this.foreignKeyColumn,
         FILE_PATH: this.filePathColumn,
         FILE_BYTES: this.fileBytesColumn,
         CREATED_DATE: this.createdDateColumn,
         CREATED_BY: this.createdByColumn,
         MODIFIED_DATE: this.modifiedDateColumn,
-        MODIFIED_BY: this.modifiedByColumn
+        MODIFIED_BY: this.modifiedByColumn,
+        REFERENCE_DATA_KEY: this.referenceDataKeyColumn,
+        FOREIGN_KEY: this.foreignKeyColumn
       };
       this.innerValue = this.dsConfig;
       this.onChange?.(this.dsConfig);
@@ -281,8 +286,8 @@ export class FileUploadConfigurationComponent
       this.idColumn == null ||
       this.statusColumn == null ||
       this.storageTypeColumn == null ||
-      this.dataIdColumn == null ||
-      this.foreignKeyNameColumn == null
+      this.foreignKeyColumn == null ||
+      this.referenceDataKeyColumn == null
     ) {
       return false;
     }
