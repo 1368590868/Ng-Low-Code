@@ -401,10 +401,6 @@ namespace DataEditorPortal.Web.Services
                     dataSourceConfig.TableSchema != model.TableSchema || dataSourceConfig.TableName != model.TableName ||
                     dataSourceConfig.QueryText != dataSourceConfig.QueryText)
                 {
-                    // data table changed, need  to clear columns, search and form configurations
-                    config.ColumnsConfig = null;
-                    config.SearchConfig = null;
-                    config.DetailConfig = null;
                     config.ConfigCompleted = false;
                 }
             }
@@ -445,7 +441,7 @@ namespace DataEditorPortal.Web.Services
                     type = "DataBaseField",
                     field = x.ColumnName,
                     header = x.ColumnName,
-                    width = 250,
+                    width = 200,
                     filterType = x.FilterType,
                     sortable = true
                 }).ToList();

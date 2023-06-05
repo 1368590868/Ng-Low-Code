@@ -1,4 +1,5 @@
-﻿using DataEditorPortal.Web.Models.UniversalGrid;
+﻿using DataEditorPortal.Data.Common;
+using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -157,27 +158,36 @@ namespace DataEditorPortal.Web.Services
             var leftJoinQuery = string.Join("", attachmentCols.Select(col =>
             {
                 var config = col.fileUploadConfig;
+                var referenceDataKey = config.GetMappedColumn("REFERENCE_DATA_KEY");
+                var foreignKey = config.GetMappedColumn("FOREIGN_KEY");
+
+                var contentTypeCol = config.GetMappedColumn("CONTENT_TYPE");
+                var contentTypeSegment = string.IsNullOrEmpty(contentTypeCol) ? "''" : $"ISNULL({EscapeColumnName(contentTypeCol)}, '')";
+                var commentsCol = config.GetMappedColumn("COMMENTS");
+                var commentsSegment = string.IsNullOrEmpty(commentsCol) ? "''" : $"ISNULL({EscapeColumnName(commentsCol)}, '')";
+                var statusSegment = $"CASE WHEN {EscapeColumnName(config.GetMappedColumn("STATUS"))} = 0 THEN '{UploadedFileStatus.Current}' ELSE '{UploadedFileStatus.Deleted}' END";
+
                 return $@"
                 LEFT JOIN (
                     SELECT 
-                        {EscapeColumnName(config.GetMappedColumn("DATA_ID"))},
+                        {EscapeColumnName(foreignKey)},
                         '[' +
                             STUFF(
                                 (SELECT 
                                     ',{{' +
                                         '""fileId"":""' + {EscapeColumnName(config.GetMappedColumn("ID"))} + '"",' +
                                         '""fileName"":""' + {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))} + '"",' +
-                                        '""contentType"":""' + {EscapeColumnName(config.GetMappedColumn("CONTENT_TYPE"))} + '"",' +
-                                        '""comments"":""' + ISNULL({EscapeColumnName(config.GetMappedColumn("COMMENTS"))}, '') + '"",' +
-                                        '""status"":""' + {EscapeColumnName(config.GetMappedColumn("STATUS"))} + '""' +
+                                        '""contentType"":""' + {contentTypeSegment} + '"",' +
+                                        '""comments"":""' + {commentsSegment} + '"",' +
+                                        '""status"":""' + {statusSegment} + '""' +
                                     '}}' 
-                                FROM {config.TableSchema}.{config.TableName} WHERE {EscapeColumnName(config.GetMappedColumn("DATA_ID"))} = A.{EscapeColumnName(config.GetMappedColumn("DATA_ID"))} FOR XML PATH (''))
+                                FROM {config.TableSchema}.{config.TableName} WHERE {EscapeColumnName(foreignKey)} = A.{EscapeColumnName(foreignKey)} FOR XML PATH (''))
                                 , 1, 1, ''
                             ) + 
                         ']' AS ATTACHMENTS
                     FROM {config.TableSchema}.{config.TableName} A
-                    GROUP BY {EscapeColumnName(config.GetMappedColumn("DATA_ID"))}
-                ) {col.field}_ATTACHMENTS ON ALL_DATA.{EscapeColumnName(config.ForeignKeyName)} = {col.field}_ATTACHMENTS.{EscapeColumnName(config.GetMappedColumn("DATA_ID"))}
+                    GROUP BY {EscapeColumnName(foreignKey)}
+                ) {col.field}_ATTACHMENTS ON ALL_DATA.{EscapeColumnName(referenceDataKey)} = {col.field}_ATTACHMENTS.{EscapeColumnName(foreignKey)}
                 ";
             }));
 

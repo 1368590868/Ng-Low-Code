@@ -658,6 +658,11 @@ namespace DataEditorPortal.Web.Services
 
                 #region prepair values and paramsters
 
+                // drop the keyvalue which not in formfield defination
+                model = model.ToList()
+                    .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
+                    .ToDictionary(x => x.Key, x => x.Value);
+
                 // add Id parameters
                 if (model.ContainsKey(dataSourceConfig.IdColumn))
                     model[dataSourceConfig.IdColumn] = id;
@@ -666,6 +671,19 @@ namespace DataEditorPortal.Web.Services
 
                 // calculate the computed field values
                 ProcessComputedValues(formLayout.FormFields, model, con);
+
+                // use value processor to convert values in model
+                var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+                var valueProcessors = new List<ValueProcessorBase>();
+                foreach (var field in formLayout.FormFields)
+                {
+                    var processor = factory.CreateValueProcessor(field.filterType);
+                    if (processor != null)
+                    {
+                        processor.PreProcess(config, field, model);
+                        valueProcessors.Add(processor);
+                    }
+                }
 
                 // generate the query text and parameter
                 var queryText = _queryBuilder.ReplaceQueryParamters(formLayout.OnValidate.Script);
@@ -718,6 +736,9 @@ namespace DataEditorPortal.Web.Services
                     .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
                     .ToDictionary(x => x.Key, x => x.Value);
 
+                // calculate the computed field values
+                ProcessComputedValues(formLayout.FormFields, model, con);
+
                 // use value processor to convert values in model
                 var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
                 var valueProcessors = new List<ValueProcessorBase>();
@@ -731,16 +752,13 @@ namespace DataEditorPortal.Web.Services
                     }
                 }
 
-                // calculate the computed field values
-                ProcessComputedValues(formLayout.FormFields, model, con);
-
                 // generate the query text and parameters
                 var queryText = _queryBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
                 {
                     IdColumn = dataSourceConfig.IdColumn,
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
-                    Columns = model.ToList().Where(kv => kv.Value != null).Select(kv => kv.Key).ToList(),
+                    Columns = model.Keys.ToList(),
                     QueryText = formLayout.QueryText
                 });
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
@@ -815,6 +833,9 @@ namespace DataEditorPortal.Web.Services
                     .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
                     .ToDictionary(x => x.Key, x => x.Value);
 
+                // calculate the computed field values
+                ProcessComputedValues(formLayout.FormFields, model, con);
+
                 // use value processor to convert values in model
                 var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
                 var valueProcessors = new List<ValueProcessorBase>();
@@ -828,16 +849,13 @@ namespace DataEditorPortal.Web.Services
                     }
                 }
 
-                // calculate the computed field values
-                ProcessComputedValues(formLayout.FormFields, model, con);
-
                 // generate the query text
                 var queryText = _queryBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
                 {
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
                     IdColumn = dataSourceConfig.IdColumn,
-                    Columns = model.ToList().Where(kv => kv.Value != null).Select(kv => kv.Key).ToList(),
+                    Columns = model.Keys.ToList(),
                     QueryText = formLayout.QueryText
                 });
 
@@ -1133,7 +1151,7 @@ namespace DataEditorPortal.Web.Services
                     {
                         x.fileUploadConfig = _attachmentService.GetDefaultConfig();
                         var datasourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-                        x.fileUploadConfig.ForeignKeyName = datasourceConfig.IdColumn;
+                        x.fileUploadConfig.FieldMapping.Add("REFERENCE_DATA_KEY", datasourceConfig.IdColumn);
                     }
                     return x;
                 });

@@ -158,6 +158,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public FileStorageType FileStorageType { get; set; }
         public string ForeignKeyName { get; set; }
+        public string BasePath { get; set; }
         public Dictionary<string, string> FieldMapping { get; set; }
 
         public string GetMappedColumn(string column)

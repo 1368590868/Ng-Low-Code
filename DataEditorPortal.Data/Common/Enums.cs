@@ -9,9 +9,9 @@
 
     public enum UploadedFileStatus
     {
-        New,
-        Current,
-        Deleted
+        Current = 0,
+        Deleted = 1,
+        New = 2,
     }
 
     public enum FileStorageType

@@ -30,12 +30,13 @@ namespace DataEditorPortal.Web.Jobs
                 {
                     var dir = new DirectoryInfo(tempFolder);
                     var files = dir.GetFiles().Where(f => f.Exists && f.CreationTimeUtc.AddDays(10) < DateTime.UtcNow);
+                    var count = files.Count();
                     foreach (var file in files)
                     {
                         file.Delete();
                     }
 
-                    _logger.LogInformation($"{files.Count()} files are deleted.");
+                    _logger.LogInformation($"{count} files are deleted.");
                 }
 
                 return Task.CompletedTask;
