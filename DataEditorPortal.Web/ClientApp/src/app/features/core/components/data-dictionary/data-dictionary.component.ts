@@ -21,6 +21,7 @@ export class DataDictionaryComponent implements OnInit {
   @ViewChild('addDialog') addDialog!: AddDictionaryDialogComponent;
   public data: DictionaryData[] = [];
 
+  loading = false;
   totalRecords = 0;
   first = 0;
   rows = 50;
@@ -70,6 +71,7 @@ export class DataDictionaryComponent implements OnInit {
   }
 
   fetchData() {
+    this.loading = true;
     const fetchDataParam = this.getFetchParam();
 
     this.dataDictionaryService
@@ -79,6 +81,7 @@ export class DataDictionaryComponent implements OnInit {
           this.data = res.result?.data ?? [];
           this.totalRecords = res.result?.total ?? 0;
         }
+        this.loading = false;
       });
   }
 

@@ -18,6 +18,7 @@ export class SystemLogComponent implements OnInit {
   @ViewChild('systemDialog') systemDialog!: SystemLogDialogComponent;
   public data: any = [];
   public totalRecords = 0;
+  public loading = false;
 
   searchModel = {};
   first = 0;
@@ -95,6 +96,7 @@ export class SystemLogComponent implements OnInit {
   }
 
   fetchData() {
+    this.loading = true;
     const fetchDataParam = this.getFetchParam();
     this.systemLogService
       .getTableData(fetchDataParam)
@@ -106,6 +108,6 @@ export class SystemLogComponent implements OnInit {
           }
         })
       )
-      .subscribe();
+      .subscribe(() => (this.loading = false));
   }
 }
