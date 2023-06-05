@@ -60,14 +60,6 @@ export class PortalEditFormComponent
       ]).subscribe(res => {
         this.isLoading = false;
 
-        if (res[0].addingForm && res[0].addingForm.formFields)
-          res[0].addingForm.formFields = res[0].addingForm?.formFields.filter(
-            c =>
-              res[1].find(
-                s => s.columnName === c.key && s.filterType === c.filterType
-              )
-          );
-
         this.addingFormConfig = this.buildFields(res[0].addingForm, res[1]);
         this.deleteFormConfig = this.buildFields(res[0].deletingForm, res[1]);
         this.updatingFormConfig = this.buildFields(
@@ -107,7 +99,9 @@ export class PortalEditFormComponent
     if (config && config.formFields) {
       config.formFields = config.formFields.filter(c =>
         dbCols.find(
-          s => s.columnName === c.key && s.filterType === c.filterType
+          s =>
+            c.type !== 'DataBaseField' ||
+            (s.columnName === c.key && s.filterType === c.filterType)
         )
       );
     }
