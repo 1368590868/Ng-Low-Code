@@ -241,7 +241,7 @@ namespace DataEditorPortal.Web.Services
             var storageType = config.FileStorageType;
 
             var fieldMapping = config.FieldMapping
-                .Where(x => x.Key != "REFERENCE_DATA_KEY" && x.Key != (storageType == FileStorageType.FileSystem ? "FILE_BYTES" : "FILE_PATH"))
+                .Where(x => x.Key != "REFERENCE_DATA_KEY" && x.Key != "MODIFIED_DATE" && x.Key != "MODIFIED_BY" && x.Key != (storageType == FileStorageType.FileSystem ? "FILE_BYTES" : "FILE_PATH"))
                 .Where(x => !string.IsNullOrEmpty(x.Value))
                 .Select(x => x.Value);
 
