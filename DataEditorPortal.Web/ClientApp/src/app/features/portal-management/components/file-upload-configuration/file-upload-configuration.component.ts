@@ -111,13 +111,13 @@ export class FileUploadConfigurationComponent
       this.statusColumn = newVal.fieldMapping.STATUS;
       this.fileNameColumn = newVal.fieldMapping.FILE_NAME;
       this.storageTypeColumn = newVal.fileStorageType;
-      this.referenceDataKeyColumn = newVal.referenceDataKeyColumn;
       this.commentsColumn = newVal.fieldMapping.COMMENTS;
       this.foreignKeyColumn = newVal.fieldMapping.FOREIGN_KEY;
       this.filePathColumn = newVal.fieldMapping.FILE_PATH;
       this.fileBytesColumn = newVal.fieldMapping.FILE_BYTES;
       this.basePathColumn = newVal.basePath;
 
+      this.referenceDataKeyColumn = newVal.fieldMapping?.REFERENCE_DATA_KEY;
       this.createdDateColumn = newVal.fieldMapping?.CREATED_DATE;
       this.createdByColumn = newVal.fieldMapping?.CREATED_BY;
       this.modifiedDateColumn = newVal.fieldMapping?.MODIFIED_DATE;
