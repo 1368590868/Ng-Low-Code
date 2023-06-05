@@ -1,4 +1,5 @@
-﻿using DataEditorPortal.Web.Models.UniversalGrid;
+﻿using DataEditorPortal.Data.Common;
+using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -164,6 +165,7 @@ namespace DataEditorPortal.Web.Services
                 var contentTypeSegment = string.IsNullOrEmpty(contentTypeCol) ? "''" : $"ISNULL({EscapeColumnName(contentTypeCol)}, '')";
                 var commentsCol = config.GetMappedColumn("COMMENTS");
                 var commentsSegment = string.IsNullOrEmpty(commentsCol) ? "''" : $"ISNULL({EscapeColumnName(commentsCol)}, '')";
+                var statusSegment = $"CASE WHEN {EscapeColumnName(config.GetMappedColumn("STATUS"))} = 0 THEN '{UploadedFileStatus.Current}' ELSE '{UploadedFileStatus.Deleted}' END";
 
                 return $@"
                 LEFT JOIN (
@@ -177,7 +179,7 @@ namespace DataEditorPortal.Web.Services
                                         '""fileName"":""' + {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))} + '"",' +
                                         '""contentType"":""' + {contentTypeSegment} + '"",' +
                                         '""comments"":""' + {commentsSegment} + '"",' +
-                                        '""status"":""' + {EscapeColumnName(config.GetMappedColumn("STATUS"))} + '""' +
+                                        '""status"":""' + {statusSegment} + '""' +
                                     '}}' 
                                 FROM {config.TableSchema}.{config.TableName} WHERE {EscapeColumnName(foreignKey)} = A.{EscapeColumnName(foreignKey)} FOR XML PATH (''))
                                 , 1, 1, ''

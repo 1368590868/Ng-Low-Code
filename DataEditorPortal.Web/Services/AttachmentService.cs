@@ -129,7 +129,7 @@ namespace DataEditorPortal.Web.Services
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("CREATED_BY")))
                         value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("CREATED_BY"), CurrentUsername));
 
-                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("STATUS"), UploadedFileStatus.Current));
+                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("STATUS"), GetStatusMapValue(UploadedFileStatus.Current)));
 
                     insertParameters.Add(_queryBuilder.GenerateDynamicParameter(value));
                 }
@@ -137,7 +137,7 @@ namespace DataEditorPortal.Web.Services
                 {
                     var value = new List<KeyValuePair<string, object>>();
                     value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("ID"), uploadedFile.FileId));
-                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("STATUS"), uploadedFile.Status));
+                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("STATUS"), GetStatusMapValue(uploadedFile.Status)));
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("MODIFIED_DATE")))
                         value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("MODIFIED_DATE"), DateTime.UtcNow));
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("MODIFIED_BY")))
@@ -311,6 +311,12 @@ namespace DataEditorPortal.Web.Services
             }
 
             return filePath;
+        }
+
+        // customize according to database
+        private bool GetStatusMapValue(UploadedFileStatus status)
+        {
+            return status == UploadedFileStatus.Deleted;
         }
     }
 }

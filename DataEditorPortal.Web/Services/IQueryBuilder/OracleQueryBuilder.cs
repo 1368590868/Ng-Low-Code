@@ -1,4 +1,5 @@
-﻿using DataEditorPortal.Web.Models.UniversalGrid;
+﻿using DataEditorPortal.Data.Common;
+using DataEditorPortal.Web.Models.UniversalGrid;
 using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
@@ -239,6 +240,7 @@ namespace DataEditorPortal.Web.Services
                 var contentTypeSegment = string.IsNullOrEmpty(contentTypeCol) ? "''" : EscapeColumnName(contentTypeCol);
                 var commentsCol = config.GetMappedColumn("COMMENTS");
                 var commentsSegment = string.IsNullOrEmpty(commentsCol) ? "''" : EscapeColumnName(commentsCol);
+                var statusSegment = $"CASE WHEN {EscapeColumnName(config.GetMappedColumn("STATUS"))} = 0 THEN '{UploadedFileStatus.Current}' ELSE '{UploadedFileStatus.Deleted}' END";
 
                 return $@"
                 LEFT JOIN (
@@ -252,7 +254,7 @@ namespace DataEditorPortal.Web.Services
                                         '""fileName"":""' || {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))} || '"",' || 
                                         '""contentType"":""' || {contentTypeSegment} || '"",' || 
                                         '""comments"":""' || {commentsSegment} || '"",' || 
-                                        '""status"":""' || {EscapeColumnName(config.GetMappedColumn("STATUS"))} || '""' ||
+                                        '""status"":""' || {statusSegment} || '""' ||
                                     '}}'
                                     , ','
                                 ) WITHIN GROUP (ORDER BY { EscapeColumnName(config.GetMappedColumn("FILE_NAME"))})
