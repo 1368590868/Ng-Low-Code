@@ -92,6 +92,11 @@ export class FileUploadConfigurationComponent
   filePathColumn: null | string = null;
   fileBytesColumn: null | string = null;
 
+  createdDateColumn: null | string = null;
+  createdByColumn: null | string = null;
+  modifiedDateColumn: null | string = null;
+  modifiedByColumn: null | string = null;
+
   @Input()
   set value(val: any) {
     if (!val) {
@@ -113,6 +118,11 @@ export class FileUploadConfigurationComponent
       this.dataIdColumn = newVal.fieldMapping.DATA_ID;
       this.filePathColumn = newVal.fieldMapping.FILE_PATH;
       this.fileBytesColumn = newVal.fieldMapping.FILE_BYTES;
+
+      this.createdDateColumn = newVal.fieldMapping?.CREATED_DATE;
+      this.createdByColumn = newVal.fieldMapping?.CREATED_BY;
+      this.modifiedDateColumn = newVal.fieldMapping?.MODIFIED_DATE;
+      this.modifiedByColumn = newVal.fieldMapping?.MODIFIED_BY;
 
       this.formControlConnection.setValue(newVal.dataSourceConnectionId);
       this.formControlDbTable.setValue(
@@ -247,7 +257,11 @@ export class FileUploadConfigurationComponent
         COMMENTS: this.commentsColumn,
         DATA_ID: this.dataIdColumn,
         FILE_PATH: this.filePathColumn,
-        FILE_BYTES: this.fileBytesColumn
+        FILE_BYTES: this.fileBytesColumn,
+        CREATED_DATE: this.createdDateColumn,
+        CREATED_BY: this.createdByColumn,
+        MODIFIED_DATE: this.modifiedDateColumn,
+        MODIFIED_BY: this.modifiedByColumn
       };
       this.innerValue = this.dsConfig;
       this.onChange?.(this.dsConfig);
