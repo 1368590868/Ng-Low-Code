@@ -361,8 +361,8 @@ export class FormDesignerDirective {
               key: 'mappingColumns',
               type: 'locationConfig',
               props: {
-                label: 'Location Configuration',
-                description: 'Set location configuration',
+                label: 'Fields Mapping',
+                description: 'Set location fields mapping',
                 locationType: 2
               },
               expressions: {
