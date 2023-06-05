@@ -1151,7 +1151,7 @@ namespace DataEditorPortal.Web.Services
                     {
                         x.fileUploadConfig = _attachmentService.GetDefaultConfig();
                         var datasourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-                        x.fileUploadConfig.ForeignKeyName = datasourceConfig.IdColumn;
+                        x.fileUploadConfig.FieldMapping.Add("REFERENCE_DATA_KEY", datasourceConfig.IdColumn);
                     }
                     return x;
                 });
