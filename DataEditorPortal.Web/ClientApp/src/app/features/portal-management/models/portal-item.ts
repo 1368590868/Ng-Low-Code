@@ -10,7 +10,6 @@ export interface PortalItemData {
 
 export interface DataSourceConnection {
   name: string;
-  id?: string;
   connectionString: string;
 }
 
@@ -32,7 +31,7 @@ export interface DataSourceTableColumn {
 }
 
 export interface DataSourceConfig {
-  dataSourceConnectionId: string;
+  dataSourceConnectionName: string;
   tableName?: string;
   tableSchema?: string;
   idColumn: string;

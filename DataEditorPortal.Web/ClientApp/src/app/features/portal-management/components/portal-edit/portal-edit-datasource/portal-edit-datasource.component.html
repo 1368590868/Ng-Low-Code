@@ -44,7 +44,7 @@
             [style]="{ minWidth: '20rem' }"
             appendTo="body"></p-dropdown>
           <p-button
-            [disabled]="!datasourceConfig.dataSourceConnectionId"
+            [disabled]="!datasourceConfig.dataSourceConnectionName"
             class="ml-1"
             pTooltip="Create new Query"
             styleClass="p-button-text p-button-rounded"
@@ -73,7 +73,7 @@
       </ng-container>
       <app-advanced-query-dialog
         #advancedQueryDialog
-        [connectionId]="datasourceConfig.dataSourceConnectionId"
+        [connectionName]="datasourceConfig.dataSourceConnectionName"
         [queryText]="datasourceConfig.queryText"
         (queryChange)="queryChange($event)"></app-advanced-query-dialog>
     </div>

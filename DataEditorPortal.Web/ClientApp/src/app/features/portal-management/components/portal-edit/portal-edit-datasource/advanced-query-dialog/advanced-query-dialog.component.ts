@@ -15,7 +15,7 @@ export interface AdvancedQueryModel {
   styleUrls: ['./advanced-query-dialog.component.scss']
 })
 export class AdvancedQueryDialogComponent {
-  @Input() connectionId = '';
+  @Input() connectionName = '';
   @Input() queryText?: string;
   @Output() queryChange = new EventEmitter<AdvancedQueryModel>();
 
@@ -66,7 +66,7 @@ export class AdvancedQueryDialogComponent {
         this.loading = true;
         this.portalItemService
           .getDataSourceTableColumnsByQuery(
-            this.connectionId,
+            this.connectionName,
             this.formControlQuery.value
           )
           .subscribe(res => {

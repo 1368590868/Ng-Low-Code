@@ -132,7 +132,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
       const connections: DataSourceConnection[] = res;
       if (connections.length === 0) return;
       this.dbConnections = connections.map(x => {
-        return { label: x.name, value: x.id || '' };
+        return { label: x.name, value: x.name || '' };
       });
       if (this.optionsLookup) {
         this.lookupService.getOptionQuery(this.optionsLookup).subscribe(res => {
@@ -140,14 +140,14 @@ export class OptionDialogComponent implements ControlValueAccessor {
           this.formControlQuery.setValue(res?.queryText);
 
           // check if current selected connections exists, if not exist, use the first
-          if (!connections.find(x => x.id === res?.connectionId)) {
-            this.formControlConnection.setValue(connections[0].id);
+          if (!connections.find(x => x.name === res?.connectionName)) {
+            this.formControlConnection.setValue(connections[0].name);
           } else {
-            this.formControlConnection.setValue(res?.connectionId);
+            this.formControlConnection.setValue(res?.connectionName);
           }
         });
       } else {
-        this.formControlConnection.setValue(connections[0].id);
+        this.formControlConnection.setValue(connections[0].name);
       }
     });
   }
@@ -215,7 +215,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
             this.formControlQuery.value === this.helperMessage
               ? ''
               : this.formControlQuery.value,
-          connectionId: this.formControlConnection.value
+          connectionName: this.formControlConnection.value
         };
         this.lookupService.saveOptionQuery(data).subscribe(res => {
           this.isLoading = false;

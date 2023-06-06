@@ -56,7 +56,7 @@ export class FileUploadConfigurationComponent
   dsConfig: {
     queryText?: string;
     idColumn?: string;
-    dataSourceConnectionId: string;
+    dataSourceConnectionName: string;
     tableName: string;
     tableSchema: string;
     fileStorageType: string;
@@ -66,7 +66,7 @@ export class FileUploadConfigurationComponent
     };
   } = {
     idColumn: undefined,
-    dataSourceConnectionId: '',
+    dataSourceConnectionName: '',
     tableName: '',
     tableSchema: '',
     fileStorageType: '',
@@ -123,7 +123,7 @@ export class FileUploadConfigurationComponent
       this.modifiedDateColumn = newVal.fieldMapping?.MODIFIED_DATE;
       this.modifiedByColumn = newVal.fieldMapping?.MODIFIED_BY;
 
-      this.formControlConnection.setValue(newVal.dataSourceConnectionId);
+      this.formControlConnection.setValue(newVal.dataSourceConnectionName);
       this.formControlDbTable.setValue(
         `${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`
       );
@@ -159,7 +159,7 @@ export class FileUploadConfigurationComponent
       }
     });
     this.formControlConnection.valueChanges.subscribe(value => {
-      this.dsConfig.dataSourceConnectionId = value;
+      this.dsConfig.dataSourceConnectionName = value;
     });
     // get protal item datasource config
     if (this.portalItemService.itemId) {
@@ -172,17 +172,19 @@ export class FileUploadConfigurationComponent
         const connections: DataSourceConnection[] = res[1];
         if (connections.length === 0) return;
         this.dbConnections = connections.map(x => {
-          return { label: x.name, value: x.id || '' };
+          return { label: x.name, value: x.name || '' };
         });
 
         // check if current selected connections exists, if not exist, use the first
         if (
-          !connections.find(x => x.id === this.dsConfig.dataSourceConnectionId)
+          !connections.find(
+            x => x.name === this.dsConfig.dataSourceConnectionName
+          )
         ) {
-          this.formControlConnection.setValue(connections[0].id);
+          this.formControlConnection.setValue(connections[0].name);
         } else {
           this.formControlConnection.setValue(
-            this.dsConfig.dataSourceConnectionId
+            this.dsConfig.dataSourceConnectionName
           );
         }
 
@@ -280,7 +282,7 @@ export class FileUploadConfigurationComponent
 
   valid() {
     if (
-      this.dsConfig.dataSourceConnectionId == null ||
+      this.dsConfig.dataSourceConnectionName == null ||
       this.idColumn == null ||
       this.statusColumn == null ||
       this.storageTypeColumn == null ||
