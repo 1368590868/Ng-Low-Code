@@ -275,7 +275,7 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
-            return result;
+            return result.OrderBy(t => t.TableSchema).ThenBy(t => t.TableName).ToList();
         }
 
         public List<DataSourceTableColumn> GetDataSourceTableColumns(string name, string sqlText)
