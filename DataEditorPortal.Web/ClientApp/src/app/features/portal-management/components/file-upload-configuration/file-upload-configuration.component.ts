@@ -241,6 +241,7 @@ export class FileUploadConfigurationComponent
     this.dropdownList.forEach(x => {
       x.control.markAsDirty();
     });
+    this.formControlDbTable.markAsDirty();
     if (this.valid()) {
       if (this.storageTypeColumn === 'SqlBinary') {
         if (this.fileBytesColumn == null) {
@@ -274,7 +275,7 @@ export class FileUploadConfigurationComponent
     if (!this.innerValue) {
       this.onReset();
     }
-
+    this.formControlDbTable.markAsPristine();
     this.dropdownList.forEach(x => {
       x.control.markAsPristine();
     });
@@ -321,10 +322,8 @@ export class FileUploadConfigurationComponent
 
         const selectedDbTable = `${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`;
 
-        // check if current selected dbTable exists, if not exist, use the first
-        if (!tables.find(x => x.value === selectedDbTable)) {
-          this.formControlDbTable.setValue(tables[0].value);
-        } else {
+        // check if current selected dbTable exists, if not exist
+        if (tables.find(x => x.value === selectedDbTable)) {
           this.formControlDbTable.setValue(selectedDbTable);
         }
 

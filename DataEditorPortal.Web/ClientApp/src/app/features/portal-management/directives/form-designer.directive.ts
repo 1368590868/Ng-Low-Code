@@ -350,11 +350,15 @@ export class FormDesignerDirective {
                 label: 'Location Type',
                 description: 'Select location type',
                 placeholder: 'Select location type',
+                required: true,
                 options: [
                   { label: 'Point Location', value: 2 },
                   { label: 'Linear Location', value: 3 },
                   { label: 'Linear Multiple', value: 4 }
-                ]
+                ],
+                change: (field: any) => {
+                  field.parent.get('mappingColumns').formControl.setValue(null);
+                }
               }
             },
             {

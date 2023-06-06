@@ -229,6 +229,7 @@ export class PortalEditLinkComponent
   }
 
   onSaveAndNext() {
+    if (!this.validate()) return;
     this.isSavingAndNext = true;
 
     if (this.valid()) {
@@ -237,6 +238,7 @@ export class PortalEditLinkComponent
   }
 
   onSaveAndExit() {
+    if (!this.validate()) return;
     this.isSavingAndExit = true;
     this.onSave();
   }
@@ -323,9 +325,7 @@ export class PortalEditLinkComponent
         if (!this.dsConfig.queryText) {
           const selectedDbTable = `${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`;
           // check if current selected dbTable exists, if not exist, use the first
-          if (!tables.find(x => x.value === selectedDbTable)) {
-            this.formControlDbTable.setValue(tables[0].value);
-          } else {
+          if (tables.find(x => x.value === selectedDbTable)) {
             this.formControlDbTable.setValue(selectedDbTable);
           }
         }
@@ -360,6 +360,28 @@ export class PortalEditLinkComponent
     }
   }
 
+  validate() {
+    if (!this.formControlConnection.valid) {
+      this.formControlConnection.markAsDirty();
+      this.formControlConnection.updateValueAndValidity();
+    }
+
+    if (!this.formControlDbTable.valid) {
+      this.formControlDbTable.markAsDirty();
+      this.formControlDbTable.updateValueAndValidity();
+    }
+
+    if (!this.formControlIdColumn.valid) {
+      this.formControlIdColumn.markAsDirty();
+      this.formControlIdColumn.updateValueAndValidity();
+    }
+    return (
+      this.formControlConnection.valid &&
+      this.formControlDbTable.valid &&
+      this.formControlIdColumn.valid
+    );
+  }
+
   getDbTableColumns() {
     if (this.dsConfig.queryText) {
       this.portalItemService
@@ -389,7 +411,7 @@ export class PortalEditLinkComponent
   }
   removeAdvancedQuery() {
     this.dsConfig.queryText = undefined;
-    this.formControlDbTable.setValue(this.dbTables[0].value);
+    this.formControlDbTable.setValue(null);
 
     this.getDbTableColumns();
   }
