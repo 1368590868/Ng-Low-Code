@@ -3,7 +3,7 @@
     public static class Constants
     {
         public static readonly string DEFAULT_CONNECTION_NAME = "Default";
-        public static string DEFAULT_SCHEMA = null; // will be set at startup
+        public static string DEFAULT_SCHEMA = "DATA_EDITOR_PORTAL"; // will be set at startup
         public static readonly string LINK_DATA_FIELD_NAME = "LINK_DATA_FIELD";
     }
 
