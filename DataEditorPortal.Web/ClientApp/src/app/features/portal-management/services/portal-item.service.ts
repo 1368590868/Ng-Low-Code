@@ -163,7 +163,7 @@ export class PortalItemService {
   }
 
   getCodeName(name: string): Observable<ApiResponse<string>> {
-    let params = new HttpParams().set('name', name);
+    const params = new HttpParams().set('name', name);
     return this.http.get<ApiResponse<string>>(
       `${this._apiUrl}portal-item/get-code-name`,
       {
@@ -243,22 +243,22 @@ export class PortalItemService {
     );
   }
 
-  getDataSourceTables(connectionId: string): Observable<DataSourceTable[]> {
+  getDataSourceTables(connectionName: string): Observable<DataSourceTable[]> {
     return this.http
       .get<ApiResponse<DataSourceTable[]>>(
-        `${this._apiUrl}portal-item/datasource/${connectionId}/tables`
+        `${this._apiUrl}portal-item/datasource/${connectionName}/tables`
       )
       .pipe(map(x => x.result || []));
   }
 
   getDataSourceTableColumns(
-    connectionId: string,
+    connectionName: string,
     tableSchema: string,
     tableName: string
   ): Observable<DataSourceTableColumn[]> {
     return this.http
       .get<ApiResponse<DataSourceTableColumn[]>>(
-        `${this._apiUrl}portal-item/datasource/${connectionId}/table-columns`,
+        `${this._apiUrl}portal-item/datasource/${connectionName}/table-columns`,
         {
           params: {
             tableSchema,
@@ -270,11 +270,11 @@ export class PortalItemService {
   }
 
   getDataSourceTableColumnsByQuery(
-    connectionId: string,
+    connectionName: string,
     queryText: string
   ): Observable<ApiResponse<DataSourceTableColumn[]>> {
     return this.http.post<ApiResponse<DataSourceTableColumn[]>>(
-      `${this._apiUrl}portal-item/datasource/${connectionId}/query-columns`,
+      `${this._apiUrl}portal-item/datasource/${connectionName}/query-columns`,
       { queryText }
     );
   }
@@ -299,7 +299,7 @@ export class PortalItemService {
         map(
           x =>
             x.result || {
-              dataSourceConnectionId: '',
+              dataSourceConnectionName: '',
               pageSize: 100,
               idColumn: ''
             }

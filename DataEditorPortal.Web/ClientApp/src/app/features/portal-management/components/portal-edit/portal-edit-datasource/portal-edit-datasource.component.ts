@@ -40,7 +40,7 @@ export class PortalEditDatasourceComponent
 
   orginalConfig?: DataSourceConfig;
   datasourceConfig: DataSourceConfig = {
-    dataSourceConnectionId: '',
+    dataSourceConnectionName: '',
     tableName: '',
     tableSchema: '',
     idColumn: '',
@@ -99,7 +99,7 @@ export class PortalEditDatasourceComponent
       value => (this.datasourceConfig.idColumn = value)
     );
     this.formControlConnection.valueChanges.subscribe(
-      value => (this.datasourceConfig.dataSourceConnectionId = value)
+      value => (this.datasourceConfig.dataSourceConnectionName = value)
     );
     if (this.dbConnectionDisabled) this.formControlConnection.disable();
 
@@ -114,7 +114,7 @@ export class PortalEditDatasourceComponent
         const connections: DataSourceConnection[] = res[1];
         if (connections.length === 0) return;
         this.dbConnections = connections.map(x => {
-          return { label: x.name, value: x.id || '' };
+          return { label: x.name, value: x.name || '' };
         });
 
         const dsConfig = res[0];
@@ -122,10 +122,14 @@ export class PortalEditDatasourceComponent
         this.orginalConfig = { ...dsConfig };
 
         // check if current selected connections exists, if not exist, use the first
-        if (!connections.find(x => x.id === dsConfig.dataSourceConnectionId)) {
-          this.formControlConnection.setValue(connections[0].id);
+        if (
+          !connections.find(x => x.name === dsConfig.dataSourceConnectionName)
+        ) {
+          this.formControlConnection.setValue(connections[0].name);
         } else {
-          this.formControlConnection.setValue(dsConfig.dataSourceConnectionId);
+          this.formControlConnection.setValue(
+            dsConfig.dataSourceConnectionName
+          );
         }
 
         // set filters
@@ -309,7 +313,8 @@ export class PortalEditDatasourceComponent
       this.isSaving = true;
       if (this.portalItemService.itemId) {
         const data: DataSourceConfig = {
-          dataSourceConnectionId: this.datasourceConfig.dataSourceConnectionId,
+          dataSourceConnectionName:
+            this.datasourceConfig.dataSourceConnectionName,
           pageSize: this.pageSize,
           idColumn: this.datasourceConfig.idColumn,
           filters: this.filters.map<DataSourceFilter>(x => {
@@ -369,8 +374,8 @@ export class PortalEditDatasourceComponent
     return (
       this.orginalConfig &&
       (this.orginalConfig.queryText || this.orginalConfig.tableName) &&
-      (this.datasourceConfig.dataSourceConnectionId !=
-        this.orginalConfig.dataSourceConnectionId ||
+      (this.datasourceConfig.dataSourceConnectionName !=
+        this.orginalConfig.dataSourceConnectionName ||
         this.datasourceConfig.queryText != this.orginalConfig.queryText ||
         this.datasourceConfig.tableName != this.orginalConfig.tableName ||
         this.datasourceConfig.tableSchema != this.orginalConfig.tableSchema)

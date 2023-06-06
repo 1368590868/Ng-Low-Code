@@ -43,7 +43,7 @@
             [style]="{ minWidth: '20rem' }"
             appendTo="body"></p-dropdown>
           <p-button
-            [disabled]="!dsConfig.dataSourceConnectionId"
+            [disabled]="!dsConfig.dataSourceConnectionName"
             class="ml-1"
             pTooltip="Create new Query"
             styleClass="p-button-text p-button-rounded"
@@ -72,7 +72,7 @@
       </ng-container>
       <app-advanced-query-dialog
         #advancedQueryDialog
-        [connectionId]="dsConfig.dataSourceConnectionId"
+        [connectionName]="dsConfig.dataSourceConnectionName"
         [queryText]="dsConfig.queryText"
         (queryChange)="queryChange($event)"></app-advanced-query-dialog>
     </div>
@@ -122,7 +122,7 @@
   <!-- Table  -->
   <div
     *ngIf="
-      dsConfig?.dataSourceConnectionId !== null && dsConfig?.idColumn !== null
+      dsConfig?.dataSourceConnectionName !== null && dsConfig?.idColumn !== null
     ">
     <p-divider styleClass="w-6 mt-4">Primary Table</p-divider>
     <div class="w-6 mb-2">

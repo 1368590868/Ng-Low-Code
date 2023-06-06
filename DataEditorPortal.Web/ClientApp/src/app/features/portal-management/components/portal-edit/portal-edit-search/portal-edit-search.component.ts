@@ -99,20 +99,12 @@ export class PortalEditSearchComponent
           : this.portalItemService.getDataSourceTableColumnsByPortalId()
       ]).subscribe(res => {
         this.isLoading = false;
-        this.targetColumns = res[0]
-          .filter(c =>
-            res[1].find(
-              s =>
-                c.type !== 'DataBaseField' ||
-                (s.columnName === c.key && s.filterType === c.filterType)
-            )
-          )
-          .map<GridSearchField>(x => {
-            return {
-              ...x,
-              selected: true
-            };
-          });
+        this.targetColumns = res[0].map<GridSearchField>(x => {
+          return {
+            ...x,
+            selected: true
+          };
+        });
         this.sourceColumns = res[1]
           .filter(s => !this.targetColumns.find(t => t.key === s.columnName))
           .map<GridSearchField>(x => {

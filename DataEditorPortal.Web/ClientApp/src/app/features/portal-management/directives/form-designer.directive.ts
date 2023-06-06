@@ -165,7 +165,7 @@ export class FormDesignerDirective {
         }
       ],
       expressions: {
-        hide: `formState.hideComputedValue || 'fileUpload' === field.parent.model.type`
+        hide: `formState.hideComputedValue === field.parent.model.type || 'fileUpload' === field.parent.model.type || 'locationEditor'=== field.parent.model.type `
       }
     },
     {
@@ -361,8 +361,8 @@ export class FormDesignerDirective {
               key: 'mappingColumns',
               type: 'locationConfig',
               props: {
-                label: 'Location Configuration',
-                description: 'Set location configuration',
+                label: 'Fields Mapping',
+                description: 'Set location fields mapping',
                 locationType: 2
               },
               expressions: {
@@ -411,7 +411,7 @@ export class FormDesignerDirective {
         }
       ],
       expressions: {
-        hide: `formState.hideValidation || 'fileUpload' === field.parent.model.type`
+        hide: `formState.hideValidation === field.parent.model.type || 'fileUpload' === field.parent.model.type || 'locationEditor' === field.parent.model.type `
       }
     }
   ];
