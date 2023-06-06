@@ -64,7 +64,6 @@ export class LocationConfigurationComponent {
 
     const newVal = JSON.parse(JSON.stringify(val || null));
     if (newVal) {
-      console.log(val?.fromVs);
       this.formControlFromVs.setValue(val?.fromVs);
       this.formControlFromMeasure.setValue(val?.fromMeasure);
       this.formControlToVs.setValue(val?.toVs);
@@ -116,6 +115,14 @@ export class LocationConfigurationComponent {
       toVs: this.formControlToVs.value,
       toMeasure: this.formControlToMeasure.value
     };
+
+    switch (this.locationType) {
+      case 2: {
+        data.toVs = null;
+        data.toMeasure = null;
+        break;
+      }
+    }
 
     this.onChange?.(data);
     this.innerValue = data;
