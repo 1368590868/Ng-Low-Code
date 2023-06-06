@@ -35,12 +35,15 @@
         <div class="flex align-items-center">
           <p-dropdown
             *ngIf="!dsConfig.queryText"
+            [virtualScroll]="true"
+            [virtualScrollItemSize]="20"
+            [filter]="true"
             [required]="true"
             [options]="dbTables"
             (onChange)="onTableNameChange($event)"
             [formControl]="formControlDbTable"
             placeholder="Please Select"
-            [style]="{ minWidth: '20rem' }"
+            [style]="{ minWidth: '41.5rem' }"
             appendTo="body"></p-dropdown>
           <p-button
             [disabled]="!dsConfig.dataSourceConnectionName"
@@ -57,7 +60,7 @@
           <div (click)="advancedQueryDialog.showAdvanceDialog()">
             <ngx-monaco-editor
               [ngModel]="dsConfig.queryText"
-              [style]="{ minWidth: '40rem' }"
+              [style]="{ minWidth: '41.5rem' }"
               class="pt-3 border-round monaco-editor-wrapper display-only overflow-hidden"
               [options]="{
                 readOnly: true,
@@ -120,10 +123,7 @@
   </div>
 
   <!-- Table  -->
-  <div
-    *ngIf="
-      dsConfig?.dataSourceConnectionName !== null && dsConfig?.idColumn !== null
-    ">
+  <div *ngIf="dsConfig?.dataSourceConnectionName !== null">
     <p-divider styleClass="w-6 mt-4">Primary Table</p-divider>
     <div class="w-6 mb-2">
       <ng-container

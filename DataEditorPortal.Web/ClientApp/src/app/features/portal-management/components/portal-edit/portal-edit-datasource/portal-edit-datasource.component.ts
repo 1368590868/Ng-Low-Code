@@ -172,7 +172,7 @@ export class PortalEditDatasourceComponent
 
   removeAdvancedQuery() {
     this.datasourceConfig.queryText = undefined;
-    this.formControlDbTable.setValue(this.dbTables[0].value);
+    this.formControlDbTable.setValue(null);
     // db query removed and db table changed, need to clear configurations base on previous db query.
     this.filters = [];
     this.sortBy = [];
@@ -228,10 +228,8 @@ export class PortalEditDatasourceComponent
 
         if (!this.datasourceConfig.queryText) {
           const selectedDbTable = `${this.datasourceConfig.tableSchema}.${this.datasourceConfig.tableName}`;
-          // check if current selected dbTable exists, if not exist, use the first
-          if (!tables.find(x => x.value === selectedDbTable)) {
-            this.formControlDbTable.setValue(tables[0].value);
-          } else {
+          // check if current selected dbTable exists
+          if (tables.find(x => x.value === selectedDbTable)) {
             this.formControlDbTable.setValue(selectedDbTable);
           }
         }
