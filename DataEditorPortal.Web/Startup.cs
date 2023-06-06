@@ -45,6 +45,9 @@ namespace DataEditorPortal.Web
             services.AddTransient<DepDbContextOracle>();
             services.AddScoped(sp =>
             {
+                // set default schema from configuration file. This will be used in all Migrations and SeedDataCreator
+                Data.Common.Constants.DEFAULT_SCHEMA = Configuration.GetValue<string>("Default_Schema");
+
                 var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
                 if (databaseProvider == "SqlConnection")
                     return new DbContextOptionsBuilder<DepDbContext>()

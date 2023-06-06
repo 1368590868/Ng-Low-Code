@@ -8,12 +8,12 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.DropColumn(
                 name: "STORAGE_TYPE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE");
 
             migrationBuilder.AlterColumn<string>(
                 name: "STATUS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE",
                 type: "nvarchar(max)",
                 nullable: true,
@@ -22,7 +22,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
             migrationBuilder.AddColumn<string>(
                 name: "DATA_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE",
                 type: "nvarchar(max)",
                 nullable: true);
@@ -32,12 +32,12 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.DropColumn(
                 name: "DATA_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE");
 
             migrationBuilder.AlterColumn<int>(
                 name: "STATUS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE",
                 type: "int",
                 nullable: false,
@@ -48,7 +48,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
             migrationBuilder.AddColumn<int>(
                 name: "STORAGE_TYPE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE",
                 type: "int",
                 nullable: false,

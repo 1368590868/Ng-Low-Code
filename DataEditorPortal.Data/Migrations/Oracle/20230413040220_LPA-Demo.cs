@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 
 namespace DataEditorPortal.Data.Migrations.Oracle
 {
@@ -9,7 +9,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.CreateTable(
                 name: "GFORM_SITE_HIERARCHY_MV",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     HIERARCHY_GLOBALID = table.Column<string>(type: "NVARCHAR2(450)", nullable: false),
@@ -27,7 +27,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "LPAREMEDIATIONACTSITE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     OBJECTID = table.Column<int>(type: "NUMBER(10)", nullable: false)
@@ -55,7 +55,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "LPASITE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     OBJECTID = table.Column<int>(type: "NUMBER(10)", nullable: false)
@@ -87,7 +87,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "LPASITE_RELATION",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     OBJECTID = table.Column<int>(type: "NUMBER(10)", nullable: false)
@@ -105,19 +105,19 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.DropTable(
                 name: "GFORM_SITE_HIERARCHY_MV",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "LPAREMEDIATIONACTSITE",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "LPASITE",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "LPASITE_RELATION",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
         }
     }
 }

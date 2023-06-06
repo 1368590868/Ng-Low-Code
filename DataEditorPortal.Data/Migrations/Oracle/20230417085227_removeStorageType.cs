@@ -8,12 +8,12 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.DropColumn(
                 name: "STORAGE_TYPE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE");
 
             migrationBuilder.AlterColumn<string>(
                 name: "STATUS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE",
                 type: "NVARCHAR2(2000)",
                 nullable: true,
@@ -25,7 +25,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.AlterColumn<int>(
                 name: "STATUS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE",
                 type: "NUMBER(10)",
                 nullable: false,
@@ -36,7 +36,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.AddColumn<int>(
                 name: "STORAGE_TYPE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE",
                 type: "NUMBER(10)",
                 nullable: false,

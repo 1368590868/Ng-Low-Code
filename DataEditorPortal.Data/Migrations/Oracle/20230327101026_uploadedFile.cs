@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataEditorPortal.Data.Migrations.Oracle
 {
@@ -9,7 +8,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.CreateTable(
                 name: "UPLOADED_FILE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<string>(type: "NVARCHAR2(450)", nullable: false),
@@ -31,7 +30,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.DropTable(
                 name: "UPLOADED_FILE",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
         }
     }
 }

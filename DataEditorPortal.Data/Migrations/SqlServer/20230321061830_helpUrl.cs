@@ -8,7 +8,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.AddColumn<string>(
                 name: "HELP_URL",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "SITE_MENUS",
                 type: "nvarchar(max)",
                 nullable: true);
@@ -18,7 +18,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.DropColumn(
                 name: "HELP_URL",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "SITE_MENUS");
         }
     }

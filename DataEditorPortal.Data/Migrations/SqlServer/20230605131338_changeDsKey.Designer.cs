@@ -17,7 +17,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("DATA_EDITOR_PORTAL")
+                .HasDefaultSchema(Data.Common.Constants.DEFAULT_SCHEMA)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);

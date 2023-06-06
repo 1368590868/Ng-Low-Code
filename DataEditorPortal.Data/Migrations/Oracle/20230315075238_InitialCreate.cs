@@ -8,11 +8,11 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "DATA_EDITOR_PORTAL");
+                name: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.CreateTable(
                 name: "DATA_DICTIONARIES",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -29,7 +29,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "DATA_SOURCE_CONNECTIONS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -43,7 +43,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "DEMO_TABLE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false, defaultValueSql: "sys_guid()"),
@@ -64,7 +64,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "EVENT_LOGS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -84,7 +84,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "SITE_MENUS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -104,7 +104,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     table.ForeignKey(
                         name: "FK_SITE_MENUS_SITE_MENUS_PARE~",
                         column: x => x.PARENT_ID,
-                        principalSchema: "DATA_EDITOR_PORTAL",
+                        principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                         principalTable: "SITE_MENUS",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
@@ -112,7 +112,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "SITE_PERMISSIONS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -127,7 +127,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "SITE_ROLES",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -141,7 +141,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "SITE_SETTINGS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -157,7 +157,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "USERS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false, defaultValueSql: "sys_guid()"),
@@ -180,7 +180,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "LOOKUPS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -194,7 +194,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     table.ForeignKey(
                         name: "FK_LOOKUPS_DATA_SOURCE_CONNEC~",
                         column: x => x.DATA_SOURCE_CONNECTION_ID,
-                        principalSchema: "DATA_EDITOR_PORTAL",
+                        principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                         principalTable: "DATA_SOURCE_CONNECTIONS",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
@@ -202,7 +202,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "UNIVERSAL_GRID_CONFIGURATIONS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -224,7 +224,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     table.ForeignKey(
                         name: "FK_UNIVERSAL_GRID_CONFIGURATI~",
                         column: x => x.DATA_SOURCE_CONNECTION_ID,
-                        principalSchema: "DATA_EDITOR_PORTAL",
+                        principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                         principalTable: "DATA_SOURCE_CONNECTIONS",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
@@ -232,7 +232,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "SITE_ROLE_PERMISSIONS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -247,14 +247,14 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     table.ForeignKey(
                         name: "FK_SITE_ROLE_PERMISSIONS_SIT~1",
                         column: x => x.SITE_ROLE_ID,
-                        principalSchema: "DATA_EDITOR_PORTAL",
+                        principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                         principalTable: "SITE_ROLES",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SITE_ROLE_PERMISSIONS_SITE~",
                         column: x => x.SITE_PERMISSION_ID,
-                        principalSchema: "DATA_EDITOR_PORTAL",
+                        principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                         principalTable: "SITE_PERMISSIONS",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
@@ -262,7 +262,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateTable(
                 name: "USER_PERMISSIONS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "RAW(16)", nullable: false),
@@ -278,7 +278,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     table.ForeignKey(
                         name: "FK_USER_PERMISSIONS_USERS_USE~",
                         column: x => x.USER_ID,
-                        principalSchema: "DATA_EDITOR_PORTAL",
+                        principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                         principalTable: "USERS",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
@@ -286,37 +286,37 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
             migrationBuilder.CreateIndex(
                 name: "IX_LOOKUPS_DATA_SOURCE_CONNEC~",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS",
                 column: "DATA_SOURCE_CONNECTION_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SITE_MENUS_PARENT_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "SITE_MENUS",
                 column: "PARENT_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SITE_ROLE_PERMISSIONS_SIT~1",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "SITE_ROLE_PERMISSIONS",
                 column: "SITE_ROLE_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SITE_ROLE_PERMISSIONS_SITE~",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "SITE_ROLE_PERMISSIONS",
                 column: "SITE_PERMISSION_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UNIVERSAL_GRID_CONFIGURATI~",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS",
                 column: "DATA_SOURCE_CONNECTION_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_USER_PERMISSIONS_USER_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "USER_PERMISSIONS",
                 column: "USER_ID");
         }
@@ -325,55 +325,55 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.DropTable(
                 name: "DATA_DICTIONARIES",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "DEMO_TABLE",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "EVENT_LOGS",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "LOOKUPS",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "SITE_MENUS",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "SITE_ROLE_PERMISSIONS",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "SITE_SETTINGS",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "UNIVERSAL_GRID_CONFIGURATIONS",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "USER_PERMISSIONS",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "SITE_ROLES",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "SITE_PERMISSIONS",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "DATA_SOURCE_CONNECTIONS",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
                 name: "USERS",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
@@ -9,61 +9,61 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_LOOKUPS_DATA_SOURCE_CONNECTIONS_DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_UNIVERSAL_GRID_CONFIGURATIONS_DATA_SOURCE_CONNECTIONS_DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS");
 
             migrationBuilder.DropIndex(
                 name: "IX_UNIVERSAL_GRID_CONFIGURATIONS_DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS");
 
             migrationBuilder.DropIndex(
                 name: "IX_LOOKUPS_DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_DATA_SOURCE_CONNECTIONS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_SOURCE_CONNECTIONS");
 
             migrationBuilder.DropColumn(
                 name: "DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS");
 
             migrationBuilder.DropColumn(
                 name: "DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS");
 
             migrationBuilder.DropColumn(
                 name: "ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_SOURCE_CONNECTIONS");
 
             migrationBuilder.AddColumn<string>(
                 name: "DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS",
                 type: "nvarchar(450)",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS",
                 type: "nvarchar(450)",
                 nullable: true);
 
             migrationBuilder.AlterColumn<string>(
                 name: "NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_SOURCE_CONNECTIONS",
                 type: "nvarchar(450)",
                 nullable: false,
@@ -74,38 +74,38 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_DATA_SOURCE_CONNECTIONS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_SOURCE_CONNECTIONS",
                 column: "NAME");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UNIVERSAL_GRID_CONFIGURATIONS_DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS",
                 column: "DATA_SOURCE_CONNECTION_NAME");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LOOKUPS_DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS",
                 column: "DATA_SOURCE_CONNECTION_NAME");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_LOOKUPS_DATA_SOURCE_CONNECTIONS_DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS",
                 column: "DATA_SOURCE_CONNECTION_NAME",
-                principalSchema: "DATA_EDITOR_PORTAL",
+                principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                 principalTable: "DATA_SOURCE_CONNECTIONS",
                 principalColumn: "NAME",
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_UNIVERSAL_GRID_CONFIGURATIONS_DATA_SOURCE_CONNECTIONS_DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS",
                 column: "DATA_SOURCE_CONNECTION_NAME",
-                principalSchema: "DATA_EDITOR_PORTAL",
+                principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                 principalTable: "DATA_SOURCE_CONNECTIONS",
                 principalColumn: "NAME",
                 onDelete: ReferentialAction.Restrict);
@@ -115,49 +115,49 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_LOOKUPS_DATA_SOURCE_CONNECTIONS_DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_UNIVERSAL_GRID_CONFIGURATIONS_DATA_SOURCE_CONNECTIONS_DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS");
 
             migrationBuilder.DropIndex(
                 name: "IX_UNIVERSAL_GRID_CONFIGURATIONS_DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS");
 
             migrationBuilder.DropIndex(
                 name: "IX_LOOKUPS_DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_DATA_SOURCE_CONNECTIONS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_SOURCE_CONNECTIONS");
 
             migrationBuilder.DropColumn(
                 name: "DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS");
 
             migrationBuilder.DropColumn(
                 name: "DATA_SOURCE_CONNECTION_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS");
 
             migrationBuilder.AddColumn<Guid>(
                 name: "DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS",
                 type: "uniqueidentifier",
                 nullable: true);
 
             migrationBuilder.AddColumn<Guid>(
                 name: "DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS",
                 type: "uniqueidentifier",
                 nullable: false,
@@ -165,7 +165,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
             migrationBuilder.AlterColumn<string>(
                 name: "NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_SOURCE_CONNECTIONS",
                 type: "nvarchar(max)",
                 nullable: true,
@@ -174,7 +174,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
             migrationBuilder.AddColumn<Guid>(
                 name: "ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_SOURCE_CONNECTIONS",
                 type: "uniqueidentifier",
                 nullable: false,
@@ -182,38 +182,38 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_DATA_SOURCE_CONNECTIONS",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_SOURCE_CONNECTIONS",
                 column: "ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UNIVERSAL_GRID_CONFIGURATIONS_DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS",
                 column: "DATA_SOURCE_CONNECTION_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LOOKUPS_DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS",
                 column: "DATA_SOURCE_CONNECTION_ID");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_LOOKUPS_DATA_SOURCE_CONNECTIONS_DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "LOOKUPS",
                 column: "DATA_SOURCE_CONNECTION_ID",
-                principalSchema: "DATA_EDITOR_PORTAL",
+                principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                 principalTable: "DATA_SOURCE_CONNECTIONS",
                 principalColumn: "ID",
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_UNIVERSAL_GRID_CONFIGURATIONS_DATA_SOURCE_CONNECTIONS_DATA_SOURCE_CONNECTION_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS",
                 column: "DATA_SOURCE_CONNECTION_ID",
-                principalSchema: "DATA_EDITOR_PORTAL",
+                principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                 principalTable: "DATA_SOURCE_CONNECTIONS",
                 principalColumn: "ID",
                 onDelete: ReferentialAction.Restrict);

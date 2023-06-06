@@ -9,7 +9,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.CreateTable(
                 name: "DATA_IMPORT_HISTORIES",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -26,14 +26,14 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     table.ForeignKey(
                         name: "FK_DATA_IMPORT_HISTORIES_UNIVERSAL_GRID_CONFIGURATIONS_GRID_COINFG_ID",
                         column: x => x.GRID_COINFG_ID,
-                        principalSchema: "DATA_EDITOR_PORTAL",
+                        principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                         principalTable: "UNIVERSAL_GRID_CONFIGURATIONS",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DATA_IMPORT_HISTORIES_USERS_CREATED_BY",
                         column: x => x.CREATED_BY,
-                        principalSchema: "DATA_EDITOR_PORTAL",
+                        principalSchema: Data.Common.Constants.DEFAULT_SCHEMA,
                         principalTable: "USERS",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
@@ -41,13 +41,13 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
             migrationBuilder.CreateIndex(
                 name: "IX_DATA_IMPORT_HISTORIES_CREATED_BY",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_IMPORT_HISTORIES",
                 column: "CREATED_BY");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DATA_IMPORT_HISTORIES_GRID_COINFG_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_IMPORT_HISTORIES",
                 column: "GRID_COINFG_ID");
         }
@@ -56,7 +56,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.DropTable(
                 name: "DATA_IMPORT_HISTORIES",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
         }
     }
 }

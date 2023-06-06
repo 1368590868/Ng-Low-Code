@@ -8,7 +8,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.AddColumn<int>(
                 name: "IMPORT_TYPE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_IMPORT_HISTORIES",
                 type: "int",
                 nullable: false,
@@ -19,7 +19,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.DropColumn(
                 name: "IMPORT_TYPE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "DATA_IMPORT_HISTORIES");
         }
     }

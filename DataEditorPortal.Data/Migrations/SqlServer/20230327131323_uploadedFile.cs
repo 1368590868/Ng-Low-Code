@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
@@ -9,7 +8,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.CreateTable(
                 name: "UPLOADED_FILE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
                     ID = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -31,7 +30,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.DropTable(
                 name: "UPLOADED_FILE",
-                schema: "DATA_EDITOR_PORTAL");
+                schema: Data.Common.Constants.DEFAULT_SCHEMA);
         }
     }
 }

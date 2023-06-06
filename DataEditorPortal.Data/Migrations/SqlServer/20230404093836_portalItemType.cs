@@ -8,7 +8,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.AddColumn<string>(
                 name: "ITEM_TYPE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS",
                 type: "nvarchar(max)",
                 nullable: true);
@@ -18,7 +18,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         {
             migrationBuilder.DropColumn(
                 name: "ITEM_TYPE",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS");
         }
     }

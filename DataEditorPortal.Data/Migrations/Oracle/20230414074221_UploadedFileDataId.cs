@@ -8,7 +8,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.AddColumn<string>(
                 name: "DATA_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE",
                 type: "NVARCHAR2(2000)",
                 nullable: true);
@@ -18,7 +18,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.DropColumn(
                 name: "DATA_ID",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 table: "UPLOADED_FILE");
         }
     }
