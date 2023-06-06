@@ -74,6 +74,20 @@ namespace Setup.Models
             }
         }
 
+        private string _defaultSchema;
+        public string DefaultSchema
+        {
+            get
+            {
+                return _defaultSchema;
+            }
+            set
+            {
+                _defaultSchema = value;
+                OnPropertyChanged("DefaultSchema");
+            }
+        }
+
 
         public string Error { get { return null; } }
 
@@ -105,6 +119,11 @@ namespace Setup.Models
                 {
                     if (string.IsNullOrEmpty(AppPath))
                         return "Application Path is Required";
+                }
+                if (columnName == "DefaultSchema")
+                {
+                    if (string.IsNullOrEmpty(DefaultSchema))
+                        return "Default Schema is Required";
                 }
 
 

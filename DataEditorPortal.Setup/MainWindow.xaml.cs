@@ -48,6 +48,7 @@ namespace Setup
 
             SitePublishModel.TargetFolder = $@"C:\inetpub\DataEditorPortal";
             SitePublishModel.AppPath = "Data Editor Portal";
+            SitePublishModel.DefaultSchema = "DATA_EDITOR_PORTAL";
 
             SiteNamesModel.SiteNames = GetAllSitesInIIS();
         }
@@ -91,7 +92,10 @@ namespace Setup
                 }
             }
 
-            containerAdmin.Visibility = Visibility.Visible;
+            if (DatabaseProvider.Value == "Oracle")
+                SitePublishModel.DefaultSchema = ConnectionList.FirstOrDefault(c => c.ConnectionName == "Default").Username;
+
+            containerPublish.Visibility = Visibility.Visible;
             containerConnection.Visibility = Visibility.Hidden;
         }
 
@@ -138,47 +142,6 @@ namespace Setup
         {
             ConnectionList.Clear();
             ConnectionList.Add(new DatabaseConnection() { ConnectionName = "Default" });
-        }
-
-        #endregion
-
-        #region Administrator setting
-
-        [System.Runtime.InteropServices.DllImport("advapi32.dll")]
-        private static extern bool LogonUser(string userName, string domainName, string password, int LogonType, int LogonProvider, ref IntPtr phToken);
-
-        private bool IsValidateCredentials(string userName, string password, string domain)
-        {
-            IntPtr tokenHandler = IntPtr.Zero;
-            bool isValid = LogonUser(userName, domain, password, 3, 0, ref tokenHandler);
-            return isValid;
-        }
-
-        private void btnAdminNext_Click(object sender, RoutedEventArgs e)
-        {
-            if (!IsAdministratorValid()) return;
-
-            if (!IsValidateCredentials(Administrator.Username, Administrator.Password, ".\\"))
-            {
-                MessageBox.Show("Username or password is not correct. ");
-                return;
-            }
-
-            containerAdmin.Visibility = Visibility.Hidden;
-            containerPublish.Visibility = Visibility.Visible;
-        }
-
-        private void btnAdminBack_Click(object sender, RoutedEventArgs e)
-        {
-            containerAdmin.Visibility = Visibility.Hidden;
-            containerConnection.Visibility = Visibility.Visible;
-        }
-
-        private bool IsAdministratorValid()
-        {
-            textUsername.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-            textPassword.GetBindingExpression(PasswordHelper.PasswordProperty).UpdateSource();
-            return !Validation.GetHasError(textUsername) && !Validation.GetHasError(textPassword);
         }
 
         #endregion
@@ -267,6 +230,11 @@ namespace Setup
                                         utf8JsonWriter1.WritePropertyName(element.Name);
                                         utf8JsonWriter1.WriteStringValue(DatabaseProvider.Value);
                                     }
+                                    else if (element.Name == "DefaultSchema")
+                                    {
+                                        utf8JsonWriter1.WritePropertyName(element.Name);
+                                        utf8JsonWriter1.WriteStringValue(SitePublishModel.DefaultSchema);
+                                    }
                                     else
                                     {
                                         element.WriteTo(utf8JsonWriter1);
@@ -309,7 +277,7 @@ namespace Setup
 
         private void btnPublishBack_Click(object sender, RoutedEventArgs e)
         {
-            containerAdmin.Visibility = Visibility.Visible;
+            containerConnection.Visibility = Visibility.Visible;
             containerPublish.Visibility = Visibility.Hidden;
         }
 
