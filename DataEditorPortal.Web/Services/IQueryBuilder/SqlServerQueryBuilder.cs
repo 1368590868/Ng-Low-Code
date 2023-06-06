@@ -121,7 +121,11 @@ namespace DataEditorPortal.Web.Services
 
         protected override string EscapeColumnName(string columnName)
         {
-            return string.Format("[{0}]", columnName);
+            var cols = columnName.Split('.');
+            if (cols.Length == 2)
+                return string.Format("{0}.[{1}]", cols[0], cols[1]);
+            else
+                return string.Format("[{0}]", columnName);
         }
 
         #endregion

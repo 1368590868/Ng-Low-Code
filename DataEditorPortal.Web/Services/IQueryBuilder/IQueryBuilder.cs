@@ -226,7 +226,7 @@ namespace DataEditorPortal.Web.Services
 
         public virtual string ParameterName(string name)
         {
-            return string.Format("P_{0}", name);
+            return string.Format("P_{0}", name.Replace(".", "_"));
         }
 
         public virtual object TransformValue(object value, DataRow schema)
