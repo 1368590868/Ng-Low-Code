@@ -93,7 +93,7 @@ namespace Setup
             }
 
             if (DatabaseProvider.Value == "Oracle")
-                SitePublishModel.DefaultSchema = ConnectionList.FirstOrDefault(c => c.ConnectionName == "Default").Username;
+                SitePublishModel.DefaultSchema = ConnectionList.FirstOrDefault(c => c.ConnectionName == "Default").Username.ToUpper();
 
             containerPublish.Visibility = Visibility.Visible;
             containerConnection.Visibility = Visibility.Hidden;
