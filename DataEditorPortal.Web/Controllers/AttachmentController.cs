@@ -57,7 +57,7 @@ namespace DataEditorPortal.Web.Controllers
             var files = model?.Files ?? new List<IFormFile>();
             try
             {
-                string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot\\FileUploadTemp");
+                string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data\\FileUploadTemp");
                 if (!Directory.Exists(tempFolder))
                 {
                     Directory.CreateDirectory(tempFolder);
@@ -102,7 +102,7 @@ namespace DataEditorPortal.Web.Controllers
         {
             try
             {
-                string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot\\FileUploadTemp");
+                string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data\\FileUploadTemp");
                 var filePath = Path.Combine(tempFolder, $"{fileId} - {fileName}");
 
                 var stream = System.IO.File.OpenRead(filePath);

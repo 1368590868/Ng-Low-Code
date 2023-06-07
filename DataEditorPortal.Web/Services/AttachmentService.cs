@@ -94,7 +94,7 @@ namespace DataEditorPortal.Web.Services
                 {
                     #region process file
 
-                    string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot/FileUploadTemp");
+                    string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data\\FileUploadTemp");
                     var tempFilePath = Path.Combine(tempFolder, $"{uploadedFile.FileId} - {uploadedFile.FileName}");
                     tempFiles.Add(tempFilePath);
 
@@ -284,7 +284,7 @@ namespace DataEditorPortal.Web.Services
             string targetFolder;
             if (!string.IsNullOrEmpty(config.BasePath))
                 targetFolder = Path.Combine(_hostEnvironment.ContentRootPath, config.BasePath);
-            else targetFolder = Path.Combine(_hostEnvironment.ContentRootPath, $"wwwroot\\Attachements\\{gridName}");
+            else targetFolder = Path.Combine(_hostEnvironment.ContentRootPath, $"App_Data\\Attachements\\{gridName}");
             if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
 
             return targetFolder;

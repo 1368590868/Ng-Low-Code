@@ -25,7 +25,7 @@ namespace DataEditorPortal.Web.Jobs
         {
             try
             {
-                string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot\\FileUploadTemp");
+                string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data\\FileUploadTemp");
                 if (Directory.Exists(tempFolder))
                 {
                     var dir = new DirectoryInfo(tempFolder);
