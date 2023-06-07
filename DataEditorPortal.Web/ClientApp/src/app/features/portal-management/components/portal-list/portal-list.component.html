@@ -36,8 +36,10 @@
       <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
         <tr [ttContextMenuRow]="rowNode">
           <td style="width: 18%">
-            <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
-            {{ rowData.label }}
+            <div class="flex">
+              <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+              {{ rowData.label }}
+            </div>
           </td>
           <td style="width: 18%">{{ rowData.name }}</td>
           <td style="width: 12%">{{ rowData.type }}</td>
