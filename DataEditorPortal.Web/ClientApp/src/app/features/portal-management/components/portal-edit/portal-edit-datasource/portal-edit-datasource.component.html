@@ -35,10 +35,13 @@
 
         <div class="flex align-items-center">
           <p-dropdown
+            #dbTableDropdown
             *ngIf="!datasourceConfig.queryText"
             [virtualScroll]="true"
             [virtualScrollItemSize]="20"
             [filter]="true"
+            (onFilter)="onFilter(dbTableDropdown)"
+            [resetFilterOnHide]="true"
             [required]="true"
             [options]="dbTables"
             (onChange)="onTableNameChange($event)"
