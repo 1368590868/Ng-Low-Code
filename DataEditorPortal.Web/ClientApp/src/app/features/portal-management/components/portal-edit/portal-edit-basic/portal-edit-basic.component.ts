@@ -90,6 +90,7 @@ export class PortalEditBasicComponent
           field.formControl?.valueChanges.subscribe(val => {
             this.portalItemService.getCodeName(val).subscribe(res => {
               field.formControl?.setValue(res.result, { emitEvent: false });
+              this.model['name'] = res.result;
               field.formControl?.markAsDirty();
             });
           });
