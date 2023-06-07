@@ -16,6 +16,7 @@ import { FormControl, NgModel } from '@angular/forms';
 import { AdvancedQueryModel } from '..';
 import { CustomActionsComponent } from '../..';
 import { AdvancedDialogComponent } from './advanced-dialog/advanced-dialog.component';
+import { Dropdown } from 'primeng/dropdown';
 @Component({
   selector: 'app-portal-edit-link',
   templateUrl: './portal-edit-link.component.html',
@@ -281,6 +282,9 @@ export class PortalEditLinkComponent
         this.isSavingAndExit = false;
         this.isSavingAndNext = false;
       });
+  }
+  onFilter(dbDropdownRef: Dropdown) {
+    dbDropdownRef.scroller?.setContentPosition(null);
   }
 
   saveSucess() {

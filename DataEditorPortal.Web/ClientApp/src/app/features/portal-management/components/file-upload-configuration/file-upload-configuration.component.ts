@@ -21,6 +21,7 @@ import {
 } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
 import { forkJoin } from 'rxjs';
+import { Dropdown } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-file-upload-configuration',
@@ -193,6 +194,10 @@ export class FileUploadConfigurationComponent
 
       this.portalItemService.saveCurrentStep('datasource');
     }
+  }
+
+  onFilter(dropdownRef: Dropdown) {
+    dropdownRef.scroller.setContentPosition(null);
   }
 
   onStorageTypeChange(value: string) {

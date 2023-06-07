@@ -380,6 +380,12 @@ export class PortalEditDatasourceComponent
     );
   }
 
+  onFilter(dropdownRef: {
+    scroller: { setContentPosition: (arg0: null) => void };
+  }) {
+    dropdownRef.scroller?.setContentPosition(null);
+  }
+
   saveSucess() {
     if (this.isSavingAndNext) {
       this.saveNextEvent.emit();

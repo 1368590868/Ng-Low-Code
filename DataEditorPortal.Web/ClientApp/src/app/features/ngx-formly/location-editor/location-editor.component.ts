@@ -62,9 +62,23 @@ export class LocationEditorComponent implements ControlValueAccessor {
   @Input() system!: { label: string; value: string }[] | { id: string };
   @Input() mappingColumns!: any;
   @Input() formControl!: AbstractControl;
+  _required = false;
+  @Input() 
+  get required() {
+    return this._required;
+  }
+  set required(val: boolean) {
+    console.log(val)
+    this._required = val;
+    this.fields.forEach(x => {
+      if(x.props)  x.props.required = val
+    })
+  }
 
   form = new FormGroup({});
-  options: FormlyFormOptions = {};
+  options: FormlyFormOptions = {
+  };
+  
 
   onChange?: any;
   onTouch?: any;
@@ -83,7 +97,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       props: {
         label: 'From VS',
         placeholder: 'Please select',
-        required: true,
+        required: this.required,
         appendTo: 'body',
         change: (field, event) => {
           const record = this.locationOptions.find(
@@ -155,7 +169,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       props: {
         label: 'From Measure',
         placeholder: 'Please enter',
-        required: true
+        required: this.required
       },
       hooks: {
         onInit: (field: FormlyFieldConfig & any) => {
@@ -193,7 +207,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       props: {
         label: 'To VS',
         placeholder: 'Please select',
-        required: true,
+        required: this.required,
         appendTo: 'body',
         options: [],
         change: (field, event) => {
@@ -243,7 +257,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       key: 'toMeasure',
       type: 'inputNumber',
       props: {
-        required: true,
+        required: this.required,
         label: 'To Measure',
         placeholder: 'Please enter'
       },
@@ -323,6 +337,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
     [formControl]="formControl"
     [formlyAttributes]="field"
     [dirty]="formControl.dirty"
+    [required]="props.required || false"
     [label]="props.label || 'Location'"
     [locationType]="props.locationType || 2"
     [mappingColumns]="props.mappingColumns || []"

@@ -34,12 +34,15 @@
         <label for="tableName" class="mb-1">Database Table</label>
         <div class="flex align-items-center">
           <p-dropdown
+            #dbTableDropdown
             *ngIf="!dsConfig.queryText"
             [virtualScroll]="true"
             [virtualScrollItemSize]="20"
             [filter]="true"
             [required]="true"
             [options]="dbTables"
+            [resetFilterOnHide]="true"
+            (onFilter)="onFilter(dbTableDropdown)"
             (onChange)="onTableNameChange($event)"
             [formControl]="formControlDbTable"
             placeholder="Please Select"

@@ -16,4 +16,10 @@
   scrollHeight="250px"
   selectionMode="checkbox"
   [(selection)]="permissionSelect">
+  <ng-template
+    *ngFor="let type of ['Folder', 'Portal Item', 'default']"
+    let-node
+    [pTemplate]="type">
+    <span [pTooltip]="node.name">{{ node.label }}</span>
+  </ng-template>
 </p-tree>

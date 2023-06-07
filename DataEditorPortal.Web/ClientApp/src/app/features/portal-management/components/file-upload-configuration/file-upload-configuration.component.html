@@ -64,12 +64,15 @@
 
           <div class="flex align-items-center">
             <p-dropdown
+              #dropdown
               [virtualScroll]="true"
               [virtualScrollItemSize]="20"
+              [resetFilterOnHide]="true"
               [filter]="true"
               [required]="true"
               [options]="dbTables"
               [formControl]="formControlDbTable"
+              (onFilter)="onFilter(dropdown)"
               (onChange)="onTableNameChange($event)"
               placeholder="Please Select"
               [style]="{ minWidth: '20rem' }"
