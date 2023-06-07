@@ -135,23 +135,8 @@ namespace DataEditorPortal.Web.Services
             item.CreatedDate = DateTime.UtcNow;
             _depDbContext.UniversalGridConfigurations.Add(item);
 
-
             // create permissions
-            var types = new List<string>();
-            if (model.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
-            if (model.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
-            if (model.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
-            types.ForEach(t =>
-            {
-                var permission = new SitePermission()
-                {
-                    Id = Guid.NewGuid(),
-                    Category = $"Portal Item: { model.Label }",
-                    PermissionName = $"{t}_{ model.Name.Replace("-", "_") }".ToUpper(),
-                    PermissionDescription = $"{t} { model.Label }"
-                };
-                _depDbContext.Add(permission);
-            });
+            CreateOrUpdatePermission(siteMenu, model);
 
             _depDbContext.SaveChanges();
 
@@ -171,14 +156,7 @@ namespace DataEditorPortal.Web.Services
             if (ExistName(model.Name, id)) throw new DepException("Portal Name does already exist.");
 
             // update permissions
-            var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"Portal Item: { siteMenu.Label }").ToList();
-
-            permissions.ForEach(p =>
-            {
-                p.Category = p.Category.Replace(siteMenu.Label, model.Label);
-                p.PermissionName = p.PermissionName.Replace(siteMenu.Name.Replace("-", "_").ToUpper(), model.Name.Replace("-", "_").ToUpper());
-                p.PermissionDescription = p.PermissionDescription.Replace(siteMenu.Label, model.Label);
-            });
+            CreateOrUpdatePermission(siteMenu, model);
 
             var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             item.Name = model.Name;
@@ -233,6 +211,33 @@ namespace DataEditorPortal.Web.Services
                 // remove siteMenu
                 _depDbContext.SiteMenus.Remove(siteMenu);
             }
+        }
+
+        private void CreateOrUpdatePermission(SiteMenu siteMenu, PortalItemData model)
+        {
+            var types = new List<string>();
+            if (model.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
+            if (model.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
+            if (model.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
+
+            // get old permissions
+            var oldPermissionNames = types.Select(t => $"{t}_{ siteMenu.Name.Replace("-", "_") }".ToUpper());
+            var permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
+
+            types.ForEach(t =>
+            {
+                var oldName = $"{t}_{ siteMenu.Name.Replace("-", "_") }".ToUpper();
+                var permission = permissions.FirstOrDefault(p => p.PermissionName == oldName);
+
+                if (permission == null)
+                {
+                    permission = new SitePermission() { Id = Guid.NewGuid() };
+                    _depDbContext.Add(permission);
+                }
+                permission.Category = $"Portal Item: { model.Label }";
+                permission.PermissionName = $"{t}_{ model.Name.Replace("-", "_") }".ToUpper();
+                permission.PermissionDescription = $"{t} { model.Label }";
+            });
         }
 
         public List<DataSourceTable> GetDataSourceTables(string name)
