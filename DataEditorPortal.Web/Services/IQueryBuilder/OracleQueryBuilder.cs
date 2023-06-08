@@ -292,7 +292,13 @@ namespace DataEditorPortal.Web.Services
         /// <returns></returns>
         public string GetSqlTextForDatabaseTables()
         {
-            return $"SELECT TABLE_NAME AS TableName, OWNER AS TableSchema FROM all_tables WHERE TABLE_NAME IN (SELECT TABLE_NAME FROM user_tables WHERE TABLE_NAME <> '__EFMigrationsHistory')";
+            return $@"
+                SELECT TABLE_NAME AS TableName, OWNER AS TableSchema FROM all_tables 
+                WHERE OWNER NOT IN (
+                    'SYS', 'SYSTEM', 'OUTLN', 'DBSFWUSER', 'CTXSYS', 'HR', 'OJVMSYS', 'DVSYS', 'AUDSYS', 'MDSYS', 'OLAPSYS',
+                    'DBSNMP', 'APPQOSSYS', 'GSMADMIN_INTERNAL', 'XDB', 'LBACSYS', 'WMSYS', 'ORDSYS', 'ORDDATA'
+                ) AND TABLE_NAME <> '__EFMigrationsHistory'
+            ";
         }
 
         public string GetSqlTextForDatabaseSource(DataSourceConfig config)
