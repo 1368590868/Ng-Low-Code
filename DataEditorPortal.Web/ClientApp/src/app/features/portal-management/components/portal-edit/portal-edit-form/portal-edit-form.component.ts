@@ -99,7 +99,7 @@ export class PortalEditFormComponent
     if (config && config.formFields) {
       config.formFields = config.formFields.filter(
         c =>
-          ['locationField'].indexOf(c.filterType) >= 0 ||
+          ['locationField', 'linkDataField'].indexOf(c.filterType) >= 0 ||
           dbCols.find(
             s => s.columnName === c.key && s.filterType === c.filterType
           )
