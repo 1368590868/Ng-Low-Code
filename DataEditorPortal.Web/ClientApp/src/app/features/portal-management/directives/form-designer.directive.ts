@@ -345,7 +345,6 @@ export class FormDesignerDirective {
             {
               key: 'locationType',
               type: 'select',
-              defaultValue: 2,
               props: {
                 label: 'Location Type',
                 description: 'Select location type',
@@ -359,6 +358,57 @@ export class FormDesignerDirective {
                 change: (field: any) => {
                   field.parent.get('mappingColumns').formControl.setValue(null);
                 }
+              }
+            },
+            {
+              key: 'fromVsLabel',
+              type: 'input',
+              props: {
+                label: 'From Vs Label',
+                placeholder: 'Enter from vs label'
+              }
+            },
+            {
+              key: 'fromMeasureLabel',
+              type: 'input',
+              props: {
+                label: 'From Measure Label',
+                placeholder: 'Enter from Measure label'
+              },
+              expressions: {
+                hide: `field.parent.parent.model.locationType < 2`
+              }
+            },
+            {
+              key: 'toVsLabel',
+              type: 'input',
+              defaultValue: 'To Vs',
+              props: {
+                label: 'To Vs Label',
+                placeholder: 'Enter to vs label'
+              },
+              expressions: {
+                hide: `field.parent.parent.model.locationType === 2 || field.parent.parent.model.locationType === 3`
+              }
+            },
+            {
+              key: 'toMeasureLabel',
+              type: 'input',
+              defaultValue: 'To Measure',
+              props: {
+                label: 'To Measure Label',
+                placeholder: 'Enter to Measure label'
+              },
+              expressions: {
+                hide: `field.parent.parent.model.locationType === 2`
+              }
+            },
+            {
+              key: 'lengthLabel',
+              type: 'input',
+              props: {
+                label: 'Length Label',
+                placeholder: 'Enter length label'
               }
             },
             {

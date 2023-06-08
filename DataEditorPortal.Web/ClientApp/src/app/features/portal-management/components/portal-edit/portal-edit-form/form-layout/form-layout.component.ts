@@ -320,7 +320,7 @@ export class FormLayoutComponent {
     }
     const key = `CUSTOM_CONTROL_${index}`;
     const result = this.controls.filter(c => c.filterType === filterType);
-    const model = {
+    const model: any = {
       key: key,
       type: result[0].value,
       props: {
@@ -329,6 +329,15 @@ export class FormLayoutComponent {
       filterType: filterType,
       selected: true
     };
+
+    if (filterType === 'locationField') {
+      model.props['fromVsLabel'] = 'From Vs';
+      model.props['fromMeasureLabel'] = 'From Measure';
+      model.props['toVsLabel'] = 'To Vs';
+      model.props['toMeasureLabel'] = 'To Measure';
+      model.props['locationType'] = 2;
+    }
+
     this.targetColumns = [model, ...this.targetColumns];
   }
 

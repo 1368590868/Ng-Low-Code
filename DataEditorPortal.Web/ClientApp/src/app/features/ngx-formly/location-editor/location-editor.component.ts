@@ -63,22 +63,79 @@ export class LocationEditorComponent implements ControlValueAccessor {
   @Input() mappingColumns!: any;
   @Input() formControl!: AbstractControl;
   _required = false;
-  @Input() 
+  @Input()
   get required() {
     return this._required;
   }
   set required(val: boolean) {
-    console.log(val)
     this._required = val;
     this.fields.forEach(x => {
-      if(x.props)  x.props.required = val
-    })
+      if (x.props) x.props.required = val;
+    });
+  }
+
+  _lengthLabel = '';
+  @Input()
+  get lengthLabel() {
+    return this._lengthLabel;
+  }
+  set lengthLabel(val: string) {
+    this._lengthLabel = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'lengthFeet') x.props.label = val;
+    });
+  }
+
+  _fromVsLabel = '';
+  @Input()
+  get fromVsLabel() {
+    return this._fromVsLabel;
+  }
+  set fromVsLabel(val: string) {
+    this._fromVsLabel = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'fromVs') x.props.label = val;
+    });
+  }
+
+  _fromMeasureLabel = 'From Measure';
+  @Input()
+  get fromMeasureLabel() {
+    return this._fromMeasureLabel;
+  }
+  set fromMeasureLabel(val: string) {
+    this._fromMeasureLabel = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'fromMeasure') x.props.label = val;
+    });
+  }
+
+  _toMeasureLabel = 'To Measure';
+  @Input()
+  get toMeasureLabel() {
+    return this._toMeasureLabel;
+  }
+  set toMeasureLabel(val: string) {
+    this._toMeasureLabel = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'toMeasure') x.props.label = val;
+    });
+  }
+
+  _toVsLabel = 'To VS';
+  @Input()
+  get toVsLabel() {
+    return this._toVsLabel;
+  }
+  set toVsLabel(val: string) {
+    this._toVsLabel = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'toVs') x.props.label = val;
+    });
   }
 
   form = new FormGroup({});
-  options: FormlyFormOptions = {
-  };
-  
+  options: FormlyFormOptions = {};
 
   onChange?: any;
   onTouch?: any;
@@ -95,7 +152,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       key: 'fromVs',
       type: 'select',
       props: {
-        label: 'From VS',
+        label: this.fromVsLabel,
         placeholder: 'Please select',
         required: this.required,
         appendTo: 'body',
@@ -155,11 +212,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
                 this.options?.detectChanges?.(field.parent.get('toVs'));
               });
           }
-
-          if (this.locationType === 2) {
-            field.props.label = 'VS';
-            field.parent.get('fromMeasure').props.label = 'Measure';
-          }
         }
       }
     },
@@ -167,7 +219,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       key: 'fromMeasure',
       type: 'inputNumber',
       props: {
-        label: 'From Measure',
+        label: this.fromMeasureLabel,
         placeholder: 'Please enter',
         required: this.required
       },
@@ -205,7 +257,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       key: 'toVs',
       type: 'select',
       props: {
-        label: 'To VS',
+        label: this.toVsLabel,
         placeholder: 'Please select',
         required: this.required,
         appendTo: 'body',
@@ -258,7 +310,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       type: 'inputNumber',
       props: {
         required: this.required,
-        label: 'To Measure',
+        label: this.toMeasureLabel,
         placeholder: 'Please enter'
       },
       validators: {
@@ -291,6 +343,26 @@ export class LocationEditorComponent implements ControlValueAccessor {
       },
       expressions: {
         hide: () => this.locationType === 2
+      }
+    },
+    {
+      key: 'lengthFeet',
+      type: 'input',
+      defaultValue: this.lengthLabel,
+      props: {
+        label: this.lengthLabel,
+        disabled: true
+      },
+      expressions: {
+        hide: () => !this.lengthLabel,
+        calcLength: field => {
+          if (this.model?.fromMeasure >= 0 && this.model?.toMeasure >= 0) {
+            if (field && field.formControl)
+              field.formControl.setValue(
+                this.model.toMeasure - this.model.fromMeasure
+              );
+          }
+        }
       }
     }
   ];
@@ -338,10 +410,15 @@ export class LocationEditorComponent implements ControlValueAccessor {
     [formlyAttributes]="field"
     [dirty]="formControl.dirty"
     [required]="props.required || false"
-    [label]="props.label || 'Location'"
+    [label]="props.label || ''"
     [locationType]="props.locationType || 2"
     [mappingColumns]="props.mappingColumns || []"
-    [system]="props.system || []"></app-location-editor>`,
+    [system]="props.system || []"
+    [fromVsLabel]="props.fromVsLabel"
+    [toVsLabel]="props.toVsLabel"
+    [fromMeasureLabel]="props.fromMeasureLabel"
+    [toMeasureLabel]="props.toMeasureLabel"
+    [lengthLabel]="props.lengthLabel || ''"></app-location-editor>`,
   styles: [
     `
       :host {
@@ -360,6 +437,11 @@ export class FormlyFieldLocationEditorComponent
         locationType: number;
         system: { label: string; value: string }[];
         mappingColumns: { label: string; value: string }[];
+        fromVsLabel: string;
+        toVsLabel: string;
+        fromMeasureLabel: string;
+        toMeasureLabel: string;
+        lengthLabel?: string;
       }
     >
   >
