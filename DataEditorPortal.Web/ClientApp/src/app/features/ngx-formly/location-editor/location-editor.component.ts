@@ -165,7 +165,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
             if (fromMeasureProps) {
               fromMeasureProps[
                 'helperText'
-              ] = `Valid Range:${record?.value1} to ${record?.value2}`;
+              ] = `Min:${record?.value1} Max: ${record?.value2}`;
               fromMeasureProps['min'] = record?.value1;
               fromMeasureProps['max'] = record?.value2;
             }
@@ -176,7 +176,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
               if (toMeasureProps) {
                 toMeasureProps[
                   'helperText'
-                ] = `Valid Range:${record?.value1} to ${record?.value2}`;
+                ] = `Min:${record?.value1} Max: ${record?.value2}`;
                 toMeasureProps['min'] = record?.value1;
                 toMeasureProps['max'] = record?.value2;
               }
@@ -211,6 +211,14 @@ export class LocationEditorComponent implements ControlValueAccessor {
                 field.parent.get('toVs').props.options = res;
                 this.options?.detectChanges?.(field.parent.get('toVs'));
               });
+          }
+          if (field && field.parent && field.parent.get) {
+            const fromMeasureProps = field.parent.get('fromMeasure').props;
+            const toMeasureProps = field.parent.get('toMeasure').props;
+            if (fromMeasureProps && toMeasureProps) {
+              fromMeasureProps['helperText'] = `Min: --  Max: --`;
+              toMeasureProps['helperText'] = `Min: --  Max: --`;
+            }
           }
         }
       }
@@ -271,7 +279,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
             if (toMeasureProps) {
               toMeasureProps[
                 'helperText'
-              ] = `Valid Range:${record?.value1} to ${record?.value2}`;
+              ] = `Min:${record?.value1} Max: ${record?.value2}`;
               toMeasureProps['min'] = record?.value1;
               toMeasureProps['max'] = record?.value2;
             }
