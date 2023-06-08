@@ -20,6 +20,7 @@ import { GridParam, SearchParam, UserService } from 'src/app/shared';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DomHandler } from 'primeng/dom';
 import { UrlParamsService } from '../../services/url-params.service';
+import * as pluralize from 'pluralize';
 
 @Component({
   selector: 'app-table',
@@ -251,7 +252,9 @@ export class TableComponent implements OnInit, OnDestroy {
         actions.push({
           name: 'add-record',
           wrapper: {
-            header: `Create ${this.tableConfig.caption}`,
+            header: `Create ${pluralize.singular(
+              this.tableConfig.caption || ''
+            )}`,
             label: `Add ${this.tableConfig.caption}`
           }
         });
