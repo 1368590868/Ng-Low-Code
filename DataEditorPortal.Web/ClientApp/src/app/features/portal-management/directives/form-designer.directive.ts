@@ -172,6 +172,9 @@ export class FormDesignerDirective {
       wrappers: ['divider'],
       props: {
         label: 'Properties'
+      },
+      expressions: {
+        hide: `field.parent.model.computedConfig`
       }
     },
     {
@@ -446,7 +449,10 @@ export class FormDesignerDirective {
             hide: `formState.hideValidation`
           }
         }
-      ]
+      ],
+      expressions: {
+        hide: `field.parent.model.computedConfig`
+      }
     },
     {
       fieldGroup: [
@@ -465,7 +471,7 @@ export class FormDesignerDirective {
         }
       ],
       expressions: {
-        hide: `formState.hideValidation === field.parent.model.type || 'fileUpload' === field.parent.model.type || 'locationEditor' === field.parent.model.type `
+        hide: `formState.hideValidation === field.parent.model.type || 'fileUpload' === field.parent.model.type || 'locationEditor' === field.parent.model.type || field.parent.model.computedConfig`
       }
     }
   ];
