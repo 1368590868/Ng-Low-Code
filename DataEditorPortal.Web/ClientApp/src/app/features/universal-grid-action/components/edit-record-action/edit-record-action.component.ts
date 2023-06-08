@@ -113,7 +113,7 @@ export class EditRecordActionComponent
           this.configFieldValidator(fields);
           this.configFieldExpressions(fields);
           this.configFieldProps(fields);
-            this.fields = fields;
+          this.fields = fields;
           this.onLoadUrlParams();
 
           if (fields.length > 0) this.loadedEvent.emit();
@@ -135,7 +135,6 @@ export class EditRecordActionComponent
       )
       .forEach(f => {
         if (f.props) {
-          f.props.placeholder = 'Please Select';
           if (!f.props.options) f.props.options = [];
 
           if (Array.isArray(f.props['optionsLookup'])) {
