@@ -226,7 +226,7 @@ export class TableComponent implements OnInit, OnDestroy {
         icon: 'pi pi-file-edit',
         class: 'flex',
         buttonStyleClass: ' p-button-text',
-        header: `Update ${this.tableConfig.caption}`
+        header: `Update ${pluralize.singular(this.tableConfig.caption || '')}`
       };
       if (this.tableConfig.customEditFormName) {
         actions.push({
@@ -255,7 +255,7 @@ export class TableComponent implements OnInit, OnDestroy {
             header: `Create ${pluralize.singular(
               this.tableConfig.caption || ''
             )}`,
-            label: `Add ${this.tableConfig.caption}`
+            label: `Add ${pluralize.singular(this.tableConfig.caption || '')}`
           }
         });
       }
