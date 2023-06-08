@@ -3,6 +3,7 @@ using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -95,6 +96,9 @@ namespace DataEditorPortal.Web.Services
 
         private void SetPortalItemPermissions(PermissionNode node, List<AppRolePermission> rolePermissions, bool isAdmin)
         {
+            var types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
+            var permissionNames = types.Select(t => $"{t}_{ node.Name.Replace("-", "_") }".ToUpper());
+
             if (node.Children != null)
             {
                 node.Children.ForEach(x =>
@@ -106,7 +110,7 @@ namespace DataEditorPortal.Web.Services
                 if (node.Type == "Portal Item")
                 {
                     var permission = rolePermissions
-                    .Where(p => p.PermissionName.Contains($"_{ node.Name.Replace("-", "_") }".ToUpper()))
+                    .Where(p => permissionNames.Contains(p.PermissionName))
                     .Select(x => new PermissionNode
                     {
                         Label = x.PermissionDescription,
@@ -125,7 +129,7 @@ namespace DataEditorPortal.Web.Services
             else
             {
                 node.Children = rolePermissions
-                    .Where(p => p.PermissionName.Contains($"_{ node.Name.Replace("-", "_") }".ToUpper()))
+                    .Where(p => permissionNames.Contains(p.PermissionName))
                     .Select(x => new PermissionNode
                     {
                         Label = x.PermissionDescription,

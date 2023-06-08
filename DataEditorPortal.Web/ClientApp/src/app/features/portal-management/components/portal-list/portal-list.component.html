@@ -36,7 +36,7 @@
       <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
         <tr [ttContextMenuRow]="rowNode">
           <td style="width: 18%">
-            <div class="flex">
+            <div class="flex align-items-center">
               <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
               {{ rowData.label }}
             </div>

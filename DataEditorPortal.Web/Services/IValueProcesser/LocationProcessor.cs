@@ -43,8 +43,11 @@ namespace DataEditorPortal.Web.Services
                 var mappingProp = props.FirstOrDefault(x => x.Name == "mappingColumns").Value;
                 if (mappingProp.ValueKind == JsonValueKind.Object)
                 {
+                    // only get the mappings that already configed.
+                    var mappings = mappingProp.EnumerateObject().Where(m => m.Value.GetString() != null);
+
                     var valueModel = new Dictionary<string, object>();
-                    foreach (var mapping in mappingProp.EnumerateObject())
+                    foreach (var mapping in mappings)
                     {
                         var key = mapping.Value.GetString();
                         if (model.ContainsKey(key))

@@ -100,12 +100,12 @@ export class PortalEditSearchComponent
       ]).subscribe(res => {
         this.isLoading = false;
         this.targetColumns = res[0]
-          .filter(c =>
-            res[1].find(
-              s =>
-                c.key.startsWith('CUSTOM_SEARCH_') ||
-                (s.columnName === c.key && s.filterType === c.filterType)
-            )
+          .filter(
+            c =>
+              c.key.startsWith('CUSTOM_SEARCH_') ||
+              !!res[1].find(
+                s => s.columnName === c.key && s.filterType === c.filterType
+              )
           )
           .map<GridSearchField>(x => {
             return {

@@ -58,7 +58,7 @@ namespace DataEditorPortal.Web.Services
             var config = _universalGridService.GetUniversalGridConfiguration(name);
             var fields = GetTemplateFields(config, type);
 
-            string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot/FileUploadTemp");
+            string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data\\FileUploadTemp");
             var tempFilePath = Path.Combine(tempFolder, $"{uploadedFile.FileId} - {uploadedFile.FileName}");
             if (!File.Exists(tempFilePath)) throw new DepException("Uploaded File doesn't exist.");
 

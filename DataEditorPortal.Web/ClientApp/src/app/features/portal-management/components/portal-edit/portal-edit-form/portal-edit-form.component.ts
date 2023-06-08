@@ -97,12 +97,12 @@ export class PortalEditFormComponent
     dbCols: DataSourceTableColumn[]
   ) {
     if (config && config.formFields) {
-      config.formFields = config.formFields.filter(c =>
-        dbCols.find(
-          s =>
-            ['locationField'].indexOf(c.filterType) >= 0 ||
-            (s.columnName === c.key && s.filterType === c.filterType)
-        )
+      config.formFields = config.formFields.filter(
+        c =>
+          ['locationField'].indexOf(c.filterType) >= 0 ||
+          dbCols.find(
+            s => s.columnName === c.key && s.filterType === c.filterType
+          )
       );
     }
     return config || {};
