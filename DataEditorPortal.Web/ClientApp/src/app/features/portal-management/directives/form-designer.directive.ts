@@ -340,9 +340,9 @@ export class FormDesignerDirective {
               key: 'system',
               type: 'optionsEditor',
               props: {
-                label: 'Pressure System',
+                label: 'From/To Options',
                 onlyAdvanced: true,
-                dialogTitle: 'Pressure System'
+                dialogTitle: 'From/To Options'
               }
             },
             {
@@ -364,16 +364,18 @@ export class FormDesignerDirective {
               }
             },
             {
-              key: 'fromVsLabel',
+              key: 'fromLabel',
               type: 'input',
+              defaultValue: 'From',
               props: {
-                label: 'From Vs Label',
-                placeholder: 'Enter from vs label'
+                label: 'From Label',
+                placeholder: 'Enter from  label'
               }
             },
             {
               key: 'fromMeasureLabel',
               type: 'input',
+              defaultValue: 'From Measure',
               props: {
                 label: 'From Measure Label',
                 placeholder: 'Enter from Measure label'
@@ -383,12 +385,12 @@ export class FormDesignerDirective {
               }
             },
             {
-              key: 'toVsLabel',
+              key: 'toLabel',
               type: 'input',
-              defaultValue: 'To Vs',
+              defaultValue: 'To',
               props: {
-                label: 'To Vs Label',
-                placeholder: 'Enter to vs label'
+                label: 'To Label',
+                placeholder: 'Enter to label'
               },
               expressions: {
                 hide: `field.parent.parent.model.locationType === 2 || field.parent.parent.model.locationType === 3`

@@ -86,15 +86,15 @@ export class LocationEditorComponent implements ControlValueAccessor {
     });
   }
 
-  _fromVsLabel = '';
+  _fromLabel = '';
   @Input()
-  get fromVsLabel() {
-    return this._fromVsLabel;
+  get fromLabel() {
+    return this._fromLabel;
   }
-  set fromVsLabel(val: string) {
-    this._fromVsLabel = val;
+  set fromLabel(val: string) {
+    this._fromLabel = val;
     this.fields.forEach(x => {
-      if (x.props && x.key === 'fromVs') x.props.label = val;
+      if (x.props && x.key === 'from') x.props.label = val;
     });
   }
 
@@ -122,15 +122,15 @@ export class LocationEditorComponent implements ControlValueAccessor {
     });
   }
 
-  _toVsLabel = 'To VS';
+  _toLabel = 'To';
   @Input()
-  get toVsLabel() {
-    return this._toVsLabel;
+  get toLabel() {
+    return this._toLabel;
   }
-  set toVsLabel(val: string) {
-    this._toVsLabel = val;
+  set toLabel(val: string) {
+    this._toLabel = val;
     this.fields.forEach(x => {
-      if (x.props && x.key === 'toVs') x.props.label = val;
+      if (x.props && x.key === 'to') x.props.label = val;
     });
   }
 
@@ -149,10 +149,10 @@ export class LocationEditorComponent implements ControlValueAccessor {
   }[] = [];
   fields: FormlyFieldConfig[] = [
     {
-      key: 'fromVs',
+      key: 'from',
       type: 'select',
       props: {
-        label: this.fromVsLabel,
+        label: this.fromLabel,
         placeholder: 'Please select',
         required: this.required,
         appendTo: 'body',
@@ -182,17 +182,17 @@ export class LocationEditorComponent implements ControlValueAccessor {
               }
             }
 
-            const toVs = field.parent.get('toVs').formControl;
-            if (toVs?.value) {
+            const to = field.parent.get('to').formControl;
+            if (to?.value) {
               const fIndex = this.locationOptions.findIndex(
                 x => x.value === event.value
               );
               const tIndex = this.locationOptions.findIndex(
-                x => x.value === toVs.value
+                x => x.value === to.value
               );
               // current index must be less than ToVs index
               if (tIndex <= fIndex) {
-                toVs.setValue(toVs.value);
+                to.setValue(to.value);
               }
             }
           }
@@ -208,8 +208,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
                 field.props.options = res;
                 this.options?.detectChanges?.(field);
 
-                field.parent.get('toVs').props.options = res;
-                this.options?.detectChanges?.(field.parent.get('toVs'));
+                field.parent.get('to').props.options = res;
+                this.options?.detectChanges?.(field.parent.get('to'));
               });
           }
           if (field && field.parent && field.parent.get) {
@@ -262,10 +262,10 @@ export class LocationEditorComponent implements ControlValueAccessor {
       }
     },
     {
-      key: 'toVs',
+      key: 'to',
       type: 'select',
       props: {
-        label: this.toVsLabel,
+        label: this.toLabel,
         placeholder: 'Please select',
         required: this.required,
         appendTo: 'body',
@@ -289,10 +289,10 @@ export class LocationEditorComponent implements ControlValueAccessor {
       validators: {
         validRange: {
           expression: (control: AbstractControl, field: any) => {
-            const fromVsValue = field.parent.get('fromVs').formControl?.value;
-            if (fromVsValue) {
+            const fromValue = field.parent.get('from').formControl?.value;
+            if (fromValue) {
               const fIndex = this.locationOptions.findIndex(
-                x => x.value === fromVsValue
+                x => x.value === fromValue
               );
               const tIndex = this.locationOptions.findIndex(
                 x => x.value === control.value
@@ -384,7 +384,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
     let val: any;
     if (this.form.valid) {
       if (this.locationType === 3) {
-        val = { ...$event, toVs: $event.fromVs };
+        val = { ...$event, to: $event.from };
       } else {
         val = { ...$event };
       }
@@ -422,8 +422,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
     [locationType]="props.locationType || 2"
     [mappingColumns]="props.mappingColumns || []"
     [system]="props.system || []"
-    [fromVsLabel]="props.fromVsLabel"
-    [toVsLabel]="props.toVsLabel"
+    [fromLabel]="props.fromLabel"
+    [toLabel]="props.toLabel"
     [fromMeasureLabel]="props.fromMeasureLabel"
     [toMeasureLabel]="props.toMeasureLabel"
     [lengthLabel]="props.lengthLabel || ''"></app-location-editor>`,
@@ -445,8 +445,8 @@ export class FormlyFieldLocationEditorComponent
         locationType: number;
         system: { label: string; value: string }[];
         mappingColumns: { label: string; value: string }[];
-        fromVsLabel: string;
-        toVsLabel: string;
+        fromLabel: string;
+        toLabel: string;
         fromMeasureLabel: string;
         toMeasureLabel: string;
         lengthLabel?: string;

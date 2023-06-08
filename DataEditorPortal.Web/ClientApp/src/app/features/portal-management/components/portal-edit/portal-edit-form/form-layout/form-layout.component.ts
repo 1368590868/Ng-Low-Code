@@ -331,9 +331,9 @@ export class FormLayoutComponent {
     };
 
     if (filterType === 'locationField') {
-      model.props['fromVsLabel'] = 'From Vs';
+      model.props['fromLabel'] = 'From';
       model.props['fromMeasureLabel'] = 'From Measure';
-      model.props['toVsLabel'] = 'To Vs';
+      model.props['toLabel'] = 'To';
       model.props['toMeasureLabel'] = 'To Measure';
       model.props['locationType'] = 2;
     }

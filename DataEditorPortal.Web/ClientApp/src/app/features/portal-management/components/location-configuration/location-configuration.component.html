@@ -4,12 +4,12 @@
       *ngIf="!innerValue"
       class="cursor-pointer"
       severity="warn"
-      text="No Configuration"></p-message>
+      text="Not Configured"></p-message>
     <p-message
       *ngIf="innerValue"
       class="cursor-pointer"
       severity="success"
-      text="Have Configuration"
+      text="Configured"
       (click)="showDialog()"></p-message>
 
     <p-button
@@ -41,7 +41,7 @@
           <input
             type="text"
             pInputText
-            [ngModel]="locationType === 2 ? 'VS' : 'From VS'"
+            [ngModel]="'From'"
             [disabled]="true"
             [style]="{ minWidth: '20rem' }" />
         </div>
@@ -51,7 +51,7 @@
           <label for="tableName" class="mb-1">Map To</label>
           <div class="flex align-items-center">
             <p-dropdown
-              [formControl]="formControlFromVs"
+              [formControl]="formControlFrom"
               class="mr-1 flex-grow-1"
               [style]="{ minWidth: '20rem' }"
               appendTo="body"
@@ -102,7 +102,7 @@
           <input
             type="text"
             pInputText
-            [ngModel]="'To VS'"
+            [ngModel]="'To'"
             [disabled]="true"
             [style]="{ minWidth: '20rem' }" />
         </div>
@@ -113,7 +113,7 @@
 
           <div class="flex align-items-center">
             <p-dropdown
-              [formControl]="formControlToVs"
+              [formControl]="formControlTo"
               class="mr-1 flex-grow-1"
               [style]="{ minWidth: '20rem' }"
               appendTo="body"
