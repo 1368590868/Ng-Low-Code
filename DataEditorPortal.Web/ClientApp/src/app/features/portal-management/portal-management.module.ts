@@ -40,6 +40,7 @@ import { TabViewModule } from 'primeng/tabview';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
+import { SharedModule } from 'src/app/shared';
 import {
   PortalListComponent,
   AddPortalDialogComponent,
@@ -118,6 +119,7 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
   ],
   imports: [
     CommonModule,
+    SharedModule,
     PortalManagementRoutingModule,
     UniversalGridActionModule,
     FormsModule,

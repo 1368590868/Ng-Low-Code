@@ -16,6 +16,7 @@ import { BooleanTextPipe } from './pipes/boolean-text.pipe';
 import { AttachmentsPipe } from './pipes/attachments.pipe';
 import { TemplatePipe } from './pipes/template.pipe';
 import { DataFormatService } from './services/data-format.service';
+import { AutoFilterDirective } from './directive/auto-filter.directive';
 
 // public components
 import { AttachmentsComponent } from './components/attachments/attachments.component';
@@ -33,13 +34,13 @@ export { UserService } from './services/user.service';
 export { DataDictionaryService } from './services/data-dictionary.service';
 export { SystemLogService } from './services/system-log.service';
 export { DataFormatService } from './services/data-format.service';
-export { SystemLogDialogComponent } from '../features/core/components/system-log/system-log-dialog/system-log-dialog.component';
 export * from './models/universal.type';
-export { SystemLogData } from '../shared/models/system-log';
+export { SystemLogData } from './models/system-log';
 
 @NgModule({
   declarations: [
     PermissionDirective,
+    AutoFilterDirective,
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
@@ -54,6 +55,7 @@ export { SystemLogData } from '../shared/models/system-log';
   ],
   exports: [
     PermissionDirective,
+    AutoFilterDirective,
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,

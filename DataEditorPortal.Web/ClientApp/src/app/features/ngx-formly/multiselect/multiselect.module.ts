@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FormlySelectModule } from '@ngx-formly/core/select';
 import { FormlyFieldMultiSelectComponent } from './multiselect.type';
+import { SharedModule } from 'src/app/shared';
 
 @NgModule({
   declarations: [FormlyFieldMultiSelectComponent],
@@ -21,7 +22,8 @@ import { FormlyFieldMultiSelectComponent } from './multiselect.type';
         }
       ]
     }),
-    FormlySelectModule
+    FormlySelectModule,
+    SharedModule
   ]
 })
 export class FormlyMultiSelectModule {}
