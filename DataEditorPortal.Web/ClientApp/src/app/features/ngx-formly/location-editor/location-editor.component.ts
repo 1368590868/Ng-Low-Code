@@ -165,7 +165,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
             if (fromMeasureProps) {
               fromMeasureProps[
                 'helperText'
-              ] = `Min:${record?.value1} Max: ${record?.value2}`;
+              ] = `Min: ${record?.value1} Max: ${record?.value2}`;
               fromMeasureProps['min'] = record?.value1;
               fromMeasureProps['max'] = record?.value2;
             }
@@ -176,7 +176,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
               if (toMeasureProps) {
                 toMeasureProps[
                   'helperText'
-                ] = `Min:${record?.value1} Max: ${record?.value2}`;
+                ] = `Min: ${record?.value1} Max: ${record?.value2}`;
                 toMeasureProps['min'] = record?.value1;
                 toMeasureProps['max'] = record?.value2;
               }
@@ -279,7 +279,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
             if (toMeasureProps) {
               toMeasureProps[
                 'helperText'
-              ] = `Min:${record?.value1} Max: ${record?.value2}`;
+              ] = `Min: ${record?.value1} Max: ${record?.value2}`;
               toMeasureProps['min'] = record?.value1;
               toMeasureProps['max'] = record?.value2;
             }
@@ -355,11 +355,11 @@ export class LocationEditorComponent implements ControlValueAccessor {
     },
     {
       key: 'lengthFeet',
-      type: 'input',
-      defaultValue: this.lengthLabel,
+      type: 'inputNumber',
       props: {
         label: this.lengthLabel,
-        disabled: true
+        disabled: true,
+        hideRequiredMarker: true
       },
       expressions: {
         hide: () => !this.lengthLabel,
