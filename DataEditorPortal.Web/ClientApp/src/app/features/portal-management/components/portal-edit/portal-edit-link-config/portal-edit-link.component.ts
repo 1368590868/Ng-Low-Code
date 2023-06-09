@@ -283,9 +283,6 @@ export class PortalEditLinkComponent
         this.isSavingAndNext = false;
       });
   }
-  onFilter(dbDropdownRef: Dropdown) {
-    dbDropdownRef.scroller?.setContentPosition(null);
-  }
 
   saveSucess() {
     if (this.isSavingAndNext) {
