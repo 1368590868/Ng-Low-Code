@@ -4,9 +4,9 @@
     Create or update settings of the linked table.
   </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
-  <!-- datasource connect -->
-  <p-divider styleClass="w-6 mt-4">Link Table</p-divider>
-  <div class="w-6 ml-4">
+
+  <!-- datasource connection -->
+  <div class="w-6 pt-3">
     <div class="flex flex-column mb-3">
       <label for="" class="mb-1">Database Connection</label>
       <div class="flex align-items-center">
@@ -29,101 +29,13 @@
         #dbConnectionDialog
         (connectionChange)="connectionSaved($event)"></app-db-connection-dialog>
     </div>
-    <div class="flex flex-column mb-3">
-      <ng-container *ngIf="!dsConfig.queryText">
-        <label for="tableName" class="mb-1">Database Table</label>
-        <div class="flex align-items-center">
-          <p-dropdown
-            #dbTableDropdown
-            *ngIf="!dsConfig.queryText"
-            [required]="true"
-            [options]="dbTables"
-            (onChange)="onTableNameChange($event)"
-            [formControl]="formControlDbTable"
-            placeholder="Please Select"
-            [style]="{ minWidth: '41.5rem' }"
-            appendTo="body"></p-dropdown>
-          <p-button
-            [disabled]="!dsConfig.dataSourceConnectionName"
-            class="ml-1"
-            pTooltip="Create new Query"
-            styleClass="p-button-text p-button-rounded"
-            icon="pi pi-ellipsis-v"
-            (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button>
-        </div>
-      </ng-container>
-      <ng-container *ngIf="dsConfig.queryText">
-        <label class="line-height-3">Database Query</label>
-        <div class="flex align-items-center">
-          <div (click)="advancedQueryDialog.showAdvanceDialog()">
-            <ngx-monaco-editor
-              [ngModel]="dsConfig.queryText"
-              [style]="{ minWidth: '41.5rem' }"
-              class="pt-3 border-round monaco-editor-wrapper display-only overflow-hidden"
-              [options]="{
-                readOnly: true,
-                domReadOnly: true
-              }"></ngx-monaco-editor>
-          </div>
-          <p-button
-            styleClass="p-button-text p-button-rounded ml-2"
-            icon="pi pi-times-circle"
-            (onClick)="removeAdvancedQuery()"></p-button>
-        </div>
-      </ng-container>
-      <app-advanced-query-dialog
-        #advancedQueryDialog
-        [connectionName]="dsConfig.dataSourceConnectionName"
-        [queryText]="dsConfig.queryText"
-        (queryChange)="queryChange($event)"></app-advanced-query-dialog>
-    </div>
-    <div class="flex align-items-center mt-3">
-      <div class="flex align-items-center">
-        <div class="flex flex-column mb-2 mr-4">
-          <label for="idColumn" class="mb-1">Id Column</label>
-          <div class="flex align-items-center">
-            <p-dropdown
-              [required]="true"
-              [formControl]="formControlIdColumn"
-              [options]="dbTableColumns"
-              placeholder="Please Select"
-              [style]="{ minWidth: '20rem' }"
-              optionLabel="columnName"
-              optionValue="columnName"
-              appendTo="body"></p-dropdown>
-          </div>
-        </div>
-      </div>
-      <div class="flex flex-column mb-2" style="margin-left: '-1.23rem'">
-        <label class="mb-4"> </label>
-        <div class="flex align-items-center">
-          <p-button
-            title="Advanced Configuration"
-            styleClass="p-button-text p-button-rounded"
-            icon="pi pi-ellipsis-v"
-            (onClick)="advancedDialog.showDialog()"></p-button>
-          <p-message
-            severity="info"
-            [text]="
-              advancedValue
-                ? 'Obtained from custom query text'
-                : 'Automatically obtained from the database'
-            "
-            styleClass="mr-1 ml-1"></p-message>
-          <p-button
-            *ngIf="advancedValue"
-            styleClass="p-button-text p-button-rounded remove-btn"
-            icon="pi pi-times-circle"
-            (onClick)="advancedDialog.onRemove()"></p-button>
-        </div>
-      </div>
-    </div>
   </div>
+  <!-- datasource connection -->
 
-  <!-- Table  -->
+  <!-- Link Tables  -->
   <div *ngIf="dsConfig?.dataSourceConnectionName !== null">
-    <p-divider styleClass="w-6 mt-4">Primary Table</p-divider>
-    <div class="w-6 mb-2">
+    <p-divider styleClass="w-6 mt-4 font-semibold">Primary Table</p-divider>
+    <div class="w-6 mb-3 overflow-hidden">
       <ng-container
         *ngIf="
           primaryTableConfig?.details && primaryTableConfig.details.length > 0
@@ -131,7 +43,7 @@
         <p-table
           [value]="primaryTableConfig.details"
           [rowHover]="true"
-          styleClass="p-datatable-striped ml-4">
+          styleClass="p-datatable-striped">
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 25%">Label</th>
@@ -172,61 +84,24 @@
             </tr>
           </ng-template>
         </p-table>
-        <div
-          *ngIf="
-            secondaryTableConfig?.details &&
-            primaryTableConfig.details[0].configCompleted &&
-            secondaryTableConfig.details[0].configCompleted
-          ">
-          <div class="flex align-items-center mt-3">
-            <div class="flex flex-column mb-2 ml-4">
-              <label for="idColumn" class="mb-1"
-                >Id Column of Primary Table</label
-              >
-              <div class="flex align-items-center">
-                <input
-                  pInputText
-                  [value]="primaryTableConfig.idColumn"
-                  [disabled]="true"
-                  [style]="{ minWidth: '20rem' }" />
-              </div>
-            </div>
-            <div class="flex flex-column mb-2 ml-4">
-              <label for="idColumn" class="mb-1"
-                >Map to Column of Link Table</label
-              >
-              <div class="flex align-items-center">
-                <p-dropdown
-                  [required]="true"
-                  [formControl]="formControlPrimaryMap"
-                  [options]="dbTableColumns"
-                  placeholder="Please Select"
-                  [style]="{ minWidth: '20rem' }"
-                  optionLabel="columnName"
-                  optionValue="columnName"
-                  appendTo="body"></p-dropdown>
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-column mb-2 ml-4 mt-3">
-            <label for="columnsForLinkedField" class="mb-1"
-              >Select Columns of Link Data Editor</label
-            >
-            <div class="flex align-items-center">
-              <p-multiSelect
-                #validationRef="ngModel"
-                [required]="true"
-                [style]="{ width: '41.5rem' }"
-                [showToggleAll]="false"
-                appendTo="body"
-                placeholder="Place Select One Column"
-                [filter]="false"
-                [showHeader]="false"
-                display="chip"
-                [(ngModel)]="primarySelected"
-                [options]="primaryTableConfig.columns">
-              </p-multiSelect>
-            </div>
+        <div class="flex flex-column mb-2 mt-3">
+          <label for="columnsForLinkedField" class="mb-1"
+            >Select Columns for Link Data Editor</label
+          >
+          <div class="flex align-items-center">
+            <p-multiSelect
+              #validationRef="ngModel"
+              [required]="true"
+              [style]="{ width: '41.5rem' }"
+              [showToggleAll]="false"
+              appendTo="body"
+              placeholder="Place Select One Column"
+              [filter]="false"
+              [showHeader]="false"
+              display="chip"
+              [(ngModel)]="primarySelected"
+              [options]="primaryTableConfig.columns">
+            </p-multiSelect>
           </div>
         </div>
       </ng-container>
@@ -235,12 +110,11 @@
         *ngIf="!primaryTableConfig?.details"
         label="Add"
         icon="pi pi-plus"
-        class="mt-1 ml-4"
-        styleClass="p-button-text p-button-sm"
+        styleClass="p-button-text p-button-sm mt-1 mb-3"
         (onClick)="onAddPrimaryTable()"></p-button>
     </div>
-    <p-divider styleClass="w-6 mt-4">Secondary Table</p-divider>
-    <div class="w-6 mb-2">
+    <p-divider styleClass="w-6 mt-4 font-semibold">Secondary Table</p-divider>
+    <div class="w-6 mb-3 overflow-hidden">
       <ng-container
         *ngIf="
           secondaryTableConfig?.details &&
@@ -249,7 +123,7 @@
         <p-table
           [value]="secondaryTableConfig.details"
           [rowHover]="true"
-          styleClass="p-datatable-striped ml-4">
+          styleClass="p-datatable-striped">
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 25%">Label</th>
@@ -291,61 +165,24 @@
             </tr>
           </ng-template>
         </p-table>
-        <div
-          *ngIf="
-            secondaryTableConfig.details &&
-            secondaryTableConfig.details[0].configCompleted
-          ">
-          <div class="flex align-items-center mt-3">
-            <div class="flex flex-column mb-2 ml-4">
-              <label for="idColumn" class="mb-1"
-                >Id Column of Secondary Table</label
-              >
-              <div class="flex align-items-center">
-                <input
-                  pInputText
-                  [value]="secondaryTableConfig.idColumn"
-                  [disabled]="true"
-                  [style]="{ minWidth: '20rem' }" />
-              </div>
-            </div>
-            <div class="flex flex-column mb-2 ml-4">
-              <label for="idColumn" class="mb-1"
-                >Map to Column of Link Table</label
-              >
-              <div class="flex align-items-center">
-                <p-dropdown
-                  [required]="true"
-                  [formControl]="formControlSecondaryMap"
-                  [options]="dbTableColumns"
-                  placeholder="Please Select"
-                  [style]="{ minWidth: '20rem' }"
-                  optionLabel="columnName"
-                  optionValue="columnName"
-                  appendTo="body"></p-dropdown>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex flex-column mb-2 ml-4 mt-3">
-            <label for="columnsForLinkedField" class="mb-1"
-              >Select Columns for Link Data Editor</label
-            >
-            <div class="flex align-items-center">
-              <p-multiSelect
-                #validationRef="ngModel"
-                [required]="true"
-                [style]="{ width: '41.5rem' }"
-                [showToggleAll]="false"
-                appendTo="body"
-                placeholder="Place Select One Column"
-                [filter]="false"
-                [showHeader]="false"
-                display="chip"
-                [(ngModel)]="secondarySelected"
-                [options]="secondaryTableConfig.columns">
-              </p-multiSelect>
-            </div>
+        <div class="flex flex-column mb-2 mt-3">
+          <label for="columnsForLinkedField" class="mb-1"
+            >Select Columns for Link Data Editor</label
+          >
+          <div class="flex align-items-center">
+            <p-multiSelect
+              #validationRef="ngModel"
+              [required]="true"
+              [style]="{ width: '41.5rem' }"
+              [showToggleAll]="false"
+              appendTo="body"
+              placeholder="Place Select One Column"
+              [filter]="false"
+              [showHeader]="false"
+              display="chip"
+              [(ngModel)]="secondarySelected"
+              [options]="secondaryTableConfig.columns">
+            </p-multiSelect>
           </div>
         </div>
       </ng-container>
@@ -353,12 +190,169 @@
         *ngIf="!secondaryTableConfig?.details"
         label="Add"
         icon="pi pi-plus"
-        class="mt-1 ml-4"
-        styleClass="p-button-text p-button-sm"
+        styleClass="p-button-text p-button-sm mt-1 mb-3"
         (onClick)="onAddSecondaryTable()">
       </p-button>
     </div>
   </div>
+  <!-- Link Tables  -->
+
+  <!-- Link Relation  -->
+  <ng-container
+    *ngIf="
+      primaryTableConfig?.details &&
+      primaryTableConfig.details.length > 0 &&
+      primaryTableConfig.details[0].configCompleted &&
+      secondaryTableConfig?.details &&
+      secondaryTableConfig.details.length > 0 &&
+      secondaryTableConfig.details[0].configCompleted
+    ">
+    <p-divider styleClass="w-6 mt-4 font-semibold">Link Table</p-divider>
+    <div class="w-6 mb-3">
+      <div class="flex flex-column mb-3">
+        <ng-container *ngIf="!dsConfig.queryText">
+          <label for="tableName" class="mb-1">Database Table</label>
+          <div class="flex align-items-center">
+            <p-dropdown
+              #dbTableDropdown
+              *ngIf="!dsConfig.queryText"
+              [required]="true"
+              [options]="dbTables"
+              (onChange)="onTableNameChange($event)"
+              [formControl]="formControlDbTable"
+              placeholder="Please Select"
+              [style]="{ minWidth: '41.5rem' }"
+              appendTo="body"></p-dropdown>
+            <p-button
+              [disabled]="!dsConfig.dataSourceConnectionName"
+              class="ml-1"
+              pTooltip="Create new Query"
+              styleClass="p-button-text p-button-rounded"
+              icon="pi pi-ellipsis-v"
+              (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="dsConfig.queryText">
+          <label class="line-height-3">Database Query</label>
+          <div class="flex align-items-center">
+            <div (click)="advancedQueryDialog.showAdvanceDialog()">
+              <ngx-monaco-editor
+                [ngModel]="dsConfig.queryText"
+                [style]="{ minWidth: '41.5rem' }"
+                class="pt-3 border-round monaco-editor-wrapper display-only overflow-hidden"
+                [options]="{
+                  readOnly: true,
+                  domReadOnly: true
+                }"></ngx-monaco-editor>
+            </div>
+            <p-button
+              styleClass="p-button-text p-button-rounded ml-2"
+              icon="pi pi-times-circle"
+              (onClick)="removeAdvancedQuery()"></p-button>
+          </div>
+        </ng-container>
+        <app-advanced-query-dialog
+          #advancedQueryDialog
+          [connectionName]="dsConfig.dataSourceConnectionName"
+          [queryText]="dsConfig.queryText"
+          (queryChange)="queryChange($event)"></app-advanced-query-dialog>
+      </div>
+      <div class="flex align-items-center mt-3">
+        <div class="flex align-items-center">
+          <div class="flex flex-column mb-2 mr-4">
+            <label for="idColumn" class="mb-1">Id Column</label>
+            <div class="flex align-items-center">
+              <p-dropdown
+                [required]="true"
+                [formControl]="formControlIdColumn"
+                [options]="dbTableColumns"
+                placeholder="Please Select"
+                [style]="{ minWidth: '20rem' }"
+                optionLabel="columnName"
+                optionValue="columnName"
+                appendTo="body"></p-dropdown>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-column mb-2" style="margin-left: '-1.23rem'">
+          <label class="mb-4"> </label>
+          <div class="flex align-items-center">
+            <p-button
+              title="Advanced Configuration"
+              styleClass="p-button-text p-button-rounded"
+              icon="pi pi-ellipsis-v"
+              (onClick)="advancedDialog.showDialog()"></p-button>
+            <p-message
+              severity="info"
+              [text]="
+                advancedValue
+                  ? 'Obtained from custom query text'
+                  : 'Automatically obtained from the database'
+              "
+              styleClass="mr-1 ml-1"></p-message>
+            <p-button
+              *ngIf="advancedValue"
+              styleClass="p-button-text p-button-rounded remove-btn"
+              icon="pi pi-times-circle"
+              (onClick)="advancedDialog.onRemove()"></p-button>
+          </div>
+        </div>
+      </div>
+      <div class="flex align-items-center mt-3">
+        <div class="flex flex-column mb-2">
+          <label for="idColumn" class="mb-1">Reference Key (Primary)</label>
+          <div class="flex align-items-center">
+            <input
+              pInputText
+              [value]="primaryTableConfig.idColumn"
+              [disabled]="true"
+              [style]="{ minWidth: '20rem' }" />
+          </div>
+        </div>
+        <div class="flex flex-column mb-2 ml-4">
+          <label for="idColumn" class="mb-1">Foreign Key (Primary)</label>
+          <div class="flex align-items-center">
+            <p-dropdown
+              [required]="true"
+              [formControl]="formControlPrimaryMap"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
+        </div>
+      </div>
+      <div class="flex align-items-center mt-3">
+        <div class="flex flex-column mb-2">
+          <label for="idColumn" class="mb-1">Reference Key (Secondary)</label>
+          <div class="flex align-items-center">
+            <input
+              pInputText
+              [value]="secondaryTableConfig.idColumn"
+              [disabled]="true"
+              [style]="{ minWidth: '20rem' }" />
+          </div>
+        </div>
+        <div class="flex flex-column mb-2 ml-4">
+          <label for="idColumn" class="mb-1">Foreign Key (Secondary)</label>
+          <div class="flex align-items-center">
+            <p-dropdown
+              [required]="true"
+              [formControl]="formControlSecondaryMap"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <!-- Link Relation  -->
 
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
