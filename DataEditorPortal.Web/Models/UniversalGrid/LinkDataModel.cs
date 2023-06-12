@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DataEditorPortal.Web.Models.UniversalGrid
 {
@@ -11,16 +12,23 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class LinkedTableInfo
     {
-        public string Table2Name { get; set; }
-        public Guid Table2Id { get; set; }
-        public string Table2DataSource { get; set; }
-        public string Name { get; set; }
-        public Guid Id { get; set; }
+        public TableMeta Table1 { get; set; }
+        public TableMeta Table2 { get; set; }
+        public TableMeta LinkTable { get; set; }
+    }
 
+    public class TableMeta
+    {
+        public string Name { get; set; }
+        public Guid MenuId { get; set; }
+        public string IdColumn { get; set; }
+        public string Query_AllData { get; set; }
+        public List<string> EditorColumns { get; set; }
+        public string Query_GetLinkedDataById { get; set; }
+        public string ReferenceKey { get; set; }
+        public string ForeignKey { get; set; }
         public string ConnectionString { get; set; }
-        public DataSourceConfig LinkedTable { get; set; }
-        public string DataSourceConfig { get; set; }
-        public string Table2MappingField { get; set; }
-        public string Table1MappingField { get; set; }
+        public string Query_Insert { get; set; }
+        public string Query_Delete { get; set; }
     }
 }

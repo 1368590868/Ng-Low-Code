@@ -106,5 +106,15 @@ namespace DataEditorPortal.Web.Services
                 }
             }
         }
+
+        public override void BeforeDeleted(UniversalGridConfiguration config, FormFieldConfig field, IEnumerable<object> dataIds)
+        {
+            return;
+        }
+
+        public override void AfterDeleted()
+        {
+            return;
+        }
     }
 }

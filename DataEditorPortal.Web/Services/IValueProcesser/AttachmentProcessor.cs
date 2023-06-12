@@ -74,5 +74,15 @@ namespace DataEditorPortal.Web.Services
             var attachmentService = _serviceProvider.GetRequiredService<IAttachmentService>();
             attachmentService.SaveUploadedFiles(_uploadeFiledMeta, dataId, _config.Name);
         }
+
+        public override void BeforeDeleted(UniversalGridConfiguration config, FormFieldConfig field, IEnumerable<object> dataIds)
+        {
+            return;
+        }
+
+        public override void AfterDeleted()
+        {
+            return;
+        }
     }
 }

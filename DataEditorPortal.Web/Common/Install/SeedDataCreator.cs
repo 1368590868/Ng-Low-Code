@@ -901,24 +901,26 @@ namespace DataEditorPortal.Web.Common.Install
 
                 DataSourceConfig = JsonSerializer.Serialize(new LinkedDataSourceConfig
                 {
-                    LinkedTable = new DataSourceConfig()
+                    LinkTable = new RelationDataSourceConfig()
                     {
                         DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME,
                         TableName = "LPASITE_RELATION",
                         TableSchema = Constants.DEFAULT_SCHEMA,
-                        IdColumn = "OBJECTID"
+                        IdColumn = "OBJECTID",
+                        PrimaryForeignKey = "LEFTID",
+                        PrimaryReferenceKey = "OBJECTID",
+                        SecondaryForeignKey = "RIGHTID",
+                        SecondaryReferenceKey = "OBJECTID"
                     },
                     PrimaryTable = new LinkedTableConfig()
                     {
                         Id = new Guid("060B81FF-EBBB-4FA8-BCD5-00568860153F"),
                         ColumnsForLinkedField = new List<string>() { "LPANAME", "TYPE", "LPASTATUS", "DISCOVERYDATE", "REMEDIATIONPROPOSEDDATE", "COMMENTS" },
-                        MapToLinkedTableField = "LEFTID"
                     },
                     SecondaryTable = new LinkedTableConfig()
                     {
                         Id = new Guid("9CAB7319-5295-46F0-8879-F58F434C0397"),
                         ColumnsForLinkedField = new List<string>() { "TYPE", "LPAACTIVITYSTATUS", "REMEDIATIONPROPOSEDDATE", "COMMENTS" },
-                        MapToLinkedTableField = "RIGHTID"
                     }
                 }),
 
