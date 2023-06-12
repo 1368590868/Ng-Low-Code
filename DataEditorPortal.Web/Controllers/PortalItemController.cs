@@ -648,11 +648,15 @@ namespace DataEditorPortal.Web.Controllers
             var datasource = JsonSerializer.Deserialize<DataSourceConfig>(!string.IsNullOrEmpty(item.DataSourceConfig) ? item.DataSourceConfig : "{}");
             var columns = JsonSerializer.Deserialize<List<GridColConfig>>(!string.IsNullOrEmpty(item.ColumnsConfig) ? item.ColumnsConfig : "[]"); ;
 
+            var sqlText = _queryBuilder.GetSqlTextForDatabaseSource(datasource);
+            var fields = _portalItemService.GetDataSourceTableColumns(datasource.DataSourceConnectionName, sqlText);
+
             return new
             {
                 details = new object[] { details },
                 idColumn = datasource.IdColumn,
-                columns = columns.Select(x => x.field)
+                gridColumns = columns.Select(x => new { label = x.field, value = x.field }),
+                databaseColumns = fields.Select(x => new { label = x.ColumnName, value = x.ColumnName })
             };
         }
 
