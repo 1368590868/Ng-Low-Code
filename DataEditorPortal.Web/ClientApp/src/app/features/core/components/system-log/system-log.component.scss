@@ -42,4 +42,13 @@
       min-height: calc(100% - 8rem);
     }
   }
+
+  .p-datatable {
+    .p-datatable-tbody > tr > td:first-child {
+      padding-left: 1rem !important;
+    }
+    .p-datatable-thead > tr > th:first-child {
+      padding-left: 1rem !important;
+    }
+  }
 }
