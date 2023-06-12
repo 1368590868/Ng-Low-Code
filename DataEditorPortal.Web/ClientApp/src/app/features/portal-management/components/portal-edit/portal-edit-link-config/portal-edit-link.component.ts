@@ -218,15 +218,25 @@ export class PortalEditLinkComponent
   }
 
   onEditTable(tableId: string) {
-    this.onSave();
-    this.router.navigate([`./edit/${tableId}`], {
-      relativeTo: this.route
+    this.onSave().subscribe(res => {
+      if (!res.isError) {
+        this.saveSucess();
+        this.router.navigate([`./edit/${tableId}`], {
+          relativeTo: this.route
+        });
+      }
+      this.clearStatus();
     });
   }
 
   onAddPrimaryTable() {
-    this.onSave();
-    this.router.navigate(['./add'], { relativeTo: this.route });
+    this.onSave().subscribe(res => {
+      if (!res.isError) {
+        this.saveSucess();
+        this.router.navigate(['./add'], { relativeTo: this.route });
+      }
+      this.clearStatus();
+    });
   }
 
   onAddSecondaryTable() {
@@ -236,8 +246,13 @@ export class PortalEditLinkComponent
         'Please select primary table first.'
       );
     } else {
-      this.onSave();
-      this.router.navigate(['./add'], { relativeTo: this.route });
+      this.onSave().subscribe(res => {
+        if (!res.isError) {
+          this.saveSucess();
+          this.router.navigate(['./add'], { relativeTo: this.route });
+        }
+        this.clearStatus();
+      });
     }
   }
 
@@ -280,14 +295,30 @@ export class PortalEditLinkComponent
     this.isSavingAndNext = true;
 
     if (this.valid()) {
-      this.onSave();
+      this.onSave().subscribe(res => {
+        if (!res.isError) {
+          this.saveSucess();
+        }
+        this.clearStatus();
+      });
     }
   }
 
   onSaveAndExit() {
     if (!this.validate()) return;
     this.isSavingAndExit = true;
-    this.onSave();
+    this.onSave().subscribe(res => {
+      if (!res.isError) {
+        this.saveSucess();
+      }
+      this.clearStatus();
+    });
+  }
+
+  clearStatus() {
+    this.isSaving = false;
+    this.isSavingAndExit = false;
+    this.isSavingAndNext = false;
   }
 
   onSave() {
@@ -309,35 +340,25 @@ export class PortalEditLinkComponent
     } else {
       data.queryText = this.dsConfig.queryText;
     }
-    this.portalItemService
-      .saveLinkedDatasource({
-        primaryTable: this.dataSourceConfig.primaryTable?.id
-          ? {
-              id: this.dataSourceConfig.primaryTable?.id,
-              columnsForLinkedField: this.primarySelected
-            }
-          : null,
-        secondaryTable: this.dataSourceConfig.secondaryTable?.id
-          ? {
-              id: this.dataSourceConfig.secondaryTable?.id,
-              columnsForLinkedField: this.secondarySelected
-            }
-          : null,
-        linkTable: data
-      })
-      .subscribe(res => {
-        if (!res.isError) {
-          this.saveSucess();
-        }
-        this.isSaving = false;
-        this.isSavingAndExit = false;
-        this.isSavingAndNext = false;
-      });
+    return this.portalItemService.saveLinkedDatasource({
+      primaryTable: this.dataSourceConfig.primaryTable?.id
+        ? {
+            id: this.dataSourceConfig.primaryTable?.id,
+            columnsForLinkedField: this.primarySelected
+          }
+        : null,
+      secondaryTable: this.dataSourceConfig.secondaryTable?.id
+        ? {
+            id: this.dataSourceConfig.secondaryTable?.id,
+            columnsForLinkedField: this.secondarySelected
+          }
+        : null,
+      linkTable: data
+    });
   }
 
   saveSucess() {
     if (this.isSavingAndNext) {
-      this.portalItemService.saveCurrentStep('search');
       this.saveNextEvent.emit();
     }
     if (this.isSavingAndExit) {
