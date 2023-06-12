@@ -100,7 +100,7 @@
               [showHeader]="false"
               display="chip"
               [(ngModel)]="primarySelected"
-              [options]="primaryTableConfig.columns">
+              [options]="primaryTableConfig.gridColumns">
             </p-multiSelect>
           </div>
         </div>
@@ -181,7 +181,7 @@
               [showHeader]="false"
               display="chip"
               [(ngModel)]="secondarySelected"
-              [options]="secondaryTableConfig.columns">
+              [options]="secondaryTableConfig.gridColumns">
             </p-multiSelect>
           </div>
         </div>
@@ -274,39 +274,18 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-column mb-2" style="margin-left: '-1.23rem'">
-          <label class="mb-4"> </label>
-          <div class="flex align-items-center">
-            <p-button
-              title="Advanced Configuration"
-              styleClass="p-button-text p-button-rounded"
-              icon="pi pi-ellipsis-v"
-              (onClick)="advancedDialog.showDialog()"></p-button>
-            <p-message
-              severity="info"
-              [text]="
-                advancedValue
-                  ? 'Obtained from custom query text'
-                  : 'Automatically obtained from the database'
-              "
-              styleClass="mr-1 ml-1"></p-message>
-            <p-button
-              *ngIf="advancedValue"
-              styleClass="p-button-text p-button-rounded remove-btn"
-              icon="pi pi-times-circle"
-              (onClick)="advancedDialog.onRemove()"></p-button>
-          </div>
-        </div>
       </div>
       <div class="flex align-items-center mt-3">
         <div class="flex flex-column mb-2">
           <label for="idColumn" class="mb-1">Reference Key (Primary)</label>
           <div class="flex align-items-center">
-            <input
-              pInputText
-              [value]="primaryTableConfig.idColumn"
-              [disabled]="true"
-              [style]="{ minWidth: '20rem' }" />
+            <p-dropdown
+              [required]="true"
+              [formControl]="formControlPrimaryReference"
+              [options]="primaryTableConfig.databaseColumns || []"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              appendTo="body"></p-dropdown>
           </div>
         </div>
         <div class="flex flex-column mb-2 ml-4">
@@ -328,11 +307,13 @@
         <div class="flex flex-column mb-2">
           <label for="idColumn" class="mb-1">Reference Key (Secondary)</label>
           <div class="flex align-items-center">
-            <input
-              pInputText
-              [value]="secondaryTableConfig.idColumn"
-              [disabled]="true"
-              [style]="{ minWidth: '20rem' }" />
+            <p-dropdown
+              [required]="true"
+              [formControl]="formControlSecondaryReference"
+              [options]="secondaryTableConfig.databaseColumns || []"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              appendTo="body"></p-dropdown>
           </div>
         </div>
         <div class="flex flex-column mb-2 ml-4">
@@ -353,6 +334,24 @@
     </div>
   </ng-container>
   <!-- Link Relation  -->
+
+  <p-divider styleClass="w-6">
+    <p-button
+      label="Query for Adding"
+      [icon]="showQuery ? 'pi pi-minus' : 'pi pi-plus'"
+      styleClass="p-button-text p-button-sm"
+      (onClick)="showQuery = !showQuery"></p-button>
+  </p-divider>
+  <p *ngIf="showQuery" class="line-height-2 mb-1">
+    Enter your query text that will be run when creating new data.
+  </p>
+  <ngx-monaco-editor
+    *ngIf="showQuery"
+    [formControl]="formControlQueryText"
+    (onInit)="onMonacoEditorInit($event)"
+    [style]="{ height: '20rem' }"
+    class="pt-3 w-6 order-round monaco-editor-wrapper overflow-hidden mb-2"
+    [options]="{}"></ngx-monaco-editor>
 
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
@@ -383,6 +382,3 @@
 </p-card>
 
 <app-custom-actions #customActions></app-custom-actions>
-<app-advanced-dialog
-  #advancedDialog
-  [(ngModel)]="advancedValue"></app-advanced-dialog>

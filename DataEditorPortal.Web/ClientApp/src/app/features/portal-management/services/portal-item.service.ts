@@ -87,12 +87,12 @@ export class PortalItemService {
       .pipe(tap(() => this.refreshMenu()));
   }
 
-  getLinkedSingleTableConfig(id: string) {
+  getLinkedSingleTableConfig(id: string): Observable<LinkedSingleConfig> {
     return this.http
       .get<ApiResponse<LinkedSingleConfig>>(
         `${this._apiUrl}portal-item/${id}/linked-single-config`
       )
-      .pipe(map(x => x.result || { details: [], columns: [] }));
+      .pipe(map(x => x.result || { details: [], gridColumns: [] }));
   }
 
   getPortalList(): Observable<PortalItem[]> {

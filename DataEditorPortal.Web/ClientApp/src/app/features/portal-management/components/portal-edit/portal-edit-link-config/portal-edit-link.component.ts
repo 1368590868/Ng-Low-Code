@@ -15,8 +15,6 @@ import {
 import { FormControl, NgModel } from '@angular/forms';
 import { AdvancedQueryModel } from '..';
 import { CustomActionsComponent } from '../..';
-import { AdvancedDialogComponent } from './advanced-dialog/advanced-dialog.component';
-import { Dropdown } from 'primeng/dropdown';
 @Component({
   selector: 'app-portal-edit-link',
   templateUrl: './portal-edit-link.component.html',
@@ -27,13 +25,11 @@ export class PortalEditLinkComponent
   implements OnInit
 {
   @ViewChild('customActions') customActions!: CustomActionsComponent;
-  @ViewChild('advancedDialog') advancedDialog!: AdvancedDialogComponent;
   @ViewChildren('validationRef') validationRef!: NgModel[];
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
   isSavingAndExit = false;
-  advancedValue?: { queryText: string; type: string };
 
   set itemId(val: string | undefined) {
     this.portalItemService.itemId = val;
@@ -53,15 +49,26 @@ export class PortalEditLinkComponent
     dataSourceConnectionName: '',
     tableName: '',
     tableSchema: '',
-    idColumn: ''
+    idColumn: '',
+    primaryForeignKey: '',
+    secondaryForeignKey: ''
   };
   dbTables: DataSourceTable[] = [];
   dbTableColumns: DataSourceTableColumn[] = [];
+
   formControlConnection: FormControl = new FormControl();
   formControlDbTable: FormControl = new FormControl();
   formControlIdColumn: FormControl = new FormControl();
   formControlPrimaryMap: FormControl = new FormControl();
   formControlSecondaryMap: FormControl = new FormControl();
+  formControlPrimaryReference: FormControl = new FormControl();
+  formControlSecondaryReference: FormControl = new FormControl();
+
+  showQuery = false;
+  helperMessage =
+    '-- E.g. \r\n\r\n' +
+    '-- INSERT INTO DEMO_TABLE (ID, NAME, FIRST_NAME, TOTAL, CREATED_DATE) VALUES (NEWID(), ##NAME##, ##FIRST_NAME##, ##TOTAL##, GETDATE())';
+  formControlQueryText: FormControl = new FormControl();
 
   constructor(
     private portalItemService: PortalItemService,
@@ -104,10 +111,20 @@ export class PortalEditLinkComponent
           this.secondarySelected =
             this.dataSourceConfig.secondaryTable?.columnsForLinkedField || [];
           this.formControlPrimaryMap.setValue(
-            this.dataSourceConfig.primaryTable?.mapToLinkedTableField
+            this.dataSourceConfig.linkTable?.primaryForeignKey
           );
           this.formControlSecondaryMap.setValue(
-            this.dataSourceConfig.secondaryTable?.mapToLinkedTableField
+            this.dataSourceConfig.linkTable?.secondaryForeignKey
+          );
+
+          this.showQuery =
+            !!result?.linkTable?.queryInsert &&
+            result?.linkTable?.queryInsert != this.helperMessage;
+
+          this.formControlQueryText.setValue(
+            result?.linkTable?.queryInsert
+              ? result?.linkTable?.queryInsert
+              : this.helperMessage
           );
 
           if (result?.primaryTable?.id != null) {
@@ -116,11 +133,16 @@ export class PortalEditLinkComponent
               .subscribe(item => {
                 this.primaryTableConfig = item;
                 const filteredData = this.primarySelected.filter(
-                  x => !!item.columns.find(y => y === x)
+                  x => !!item.gridColumns.find(y => y.value === x)
                 );
                 if (filteredData.length < this.primarySelected.length) {
                   this.primarySelected = filteredData;
                 }
+
+                this.formControlPrimaryReference.setValue(
+                  this.dataSourceConfig.linkTable?.primaryReferenceKey ??
+                    item?.idColumn
+                );
               });
           }
 
@@ -130,17 +152,21 @@ export class PortalEditLinkComponent
               .subscribe(item => {
                 this.secondaryTableConfig = item;
                 const filteredData = this.secondarySelected.filter(
-                  x => !!item.columns.find(y => y === x)
+                  x => !!item.gridColumns.find(y => y.value === x)
                 );
                 if (filteredData.length < this.secondarySelected.length) {
                   this.secondarySelected = filteredData;
                 }
+
+                this.formControlSecondaryReference.setValue(
+                  this.dataSourceConfig.linkTable?.secondaryReferenceKey ??
+                    item?.idColumn
+                );
               });
           }
 
-          if (result?.linkedTable) {
-            this.advancedValue = result.linkedTable?.queryToGetId;
-            this.dsConfig = result.linkedTable;
+          if (result?.linkTable) {
+            this.dsConfig = result.linkTable;
           }
         }
       });
@@ -167,6 +193,22 @@ export class PortalEditLinkComponent
       }
 
       this.getDbTables();
+    });
+  }
+
+  onMonacoEditorInit(editor: any) {
+    editor.onMouseDown(() => {
+      if (this.formControlQueryText.value === this.helperMessage) {
+        this.formControlQueryText.reset();
+        setTimeout(() => {
+          this.formControlQueryText.markAsPristine();
+        }, 100);
+      }
+    });
+    editor.onDidBlurEditorText(() => {
+      if (!this.formControlQueryText.value) {
+        this.formControlQueryText.setValue(this.helperMessage);
+      }
     });
   }
 
@@ -206,10 +248,14 @@ export class PortalEditLinkComponent
       this.dsConfig.dataSourceConnectionName == null ||
       this.dsConfig.idColumn == null ||
       this.formControlPrimaryMap.value == null ||
-      this.formControlSecondaryMap.value == null
+      this.formControlSecondaryMap.value == null ||
+      this.formControlPrimaryReference.value == null ||
+      this.formControlSecondaryReference.value == null
     ) {
       this.formControlSecondaryMap.markAsDirty();
       this.formControlPrimaryMap.markAsDirty();
+      this.formControlPrimaryReference.markAsDirty();
+      this.formControlSecondaryReference.markAsDirty();
       this.validationRef.forEach(x => {
         x.control.markAsDirty();
       });
@@ -248,7 +294,14 @@ export class PortalEditLinkComponent
     const data: DataSourceConfig = {
       dataSourceConnectionName: this.dsConfig.dataSourceConnectionName,
       idColumn: this.dsConfig.idColumn,
-      queryToGetId: this.advancedValue
+      primaryForeignKey: this.formControlPrimaryMap.value,
+      secondaryForeignKey: this.formControlSecondaryMap.value,
+      primaryReferenceKey: this.formControlPrimaryReference.value,
+      secondaryReferenceKey: this.formControlSecondaryReference.value,
+      queryInsert:
+        this.formControlQueryText.value === this.helperMessage
+          ? undefined
+          : this.formControlQueryText.value
     };
     if (!this.dsConfig.queryText) {
       data.tableName = this.dsConfig.tableName;
@@ -261,18 +314,16 @@ export class PortalEditLinkComponent
         primaryTable: this.dataSourceConfig.primaryTable?.id
           ? {
               id: this.dataSourceConfig.primaryTable?.id,
-              columnsForLinkedField: this.primarySelected,
-              mapToLinkedTableField: this.formControlPrimaryMap.value
+              columnsForLinkedField: this.primarySelected
             }
           : null,
         secondaryTable: this.dataSourceConfig.secondaryTable?.id
           ? {
               id: this.dataSourceConfig.secondaryTable?.id,
-              columnsForLinkedField: this.secondarySelected,
-              mapToLinkedTableField: this.formControlSecondaryMap.value
+              columnsForLinkedField: this.secondarySelected
             }
           : null,
-        linkedTable: data
+        linkTable: data
       })
       .subscribe(res => {
         if (!res.isError) {
@@ -376,6 +427,7 @@ export class PortalEditLinkComponent
       this.formControlIdColumn.markAsDirty();
       this.formControlIdColumn.updateValueAndValidity();
     }
+
     return (
       this.formControlConnection.valid &&
       this.formControlDbTable.valid &&
