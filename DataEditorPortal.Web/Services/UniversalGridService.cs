@@ -1226,7 +1226,7 @@ namespace DataEditorPortal.Web.Services
                     table1Ids = datas.Select(data =>
                     {
                         var item = (IDictionary<string, object>)data;
-                        return item[$"T1_{linkedTableInfo.Table1.IdColumn}"];
+                        return item[$"T2_{linkedTableInfo.Table1.IdColumn}"];
                     });
                 }
             }
@@ -1287,13 +1287,14 @@ namespace DataEditorPortal.Web.Services
                 .Select(t =>
                 {
                     var ds = JsonSerializer.Deserialize<LinkedDataSourceConfig>(t.DataSource);
-                    var query1 = _queryBuilder.GenerateSqlTextForDatasource(ds.LinkTable);
+                    ds.LinkTable.Columns = new List<string>() { ds.LinkTable.IdColumn, dsLink.LinkTable.PrimaryForeignKey, dsLink.LinkTable.SecondaryForeignKey };
+                    var query = _queryBuilder.GenerateSqlTextForDatasource(ds.LinkTable);
                     return new TableMeta()
                     {
                         Name = t.Name,
                         MenuId = t.Id,
                         IdColumn = ds.LinkTable.IdColumn,
-                        Query_AllData = query1,
+                        Query_AllData = query,
                         ConnectionString = t.ConnectionString
                     };
                 }).FirstOrDefault();
@@ -1303,13 +1304,13 @@ namespace DataEditorPortal.Web.Services
                     .Select(t =>
                     {
                         var ds = JsonSerializer.Deserialize<DataSourceConfig>(t.DataSource);
-                        var query1 = _queryBuilder.GenerateSqlTextForDatasource(ds);
+                        var query = _queryBuilder.GenerateSqlTextForDatasource(ds);
                         return new TableMeta()
                         {
                             Name = t.Name,
                             MenuId = t.Id,
                             IdColumn = ds.IdColumn,
-                            Query_AllData = query1,
+                            Query_AllData = query,
                             EditorColumns = dsLink.PrimaryTable.ColumnsForLinkedField,
                             ReferenceKey = dsLink.LinkTable.PrimaryReferenceKey,
                             ForeignKey = dsLink.LinkTable.PrimaryForeignKey,
@@ -1323,13 +1324,13 @@ namespace DataEditorPortal.Web.Services
                     .Select(t =>
                     {
                         var ds = JsonSerializer.Deserialize<DataSourceConfig>(t.DataSource);
-                        var query1 = _queryBuilder.GenerateSqlTextForDatasource(ds);
+                        var query = _queryBuilder.GenerateSqlTextForDatasource(ds);
                         return new TableMeta()
                         {
                             Name = t.Name,
                             MenuId = t.Id,
                             IdColumn = ds.IdColumn,
-                            Query_AllData = query1,
+                            Query_AllData = query,
                             EditorColumns = dsLink.SecondaryTable.ColumnsForLinkedField,
                             ReferenceKey = dsLink.LinkTable.SecondaryReferenceKey,
                             ForeignKey = dsLink.LinkTable.SecondaryForeignKey,
