@@ -11,7 +11,6 @@ import { LinkDataTableService } from '../service/link-data-table.service';
 import { forkJoin } from 'rxjs';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { GridParam } from 'src/app/shared';
-import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-link-data-table',
@@ -33,14 +32,11 @@ import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   @Input() table1Name!: string;
   @Input() searchParams: any = {};
-  @Input() table1Model: any;
   columnsConfig: ColumnsConfig[] = [];
   fetchDataParam?: GridParam;
   dataSource: any[] = [];
   table2IdColumn = '';
   table2Name = '';
-  table1IdColumn = '';
-  table1ReferenceKey = '';
   table2ReferenceKey = '';
 
   selection: any = [];
@@ -88,9 +84,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
         );
         if (!repeat) {
           this.innerValue.push({
-            table1Id: this.table1Model[this.table1IdColumn],
             table2Id: item[this.table2IdColumn],
-            table1RefValue: this.table1Model[this.table1ReferenceKey],
             table2RefValue: item[this.table2ReferenceKey]
           });
         }
@@ -121,9 +115,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   onRowSelect(event: any) {
     const { data } = event;
     this.innerValue.push({
-      table1Id: this.table1Model[this.table1IdColumn],
       table2Id: data[this.table2IdColumn],
-      table1RefValue: this.table1Model[this.table1ReferenceKey],
       table2RefValue: data[this.table2ReferenceKey]
     });
     this.onChange(this.innerValue);
@@ -165,9 +157,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
       ]).subscribe(([tableConfig, dataSource]) => {
         this.columnsConfig = tableConfig.columns;
         this.dataSource = dataSource || [];
-        this.table1IdColumn = tableConfig.table1IdColumn;
         this.table2IdColumn = tableConfig.table2IdColumn;
-        this.table1ReferenceKey = tableConfig.table1ReferenceKey;
         this.table2ReferenceKey = tableConfig.table2ReferenceKey;
         this.table2Name = tableConfig.table2Name;
         this.selection = dataSource.filter((item: any) =>
@@ -175,7 +165,6 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
             (x: any) => x.table2Id === item[this.table2IdColumn]
           )
         );
-
         this.cdr.detectChanges();
       });
     }

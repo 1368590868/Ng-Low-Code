@@ -24,9 +24,7 @@ export class LinkDataTableService {
           res =>
             res.result || {
               columns: [],
-              table1IdColumn: '',
               table2IdColumn: '',
-              table1ReferenceKey: '',
               table2ReferenceKey: '',
               table2Name: ''
             }
