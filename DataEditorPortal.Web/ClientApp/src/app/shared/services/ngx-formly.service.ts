@@ -7,7 +7,6 @@ import {
   Observable,
   tap,
   debounceTime,
-  startWith,
   Subject,
   takeUntil
 } from 'rxjs';
@@ -86,16 +85,29 @@ export class NgxFormlyService {
           this.initFieldOptions(f, model);
 
           // subscribe depends on fields value changes.
+          const subject = new Subject<any>();
+          const observable = subject as Observable<any>;
+          observable
+            .pipe(
+              debounceTime(100),
+              distinctUntilChanged(),
+              takeUntil(destroy$)
+            )
+            .subscribe(({ f, model }) => {
+              this.initFieldOptions(f, model);
+            });
+
           $deps.forEach((key: string) => {
             if (f.key === key) return;
             const dependOnField = f.parent.get(key);
             dependOnField.formControl?.valueChanges
               .pipe(
+                debounceTime(100),
                 distinctUntilChanged(),
                 takeUntil(destroy$),
                 tap(val => {
                   model[key] = val;
-                  this.initFieldOptions(f, model);
+                  subject.next({ f, model });
                 })
               )
               .subscribe();
