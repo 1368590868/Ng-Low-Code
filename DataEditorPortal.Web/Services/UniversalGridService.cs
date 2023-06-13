@@ -766,6 +766,8 @@ namespace DataEditorPortal.Web.Services
                 #endregion
 
                 // excute command
+                object returnedId = null;
+
                 var trans = con.BeginTransaction();
                 try
                 {
@@ -774,13 +776,7 @@ namespace DataEditorPortal.Web.Services
                     dynamicParameters.Add(paramReturnId, dbType: null, direction: ParameterDirection.Output, size: 40);
 
                     var affected = con.Execute(queryText, dynamicParameters, trans);
-                    var returnedId = dynamicParameters.Get<object>(paramReturnId);
-
-                    // use value processors to execute extra operations
-                    foreach (var processor in valueProcessors)
-                    {
-                        processor.PostProcess(returnedId);
-                    }
+                    returnedId = dynamicParameters.Get<object>(paramReturnId);
 
                     trans.Commit();
 
@@ -806,6 +802,12 @@ namespace DataEditorPortal.Web.Services
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
+                }
+
+                // use value processors to execute extra operations
+                foreach (var processor in valueProcessors)
+                {
+                    processor.PostProcess(returnedId);
                 }
             }
 
@@ -874,12 +876,6 @@ namespace DataEditorPortal.Web.Services
                 {
                     var affected = con.Execute(queryText, param, trans);
 
-                    // use value processors to execute extra operations
-                    foreach (var processor in valueProcessors)
-                    {
-                        processor.PostProcess(id);
-                    }
-
                     trans.Commit();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
@@ -904,6 +900,12 @@ namespace DataEditorPortal.Web.Services
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
+                }
+
+                // use value processors to execute extra operations
+                foreach (var processor in valueProcessors)
+                {
+                    processor.PostProcess(id);
                 }
             }
 
@@ -965,12 +967,6 @@ namespace DataEditorPortal.Web.Services
                 {
                     var affected = con.Execute(queryText, param, trans);
 
-                    // use value processors to execute extra operations
-                    foreach (var processor in valueProcessors)
-                    {
-                        processor.AfterDeleted();
-                    }
-
                     trans.Commit();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
@@ -995,6 +991,12 @@ namespace DataEditorPortal.Web.Services
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
+                }
+
+                // use value processors to execute extra operations
+                foreach (var processor in valueProcessors)
+                {
+                    processor.AfterDeleted();
                 }
             }
 
@@ -1196,8 +1198,11 @@ namespace DataEditorPortal.Web.Services
             return new
             {
                 columns = columns.Where(c => linkedTableInfo.Table2.EditorColumns.Contains(c.field)).ToList(),
-                dataKey = linkedTableInfo.Table2.IdColumn,
-                table2Name = linkedTableInfo.Table2.Name
+                table2Name = linkedTableInfo.Table2.Name,
+                table2IdColumn = linkedTableInfo.Table2.IdColumn,
+                table2ReferenceKey = linkedTableInfo.Table2.ReferenceKey,
+                table1IdColumn = linkedTableInfo.Table1.IdColumn,
+                table1ReferenceKey = linkedTableInfo.Table1.ReferenceKey
             };
         }
 

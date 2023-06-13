@@ -8,6 +8,9 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public object Id { get; set; }
         public object Table1Id { get; set; }
         public object Table2Id { get; set; }
+
+        public object Table1RefValue { get; set; }
+        public object Table2RefValue { get; set; }
     }
 
     public class LinkedTableInfo

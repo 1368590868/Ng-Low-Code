@@ -395,7 +395,9 @@ namespace DataEditorPortal.Web.Services
                     SELECT 
                         link.{EscapeColumnName(linkTable.IdColumn)} AS ""LINK_{linkTable.IdColumn}"", 
                         t1.{EscapeColumnName(input.IdColumn)} AS ""T1_{input.IdColumn}"", 
-                        t2.{EscapeColumnName(output.IdColumn)} AS ""T2_{output.IdColumn}""
+                        t2.{EscapeColumnName(output.IdColumn)} AS ""T2_{output.IdColumn}"",
+                        link.{EscapeColumnName(input.ForeignKey)} AS ""F1_{input.ForeignKey}"", 
+                        link.{EscapeColumnName(output.ForeignKey)} AS ""F2_{output.ForeignKey}""
                     FROM ({input.Query_AllData}) t1
                     INNER JOIN ({linkTable.Query_AllData}) link ON t1.{EscapeColumnName(input.ReferenceKey)} = link.{EscapeColumnName(input.ForeignKey)} 
                     INNER JOIN ({output.Query_AllData}) t2 ON t2.{EscapeColumnName(output.ReferenceKey)} = link.{EscapeColumnName(output.ForeignKey)} 

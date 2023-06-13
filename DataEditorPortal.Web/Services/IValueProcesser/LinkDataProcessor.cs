@@ -134,17 +134,16 @@ namespace DataEditorPortal.Web.Services
                 try
                 {
                     var toAdd = inputModel
-                        .Where(input => existingModel.All(existing => !(existing.Table1Id == input.Table1Id && existing.Table2Id == input.Table2Id)))
-                        .Select(x => x.Table2Id);
+                        .Where(input => existingModel.All(existing => !(existing.Table1Id == input.Table1Id && existing.Table2Id == input.Table2Id)));
                     if (toAdd.Any())
                     {
                         var sql = _linkedTableInfo.LinkTable.Query_Insert;
 
-                        foreach (var table2Id in toAdd)
+                        foreach (var item in toAdd)
                         {
                             var value = new List<KeyValuePair<string, object>>();
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, table1Id));
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table2.ForeignKey, table2Id));
+                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, item.Table1RefValue));
+                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table2.ForeignKey, item.Table2RefValue));
                             var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
                             var paramReturnId = _queryBuilder.ParameterName($"RETURNED_{linkTable.IdColumn}");
                             dynamicParameters.Add(paramReturnId, dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
@@ -203,7 +202,9 @@ namespace DataEditorPortal.Web.Services
                             {
                                 Id = item[$"LINK_{_linkedTableInfo.LinkTable.IdColumn}"],
                                 Table1Id = item[$"T1_{_linkedTableInfo.Table1.IdColumn}"],
-                                Table2Id = item[$"T2_{_linkedTableInfo.Table2.IdColumn}"]
+                                Table2Id = item[$"T2_{_linkedTableInfo.Table2.IdColumn}"],
+                                Table1RefValue = item[$"F1_{_linkedTableInfo.Table1.ForeignKey}"],
+                                Table2RefValue = item[$"F2_{_linkedTableInfo.Table2.ForeignKey}"]
                             };
                         }).ToList();
                     }
