@@ -55,9 +55,19 @@ namespace DataEditorPortal.Web.Services
         public override void FetchValue(UniversalGridConfiguration config, FormFieldConfig field, object dataId, IDictionary<string, object> model)
         {
             _config = config;
-            model.Add(Constants.LINK_DATA_FIELD_NAME, GetLinkDataModelForForm(_config.Name, dataId));
-        }
+            var data = GetLinkDataModelForForm(_config.Name, dataId)
+                .Select(x =>
+                {
+                    return new
+                    {
+                        Table2Id = x.Table2Id,
+                        Table2RefValue = x.Table2RefValue
+                    };
+                })
+                .ToList();
 
+            model.Add(Constants.LINK_DATA_FIELD_NAME, data);
+        }
 
         public override void BeforeDeleted(UniversalGridConfiguration config, FormFieldConfig field, IEnumerable<object> dataIds)
         {
@@ -137,7 +147,7 @@ namespace DataEditorPortal.Web.Services
                 try
                 {
                     var toAdd = inputModel
-                        .Where(input => existingModel.All(existing => !(existing.Table1Id == input.Table1Id && existing.Table2Id == input.Table2Id)));
+                        .Where(input => existingModel.All(existing => !(existing.Table1Id == table1Id && existing.Table2Id == input.Table2Id)));
                     if (toAdd.Any())
                     {
                         var sql = _linkedTableInfo.LinkTable.Query_Insert;
@@ -145,7 +155,7 @@ namespace DataEditorPortal.Web.Services
                         foreach (var item in toAdd)
                         {
                             var value = new List<KeyValuePair<string, object>>();
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, item.Table1RefValue));
+                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, model[_linkedTableInfo.Table1.ReferenceKey]));
                             value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table2.ForeignKey, item.Table2RefValue));
                             var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
                             var paramReturnId = _queryBuilder.ParameterName($"RETURNED_{linkTable.IdColumn}");
@@ -156,7 +166,7 @@ namespace DataEditorPortal.Web.Services
                     }
 
                     var toDelete = existingModel
-                        .Where(existing => inputModel.All(input => !(input.Table1Id == existing.Table1Id && input.Table2Id == existing.Table2Id)))
+                        .Where(existing => inputModel.All(input => !(table1Id == existing.Table1Id && input.Table2Id == existing.Table2Id)))
                         .Select(x => x.Id);
                     if (toDelete.Any())
                     {
@@ -215,6 +225,7 @@ namespace DataEditorPortal.Web.Services
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.Message, ex);
+                    throw;
                 }
             }
 

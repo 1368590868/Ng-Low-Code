@@ -1202,9 +1202,7 @@ namespace DataEditorPortal.Web.Services
                 columns = columns.Where(c => linkedTableInfo.Table2.EditorColumns.Contains(c.field)).ToList(),
                 table2Name = linkedTableInfo.Table2.Name,
                 table2IdColumn = linkedTableInfo.Table2.IdColumn,
-                table2ReferenceKey = linkedTableInfo.Table2.ReferenceKey,
-                table1IdColumn = linkedTableInfo.Table1.IdColumn,
-                table1ReferenceKey = linkedTableInfo.Table1.ReferenceKey
+                table2ReferenceKey = linkedTableInfo.Table2.ReferenceKey
             };
         }
 
