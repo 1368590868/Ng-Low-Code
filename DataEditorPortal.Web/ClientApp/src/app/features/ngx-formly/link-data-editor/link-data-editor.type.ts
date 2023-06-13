@@ -15,14 +15,17 @@ export interface ColumnsConfig {
 
 export interface TableConfig {
   columns: ColumnsConfig[];
-  dataKey: string;
+  table1IdColumn: string;
+  table2IdColumn: string;
   table2Name: string;
+  table1ReferenceKey: string;
+  table2ReferenceKey: string;
 }
 
 interface LinkDataEditorProps extends FormlyFieldProps {
   table1Name?: string;
   searchParams?: any;
-  table1Id?: string;
+  table1Model?: any;
 }
 
 @Component({
@@ -32,7 +35,7 @@ interface LinkDataEditorProps extends FormlyFieldProps {
     [table1Name]="props.table1Name || ''"
     [formControl]="formControl"
     [formlyAttributes]="field"
-    [table1Id]="props.table1Id"></app-link-data-table> `,
+    [table1Model]="props.table1Model"></app-link-data-table> `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
     `

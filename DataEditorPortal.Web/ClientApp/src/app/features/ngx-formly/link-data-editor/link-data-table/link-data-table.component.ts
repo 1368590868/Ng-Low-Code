@@ -33,12 +33,15 @@ import { evalExpression, evalStringExpression } from 'src/app/shared/utils';
 export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   @Input() table1Name!: string;
   @Input() searchParams: any = {};
-  @Input() table1Id?: string;
+  @Input() table1Model: any;
   columnsConfig: ColumnsConfig[] = [];
   fetchDataParam?: GridParam;
   dataSource: any[] = [];
-  dataKey = '';
+  table2IdColumn = '';
   table2Name = '';
+  table1IdColumn = '';
+  table1ReferenceKey = '';
+  table2ReferenceKey = '';
 
   selection: any = [];
   onChange?: any;
@@ -54,7 +57,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
     this.innerValue = val || [];
 
     this.selection = this.dataSource.filter((item: any) =>
-      this.innerValue.find((x: any) => x.table2Id === item[this.dataKey])
+      this.innerValue.find((x: any) => x.table2Id === item[this.table2IdColumn])
     );
   }
 
@@ -81,19 +84,21 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
     if (checked) {
       this.dataSource.forEach((item: any) => {
         const repeat = this.innerValue.find(
-          (x: any) => x.table2Id === item[this.dataKey]
+          (x: any) => x.table2Id === item[this.table2IdColumn]
         );
         if (!repeat) {
           this.innerValue.push({
-            table1Id: this.table1Id,
-            table2Id: item[this.dataKey]
+            table1Id: this.table1Model[this.table1IdColumn],
+            table2Id: item[this.table2IdColumn],
+            table1RefValue: this.table1Model[this.table1ReferenceKey],
+            table2RefValue: item[this.table2ReferenceKey]
           });
         }
       });
     } else {
       this.dataSource.forEach((item: any) => {
         const removeIds = this.innerValue.findIndex(x => {
-          return x.table2Id === item[this.dataKey];
+          return x.table2Id === item[this.table2IdColumn];
         });
 
         this.innerValue.splice(removeIds, 1);
@@ -106,7 +111,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   onRowUnselect(event: any) {
     const { data } = event;
     const removeIds = this.innerValue.findIndex(x => {
-      return x.table2Id === data[this.dataKey];
+      return x.table2Id === data[this.table2IdColumn];
     });
 
     this.innerValue.splice(removeIds, 1);
@@ -116,8 +121,10 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   onRowSelect(event: any) {
     const { data } = event;
     this.innerValue.push({
-      table1Id: this.table1Id,
-      table2Id: data[this.dataKey]
+      table1Id: this.table1Model[this.table1IdColumn],
+      table2Id: data[this.table2IdColumn],
+      table1RefValue: this.table1Model[this.table1ReferenceKey],
+      table2RefValue: data[this.table2ReferenceKey]
     });
     this.onChange(this.innerValue);
   }
@@ -133,7 +140,9 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
       .subscribe(dataSource => {
         this.dataSource = dataSource || [];
         this.selection = dataSource.filter((item: any) =>
-          this.innerValue.find((x: any) => x.table2Id === item[this.dataKey])
+          this.innerValue.find(
+            (x: any) => x.table2Id === item[this.table2IdColumn]
+          )
         );
         this.cdr.detectChanges();
       });
@@ -156,10 +165,15 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
       ]).subscribe(([tableConfig, dataSource]) => {
         this.columnsConfig = tableConfig.columns;
         this.dataSource = dataSource || [];
-        this.dataKey = tableConfig.dataKey;
+        this.table1IdColumn = tableConfig.table1IdColumn;
+        this.table2IdColumn = tableConfig.table2IdColumn;
+        this.table1ReferenceKey = tableConfig.table1ReferenceKey;
+        this.table2ReferenceKey = tableConfig.table2ReferenceKey;
         this.table2Name = tableConfig.table2Name;
         this.selection = dataSource.filter((item: any) =>
-          this.innerValue.find((x: any) => x.table2Id === item[this.dataKey])
+          this.innerValue.find(
+            (x: any) => x.table2Id === item[this.table2IdColumn]
+          )
         );
 
         this.cdr.detectChanges();

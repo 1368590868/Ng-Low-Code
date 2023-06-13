@@ -186,7 +186,7 @@ export class EditRecordActionComponent
         if (x.props) {
           x.props['table1Name'] = this.gridName;
           x.props['searchParams'] = this.fetchDataParam?.searches;
-          x.props['table1Id'] = this.dataKey;
+          x.props['table1Model'] = this.model;
         }
       });
     // set props for checkbox

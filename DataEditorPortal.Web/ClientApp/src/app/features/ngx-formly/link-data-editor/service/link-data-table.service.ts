@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { map } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiResponse } from 'src/app/shared';
 import { TableConfig } from '../link-data-editor.type';
 
@@ -13,14 +13,24 @@ export class LinkDataTableService {
     this._apiUrl = apiUrl;
   }
 
-  getTableConfig(name: string) {
+  getTableConfig(name: string): Observable<TableConfig> {
     return this.http
       .post<ApiResponse<TableConfig>>(
         `${this._apiUrl}universal-grid/${name}/linked-table-editor/table-config`,
         null
       )
       .pipe(
-        map(res => res.result || { columns: [], dataKey: '', table2Name: '' })
+        map(
+          res =>
+            res.result || {
+              columns: [],
+              table1IdColumn: '',
+              table2IdColumn: '',
+              table1ReferenceKey: '',
+              table2ReferenceKey: '',
+              table2Name: ''
+            }
+        )
       );
   }
 
