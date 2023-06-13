@@ -52,6 +52,7 @@
                   [formControl]="option.formControl"
                   pInputText
                   placeholder="Enter a value"
+                  (mousedown)="$event.stopPropagation()"
                   required />
               </div>
               <div>

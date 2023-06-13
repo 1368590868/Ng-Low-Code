@@ -196,10 +196,6 @@ export class FileUploadConfigurationComponent
     }
   }
 
-  onFilter(dropdownRef: Dropdown) {
-    dropdownRef.scroller.setContentPosition(null);
-  }
-
   onStorageTypeChange(value: string) {
     value === 'SqlBinary'
       ? (this.isStorageTypeBinary = true)

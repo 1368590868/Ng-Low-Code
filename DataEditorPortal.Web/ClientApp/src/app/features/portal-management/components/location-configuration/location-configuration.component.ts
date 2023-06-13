@@ -31,12 +31,12 @@ export class LocationConfigurationComponent {
   onTouch?: any;
   disabled = false;
 
-  formControlFromVs: FormControl = new FormControl(null, Validators.required);
+  formControlFrom: FormControl = new FormControl(null, Validators.required);
   formControlFromMeasure: FormControl = new FormControl(
     null,
     Validators.required
   );
-  formControlToVs: FormControl = new FormControl(null, Validators.required);
+  formControlTo: FormControl = new FormControl(null, Validators.required);
   formControlToMeasure: FormControl = new FormControl(
     null,
     Validators.required
@@ -64,9 +64,9 @@ export class LocationConfigurationComponent {
 
     const newVal = JSON.parse(JSON.stringify(val || null));
     if (newVal) {
-      this.formControlFromVs.setValue(val?.fromVs);
+      this.formControlFrom.setValue(val?.from);
       this.formControlFromMeasure.setValue(val?.fromMeasure);
-      this.formControlToVs.setValue(val?.toVs);
+      this.formControlTo.setValue(val?.to);
       this.formControlToMeasure.setValue(val?.toMeasure);
     }
   }
@@ -94,14 +94,14 @@ export class LocationConfigurationComponent {
   showDialog() {
     this.visible = true;
     if (this.innerValue) {
-      this.formControlFromVs.setValue(this.innerValue?.fromVs);
+      this.formControlFrom.setValue(this.innerValue?.from);
       this.formControlFromMeasure.setValue(this.innerValue?.fromMeasure);
-      this.formControlToVs.setValue(this.innerValue?.toVs);
+      this.formControlTo.setValue(this.innerValue?.to);
       this.formControlToMeasure.setValue(this.innerValue?.toMeasure);
     } else {
-      this.formControlFromVs.reset();
+      this.formControlFrom.reset();
       this.formControlFromMeasure.reset();
-      this.formControlToVs.reset();
+      this.formControlTo.reset();
       this.formControlToMeasure.reset();
     }
   }
@@ -110,15 +110,15 @@ export class LocationConfigurationComponent {
       return;
     }
     const data = {
-      fromVs: this.formControlFromVs.value,
+      from: this.formControlFrom.value,
       fromMeasure: this.formControlFromMeasure.value,
-      toVs: this.formControlToVs.value,
+      to: this.formControlTo.value,
       toMeasure: this.formControlToMeasure.value
     };
 
     switch (this.locationType) {
       case 2: {
-        data.toVs = null;
+        data.to = null;
         data.toMeasure = null;
         break;
       }
@@ -131,17 +131,17 @@ export class LocationConfigurationComponent {
 
   onValid() {
     this.formControlFromMeasure.markAsDirty();
-    this.formControlFromVs.markAsDirty();
+    this.formControlFrom.markAsDirty();
     this.formControlToMeasure.markAsDirty();
-    this.formControlToVs.markAsDirty();
-    if (!this.formControlFromMeasure.valid || !this.formControlFromVs.valid) {
+    this.formControlTo.markAsDirty();
+    if (!this.formControlFromMeasure.valid || !this.formControlFrom.valid) {
       return false;
     }
     if (this.locationType === 3 && !this.formControlToMeasure.valid) {
       return false;
     }
     if (this.locationType === 4) {
-      if (!this.formControlToMeasure.valid || !this.formControlToVs.valid)
+      if (!this.formControlToMeasure.valid || !this.formControlTo.valid)
         return false;
     }
     return true;

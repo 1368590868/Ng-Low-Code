@@ -20,6 +20,7 @@ import { GridParam, SearchParam, UserService } from 'src/app/shared';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DomHandler } from 'primeng/dom';
 import { UrlParamsService } from '../../services/url-params.service';
+import * as pluralize from 'pluralize';
 
 @Component({
   selector: 'app-table',
@@ -224,7 +225,8 @@ export class TableComponent implements OnInit, OnDestroy {
         label: '',
         icon: 'pi pi-file-edit',
         class: 'flex',
-        buttonStyleClass: ' p-button-text'
+        buttonStyleClass: ' p-button-text',
+        header: `Update ${pluralize.singular(this.tableConfig.caption || '')}`
       };
       if (this.tableConfig.customEditFormName) {
         actions.push({
@@ -247,7 +249,15 @@ export class TableComponent implements OnInit, OnDestroy {
       if (this.tableConfig.customAddFormName) {
         actions.push({ name: this.tableConfig.customAddFormName });
       } else {
-        actions.push({ name: 'add-record' });
+        actions.push({
+          name: 'add-record',
+          wrapper: {
+            header: `Create ${pluralize.singular(
+              this.tableConfig.caption || ''
+            )}`,
+            label: `Add ${pluralize.singular(this.tableConfig.caption || '')}`
+          }
+        });
       }
     }
     if (this.allowDelete) {

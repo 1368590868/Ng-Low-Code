@@ -96,7 +96,10 @@ export class FormDesignerConfigComponent
             onInit: (editor: any) => this.onMonacoEditorInit(editor)
           }
         }
-      ]
+      ],
+      expressions: {
+        hide: `field.parent.model.computedConfig`
+      }
     });
   }
 

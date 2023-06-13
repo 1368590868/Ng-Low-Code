@@ -39,7 +39,11 @@ export interface DataSourceConfig {
   sortBy?: DataSourceSortBy[];
   queryText?: string;
   pageSize?: number;
-  queryToGetId?: { type: string; queryText: string };
+  primaryForeignKey?: string;
+  primaryReferenceKey?: string;
+  secondaryForeignKey?: string;
+  secondaryReferenceKey?: string;
+  queryInsert?: string;
 }
 
 export interface DataSourceFilter {
@@ -125,7 +129,7 @@ export interface LinkedTableConfig {
 export interface LinkedDataSourceConfig {
   primaryTable?: LinkedTableConfig | null;
   secondaryTable?: LinkedTableConfig | null;
-  linkedTable?: DataSourceConfig;
+  linkTable?: DataSourceConfig | null;
 }
 
 export interface LinkedSingleConfigDetails {
@@ -138,7 +142,8 @@ export interface LinkedSingleConfigDetails {
 }
 
 export interface LinkedSingleConfig {
-  columns: string[];
+  gridColumns: { label: string; value: string }[];
+  databaseColumns?: { label: string; value: string }[];
   details: LinkedSingleConfigDetails[];
   idColumn?: string;
 }

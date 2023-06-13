@@ -113,7 +113,7 @@ export class EditRecordActionComponent
           this.configFieldValidator(fields);
           this.configFieldExpressions(fields);
           this.configFieldProps(fields);
-            this.fields = fields;
+          this.fields = fields;
           this.onLoadUrlParams();
 
           if (fields.length > 0) this.loadedEvent.emit();
@@ -135,7 +135,6 @@ export class EditRecordActionComponent
       )
       .forEach(f => {
         if (f.props) {
-          f.props.placeholder = 'Please Select';
           if (!f.props.options) f.props.options = [];
 
           if (Array.isArray(f.props['optionsLookup'])) {
@@ -187,7 +186,7 @@ export class EditRecordActionComponent
         if (x.props) {
           x.props['table1Name'] = this.gridName;
           x.props['searchParams'] = this.fetchDataParam?.searches;
-          x.props['table1Id'] = this.dataKey;
+          x.props['table1Model'] = this.model;
         }
       });
     // set props for checkbox

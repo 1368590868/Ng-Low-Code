@@ -37,12 +37,8 @@ export interface FormlySelectFieldConfig
       [showClear]="true"
       [formControl]="formControl"
       [formlyAttributes]="field"
-      [virtualScroll]="props.virtualScroll ?? true"
-      [virtualScrollItemSize]="props.virtualScrollItemSize ?? 38"
       [placeholder]="props.placeholder || ''"
       [appendTo]="props.appendTo || 'body'"
-      (onFilter)="onFilter()"
-      [resetFilterOnHide]="props.resetFilterOnHide || true"
       (onChange)="props.change && props.change(field, $event)">
       <ng-template let-select pTemplate="selectedItem">
         <div class="flex  align-items-center">
@@ -335,8 +331,5 @@ export class FormlyFieldIconSelectComponent extends FieldType<
       label: icon.replace('pi ', ''),
       value: icon
     }));
-  }
-  onFilter() {
-    this.dropdown.scroller?.setContentPosition(null);
   }
 }

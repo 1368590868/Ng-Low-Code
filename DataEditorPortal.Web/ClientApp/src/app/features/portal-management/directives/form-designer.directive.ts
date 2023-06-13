@@ -172,6 +172,9 @@ export class FormDesignerDirective {
       wrappers: ['divider'],
       props: {
         label: 'Properties'
+      },
+      expressions: {
+        hide: `field.parent.model.computedConfig`
       }
     },
     {
@@ -337,15 +340,14 @@ export class FormDesignerDirective {
               key: 'system',
               type: 'optionsEditor',
               props: {
-                label: 'Pressure System',
+                label: 'From/To Options',
                 onlyAdvanced: true,
-                dialogTitle: 'Pressure System'
+                dialogTitle: 'From/To Options'
               }
             },
             {
               key: 'locationType',
               type: 'select',
-              defaultValue: 2,
               props: {
                 label: 'Location Type',
                 description: 'Select location type',
@@ -359,6 +361,59 @@ export class FormDesignerDirective {
                 change: (field: any) => {
                   field.parent.get('mappingColumns').formControl.setValue(null);
                 }
+              }
+            },
+            {
+              key: 'fromLabel',
+              type: 'input',
+              defaultValue: 'From',
+              props: {
+                label: 'From Label',
+                placeholder: 'Enter from  label'
+              }
+            },
+            {
+              key: 'fromMeasureLabel',
+              type: 'input',
+              defaultValue: 'From Measure',
+              props: {
+                label: 'From Measure Label',
+                placeholder: 'Enter from Measure label'
+              },
+              expressions: {
+                hide: `field.parent.parent.model.locationType < 2`
+              }
+            },
+            {
+              key: 'toLabel',
+              type: 'input',
+              defaultValue: 'To',
+              props: {
+                label: 'To Label',
+                placeholder: 'Enter to label'
+              },
+              expressions: {
+                hide: `field.parent.parent.model.locationType === 2 || field.parent.parent.model.locationType === 3`
+              }
+            },
+            {
+              key: 'toMeasureLabel',
+              type: 'input',
+              defaultValue: 'To Measure',
+              props: {
+                label: 'To Measure Label',
+                placeholder: 'Enter to Measure label'
+              },
+              expressions: {
+                hide: `field.parent.parent.model.locationType === 2`
+              }
+            },
+            {
+              key: 'lengthLabel',
+              type: 'input',
+              props: {
+                label: 'Length Label',
+                placeholder: 'Enter length label'
               }
             },
             {
@@ -396,7 +451,10 @@ export class FormDesignerDirective {
             hide: `formState.hideValidation`
           }
         }
-      ]
+      ],
+      expressions: {
+        hide: `field.parent.model.computedConfig`
+      }
     },
     {
       fieldGroup: [
@@ -415,7 +473,7 @@ export class FormDesignerDirective {
         }
       ],
       expressions: {
-        hide: `formState.hideValidation === field.parent.model.type || 'fileUpload' === field.parent.model.type || 'locationEditor' === field.parent.model.type `
+        hide: `formState.hideValidation === field.parent.model.type || 'fileUpload' === field.parent.model.type || 'locationEditor' === field.parent.model.type || field.parent.model.computedConfig`
       }
     }
   ];

@@ -5,9 +5,9 @@ import {
   PaginationEvent,
   SortMetaEvent,
   SystemLogData,
-  SystemLogDialogComponent,
   SystemLogService
 } from 'src/app/shared';
+import { SystemLogDialogComponent } from './system-log-dialog/system-log-dialog.component';
 
 @Component({
   selector: 'app-system-log',

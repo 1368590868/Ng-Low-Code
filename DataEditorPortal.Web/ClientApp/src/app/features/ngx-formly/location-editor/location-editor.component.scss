@@ -12,12 +12,15 @@
         }
       }
 
-      label {
-        padding-left: 1.5rem;
-      }
-
       formly-validation-message {
         display: none;
+      }
+    }
+  }
+  form > formly-form.label-padding {
+    ::ng-deep {
+      label {
+        padding-left: 1.5rem;
       }
     }
   }
