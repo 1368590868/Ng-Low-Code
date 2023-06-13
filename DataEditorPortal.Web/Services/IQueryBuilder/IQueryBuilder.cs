@@ -24,13 +24,17 @@ namespace DataEditorPortal.Web.Services
         object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues);
         string ReplaceQueryParamters(string queryText);
         string JoinAttachments(string query, IEnumerable<GridColConfig> attachmentCols);
+
         // universal grid
+        string GenerateSqlTextForDatasource(DataSourceConfig config);
         string GenerateSqlTextForList(DataSourceConfig config);
         string GenerateSqlTextForDetail(DataSourceConfig config);
         string GenerateSqlTextForInsert(DataSourceConfig config);
         string GenerateSqlTextForUpdate(DataSourceConfig config);
         string GenerateSqlTextForDelete(DataSourceConfig config);
         string GenerateSqlTextForExist(DataSourceConfig config);
+        string GenerateSqlTextForLinkData(TableMeta linkTable, TableMeta t1, TableMeta t2);
+        string GenerateSqlTextForDeleteLinkData(TableMeta linkTable, TableMeta input);
 
         string GenerateSqlTextForColumnFilterOption(DataSourceConfig config);
 
@@ -276,12 +280,18 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public virtual string GenerateSqlTextForDetail(DataSourceConfig config)
+        public virtual string GenerateSqlTextForDatasource(DataSourceConfig config)
         {
             var queryText = GenerateSqlTextForList(config);
             queryText = UseSearches(queryText);
             queryText = UseFilters(queryText);
             queryText = RemoveOrderBy(queryText);
+            return queryText;
+        }
+
+        public virtual string GenerateSqlTextForDetail(DataSourceConfig config)
+        {
+            var queryText = GenerateSqlTextForDatasource(config);
 
             return $@"SELECT * FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} = {ParameterPrefix}{ParameterName(config.IdColumn)}";
         }
@@ -370,6 +380,40 @@ namespace DataEditorPortal.Web.Services
             queryText = RemoveOrderBy(queryText);
 
             return $@"SELECT {EscapeColumnName(config.IdColumn)} FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} IN {ParameterPrefix}{ParameterName(config.IdColumn)}";
+        }
+
+        /// <summary>
+        /// get the link data by table1 id
+        /// </summary>
+        /// <param name="dsLink"></param>
+        /// <param name="input"></param>
+        /// <param name="output"></param>
+        /// <returns></returns>
+        public virtual string GenerateSqlTextForLinkData(TableMeta linkTable, TableMeta input, TableMeta output)
+        {
+            var linkQuery = $@"
+                    SELECT 
+                        link.{EscapeColumnName(linkTable.IdColumn)} AS ""LINK_{linkTable.IdColumn}"", 
+                        t1.{EscapeColumnName(input.IdColumn)} AS ""T1_{input.IdColumn}"", 
+                        t2.{EscapeColumnName(output.IdColumn)} AS ""T2_{output.IdColumn}"",
+                        link.{EscapeColumnName(input.ForeignKey)} AS ""F1_{input.ForeignKey}"", 
+                        link.{EscapeColumnName(output.ForeignKey)} AS ""F2_{output.ForeignKey}""
+                    FROM ({input.Query_AllData}) t1
+                    INNER JOIN ({linkTable.Query_AllData}) link ON t1.{EscapeColumnName(input.ReferenceKey)} = link.{EscapeColumnName(input.ForeignKey)} 
+                    INNER JOIN ({output.Query_AllData}) t2 ON t2.{EscapeColumnName(output.ReferenceKey)} = link.{EscapeColumnName(output.ForeignKey)} 
+                    WHERE t1.{input.IdColumn} = {ParameterPrefix}{ParameterName(input.IdColumn)}
+                ";
+
+            return linkQuery;
+        }
+
+        public virtual string GenerateSqlTextForDeleteLinkData(TableMeta linkTable, TableMeta input)
+        {
+            return $@"
+                DELETE FROM ({linkTable.Query_AllData}) link
+                INNER JOIN ({input.Query_AllData}) t1 ON link.{EscapeColumnName(input.ForeignKey)} = t1.{EscapeColumnName(input.ReferenceKey)}
+                WHERE t1.{input.IdColumn} IN {ParameterPrefix}{ParameterName(input.IdColumn)}
+            ";
         }
 
         #endregion

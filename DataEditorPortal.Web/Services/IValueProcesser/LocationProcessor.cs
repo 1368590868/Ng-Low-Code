@@ -1,5 +1,4 @@
 ﻿using DataEditorPortal.Data.Models;
-using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
@@ -11,9 +10,7 @@ namespace DataEditorPortal.Web.Services
     [FilterType("locationField")]
     public class LocationProcessor : ValueProcessorBase
     {
-        private UploadedFileMeta _uploadeFiledMeta;
         private UniversalGridConfiguration _config;
-
         private readonly IServiceProvider _serviceProvider;
 
         public LocationProcessor(IServiceProvider serviceProvider)
@@ -27,7 +24,7 @@ namespace DataEditorPortal.Web.Services
             ProcessLocationField(field, model);
         }
 
-        public override void PostProcess(object dataId)
+        public override void PostProcess(IDictionary<string, object> model)
         {
             return;
         }
@@ -105,6 +102,16 @@ namespace DataEditorPortal.Web.Services
                     model.Remove(field.key);
                 }
             }
+        }
+
+        public override void BeforeDeleted(UniversalGridConfiguration config, FormFieldConfig field, IEnumerable<object> dataIds)
+        {
+            return;
+        }
+
+        public override void AfterDeleted()
+        {
+            return;
         }
     }
 }

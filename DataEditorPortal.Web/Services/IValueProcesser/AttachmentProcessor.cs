@@ -28,11 +28,11 @@ namespace DataEditorPortal.Web.Services
             ProcessFileUploadFileds(field, model);
         }
 
-        public override void PostProcess(object dataId)
+        public override void PostProcess(IDictionary<string, object> model)
         {
             if (_uploadeFiledMeta != null)
             {
-                SaveUploadedFiles(dataId);
+                SaveUploadedFiles(model);
             }
         }
 
@@ -69,10 +69,20 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        private void SaveUploadedFiles(object dataId)
+        private void SaveUploadedFiles(IDictionary<string, object> model)
         {
             var attachmentService = _serviceProvider.GetRequiredService<IAttachmentService>();
-            attachmentService.SaveUploadedFiles(_uploadeFiledMeta, dataId, _config.Name);
+            attachmentService.SaveUploadedFiles(_uploadeFiledMeta, model, _config.Name);
+        }
+
+        public override void BeforeDeleted(UniversalGridConfiguration config, FormFieldConfig field, IEnumerable<object> dataIds)
+        {
+            return;
+        }
+
+        public override void AfterDeleted()
+        {
+            return;
         }
     }
 }

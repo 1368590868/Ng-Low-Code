@@ -19,7 +19,7 @@ namespace DataEditorPortal.Web.Services
     public interface IAttachmentService
     {
         FileUploadConfig GetDefaultConfig();
-        void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, object dataId, string gridName);
+        void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, IDictionary<string, object> model, string gridName);
         dynamic GetFileStream(string fileId, FileUploadConfig options);
     }
 
@@ -71,7 +71,7 @@ namespace DataEditorPortal.Web.Services
         {
             return DEFAULT_CONFIG;
         }
-        public void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, object dataId, string gridName)
+        public void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, IDictionary<string, object> model, string gridName)
         {
             var config = GetConfigOrDefault(uploadedFileMeta);
             var storageType = config.FileStorageType;
@@ -116,10 +116,16 @@ namespace DataEditorPortal.Web.Services
 
                     #endregion
 
+                    // FILE ID and DATA ID
                     value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("ID"), uploadedFile.FileId));
-                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("FILE_NAME"), uploadedFile.FileName));
-                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("FOREIGN_KEY"), dataId));
+                    var referenceDataKey = config.GetMappedColumn("REFERENCE_DATA_KEY");
+                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("FOREIGN_KEY"), model[referenceDataKey]));
 
+                    // FILE NAME and STATUS
+                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("FILE_NAME"), uploadedFile.FileName));
+                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("STATUS"), GetStatusMapValue(UploadedFileStatus.Current)));
+
+                    // Optional pre-defined fields
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("CONTENT_TYPE")))
                         value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("CONTENT_TYPE"), uploadedFile.ContentType));
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("COMMENTS")))
@@ -129,7 +135,17 @@ namespace DataEditorPortal.Web.Services
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("CREATED_BY")))
                         value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("CREATED_BY"), CurrentUsername));
 
-                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("STATUS"), GetStatusMapValue(UploadedFileStatus.Current)));
+                    // Custom Optional Fields
+                    if (config.CustomFields != null)
+                    {
+                        foreach (var mapping in config.CustomFields)
+                        {
+                            var key = mapping.Value;
+                            var data = model.ContainsKey(key) ? model[key] : null;
+                            if (!string.IsNullOrEmpty(key) && data != null)
+                                value.Add(new KeyValuePair<string, object>(mapping.Value, model[mapping.Key]));
+                        }
+                    }
 
                     insertParameters.Add(_queryBuilder.GenerateDynamicParameter(value));
                 }

@@ -90,7 +90,6 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string TableName { get; set; }
         public string TableSchema { get; set; }
         public string IdColumn { get; set; }
-        public ComputedConfig QueryToGetId { get; set; }
         public int PageSize { get; set; } = 100;
         public List<string> Columns { get; set; } = new List<string>();
         public List<SortParam> SortBy { get; set; } = new List<SortParam>();
@@ -140,14 +139,22 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public LinkedTableConfig PrimaryTable { get; set; }
         public LinkedTableConfig SecondaryTable { get; set; }
 
-        public DataSourceConfig LinkedTable { get; set; }
+        public RelationDataSourceConfig LinkTable { get; set; }
+    }
+
+    public class RelationDataSourceConfig : DataSourceConfig
+    {
+        public string PrimaryReferenceKey { get; set; }
+        public string PrimaryForeignKey { get; set; }
+        public string SecondaryReferenceKey { get; set; }
+        public string SecondaryForeignKey { get; set; }
+        public string QueryInsert { get; set; }
     }
 
     public class LinkedTableConfig
     {
         public Guid Id { get; set; }
         public List<string> ColumnsForLinkedField { get; set; }
-        public string MapToLinkedTableField { get; set; }
     }
 
     public class FileUploadConfig
@@ -160,7 +167,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string ForeignKeyName { get; set; }
         public string BasePath { get; set; }
         public Dictionary<string, string> FieldMapping { get; set; }
-
+        public Dictionary<string, string> CustomFields { get; set; }
         public string GetMappedColumn(string column)
         {
             return FieldMapping.FirstOrDefault(x => x.Key == column).Value;

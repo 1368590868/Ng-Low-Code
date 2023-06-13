@@ -668,7 +668,7 @@ namespace DataEditorPortal.Web.Services
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
             config.DataSourceConfig = JsonSerializer.Serialize(model);
-            config.DataSourceConnectionName = model.LinkedTable.DataSourceConnectionName;
+            config.DataSourceConnectionName = model.LinkTable.DataSourceConnectionName;
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
 
             _depDbContext.SaveChanges();
