@@ -167,7 +167,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string ForeignKeyName { get; set; }
         public string BasePath { get; set; }
         public Dictionary<string, string> FieldMapping { get; set; }
-
+        public Dictionary<string, string> CustomFields { get; set; }
         public string GetMappedColumn(string column)
         {
             return FieldMapping.FirstOrDefault(x => x.Key == column).Value;

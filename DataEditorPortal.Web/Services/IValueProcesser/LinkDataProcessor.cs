@@ -44,11 +44,11 @@ namespace DataEditorPortal.Web.Services
             _relationDataModels = ProcessLinkDataField(model);
         }
 
-        public override void PostProcess(object dataId)
+        public override void PostProcess(IDictionary<string, object> model)
         {
             if (_relationDataModels != null)
             {
-                UpdateLinkData(_config.Name, dataId, _relationDataModels);
+                UpdateLinkData(_config.Name, model, _relationDataModels);
             }
         }
 
@@ -118,8 +118,11 @@ namespace DataEditorPortal.Web.Services
             return result;
         }
 
-        private void UpdateLinkData(string table1Name, object table1Id, List<RelationDataModel> inputModel)
+        private void UpdateLinkData(string table1Name, IDictionary<string, object> model, List<RelationDataModel> inputModel)
         {
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(_config.DataSourceConfig);
+            var table1Id = model[dataSourceConfig.IdColumn];
+
             var existingModel = GetLinkDataModelForForm(table1Name, table1Id);
 
             if (_linkedTableInfo == null)

@@ -766,8 +766,6 @@ namespace DataEditorPortal.Web.Services
                 #endregion
 
                 // excute command
-                object returnedId = null;
-
                 var trans = con.BeginTransaction();
                 try
                 {
@@ -776,9 +774,13 @@ namespace DataEditorPortal.Web.Services
                     dynamicParameters.Add(paramReturnId, dbType: null, direction: ParameterDirection.Output, size: 40);
 
                     var affected = con.Execute(queryText, dynamicParameters, trans);
-                    returnedId = dynamicParameters.Get<object>(paramReturnId);
+                    var returnedId = dynamicParameters.Get<object>(paramReturnId);
 
                     trans.Commit();
+
+                    if (model.Keys.Contains(dataSourceConfig.IdColumn))
+                        model[dataSourceConfig.IdColumn] = returnedId;
+                    else model.Add(dataSourceConfig.IdColumn, returnedId);
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
 
@@ -807,7 +809,7 @@ namespace DataEditorPortal.Web.Services
                 // use value processors to execute extra operations
                 foreach (var processor in valueProcessors)
                 {
-                    processor.PostProcess(returnedId);
+                    processor.PostProcess(model);
                 }
             }
 
@@ -905,7 +907,7 @@ namespace DataEditorPortal.Web.Services
                 // use value processors to execute extra operations
                 foreach (var processor in valueProcessors)
                 {
-                    processor.PostProcess(id);
+                    processor.PostProcess(model);
                 }
             }
 
