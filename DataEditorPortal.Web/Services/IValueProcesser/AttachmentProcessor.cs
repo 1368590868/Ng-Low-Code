@@ -1,6 +1,4 @@
-﻿using DataEditorPortal.Data.Models;
-using DataEditorPortal.Web.Models;
-using DataEditorPortal.Web.Models.UniversalGrid;
+﻿using DataEditorPortal.Web.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -13,7 +11,6 @@ namespace DataEditorPortal.Web.Services
     public class AttachmentProcessor : ValueProcessorBase
     {
         private UploadedFileMeta _uploadeFiledMeta;
-        private UniversalGridConfiguration _config;
 
         private readonly IServiceProvider _serviceProvider;
 
@@ -22,10 +19,9 @@ namespace DataEditorPortal.Web.Services
             _serviceProvider = serviceProvider;
         }
 
-        public override void PreProcess(UniversalGridConfiguration config, FormFieldConfig field, IDictionary<string, object> model)
+        public override void PreProcess(IDictionary<string, object> model)
         {
-            _config = config;
-            ProcessFileUploadFileds(field, model);
+            ProcessFileUploadFileds(model);
         }
 
         public override void PostProcess(IDictionary<string, object> model)
@@ -36,35 +32,35 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public override void FetchValue(UniversalGridConfiguration config, FormFieldConfig field, IDictionary<string, object> model)
+        public override void FetchValue(IDictionary<string, object> model)
         {
             return;
         }
 
-        private void ProcessFileUploadFileds(FormFieldConfig field, IDictionary<string, object> model)
+        private void ProcessFileUploadFileds(IDictionary<string, object> model)
         {
             var service = _serviceProvider.GetRequiredService<IUniversalGridService>();
-            var attachmentCols = service.GetAttachmentCols(_config);
+            var attachmentCols = service.GetAttachmentCols(Config);
 
-            if (field.filterType == "attachments")
+            if (Field.filterType == "attachments")
             {
-                if (model.ContainsKey(field.key))
+                if (model.ContainsKey(Field.key))
                 {
-                    if (model[field.key] != null)
+                    if (model[Field.key] != null)
                     {
                         var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                        var jsonElement = (JsonElement)model[field.key];
+                        var jsonElement = (JsonElement)model[Field.key];
                         if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
                         {
                             _uploadeFiledMeta = new UploadedFileMeta()
                             {
-                                FieldName = field.key,
+                                FieldName = Field.key,
                                 UploadedFiles = JsonSerializer.Deserialize<List<UploadedFileModel>>(jsonElement.ToString(), jsonOptions),
-                                FileUploadConfig = attachmentCols.FirstOrDefault(c => c.field == field.key).fileUploadConfig
+                                FileUploadConfig = attachmentCols.FirstOrDefault(c => c.field == Field.key).fileUploadConfig
                             };
                         }
                     }
-                    model.Remove(field.key);
+                    model.Remove(Field.key);
                 }
             }
         }
@@ -72,10 +68,10 @@ namespace DataEditorPortal.Web.Services
         private void SaveUploadedFiles(IDictionary<string, object> model)
         {
             var attachmentService = _serviceProvider.GetRequiredService<IAttachmentService>();
-            attachmentService.SaveUploadedFiles(_uploadeFiledMeta, model, _config.Name);
+            attachmentService.SaveUploadedFiles(_uploadeFiledMeta, model, Config.Name, Conn, Trans);
         }
 
-        public override void BeforeDeleted(UniversalGridConfiguration config, FormFieldConfig field, IEnumerable<object> dataIds)
+        public override void BeforeDeleted(IEnumerable<object> dataIds)
         {
             return;
         }

@@ -1,13 +1,11 @@
 ﻿using Dapper;
 using DataEditorPortal.Data.Common;
-using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 using System.Text.Json;
 
@@ -16,7 +14,6 @@ namespace DataEditorPortal.Web.Services
     [FilterType("linkDataField")]
     public class LinkDataProcessor : ValueProcessorBase
     {
-        private UniversalGridConfiguration _config;
         private List<RelationDataModel> _inputModel;
         private List<RelationDataModel> _existingModel;
         private LinkedTableInfo _linkedTableInfo;
@@ -39,29 +36,26 @@ namespace DataEditorPortal.Web.Services
             _logger = logger;
         }
 
-        public override void PreProcess(UniversalGridConfiguration config, FormFieldConfig field, IDictionary<string, object> model)
+        public override void PreProcess(IDictionary<string, object> model)
         {
-            _config = config;
-
             if (_linkedTableInfo == null)
-                _linkedTableInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetLinkedTableInfo(_config.Name);
+                _linkedTableInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetLinkedTableInfo(Config.Name);
 
             _inputModel = ProcessLinkDataField(model);
-            _existingModel = GetLinkDataModelForForm(_config.Name, model);
+            _existingModel = GetLinkDataModelForForm(Config.Name, model);
         }
 
         public override void PostProcess(IDictionary<string, object> model)
         {
             if (_inputModel != null)
             {
-                UpdateLinkData(_config.Name, model);
+                UpdateLinkData(Config.Name, model);
             }
         }
 
-        public override void FetchValue(UniversalGridConfiguration config, FormFieldConfig field, IDictionary<string, object> model)
+        public override void FetchValue(IDictionary<string, object> model)
         {
-            _config = config;
-            var data = GetLinkDataModelForForm(_config.Name, model)
+            var data = GetLinkDataModelForForm(Config.Name, model)
                 .Select(x =>
                 {
                     return new
@@ -75,14 +69,12 @@ namespace DataEditorPortal.Web.Services
             model.Add(Constants.LINK_DATA_FIELD_NAME, data);
         }
 
-        public override void BeforeDeleted(UniversalGridConfiguration config, FormFieldConfig field, IEnumerable<object> dataIds)
+        public override void BeforeDeleted(IEnumerable<object> dataIds)
         {
-            _config = config;
-
             if (dataIds.Any())
             {
                 if (_linkedTableInfo == null)
-                    _linkedTableInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetLinkedTableInfo(config.Name);
+                    _linkedTableInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetLinkedTableInfo(Config.Name);
 
                 _queryToDelete = _queryBuilder.GenerateSqlTextForDeleteLinkData(_linkedTableInfo.LinkTable, _linkedTableInfo.Table1);
                 _parameterToDelete = _queryBuilder.GenerateDynamicParameter(
@@ -100,12 +92,7 @@ namespace DataEditorPortal.Web.Services
             {
                 try
                 {
-                    using (var con = _serviceProvider.GetRequiredService<DbConnection>())
-                    {
-                        con.ConnectionString = _linkedTableInfo.LinkTable.ConnectionString;
-                        con.Open();
-                        con.Execute(_queryToDelete, _parameterToDelete);
-                    }
+                    Conn.Execute(_queryToDelete, _parameterToDelete, Trans);
                 }
                 catch (Exception ex)
                 {
@@ -151,25 +138,21 @@ namespace DataEditorPortal.Web.Services
                     new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(_linkedTableInfo.Table1.IdColumn, table1Ids) }
                 );
                 // get the table1RefValue
-                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
-                {
-                    con.ConnectionString = linkTable.ConnectionString;
-                    var datas = con.Query(queryText, param)
-                        .Cast<IDictionary<string, object>>()
-                        .Select(d => new
-                        {
-                            TableId = d[_linkedTableInfo.Table1.IdColumn],
-                            TableRefValue = d[_linkedTableInfo.Table1.ReferenceKey]
-                        });
-
-                    _inputModel.ForEach(m =>
+                var datas = Conn.Query(queryText, param, Trans)
+                    .Cast<IDictionary<string, object>>()
+                    .Select(d => new
                     {
-                        m.Table1RefValue = datas
-                            .Where(d => d.TableId != null && d.TableId.ToString() == m.Table1Id.ToString())
-                            .Select(d => d.TableRefValue)
-                            .FirstOrDefault();
+                        TableId = d[_linkedTableInfo.Table1.IdColumn],
+                        TableRefValue = d[_linkedTableInfo.Table1.ReferenceKey]
                     });
-                }
+
+                _inputModel.ForEach(m =>
+                {
+                    m.Table1RefValue = datas
+                        .Where(d => d.TableId != null && d.TableId.ToString() == m.Table1Id.ToString())
+                        .Select(d => d.TableRefValue)
+                        .FirstOrDefault();
+                });
             }
 
             // Set table2RefValue, if ReferenceKey Key is not the same as Id Column, query it from database
@@ -181,82 +164,74 @@ namespace DataEditorPortal.Web.Services
                 var param = _queryBuilder.GenerateDynamicParameter(
                     new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(_linkedTableInfo.Table2.IdColumn, table2Ids) }
                 );
-                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
-                {
-                    con.ConnectionString = linkTable.ConnectionString;
-                    var datas = con.Query(queryText, param)
-                        .Cast<IDictionary<string, object>>()
-                        .Select(d => new
-                        {
-                            TableId = d[_linkedTableInfo.Table2.IdColumn],
-                            TableRefValue = d[_linkedTableInfo.Table2.ReferenceKey]
-                        });
 
-                    _inputModel.ForEach(m =>
+                var datas = Conn.Query(queryText, param, Trans)
+                    .Cast<IDictionary<string, object>>()
+                    .Select(d => new
                     {
-                        m.Table2RefValue = datas
-                            .Where(d => d.TableId != null && d.TableId.ToString() == m.Table2Id.ToString())
-                            .Select(d => d.TableRefValue)
-                            .FirstOrDefault();
+                        TableId = d[_linkedTableInfo.Table2.IdColumn],
+                        TableRefValue = d[_linkedTableInfo.Table2.ReferenceKey]
                     });
-                }
+
+                _inputModel.ForEach(m =>
+                {
+                    m.Table2RefValue = datas
+                        .Where(d => d.TableId != null && d.TableId.ToString() == m.Table2Id.ToString())
+                        .Select(d => d.TableRefValue)
+                        .FirstOrDefault();
+                });
             }
 
-            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+            try
             {
-                con.ConnectionString = linkTable.ConnectionString;
-
-                try
-                {
-                    var toAdd = _inputModel.Where(
-                        input => _existingModel.All(
-                            existing => !(
-                                existing.Table1Id.ToString() == input.Table1Id.ToString() &&
-                                existing.Table2Id.ToString() == input.Table2Id.ToString()
-                            )
-                        )
-                    );
-                    if (toAdd.Any())
-                    {
-                        var sql = _linkedTableInfo.LinkTable.Query_Insert;
-
-                        foreach (var item in toAdd)
-                        {
-                            var value = new List<KeyValuePair<string, object>>();
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, item.Table1RefValue));
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table2.ForeignKey, item.Table2RefValue));
-                            var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
-                            var paramReturnId = _queryBuilder.ParameterName($"RETURNED_{linkTable.IdColumn}");
-                            dynamicParameters.Add(paramReturnId, dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
-
-                            con.Execute(sql, dynamicParameters);
-                        }
-                    }
-
-                    var toDelete = _existingModel.Where(
-                        existing => _inputModel.All(
-                            input => !(
-                                input.Table1Id.ToString() == existing.Table1Id.ToString() &&
-                                input.Table2Id.ToString() == existing.Table2Id.ToString()
-                            )
+                var toAdd = _inputModel.Where(
+                    input => _existingModel.All(
+                        existing => !(
+                            existing.Table1Id.ToString() == input.Table1Id.ToString() &&
+                            existing.Table2Id.ToString() == input.Table2Id.ToString()
                         )
                     )
-                    .Select(x => x.Id);
+                );
+                if (toAdd.Any())
+                {
+                    var sql = _linkedTableInfo.LinkTable.Query_Insert;
 
-                    if (toDelete.Any())
+                    foreach (var item in toAdd)
                     {
-                        var deleteSql = _linkedTableInfo.LinkTable.Query_Delete;
-                        var deleteParam = _queryBuilder.GenerateDynamicParameter(
-                            new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(linkTable.IdColumn, toDelete) }
-                        );
-                        con.Execute(deleteSql, deleteParam);
+                        var value = new List<KeyValuePair<string, object>>();
+                        value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, item.Table1RefValue));
+                        value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table2.ForeignKey, item.Table2RefValue));
+                        var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
+                        var paramReturnId = _queryBuilder.ParameterName($"RETURNED_{linkTable.IdColumn}");
+                        dynamicParameters.Add(paramReturnId, dbType: DbType.String, direction: ParameterDirection.Output, size: 40);
+
+                        Conn.Execute(sql, dynamicParameters, Trans);
                     }
                 }
-                catch (Exception ex)
+
+                var toDelete = _existingModel.Where(
+                    existing => _inputModel.All(
+                        input => !(
+                            input.Table1Id.ToString() == existing.Table1Id.ToString() &&
+                            input.Table2Id.ToString() == existing.Table2Id.ToString()
+                        )
+                    )
+                )
+                .Select(x => x.Id);
+
+                if (toDelete.Any())
                 {
-                    _logger.LogError(ex.Message, ex);
-                    throw;
+                    var deleteSql = _linkedTableInfo.LinkTable.Query_Delete;
+                    var deleteParam = _queryBuilder.GenerateDynamicParameter(
+                        new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(linkTable.IdColumn, toDelete) }
+                    );
+                    Conn.Execute(deleteSql, deleteParam, Trans);
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                throw;
             }
         }
 
@@ -278,26 +253,21 @@ namespace DataEditorPortal.Web.Services
                 var table2Ids = Enumerable.Empty<object>();
                 try
                 {
-                    using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                    var datas = Conn.Query(queryText, param, Trans);
+
+                    relationData = datas.Select(data =>
                     {
-                        con.ConnectionString = _linkedTableInfo.LinkTable.ConnectionString;
-                        con.Open();
-                        var datas = con.Query(queryText, param);
+                        var item = (IDictionary<string, object>)data;
 
-                        relationData = datas.Select(data =>
+                        return new RelationDataModel()
                         {
-                            var item = (IDictionary<string, object>)data;
-
-                            return new RelationDataModel()
-                            {
-                                Id = item[$"LINK_{_linkedTableInfo.LinkTable.IdColumn}"],
-                                Table1Id = item[$"T1_{_linkedTableInfo.Table1.IdColumn}"],
-                                Table2Id = item[$"T2_{_linkedTableInfo.Table2.IdColumn}"],
-                                Table1RefValue = item[$"F1_{_linkedTableInfo.Table1.ForeignKey}"],
-                                Table2RefValue = item[$"F2_{_linkedTableInfo.Table2.ForeignKey}"]
-                            };
-                        }).ToList();
-                    }
+                            Id = item[$"LINK_{_linkedTableInfo.LinkTable.IdColumn}"],
+                            Table1Id = item[$"T1_{_linkedTableInfo.Table1.IdColumn}"],
+                            Table2Id = item[$"T2_{_linkedTableInfo.Table2.IdColumn}"],
+                            Table1RefValue = item[$"F1_{_linkedTableInfo.Table1.ForeignKey}"],
+                            Table2RefValue = item[$"F2_{_linkedTableInfo.Table2.ForeignKey}"]
+                        };
+                    }).ToList();
                 }
                 catch (Exception ex)
                 {
