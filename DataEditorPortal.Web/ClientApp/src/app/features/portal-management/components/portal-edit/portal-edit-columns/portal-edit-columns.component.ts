@@ -238,7 +238,7 @@ export class PortalEditColumnsComponent
   }
   onMonacoEditorInit(editor: any) {
     const formControlTemplate = this.form.get('template');
-    if (formControlTemplate?.value === null) {
+    if (!formControlTemplate?.value) {
       formControlTemplate?.setValue(this.helperMessage as never);
     }
     editor.onMouseDown(() => {

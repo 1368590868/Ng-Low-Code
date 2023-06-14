@@ -103,7 +103,9 @@ export class PortalEditBasicComponent
       props: {
         label: 'Icon',
         placeholder: 'Icon',
-        required: true
+        required: true,
+        description:
+          '<a href="https://fontawesome.com/search?o=r&m=free&s=regular" target="__blank">More icons can be click</a>'
       }
     },
     {
