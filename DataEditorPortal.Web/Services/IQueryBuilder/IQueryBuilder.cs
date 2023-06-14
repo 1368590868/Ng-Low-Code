@@ -35,6 +35,7 @@ namespace DataEditorPortal.Web.Services
         string GenerateSqlTextForExist(DataSourceConfig config);
         string GenerateSqlTextForLinkData(TableMeta linkTable, TableMeta t1, TableMeta t2);
         string GenerateSqlTextForDeleteLinkData(TableMeta linkTable, TableMeta input);
+        string GenerateSqlTextForQueryForeignKeyValue(TableMeta input);
 
         string GenerateSqlTextForColumnFilterOption(DataSourceConfig config);
 
@@ -416,6 +417,14 @@ namespace DataEditorPortal.Web.Services
             ";
         }
 
+        public virtual string GenerateSqlTextForQueryForeignKeyValue(TableMeta input)
+        {
+            var columns = new List<string>() { EscapeColumnName(input.IdColumn) };
+            if (input.IdColumn != input.ReferenceKey)
+                columns.Add(EscapeColumnName(input.ReferenceKey));
+
+            return $@"SELECT {string.Join(",", columns)} FROM ({input.Query_AllData}) A WHERE {EscapeColumnName(input.IdColumn)} IN {ParameterPrefix}{ParameterName(input.IdColumn)}";
+        }
         #endregion
 
         public (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, IDictionary<string, object> model)

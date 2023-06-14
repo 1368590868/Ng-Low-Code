@@ -29,7 +29,7 @@ namespace DataEditorPortal.Web.Services
             return;
         }
 
-        public override void FetchValue(UniversalGridConfiguration config, FormFieldConfig field, object dataId, IDictionary<string, object> model)
+        public override void FetchValue(UniversalGridConfiguration config, FormFieldConfig field, IDictionary<string, object> model)
         {
             if (field.props == null) return;
 

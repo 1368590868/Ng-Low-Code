@@ -618,7 +618,7 @@ namespace DataEditorPortal.Web.Services
                 var processor = factory.CreateValueProcessor(field.filterType);
                 if (processor != null)
                 {
-                    processor.FetchValue(config, field, id, result);
+                    processor.FetchValue(config, field, result);
                 }
             }
 
@@ -837,6 +837,12 @@ namespace DataEditorPortal.Web.Services
                     .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
                     .ToDictionary(x => x.Key, x => x.Value);
 
+                // add id parameter
+                if (model.ContainsKey(dataSourceConfig.IdColumn))
+                    model[dataSourceConfig.IdColumn] = id;
+                else
+                    model.Add(dataSourceConfig.IdColumn, id);
+
                 // calculate the computed field values
                 ProcessComputedValues(formLayout.FormFields, model, con);
 
@@ -862,12 +868,6 @@ namespace DataEditorPortal.Web.Services
                     Columns = model.Keys.ToList(),
                     QueryText = formLayout.QueryText
                 });
-
-                // add query parameters
-                if (model.ContainsKey(dataSourceConfig.IdColumn))
-                    model[dataSourceConfig.IdColumn] = id;
-                else
-                    model.Add(dataSourceConfig.IdColumn, id);
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
 
                 #endregion
@@ -1309,13 +1309,12 @@ namespace DataEditorPortal.Web.Services
                     .Select(t =>
                     {
                         var ds = JsonSerializer.Deserialize<DataSourceConfig>(t.DataSource);
-                        var query = _queryBuilder.GenerateSqlTextForDatasource(ds);
                         return new TableMeta()
                         {
                             Name = t.Name,
                             MenuId = t.Id,
                             IdColumn = ds.IdColumn,
-                            Query_AllData = query,
+                            Query_AllData = _queryBuilder.GenerateSqlTextForDatasource(ds),
                             EditorColumns = dsLink.PrimaryTable.ColumnsForLinkedField,
                             ReferenceKey = dsLink.LinkTable.PrimaryReferenceKey,
                             ForeignKey = dsLink.LinkTable.PrimaryForeignKey,
@@ -1329,13 +1328,12 @@ namespace DataEditorPortal.Web.Services
                     .Select(t =>
                     {
                         var ds = JsonSerializer.Deserialize<DataSourceConfig>(t.DataSource);
-                        var query = _queryBuilder.GenerateSqlTextForDatasource(ds);
                         return new TableMeta()
                         {
                             Name = t.Name,
                             MenuId = t.Id,
                             IdColumn = ds.IdColumn,
-                            Query_AllData = query,
+                            Query_AllData = _queryBuilder.GenerateSqlTextForDatasource(ds),
                             EditorColumns = dsLink.SecondaryTable.ColumnsForLinkedField,
                             ReferenceKey = dsLink.LinkTable.SecondaryReferenceKey,
                             ForeignKey = dsLink.LinkTable.SecondaryForeignKey,
