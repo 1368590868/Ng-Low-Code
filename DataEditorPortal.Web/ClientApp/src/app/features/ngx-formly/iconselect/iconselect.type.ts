@@ -29,31 +29,52 @@ export interface FormlySelectFieldConfig
 @Component({
   selector: 'app-formly-field-primeng-icon-select',
   template: `
-    <p-dropdown
-      #dropdown
-      [options]="iconList"
-      [filter]="true"
-      filterBy="label"
-      [showClear]="true"
-      [formControl]="formControl"
-      [formlyAttributes]="field"
-      [placeholder]="props.placeholder || ''"
-      [appendTo]="props.appendTo || 'body'"
-      (onChange)="props.change && props.change(field, $event)">
-      <ng-template let-select pTemplate="selectedItem">
-        <div class="flex  align-items-center">
-          <i [class]="select.value"></i>
-          <p class="ml-5">{{ select.label }}</p>
-        </div>
-      </ng-template>
-      <ng-template let-icon pTemplate="item">
-        <div class="flex align-items-center">
-          <i [class]="icon.value"></i>
-          <p class="ml-5">{{ icon.label }}</p>
-        </div>
-      </ng-template>
-    </p-dropdown>
+    <div class=" relative">
+      <p-dropdown
+        #dropdown
+        [options]="iconList"
+        [filter]="true"
+        filterBy="label"
+        [editable]="true"
+        [showClear]="true"
+        [formControl]="formControl"
+        [formlyAttributes]="field"
+        [placeholder]="props.placeholder || ''"
+        [appendTo]="props.appendTo || 'body'"
+        (onChange)="props.change && props.change(field, $event)">
+        <ng-template let-select pTemplate="selectedItem">
+          <div class="flex align-items-center">
+            <i [class]="select.value"></i>
+            <p class="ml-5">{{ select.label }}</p>
+          </div>
+        </ng-template>
+        <ng-template let-icon pTemplate="item">
+          <div class="flex align-items-center">
+            <i [class]="icon.value"></i>
+            <p class="ml-5">{{ icon.label }}</p>
+          </div>
+        </ng-template>
+      </p-dropdown>
+
+      <i
+        [class]="
+          (dropdown?.value?.startsWith('pi') ? 'pi ' : '') + dropdown.value
+        "
+        class="absolute"
+        style="left:1rem;top:.9rem;"></i>
+    </div>
   `,
+  styles: [
+    `
+      :host {
+        ::ng-deep {
+          .p-dropdown.p-dropdown-clearable .p-dropdown-label {
+            padding-left: 3rem;
+          }
+        }
+      }
+    `
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldIconSelectComponent extends FieldType<
