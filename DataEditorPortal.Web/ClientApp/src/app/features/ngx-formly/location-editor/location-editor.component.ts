@@ -431,6 +431,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
     `
       :host {
         width: 100% !important;
+        margin-bottom: -1rem !important;
       }
     `
   ],
