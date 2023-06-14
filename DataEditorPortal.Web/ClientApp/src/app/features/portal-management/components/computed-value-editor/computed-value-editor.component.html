@@ -14,7 +14,8 @@
       *ngIf="hasAdvanceData"
       severity="info"
       text="Use Query Text"
-      styleClass="mr-1"></p-message>
+      styleClass="mr-1 cursor-pointer"
+      (click)="showDialog()"></p-message>
     <p-button
       *ngIf="hasAdvanceData"
       styleClass="p-button-text p-button-rounded remove-btn"
