@@ -1,6 +1,4 @@
-﻿using DataEditorPortal.Data.Models;
-using DataEditorPortal.Web.Models.UniversalGrid;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -10,7 +8,6 @@ namespace DataEditorPortal.Web.Services
     [FilterType("locationField")]
     public class LocationProcessor : ValueProcessorBase
     {
-        private UniversalGridConfiguration _config;
         private readonly IServiceProvider _serviceProvider;
 
         public LocationProcessor(IServiceProvider serviceProvider)
@@ -18,10 +15,9 @@ namespace DataEditorPortal.Web.Services
             _serviceProvider = serviceProvider;
         }
 
-        public override void PreProcess(UniversalGridConfiguration config, FormFieldConfig field, IDictionary<string, object> model)
+        public override void PreProcess(IDictionary<string, object> model)
         {
-            _config = config;
-            ProcessLocationField(field, model);
+            ProcessLocationField(model);
         }
 
         public override void PostProcess(IDictionary<string, object> model)
@@ -29,11 +25,11 @@ namespace DataEditorPortal.Web.Services
             return;
         }
 
-        public override void FetchValue(UniversalGridConfiguration config, FormFieldConfig field, object dataId, IDictionary<string, object> model)
+        public override void FetchValue(IDictionary<string, object> model)
         {
-            if (field.props == null) return;
+            if (Field.props == null) return;
 
-            using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+            using (JsonDocument doc = JsonDocument.Parse(Field.props.ToString()))
             {
                 var props = doc.RootElement.EnumerateObject();
 
@@ -51,23 +47,23 @@ namespace DataEditorPortal.Web.Services
                             valueModel.Add(mapping.Name, model[key]);
                     }
 
-                    if (model.ContainsKey(field.key))
-                        model[field.key] = valueModel;
+                    if (model.ContainsKey(Field.key))
+                        model[Field.key] = valueModel;
                     else
-                        model.Add(field.key, valueModel);
+                        model.Add(Field.key, valueModel);
                 }
             }
         }
 
-        private void ProcessLocationField(FormFieldConfig field, IDictionary<string, object> model)
+        private void ProcessLocationField(IDictionary<string, object> model)
         {
-            if (field.props == null) return;
+            if (Field.props == null) return;
 
-            if (field.filterType == "locationField")
+            if (Field.filterType == "locationField")
             {
-                if (model.ContainsKey(field.key))
+                if (model.ContainsKey(Field.key))
                 {
-                    using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
+                    using (JsonDocument doc = JsonDocument.Parse(Field.props.ToString()))
                     {
                         var props = doc.RootElement.EnumerateObject();
 
@@ -76,7 +72,7 @@ namespace DataEditorPortal.Web.Services
                         {
                             IEnumerable<JsonProperty> fieldValues = null;
                             // if value is null, initial a JsonElement of undefined.
-                            var jsonElement = model[field.key] != null ? (JsonElement)model[field.key] : new JsonElement();
+                            var jsonElement = model[Field.key] != null ? (JsonElement)model[Field.key] : new JsonElement();
                             if (jsonElement.ValueKind == JsonValueKind.Object)
                                 fieldValues = jsonElement.EnumerateObject();
 
@@ -99,12 +95,12 @@ namespace DataEditorPortal.Web.Services
                         }
                     }
 
-                    model.Remove(field.key);
+                    model.Remove(Field.key);
                 }
             }
         }
 
-        public override void BeforeDeleted(UniversalGridConfiguration config, FormFieldConfig field, IEnumerable<object> dataIds)
+        public override void BeforeDeleted(IEnumerable<object> dataIds)
         {
             return;
         }

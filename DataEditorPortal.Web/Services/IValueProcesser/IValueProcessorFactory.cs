@@ -1,5 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Models.UniversalGrid;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 
@@ -7,7 +10,7 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IValueProcessorFactory
     {
-        public ValueProcessorBase CreateValueProcessor(string filterType);
+        public ValueProcessorBase CreateValueProcessor(FormFieldConfig field, UniversalGridConfiguration config, IDbConnection con, IDbTransaction trans = null);
         public ValueProcessorBase CreateValueProcessor(Type type);
     }
 
@@ -20,7 +23,7 @@ namespace DataEditorPortal.Web.Services
             _serviceProvider = serviceProvider;
         }
 
-        public ValueProcessorBase CreateValueProcessor(string filterType)
+        public ValueProcessorBase CreateValueProcessor(FormFieldConfig field, UniversalGridConfiguration config, IDbConnection con, IDbTransaction trans = null)
         {
             var type = Assembly.GetCallingAssembly().GetTypes()
                 .Where(x =>
@@ -28,7 +31,7 @@ namespace DataEditorPortal.Web.Services
                     if (typeof(ValueProcessorBase).IsAssignableFrom(x))
                     {
                         var attr = x.GetCustomAttribute<FilterTypeAttribute>();
-                        return attr != null && attr.GetFilterType() == filterType;
+                        return attr != null && attr.GetFilterType() == field.filterType;
                     }
                     return false;
                 })
@@ -36,7 +39,12 @@ namespace DataEditorPortal.Web.Services
 
             if (type != null)
             {
-                return _serviceProvider.GetRequiredService(type) as ValueProcessorBase;
+                var instance = _serviceProvider.GetRequiredService(type) as ValueProcessorBase;
+                instance.Conn = con;
+                instance.Trans = trans;
+                instance.Config = config;
+                instance.Field = field;
+                return instance;
             }
 
             return null;

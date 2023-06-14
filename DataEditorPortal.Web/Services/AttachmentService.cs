@@ -19,7 +19,7 @@ namespace DataEditorPortal.Web.Services
     public interface IAttachmentService
     {
         FileUploadConfig GetDefaultConfig();
-        void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, IDictionary<string, object> model, string gridName);
+        void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, IDictionary<string, object> model, string gridName, IDbConnection con, IDbTransaction trans);
         dynamic GetFileStream(string fileId, FileUploadConfig options);
     }
 
@@ -71,7 +71,7 @@ namespace DataEditorPortal.Web.Services
         {
             return DEFAULT_CONFIG;
         }
-        public void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, IDictionary<string, object> model, string gridName)
+        public void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, IDictionary<string, object> model, string gridName, IDbConnection con, IDbTransaction trans)
         {
             var config = GetConfigOrDefault(uploadedFileMeta);
             var storageType = config.FileStorageType;
@@ -166,15 +166,11 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
-            var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == config.DataSourceConnectionName);
-            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
-            {
-                con.ConnectionString = dsConnection.ConnectionString;
-                if (insertParameters.Any())
-                    con.Execute(insertScript, insertParameters);
-                if (updateParameters.Any())
-                    con.Execute(updateScript, updateParameters);
-            }
+
+            if (insertParameters.Any())
+                con.Execute(insertScript, insertParameters, trans);
+            if (updateParameters.Any())
+                con.Execute(updateScript, updateParameters, trans);
 
             try
             {
@@ -219,8 +215,10 @@ namespace DataEditorPortal.Web.Services
             string contentType = null;
             Stream stream = null;
 
+            var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == config.DataSourceConnectionName);
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
+                con.ConnectionString = dsConnection.ConnectionString;
                 var uploadedFile = con.QueryFirst(queryScript, param);
                 if (uploadedFile == null) throw new DepException($"File [{fileId}] doesn't exist.");
 

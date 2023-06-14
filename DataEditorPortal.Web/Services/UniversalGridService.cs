@@ -607,22 +607,22 @@ namespace DataEditorPortal.Web.Services
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
-            }
 
-            // process value if required
-            var result = details.AsList().ToDictionary(x => x.Key, x => x.Value);
-            var formLayout = GetUpdatingFormConfig(config);
-            var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
-            foreach (var field in formLayout.FormFields)
-            {
-                var processor = factory.CreateValueProcessor(field.filterType);
-                if (processor != null)
+                // process value if required
+                var result = details.AsList().ToDictionary(x => x.Key, x => x.Value);
+                var formLayout = GetUpdatingFormConfig(config);
+                var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+                foreach (var field in formLayout.FormFields)
                 {
-                    processor.FetchValue(config, field, id, result);
+                    var processor = factory.CreateValueProcessor(field, config, con);
+                    if (processor != null)
+                    {
+                        processor.FetchValue(result);
+                    }
                 }
-            }
 
-            return result;
+                return result;
+            }
         }
 
         public bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model)
@@ -674,14 +674,12 @@ namespace DataEditorPortal.Web.Services
 
                 // use value processor to convert values in model
                 var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
-                var valueProcessors = new List<ValueProcessorBase>();
                 foreach (var field in formLayout.FormFields)
                 {
-                    var processor = factory.CreateValueProcessor(field.filterType);
+                    var processor = factory.CreateValueProcessor(field, config, con);
                     if (processor != null)
                     {
-                        processor.PreProcess(config, field, model);
-                        valueProcessors.Add(processor);
+                        processor.PreProcess(model);
                     }
                 }
 
@@ -739,16 +737,19 @@ namespace DataEditorPortal.Web.Services
                 // calculate the computed field values
                 ProcessComputedValues(formLayout.FormFields, model, con);
 
+                // excute command
+                var trans = con.BeginTransaction();
+
                 // use value processor to convert values in model
                 var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
                 var valueProcessors = new List<ValueProcessorBase>();
                 foreach (var field in formLayout.FormFields)
                 {
-                    var processor = factory.CreateValueProcessor(field.filterType);
+                    var processor = factory.CreateValueProcessor(field, config, con, trans);
                     if (processor != null)
                     {
-                        processor.PreProcess(config, field, model);
                         valueProcessors.Add(processor);
+                        processor.PreProcess(model);
                     }
                 }
 
@@ -765,8 +766,6 @@ namespace DataEditorPortal.Web.Services
 
                 #endregion
 
-                // excute command
-                var trans = con.BeginTransaction();
                 try
                 {
                     var dynamicParameters = new DynamicParameters(param);
@@ -776,11 +775,17 @@ namespace DataEditorPortal.Web.Services
                     var affected = con.Execute(queryText, dynamicParameters, trans);
                     var returnedId = dynamicParameters.Get<object>(paramReturnId);
 
-                    trans.Commit();
-
                     if (model.Keys.Contains(dataSourceConfig.IdColumn))
                         model[dataSourceConfig.IdColumn] = returnedId;
                     else model.Add(dataSourceConfig.IdColumn, returnedId);
+
+                    // use value processors to execute extra operations
+                    foreach (var processor in valueProcessors)
+                    {
+                        processor.PostProcess(model);
+                    }
+
+                    trans.Commit();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
 
@@ -804,12 +809,6 @@ namespace DataEditorPortal.Web.Services
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
-                }
-
-                // use value processors to execute extra operations
-                foreach (var processor in valueProcessors)
-                {
-                    processor.PostProcess(model);
                 }
             }
 
@@ -837,19 +836,28 @@ namespace DataEditorPortal.Web.Services
                     .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
                     .ToDictionary(x => x.Key, x => x.Value);
 
+                // add id parameter
+                if (model.ContainsKey(dataSourceConfig.IdColumn))
+                    model[dataSourceConfig.IdColumn] = id;
+                else
+                    model.Add(dataSourceConfig.IdColumn, id);
+
                 // calculate the computed field values
                 ProcessComputedValues(formLayout.FormFields, model, con);
+
+                // excute command
+                var trans = con.BeginTransaction();
 
                 // use value processor to convert values in model
                 var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
                 var valueProcessors = new List<ValueProcessorBase>();
                 foreach (var field in formLayout.FormFields)
                 {
-                    var processor = factory.CreateValueProcessor(field.filterType);
+                    var processor = factory.CreateValueProcessor(field, config, con, trans);
                     if (processor != null)
                     {
-                        processor.PreProcess(config, field, model);
                         valueProcessors.Add(processor);
+                        processor.PreProcess(model);
                     }
                 }
 
@@ -862,21 +870,19 @@ namespace DataEditorPortal.Web.Services
                     Columns = model.Keys.ToList(),
                     QueryText = formLayout.QueryText
                 });
-
-                // add query parameters
-                if (model.ContainsKey(dataSourceConfig.IdColumn))
-                    model[dataSourceConfig.IdColumn] = id;
-                else
-                    model.Add(dataSourceConfig.IdColumn, id);
                 var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
 
                 #endregion
 
-                // excute command
-                var trans = con.BeginTransaction();
                 try
                 {
                     var affected = con.Execute(queryText, param, trans);
+
+                    // use value processors to execute extra operations
+                    foreach (var processor in valueProcessors)
+                    {
+                        processor.PostProcess(model);
+                    }
 
                     trans.Commit();
 
@@ -902,12 +908,6 @@ namespace DataEditorPortal.Web.Services
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
-                }
-
-                // use value processors to execute extra operations
-                foreach (var processor in valueProcessors)
-                {
-                    processor.PostProcess(model);
                 }
             }
 
@@ -946,28 +946,34 @@ namespace DataEditorPortal.Web.Services
             GetAddingFormConfig(config).FormFields.ForEach(x => { if (!fields.Any(x => x.key == x.key)) fields.Add(x); });
             GetUpdatingFormConfig(config).FormFields.ForEach(x => { if (!fields.Any(x => x.key == x.key)) fields.Add(x); });
 
-            // use value processor to convert values in model
-            var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
-            var valueProcessors = new List<ValueProcessorBase>();
-            foreach (var field in fields)
-            {
-                var processor = factory.CreateValueProcessor(field.filterType);
-                if (processor != null)
-                {
-                    processor.BeforeDeleted(config, field, ids);
-                    valueProcessors.Add(processor);
-                }
-            }
-
             using (var con = _serviceProvider.GetRequiredService<DbConnection>())
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
                 con.Open();
                 var trans = con.BeginTransaction();
 
+                // use value processor to convert values in model
+                var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+                var valueProcessors = new List<ValueProcessorBase>();
+                foreach (var field in fields)
+                {
+                    var processor = factory.CreateValueProcessor(field, config, con, trans);
+                    if (processor != null)
+                    {
+                        processor.BeforeDeleted(ids);
+                        valueProcessors.Add(processor);
+                    }
+                }
+
                 try
                 {
                     var affected = con.Execute(queryText, param, trans);
+
+                    // use value processors to execute extra operations
+                    foreach (var processor in valueProcessors)
+                    {
+                        processor.AfterDeleted();
+                    }
 
                     trans.Commit();
 
@@ -993,12 +999,6 @@ namespace DataEditorPortal.Web.Services
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
                     _logger.LogError(ex.Message, ex);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
-                }
-
-                // use value processors to execute extra operations
-                foreach (var processor in valueProcessors)
-                {
-                    processor.AfterDeleted();
                 }
             }
 
@@ -1202,9 +1202,7 @@ namespace DataEditorPortal.Web.Services
                 columns = columns.Where(c => linkedTableInfo.Table2.EditorColumns.Contains(c.field)).ToList(),
                 table2Name = linkedTableInfo.Table2.Name,
                 table2IdColumn = linkedTableInfo.Table2.IdColumn,
-                table2ReferenceKey = linkedTableInfo.Table2.ReferenceKey,
-                table1IdColumn = linkedTableInfo.Table1.IdColumn,
-                table1ReferenceKey = linkedTableInfo.Table1.ReferenceKey
+                table2ReferenceKey = linkedTableInfo.Table2.ReferenceKey
             };
         }
 
@@ -1311,13 +1309,12 @@ namespace DataEditorPortal.Web.Services
                     .Select(t =>
                     {
                         var ds = JsonSerializer.Deserialize<DataSourceConfig>(t.DataSource);
-                        var query = _queryBuilder.GenerateSqlTextForDatasource(ds);
                         return new TableMeta()
                         {
                             Name = t.Name,
                             MenuId = t.Id,
                             IdColumn = ds.IdColumn,
-                            Query_AllData = query,
+                            Query_AllData = _queryBuilder.GenerateSqlTextForDatasource(ds),
                             EditorColumns = dsLink.PrimaryTable.ColumnsForLinkedField,
                             ReferenceKey = dsLink.LinkTable.PrimaryReferenceKey,
                             ForeignKey = dsLink.LinkTable.PrimaryForeignKey,
@@ -1331,13 +1328,12 @@ namespace DataEditorPortal.Web.Services
                     .Select(t =>
                     {
                         var ds = JsonSerializer.Deserialize<DataSourceConfig>(t.DataSource);
-                        var query = _queryBuilder.GenerateSqlTextForDatasource(ds);
                         return new TableMeta()
                         {
                             Name = t.Name,
                             MenuId = t.Id,
                             IdColumn = ds.IdColumn,
-                            Query_AllData = query,
+                            Query_AllData = _queryBuilder.GenerateSqlTextForDatasource(ds),
                             EditorColumns = dsLink.SecondaryTable.ColumnsForLinkedField,
                             ReferenceKey = dsLink.LinkTable.SecondaryReferenceKey,
                             ForeignKey = dsLink.LinkTable.SecondaryForeignKey,
