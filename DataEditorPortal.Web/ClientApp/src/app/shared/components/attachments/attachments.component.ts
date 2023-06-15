@@ -24,7 +24,7 @@ export class AttachmentsComponent {
     }
 
     this.fileList = parseVal.filter(item => item?.status !== 'Deleted');
-    const msg = parseVal
+    const msg = this.fileList
       .map(item => {
         const comments = item?.comments;
         if (!comments) return '';
