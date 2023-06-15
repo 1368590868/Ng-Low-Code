@@ -3,10 +3,8 @@
     width: 2rem;
     height: 2rem;
   }
-  @media screen and (min-width: 1729px) {
-    .layout-content {
-      min-height: calc(100% - 8rem);
-    }
+  .layout-content {
+    min-height: calc(100% - 9rem);
   }
   .p-datatable {
     .p-datatable-tbody > tr > td:first-child {
@@ -19,13 +17,8 @@
 }
 
 .p-card {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  height: calc(100% - 8rem);
-  width: calc(100% - 1rem);
-  left: 0.5rem;
-  top: 0.5rem;
+  height: calc(100% - 10rem);
+  width: calc(100% - 2rem);
   ::ng-deep {
     .p-datatable-wrapper {
       overflow-x: auto;
