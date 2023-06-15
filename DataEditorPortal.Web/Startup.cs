@@ -21,7 +21,7 @@ using Microsoft.Extensions.Logging;
 using Oracle.ManagedDataAccess.Client;
 using Quartz;
 using System;
-using System.Data.Common;
+using System.Data;
 
 namespace DataEditorPortal.Web
 {
@@ -80,7 +80,7 @@ namespace DataEditorPortal.Web
                 else
                     throw new NotImplementedException();
             });
-            services.AddTransient<DbConnection>(sp =>
+            services.AddTransient<IDbConnection>(sp =>
             {
                 var databaseProvider = Configuration.GetValue<string>("DatabaseProvider");
                 if (databaseProvider == "SqlConnection")

@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.Linq;
 using System.Text.Json;
 
@@ -432,7 +432,7 @@ namespace DataEditorPortal.Web.Controllers
             try
             {
                 // try to connect to database to validate if the connection string is valid.
-                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                 {
                     con.ConnectionString = model.ConnectionString;
                     con.Open();
@@ -464,7 +464,7 @@ namespace DataEditorPortal.Web.Controllers
             try
             {
                 // try to connect to database to validate if the connection string is valid.
-                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                 {
                     con.ConnectionString = model.ConnectionString;
                     con.Open();

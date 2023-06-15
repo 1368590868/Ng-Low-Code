@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.IO;
 using System.Linq;
 
@@ -216,7 +215,7 @@ namespace DataEditorPortal.Web.Services
             Stream stream = null;
 
             var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == config.DataSourceConnectionName);
-            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
             {
                 con.ConnectionString = dsConnection.ConnectionString;
                 var uploadedFile = con.QueryFirst(queryScript, param);
