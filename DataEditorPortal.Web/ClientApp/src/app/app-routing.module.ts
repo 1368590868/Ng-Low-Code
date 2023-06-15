@@ -35,9 +35,9 @@ const routes: Routes = [
     canActivate: [AuthRouterGuard, AdminPermissionGuard]
   },
   {
-    path: 'datasource-connection',
+    path: 'datasource-connections',
     component: DbConnectionComponent,
-    canActivate: []
+    canActivate: [AuthRouterGuard, AdminPermissionGuard]
   },
   {
     path: 'system-event-logs',
