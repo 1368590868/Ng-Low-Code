@@ -34,7 +34,7 @@ namespace DataEditorPortal.Web.Services
         string GenerateSqlTextForDelete(DataSourceConfig config);
         string GenerateSqlTextForExist(DataSourceConfig config);
         string GenerateSqlTextForLinkData(TableMeta linkTable, TableMeta t1, TableMeta t2);
-        string GenerateSqlTextForDeleteLinkData(TableMeta linkTable, TableMeta input);
+        string GenerateSqlTextForDeleteLinkData(DataSourceConfig config, TableMeta input);
         string GenerateSqlTextForQueryForeignKeyValue(TableMeta input);
 
         string GenerateSqlTextForColumnFilterOption(DataSourceConfig config);
@@ -408,12 +408,16 @@ namespace DataEditorPortal.Web.Services
             return linkQuery;
         }
 
-        public virtual string GenerateSqlTextForDeleteLinkData(TableMeta linkTable, TableMeta input)
+        public virtual string GenerateSqlTextForDeleteLinkData(DataSourceConfig config, TableMeta input)
         {
             return $@"
-                DELETE FROM ({linkTable.Query_AllData}) link
-                INNER JOIN ({input.Query_AllData}) t1 ON link.{EscapeColumnName(input.ForeignKey)} = t1.{EscapeColumnName(input.ReferenceKey)}
-                WHERE t1.{input.IdColumn} IN {ParameterPrefix}{ParameterName(input.IdColumn)}
+                DELETE FROM {config.TableSchema}.{config.TableName}
+                WHERE {EscapeColumnName(input.ForeignKey)} IN (
+                    SELECT link.{EscapeColumnName(input.ForeignKey)} 
+                    FROM {config.TableSchema}.{config.TableName} link
+                    INNER JOIN ({input.Query_AllData}) t1 ON link.{EscapeColumnName(input.ForeignKey)} = t1.{EscapeColumnName(input.ReferenceKey)}
+                    WHERE t1.{input.IdColumn} IN {ParameterPrefix}{ParameterName(input.IdColumn)}
+                )
             ";
         }
 

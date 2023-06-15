@@ -941,8 +941,8 @@ namespace DataEditorPortal.Web.Services
                     );
 
             var fields = new List<FormFieldConfig>();
-            GetAddingFormConfig(config).FormFields.ForEach(x => { if (!fields.Any(x => x.key == x.key)) fields.Add(x); });
-            GetUpdatingFormConfig(config).FormFields.ForEach(x => { if (!fields.Any(x => x.key == x.key)) fields.Add(x); });
+            GetAddingFormConfig(config).FormFields.ForEach(x => { if (!fields.Any(f => x.key == f.key)) fields.Add(x); });
+            GetUpdatingFormConfig(config).FormFields.ForEach(x => { if (!fields.Any(f => x.key == f.key)) fields.Add(x); });
 
             using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
             {
@@ -950,21 +950,21 @@ namespace DataEditorPortal.Web.Services
                 con.Open();
                 var trans = con.BeginTransaction();
 
-                // use value processor to convert values in model
-                var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
-                var valueProcessors = new List<ValueProcessorBase>();
-                foreach (var field in fields)
-                {
-                    var processor = factory.CreateValueProcessor(field, config, con, trans);
-                    if (processor != null)
-                    {
-                        processor.BeforeDeleted(ids);
-                        valueProcessors.Add(processor);
-                    }
-                }
-
                 try
                 {
+                    // use value processor to convert values in model
+                    var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+                    var valueProcessors = new List<ValueProcessorBase>();
+                    foreach (var field in fields)
+                    {
+                        var processor = factory.CreateValueProcessor(field, config, con, trans);
+                        if (processor != null)
+                        {
+                            processor.BeforeDeleted(ids);
+                            valueProcessors.Add(processor);
+                        }
+                    }
+
                     var affected = con.Execute(queryText, param, trans);
 
                     // use value processors to execute extra operations
@@ -1298,7 +1298,7 @@ namespace DataEditorPortal.Web.Services
                         MenuId = t.Id,
                         IdColumn = ds.LinkTable.IdColumn,
                         Query_AllData = query,
-                        ConnectionString = t.ConnectionString
+                        ConnectionString = t.ConnectionString,
                     };
                 }).FirstOrDefault();
 
@@ -1352,9 +1352,9 @@ namespace DataEditorPortal.Web.Services
                         QueryText = dsLink.LinkTable.QueryInsert
                     }
                 );
-                linkTable.Query_Delete = _queryBuilder.GenerateSqlTextForDelete(dsLink.LinkTable);
 
                 var table1IsPrimary = primary.Name == table1Name;
+                linkTable.Query_Delete = _queryBuilder.GenerateSqlTextForDeleteLinkData(dsLink.LinkTable, table1IsPrimary ? primary : secondary);
 
                 return new LinkedTableInfo()
                 {
