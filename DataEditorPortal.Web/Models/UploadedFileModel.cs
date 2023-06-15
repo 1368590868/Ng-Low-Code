@@ -23,6 +23,7 @@ namespace DataEditorPortal.Web.Models
 
     public class UploadedFileMeta
     {
+        public string GridName { get; set; }
         public string FieldName { get; set; }
         public List<UploadedFileModel> UploadedFiles { get; set; }
         public FileUploadConfig FileUploadConfig { get; set; }

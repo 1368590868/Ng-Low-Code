@@ -28,7 +28,7 @@ namespace DataEditorPortal.Web.Services
         // universal grid
         string GenerateSqlTextForDatasource(DataSourceConfig config);
         string GenerateSqlTextForList(DataSourceConfig config);
-        string GenerateSqlTextForDetail(DataSourceConfig config);
+        string GenerateSqlTextForDetail(DataSourceConfig config, bool multiple = false);
         string GenerateSqlTextForInsert(DataSourceConfig config);
         string GenerateSqlTextForUpdate(DataSourceConfig config);
         string GenerateSqlTextForDelete(DataSourceConfig config);
@@ -273,6 +273,8 @@ namespace DataEditorPortal.Web.Services
             {
                 var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
 
+                if (config.Columns.Count > 0 && !config.Columns.Contains(config.IdColumn)) config.Columns.Add(config.IdColumn);
+
                 var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => EscapeColumnName(x))) : "*";
 
                 var queryText = $@"SELECT {columns} FROM {source} WHERE {where} AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##";
@@ -290,11 +292,11 @@ namespace DataEditorPortal.Web.Services
             return queryText;
         }
 
-        public virtual string GenerateSqlTextForDetail(DataSourceConfig config)
+        public virtual string GenerateSqlTextForDetail(DataSourceConfig config, bool multiple = false)
         {
             var queryText = GenerateSqlTextForDatasource(config);
 
-            return $@"SELECT * FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} = {ParameterPrefix}{ParameterName(config.IdColumn)}";
+            return $@"SELECT * FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} {(multiple ? "IN" : "=")} {ParameterPrefix}{ParameterName(config.IdColumn)}";
         }
 
         public abstract string GenerateSqlTextForInsert(DataSourceConfig config);
