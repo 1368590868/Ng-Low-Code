@@ -1,22 +1,26 @@
 :host {
-  form > formly-form.location-wrapper {
-    ::ng-deep {
-      & > formly-field > formly-group > formly-field {
-        .p-field {
-          margin-bottom: 1rem !important;
+  form > formly-form {
+    &.location-wrapper {
+      ::ng-deep {
+        & > formly-field > formly-group > formly-field {
+          .p-field {
+            margin-bottom: 1rem !important;
+          }
         }
-      }
-      & > formly-field > formly-group > formly-field:last-child {
-        .p-field {
-          margin-bottom: 0rem !important;
-        }
-      }
 
-      formly-validation-message {
-        display: none;
+        & > formly-field > formly-group > .no-length {
+          .p-field {
+            margin-bottom: 0rem !important;
+          }
+        }
+
+        formly-validation-message {
+          display: none;
+        }
       }
     }
   }
+
   form > formly-form.label-padding {
     ::ng-deep {
       label {

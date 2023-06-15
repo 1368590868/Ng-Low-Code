@@ -83,6 +83,12 @@ export class LocationEditorComponent implements ControlValueAccessor {
     this._lengthLabel = val;
     this.fields.forEach(x => {
       if (x.props && x.key === 'lengthFeet') x.props.label = val;
+
+      if (x.props && x.key === 'toMeasure' && !val && this.locationType !== 2)
+        x.className = 'no-length';
+
+      if (x.props && x.key === 'fromMeasure' && !val && this.locationType === 2)
+        x.className = 'no-length';
     });
   }
 
@@ -242,6 +248,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
     {
       key: 'fromMeasure',
       type: 'inputNumber',
+      className: '',
       props: {
         label: this.fromMeasureLabel,
         placeholder: 'Please enter',
@@ -332,6 +339,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
     {
       key: 'toMeasure',
       type: 'inputNumber',
+      className: '',
       props: {
         required: this.required,
         label: this.toMeasureLabel,
@@ -447,7 +455,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
     `
       :host {
         width: 100% !important;
-        margin-bottom: -1rem !important;
       }
     `
   ],
