@@ -29,6 +29,7 @@ export class PortalItemService {
   public configCompleted?: boolean;
   public itemCaption?: string;
   public itemType?: string;
+  public dataSourceConnectionName?: string;
 
   constructor(
     private http: HttpClient,

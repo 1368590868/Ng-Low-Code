@@ -47,6 +47,12 @@ export class PortalEditComponent implements OnInit, OnDestroy {
   get parentId() {
     return this.portalItemService.parentFolder;
   }
+  set dataSourceConnectionName(val: string | undefined) {
+    this.portalItemService.dataSourceConnectionName = val;
+  }
+  get dataSourceConnectionName() {
+    return this.portalItemService.dataSourceConnectionName;
+  }
 
   constructor(
     private router: Router,
@@ -78,6 +84,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
             .subscribe(res => {
               this.configCompleted = res['configCompleted'];
               this.itemCaption = res['label'];
+              this.dataSourceConnectionName = res['dataSourceConnectionName'];
               const next = res['currentStep'] || 'basic';
 
               // set activated index

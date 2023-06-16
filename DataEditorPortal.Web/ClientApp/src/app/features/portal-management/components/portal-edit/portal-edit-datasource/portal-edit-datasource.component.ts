@@ -75,6 +75,13 @@ export class PortalEditDatasourceComponent
     return this.portalItemService.itemType === 'linked-single';
   }
 
+  set dataSourceConnectionName(val: string | undefined) {
+    this.portalItemService.dataSourceConnectionName = val;
+  }
+  get dataSourceConnectionName() {
+    return this.portalItemService.dataSourceConnectionName;
+  }
+
   constructor(
     private portalItemService: PortalItemService,
     private primeNGConfig: PrimeNGConfig,
@@ -310,6 +317,8 @@ export class PortalEditDatasourceComponent
     const save = () => {
       this.isSaving = true;
       if (this.portalItemService.itemId) {
+        this.dataSourceConnectionName =
+          this.datasourceConfig.dataSourceConnectionName;
         const data: DataSourceConfig = {
           dataSourceConnectionName:
             this.datasourceConfig.dataSourceConnectionName,

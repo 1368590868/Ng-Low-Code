@@ -45,18 +45,7 @@
             placeholder="Please Select"
             [style]="{ minWidth: '20rem' }"
             appendTo="body"></p-dropdown>
-          <p-button
-            class="ml-1"
-            pTooltip="Create new Connection"
-            styleClass="p-button-text p-button-rounded"
-            icon="pi pi-ellipsis-v"
-            (onClick)="dbConnectionDialog.showDialog()"></p-button>
         </div>
-        <app-db-connection-dialog
-          #dbConnectionDialog
-          (connectionChange)="
-            connectionSaved($event)
-          "></app-db-connection-dialog>
       </div>
       <div class="flex flex-column">
         <ng-container>
@@ -298,6 +287,7 @@
             <p-dropdown
               #dropdownList="ngModel"
               [required]="false"
+              [showClear]="true"
               [(ngModel)]="filePathColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -330,6 +320,7 @@
             <p-dropdown
               #dropdownList="ngModel"
               [required]="false"
+              [showClear]="true"
               [(ngModel)]="commentsColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -362,6 +353,7 @@
             <p-dropdown
               #dropdownList="ngModel"
               [required]="false"
+              [showClear]="true"
               [(ngModel)]="contentTypeColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -394,6 +386,7 @@
             <p-dropdown
               #dropdownList="ngModel"
               [required]="false"
+              [showClear]="true"
               [(ngModel)]="createdByColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -426,6 +419,7 @@
             <p-dropdown
               #dropdownList="ngModel"
               [required]="false"
+              [showClear]="true"
               [(ngModel)]="createdDateColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -458,6 +452,7 @@
             <p-dropdown
               #dropdownList="ngModel"
               [required]="false"
+              [showClear]="true"
               [(ngModel)]="modifiedByColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
@@ -490,6 +485,7 @@
             <p-dropdown
               #dropdownList="ngModel"
               [required]="false"
+              [showClear]="true"
               [(ngModel)]="modifiedDateColumn"
               [options]="dbTableColumns"
               placeholder="Please Select"
