@@ -46,13 +46,10 @@ body {
   background-color: var(--primary-color);
 }
 
-@media screen and (min-width: 1729px) {
-  .layout-content {
-    width: 1504px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    min-height: calc(100% - 7rem);
-  }
+.layout-content {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  min-height: calc(100% - 7rem);
 }
 
 // fontawesome
