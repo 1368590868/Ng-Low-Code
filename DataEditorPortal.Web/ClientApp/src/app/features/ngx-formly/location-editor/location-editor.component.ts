@@ -210,15 +210,31 @@ export class LocationEditorComponent implements ControlValueAccessor {
 
                 field.parent.get('to').props.options = res;
                 this.options?.detectChanges?.(field.parent.get('to'));
+
+                // Init fromMeasure and toMeasure helper text
+                if (field && field.parent && field.parent.get) {
+                  const fromMeasureProps =
+                    field.parent.get('fromMeasure').props;
+                  const toMeasureProps = field.parent.get('toMeasure').props;
+
+                  // from to have value , set helper text
+                  const from = field.parent.get('from').formControl;
+                  const to = field.parent.get('to').formControl;
+
+                  const fromRecord = res.find(x => x.value === from.value);
+                  const toRecord = res.find(x => x.value === to.value);
+
+                  if (fromMeasureProps && toMeasureProps) {
+                    fromMeasureProps['helperText'] = `Min: ${
+                      fromRecord?.value1 ?? '--'
+                    }  Max: ${fromRecord?.value2 ?? '--'}`;
+
+                    toMeasureProps['helperText'] = `Min: ${
+                      toRecord?.value1 ?? '--'
+                    }  Max: ${toRecord?.value2 ?? '--'}`;
+                  }
+                }
               });
-          }
-          if (field && field.parent && field.parent.get) {
-            const fromMeasureProps = field.parent.get('fromMeasure').props;
-            const toMeasureProps = field.parent.get('toMeasure').props;
-            if (fromMeasureProps && toMeasureProps) {
-              fromMeasureProps['helperText'] = `Min: --  Max: --`;
-              toMeasureProps['helperText'] = `Min: --  Max: --`;
-            }
           }
         }
       }

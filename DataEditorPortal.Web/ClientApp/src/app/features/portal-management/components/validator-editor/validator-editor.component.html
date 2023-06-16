@@ -51,7 +51,7 @@
   <p-dialog
     header="Advanced  Configuration"
     [(visible)]="visible"
-    [style]="{ minWidth: '40rem' }"
+    [style]="{ minWidth: '50rem' }"
     [modal]="true"
     appendTo="body"
     contentStyleClass="border-top-1 surface-border pt-4 pb-0">
@@ -63,6 +63,7 @@
         <ngx-monaco-editor
           *ngIf="visible"
           formControlName="expressionFormControl"
+          [style]="{ minWidth: '40rem', height: '16rem' }"
           class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
           (onInit)="onMonacoEditorInit($event)"
           [options]="{ language: 'javascript' }"></ngx-monaco-editor>

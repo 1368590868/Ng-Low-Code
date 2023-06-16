@@ -1,3 +1,21 @@
+:host ::ng-deep {
+  .p-button.p-button-icon-only.p-button-rounded {
+    width: 2rem;
+    height: 2rem;
+  }
+  .layout-content {
+    min-height: calc(100% - 9rem);
+  }
+  .p-datatable {
+    .p-datatable-tbody > tr > td:first-child {
+      padding-left: 1rem !important;
+    }
+    .p-datatable-thead > tr > th:first-child {
+      padding-left: 1rem !important;
+    }
+  }
+}
+
 .p-card {
   height: calc(100% - 10rem);
   width: calc(100% - 2rem);
@@ -27,21 +45,6 @@
         width: 1.625rem;
         padding: 0.30375rem 0.4375rem;
       }
-    }
-  }
-}
-
-:host {
-  .layout-content {
-    min-height: calc(100% - 9rem);
-  }
-
-  .p-datatable {
-    .p-datatable-tbody > tr > td:first-child {
-      padding-left: 1rem !important;
-    }
-    .p-datatable-thead > tr > th:first-child {
-      padding-left: 1rem !important;
     }
   }
 }

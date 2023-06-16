@@ -1,0 +1,92 @@
+<div class="layout-content flex flex-column mt-3 p-card">
+  <div class="flex-grow-1">
+    <p-table
+      [loading]="loading"
+      styleClass="p-datatable-striped"
+      [value]="data"
+      [rowHover]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      [lazy]="true"
+      [scrollable]="true"
+      scrollHeight="flex"
+      [filterDelay]="0"
+      [virtualScroll]="true"
+      [virtualScrollItemSize]="51.75"
+      [virtualScrollDelay]="0"
+      dataKey="id">
+      <ng-template pTemplate="caption">
+        <div class="flex align-items-center my-2">
+          <h3 class="">DataSource Connection</h3>
+          <p-button
+            icon="pi pi-plus"
+            class="ml-auto"
+            styleClass="p-button-outlined"
+            label="New"
+            (onClick)="onNewOpen()"></p-button>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 20%">
+            <span style="vertical-align: middle">Name</span>
+          </th>
+          <th>
+            <span style="vertical-align: middle">Connection String</span>
+          </th>
+          <th style="width: 10%">
+            <span style="vertical-align: middle">Used Count</span>
+          </th>
+          <th style="width: 5rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData>
+        <tr>
+          <td style="width: 20%">
+            {{ rowData.name }}
+          </td>
+          <td>{{ rowData.connectionString }}</td>
+          <td style="width: 10%">{{ rowData.usedCount }}</td>
+          <td style="width: 5rem">
+            <p-menu
+              #menu
+              [popup]="true"
+              [model]="contextMenuItems"
+              appendTo="body"
+              [style]="{ width: 'auto' }"></p-menu>
+            <button
+              type="button"
+              *ngIf="rowData.usedCount === 0"
+              pButton
+              icon="pi pi-ellipsis-v"
+              class="p-button-rounded p-button-text"
+              (click)="onShowMenu(menu, $event, rowData)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <p-paginator
+    [rows]="rows"
+    [first]="first"
+    [totalRecords]="totalRecords"
+    [pageLinkSize]="5"
+    styleClass="p-paginator-bottom"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries  "
+    [alwaysShow]="true"
+    (onPageChange)="onPageChange($event)"
+    [rowsPerPageOptions]="rowsPerPageOptions"
+    [showFirstLastIcon]="true"
+    [showCurrentPageReport]="true"
+    [showPageLinks]="true"></p-paginator>
+</div>
+
+<app-add-connection-dialog
+  #addDialog
+  [type]="type"
+  (saved)="onDiaglogSaved()"></app-add-connection-dialog>
+
+<p-confirmDialog
+  [style]="{ width: '40rem' }"
+  [baseZIndex]="10000"
+  rejectButtonStyleClass="p-button-text"></p-confirmDialog>

@@ -39,8 +39,10 @@ import {
   PersonalDialogComponent,
   DataDictionaryComponent,
   AddDictionaryDialogComponent,
+  AddConnectionDialogComponent,
   SystemLogComponent,
-  SystemLogDialogComponent
+  SystemLogDialogComponent,
+  DbConnectionComponent
 } from './components';
 
 import { SharedModule } from 'src/app/shared';
@@ -62,8 +64,10 @@ export * from './components';
     PersonalDialogComponent,
     DataDictionaryComponent,
     AddDictionaryDialogComponent,
+    AddConnectionDialogComponent,
     SystemLogComponent,
-    SystemLogDialogComponent
+    SystemLogDialogComponent,
+    DbConnectionComponent
   ],
   imports: [
     CommonModule,

@@ -8,7 +8,8 @@ import {
   TileComponent,
   SiteSettingsComponent,
   DataDictionaryComponent,
-  SystemLogComponent
+  SystemLogComponent,
+  DbConnectionComponent
 } from './features/core';
 import { AdminPermissionGuard, AuthRouterGuard } from './shared';
 
@@ -31,6 +32,11 @@ const routes: Routes = [
   {
     path: 'data-dictionaries',
     component: DataDictionaryComponent,
+    canActivate: [AuthRouterGuard, AdminPermissionGuard]
+  },
+  {
+    path: 'datasource-connections',
+    component: DbConnectionComponent,
     canActivate: [AuthRouterGuard, AdminPermissionGuard]
   },
   {
