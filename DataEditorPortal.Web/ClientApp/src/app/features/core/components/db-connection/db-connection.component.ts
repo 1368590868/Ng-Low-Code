@@ -93,8 +93,8 @@ export class DbConnectionComponent {
 
   deleteConfirm(rowData: DbConnectionData) {
     this.confirmationService.confirm({
-      message: 'Do you want to delete this data dictionary?',
-      header: 'Delete Data Dictionary',
+      message: 'Do you want to delete this dataSource Connection?',
+      header: 'Delete DataSource Connection',
       icon: 'pi pi-info-circle',
 
       accept: () => {
