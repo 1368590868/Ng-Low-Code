@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -414,12 +415,15 @@ namespace DataEditorPortal.Web.Controllers
         [Route("datasource/connections/list")]
         public List<DataSourceConnection> GetDataSourceConnectionList()
         {
+            string pattern = @"(Pwd|Password)=(\w+)";
+            string replacement = "$1=******";
+
             return _depDbContext.DataSourceConnections
                 .Include(x => x.UniversalGridConfigurations)
                 .Select(x => new DataSourceConnection()
                 {
                     Name = x.Name,
-                    ConnectionString = x.ConnectionString,
+                    ConnectionString = Regex.Replace(x.ConnectionString, pattern, replacement),
                     UsedCount = x.UniversalGridConfigurations.Count(),
                     Type = _config.GetValue<string>("DatabaseProvider")
                 })
