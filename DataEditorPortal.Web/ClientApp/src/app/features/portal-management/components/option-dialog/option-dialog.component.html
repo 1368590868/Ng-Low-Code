@@ -14,11 +14,7 @@
 </div>
 <p-dialog
   [(visible)]="visible"
-  [style]="
-    isAdvanced
-      ? { minWidth: '50rem', minHeight: '20rem' }
-      : { minWidth: '35rem' }
-  "
+  [style]="{ minWidth: '50rem', minHeight: '20rem' }"
   [modal]="true"
   appendTo="body"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0">
@@ -125,6 +121,7 @@
               [formControl]="formControlQuery"
               (onInit)="onMonacoEditorInit($event)"
               [required]="true"
+              [style]="{ minWidth: '40rem', height: '16rem' }"
               class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
               [options]="{}"></ngx-monaco-editor>
           </div>

@@ -38,7 +38,8 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
 
   visible = false;
   dialogStyle: any = {
-    minWidth: '40rem'
+    minWidth: '40rem',
+    height: '16rem'
   };
 
   helperMessage =

@@ -32,7 +32,7 @@
   <p-dialog
     header="Advanced Query Configuration"
     [(visible)]="visible"
-    [style]="{ minWidth: '40rem' }"
+    [style]="{ minWidth: '50rem' }"
     [modal]="true"
     appendTo="body"
     contentStyleClass="border-top-1 surface-border pt-4 pb-0">
@@ -53,6 +53,7 @@
       <ngx-monaco-editor
         *ngIf="visible"
         formControlName="queryTextFormControl"
+        [style]="{ minWidth: '50rem', minHeight: '20rem' }"
         class="pt-3 border-round monaco-editor-wrapper"
         (onInit)="onMonacoEditorInit($event)"
         [options]="{}"></ngx-monaco-editor>
