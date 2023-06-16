@@ -28,13 +28,13 @@ namespace DataEditorPortal.Web.Services
         // universal grid
         string GenerateSqlTextForDatasource(DataSourceConfig config);
         string GenerateSqlTextForList(DataSourceConfig config);
-        string GenerateSqlTextForDetail(DataSourceConfig config);
+        string GenerateSqlTextForDetail(DataSourceConfig config, bool multiple = false);
         string GenerateSqlTextForInsert(DataSourceConfig config);
         string GenerateSqlTextForUpdate(DataSourceConfig config);
         string GenerateSqlTextForDelete(DataSourceConfig config);
         string GenerateSqlTextForExist(DataSourceConfig config);
         string GenerateSqlTextForLinkData(TableMeta linkTable, TableMeta t1, TableMeta t2);
-        string GenerateSqlTextForDeleteLinkData(TableMeta linkTable, TableMeta input);
+        string GenerateSqlTextForDeleteLinkData(DataSourceConfig config, TableMeta input);
         string GenerateSqlTextForQueryForeignKeyValue(TableMeta input);
 
         string GenerateSqlTextForColumnFilterOption(DataSourceConfig config);
@@ -273,6 +273,8 @@ namespace DataEditorPortal.Web.Services
             {
                 var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
 
+                if (config.Columns.Count > 0 && !config.Columns.Contains(config.IdColumn)) config.Columns.Add(config.IdColumn);
+
                 var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => EscapeColumnName(x))) : "*";
 
                 var queryText = $@"SELECT {columns} FROM {source} WHERE {where} AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##";
@@ -290,11 +292,11 @@ namespace DataEditorPortal.Web.Services
             return queryText;
         }
 
-        public virtual string GenerateSqlTextForDetail(DataSourceConfig config)
+        public virtual string GenerateSqlTextForDetail(DataSourceConfig config, bool multiple = false)
         {
             var queryText = GenerateSqlTextForDatasource(config);
 
-            return $@"SELECT * FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} = {ParameterPrefix}{ParameterName(config.IdColumn)}";
+            return $@"SELECT * FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} {(multiple ? "IN" : "=")} {ParameterPrefix}{ParameterName(config.IdColumn)}";
         }
 
         public abstract string GenerateSqlTextForInsert(DataSourceConfig config);
@@ -408,12 +410,16 @@ namespace DataEditorPortal.Web.Services
             return linkQuery;
         }
 
-        public virtual string GenerateSqlTextForDeleteLinkData(TableMeta linkTable, TableMeta input)
+        public virtual string GenerateSqlTextForDeleteLinkData(DataSourceConfig config, TableMeta input)
         {
             return $@"
-                DELETE FROM ({linkTable.Query_AllData}) link
-                INNER JOIN ({input.Query_AllData}) t1 ON link.{EscapeColumnName(input.ForeignKey)} = t1.{EscapeColumnName(input.ReferenceKey)}
-                WHERE t1.{input.IdColumn} IN {ParameterPrefix}{ParameterName(input.IdColumn)}
+                DELETE FROM {config.TableSchema}.{config.TableName}
+                WHERE {EscapeColumnName(input.ForeignKey)} IN (
+                    SELECT link.{EscapeColumnName(input.ForeignKey)} 
+                    FROM {config.TableSchema}.{config.TableName} link
+                    INNER JOIN ({input.Query_AllData}) t1 ON link.{EscapeColumnName(input.ForeignKey)} = t1.{EscapeColumnName(input.ReferenceKey)}
+                    WHERE t1.{input.IdColumn} IN {ParameterPrefix}{ParameterName(input.IdColumn)}
+                )
             ";
         }
 

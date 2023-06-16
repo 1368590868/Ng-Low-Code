@@ -8,15 +8,18 @@ using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -376,6 +379,7 @@ namespace DataEditorPortal.Web.Controllers
             result.CurrentStep = item.CurrentStep;
             result.ConfigCompleted = item.ConfigCompleted;
             result.ItemType = item.ItemType;
+            result.DataSourceConnectionName = item.DataSourceConnectionName;
 
             return result;
         }
@@ -411,30 +415,40 @@ namespace DataEditorPortal.Web.Controllers
         [Route("datasource/connections/list")]
         public List<DataSourceConnection> GetDataSourceConnectionList()
         {
+            string pattern = @"(Pwd|Password)=(\w+)";
+            string replacement = "$1=******";
+
             return _depDbContext.DataSourceConnections
                 .Include(x => x.UniversalGridConfigurations)
                 .Select(x => new DataSourceConnection()
                 {
                     Name = x.Name,
-                    ConnectionString = x.ConnectionString,
-                    UsedCount = x.UniversalGridConfigurations.Count()
+                    ConnectionString = Regex.Replace(x.ConnectionString, pattern, replacement),
+                    UsedCount = x.UniversalGridConfigurations.Count(),
+                    Type = _config.GetValue<string>("DatabaseProvider")
                 })
                 .ToList();
         }
 
         [HttpPost]
         [Route("datasource/connections/create")]
-        public string CreateDataSourceConnection([FromBody] DataSourceConnection model)
+        public string CreateDataSourceConnection([FromBody] DataSourceConnectionModel model)
         {
-            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.ConnectionString))
+            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.ServerName)
+                || string.IsNullOrEmpty(model.Authentication) || string.IsNullOrEmpty(model.DbName))
                 throw new ArgumentNullException();
 
+            var dsc = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == model.Name);
+            if (dsc != null)
+                throw new ApiException("Name has already exist. Please use another one.");
+
+            var connectionStr = GetConnectionString(model);
             try
             {
                 // try to connect to database to validate if the connection string is valid.
-                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                 {
-                    con.ConnectionString = model.ConnectionString;
+                    con.ConnectionString = connectionStr;
                     con.Open();
                     con.Close();
                 }
@@ -445,43 +459,81 @@ namespace DataEditorPortal.Web.Controllers
                 throw new DepException(ex.Message);
             }
 
-            _depDbContext.DataSourceConnections.Add(model);
+            _depDbContext.DataSourceConnections.Add(new DataSourceConnection() { Name = model.Name, ConnectionString = connectionStr });
             _depDbContext.SaveChanges();
 
             return model.Name;
         }
 
-        [HttpPut]
-        [Route("datasource/connections/{name}/update")]
-        public string UpdateDataSourceConnection(string name, [FromBody] DataSourceConnection model)
+        private string GetConnectionString(DataSourceConnectionModel con)
         {
-            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.ConnectionString))
-                throw new ArgumentNullException();
+            var dbType = _config.GetValue<string>("DatabaseProvider");
+            if (dbType == "SqlConnection")
+            {
+                var builder = new SqlConnectionStringBuilder();
+                builder.DataSource = con.ServerName;
 
-            var dsc = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == name);
+                if (con.Authentication == "Windows Authentication")
+                {
+                    builder.IntegratedSecurity = true;
+                }
+                else
+                {
+                    builder.UserID = con.Username;
+                    builder.Password = con.Password;
+                }
+                builder.InitialCatalog = con.DbName;
+
+                return builder.ToString();
+            }
+            else
+            {
+                var host = con.ServerName;
+                var port = "1521";
+
+                var strArray = con.ServerName.Split(':');
+                if (strArray.Length == 2)
+                {
+                    host = strArray[0];
+                    port = strArray[1];
+                }
+
+                var builder = new OracleConnectionStringBuilder();
+
+                builder.DataSource = $"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={con.DbName})));";
+
+                if (con.Authentication == "OS Authentication")
+                {
+                    // get from current server.
+                    builder.UserID = con.Username;
+                    builder.Password = con.Password;
+                }
+                else
+                {
+                    builder.UserID = con.Username;
+                    builder.Password = con.Password;
+                }
+
+                return builder.ToString();
+            }
+        }
+
+        [HttpDelete]
+        [Route("datasource/connections/{name}/delete")]
+        public bool DeleteDataSourceConnection(string name)
+        {
+            var dsc = _depDbContext.DataSourceConnections
+                .Include(x => x.UniversalGridConfigurations)
+                .FirstOrDefault(x => x.Name == name);
             if (dsc == null)
                 throw new ApiException("Not Found", 404);
-            try
-            {
-                // try to connect to database to validate if the connection string is valid.
-                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
-                {
-                    con.ConnectionString = model.ConnectionString;
-                    con.Open();
-                    con.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message, ex);
-                throw new DepException(ex.Message);
-            }
+            if (dsc.UniversalGridConfigurations.Count > 0)
+                throw new ApiException("Connnection is in use.");
 
-            dsc.Name = model.Name;
-            dsc.ConnectionString = model.ConnectionString;
+            _depDbContext.DataSourceConnections.Remove(dsc);
             _depDbContext.SaveChanges();
 
-            return model.Name;
+            return true;
         }
 
         #endregion

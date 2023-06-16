@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -246,7 +245,7 @@ namespace DataEditorPortal.Web.Services
 
             var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(c => c.Name == name);
 
-            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
             {
                 con.ConnectionString = dsConnection.ConnectionString;
 
@@ -289,7 +288,7 @@ namespace DataEditorPortal.Web.Services
 
             var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(c => c.Name == name);
 
-            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
             {
                 con.ConnectionString = dsConnection.ConnectionString;
 

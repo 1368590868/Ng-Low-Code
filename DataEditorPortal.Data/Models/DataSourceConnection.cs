@@ -17,5 +17,8 @@ namespace DataEditorPortal.Data.Models
 
         [NotMapped]
         public int UsedCount { get; set; }
+
+        [NotMapped]
+        public string Type { get; set; }
     }
 }

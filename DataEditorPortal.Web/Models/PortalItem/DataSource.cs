@@ -16,4 +16,14 @@
         public bool AllowDBNull { get; set; }
         public string FilterType { get; set; }
     }
+
+    public class DataSourceConnectionModel
+    {
+        public string Name { get; set; }
+        public string ServerName { get; set; }
+        public string Authentication { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string DbName { get; set; }
+    }
 }

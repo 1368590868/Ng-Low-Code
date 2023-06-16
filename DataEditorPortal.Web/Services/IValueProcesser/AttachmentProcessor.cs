@@ -1,4 +1,6 @@
-﻿using DataEditorPortal.Web.Models;
+﻿using Dapper;
+using DataEditorPortal.Web.Models;
+using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,12 @@ namespace DataEditorPortal.Web.Services
         private UploadedFileMeta _uploadeFiledMeta;
 
         private readonly IServiceProvider _serviceProvider;
+        private readonly IQueryBuilder _queryBuilder;
 
-        public AttachmentProcessor(IServiceProvider serviceProvider)
+        public AttachmentProcessor(IServiceProvider serviceProvider, IQueryBuilder queryBuilder)
         {
             _serviceProvider = serviceProvider;
+            _queryBuilder = queryBuilder;
         }
 
         public override void PreProcess(IDictionary<string, object> model)
@@ -54,6 +58,7 @@ namespace DataEditorPortal.Web.Services
                         {
                             _uploadeFiledMeta = new UploadedFileMeta()
                             {
+                                GridName = Config.Name,
                                 FieldName = Field.key,
                                 UploadedFiles = JsonSerializer.Deserialize<List<UploadedFileModel>>(jsonElement.ToString(), jsonOptions),
                                 FileUploadConfig = attachmentCols.FirstOrDefault(c => c.field == Field.key).fileUploadConfig
@@ -67,18 +72,51 @@ namespace DataEditorPortal.Web.Services
 
         private void SaveUploadedFiles(IDictionary<string, object> model)
         {
+            // get the latest values for current data. 
+            var values = GetDetailValue(model);
+            // pass it to attachment service, the servcie will use the value in models.
             var attachmentService = _serviceProvider.GetRequiredService<IAttachmentService>();
-            attachmentService.SaveUploadedFiles(_uploadeFiledMeta, model, Config.Name, Conn, Trans);
+            attachmentService.SaveUploadedFiles(_uploadeFiledMeta, values, Conn, Trans);
         }
 
         public override void BeforeDeleted(IEnumerable<object> dataIds)
         {
+            var service = _serviceProvider.GetRequiredService<IUniversalGridService>();
+            var attachmentCols = service.GetAttachmentCols(Config);
+            var fileUploadConfig = attachmentCols.FirstOrDefault(c => c.field == Field.key).fileUploadConfig;
+            var referenceDataKey = fileUploadConfig.GetMappedColumn("REFERENCE_DATA_KEY");
+
+            var dsConfig = JsonSerializer.Deserialize<DataSourceConfig>(Config.DataSourceConfig);
+            var refValues = dataIds;
+            if (dsConfig.IdColumn != referenceDataKey)
+            {
+                var queryText = _queryBuilder.GenerateSqlTextForDetail(dsConfig, true);
+                var param = _queryBuilder.GenerateDynamicParameter(
+                    new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(dsConfig.IdColumn, dataIds) }
+                );
+                refValues = Conn.Query(queryText, param, Trans).Cast<IDictionary<string, object>>().Select(x => x[referenceDataKey]);
+            }
+
+            var attachmentService = _serviceProvider.GetRequiredService<IAttachmentService>();
+            attachmentService.RemoveFiles(fileUploadConfig, refValues, Conn, Trans);
+
             return;
         }
 
         public override void AfterDeleted()
         {
             return;
+        }
+
+        private IDictionary<string, object> GetDetailValue(IDictionary<string, object> model)
+        {
+            var dsConfig = JsonSerializer.Deserialize<DataSourceConfig>(Config.DataSourceConfig);
+
+            var queryText = _queryBuilder.GenerateSqlTextForDetail(dsConfig);
+            var param = _queryBuilder.GenerateDynamicParameter(
+                new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(dsConfig.IdColumn, model[dsConfig.IdColumn]) }
+            );
+            return Conn.QueryFirst(queryText, param, Trans) as IDictionary<string, object>;
         }
     }
 }

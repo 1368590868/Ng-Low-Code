@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.IO;
 using System.Linq;
 
@@ -19,7 +18,8 @@ namespace DataEditorPortal.Web.Services
     public interface IAttachmentService
     {
         FileUploadConfig GetDefaultConfig();
-        void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, IDictionary<string, object> model, string gridName, IDbConnection con, IDbTransaction trans);
+        void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, IDictionary<string, object> model, IDbConnection con, IDbTransaction trans);
+        void RemoveFiles(FileUploadConfig config, IEnumerable<object> ids, IDbConnection con, IDbTransaction trans);
         dynamic GetFileStream(string fileId, FileUploadConfig options);
     }
 
@@ -71,7 +71,8 @@ namespace DataEditorPortal.Web.Services
         {
             return DEFAULT_CONFIG;
         }
-        public void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, IDictionary<string, object> model, string gridName, IDbConnection con, IDbTransaction trans)
+
+        public void SaveUploadedFiles(UploadedFileMeta uploadedFileMeta, IDictionary<string, object> model, IDbConnection con, IDbTransaction trans)
         {
             var config = GetConfigOrDefault(uploadedFileMeta);
             var storageType = config.FileStorageType;
@@ -79,7 +80,7 @@ namespace DataEditorPortal.Web.Services
             var targetFolder = string.Empty;
             if (storageType == FileStorageType.FileSystem)
             {
-                targetFolder = EnsureTargetFolder(config, gridName);
+                targetFolder = EnsureTargetFolder(config, uploadedFileMeta.GridName);
             }
 
             var insertScript = GetInsertScript(config);
@@ -147,7 +148,12 @@ namespace DataEditorPortal.Web.Services
                         }
                     }
 
-                    insertParameters.Add(_queryBuilder.GenerateDynamicParameter(value));
+                    var param = _queryBuilder.GenerateDynamicParameter(value);
+                    var dynamicParameters = new DynamicParameters(param);
+                    var paramReturnId = _queryBuilder.ParameterName($"RETURNED_{config.GetMappedColumn("ID")}");
+                    dynamicParameters.Add(paramReturnId, dbType: null, direction: ParameterDirection.Output, size: 40);
+
+                    insertParameters.Add(dynamicParameters);
                 }
                 else
                 {
@@ -168,7 +174,9 @@ namespace DataEditorPortal.Web.Services
 
 
             if (insertParameters.Any())
+            {
                 con.Execute(insertScript, insertParameters, trans);
+            }
             if (updateParameters.Any())
                 con.Execute(updateScript, updateParameters, trans);
 
@@ -203,10 +211,13 @@ namespace DataEditorPortal.Web.Services
                 if (!string.IsNullOrEmpty(fileByteColumn)) fields.Add(fileByteColumn);
             }
 
-            var columns = string.Join(",", fields);
-            var queryScript = _queryBuilder.ReplaceQueryParamters(
-                $"SELECT {columns} FROM {config.TableSchema}.{config.TableName} WHERE {idColumn}=##{idColumn}##"
-            );
+            var queryScript = _queryBuilder.GenerateSqlTextForDetail(new DataSourceConfig()
+            {
+                TableName = config.TableName,
+                TableSchema = config.TableSchema,
+                Columns = fields.ToList(),
+                IdColumn = config.GetMappedColumn("ID")
+            });
             var value = new List<KeyValuePair<string, object>>();
             value.Add(new KeyValuePair<string, object>(idColumn, fileId));
             var param = _queryBuilder.GenerateDynamicParameter(value);
@@ -216,7 +227,7 @@ namespace DataEditorPortal.Web.Services
             Stream stream = null;
 
             var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == config.DataSourceConnectionName);
-            using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
             {
                 con.ConnectionString = dsConnection.ConnectionString;
                 var uploadedFile = con.QueryFirst(queryScript, param);
@@ -259,11 +270,12 @@ namespace DataEditorPortal.Web.Services
                 .Where(x => !string.IsNullOrEmpty(x.Value))
                 .Select(x => x.Value);
 
-            var columns = string.Join(",", fieldMapping);
-            var parameters = string.Join(",", fieldMapping.Select(x => $"##{x}##"));
             return _queryBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
             {
-                QueryText = $"INSERT INTO {config.TableSchema}.{config.TableName} ({columns}) VALUES ({parameters})"
+                TableName = config.TableName,
+                TableSchema = config.TableSchema,
+                Columns = fieldMapping.ToList(),
+                IdColumn = config.GetMappedColumn("ID")
             });
         }
 
@@ -276,12 +288,12 @@ namespace DataEditorPortal.Web.Services
                 .Where(x => !string.IsNullOrEmpty(x.Value))
                 .Select(x => x.Value);
 
-            var idColumn = config.GetMappedColumn("ID");
-
-            var sets = string.Join(",", columns.Select(x => $"{x}=##{x}##"));
-            return _queryBuilder.GenerateSqlTextForInsert(new DataSourceConfig()
+            return _queryBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
             {
-                QueryText = $"UPDATE {config.TableSchema}.{config.TableName} SET {sets} WHERE {idColumn}=##{idColumn}##"
+                TableName = config.TableName,
+                TableSchema = config.TableSchema,
+                Columns = columns.ToList(),
+                IdColumn = config.GetMappedColumn("ID")
             });
         }
 
@@ -328,9 +340,75 @@ namespace DataEditorPortal.Web.Services
         }
 
         // customize according to database
-        private bool GetStatusMapValue(UploadedFileStatus status)
+        private string GetStatusMapValue(UploadedFileStatus status)
         {
-            return status == UploadedFileStatus.Deleted;
+            return status == UploadedFileStatus.Deleted ? "N" : "Y";
+        }
+
+        public void RemoveFiles(FileUploadConfig config, IEnumerable<object> ids, IDbConnection con, IDbTransaction trans)
+        {
+            if (config == null) config = DEFAULT_CONFIG;
+
+            if (ids.Any())
+            {
+                var foreignKeyColumn = config.GetMappedColumn("FOREIGN_KEY");
+                var param = _queryBuilder.GenerateDynamicParameter(
+                    new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(foreignKeyColumn, ids) }
+                );
+
+                // remove phsical file if FileStorageType is FileSYstem
+                IEnumerable<string> files = Enumerable.Empty<string>();
+                if (config.FileStorageType == FileStorageType.FileSystem)
+                {
+                    var filePathColumn = config.GetMappedColumn("FILE_PATH");
+                    var fileNameColumn = config.GetMappedColumn("FILE_NAME");
+
+                    // check strogeType
+                    List<string> fields = new List<string>() { fileNameColumn };
+                    if (!string.IsNullOrEmpty(filePathColumn)) fields.Add(filePathColumn);
+
+                    var queryText = _queryBuilder.GenerateSqlTextForDetail(new DataSourceConfig()
+                    {
+                        TableName = config.TableName,
+                        TableSchema = config.TableSchema,
+                        Columns = fields.ToList(),
+                        IdColumn = foreignKeyColumn
+                    }, true);
+
+                    files = con.Query(queryText, param, trans)
+                        .Cast<IDictionary<string, object>>()
+                        .Select(file =>
+                        {
+                            string filePath = null;
+                            if (!string.IsNullOrEmpty(filePathColumn))
+                                filePath = (string)file[filePathColumn];
+                            else
+                                filePath = Path.Combine(config.BasePath, (string)file[fileNameColumn]);
+                            return filePath;
+                        });
+                }
+
+                var queryToDelete = _queryBuilder.GenerateSqlTextForDelete(new DataSourceConfig()
+                {
+                    TableName = config.TableName,
+                    TableSchema = config.TableSchema,
+                    IdColumn = foreignKeyColumn
+                });
+                var parameterToDelete = _queryBuilder.GenerateDynamicParameter(
+                    new List<KeyValuePair<string, object>>()
+                    {
+                        new KeyValuePair<string, object>(config.GetMappedColumn("FOREIGN_KEY"), ids)
+                    }
+                );
+                con.Execute(queryToDelete, parameterToDelete, trans);
+
+                try
+                {
+                    foreach (var file in files)
+                        if (File.Exists(file)) File.Delete(file);
+                }
+                catch { }
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ export class AddConnectionDialogComponent {
   @Input() header = 'Add / Edit';
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
-  @Input() dialogStyle = { width: '40rem' };
+  @Input() dialogStyle = { width: '50rem' };
   @Input()
   set type(val: string) {
     this.fields.forEach(field => {

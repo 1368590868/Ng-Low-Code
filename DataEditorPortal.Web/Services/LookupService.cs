@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 
 namespace DataEditorPortal.Web.Services
@@ -108,10 +107,10 @@ namespace DataEditorPortal.Web.Services
                 var connection = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == model.ConnectionName);
                 var query = _queryBuilder.ProcessQueryWithParamters(model.QueryText, new Dictionary<string, object>());
 
-                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                 {
                     con.ConnectionString = connection.ConnectionString;
-                    con.Query<DropdownOptionsItem>(query.Item1, query.Item2).ToList();
+                    con.QueryFirst<DropdownOptionsItem>(query.Item1, query.Item2);
                 }
             }
             catch (Exception ex)
@@ -135,7 +134,7 @@ namespace DataEditorPortal.Web.Services
 
                 var query = _queryBuilder.ProcessQueryWithParamters(lookup.QueryText, model);
 
-                using (var con = _serviceProvider.GetRequiredService<DbConnection>())
+                using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                 {
                     con.ConnectionString = lookup.DataSourceConnection.ConnectionString;
 

@@ -244,7 +244,7 @@ namespace DataEditorPortal.Web.Services
                 var contentTypeSegment = string.IsNullOrEmpty(contentTypeCol) ? "''" : EscapeColumnName(contentTypeCol);
                 var commentsCol = config.GetMappedColumn("COMMENTS");
                 var commentsSegment = string.IsNullOrEmpty(commentsCol) ? "''" : EscapeColumnName(commentsCol);
-                var statusSegment = $"CASE WHEN {EscapeColumnName(config.GetMappedColumn("STATUS"))} = '0' THEN '{UploadedFileStatus.Current}' ELSE '{UploadedFileStatus.Deleted}' END";
+                var statusSegment = $"CASE WHEN {EscapeColumnName(config.GetMappedColumn("STATUS"))} = 'N' THEN '{UploadedFileStatus.Deleted}' ELSE '{UploadedFileStatus.Current}' END";
 
                 return $@"
                 LEFT JOIN (

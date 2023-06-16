@@ -62,7 +62,7 @@ const GRID_ACTION_CONFIG = [
       label: 'Add New',
       icon: 'pi pi-plus',
       header: 'Create new data',
-      dialogStyle: { width: '40rem' },
+      dialogStyle: { width: '50rem' },
       okText: 'Create'
     },
     props: {
@@ -75,7 +75,7 @@ const GRID_ACTION_CONFIG = [
     component: EditRecordActionComponent,
     wrapper: {
       header: 'Update data details',
-      dialogStyle: { width: '40rem' },
+      dialogStyle: { width: '50rem' },
       okText: 'Update'
     }
   },
@@ -86,7 +86,7 @@ const GRID_ACTION_CONFIG = [
     wrapper: {
       header: 'View data details',
       cancelText: '',
-      dialogStyle: { width: '40rem' }
+      dialogStyle: { width: '50rem' }
     }
   },
   {
@@ -140,7 +140,7 @@ const GRID_ACTION_CONFIG = [
       label: 'New User',
       icon: 'pi pi-plus',
       header: 'Create User',
-      dialogStyle: { width: '40rem' },
+      dialogStyle: { width: '50rem' },
       okText: 'Create User'
     },
     props: {
@@ -158,7 +158,7 @@ const GRID_ACTION_CONFIG = [
       icon: 'pi pi-pencil',
       buttonStyleClass: 'p-button-outlined',
       header: 'Update User details',
-      dialogStyle: { width: '40rem' },
+      dialogStyle: { width: '50rem' },
       okText: 'Update User'
     }
   },

@@ -22,7 +22,7 @@ export class AddDictionaryDialogComponent {
   @Input() header = 'Add / Edit';
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
-  @Input() dialogStyle = { width: '40rem' };
+  @Input() dialogStyle = { width: '50rem' };
 
   @Output() saved = new EventEmitter<string>();
 

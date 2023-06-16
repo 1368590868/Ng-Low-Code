@@ -131,6 +131,19 @@ namespace DataEditorPortal.Web.Common.Install
                     Order = 4,
                     Status = PortalItemStatus.Published
                 },
+                // datasource connection
+                new SiteMenu()
+                {
+                    Id = new Guid("17016009-bb65-45f2-8b42-095d8b8a4724"),
+                    Name = "datasource-connections",
+                    Label = "Datasource Connections",
+                    Icon = "pi pi-database",
+                    Type = "System",
+                    Link = "/datasource-connections",
+                    ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                    Order = 5,
+                    Status = PortalItemStatus.Published
+                },
                 // demo items
                 new SiteMenu()
                 {

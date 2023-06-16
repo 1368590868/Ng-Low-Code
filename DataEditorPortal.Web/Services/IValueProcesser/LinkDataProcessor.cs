@@ -76,29 +76,20 @@ namespace DataEditorPortal.Web.Services
                 if (_linkedTableInfo == null)
                     _linkedTableInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetLinkedTableInfo(Config.Name);
 
-                _queryToDelete = _queryBuilder.GenerateSqlTextForDeleteLinkData(_linkedTableInfo.LinkTable, _linkedTableInfo.Table1);
+                _queryToDelete = _linkedTableInfo.LinkTable.Query_Delete;
                 _parameterToDelete = _queryBuilder.GenerateDynamicParameter(
                     new List<KeyValuePair<string, object>>()
                     {
-                    new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, dataIds)
+                        new KeyValuePair<string, object>(_linkedTableInfo.Table1.IdColumn, dataIds)
                     }
                 );
+                Conn.Execute(_queryToDelete, _parameterToDelete, Trans);
             }
         }
 
         public override void AfterDeleted()
         {
-            if (string.IsNullOrEmpty(_queryToDelete) && _parameterToDelete != null)
-            {
-                try
-                {
-                    Conn.Execute(_queryToDelete, _parameterToDelete, Trans);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.Message, ex);
-                }
-            }
+            return;
         }
 
         private List<RelationDataModel> ProcessLinkDataField(IDictionary<string, object> model)
