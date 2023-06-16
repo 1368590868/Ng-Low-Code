@@ -31,11 +31,11 @@
           <th style="width: 20%">
             <span style="vertical-align: middle">Name</span>
           </th>
-          <th style="width: 10%">
-            <span style="vertical-align: middle">Used Count</span>
-          </th>
           <th>
             <span style="vertical-align: middle">Connection String</span>
+          </th>
+          <th style="width: 10%">
+            <span style="vertical-align: middle">Used Count</span>
           </th>
           <th style="width: 5rem"></th>
         </tr>
@@ -45,8 +45,8 @@
           <td style="width: 20%">
             {{ rowData.name }}
           </td>
-          <td style="width: 10%">{{ rowData.usedCount }}</td>
           <td>{{ rowData.connectionString }}</td>
+          <td style="width: 10%">{{ rowData.usedCount }}</td>
           <td style="width: 5rem">
             <p-menu
               #menu
@@ -56,6 +56,7 @@
               [style]="{ width: 'auto' }"></p-menu>
             <button
               type="button"
+              *ngIf="rowData.usedCount === 0"
               pButton
               icon="pi pi-ellipsis-v"
               class="p-button-rounded p-button-text"
