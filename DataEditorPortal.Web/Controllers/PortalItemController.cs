@@ -378,6 +378,7 @@ namespace DataEditorPortal.Web.Controllers
             result.CurrentStep = item.CurrentStep;
             result.ConfigCompleted = item.ConfigCompleted;
             result.ItemType = item.ItemType;
+            result.DataSourceConnectionName = item.DataSourceConnectionName;
 
             return result;
         }
