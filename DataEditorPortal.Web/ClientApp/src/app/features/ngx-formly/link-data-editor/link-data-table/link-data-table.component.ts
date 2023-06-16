@@ -37,7 +37,6 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   dataSource: any[] = [];
   table2IdColumn = '';
   table2Name = '';
-  table2ReferenceKey = '';
 
   selection: any = [];
   onChange?: any;
@@ -83,10 +82,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
           (x: any) => x.table2Id === item[this.table2IdColumn]
         );
         if (!repeat) {
-          this.innerValue.push({
-            table2Id: item[this.table2IdColumn],
-            table2RefValue: item[this.table2ReferenceKey]
-          });
+          this.innerValue.push({ table2Id: item[this.table2IdColumn] });
         }
       });
     } else {
@@ -114,10 +110,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   onRowSelect(event: any) {
     const { data } = event;
-    this.innerValue.push({
-      table2Id: data[this.table2IdColumn],
-      table2RefValue: data[this.table2ReferenceKey]
-    });
+    this.innerValue.push({ table2Id: data[this.table2IdColumn] });
     this.onChange(this.innerValue);
   }
 
@@ -158,7 +151,6 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
         this.columnsConfig = tableConfig.columns;
         this.dataSource = dataSource || [];
         this.table2IdColumn = tableConfig.table2IdColumn;
-        this.table2ReferenceKey = tableConfig.table2ReferenceKey;
         this.table2Name = tableConfig.table2Name;
         this.selection = dataSource.filter((item: any) =>
           this.innerValue.find(
