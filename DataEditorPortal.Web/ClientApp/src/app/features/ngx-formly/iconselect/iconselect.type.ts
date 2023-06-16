@@ -58,10 +58,12 @@ export interface FormlySelectFieldConfig
 
       <i
         [class]="
-          (dropdown?.value?.startsWith('pi') ? 'pi ' : '') + dropdown.value
+          dropdown.value
+            ? (dropdown?.value?.startsWith('pi') ? 'pi ' : '') + dropdown.value
+            : 'fa fa-no-icon'
         "
         class="absolute"
-        style="left:1rem;top:.9rem;"></i>
+        style="left:1rem;top:.87rem;"></i>
     </div>
   `,
   styles: [
