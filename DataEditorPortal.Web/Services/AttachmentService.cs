@@ -340,9 +340,9 @@ namespace DataEditorPortal.Web.Services
         }
 
         // customize according to database
-        private bool GetStatusMapValue(UploadedFileStatus status)
+        private string GetStatusMapValue(UploadedFileStatus status)
         {
-            return status == UploadedFileStatus.Deleted;
+            return status == UploadedFileStatus.Deleted ? "N" : "Y";
         }
 
         public void RemoveFiles(FileUploadConfig config, IEnumerable<object> ids, IDbConnection con, IDbTransaction trans)
