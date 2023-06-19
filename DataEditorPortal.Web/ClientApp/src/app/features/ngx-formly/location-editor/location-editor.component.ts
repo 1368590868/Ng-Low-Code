@@ -134,6 +134,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
     });
   }
 
+  _siteName!: string;
   @Input()
   get siteName() {
     return this._siteName;
@@ -154,12 +155,10 @@ export class LocationEditorComponent implements ControlValueAccessor {
       }
     });
     this.onChange?.('error');
-    this.dirty = !this.dirty;
   }
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  _siteName!: string;
   siteNameChange = false;
 
   onChange?: any;
@@ -182,22 +181,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
         required: this.required,
         appendTo: 'body',
         options: [],
-        onShow: () => {
-          const allModel = this.formControl.parent;
-          const fromProps = this.fields[0].props;
-          const toProps = this.fields[2].props;
-          if (this._siteName && this.siteNameChange) {
-            this.locationEditorService
-              .getPipeOptions(this.system.id, allModel?.value)
-              .subscribe(res => {
-                if (fromProps && toProps) {
-                  fromProps.options = res;
-                  toProps.options = res;
-                }
-                this.siteNameChange = false;
-              });
-          }
-        },
+        onShow: () => this.onShow(),
         change: (field, event) => {
           const record = this.locationOptions.find(
             x => x.value === event.value
@@ -254,11 +238,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
                     field.parent.get('fromMeasure').props;
                   const toMeasureProps = field.parent.get('toMeasure').props;
 
-                  // bind to onshow event
-                  const fromProps = field.parent.get('from').props;
-                  const toProps = field.parent.get('to').props;
-                  toProps['onShow'] = fromProps['onShow'];
-
                   // from to have value , set helper text
                   const from = field.parent.get('from').formControl;
                   const to = field.parent.get('to').formControl;
@@ -274,6 +253,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
                     toMeasureProps['helperText'] = `Min: ${
                       toRecord?.value1 ?? '--'
                     }  Max: ${toRecord?.value2 ?? '--'}`;
+
+                    this.options.detectChanges?.(field);
                   }
                 }
               });
@@ -328,6 +309,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
         required: this.required,
         appendTo: 'body',
         options: [],
+        onShow: () => this.onShow(),
         change: (field, event) => {
           const record = this.locationOptions.find(
             x => x.value === event.value
@@ -437,6 +419,23 @@ export class LocationEditorComponent implements ControlValueAccessor {
     private locationEditorService: LocationEditorService,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
+
+  onShow() {
+    const allModel = this.formControl.parent;
+    const fromProps = this.fields[0].props;
+    const toProps = this.fields[2].props;
+    if (this._siteName && this.siteNameChange) {
+      this.locationEditorService
+        .getPipeOptions(this.system.id, allModel?.value)
+        .subscribe(res => {
+          if (fromProps && toProps) {
+            fromProps.options = res;
+            toProps.options = res;
+          }
+          this.siteNameChange = false;
+        });
+    }
+  }
 
   modelChange($event: any) {
     let val: any;
