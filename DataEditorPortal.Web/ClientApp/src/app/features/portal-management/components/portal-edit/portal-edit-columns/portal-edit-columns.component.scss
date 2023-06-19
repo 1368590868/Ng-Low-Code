@@ -7,18 +7,7 @@
 
   .p-picklist-list {
     padding: 0.75rem;
-    height: calc(100vh - 40.375rem);
-
-    &::-webkit-scrollbar {
-      width: 0.25rem;
-      height: 0.25rem;
-    }
-    &::-webkit-scrollbar-track {
-      border-bottom-right-radius: var(--border-radius);
-    }
-    &::-webkit-scrollbar-thumb {
-      border-bottom-right-radius: var(--border-radius);
-    }
+    height: calc(100vh - 40.125rem);
   }
 }
 
@@ -52,5 +41,21 @@
 
   .monaco-editor-wrapper {
     height: 10rem !important;
+  }
+
+  .p-picklist-list {
+    padding: 0.75rem;
+    height: calc(100vh - 40.125rem);
+
+    &::-webkit-scrollbar {
+      width: 0.25rem;
+      height: 0.25rem;
+    }
+    &::-webkit-scrollbar-track {
+      border-bottom-right-radius: var(--border-radius);
+    }
+    &::-webkit-scrollbar-thumb {
+      border-bottom-right-radius: var(--border-radius);
+    }
   }
 }
