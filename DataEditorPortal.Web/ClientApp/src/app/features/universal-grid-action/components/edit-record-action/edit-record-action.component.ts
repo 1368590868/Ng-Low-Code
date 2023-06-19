@@ -204,6 +204,17 @@ export class EditRecordActionComponent
           x.props['gridName'] = this.gridName;
         }
       });
+
+    // valuechange sitename
+    fields
+      .filter(f => f.type === 'locationEditor')
+      .forEach(x => {
+        if (x.props) {
+          x.expressions = {
+            'props.siteName': `field.parent.model.SITENAME`
+          };
+        }
+      });
   }
   private configFieldExpressions(fields: FormlyFieldConfig[]) {
     // set expressions
