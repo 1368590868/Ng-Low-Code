@@ -113,6 +113,7 @@ export class EditRecordActionComponent
           this.configFieldValidator(fields);
           this.configFieldExpressions(fields);
           this.configFieldProps(fields);
+          this.configSearchParams();
           this.fields = fields;
           this.onLoadUrlParams();
 
@@ -170,6 +171,21 @@ export class EditRecordActionComponent
         f.defaultValue = value;
       });
   }
+
+  private configSearchParams() {
+    this.gridService.getSearchConfig(this.gridName).subscribe(res => {
+      const formSearch: any = {};
+      res.forEach((x: any) => {
+        let key = x.key;
+        if (x.searchRule && x.searchRule.field) {
+          key = x.searchRule.field;
+        }
+        formSearch[key] = this.fetchDataParam?.searches[x.key];
+      });
+      this.model = { ...this.model, ...formSearch };
+    });
+  }
+
   private configFieldValidator(fields: FormlyFieldConfig[]) {
     // set validators
     fields

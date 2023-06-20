@@ -5,6 +5,7 @@ import { ApiResponse, NotifyService } from 'src/app/shared';
 import { GridColumn } from '../../portal-management/models/portal-item';
 import { EditFormData, EditFormField, FormEventConfig } from '../models/edit';
 import { ExportParam } from '../models/export';
+import { GridSearchConfig } from '../../universal-grid/models/grid-types';
 
 @Injectable({
   providedIn: 'root'
@@ -94,6 +95,14 @@ export class UniversalGridService {
     return this.http
       .get<ApiResponse<GridColumn[]>>(
         `${this._apiUrl}universal-grid/${name}/config/columns`
+      )
+      .pipe(map(res => res.result || []));
+  }
+
+  getSearchConfig(name: string): Observable<GridSearchConfig[]> {
+    return this.http
+      .get<ApiResponse<GridSearchConfig[]>>(
+        `${this._apiUrl}universal-grid/${name}/config/search`
       )
       .pipe(map(res => res.result || []));
   }
