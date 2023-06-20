@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MenuItem, TreeNode } from 'primeng/api';
 import { ContextMenu } from 'primeng/contextmenu';
 import { Menu } from 'primeng/menu';
-import { tap } from 'rxjs';
+import { EMPTY, catchError, tap } from 'rxjs';
 import { ConfigDataService, NotifyService } from 'src/app/shared';
 import { PortalItem, PortalItemData } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
@@ -117,6 +117,11 @@ export class PortalListComponent implements OnInit {
             relativeTo: this.activatedRoute
           });
         }
+      });
+      items.push({
+        label: 'Export',
+        icon: 'pi pi-fw pi-file-export',
+        command: () => this.export(row)
       });
       if (row['configCompleted'] && row['itemType'] !== 'linked') {
         items.push({
@@ -327,6 +332,29 @@ export class PortalListComponent implements OnInit {
           if (res && !res.isError) {
             this.getPortalList();
           }
+        })
+      )
+      .subscribe();
+  }
+
+  export(row: PortalItemData) {
+    this.portalItemService
+      .export(row['id'])
+      .pipe(
+        catchError(() => {
+          return EMPTY;
+        }),
+        tap(result => {
+          const url = window.URL.createObjectURL(result);
+          const a = document.createElement('a');
+          a.href = url;
+          const fileName = `Export-${row['name']}-${new Date()
+            .toLocaleString('en-US')
+            .replace(/[^0-9APM]/g, '_')
+            .replace(/(.)\1+/g, '$1')}.zip`;
+          a.download = fileName;
+          a.click();
+          a.remove();
         })
       )
       .subscribe();
