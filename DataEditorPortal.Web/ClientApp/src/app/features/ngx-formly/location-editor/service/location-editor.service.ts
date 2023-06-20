@@ -12,9 +12,9 @@ export class LocationEditorService {
     @Inject('API_URL') public apiUrl: string
   ) {}
 
-  getPipeOptions(id: string) {
+  getPipeOptions(id: string, data = {}) {
     return this.http
-      .post<ApiResponse<any[]>>(`${this.apiUrl}lookup/${id}/options`, {})
+      .post<ApiResponse<any[]>>(`${this.apiUrl}lookup/${id}/options`, data)
       .pipe(map(res => res.result || []));
   }
 }

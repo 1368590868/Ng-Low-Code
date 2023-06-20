@@ -211,10 +211,18 @@ export class EditRecordActionComponent
       .filter((x: any) => x.expressionsConfig)
       .forEach((x: any) => {
         x.expressions = {};
+        let customExpression: any = {};
         Object.keys(x.expressionsConfig).forEach(key => {
-          if (x.expressionsConfig[key])
-            x.expressions[key.replace('_', '.')] = x.expressionsConfig[key];
+          if (x.expressionsConfig[key]) {
+            if (key === 'customExpression') {
+              customExpression = JSON.parse(
+                x.expressionsConfig['customExpression']
+              );
+            } else
+              x.expressions[key.replace('_', '.')] = x.expressionsConfig[key];
+          }
         });
+        x.expressions = { ...x.expressions, ...customExpression };
         x.expressionsConfig = undefined;
       });
   }

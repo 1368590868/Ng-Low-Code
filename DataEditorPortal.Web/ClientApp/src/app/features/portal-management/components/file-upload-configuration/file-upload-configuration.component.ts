@@ -124,13 +124,20 @@ export class FileUploadConfigurationComponent
       this.modifiedDateColumn = newVal.fieldMapping?.MODIFIED_DATE;
       this.modifiedByColumn = newVal.fieldMapping?.MODIFIED_BY;
 
-      this.formControlConnection.setValue(newVal.dataSourceConnectionName);
       this.formControlDbTable.setValue(
         `${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`
       );
 
       this.onStorageTypeChange(this.storageTypeColumn || '');
     }
+
+    if (this.dataSourceConnectionName) {
+      this.formControlConnection.setValue(this.dataSourceConnectionName);
+    }
+  }
+
+  get dataSourceConnectionName() {
+    return this.portalItemService.dataSourceConnectionName;
   }
 
   writeValue(value: any): void {
@@ -149,6 +156,8 @@ export class FileUploadConfigurationComponent
   constructor(private portalItemService: PortalItemService) {}
 
   ngOnInit(): void {
+    this.formControlConnection.disable();
+
     this.formControlDbTable.valueChanges.subscribe(value => {
       if (value) {
         const [tableSchema, tableName] = value.split('.');
@@ -175,19 +184,6 @@ export class FileUploadConfigurationComponent
         this.dbConnections = connections.map(x => {
           return { label: x.name, value: x.name || '' };
         });
-
-        // check if current selected connections exists, if not exist, use the first
-        if (
-          !connections.find(
-            x => x.name === this.dsConfig.dataSourceConnectionName
-          )
-        ) {
-          this.formControlConnection.setValue(connections[0].name);
-        } else {
-          this.formControlConnection.setValue(
-            this.dsConfig.dataSourceConnectionName
-          );
-        }
 
         this.getDbTables();
       });
@@ -330,13 +326,6 @@ export class FileUploadConfigurationComponent
 
         this.getDbTableColumns();
       });
-  }
-
-  /* db connection dialog */
-  connectionSaved(item: { label: string; value: string }) {
-    this.dbConnections.push(item);
-    this.formControlConnection.setValue(item.value);
-    this.onConnectionChange(item);
   }
 
   onTableNameChange({ value }: { value: string }) {

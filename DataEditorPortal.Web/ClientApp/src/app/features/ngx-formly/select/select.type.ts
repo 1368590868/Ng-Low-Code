@@ -11,6 +11,7 @@ interface SelectProps extends FormlyFieldProps, FormlyFieldSelectProps {
   appendTo?: string;
   autoDisplayFirst: boolean;
   virtualScrollItemSize?: number;
+  onShow?: () => void;
 }
 
 export interface FormlySelectFieldConfig
@@ -30,7 +31,8 @@ export interface FormlySelectFieldConfig
       [showClear]="!props.required"
       (onChange)="props.change && props.change(field, $event)"
       [appendTo]="props.appendTo || 'body'"
-      [autoDisplayFirst]="!!props.autoDisplayFirst">
+      [autoDisplayFirst]="!!props.autoDisplayFirst"
+      (onShow)="props.onShow && props.onShow()">
     </p-dropdown>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush

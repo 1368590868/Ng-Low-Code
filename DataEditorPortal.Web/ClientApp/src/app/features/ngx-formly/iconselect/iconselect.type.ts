@@ -55,13 +55,16 @@ export interface FormlySelectFieldConfig
           </div>
         </ng-template>
       </p-dropdown>
-
-      <i
-        [class]="
-          (dropdown?.value?.startsWith('pi') ? 'pi ' : '') + dropdown.value
-        "
-        class="absolute"
-        style="left:1rem;top:.9rem;"></i>
+      <div
+        class="absolute w-3rem h-full  top-0  flex justify-content-center align-items-center">
+        <i
+          [class]="
+            dropdown.value
+              ? (dropdown?.value?.startsWith('pi') ? 'pi ' : '') +
+                dropdown.value
+              : 'fa fa-no-icon'
+          "></i>
+      </div>
     </div>
   `,
   styles: [

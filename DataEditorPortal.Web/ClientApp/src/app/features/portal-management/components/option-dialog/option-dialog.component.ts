@@ -53,11 +53,17 @@ export class OptionDialogComponent implements ControlValueAccessor {
     '-- E.g. \r\n' +
     "-- SELECT LABEL, VALUE, VALUE1, VALUE2 FROM DATA_DICTIONARIES WHERE CATEGORY = 'Employer' {{ AND VALUE1 IN ##VENDOR## }} ORDER BY LABEL";
 
+  get dataSourceConnectionName() {
+    return this.portalItemService.dataSourceConnectionName;
+  }
+
   constructor(
     private lookupService: LookupService,
     private portalItemService: PortalItemService,
     private notifyService: NotifyService
-  ) {}
+  ) {
+    this.formControlConnection.disable();
+  }
 
   set value(val: { id: string } | any[]) {
     if (Array.isArray(val)) {
@@ -134,20 +140,12 @@ export class OptionDialogComponent implements ControlValueAccessor {
       this.dbConnections = connections.map(x => {
         return { label: x.name, value: x.name || '' };
       });
+      this.formControlConnection.setValue(this.dataSourceConnectionName);
       if (this.optionsLookup) {
         this.lookupService.getOptionQuery(this.optionsLookup).subscribe(res => {
           this.formControlName.setValue(res?.name);
           this.formControlQuery.setValue(res?.queryText);
-
-          // check if current selected connections exists, if not exist, use the first
-          if (!connections.find(x => x.name === res?.connectionName)) {
-            this.formControlConnection.setValue(connections[0].name);
-          } else {
-            this.formControlConnection.setValue(res?.connectionName);
-          }
         });
-      } else {
-        this.formControlConnection.setValue(connections[0].name);
       }
     });
   }
@@ -173,9 +171,6 @@ export class OptionDialogComponent implements ControlValueAccessor {
 
   validate() {
     if (this.isAdvanced) {
-      if (!this.formControlConnection.valid) {
-        this.formControlConnection.markAsDirty();
-      }
       if (!this.formControlName.valid) {
         this.formControlName.markAsDirty();
       }
@@ -186,7 +181,6 @@ export class OptionDialogComponent implements ControlValueAccessor {
         this.notifyService.notifyWarning('', 'Query  Text is required.');
       }
       return (
-        this.formControlConnection.valid &&
         this.formControlName.valid &&
         this.formControlQuery.valid &&
         this.formControlQuery.value !== this.helperMessage
@@ -252,11 +246,6 @@ export class OptionDialogComponent implements ControlValueAccessor {
     this.visible = false;
   }
 
-  /* db connection dialog */
-  connectionSaved(item: { label: string; value: string }) {
-    this.dbConnections.push(item);
-    this.formControlConnection.setValue(item.value);
-  }
   /* db connection dialog */
 }
 

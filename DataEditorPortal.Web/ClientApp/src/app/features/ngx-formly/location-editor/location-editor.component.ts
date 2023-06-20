@@ -59,7 +59,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
   }
   @Input() label!: string;
   @Input() locationType!: number;
-  @Input() system!: { label: string; value: string }[] | { id: string };
+  @Input() system!: { id: string };
   @Input() mappingColumns!: any;
   @Input() formControl!: AbstractControl;
   _required = false;
@@ -134,8 +134,32 @@ export class LocationEditorComponent implements ControlValueAccessor {
     });
   }
 
+  _siteName!: string;
+  @Input()
+  get siteName() {
+    return this._siteName;
+  }
+  set siteName(val: string) {
+    this._siteName = val;
+    this.siteNameChange = true;
+    this.form.reset();
+    this.fields.forEach(x => {
+      // min max reset
+      if (x && x.parent && x.parent.get) {
+        const fromMeasureProps = x.parent.get('fromMeasure').props;
+        const toMeasureProps = x.parent.get('toMeasure').props;
+        if (fromMeasureProps && toMeasureProps) {
+          fromMeasureProps['helperText'] = `Min: --  Max: --`;
+          toMeasureProps['helperText'] = `Min: --  Max: --`;
+        }
+      }
+    });
+    this.onChange?.('error');
+  }
+
   form = new FormGroup({});
   options: FormlyFormOptions = {};
+  siteNameChange = false;
 
   onChange?: any;
   onTouch?: any;
@@ -156,6 +180,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
         placeholder: 'Please select',
         required: this.required,
         appendTo: 'body',
+        options: [],
+        onShow: () => this.onShow(),
         change: (field, event) => {
           const record = this.locationOptions.find(
             x => x.value === event.value
@@ -205,11 +231,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
               .getPipeOptions(this.system?.id)
               .subscribe(res => {
                 this.locationOptions = res;
-                field.props.options = res;
-                this.options?.detectChanges?.(field);
-
-                field.parent.get('to').props.options = res;
-                this.options?.detectChanges?.(field.parent.get('to'));
 
                 // Init fromMeasure and toMeasure helper text
                 if (field && field.parent && field.parent.get) {
@@ -232,6 +253,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
                     toMeasureProps['helperText'] = `Min: ${
                       toRecord?.value1 ?? '--'
                     }  Max: ${toRecord?.value2 ?? '--'}`;
+
+                    this.options.detectChanges?.(field);
                   }
                 }
               });
@@ -286,6 +309,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
         required: this.required,
         appendTo: 'body',
         options: [],
+        onShow: () => this.onShow(),
         change: (field, event) => {
           const record = this.locationOptions.find(
             x => x.value === event.value
@@ -396,6 +420,23 @@ export class LocationEditorComponent implements ControlValueAccessor {
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
+  onShow() {
+    const allModel = this.formControl.parent;
+    const fromProps = this.fields[0].props;
+    const toProps = this.fields[2].props;
+    if (this._siteName && this.siteNameChange) {
+      this.locationEditorService
+        .getPipeOptions(this.system.id, allModel?.value)
+        .subscribe(res => {
+          if (fromProps && toProps) {
+            fromProps.options = res;
+            toProps.options = res;
+          }
+          this.siteNameChange = false;
+        });
+    }
+  }
+
   modelChange($event: any) {
     let val: any;
     if (this.form.valid) {
@@ -437,12 +478,13 @@ export class LocationEditorComponent implements ControlValueAccessor {
     [label]="props.label || ''"
     [locationType]="props.locationType || 2"
     [mappingColumns]="props.mappingColumns || []"
-    [system]="props.system || []"
+    [system]="props.system || { id: '' }"
     [fromLabel]="props.fromLabel"
     [toLabel]="props.toLabel"
     [fromMeasureLabel]="props.fromMeasureLabel"
     [toMeasureLabel]="props.toMeasureLabel"
-    [lengthLabel]="props.lengthLabel || ''"></app-location-editor>`,
+    [lengthLabel]="props.lengthLabel || ''"
+    [siteName]="props.siteName || ''"></app-location-editor>`,
   styles: [
     `
       :host {
@@ -459,13 +501,14 @@ export class FormlyFieldLocationEditorComponent
         dirty: boolean;
         label: string;
         locationType: number;
-        system: { label: string; value: string }[];
+        system: { id: string };
         mappingColumns: { label: string; value: string }[];
         fromLabel: string;
         toLabel: string;
         fromMeasureLabel: string;
         toMeasureLabel: string;
         lengthLabel?: string;
+        siteName?: string;
       }
     >
   >

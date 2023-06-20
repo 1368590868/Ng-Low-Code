@@ -95,6 +95,19 @@ export class FormDesignerConfigComponent
             },
             onInit: (editor: any) => this.onMonacoEditorInit(editor)
           }
+        },
+        {
+          key: 'customExpression',
+          type: 'monacoEditor',
+          props: {
+            label: 'expression =',
+            description:
+              'Only Support Javascript Expression\nExpression value type is `boolean`\n<a href="https://formly.dev/docs/guide/expression-properties" target="_blank">See more</a>',
+            config: {
+              language: 'json'
+            },
+            onInit: (editor: any) => this.onMonacoEditorInit(editor)
+          }
         }
       ],
       expressions: {
