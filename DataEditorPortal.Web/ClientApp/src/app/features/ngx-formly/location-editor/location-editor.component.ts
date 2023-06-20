@@ -43,8 +43,7 @@ import { LocationEditorService } from './service/location-editor.service';
 })
 export class LocationEditorComponent implements ControlValueAccessor {
   @Input()
-  set dirty1(val: boolean) {
-    console.log(val);
+  set dirty(val: boolean) {
     if (val) this.fields.forEach(x => x.formControl?.markAsDirty());
     else this.fields.forEach(x => x.formControl?.markAsPristine());
   }
@@ -183,14 +182,14 @@ export class LocationEditorComponent implements ControlValueAccessor {
     });
   }
 
-  _siteName!: string;
+  _systemName!: string;
   @Input()
-  get siteName() {
-    return this._siteName;
+  get systemName() {
+    return this._systemName;
   }
-  set siteName(val: string) {
-    this._siteName = val;
-    this.siteNameChange = true;
+  set systemName(val: string) {
+    this._systemName = val;
+    this.systemNameChange = true;
     this.form.reset();
     this.fields.forEach(x => {
       // min max reset
@@ -210,13 +209,12 @@ export class LocationEditorComponent implements ControlValueAccessor {
         }
       }
     });
-    this.dirty1 = false;
-    this.onChange?.('error');
+    this.dirty = false;
   }
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  siteNameChange = false;
+  systemNameChange = false;
 
   onChange?: any;
   onTouch?: any;
@@ -460,7 +458,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
     const allModel = this.formControl.parent;
     const fromProps = this.fields[0].props;
     const toProps = this.fields[2].props;
-    if (this._siteName && this.siteNameChange) {
+    if (this._systemName && this.systemNameChange) {
       this.locationEditorService
         .getPipeOptions(this.system.id, allModel?.value)
         .subscribe(res => {
@@ -495,7 +493,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
             fromProps.options = res;
             toProps.options = res;
           }
-          this.siteNameChange = false;
+          this.systemNameChange = false;
         });
     }
   }
@@ -536,7 +534,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
   template: `<app-location-editor
     [formControl]="formControl"
     [formlyAttributes]="field"
-    [dirty1]="formControl.dirty"
+    [dirty]="formControl.dirty"
     [required]="props.required || false"
     [label]="props.label || ''"
     [locationType]="props.locationType || 2"
@@ -551,7 +549,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
     [toMeasureLabel]="props.toMeasureLabel"
     [toMeasureDescription]="props.toMeasureDescription || ''"
     [lengthLabel]="props.lengthLabel || ''"
-    [siteName]="props.siteName || ''"></app-location-editor>`,
+    [systemName]="props.systemName || ''"></app-location-editor>`,
   styles: [
     `
       :host {
@@ -579,7 +577,7 @@ export class FormlyFieldLocationEditorComponent
         toMeasureLabel: string;
         toMeasureDescription?: string;
         lengthLabel?: string;
-        siteName?: string;
+        systemName?: string;
       }
     >
   >
@@ -592,7 +590,6 @@ export class FormlyFieldLocationEditorComponent
     this.field.formControl.addValidators(
       (control: AbstractControl): ValidationErrors | null => {
         if (control.value === 'error') {
-          console.log('****************');
           control.markAsPristine();
           return { errorData: true };
         }

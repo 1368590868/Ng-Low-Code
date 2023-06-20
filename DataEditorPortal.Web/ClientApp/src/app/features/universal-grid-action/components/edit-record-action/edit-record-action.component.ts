@@ -331,7 +331,9 @@ export class EditRecordActionComponent
         this.submitSave(model);
       }
     } else {
-      this.fields.forEach(x => x.formControl?.markAsDirty());
+      setTimeout(() => {
+        this.fields.forEach(x => x.formControl?.markAsDirty());
+      }, 0);
       this.errorEvent.emit();
     }
   }
