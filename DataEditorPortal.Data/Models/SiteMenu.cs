@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Serialization;
 
 namespace DataEditorPortal.Data.Models
 {
@@ -30,6 +31,7 @@ namespace DataEditorPortal.Data.Models
         [Column("STATUS")]
         public PortalItemStatus Status { get; set; }
 
+        [XmlIgnore]
         public SiteMenu Parent { get; set; }
         [Column("PARENT_ID")]
         public Guid? ParentId { get; set; }

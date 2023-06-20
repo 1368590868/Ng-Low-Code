@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Serialization;
 
 namespace DataEditorPortal.Data.Models
 {
@@ -34,6 +35,7 @@ namespace DataEditorPortal.Data.Models
         public DateTime CreatedDate { get; set; }
         [Column("DATA_SOURCE_CONNECTION_NAME")]
         public string DataSourceConnectionName { get; set; }
+        [XmlIgnore]
         public virtual DataSourceConnection DataSourceConnection { get; set; }
     }
 }

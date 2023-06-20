@@ -15,10 +15,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -44,6 +47,7 @@ namespace DataEditorPortal.Web.Services
         bool SaveCustomActions(Guid id, List<CustomAction> model);
         LinkedDataSourceConfig GetLinkedDataSourceConfig(Guid id);
         bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model);
+        MemoryStream ExportPortalItem(Guid id);
     }
 
     public class PortalItemService : IPortalItemService
@@ -686,6 +690,61 @@ namespace DataEditorPortal.Web.Services
             _memoryCache.Remove($"grid.{name}");
             _memoryCache.Remove($"grid.{name}.datasource");
             _memoryCache.Remove($"grid.{name}.attachment.cols");
+        }
+
+        public MemoryStream ExportPortalItem(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+
+            var ds = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == config.DataSourceConnectionName);
+            var menus = _depDbContext.SiteMenus.Where(x => x.Id == id || x.ParentId == id).OrderBy(x => x.ParentId).ToList();
+            var configs = _depDbContext.UniversalGridConfigurations.Where(x => menus.Select(m => m.Name).Contains(x.Name)).ToList();
+            // Create a zip archive in memory
+            var zipMemoryStream = new MemoryStream();
+            using (var archive = new ZipArchive(zipMemoryStream, ZipArchiveMode.Create, true))
+            {
+                // Add the XML files to the zip archive
+                AddFileToZipArchive(archive, GetXml(menus), $"SiteMenus.xml");
+                AddFileToZipArchive(archive, GetXml(ds), "DataSourceConnections.xml");
+                AddFileToZipArchive(archive, GetXml(configs), "UniversalGridConfigurations.xml");
+            }
+
+            zipMemoryStream.Position = 0;
+            return zipMemoryStream;
+        }
+
+        private string GetXml<T>(T obj)
+        {
+            var serializer = new XmlSerializer(typeof(T));
+
+            // Create a StringWriter to hold the XML output
+            using (var stringWriter = new StringWriter())
+            {
+                // Serialize the object to XML
+                serializer.Serialize(stringWriter, obj);
+
+                // Get the serialized XML string
+                return stringWriter.ToString();
+            }
+        }
+        private void AddFileToZipArchive(ZipArchive archive, string xmlString, string fileName)
+        {
+            using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(xmlString)))
+            {
+                var entry = archive.CreateEntry(fileName);
+                using (var entryStream = entry.Open())
+                {
+                    memoryStream.CopyTo(entryStream);
+                }
+            }
         }
     }
 }

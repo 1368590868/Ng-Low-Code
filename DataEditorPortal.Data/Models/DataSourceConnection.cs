@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Serialization;
 
 namespace DataEditorPortal.Data.Models
 {
@@ -13,12 +14,15 @@ namespace DataEditorPortal.Data.Models
         [Column("CONNECTION_STRING")]
         public string ConnectionString { get; set; }
 
+        [XmlIgnore]
         public virtual ICollection<UniversalGridConfiguration> UniversalGridConfigurations { get; set; }
 
         [NotMapped]
+        [XmlIgnore]
         public int UsedCount { get; set; }
 
         [NotMapped]
+        [XmlIgnore]
         public string Type { get; set; }
     }
 }
