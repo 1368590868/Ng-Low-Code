@@ -941,8 +941,10 @@ namespace DataEditorPortal.Web.Services
                     );
 
             var fields = new List<FormFieldConfig>();
-            GetAddingFormConfig(config).FormFields.ForEach(x => { if (!fields.Any(f => x.key == f.key)) fields.Add(x); });
-            GetUpdatingFormConfig(config).FormFields.ForEach(x => { if (!fields.Any(f => x.key == f.key)) fields.Add(x); });
+            if (detailConfig.AddingForm != null && detailConfig.AddingForm.FormFields != null)
+                detailConfig.AddingForm.FormFields.ForEach(x => { if (!fields.Any(f => x.key == f.key)) fields.Add(x); });
+            if (detailConfig.UpdatingForm != null && detailConfig.UpdatingForm.FormFields != null)
+                detailConfig.UpdatingForm.FormFields.ForEach(x => { if (!fields.Any(f => x.key == f.key)) fields.Add(x); });
 
             using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
             {
