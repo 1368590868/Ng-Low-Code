@@ -43,7 +43,8 @@ import { LocationEditorService } from './service/location-editor.service';
 })
 export class LocationEditorComponent implements ControlValueAccessor {
   @Input()
-  set dirty(val: boolean) {
+  set dirty1(val: boolean) {
+    console.log(val);
     if (val) this.fields.forEach(x => x.formControl?.markAsDirty());
     else this.fields.forEach(x => x.formControl?.markAsPristine());
   }
@@ -209,6 +210,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
         }
       }
     });
+    this.dirty1 = false;
     this.onChange?.('error');
   }
 
@@ -534,7 +536,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
   template: `<app-location-editor
     [formControl]="formControl"
     [formlyAttributes]="field"
-    [dirty]="formControl.dirty"
+    [dirty1]="formControl.dirty"
     [required]="props.required || false"
     [label]="props.label || ''"
     [locationType]="props.locationType || 2"
@@ -590,6 +592,7 @@ export class FormlyFieldLocationEditorComponent
     this.field.formControl.addValidators(
       (control: AbstractControl): ValidationErrors | null => {
         if (control.value === 'error') {
+          console.log('****************');
           control.markAsPristine();
           return { errorData: true };
         }
