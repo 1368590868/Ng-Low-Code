@@ -98,6 +98,18 @@ export class LocationEditorComponent implements ControlValueAccessor {
     });
   }
 
+  _fromDescription = '';
+  @Input()
+  get fromDescription() {
+    return this._fromDescription;
+  }
+  set fromDescription(val: string) {
+    this._fromDescription = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'from') x.props.description = val;
+    });
+  }
+
   _fromMeasureLabel = 'From Measure';
   @Input()
   get fromMeasureLabel() {
@@ -107,6 +119,18 @@ export class LocationEditorComponent implements ControlValueAccessor {
     this._fromMeasureLabel = val;
     this.fields.forEach(x => {
       if (x.props && x.key === 'fromMeasure') x.props.label = val;
+    });
+  }
+
+  _fromMeasureDescription = '';
+  @Input()
+  get fromMeasureDescription() {
+    return this._fromMeasureDescription;
+  }
+  set fromMeasureDescription(val: string) {
+    this._fromDescription = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'fromMeasure') x.props.description = val;
     });
   }
 
@@ -122,6 +146,18 @@ export class LocationEditorComponent implements ControlValueAccessor {
     });
   }
 
+  _toMeasureDescription = '';
+  @Input()
+  get toMeasureDescription() {
+    return this._toMeasureDescription;
+  }
+  set toMeasureDescription(val: string) {
+    this._toMeasureDescription = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'toMeasure') x.props.description = val;
+    });
+  }
+
   _toLabel = 'To';
   @Input()
   get toLabel() {
@@ -131,6 +167,18 @@ export class LocationEditorComponent implements ControlValueAccessor {
     this._toLabel = val;
     this.fields.forEach(x => {
       if (x.props && x.key === 'to') x.props.label = val;
+    });
+  }
+
+  _toDescription = '';
+  @Input()
+  get toDescription() {
+    return this._toDescription;
+  }
+  set toDescription(val: string) {
+    this._toDescription = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'to') x.props.description = val;
     });
   }
 
@@ -149,8 +197,15 @@ export class LocationEditorComponent implements ControlValueAccessor {
         const fromMeasureProps = x.parent.get('fromMeasure').props;
         const toMeasureProps = x.parent.get('toMeasure').props;
         if (fromMeasureProps && toMeasureProps) {
-          fromMeasureProps['helperText'] = `Min: --  Max: --`;
-          toMeasureProps['helperText'] = `Min: --  Max: --`;
+          fromMeasureProps['helperText'] = `Min: --    Max: --`;
+          toMeasureProps['helperText'] = `Min: --    Max: --`;
+        }
+
+        const fromProps = x.parent.get('from').props;
+        const toProps = x.parent.get('to').props;
+        if (!val) {
+          if (fromProps) fromProps['options'] = [];
+          if (toProps) toProps['options'] = [];
         }
       }
     });
@@ -226,38 +281,17 @@ export class LocationEditorComponent implements ControlValueAccessor {
       },
       hooks: {
         onInit: (field: FormlyFieldConfig & any) => {
-          if (!Array.isArray(this.system)) {
-            this.locationEditorService
-              .getPipeOptions(this.system?.id)
-              .subscribe(res => {
-                this.locationOptions = res;
+          // Init fromMeasure and toMeasure helper text
+          if (field && field.parent && field.parent.get) {
+            const fromMeasureProps = field.parent.get('fromMeasure').props;
+            const toMeasureProps = field.parent.get('toMeasure').props;
+            if (fromMeasureProps && toMeasureProps) {
+              fromMeasureProps['helperText'] = `Min: --  Max: --`;
 
-                // Init fromMeasure and toMeasure helper text
-                if (field && field.parent && field.parent.get) {
-                  const fromMeasureProps =
-                    field.parent.get('fromMeasure').props;
-                  const toMeasureProps = field.parent.get('toMeasure').props;
+              toMeasureProps['helperText'] = `Min: --  Max: --`;
 
-                  // from to have value , set helper text
-                  const from = field.parent.get('from').formControl;
-                  const to = field.parent.get('to').formControl;
-
-                  const fromRecord = res.find(x => x.value === from.value);
-                  const toRecord = res.find(x => x.value === to.value);
-
-                  if (fromMeasureProps && toMeasureProps) {
-                    fromMeasureProps['helperText'] = `Min: ${
-                      fromRecord?.value1 ?? '--'
-                    }  Max: ${fromRecord?.value2 ?? '--'}`;
-
-                    toMeasureProps['helperText'] = `Min: ${
-                      toRecord?.value1 ?? '--'
-                    }  Max: ${toRecord?.value2 ?? '--'}`;
-
-                    this.options.detectChanges?.(field);
-                  }
-                }
-              });
+              this.options.detectChanges?.(field);
+            }
           }
         }
       }
@@ -428,6 +462,33 @@ export class LocationEditorComponent implements ControlValueAccessor {
       this.locationEditorService
         .getPipeOptions(this.system.id, allModel?.value)
         .subscribe(res => {
+          this.locationOptions = res;
+          // Init fromMeasure and toMeasure helper text
+
+          const fromMeasureProps = this.fields[1].props;
+          const toMeasureProps = this.fields[3].props;
+
+          // from to have value , set helper text
+          const from = this.fields[0].formControl;
+          const to = this.fields[2].formControl;
+
+          if (from && to) {
+            const fromRecord = res.find(x => x.value === from.value);
+            const toRecord = res.find(x => x.value === to.value);
+
+            if (fromMeasureProps && toMeasureProps) {
+              fromMeasureProps['helperText'] = `Min: ${
+                fromRecord?.value1 ?? '--'
+              }  Max: ${fromRecord?.value2 ?? '--'}`;
+
+              toMeasureProps['helperText'] = `Min: ${
+                toRecord?.value1 ?? '--'
+              }  Max: ${toRecord?.value2 ?? '--'}`;
+
+              this.options.detectChanges?.(this.fields[1]);
+            }
+          }
+
           if (fromProps && toProps) {
             fromProps.options = res;
             toProps.options = res;
@@ -480,9 +541,13 @@ export class LocationEditorComponent implements ControlValueAccessor {
     [mappingColumns]="props.mappingColumns || []"
     [system]="props.system || { id: '' }"
     [fromLabel]="props.fromLabel"
+    [fromDescription]="props.fromDescription || ''"
     [toLabel]="props.toLabel"
+    [toDescription]="props.toDescription || ''"
     [fromMeasureLabel]="props.fromMeasureLabel"
+    [fromMeasureDescription]="props.fromMeasureDescription || ''"
     [toMeasureLabel]="props.toMeasureLabel"
+    [toMeasureDescription]="props.toMeasureDescription || ''"
     [lengthLabel]="props.lengthLabel || ''"
     [siteName]="props.siteName || ''"></app-location-editor>`,
   styles: [
@@ -504,9 +569,13 @@ export class FormlyFieldLocationEditorComponent
         system: { id: string };
         mappingColumns: { label: string; value: string }[];
         fromLabel: string;
+        fromDescription?: string;
         toLabel: string;
+        toDescription?: string;
         fromMeasureLabel: string;
+        fromMeasureDescription?: string;
         toMeasureLabel: string;
+        toMeasureDescription?: string;
         lengthLabel?: string;
         siteName?: string;
       }

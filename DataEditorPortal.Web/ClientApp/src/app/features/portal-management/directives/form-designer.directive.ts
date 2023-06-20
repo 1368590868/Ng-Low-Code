@@ -373,6 +373,14 @@ export class FormDesignerDirective {
               }
             },
             {
+              key: 'fromDescription',
+              type: 'input',
+              props: {
+                label: 'From Description',
+                placeholder: 'Enter from description'
+              }
+            },
+            {
               key: 'fromMeasureLabel',
               type: 'input',
               defaultValue: 'From Measure',
@@ -382,6 +390,14 @@ export class FormDesignerDirective {
               },
               expressions: {
                 hide: `field.parent.parent.model.locationType < 2`
+              }
+            },
+            {
+              key: 'fromMeasureDescription',
+              type: 'input',
+              props: {
+                label: 'From Measure Description',
+                placeholder: 'Enter from Measure description'
               }
             },
             {
@@ -397,12 +413,34 @@ export class FormDesignerDirective {
               }
             },
             {
+              key: 'toDescription',
+              type: 'input',
+              props: {
+                label: 'to Description',
+                placeholder: 'Enter to description'
+              },
+              expressions: {
+                hide: `field.parent.parent.model.locationType === 2 || field.parent.parent.model.locationType === 3`
+              }
+            },
+            {
               key: 'toMeasureLabel',
               type: 'input',
               defaultValue: 'To Measure',
               props: {
                 label: 'To Measure Label',
                 placeholder: 'Enter to Measure label'
+              },
+              expressions: {
+                hide: `field.parent.parent.model.locationType === 2`
+              }
+            },
+            {
+              key: 'toMeasureDescription',
+              type: 'input',
+              props: {
+                label: 'To Measure Description',
+                placeholder: 'Enter to description'
               },
               expressions: {
                 hide: `field.parent.parent.model.locationType === 2`
