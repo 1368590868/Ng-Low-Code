@@ -715,7 +715,7 @@ namespace DataEditorPortal.Web.Controllers
 
         #endregion
 
-        [HttpGet]
+        [HttpPost]
         [Route("{id}/export")]
         [AutoWrapIgnore]
         public IActionResult ExportData(Guid id)

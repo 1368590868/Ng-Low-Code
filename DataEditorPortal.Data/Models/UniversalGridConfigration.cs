@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
@@ -37,5 +38,7 @@ namespace DataEditorPortal.Data.Models
         public string DataSourceConnectionName { get; set; }
         [XmlIgnore]
         public virtual DataSourceConnection DataSourceConnection { get; set; }
+        [XmlIgnore]
+        public virtual ICollection<Lookup> Lookups { get; set; }
     }
 }

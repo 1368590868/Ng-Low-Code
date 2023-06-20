@@ -705,9 +705,17 @@ namespace DataEditorPortal.Web.Services
 
 
             var ds = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == config.DataSourceConnectionName);
-            var menus = _depDbContext.SiteMenus.Where(x => x.Id == id || x.ParentId == id).OrderBy(x => x.ParentId).ToList();
+            var menus = _depDbContext.SiteMenus.Where(x => x.Id == id || x.ParentId == id).OrderByDescending(x => x.ParentId).ToList();
             var configs = _depDbContext.UniversalGridConfigurations.Where(x => menus.Select(m => m.Name).Contains(x.Name)).ToList();
-            // Create a zip archive in memory
+            var lookups = _depDbContext.Lookups.Where(x => configs.Select(c => c.Id).Contains(x.UniversalGridConfigurationId.Value)).ToList();
+
+            var types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
+
+            // get old permissions
+            var permissionNames = new List<string>();
+            menus.ForEach(m => permissionNames.AddRange(types.Select(t => $"{t}_{ m.Name.Replace("-", "_") }".ToUpper())));
+            var permissions = _depDbContext.SitePermissions.Where(x => permissionNames.Contains(x.PermissionName)).ToList();
+
             var zipMemoryStream = new MemoryStream();
             using (var archive = new ZipArchive(zipMemoryStream, ZipArchiveMode.Create, true))
             {
@@ -715,6 +723,7 @@ namespace DataEditorPortal.Web.Services
                 AddFileToZipArchive(archive, GetXml(menus), $"SiteMenus.xml");
                 AddFileToZipArchive(archive, GetXml(ds), "DataSourceConnections.xml");
                 AddFileToZipArchive(archive, GetXml(configs), "UniversalGridConfigurations.xml");
+                AddFileToZipArchive(archive, GetXml(lookups), "Lookups.xml");
             }
 
             zipMemoryStream.Position = 0;

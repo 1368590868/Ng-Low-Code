@@ -65,11 +65,17 @@ namespace DataEditorPortal.Web.Services
 
             ValidateLookupItem(model);
 
+            var configId = (from s in _depDbContext.SiteMenus
+                            join u in _depDbContext.UniversalGridConfigurations on s.Name equals u.Name
+                            where s.Id == model.PortalItemId
+                            select u.Id).FirstOrDefault();
+
             var item = new Lookup()
             {
                 Name = model.Name,
                 QueryText = model.QueryText,
-                DataSourceConnectionName = model.ConnectionName
+                DataSourceConnectionName = model.ConnectionName,
+                UniversalGridConfigurationId = configId
             };
             _depDbContext.Lookups.Add(item);
             _depDbContext.SaveChanges();
@@ -93,6 +99,13 @@ namespace DataEditorPortal.Web.Services
             item.Name = model.Name;
             item.QueryText = model.QueryText;
             item.DataSourceConnectionName = model.ConnectionName;
+
+            var configId = (from s in _depDbContext.SiteMenus
+                            join u in _depDbContext.UniversalGridConfigurations on s.Name equals u.Name
+                            where s.Id == model.PortalItemId
+                            select u.Id).FirstOrDefault();
+
+            item.UniversalGridConfigurationId = configId;
 
             _depDbContext.SaveChanges();
 

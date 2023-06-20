@@ -163,7 +163,7 @@ namespace DataEditorPortal.Web.Services
 
             var result = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
 
-            result.ForEach(x => x.searchRule = null);
+            //result.ForEach(x => x.searchRule = null);
 
             return result;
         }
