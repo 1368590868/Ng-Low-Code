@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoWrapper.Filters;
 using AutoWrapper.Wrappers;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
@@ -713,5 +714,15 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         #endregion
+
+        [HttpGet]
+        [Route("{id}/export")]
+        [AutoWrapIgnore]
+        public IActionResult ExportData(Guid id)
+        {
+            var fs = _portalItemService.ExportPortalItem(id);
+
+            return File(fs, "application/octet-stream", $"Export_{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.zip");
+        }
     }
 }
