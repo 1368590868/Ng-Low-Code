@@ -55,7 +55,7 @@
         formControlName="queryTextFormControl"
         [style]="{ minWidth: '50rem', minHeight: '20rem' }"
         class="pt-3 border-round monaco-editor-wrapper"
-        (onInit)="onMonacoEditorInit($event)"
+        [placeholder]="helperMessage"
         [options]="{}"></ngx-monaco-editor>
     </div>
     <ng-template pTemplate="footer">

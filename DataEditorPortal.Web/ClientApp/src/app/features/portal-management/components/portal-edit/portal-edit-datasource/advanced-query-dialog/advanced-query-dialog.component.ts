@@ -24,43 +24,25 @@ export class AdvancedQueryDialogComponent {
   loading = false;
   advanceDialogVisible = false;
   helperMessage =
-    '-- Enter the query text for fetching the data. \r\n\r\n' +
-    '-- E.g. \r\n' +
-    '-- SELECT * FROM DEMO_TABLE WHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## ORDER BY ##ORDERBY##';
+    'Enter the query text for fetching the data. <br />' +
+    'E.g. <br /><br />' +
+    'SELECT * FROM DEMO_TABLE <br />WHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## <br />ORDER BY ##ORDERBY##';
 
   constructor(
     private portalItemService: PortalItemService,
     private notifyService: NotifyService
   ) {}
 
-  onMonacoEditorInit(editor: any) {
-    editor.onMouseDown(() => {
-      if (this.formControlQuery.value === this.helperMessage) {
-        this.formControlQuery.reset();
-        setTimeout(() => {
-          this.formControlQuery.markAsPristine();
-        }, 100);
-      }
-    });
-    editor.onDidBlurEditorText(() => {
-      if (!this.formControlQuery.value) {
-        this.formControlQuery.setValue(this.helperMessage);
-      }
-    });
-  }
-
   showAdvanceDialog() {
     this.advanceDialogVisible = true;
-    this.formControlQuery.reset();
-    if (this.queryText) this.formControlQuery.setValue(this.queryText);
-    else this.formControlQuery.setValue(this.helperMessage);
+    this.formControlQuery.setValue(this.queryText);
+    setTimeout(() => {
+      this.formControlQuery.markAsPristine();
+    }, 100);
   }
 
   onAdvanceDialogOk() {
-    if (
-      this.formControlQuery.valid &&
-      this.formControlQuery.value != this.helperMessage
-    ) {
+    if (this.formControlQuery.valid) {
       if (this.formControlQuery.value != this.queryText) {
         // validate if the query can be run against database succesfully
         this.loading = true;

@@ -43,11 +43,11 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   };
 
   helperMessage =
-    '-- Enter the where clause, which will be used to filter data. \r\n' +
-    '-- Use ##VALUE## to reference current field value. \r\n' +
-    '-- E.g. \r\n' +
-    '--      FIRST_NAME = ##VALUE## \r\n' +
-    "--      FIRST_NAME LIKE ##VALUE## + '%'";
+    'Enter the where clause, which will be used to filter data. <br />' +
+    'Use ##VALUE## to reference current field value. <br />' +
+    'E.g. <br /><br />' +
+    'FIRST_NAME = ##VALUE## <br />' +
+    "FIRST_NAME LIKE ##VALUE## + '%'";
 
   formControlField: FormControl = new FormControl();
   formControlMatchMode: FormControl = new FormControl();
@@ -131,34 +131,16 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
     }
   }
 
-  onMonacoEditorInit(editor: any) {
-    editor.onMouseDown(() => {
-      if (this.formControlQuery.value === this.helperMessage) {
-        this.formControlQuery.reset();
-        setTimeout(() => {
-          this.formControlQuery.markAsPristine();
-        }, 100);
-      }
-    });
-    editor.onDidBlurEditorText(() => {
-      if (!this.formControlQuery.value) {
-        this.formControlQuery.setValue(this.helperMessage);
-      }
-    });
-  }
-
   showDialog() {
     this.visible = true;
-    this.formControlQuery.reset();
-    if (this.whereClause) this.formControlQuery.setValue(this.whereClause);
-    else this.formControlQuery.setValue(this.helperMessage);
+    this.formControlQuery.setValue(this.whereClause);
+    setTimeout(() => {
+      this.formControlQuery.markAsPristine();
+    }, 100);
   }
 
   onOk() {
-    if (
-      this.formControlQuery.valid &&
-      this.formControlQuery.value != this.helperMessage
-    ) {
+    if (this.formControlQuery.valid) {
       this.whereClause = this.formControlQuery.value;
       this.visible = false;
     } else {

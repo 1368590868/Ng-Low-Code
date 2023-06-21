@@ -65,7 +65,8 @@
           formControlName="expressionFormControl"
           [style]="{ minWidth: '40rem', height: '16rem' }"
           class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
-          (onInit)="onMonacoEditorInit($event)"
+          [placeholder]="helperMessage"
+          [libSource]="libSource"
           [options]="{ language: 'javascript' }"></ngx-monaco-editor>
       </div>
       <label class="line-height-3 flex align-items-center">Message </label>

@@ -29,14 +29,14 @@ export class FormLayoutComponent {
     this._type = val;
     if (val === 'UPDATE') {
       this.helperMessage =
-        '-- E.g. \r\n\r\n' +
-        '-- UPDATE DEMO_TABLE SET NAME = ##NAME##, FIRS_TNAME = ##FIRST_NAME##, TOTAL = ##TOTAL## WHERE ID = ##ID##';
+        'E.g. <br /><br />' +
+        'UPDATE DEMO_TABLE <br />SET NAME = ##NAME##, FIRS_TNAME = ##FIRST_NAME##, TOTAL = ##TOTAL## WHERE ID = ##ID##';
     }
   }
 
   helperMessage =
-    '-- E.g. \r\n\r\n' +
-    '-- INSERT INTO DEMO_TABLE (ID, NAME, FIRST_NAME, TOTAL, CREATED_DATE) VALUES (NEWID(), ##NAME##, ##FIRST_NAME##, ##TOTAL##, GETDATE())';
+    'E.g. <br /><br />' +
+    'INSERT INTO DEMO_TABLE (ID, NAME, FIRST_NAME, TOTAL, CREATED_DATE) <br />VALUES (NEWID(), ##NAME##, ##FIRST_NAME##, ##TOTAL##, GETDATE())';
 
   _formConfig: GridFormConfig = {
     useAddingFormLayout: true
@@ -44,15 +44,9 @@ export class FormLayoutComponent {
   @Input()
   set config(val: GridFormConfig) {
     Object.assign(this._formConfig, val);
-    this.showQuery =
-      !!this._formConfig.queryText &&
-      this._formConfig.queryText != this.helperMessage;
+    this.showQuery = !!this._formConfig.queryText;
 
-    if (!this._formConfig.queryText) {
-      this.formControlQueryText.setValue(this.helperMessage);
-    } else {
-      this.formControlQueryText.setValue(this._formConfig.queryText);
-    }
+    this.formControlQueryText.setValue(this._formConfig.queryText);
 
     if (this._formConfig.onValidate) {
       this.formControlOnValidateConfig.setValue(this._formConfig.onValidate);
@@ -125,22 +119,6 @@ export class FormLayoutComponent {
     );
   }
 
-  onMonacoEditorInit(editor: any) {
-    editor.onMouseDown(() => {
-      if (this.formControlQueryText.value === this.helperMessage) {
-        this.formControlQueryText.reset();
-        setTimeout(() => {
-          this.formControlQueryText.markAsPristine();
-        }, 100);
-      }
-    });
-    editor.onDidBlurEditorText(() => {
-      if (!this.formControlQueryText.value) {
-        this.formControlQueryText.setValue(this.helperMessage);
-      }
-    });
-  }
-
   updateSourceColumns() {
     this.sourceColumns = this._dbColumns
       .filter(s => !this.targetColumns.find(t => t.key === s.columnName))
@@ -209,11 +187,7 @@ export class FormLayoutComponent {
           );
           return false;
         }
-        if (
-          this.queryTextRequired &&
-          (!this._formConfig.queryText ||
-            this._formConfig.queryText === this.helperMessage)
-        ) {
+        if (this.queryTextRequired && !this._formConfig.queryText) {
           this.notifyService.notifyWarning(
             'Warning',
             'Query for Adding is required if your data source is configured as SQL statements.'
@@ -252,11 +226,7 @@ export class FormLayoutComponent {
           );
           return false;
         }
-        if (
-          this.queryTextRequired &&
-          (!this._formConfig.queryText ||
-            this._formConfig.queryText === this.helperMessage)
-        ) {
+        if (this.queryTextRequired && !this._formConfig.queryText) {
           this.notifyService.notifyWarning(
             'Warning',
             'Query for Updating is required if your data source is configured as SQL statements.'
@@ -292,7 +262,6 @@ export class FormLayoutComponent {
   getValue(): GridFormConfig {
     const data = JSON.parse(JSON.stringify(this._formConfig)) as GridFormConfig;
     if (!data.useCustomForm) data.formFields = this.targetColumns;
-    if (data.queryText === this.helperMessage) data.queryText = undefined;
 
     data.onValidate = !this.formControlOnValidateConfig.value?.eventType
       ? undefined

@@ -56,10 +56,7 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
   formControlType = new FormControl();
   formControlText = new FormControl();
 
-  helperMessage =
-    '-- Enter the query text . \r\n\r\n' +
-    '-- E.g. \r\n' +
-    '-- SELECT Max(AMOUNT) FROM DEMO_TABLE';
+  helperMessage = '';
 
   constructor(
     @Inject('EVENT_ACTION_CONFIG')
@@ -84,12 +81,15 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
     this.formControlType.valueChanges.subscribe(val => {
       if (val === 'CommandLine') {
         this.language = 'bat';
-        this.helperMessage = 'rem Enter the command line . ';
-        this.formControlText.setValue(this.scriptText ?? this.helperMessage);
+        this.helperMessage = 'Enter the command line. ';
+        this.formControlText.setValue(this.scriptText);
       } else if (val !== 'Javascript') {
         this.language = 'sql';
-        this.helperMessage = '-- Enter the query text . ';
-        this.formControlText.setValue(this.scriptText ?? this.helperMessage);
+        this.helperMessage =
+          'Enter the query text . <br />' +
+          'E.g. <br /><br />' +
+          'SELECT Max(AMOUNT) FROM DEMO_TABLE';
+        this.formControlText.setValue(this.scriptText);
       }
 
       const isJsText = this.jsOptions.find(x => this.scriptText === x.value);
@@ -102,7 +102,7 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
         this.isJs = true;
       } else {
         if (isJsText) {
-          this.formControlText.setValue(this.helperMessage, {
+          this.formControlText.setValue(null, {
             emitEvent: false
           });
         }
@@ -111,44 +111,19 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
 
       this.onChange?.({
         eventType: this.formControlType.value,
-        script:
-          this.formControlText.value === this.helperMessage
-            ? null
-            : this.formControlText.value
+        script: this.formControlText.value
       });
     });
     this.formControlText.valueChanges.subscribe(() => {
-      if (
-        this.formControlText.value === this.helperMessage ||
-        !this.formControlText.value
-      ) {
+      if (!this.formControlText.value) {
         this.onChange?.({
           eventType: this.formControlType.value
         });
       } else {
         this.onChange?.({
           eventType: this.formControlType.value,
-          script:
-            this.formControlText.value === this.helperMessage
-              ? null
-              : this.formControlText.value
+          script: this.formControlText.value
         });
-      }
-    });
-  }
-
-  onMonacoEditorInit(editor: any) {
-    editor.onMouseDown(() => {
-      if (this.formControlText.value === this.helperMessage) {
-        this.formControlText.reset();
-        setTimeout(() => {
-          this.formControlText.markAsPristine();
-        }, 100);
-      }
-    });
-    editor.onDidBlurEditorText(() => {
-      if (!this.formControlText.value) {
-        this.formControlText.setValue(this.helperMessage, { emitEvent: false });
       }
     });
   }

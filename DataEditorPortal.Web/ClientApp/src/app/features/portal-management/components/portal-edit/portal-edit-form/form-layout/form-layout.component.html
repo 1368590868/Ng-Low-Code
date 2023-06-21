@@ -137,7 +137,7 @@
   <ngx-monaco-editor
     *ngIf="showQuery || queryTextRequired"
     [formControl]="formControlQueryText"
-    (onInit)="onMonacoEditorInit($event)"
+    [placeholder]="helperMessage"
     [style]="{ height: '20rem' }"
     class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
     [options]="{}"></ngx-monaco-editor>

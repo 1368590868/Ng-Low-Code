@@ -11,7 +11,9 @@ import { NotifyService } from 'src/app/shared';
 })
 export class FormLayoutDeleteComponent {
   helperMessage =
-    '-- E.g. \r\n\r\n' + '-- DELETE DEMO_TABLE WHERE ID IN ##ID##';
+    'E.g. <br /></br />' +
+    'DELETE DEMO_TABLE WHERE ID IN ##ID##<br /><br />' +
+    'Note: Please always use IN operator to support batch delete.';
 
   _formConfig: GridFormConfig = {};
   showOnValidate = false;
@@ -19,15 +21,9 @@ export class FormLayoutDeleteComponent {
   @Input()
   set config(val: GridFormConfig) {
     Object.assign(this._formConfig, val);
-    this.showQuery =
-      !!this._formConfig.queryText &&
-      this._formConfig.queryText != this.helperMessage;
+    this.showQuery = !!this._formConfig.queryText;
 
-    if (!this._formConfig.queryText) {
-      this.formControlQueryText.setValue(this.helperMessage);
-    } else {
-      this.formControlQueryText.setValue(this._formConfig.queryText);
-    }
+    this.formControlQueryText.setValue(this._formConfig.queryText);
 
     if (this._formConfig.onValidate) {
       this.formControlOnValidateConfig.setValue(this._formConfig.onValidate);
@@ -61,22 +57,6 @@ export class FormLayoutDeleteComponent {
     );
   }
 
-  onMonacoEditorInit(editor: any) {
-    editor.onMouseDown(() => {
-      if (this.formControlQueryText.value === this.helperMessage) {
-        this.formControlQueryText.reset();
-        setTimeout(() => {
-          this.formControlQueryText.markAsPristine();
-        }, 100);
-      }
-    });
-    editor.onDidBlurEditorText(() => {
-      if (!this.formControlQueryText.value) {
-        this.formControlQueryText.setValue(this.helperMessage);
-      }
-    });
-  }
-
   validate() {
     if (this._formConfig.useCustomForm) {
       if (!this._formConfig.customFormName) {
@@ -88,11 +68,7 @@ export class FormLayoutDeleteComponent {
       }
     } else {
       if (this.type === 'Delete') {
-        if (
-          this.queryTextRequired &&
-          (!this._formConfig.queryText ||
-            this._formConfig.queryText === this.helperMessage)
-        ) {
+        if (this.queryTextRequired && !this._formConfig.queryText) {
           this.notifyService.notifyWarning(
             'Warning',
             `Query for Deleting is required if your data source is configured as SQL statements.`
@@ -127,7 +103,6 @@ export class FormLayoutDeleteComponent {
 
   getValue(): GridFormConfig {
     const data = JSON.parse(JSON.stringify(this._formConfig)) as GridFormConfig;
-    if (data.queryText === this.helperMessage) data.queryText = undefined;
 
     data.onValidate = !this.formControlOnValidateConfig.value?.eventType
       ? undefined

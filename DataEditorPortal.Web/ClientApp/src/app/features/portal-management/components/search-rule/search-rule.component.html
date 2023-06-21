@@ -54,8 +54,8 @@
         [formControl]="formControlQuery"
         [style]="dialogStyle"
         [required]="true"
-        (onInit)="onMonacoEditorInit($event)"
         class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
+        [placeholder]="helperMessage"
         [options]="{}"></ngx-monaco-editor>
     </div>
   </div>

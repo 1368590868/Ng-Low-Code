@@ -49,10 +49,10 @@ export class OptionDialogComponent implements ControlValueAccessor {
   formControlQuery: FormControl = new FormControl();
 
   helperMessage =
-    '-- Enter some query text to get options from database.  \r\n\r\n' +
-    '-- It needs return two columns at least. Use format ##FIELD## to reference other fields in same form as paramters. And use {{}} mark the criteria is optional.   \r\n\r\n' +
-    '-- E.g. \r\n' +
-    "-- SELECT LABEL, VALUE, VALUE1, VALUE2 FROM DATA_DICTIONARIES WHERE CATEGORY = 'Employer' {{ AND VALUE1 IN ##VENDOR## }} ORDER BY LABEL";
+    'Enter some query text to get options from database.  <br />' +
+    'It needs return two columns at least. Use format ##FIELD## to reference other fields in same form as parameters. And use {{}} mark the criteria is optional.   <br />' +
+    '<br />' +
+    "SELECT LABEL, VALUE, VALUE1, VALUE2 <br />FROM DATA_DICTIONARIES <br />WHERE CATEGORY = 'Employer' {{ AND VALUE1 IN ##VENDOR## }} <br />ORDER BY LABEL";
 
   get dataSourceConnectionName() {
     return this.portalItemService.dataSourceConnectionName;
@@ -91,31 +91,11 @@ export class OptionDialogComponent implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  onMonacoEditorInit(editor: any) {
-    const formControlQuery = this.formControlQuery;
-    editor.onMouseDown(() => {
-      if (formControlQuery?.value === this.helperMessage) {
-        formControlQuery.reset();
-        setTimeout(() => {
-          formControlQuery.markAsPristine();
-        }, 100);
-      }
-    });
-    editor.onDidBlurEditorText(() => {
-      if (!formControlQuery?.value) {
-        formControlQuery?.setValue(this.helperMessage);
-      }
-    });
-    setTimeout(() => {
-      formControlQuery?.markAsPristine();
-    });
-  }
-
   changeMode() {
     this.isAdvanced = !this.isAdvanced;
     if (this.isAdvanced) {
       this.formControlName.reset();
-      this.formControlQuery.setValue(this.helperMessage);
+      this.formControlQuery.reset();
       this.getOptionQueryDetail();
     }
   }
@@ -148,6 +128,8 @@ export class OptionDialogComponent implements ControlValueAccessor {
           this.formControlQuery.setValue(res?.queryText);
         });
       }
+
+      this.formControlQuery.markAsPristine();
     });
   }
 
@@ -178,14 +160,10 @@ export class OptionDialogComponent implements ControlValueAccessor {
       if (!this.formControlQuery.valid) {
         this.formControlQuery.markAsDirty();
       }
-      if (this.formControlQuery.value === this.helperMessage) {
+      if (!this.formControlQuery.value) {
         this.notifyService.notifyWarning('', 'Query  Text is required.');
       }
-      return (
-        this.formControlName.valid &&
-        this.formControlQuery.valid &&
-        this.formControlQuery.value !== this.helperMessage
-      );
+      return this.formControlName.valid && this.formControlQuery.valid;
     } else {
       const valid = this.formControlOptions.reduce((r, x) => {
         if (!x.formControl.valid) {
@@ -206,10 +184,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
         const data: Lookup = {
           id: this.optionsLookup,
           name: this.formControlName.value,
-          queryText:
-            this.formControlQuery.value === this.helperMessage
-              ? ''
-              : this.formControlQuery.value,
+          queryText: this.formControlQuery.value,
           connectionName: this.formControlConnection.value,
           portalItemId: this.portalItemService.itemId
         };

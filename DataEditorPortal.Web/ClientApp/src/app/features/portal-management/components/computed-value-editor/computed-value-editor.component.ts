@@ -52,9 +52,9 @@ export class ComputedValueEditorComponent
   innerValue: any;
 
   helperMessage =
-    '-- Enter the query text for fetching the computed value. \r\n\r\n' +
-    '-- E.g. \r\n' +
-    '-- SELECT Max(AMOUNT) FROM DEMO_TABLE';
+    'Enter the query text for fetching the computed value. <br />' +
+    'E.g. <br /><br />' +
+    'SELECT Max(AMOUNT) FROM DEMO_TABLE';
 
   onChange!: any;
   onTouch!: any;
@@ -76,32 +76,13 @@ export class ComputedValueEditorComponent
       })
     });
   }
-  onMonacoEditorInit(editor: any) {
-    const queryTextFormControl = this.form.get('queryTextFormControl');
-    editor.onMouseDown(() => {
-      if (queryTextFormControl?.value === this.helperMessage) {
-        queryTextFormControl.reset();
-        setTimeout(() => {
-          queryTextFormControl.markAsPristine();
-        }, 100);
-      }
-    });
-    editor.onDidBlurEditorText(() => {
-      if (!queryTextFormControl?.value) {
-        queryTextFormControl?.setValue(this.helperMessage);
-      }
-    });
-    setTimeout(() => {
-      queryTextFormControl?.markAsPristine();
-    });
-  }
 
   initForm(val: any) {
     if (val?.type && val?.queryText) {
       this.form.setValue(
         {
           nameFormControl: null,
-          queryTextFormControl: val.queryText ?? this.helperMessage,
+          queryTextFormControl: val.queryText ?? '',
           typeFormControl: val?.type ?? ''
         },
         { emitEvent: false }
@@ -111,7 +92,7 @@ export class ComputedValueEditorComponent
       this.form.setValue(
         {
           nameFormControl: val?.name ?? null,
-          queryTextFormControl: this.helperMessage,
+          queryTextFormControl: '',
           typeFormControl: null
         },
         { emitEvent: false }
@@ -140,18 +121,14 @@ export class ComputedValueEditorComponent
     this.initForm(this.innerValue);
     setTimeout(() => {
       this.form.markAsPristine();
-    });
+    }, 100);
     this.visible = true;
   }
 
   onOk() {
     const queryTextFormControl = this.form.get('queryTextFormControl');
     const typeFormControl = this.form.get('typeFormControl');
-    if (
-      typeFormControl?.valid &&
-      queryTextFormControl?.valid &&
-      queryTextFormControl?.value != this.helperMessage
-    ) {
+    if (typeFormControl?.valid && queryTextFormControl?.valid) {
       this.hasAdvanceData = true;
       this.visible = false;
       this.onSendData();
@@ -166,7 +143,7 @@ export class ComputedValueEditorComponent
   }
 
   onSendData() {
-    const name = this.form.get('nameFormControl')!.value ?? null;
+    const name = this.form.get('nameFormControl')?.value ?? null;
     let data: { type?: string; name?: string; queryText?: string } | undefined;
     if (this.hasAdvanceData) {
       data = {
