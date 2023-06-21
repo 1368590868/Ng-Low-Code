@@ -20,7 +20,7 @@ namespace DataEditorPortal.Data.Models
         [XmlIgnore]
         public virtual DataSourceConnection DataSourceConnection { get; set; }
 
-        [Column("UNIVERSAL_GRID_CONFIGURATION_ID")]
+        [Column("UNIVERSAL_GRID_CONFIG_ID")]
         public Guid? UniversalGridConfigurationId { get; set; }
     }
 }
