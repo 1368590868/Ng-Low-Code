@@ -350,7 +350,6 @@ export class FormDesignerDirective {
               type: 'select',
               props: {
                 label: 'Location Type',
-                description: 'Select location type',
                 placeholder: 'Select location type',
                 required: true,
                 options: [

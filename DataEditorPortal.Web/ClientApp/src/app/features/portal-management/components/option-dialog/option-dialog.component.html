@@ -77,7 +77,13 @@
         <ng-container>
           <!-- <p-divider>Add new lookup</p-divider> -->
           <div class="mb-3 flex flex-column">
-            <label class="line-height-3">Database Connection</label>
+            <label class="line-height-3"
+              >Database Connection
+              <i
+                class="pi pi-question-circle ml-2 text-lg"
+                [escape]="false"
+                pTooltip="To process data within the same transaction, this option is restricted to using the same database connection as the <b> Data Source</b>. If there are no available database tables, please consider changing the connection in <b>Data Source</b> or granting the tables to the current database connection."></i
+            ></label>
             <div class="flex align-items-center">
               <p-dropdown
                 [required]="true"
