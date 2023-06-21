@@ -6,7 +6,9 @@ import {
   Host,
   Optional,
   Self,
-  OnInit
+  OnInit,
+  OnChanges,
+  SimpleChanges
 } from '@angular/core';
 import { EditorComponent } from 'ngx-monaco-editor';
 
@@ -14,19 +16,22 @@ import { EditorComponent } from 'ngx-monaco-editor';
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'ngx-monaco-editor'
 })
-export class MonacoEditorDirective implements OnInit {
+export class MonacoEditorDirective implements OnInit, OnChanges {
   constructor(@Host() @Self() @Optional() private ngxEditor: EditorComponent) {}
+
   @Input()
   placeholder?: string;
   @Input()
   libSource?: string;
+
+  private widget!: PlaceholderContentWidget;
 
   ngOnInit(): void {
     this.ngxEditor.onInit.subscribe(editor => this.onMonacoEditorInit(editor));
   }
 
   onMonacoEditorInit(editor: any) {
-    new PlaceholderContentWidget(this.placeholder, editor);
+    this.widget = new PlaceholderContentWidget(this.placeholder, editor);
     if (this.libSource) {
       const libUri = 'ts:filename/lib.d.ts';
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -35,6 +40,13 @@ export class MonacoEditorDirective implements OnInit {
         this.libSource,
         libUri
       );
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('placeholder' in changes) {
+      if (this.widget && this.widget.domNode)
+        this.widget.domNode.innerHTML = this.placeholder || '';
     }
   }
 }
@@ -48,7 +60,7 @@ export class MonacoEditorDirective implements OnInit {
 class PlaceholderContentWidget implements monaco.editor.IContentWidget {
   private static readonly ID = 'editor.widget.placeholderHint';
 
-  private domNode: HTMLElement | undefined;
+  public domNode: HTMLElement | undefined;
 
   constructor(
     private readonly placeholder?: string,
