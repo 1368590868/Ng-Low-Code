@@ -292,6 +292,9 @@ export class LocationEditorComponent implements ControlValueAccessor {
 
               this.options.detectChanges?.(field);
             }
+            if (this._systemName) {
+              this.onShow();
+            }
           }
         }
       }

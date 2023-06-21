@@ -85,10 +85,9 @@ export class EditRecordActionComponent
                 result[key] = new Date(result[key]);
               }
             });
-            this.model = result;
             this.onLoadUrlParams();
-
             this.searchConfig(searchConfig);
+            this.model = result;
           }),
           tap(() => this.getFormConfig()),
           tap(() => this.getEventConfig())
