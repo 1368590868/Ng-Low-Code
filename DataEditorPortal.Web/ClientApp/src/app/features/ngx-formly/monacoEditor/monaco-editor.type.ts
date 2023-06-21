@@ -5,6 +5,7 @@ import { FormlyFieldProps } from '@ngx-formly/primeng/form-field';
 interface MonacoEditorProps extends FormlyFieldProps {
   config?: any;
   onInit?: any;
+  libSource: string;
 }
 
 @Component({
@@ -14,7 +15,9 @@ interface MonacoEditorProps extends FormlyFieldProps {
       [formControl]="formControl"
       (onInit)="props.onInit && props.onInit($event)"
       class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
-      [options]="props.config || {}"></ngx-monaco-editor>
+      [options]="props.config || {}"
+      [placeholder]="props.placeholder"
+      [libSource]="props.libSource"></ngx-monaco-editor>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
