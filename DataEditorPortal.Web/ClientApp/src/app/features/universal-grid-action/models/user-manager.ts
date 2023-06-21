@@ -1,9 +1,11 @@
 export interface ManageRoleForm {
   id?: string;
   username?: string;
+  employer?: string;
   comments?: string;
   name?: string;
   email?: string;
+  vendor?: string;
   autoEmail?: boolean;
   userType?: string;
   phone?: string;
