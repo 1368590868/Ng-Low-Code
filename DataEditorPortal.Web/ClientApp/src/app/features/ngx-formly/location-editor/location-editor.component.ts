@@ -51,6 +51,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
   _value: any;
   @Input()
   set value(val: any) {
+    console.log(val);
     if (val && val !== 'error') {
       this.model = { ...this.model, ...val };
       this.changeDetectorRef.markForCheck();
@@ -190,7 +191,13 @@ export class LocationEditorComponent implements ControlValueAccessor {
   set systemName(val: string) {
     this._systemName = val;
     this.systemNameChange = true;
-    this.form.reset();
+    this.form.reset({
+      from: null,
+      to: null,
+      fromMeasure: null,
+      toMeasure: null,
+      lengthFeet: null
+    });
     this.fields.forEach(x => {
       // min max reset
       if (x && x.parent && x.parent.get) {
@@ -200,7 +207,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
           fromMeasureProps['helperText'] = `Min: --    Max: --`;
           toMeasureProps['helperText'] = `Min: --    Max: --`;
         }
-
         const fromProps = x.parent.get('from').props;
         const toProps = x.parent.get('to').props;
         if (!val) {
