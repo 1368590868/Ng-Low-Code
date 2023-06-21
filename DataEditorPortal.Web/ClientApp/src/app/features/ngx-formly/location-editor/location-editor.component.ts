@@ -98,6 +98,18 @@ export class LocationEditorComponent implements ControlValueAccessor {
     });
   }
 
+  _fromDescription = '';
+  @Input()
+  get fromDescription() {
+    return this._fromDescription;
+  }
+  set fromDescription(val: string) {
+    this._fromDescription = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'from') x.props.description = val;
+    });
+  }
+
   _fromMeasureLabel = 'From Measure';
   @Input()
   get fromMeasureLabel() {
@@ -107,6 +119,18 @@ export class LocationEditorComponent implements ControlValueAccessor {
     this._fromMeasureLabel = val;
     this.fields.forEach(x => {
       if (x.props && x.key === 'fromMeasure') x.props.label = val;
+    });
+  }
+
+  _fromMeasureDescription = '';
+  @Input()
+  get fromMeasureDescription() {
+    return this._fromMeasureDescription;
+  }
+  set fromMeasureDescription(val: string) {
+    this._fromDescription = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'fromMeasure') x.props.description = val;
     });
   }
 
@@ -122,6 +146,18 @@ export class LocationEditorComponent implements ControlValueAccessor {
     });
   }
 
+  _toMeasureDescription = '';
+  @Input()
+  get toMeasureDescription() {
+    return this._toMeasureDescription;
+  }
+  set toMeasureDescription(val: string) {
+    this._toMeasureDescription = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'toMeasure') x.props.description = val;
+    });
+  }
+
   _toLabel = 'To';
   @Input()
   get toLabel() {
@@ -134,32 +170,56 @@ export class LocationEditorComponent implements ControlValueAccessor {
     });
   }
 
-  _siteName!: string;
+  _toDescription = '';
   @Input()
-  get siteName() {
-    return this._siteName;
+  get toDescription() {
+    return this._toDescription;
   }
-  set siteName(val: string) {
-    this._siteName = val;
-    this.siteNameChange = true;
-    this.form.reset();
+  set toDescription(val: string) {
+    this._toDescription = val;
+    this.fields.forEach(x => {
+      if (x.props && x.key === 'to') x.props.description = val;
+    });
+  }
+
+  _systemName!: string;
+  @Input()
+  get systemName() {
+    return this._systemName;
+  }
+  set systemName(val: string) {
+    this._systemName = val;
+    this.systemNameChange = true;
+    this.form.reset({
+      from: null,
+      to: null,
+      fromMeasure: null,
+      toMeasure: null,
+      lengthFeet: null
+    });
     this.fields.forEach(x => {
       // min max reset
       if (x && x.parent && x.parent.get) {
         const fromMeasureProps = x.parent.get('fromMeasure').props;
         const toMeasureProps = x.parent.get('toMeasure').props;
         if (fromMeasureProps && toMeasureProps) {
-          fromMeasureProps['helperText'] = `Min: --  Max: --`;
-          toMeasureProps['helperText'] = `Min: --  Max: --`;
+          fromMeasureProps['helperText'] = `Min: --    Max: --`;
+          toMeasureProps['helperText'] = `Min: --    Max: --`;
+        }
+        const fromProps = x.parent.get('from').props;
+        const toProps = x.parent.get('to').props;
+        if (!val) {
+          if (fromProps) fromProps['options'] = [];
+          if (toProps) toProps['options'] = [];
         }
       }
     });
-    this.onChange?.('error');
+    this.dirty = false;
   }
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  siteNameChange = false;
+  systemNameChange = false;
 
   onChange?: any;
   onTouch?: any;
@@ -226,38 +286,20 @@ export class LocationEditorComponent implements ControlValueAccessor {
       },
       hooks: {
         onInit: (field: FormlyFieldConfig & any) => {
-          if (!Array.isArray(this.system)) {
-            this.locationEditorService
-              .getPipeOptions(this.system?.id)
-              .subscribe(res => {
-                this.locationOptions = res;
+          // Init fromMeasure and toMeasure helper text
+          if (field && field.parent && field.parent.get) {
+            const fromMeasureProps = field.parent.get('fromMeasure').props;
+            const toMeasureProps = field.parent.get('toMeasure').props;
+            if (fromMeasureProps && toMeasureProps) {
+              fromMeasureProps['helperText'] = `Min: --  Max: --`;
 
-                // Init fromMeasure and toMeasure helper text
-                if (field && field.parent && field.parent.get) {
-                  const fromMeasureProps =
-                    field.parent.get('fromMeasure').props;
-                  const toMeasureProps = field.parent.get('toMeasure').props;
+              toMeasureProps['helperText'] = `Min: --  Max: --`;
 
-                  // from to have value , set helper text
-                  const from = field.parent.get('from').formControl;
-                  const to = field.parent.get('to').formControl;
-
-                  const fromRecord = res.find(x => x.value === from.value);
-                  const toRecord = res.find(x => x.value === to.value);
-
-                  if (fromMeasureProps && toMeasureProps) {
-                    fromMeasureProps['helperText'] = `Min: ${
-                      fromRecord?.value1 ?? '--'
-                    }  Max: ${fromRecord?.value2 ?? '--'}`;
-
-                    toMeasureProps['helperText'] = `Min: ${
-                      toRecord?.value1 ?? '--'
-                    }  Max: ${toRecord?.value2 ?? '--'}`;
-
-                    this.options.detectChanges?.(field);
-                  }
-                }
-              });
+              this.options.detectChanges?.(field);
+            }
+            if (this._systemName) {
+              this.onShow();
+            }
           }
         }
       }
@@ -424,15 +466,47 @@ export class LocationEditorComponent implements ControlValueAccessor {
     const allModel = this.formControl.parent;
     const fromProps = this.fields[0].props;
     const toProps = this.fields[2].props;
-    if (this._siteName && this.siteNameChange) {
+
+    if (fromProps && toProps) fromProps['emptyMessage'] = 'Loading...';
+
+    if (this._systemName && this.systemNameChange) {
       this.locationEditorService
         .getPipeOptions(this.system.id, allModel?.value)
         .subscribe(res => {
+          this.locationOptions = res;
+          // Init fromMeasure and toMeasure helper text
+
+          const fromMeasureProps = this.fields[1].props;
+          const toMeasureProps = this.fields[3].props;
+
+          // from to have value , set helper text
+          const from = this.fields[0].formControl;
+          const to = this.fields[2].formControl;
+
+          if (from && to) {
+            const fromRecord = res.find(x => x.value === from.value);
+            const toRecord = res.find(x => x.value === to.value);
+
+            if (fromMeasureProps && toMeasureProps) {
+              fromMeasureProps['helperText'] = `Min: ${
+                fromRecord?.value1 ?? '--'
+              }  Max: ${fromRecord?.value2 ?? '--'}`;
+
+              toMeasureProps['helperText'] = `Min: ${
+                toRecord?.value1 ?? '--'
+              }  Max: ${toRecord?.value2 ?? '--'}`;
+
+              this.options.detectChanges?.(this.fields[1]);
+            }
+          }
+
           if (fromProps && toProps) {
             fromProps.options = res;
             toProps.options = res;
+
+            fromProps['emptyMessage'] = 'No records found';
           }
-          this.siteNameChange = false;
+          this.systemNameChange = false;
         });
     }
   }
@@ -480,11 +554,15 @@ export class LocationEditorComponent implements ControlValueAccessor {
     [mappingColumns]="props.mappingColumns || []"
     [system]="props.system || { id: '' }"
     [fromLabel]="props.fromLabel"
+    [fromDescription]="props.fromDescription || ''"
     [toLabel]="props.toLabel"
+    [toDescription]="props.toDescription || ''"
     [fromMeasureLabel]="props.fromMeasureLabel"
+    [fromMeasureDescription]="props.fromMeasureDescription || ''"
     [toMeasureLabel]="props.toMeasureLabel"
+    [toMeasureDescription]="props.toMeasureDescription || ''"
     [lengthLabel]="props.lengthLabel || ''"
-    [siteName]="props.siteName || ''"></app-location-editor>`,
+    [systemName]="props.systemName || ''"></app-location-editor>`,
   styles: [
     `
       :host {
@@ -504,11 +582,15 @@ export class FormlyFieldLocationEditorComponent
         system: { id: string };
         mappingColumns: { label: string; value: string }[];
         fromLabel: string;
+        fromDescription?: string;
         toLabel: string;
+        toDescription?: string;
         fromMeasureLabel: string;
+        fromMeasureDescription?: string;
         toMeasureLabel: string;
+        toMeasureDescription?: string;
         lengthLabel?: string;
-        siteName?: string;
+        systemName?: string;
       }
     >
   >

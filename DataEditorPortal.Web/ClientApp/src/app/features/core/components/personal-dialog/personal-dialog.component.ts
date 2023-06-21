@@ -149,54 +149,17 @@ export class PersonalDialogComponent {
     {
       fieldGroup: [
         {
-          className: 'w-6',
-          key: 'vendor',
-          type: 'select',
-          props: {
-            label: 'Vendor',
-            placeholder: 'Please select',
-            optionsLookup: {
-              id: 'E1F3E2C7-25CA-4D69-9405-ABC54923864D'
-            },
-            options: []
-          },
-          hooks: {
-            onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
-          }
-        },
-        {
-          className: 'w-6',
-          key: 'employer',
-          type: 'select',
-          props: {
-            label: 'Employer',
-            placeholder: 'Please select',
-            optionsLookup: {
-              id: '8BE7B1D6-F09A-4EEE-B8EC-4DFCF689005B',
-              deps: ['vendor']
-            },
-            options: []
-          },
-          hooks: {
-            onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
-          }
-        }
-      ]
-    },
-    {
-      fieldGroup: [
-        {
           key: 'autoEmail',
           type: 'checkbox',
           defaultValue: true,
           props: {
-            label: 'Receive Email Notifycations',
+            label: 'Receive Email Notifications',
             binary: true,
             required: true,
             options: [
               {
-                value: 'Notify',
-                label: 'Notify'
+                value: 'Notifi',
+                label: 'Notifi'
               }
             ]
           }
@@ -235,8 +198,6 @@ export class PersonalDialogComponent {
           username: res.username,
           email: res.email,
           phone: res.phone,
-          vendor: res.vendor,
-          employer: res.employer,
           autoEmail: res.autoEmail
         });
       });

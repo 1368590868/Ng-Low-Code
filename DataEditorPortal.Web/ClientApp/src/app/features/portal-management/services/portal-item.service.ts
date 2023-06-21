@@ -382,4 +382,10 @@ export class PortalItemService {
       data
     );
   }
+
+  export(id: string): Observable<Blob> {
+    return this.http.post(`${this._apiUrl}portal-item/${id}/export`, null, {
+      responseType: 'blob'
+    });
+  }
 }

@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { Subject, tap } from 'rxjs';
+import { Subject, forkJoin, tap } from 'rxjs';
 import {
   NgxFormlyService,
   NotifyService,
@@ -74,26 +74,49 @@ export class EditRecordActionComponent
   ngOnInit(): void {
     if (!this.isAddForm) {
       this.dataKey = this.selectedRecords[0][this.recordKey];
-      this.gridService
-        .getDetailData(this.gridName, this.dataKey as string)
+      forkJoin([
+        this.gridService.getDetailData(this.gridName, this.dataKey as string),
+        this.gridService.getSearchConfig(this.gridName)
+      ])
         .pipe(
-          tap(result => {
+          tap(([result, searchConfig]) => {
             Object.keys(result).forEach(key => {
               if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}.*/.test(result[key])) {
                 result[key] = new Date(result[key]);
               }
             });
-            this.model = result;
             this.onLoadUrlParams();
+            this.searchConfig(searchConfig);
+            this.model = result;
           }),
           tap(() => this.getFormConfig()),
           tap(() => this.getEventConfig())
         )
         .subscribe();
     } else {
-      this.getFormConfig();
-      this.getEventConfig();
+      this.gridService
+        .getSearchConfig(this.gridName)
+        .pipe(
+          tap(searchConfig => {
+            this.searchConfig(searchConfig);
+          }),
+          tap(() => this.getFormConfig()),
+          tap(() => this.getEventConfig())
+        )
+        .subscribe();
     }
+  }
+
+  searchConfig(searchConfig: any) {
+    const formSearch: any = {};
+    searchConfig.forEach((x: any) => {
+      let key = x.key;
+      if (x.searchRule && x.searchRule.field) {
+        key = x.searchRule.field;
+      }
+      formSearch[key] = this.fetchDataParam?.searches[x.key];
+    });
+    this.model = { ...this.model, ...formSearch };
   }
 
   onLoadUrlParams() {
@@ -170,6 +193,7 @@ export class EditRecordActionComponent
         f.defaultValue = value;
       });
   }
+
   private configFieldValidator(fields: FormlyFieldConfig[]) {
     // set validators
     fields
@@ -331,7 +355,9 @@ export class EditRecordActionComponent
         this.submitSave(model);
       }
     } else {
-      this.fields.forEach(x => x.formControl?.markAsDirty());
+      setTimeout(() => {
+        this.fields.forEach(x => x.formControl?.markAsDirty());
+      }, 0);
       this.errorEvent.emit();
     }
   }

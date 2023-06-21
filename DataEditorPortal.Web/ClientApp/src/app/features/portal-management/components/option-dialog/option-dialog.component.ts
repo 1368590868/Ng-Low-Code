@@ -9,6 +9,7 @@ import { NotifyService } from 'src/app/shared';
 import { DataSourceConnection } from '../../models/portal-item';
 import { LookupService } from '../../services/lookup.service';
 import { PortalItemService } from '../../services/portal-item.service';
+import { Lookup } from '../../models/lookup';
 
 interface OptionItem {
   formControl: FormControl;
@@ -202,14 +203,15 @@ export class OptionDialogComponent implements ControlValueAccessor {
     if (this.validate()) {
       if (this.isAdvanced) {
         this.isLoading = true;
-        const data = {
+        const data: Lookup = {
           id: this.optionsLookup,
           name: this.formControlName.value,
           queryText:
             this.formControlQuery.value === this.helperMessage
               ? ''
               : this.formControlQuery.value,
-          connectionName: this.formControlConnection.value
+          connectionName: this.formControlConnection.value,
+          portalItemId: this.portalItemService.itemId
         };
         this.lookupService.saveOptionQuery(data).subscribe(res => {
           this.isLoading = false;

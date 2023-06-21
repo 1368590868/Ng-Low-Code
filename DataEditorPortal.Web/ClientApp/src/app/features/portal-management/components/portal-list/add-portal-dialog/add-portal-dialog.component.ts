@@ -70,7 +70,7 @@ export class AddPortalDialogComponent {
         virtualScroll: false,
         required: true,
         description:
-          '<a href="https://fontawesome.com/search?o=r&m=free&s=regular" target="__blank">More icons can be click</a>'
+          'Find more icons on <a href="https://fontawesome.com/search?o=r&m=free&s=regular" target="__blank">Font Awesome</a>'
       }
     },
     {
