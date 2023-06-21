@@ -51,7 +51,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
   _value: any;
   @Input()
   set value(val: any) {
-    console.log(val);
     if (val && val !== 'error') {
       this.model = { ...this.model, ...val };
       this.changeDetectorRef.markForCheck();
@@ -467,6 +466,9 @@ export class LocationEditorComponent implements ControlValueAccessor {
     const allModel = this.formControl.parent;
     const fromProps = this.fields[0].props;
     const toProps = this.fields[2].props;
+
+    if (fromProps && toProps) fromProps['emptyMessage'] = 'Loading...';
+
     if (this._systemName && this.systemNameChange) {
       this.locationEditorService
         .getPipeOptions(this.system.id, allModel?.value)
@@ -501,6 +503,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
           if (fromProps && toProps) {
             fromProps.options = res;
             toProps.options = res;
+
+            fromProps['emptyMessage'] = 'No records found';
           }
           this.systemNameChange = false;
         });
