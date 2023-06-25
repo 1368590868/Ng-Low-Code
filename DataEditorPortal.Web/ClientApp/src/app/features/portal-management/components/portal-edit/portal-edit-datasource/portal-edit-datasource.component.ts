@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ConfirmationService, PrimeNGConfig } from 'primeng/api';
 import { forkJoin, tap } from 'rxjs';
@@ -14,8 +14,6 @@ import {
 import { PortalItemService } from '../../../services/portal-item.service';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import { AdvancedQueryModel } from './advanced-query-dialog/advanced-query-dialog.component';
-import { AddConnectionDialogComponent } from 'src/app/features/core';
-import { DbConnectionService } from 'src/app/shared/services/db-connection.service ';
 
 interface DataSourceFilterControls {
   formControlField: FormControl;
@@ -35,7 +33,6 @@ export class PortalEditDatasourceComponent
   extends PortalEditStepDirective
   implements OnInit
 {
-  @ViewChild('addDialog') addDialog!: AddConnectionDialogComponent;
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
@@ -91,9 +88,7 @@ export class PortalEditDatasourceComponent
     private portalItemService: PortalItemService,
     private primeNGConfig: PrimeNGConfig,
     private notifyService: NotifyService,
-    private confirmationService: ConfirmationService,
-    private dbConnectionService: DbConnectionService,
-    private cdRef: ChangeDetectorRef
+    private confirmationService: ConfirmationService
   ) {
     super();
   }
@@ -175,15 +170,6 @@ export class PortalEditDatasourceComponent
     }
   }
 
-  onDialogSaved(name: string) {
-    this.portalItemService.getDataSourceConnections().subscribe(res => {
-      this.dbConnections = res.map(x => {
-        return { label: x.name, value: x.name || '' };
-      });
-    });
-    this.formControlConnection.setValue(name);
-  }
-
   /* advanced query dialog */
   queryChange({ queryText, columns }: AdvancedQueryModel) {
     this.datasourceConfig.queryText = queryText;
@@ -205,7 +191,8 @@ export class PortalEditDatasourceComponent
   /* advanced query dialog */
 
   /* db connection dialog */
-  connectionSaved(item: { label: string; value: string }) {
+  connectionSaved(name: string) {
+    const item = { label: name, value: name };
     this.dbConnections.push(item);
     this.formControlConnection.setValue(item.value);
     this.onConnectionChange(item);
