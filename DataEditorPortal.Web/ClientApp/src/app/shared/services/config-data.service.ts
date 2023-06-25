@@ -18,6 +18,7 @@ interface SettingsDocument {
 export interface SiteSettings {
   siteLogo?: string;
   siteName: string;
+  dbProvider?: string;
 }
 
 @Injectable({
@@ -82,7 +83,8 @@ export class ConfigDataService {
 
   public siteSettings: SiteSettings = {
     siteLogo: '',
-    siteName: ''
+    siteName: '',
+    dbProvider: ''
   };
 
   getSiteSettings() {
@@ -92,7 +94,8 @@ export class ConfigDataService {
         tap(res => {
           if (!res.isError) {
             this.siteSettings = res.result ?? {
-              siteName: ''
+              siteName: '',
+              dbProvider: 'SqlConnection'
             };
           }
         })

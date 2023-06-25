@@ -37,6 +37,13 @@ export class DbConnectionService {
     );
   }
 
+  updateConnection(name: string, data: DbConnectionData) {
+    return this.http.put<ApiResponse<string>>(
+      `${this._apiUrl}portal-item/datasource/connections/${name}/update`,
+      data
+    );
+  }
+
   deleteConnection(data: DbConnectionData) {
     return this.http.delete<ApiResponse<string>>(
       `${this._apiUrl}portal-item/datasource/connections/${data.name}/delete`

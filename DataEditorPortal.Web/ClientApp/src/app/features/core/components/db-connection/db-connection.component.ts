@@ -84,6 +84,7 @@ export class DbConnectionComponent {
     this.addDialog.header = 'Create Datasource Connection';
     this.addDialog.model = { name: '', dbName: '' };
     this.addDialog.okText = 'Create';
+    this.addDialog.isEdit = false;
     this.addDialog.showDialog();
   }
 
@@ -96,8 +97,9 @@ export class DbConnectionComponent {
         case 'Edit': {
           res.command = () => {
             this.addDialog.header = 'Edit Datasource Connection';
-            this.addDialog.model = rowData;
+            this.addDialog.model = JSON.parse(JSON.stringify(rowData));
             this.addDialog.okText = 'Update';
+            this.addDialog.isEdit = true;
             this.addDialog.showDialog();
           };
           break;

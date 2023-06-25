@@ -8,7 +8,7 @@ import {
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { ConfirmationService } from 'primeng/api';
-import { NotifyService } from 'src/app/shared';
+import { ConfigDataService, NotifyService } from 'src/app/shared';
 import {
   DbConnectionData,
   DbConnectionService
@@ -33,6 +33,10 @@ export class AddConnectionDialogComponent {
   visible = false;
   isLoading = false;
   buttonDisabled = true;
+  isEdit = false;
+  backup = {
+    password: ''
+  };
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
@@ -103,7 +107,8 @@ export class AddConnectionDialogComponent {
 
   constructor(
     private notifyService: NotifyService,
-    private dbConnectionService: DbConnectionService
+    private dbConnectionService: DbConnectionService,
+    private configDataService: ConfigDataService
   ) {}
   showDialog() {
     this.isLoading = false;
@@ -111,17 +116,17 @@ export class AddConnectionDialogComponent {
     this.buttonDisabled = false;
 
     // type
-    const val = 'SqlConnection';
+    const type = this.configDataService.siteSettings.dbProvider;
     this.fields.forEach(field => {
       if (field.props) {
         if (field.key === 'authentication') {
-          field.formControl?.setValue(
-            val === 'SqlConnection'
+          field.defaultValue =
+            type === 'SqlConnection'
               ? 'Sql Server Authentication'
-              : 'Oracle Database Native'
-          );
+              : 'Oracle Database Native';
+          field.formControl?.setValue(field.defaultValue);
           field.props.options =
-            val === 'SqlConnection'
+            type === 'SqlConnection'
               ? [
                   {
                     label: 'Sql Server Authentication',
@@ -144,14 +149,24 @@ export class AddConnectionDialogComponent {
                 ];
         }
         if (field.key === 'serverName') {
-          field.props.label = val === 'SqlConnection' ? 'Server Name' : 'Host';
+          field.props.label = type === 'SqlConnection' ? 'Server Name' : 'Host';
         }
         if (field.key === 'dbName') {
           field.props.label =
-            val === 'SqlConnection' ? 'Database Name' : 'Service Name';
+            type === 'SqlConnection' ? 'Database Name' : 'Service Name';
         }
       }
     });
+
+    if (this.isEdit) {
+      this.backup.password = new Date().valueOf().toString();
+      this.model.password = this.backup.password;
+    }
+
+    // disable name field
+    if (this.fields[0]?.props) {
+      this.fields[0].props.disabled = this.isEdit;
+    }
   }
 
   onHide() {
@@ -169,18 +184,31 @@ export class AddConnectionDialogComponent {
   onFormSubmit(model: DbConnectionData) {
     if (this.form.valid) {
       this.isLoading = true;
-      this.dbConnectionService.createConnection(model).subscribe(res => {
-        if (!res.isError && res.result) {
-          this.notifyService.notifySuccess(
-            'Success',
-            'Save Successfully Completed.'
-          );
-          this.visible = false;
-          this.saved.emit(res.result);
-        } else {
-          this.isLoading = false;
+      if (this.isEdit) {
+        if (model.password === this.backup.password) {
+          delete model.password;
         }
-      });
+        this.dbConnectionService
+          .updateConnection(model.name, model)
+          .subscribe(res => {
+            this.visible = false;
+            this.saved.emit(res.result);
+            this.isLoading = false;
+          });
+      } else {
+        this.dbConnectionService.createConnection(model).subscribe(res => {
+          if (!res.isError && res.result) {
+            this.notifyService.notifySuccess(
+              'Success',
+              'Save Successfully Completed.'
+            );
+            this.visible = false;
+            this.saved.emit(res.result);
+          } else {
+            this.isLoading = false;
+          }
+        });
+      }
     }
   }
 }
