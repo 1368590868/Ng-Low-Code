@@ -414,21 +414,69 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("datasource/connections/list")]
-        public List<DataSourceConnection> GetDataSourceConnectionList()
+        public List<DataSourceConnectionModel> GetDataSourceConnectionList()
         {
+            var query = from ds in _depDbContext.DataSourceConnections
+                        select new
+                        {
+                            ds = ds,
+                            uCount = _depDbContext.UniversalGridConfigurations.Count(u => u.DataSourceConnectionName == ds.Name),
+                            lCount = _depDbContext.Lookups.Count(l => l.DataSourceConnectionName == ds.Name)
+                        };
+
             string pattern = @"(Pwd|Password)=(\w+)";
             string replacement = "$1=******";
 
-            return _depDbContext.DataSourceConnections
-                .Include(x => x.UniversalGridConfigurations)
-                .Select(x => new DataSourceConnection()
+            var tempResult = query.ToList();
+
+            var result = tempResult
+                .Select(x =>
                 {
-                    Name = x.Name,
-                    ConnectionString = Regex.Replace(x.ConnectionString, pattern, replacement),
-                    UsedCount = x.UniversalGridConfigurations.Count(),
-                    Type = _config.GetValue<string>("DatabaseProvider")
+                    var dsItem = new DataSourceConnectionModel()
+                    {
+                        Name = x.ds.Name,
+                        ConnectionString = Regex.Replace(x.ds.ConnectionString, pattern, replacement),
+                        UsedCount = x.uCount + x.lCount,
+                        Type = _config.GetValue<string>("DatabaseProvider")
+                    };
+
+                    if (dsItem.Type == "SqlConnection")
+                    {
+                        var builder = new SqlConnectionStringBuilder();
+                        builder.ConnectionString = dsItem.ConnectionString;
+
+                        dsItem.ServerName = builder.DataSource;
+                        dsItem.Authentication = builder.IntegratedSecurity == true ? "Windows Authentication" : "Sql Server Authentication";
+                        dsItem.Username = builder.UserID;
+                        //c.Password = builder.Password;
+                        dsItem.DbName = builder.InitialCatalog;
+                    }
+                    else
+                    {
+                        var builder = new OracleConnectionStringBuilder();
+                        builder.ConnectionString = dsItem.ConnectionString;
+
+                        dsItem.Authentication = "Oracle Database Native";
+                        dsItem.Username = builder.UserID;
+                        //c.Password = builder.Password;
+
+                        string pattern = @"HOST=([^)]+)\).*PORT=([^)]+)\).*SERVICE_NAME=([^)]+)\)";
+                        Match match = Regex.Match(builder.DataSource, pattern);
+                        if (match.Success)
+                        {
+                            string host = match.Groups[1].Value;
+                            string port = match.Groups[2].Value;
+
+                            dsItem.ServerName = $"{host}{(port == "1521" ? "" : ":" + port)}";
+                            dsItem.DbName = match.Groups[3].Value;
+                        }
+                    }
+
+                    return dsItem;
                 })
                 .ToList();
+
+            return result;
         }
 
         [HttpPost]
