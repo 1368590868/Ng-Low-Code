@@ -66,6 +66,7 @@ namespace DataEditorPortal.Web.Controllers
             {
                 WebHeaderMessage = section.GetValue<string>("WebHeaderMessage"),
                 WebHeaderDescription = section.GetValue<string>("WebHeaderDescription"),
+                dbProvider = _config.GetValue<string>("DatabaseProvider"),
                 siteName = setting.SiteName,
                 siteLogo = setting.SiteLogo
             };
