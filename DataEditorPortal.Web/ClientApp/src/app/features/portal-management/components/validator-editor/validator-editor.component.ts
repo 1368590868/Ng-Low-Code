@@ -44,11 +44,14 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
 
   hasAdvanceData = false;
   helperMessage =
-    '// Please enter the validation expression that returns boolen.\r\n' +
-    '// E.g. \r\n' +
-    '// $model.NAME && $model.NAME.length > 5 \r\n' +
-    '// $model.PASSWORD === $model.CONFIRM_PASSOWRD \r\n' +
-    '// /^[0-9]*$/.test($model.PHONE_NUMBER)';
+    'Please enter the validation expression that returns boolean.<br />' +
+    'E.g. <br /><br />' +
+    '$model.NAME && $model.NAME.length > 5 <br />' +
+    '$model.PASSWORD === $model.CONFIRM_PASSOWRD <br />' +
+    '/^[0-9]*$/.test($model.PHONE_NUMBER)';
+  libSource = ['/**', '* Current form model', '*/', 'let $model : any;'].join(
+    '\n'
+  );
 
   innerValue: any;
 
@@ -86,33 +89,6 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     return data;
   }
 
-  onMonacoEditorInit(editor: any) {
-    const expressionFormControl = this.form.get('expressionFormControl');
-    editor.onMouseDown(() => {
-      if (expressionFormControl?.value === this.helperMessage) {
-        expressionFormControl.reset();
-        setTimeout(() => {
-          expressionFormControl.markAsPristine();
-        }, 100);
-      }
-    });
-    editor.onDidBlurEditorText(() => {
-      if (!expressionFormControl?.value) {
-        expressionFormControl?.setValue(this.helperMessage);
-      }
-    });
-    setTimeout(() => {
-      expressionFormControl?.markAsPristine();
-    });
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(
-      ['/**', '* Current form model', '*/', 'let $model : any;'].join('\n'),
-      'expressions.d.ts'
-    );
-  }
-
   initForm(val: any) {
     const selected: any[] = [];
     let expressions: any = {};
@@ -131,7 +107,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     this.form.setValue(
       {
         validatorFormControl: selected,
-        expressionFormControl: expressions.expression ?? this.helperMessage,
+        expressionFormControl: expressions.expression ?? '',
         messageFormControl: expressions.message ?? ''
       },
       { emitEvent: false }
@@ -155,21 +131,17 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   }
 
   showDialog() {
+    this.visible = true;
     this.initForm(this.innerValue);
     setTimeout(() => {
       this.form.markAsPristine();
-    });
-    this.visible = true;
+    }, 100);
   }
 
   onOk() {
     const expressionFormControl = this.form.get('expressionFormControl');
     const messageFormControl = this.form.get('messageFormControl');
-    if (
-      expressionFormControl?.valid &&
-      messageFormControl?.valid &&
-      expressionFormControl.value != this.helperMessage
-    ) {
+    if (expressionFormControl?.valid && messageFormControl?.valid) {
       this.visible = false;
       this.hasAdvanceData = true;
       this.onSendData();
@@ -190,8 +162,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     }
     if (
       this.form.get('expressionFormControl')?.value &&
-      this.form.get('messageFormControl')?.value &&
-      this.form.get('expressionFormControl')?.value != this.helperMessage
+      this.form.get('messageFormControl')?.value
     ) {
       data.push({
         expression: this.form.get('expressionFormControl')?.value,

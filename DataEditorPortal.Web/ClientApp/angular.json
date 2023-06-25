@@ -34,7 +34,7 @@
                 "output": "/assets/monaco-editor/min"
               },
               {
-                "glob": "**/vs/basic-languages/{sql,javascript}/**",
+                "glob": "**/vs/basic-languages/{sql,javascript,bat}/**",
                 "input": "node_modules/monaco-editor/min",
                 "output": "/assets/monaco-editor/min"
               }

@@ -114,8 +114,8 @@
             <ngx-monaco-editor
               *ngIf="visible"
               [formControl]="formControlQuery"
-              (onInit)="onMonacoEditorInit($event)"
               [required]="true"
+              [placeholder]="helperMessage"
               [style]="{ minWidth: '40rem', height: '16rem' }"
               class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
               [options]="{}"></ngx-monaco-editor>

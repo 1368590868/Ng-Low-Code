@@ -19,7 +19,7 @@ import { FormDesignerDirective } from '../../directives/form-designer.directive'
     `
       :host ::ng-deep {
         .monaco-editor-wrapper {
-          height: 6rem !important;
+          height: 10rem !important;
         }
       }
     `
@@ -80,7 +80,8 @@ export class FormDesignerConfigComponent
             config: {
               language: 'json'
             },
-            onInit: (editor: any) => this.onMonacoEditorInit(editor)
+            placeholder:
+              '{<br>&nbsp;&nbsp;"props.required": "model.CHECKED", <br>&nbsp;&nbsp;"props.fullName": "model.FIRST_NAME + \' \' + model.LAST_NAME" <br>}'
           }
         }
       ],
@@ -88,23 +89,5 @@ export class FormDesignerConfigComponent
         hide: `field.parent.model.computedConfig`
       }
     });
-  }
-
-  onMonacoEditorInit(editor: any) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(
-      [
-        '/**',
-        '* Current field config',
-        '*/',
-        'let field : any;',
-        '/**',
-        '* Current form model',
-        '*/',
-        'let model : any;'
-      ].join('\n'),
-      'expressions.d.ts'
-    );
   }
 }

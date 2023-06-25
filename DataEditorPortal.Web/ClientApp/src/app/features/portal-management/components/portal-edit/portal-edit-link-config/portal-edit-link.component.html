@@ -348,8 +348,8 @@
   <ngx-monaco-editor
     *ngIf="showQuery"
     [formControl]="formControlQueryText"
-    (onInit)="onMonacoEditorInit($event)"
     [style]="{ height: '20rem' }"
+    [placeholder]="helperMessage"
     class="pt-3 w-6 border-round monaco-editor-wrapper overflow-hidden mb-2"
     [options]="{}"></ngx-monaco-editor>
 

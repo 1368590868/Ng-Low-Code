@@ -26,7 +26,7 @@
         [formControl]="formControlQuery"
         [style]="{ minWidth: '40rem', height: '25rem' }"
         [required]="true"
-        (onInit)="onMonacoEditorInit($event)"
+        [placeholder]="helperMessage"
         class="pt-3 border-round monaco-editor-wrapper overflow-hidden"
         [options]="{}"></ngx-monaco-editor>
     </div>

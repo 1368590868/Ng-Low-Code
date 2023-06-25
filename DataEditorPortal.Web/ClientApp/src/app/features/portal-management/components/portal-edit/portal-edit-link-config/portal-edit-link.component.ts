@@ -66,8 +66,8 @@ export class PortalEditLinkComponent
 
   showQuery = false;
   helperMessage =
-    '-- E.g. \r\n\r\n' +
-    '-- INSERT INTO DEMO_TABLE (ID, NAME, FIRST_NAME, TOTAL, CREATED_DATE) VALUES (NEWID(), ##NAME##, ##FIRST_NAME##, ##TOTAL##, GETDATE())';
+    'E.g. <br /><br />' +
+    'INSERT INTO DEMO_TABLE (ID, NAME, FIRST_NAME, TOTAL, CREATED_DATE) <br />VALUES (NEWID(), ##NAME##, ##FIRST_NAME##, ##TOTAL##, GETDATE())';
   formControlQueryText: FormControl = new FormControl();
 
   constructor(
@@ -117,15 +117,9 @@ export class PortalEditLinkComponent
             this.dataSourceConfig.linkTable?.secondaryForeignKey
           );
 
-          this.showQuery =
-            !!result?.linkTable?.queryInsert &&
-            result?.linkTable?.queryInsert != this.helperMessage;
+          this.showQuery = !!result?.linkTable?.queryInsert;
 
-          this.formControlQueryText.setValue(
-            result?.linkTable?.queryInsert
-              ? result?.linkTable?.queryInsert
-              : this.helperMessage
-          );
+          this.formControlQueryText.setValue(result?.linkTable?.queryInsert);
 
           if (result?.primaryTable?.id != null) {
             this.portalItemService
@@ -193,22 +187,6 @@ export class PortalEditLinkComponent
       }
 
       this.getDbTables();
-    });
-  }
-
-  onMonacoEditorInit(editor: any) {
-    editor.onMouseDown(() => {
-      if (this.formControlQueryText.value === this.helperMessage) {
-        this.formControlQueryText.reset();
-        setTimeout(() => {
-          this.formControlQueryText.markAsPristine();
-        }, 100);
-      }
-    });
-    editor.onDidBlurEditorText(() => {
-      if (!this.formControlQueryText.value) {
-        this.formControlQueryText.setValue(this.helperMessage);
-      }
     });
   }
 
@@ -329,10 +307,7 @@ export class PortalEditLinkComponent
       secondaryForeignKey: this.formControlSecondaryMap.value,
       primaryReferenceKey: this.formControlPrimaryReference.value,
       secondaryReferenceKey: this.formControlSecondaryReference.value,
-      queryInsert:
-        this.formControlQueryText.value === this.helperMessage
-          ? undefined
-          : this.formControlQueryText.value
+      queryInsert: this.formControlQueryText.value
     };
     if (!this.dsConfig.queryText) {
       data.tableName = this.dsConfig.tableName;

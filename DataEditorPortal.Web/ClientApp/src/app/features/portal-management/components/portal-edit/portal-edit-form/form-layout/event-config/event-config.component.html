@@ -25,8 +25,8 @@
   <ngx-monaco-editor
     *ngIf="!isJs && formControlType.value"
     [formControl]="formControlText"
-    (onInit)="onMonacoEditorInit($event)"
     [style]="{ height: '20rem' }"
+    [placeholder]="helperMessage"
     class="pt-3 mt-3 border-round monaco-editor-wrapper overflow-hidden"
     [options]="{ language,lineNumbers: 'off' }"></ngx-monaco-editor>
 </div>

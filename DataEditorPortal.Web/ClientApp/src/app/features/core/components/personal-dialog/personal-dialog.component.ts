@@ -190,15 +190,9 @@ export class PersonalDialogComponent {
           type: 'checkbox',
           defaultValue: true,
           props: {
-            label: 'Receive Email Notifycations',
+            label: 'Receive Email Notifications',
             binary: true,
-            required: true,
-            options: [
-              {
-                value: 'Notify',
-                label: 'Notify'
-              }
-            ]
+            required: true
           }
         }
       ]
