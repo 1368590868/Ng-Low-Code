@@ -15,6 +15,7 @@ import {
 import { FormControl, NgModel } from '@angular/forms';
 import { AdvancedQueryModel } from '..';
 import { CustomActionsComponent } from '../..';
+import { AddConnectionDialogComponent } from 'src/app/features/core';
 @Component({
   selector: 'app-portal-edit-link',
   templateUrl: './portal-edit-link.component.html',
@@ -24,6 +25,7 @@ export class PortalEditLinkComponent
   extends PortalEditStepDirective
   implements OnInit
 {
+  @ViewChild('addDialog') addDialog!: AddConnectionDialogComponent;
   @ViewChild('customActions') customActions!: CustomActionsComponent;
   @ViewChildren('validationRef') validationRef!: NgModel[];
   isLoading = true;
@@ -188,6 +190,15 @@ export class PortalEditLinkComponent
 
       this.getDbTables();
     });
+  }
+
+  onDialogSaved(name: string) {
+    this.portalItemService.getDataSourceConnections().subscribe(res => {
+      this.dbConnections = res.map(x => {
+        return { label: x.name, value: x.name || '' };
+      });
+    });
+    this.formControlConnection.setValue(name);
   }
 
   onShowAction(id: string) {
