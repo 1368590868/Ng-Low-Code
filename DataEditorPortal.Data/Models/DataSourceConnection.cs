@@ -16,13 +16,5 @@ namespace DataEditorPortal.Data.Models
 
         [XmlIgnore]
         public virtual ICollection<UniversalGridConfiguration> UniversalGridConfigurations { get; set; }
-
-        [NotMapped]
-        [XmlIgnore]
-        public int UsedCount { get; set; }
-
-        [NotMapped]
-        [XmlIgnore]
-        public string Type { get; set; }
     }
 }
