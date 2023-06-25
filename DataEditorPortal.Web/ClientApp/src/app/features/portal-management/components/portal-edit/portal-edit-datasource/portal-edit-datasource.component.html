@@ -30,11 +30,12 @@
           styleClass="p-button-text p-button-rounded"
           icon="pi pi-ellipsis-v"
           [disabled]="dbConnectionDisabled"
-          (onClick)="dbConnectionDialog.showDialog()"></p-button>
+          (onClick)="addDialog.showDialog()"></p-button>
       </div>
-      <app-db-connection-dialog
-        #dbConnectionDialog
-        (connectionChange)="connectionSaved($event)"></app-db-connection-dialog>
+
+      <app-add-connection-dialog
+        #addDialog
+        (saved)="onDialogSaved($event)"></app-add-connection-dialog>
     </div>
     <div class="flex flex-column mb-3">
       <ng-container *ngIf="!datasourceConfig.queryText">

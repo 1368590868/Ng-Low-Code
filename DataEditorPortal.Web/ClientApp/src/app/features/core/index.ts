@@ -104,7 +104,8 @@ export * from './components';
     SiteSettingsComponent,
     PersonalDialogComponent,
     LoginComponent,
-    ErrorPageComponent
+    ErrorPageComponent,
+    AddConnectionDialogComponent
   ]
 })
 export class CoreModule {}

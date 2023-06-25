@@ -56,7 +56,6 @@
               [style]="{ width: 'auto' }"></p-menu>
             <button
               type="button"
-              *ngIf="rowData.usedCount === 0"
               pButton
               icon="pi pi-ellipsis-v"
               class="p-button-rounded p-button-text"
@@ -83,8 +82,7 @@
 
 <app-add-connection-dialog
   #addDialog
-  [type]="type"
-  (saved)="onDiaglogSaved()"></app-add-connection-dialog>
+  (saved)="onDialogSaved()"></app-add-connection-dialog>
 
 <p-confirmDialog
   [style]="{ width: '40rem' }"

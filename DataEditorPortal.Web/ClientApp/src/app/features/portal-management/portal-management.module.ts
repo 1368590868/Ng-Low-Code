@@ -41,6 +41,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
 import { SharedModule } from 'src/app/shared';
+import { CoreModule } from '../core';
 import {
   PortalListComponent,
   AddPortalDialogComponent,
@@ -116,6 +117,7 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
     FormlyFieldLocationConfigurationComponent
   ],
   imports: [
+    CoreModule,
     CommonModule,
     SharedModule,
     PortalManagementRoutingModule,
@@ -157,7 +159,6 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
         }
       ]
     }),
-
     // primeNg
     AnimateModule,
     ToastModule,
