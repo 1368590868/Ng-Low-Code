@@ -30,6 +30,10 @@ export class DbConnectionComponent {
   rowsPerPageOptions: number[] = [50, 100, 150];
   contextMenuItems: MenuItem[] = [
     {
+      label: 'Edit',
+      icon: 'pi pi-pencil'
+    },
+    {
       label: 'Delete',
       icon: 'pi pi-times'
     }
@@ -67,7 +71,11 @@ export class DbConnectionComponent {
     });
   }
 
-  onShowMenu(menu: Menu, $event: any, rowData: DbConnectionData) {
+  onShowMenu(
+    menu: Menu,
+    $event: any,
+    rowData: DbConnectionData & { usedCount: number }
+  ) {
     this.getMenuList(rowData);
     menu.toggle($event);
   }
@@ -79,14 +87,28 @@ export class DbConnectionComponent {
     this.addDialog.showDialog();
   }
 
-  getMenuList(rowData: DbConnectionData) {
+  getMenuList(rowData: DbConnectionData & { usedCount: number }) {
+    if (rowData.usedCount > 0) {
+      this.contextMenuItems = [{ label: 'Edit', icon: 'pi pi-pencil' }];
+    }
     this.contextMenuItems.map(res => {
       switch (res.label) {
-        case 'Delete':
+        case 'Edit': {
+          res.command = () => {
+            this.addDialog.header = 'Edit Datasource Connection';
+            this.addDialog.model = rowData;
+            this.addDialog.okText = 'Update';
+            this.addDialog.showDialog();
+          };
+          break;
+        }
+        case 'Delete': {
           res.command = () => {
             this.deleteConfirm(rowData);
           };
+
           break;
+        }
       }
     });
   }
@@ -111,7 +133,7 @@ export class DbConnectionComponent {
     });
   }
 
-  onDiaglogSaved() {
+  onDialogSaved() {
     this.fetchData();
   }
 }

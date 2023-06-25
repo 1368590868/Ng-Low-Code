@@ -25,49 +25,6 @@ export class AddConnectionDialogComponent {
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
   @Input() dialogStyle = { width: '50rem' };
-  @Input()
-  set type(val: string) {
-    this.fields.forEach(field => {
-      if (field.props) {
-        if (field.key === 'authentication') {
-          field.defaultValue =
-            val === 'SqlConnection'
-              ? 'Sql Server Authentication'
-              : 'Oracle Database Native';
-
-          field.props.options =
-            val === 'SqlConnection'
-              ? [
-                  {
-                    label: 'Sql Server Authentication',
-                    value: 'Sql Server Authentication'
-                  },
-                  {
-                    label: 'Windows Authentication',
-                    value: 'Windows Authentication'
-                  }
-                ]
-              : [
-                  {
-                    label: 'Oracle Database Native',
-                    value: 'Oracle Database Native'
-                  },
-                  {
-                    label: 'OS Authentication',
-                    value: 'OS Authentication'
-                  }
-                ];
-        }
-        if (field.key === 'serverName') {
-          field.props.label = val === 'SqlConnection' ? 'Server Name' : 'Host';
-        }
-        if (field.key === 'dbName') {
-          field.props.label =
-            val === 'SqlConnection' ? 'Database Name' : 'Service Name';
-        }
-      }
-    });
-  }
 
   @Output() saved = new EventEmitter<string>();
 
@@ -79,7 +36,7 @@ export class AddConnectionDialogComponent {
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  model: DbConnectionData = { name: '', authentication: 0, dbName: '' };
+  model: DbConnectionData = { name: '', dbName: '' };
   fields: FormlyFieldConfig[] = [
     {
       key: 'name',
@@ -152,6 +109,49 @@ export class AddConnectionDialogComponent {
     this.isLoading = false;
     this.visible = true;
     this.buttonDisabled = false;
+
+    // type
+    const val = 'SqlConnection';
+    this.fields.forEach(field => {
+      if (field.props) {
+        if (field.key === 'authentication') {
+          field.formControl?.setValue(
+            val === 'SqlConnection'
+              ? 'Sql Server Authentication'
+              : 'Oracle Database Native'
+          );
+          field.props.options =
+            val === 'SqlConnection'
+              ? [
+                  {
+                    label: 'Sql Server Authentication',
+                    value: 'Sql Server Authentication'
+                  },
+                  {
+                    label: 'Windows Authentication',
+                    value: 'Windows Authentication'
+                  }
+                ]
+              : [
+                  {
+                    label: 'Oracle Database Native',
+                    value: 'Oracle Database Native'
+                  },
+                  {
+                    label: 'OS Authentication',
+                    value: 'OS Authentication'
+                  }
+                ];
+        }
+        if (field.key === 'serverName') {
+          field.props.label = val === 'SqlConnection' ? 'Server Name' : 'Host';
+        }
+        if (field.key === 'dbName') {
+          field.props.label =
+            val === 'SqlConnection' ? 'Database Name' : 'Service Name';
+        }
+      }
+    });
   }
 
   onHide() {
