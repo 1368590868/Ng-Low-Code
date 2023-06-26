@@ -23,7 +23,7 @@ export class TileComponent implements OnInit {
             .flat()
             .filter(x => x.type !== 'Folder')
             .map(menu => {
-              return {
+              const data = {
                 ...menu,
                 routerLink:
                   menu.type === 'Portal Item'
@@ -32,6 +32,21 @@ export class TileComponent implements OnInit {
                     ? menu.link
                     : undefined
               };
+              if (
+                data.icon &&
+                /^data:image\/([a-z]+);base64,/.test(data.icon)
+              ) {
+                data.iconStyle = {
+                  backgroundImage: `url(${data.icon})`,
+                  width: '4rem',
+                  height: '4rem',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: 'contain',
+                  backgroundPosition: 'center'
+                };
+                data.icon = 'pi ';
+              }
+              return data;
             });
           this.loading = true;
         })
