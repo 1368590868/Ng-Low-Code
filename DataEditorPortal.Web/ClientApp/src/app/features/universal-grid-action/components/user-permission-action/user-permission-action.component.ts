@@ -28,6 +28,17 @@ export class UserPermissionActionComponent
   childrenSelected(node: TreeNode) {
     if (node?.children) {
       node.children.forEach((child: any) => {
+        if (child.icon && /^data:image\/([a-z]+);base64,/.test(child.icon)) {
+          child.iconStyle = {
+            backgroundImage: `url(${child.icon})`,
+            backgroundSize: 'contain',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            width: '1rem',
+            height: '1rem'
+          };
+          child.icon = '';
+        }
         if (child.selected) {
           this.permissionSelect.push(child);
         }
@@ -43,6 +54,17 @@ export class UserPermissionActionComponent
     data.forEach((item: any) => {
       if (item.selected) {
         this.permissionSelect.push(item);
+      }
+      if (item.icon && /^data:image\/([a-z]+);base64,/.test(item.icon)) {
+        item.iconStyle = {
+          backgroundImage: `url(${item.icon})`,
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          width: '1rem',
+          height: '1rem'
+        };
+        item.icon = '';
       }
 
       this.childrenSelected(item);
