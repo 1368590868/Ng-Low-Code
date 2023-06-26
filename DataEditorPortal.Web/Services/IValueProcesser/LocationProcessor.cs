@@ -71,10 +71,16 @@ namespace DataEditorPortal.Web.Services
                         if (mappingProp.ValueKind == JsonValueKind.Object)
                         {
                             IEnumerable<JsonProperty> fieldValues = null;
-                            // if value is null, initial a JsonElement of undefined.
-                            var jsonElement = model[Field.key] != null ? (JsonElement)model[Field.key] : new JsonElement();
-                            if (jsonElement.ValueKind == JsonValueKind.Object)
-                                fieldValues = jsonElement.EnumerateObject();
+
+                            if (model[Field.key] != null)
+                            {
+                                JsonElement jsonElement;
+                                if (model[Field.key] is JsonElement) jsonElement = (JsonElement)model[Field.key];
+                                else jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(model[Field.key]));
+
+                                if (jsonElement.ValueKind == JsonValueKind.Object)
+                                    fieldValues = jsonElement.EnumerateObject();
+                            }
 
                             // only get the mappings that already configed.
                             var mappings = mappingProp.EnumerateObject().Where(m => m.Value.GetString() != null);

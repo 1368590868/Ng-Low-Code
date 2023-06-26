@@ -426,21 +426,19 @@ namespace DataEditorPortal.Web.Controllers
 
             string pattern = @"(Pwd|Password)=(\w+)";
             string replacement = "$1=******";
+            var type = _config.GetValue<string>("DatabaseProvider");
 
-            var tempResult = query.ToList();
-
-            var result = tempResult
+            var result = query.ToList()
                 .Select(x =>
                 {
                     var dsItem = new DataSourceConnectionModel()
                     {
                         Name = x.ds.Name,
                         ConnectionString = Regex.Replace(x.ds.ConnectionString, pattern, replacement),
-                        UsedCount = x.uCount + x.lCount,
-                        Type = _config.GetValue<string>("DatabaseProvider")
+                        UsedCount = x.uCount + x.lCount
                     };
 
-                    if (dsItem.Type == "SqlConnection")
+                    if (type == "SqlConnection")
                     {
                         var builder = new SqlConnectionStringBuilder();
                         builder.ConnectionString = dsItem.ConnectionString;
@@ -492,6 +490,62 @@ namespace DataEditorPortal.Web.Controllers
                 throw new ApiException("Name has already exist. Please use another one.");
 
             var connectionStr = GetConnectionString(model);
+
+            ValidateConnectionString(connectionStr);
+
+            _depDbContext.DataSourceConnections.Add(new DataSourceConnection() { Name = model.Name, ConnectionString = connectionStr });
+            _depDbContext.SaveChanges();
+
+            return model.Name;
+        }
+
+
+        [HttpPut]
+        [Route("datasource/connections/{name}/update")]
+        public string UpdateDataSourceConnection(string name, [FromBody] DataSourceConnectionModel model)
+        {
+            var item = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == name);
+            if (item == null)
+            {
+                throw new ApiException("Not Found", 404);
+            }
+
+            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.ServerName)
+                || string.IsNullOrEmpty(model.Authentication) || string.IsNullOrEmpty(model.DbName))
+                throw new ArgumentNullException();
+
+            // if password is null or empty, means user doesn't change password, will get the orignal password and use it to validate.
+            if (string.IsNullOrEmpty(model.Password))
+            {
+                var type = _config.GetValue<string>("DatabaseProvider");
+                var password = string.Empty;
+                if (type == "SqlConnection")
+                {
+                    var builder = new SqlConnectionStringBuilder();
+                    builder.ConnectionString = item.ConnectionString;
+                    password = builder.Password;
+                }
+                else
+                {
+                    var builder = new OracleConnectionStringBuilder();
+                    builder.ConnectionString = item.ConnectionString;
+                    password = builder.Password;
+                }
+                model.Password = password;
+            }
+
+            var connectionStr = GetConnectionString(model);
+
+            ValidateConnectionString(connectionStr);
+
+            item.ConnectionString = connectionStr;
+            _depDbContext.SaveChanges();
+
+            return model.Name;
+        }
+
+        private void ValidateConnectionString(string connectionStr)
+        {
             try
             {
                 // try to connect to database to validate if the connection string is valid.
@@ -507,13 +561,7 @@ namespace DataEditorPortal.Web.Controllers
                 _logger.LogError(ex.Message, ex);
                 throw new DepException(ex.Message);
             }
-
-            _depDbContext.DataSourceConnections.Add(new DataSourceConnection() { Name = model.Name, ConnectionString = connectionStr });
-            _depDbContext.SaveChanges();
-
-            return model.Name;
         }
-
         private string GetConnectionString(DataSourceConnectionModel con)
         {
             var dbType = _config.GetValue<string>("DatabaseProvider");
