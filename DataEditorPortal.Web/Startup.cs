@@ -5,6 +5,7 @@ using DataEditorPortal.Web.Common.Install;
 using DataEditorPortal.Web.Common.License;
 using DataEditorPortal.Web.Jobs;
 using DataEditorPortal.Web.Services;
+using DataEditorPortal.Web.Services.FieldImporter;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -117,6 +118,7 @@ namespace DataEditorPortal.Web
             services.AddScoped<ILookupService, LookupService>();
 
             services.AddValueProcessors();
+            services.AddFieldImporters();
 
             #endregion
 
