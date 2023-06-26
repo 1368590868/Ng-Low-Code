@@ -1,0 +1,74 @@
+<div class="flex gap-2 justify-content-between align-items-center">
+  <div class="relative flex-grow-1">
+    <p-dropdown
+      #dropdown
+      [style.display]="iconLogo ? 'none' : 'block'"
+      [options]="iconList"
+      [filter]="true"
+      filterBy="label"
+      [editable]="true"
+      [showClear]="true"
+      [formControl]="formControl"
+      [appendTo]="'body'"
+      (onChange)="onDropdownChange($event)">
+      <ng-template let-select pTemplate="selectedItem">
+        <div class="flex align-items-center">
+          <i [class]="select.value"></i>
+          <p class="ml-5">{{ select.label }}</p>
+        </div>
+      </ng-template>
+      <ng-template let-icon pTemplate="item">
+        <div class="flex align-items-center">
+          <i [class]="icon.value"></i>
+          <p class="ml-5">{{ icon.label }}</p>
+        </div>
+      </ng-template>
+    </p-dropdown>
+    <div
+      *ngIf="!iconLogo"
+      class="absolute w-3rem h-full top-0 flex justify-content-center align-items-center">
+      <i
+        [class]="
+          dropdown.value
+            ? (dropdown?.value?.startsWith('pi') ? 'pi ' : '') + dropdown.value
+            : 'fa fa-no-icon'
+        "></i>
+    </div>
+
+    <div
+      *ngIf="iconLogo"
+      class="w-9rem ml-3 flex justify-content-center align-items-center">
+      <img [src]="iconLogo" class="w-1rem h-1rem" />
+
+      <button
+        pButton
+        pRipple
+        label="Remove"
+        (click)="removePic()"
+        type="button"
+        class="p-button-outlined p-button-danger p-button-sm ml-3">
+        <span class="p-button-icon p-button-icon-left pi pi-trash"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Upload Button -->
+  <div
+    *ngIf="!iconLogo"
+    class="upload flex justify-content-center align-items-center">
+    <p-button
+      tabindex="0"
+      icon="pi pi-plus"
+      class="ml-auto relative padding-0"
+      label="Upload"
+      styleClass="p-button-outlined">
+      <input
+        #file
+        (change)="picChange($event)"
+        type="file"
+        accept="image/*"
+        class="opacity-0 cursor-pointer absolute left-0" />
+      <span class="p-ink"> </span>
+    </p-button>
+  </div>
+</div>

@@ -75,6 +75,18 @@ export class NavMenuComponent implements OnInit {
       menu.badgeStyleClass = 'p-badge p-badge-warning';
     }
 
+    if (menu.icon && /^data:image\/([a-z]+);base64,/.test(menu.icon)) {
+      menu.iconStyle = {
+        backgroundImage: `url(${menu.icon})`,
+        width: '1rem',
+        height: '1rem',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'contain',
+        backgroundPosition: 'center'
+      };
+      menu.icon = 'pi ';
+    }
+
     if (menu.items) {
       menu.items.forEach(i => {
         this.setMenu(i);

@@ -20,6 +20,12 @@
     *ngFor="let type of ['Folder', 'Portal Item', 'default']"
     let-node
     [pTemplate]="type">
-    <span [pTooltip]="node.name">{{ node.label }}</span>
+    <div class="flex justify-content-center align-items-center">
+      <span
+        *ngIf="node.iconStyle"
+        class="pi p-treenode-icon"
+        [style]="node.iconStyle"></span>
+      <span [pTooltip]="node.name">{{ node.label }}</span>
+    </div>
   </ng-template>
 </p-tree>
