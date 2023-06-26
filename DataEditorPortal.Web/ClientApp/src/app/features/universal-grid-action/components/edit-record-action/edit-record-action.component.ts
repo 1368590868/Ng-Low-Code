@@ -114,7 +114,9 @@ export class EditRecordActionComponent
       if (x.searchRule && x.searchRule.field) {
         key = x.searchRule.field;
       }
-      formSearch[key] = this.fetchDataParam?.searches[x.key];
+      if (this.fetchDataParam?.searches) {
+        formSearch[key] = this.fetchDataParam?.searches[x.key];
+      }
     });
     this.model = { ...this.model, ...formSearch };
   }
