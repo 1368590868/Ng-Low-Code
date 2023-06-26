@@ -129,14 +129,14 @@ export class ImportExcelActionComponent
           if (this.infoList && this.infoList.length > 0) {
             this.columns = Object.keys(this.infoList[0])
               .map(key => ({
-                header: key
+                key
               }))
-              .filter(item => item.header !== '__errors__');
+              .filter(item => item.key !== '__errors__');
 
             this.columns = this.columns
               .map(item => {
                 const fieldData = res.fields.find(
-                  (field: any) => field.key === item.header
+                  (field: any) => field.key === item.key
                 );
                 return {
                   header: fieldData?.props?.label || fieldData?.key,

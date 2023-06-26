@@ -239,7 +239,7 @@
           <th [style.min-width]="'12rem !important'">Status</th>
           <ng-container *ngFor="let col of columns">
             <th
-              *ngIf="col.header !== '__status__'"
+              *ngIf="col.key !== '__status__'"
               [pSortableColumn]="col.key"
               [style.min-width]="'12rem !important'">
               <span style="vertical-align: middle">{{ col.header }}</span>
@@ -281,13 +281,11 @@
             >
           </td>
           <ng-container *ngFor="let col of columns">
-            <td *ngIf="col.header !== '__status__'">
+            <td *ngIf="col.key !== '__status__'">
               <div>
                 <i
-                  *ngIf="col.header | hasError : infoList?.__errors__"
-                  [pTooltip]="
-                    (col.header | hasError : infoList?.__errors__) ?? ''
-                  "
+                  *ngIf="col.key | hasError : infoList?.__errors__"
+                  [pTooltip]="(col.key | hasError : infoList?.__errors__) ?? ''"
                   [escape]="false"
                   tooltipStyleClass="tooltip-error"
                   class="pi pi-times-circle text-red-500"></i>
