@@ -22,7 +22,9 @@ export class GlobalLoadingService {
 
     this.count += 1;
     if (this.count === 1) {
-      this.loading$.next(true);
+      setTimeout(() => {
+        this.loading$.next(true);
+      }, 0);
     }
   }
 

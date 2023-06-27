@@ -119,17 +119,17 @@ export class ActionWrapperComponent implements OnInit {
     Object.assign(actionRef.instance, { initParams: this.initParams });
 
     // bind action events
-    actionRef.instance.savedEvent.asObservable().subscribe(() => {
+    actionRef.instance.savedEvent.subscribe(() => {
       this.dialogVisible = false;
       this.savedEvent.emit();
     });
-    actionRef.instance.cancelEvent.asObservable().subscribe(() => {
+    actionRef.instance.cancelEvent.subscribe(() => {
       this.dialogVisible = false;
     });
-    actionRef.instance.errorEvent.asObservable().subscribe(() => {
+    actionRef.instance.errorEvent.subscribe(() => {
       this.isLoading = false;
     });
-    actionRef.instance.loadedEvent.asObservable().subscribe(() => {
+    actionRef.instance.loadedEvent.subscribe(() => {
       this.isLoading = false;
       this.buttonDisabled = false;
     });
