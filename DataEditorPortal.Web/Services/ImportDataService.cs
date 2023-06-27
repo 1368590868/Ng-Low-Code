@@ -228,10 +228,10 @@ namespace DataEditorPortal.Web.Services
                     switch (field.filterType)
                     {
                         case "locationField":
-                            errorMsg = _serviceProvider.GetRequiredService<LocationFieldImporter>().ValidateValue(field, obj, ref hasMissingField);
+                            errorMsg.AddRange(_serviceProvider.GetRequiredService<LocationFieldImporter>().ValidateValue(field, obj, ref hasMissingField));
                             break;
                         default:
-                            errorMsg = _serviceProvider.GetRequiredService<SimpleFieldImporter>().ValidateValue(field, obj, ref hasMissingField);
+                            errorMsg.AddRange(_serviceProvider.GetRequiredService<SimpleFieldImporter>().ValidateValue(field, obj, ref hasMissingField));
                             break;
                     }
                 }
@@ -287,6 +287,7 @@ namespace DataEditorPortal.Web.Services
             _memoryCache.Remove($"import_data_validation_{fieldKey}");
             _memoryCache.Remove($"import_data_options_{fieldKey}");
             _memoryCache.Remove($"import_data_fraction_{fieldKey}");
+            _memoryCache.Remove($"import_data_locationField_{fieldKey}");
         }
 
         private List<FormFieldConfig> GetTemplateFields(UniversalGridConfiguration config, ImportType type)
