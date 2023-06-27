@@ -21,6 +21,8 @@ import { MonacoEditorDirective } from './directive/monaco-editor.directive';
 
 // public components
 import { AttachmentsComponent } from './components/attachments/attachments.component';
+import { globalLoadingInterceptor } from './interceptor/global-loading.interceptor';
+import { GlobalLoadingComponent } from './components/global-loading/global-loading.component';
 
 export { AuthRouterGuard } from './guards/auth-router.guard';
 export { AdminPermissionGuard } from './guards/admin-permission.guard';
@@ -46,7 +48,8 @@ export { SystemLogData } from './models/system-log';
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
-    AttachmentsComponent
+    AttachmentsComponent,
+    GlobalLoadingComponent
   ],
   imports: [
     CommonModule,
@@ -62,12 +65,13 @@ export { SystemLogData } from './models/system-log';
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
-    AttachmentsComponent
+    AttachmentsComponent,
+    GlobalLoadingComponent
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: WinAuthInterceptor,
+      useClass: globalLoadingInterceptor,
       multi: true
     },
     {
@@ -75,6 +79,12 @@ export { SystemLogData } from './models/system-log';
       useClass: HttpErrorInterceptor,
       multi: true
     },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: WinAuthInterceptor,
+      multi: true
+    },
+
     MessageService,
     DataFormatService
   ]

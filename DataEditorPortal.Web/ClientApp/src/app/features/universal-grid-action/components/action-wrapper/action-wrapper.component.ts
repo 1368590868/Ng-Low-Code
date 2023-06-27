@@ -12,6 +12,7 @@ import {
 import { UrlParamsService } from 'src/app/features/universal-grid/services/url-params.service';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { GridActionConfig } from '../../models/grid-config';
+import { GlobalLoadingService } from 'src/app/shared/services/global-loading.service';
 
 @Component({
   selector: 'app-action-wrapper',
@@ -48,7 +49,10 @@ export class ActionWrapperComponent implements OnInit {
 
   initParams?: any;
 
-  constructor(private urlParamsService: UrlParamsService) {}
+  constructor(
+    private urlParamsService: UrlParamsService,
+    public globalLoadingService: GlobalLoadingService
+  ) {}
 
   ngOnInit(): void {
     this.initParams = this.urlParamsService.initParams;
@@ -66,6 +70,7 @@ export class ActionWrapperComponent implements OnInit {
   showDialog() {
     this.isLoading = false;
     this.dialogVisible = true;
+    this.globalLoadingService.onStart();
     this.renderAction();
   }
 
