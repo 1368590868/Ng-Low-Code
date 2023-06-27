@@ -4,27 +4,15 @@ namespace Setup.Models
 {
     public class ComboBoxModel : NotifyPropertyObject
     {
-        private List<string> _siteNames;
-        public List<string> SiteNames
+        private List<string> _items;
+        public List<string> Items
         {
-            get { return _siteNames; }
+            get { return _items; }
             set
             {
-                _siteNames = value;
-                OnPropertyChanged("SiteNames");
-            }
-        }
-
-        private string _selectedSiteName;
-        public string SelectedSiteName
-        {
-            get { return _selectedSiteName; }
-            set
-            {
-                _selectedSiteName = value;
-                OnPropertyChanged("SelectedSiteName");
+                _items = value;
+                OnPropertyChanged("Items");
             }
         }
     }
-
 }

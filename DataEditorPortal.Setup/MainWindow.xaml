@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:Setup"
     x:Class="Setup.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="600" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+        Title="Data Editor Portal Installer" Height="450" Width="600" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type FrameworkElement}" x:Key="ValidatingControl">
@@ -16,6 +16,7 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         </Grid.Resources>
         <Grid.LayoutTransform>
             <TransformGroup>
@@ -25,7 +26,55 @@
                 <TranslateTransform/>
             </TransformGroup>
         </Grid.LayoutTransform>
-        <Grid x:Name="containerConnection" Visibility="Visible">
+        <Grid x:Name="containerInstall" Visibility="Visible">
+            <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="10,20,0,0" Text="Data Editor Portal Installer" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.881,0.559" FontSize="16"/>
+            <RadioButton x:Name="radioButton" Content="Setup new website" GroupName="SetupOption" IsChecked="{Binding SetupOption.IsSetupNew, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top"/>
+            <RadioButton x:Name="radioButton1" Content="Upgrade existing website" GroupName="SetupOption" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" IsChecked="{Binding SetupOption.IsUpgrade, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Label x:Name="labelExistingSite" Content="Site:" HorizontalAlignment="Left" Margin="30,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"
+                   Visibility="{Binding SetupOption.IsUpgrade, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}">
+            </Label>
+            <ComboBox x:Name="cmbExistingSiteName" Margin="123,143,0,0" VerticalAlignment="Top" IsTextSearchEnabled="False" SelectedIndex="0" Height="20" Width="220" HorizontalAlignment="Left" Padding="6,1,5,0"
+                      SelectionChanged="cmbSiteName_SelectionChanged"
+                      SelectedValue="{Binding SetupOption.SiteName, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                      ItemsSource="{Binding SiteNamesModel.Items, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                      Visibility="{Binding SetupOption.IsUpgrade, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}">
+            </ComboBox>
+
+            <Label x:Name="labelExistingApplication" Content="Application:" HorizontalAlignment="Left" Margin="30,171,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"
+                   Visibility="{Binding SetupOption.IsUpgrade, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}">
+            </Label>
+            <ComboBox x:Name="cmbExistingApplication" Margin="123,171,0,0" VerticalAlignment="Top" IsTextSearchEnabled="False" SelectedIndex="0" Height="20" Width="220" HorizontalAlignment="Left" Padding="6,1,5,0"
+                      SelectedValue="{Binding SetupOption.Application, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                      ItemsSource="{Binding SiteApplicationsModel.Items, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
+                      Visibility="{Binding SetupOption.IsUpgrade, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}">
+            </ComboBox>
+
+            <Button x:Name="btnGoNext" Margin="0,0,10,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="60" Click="btnGoNext_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="IsEnabled" Value="False"></Setter>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=cmbExistingSiteName}" Value="False"></Condition>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="IsEnabled" Value="True"></Setter>
+                            </MultiDataTrigger>
+                            <DataTrigger Binding="{Binding IsChecked, ElementName=radioButton}" Value="True">
+                                <Setter Property="IsEnabled" Value="True"></Setter>
+                                <Setter Property="Content" Value="Next"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsChecked, ElementName=radioButton1}" Value="True">
+                                <Setter Property="Content" Value="Upgrade"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+        </Grid>
+        <Grid x:Name="containerConnection" Visibility="Hidden">
             <DataGrid x:Name="dataGridConnection" ItemsSource="{Binding}" Margin="10,87,10,40" AutoGenerateColumns="False" ColumnWidth="SizeToHeader" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="Gainsboro" CanUserAddRows="False">
                 <DataGrid.RowStyle>
                     <Style TargetType="{x:Type DataGridRow}">
@@ -52,6 +101,7 @@
             </DataGrid>
             <Button x:Name="btnConnectionNext" Content="Next" Margin="0,0,10,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="50" Click="btnConnectionNext_Click"/>
             <Button x:Name="btnAddConnection" Content="Add" Margin="0,0,75,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="50" Click="btnAddConnection_Click"/>
+            <Button x:Name="btnConnectionBack" Content="Back" Margin="10,0,0,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="50" Click="btnConnectionBack_Click"/>
             <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,20,0,0" Text="Setup Database" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.881,0.559" FontSize="16"/>
             <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="125,59,0,0" VerticalAlignment="Top" Width="120" IsTextSearchEnabled="False" SelectedValue="{Binding DatabaseProvider.Value, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0" SelectionChanged="comboBox_SelectionChanged" SelectedValuePath="Tag" Padding="6,3,5,3">
                 <ComboBoxItem Content="Sql Connection" Tag="SqlConnection" />
@@ -70,9 +120,9 @@
 
             <ComboBox x:Name="cmbSiteName" Margin="103,115,0,0" VerticalAlignment="Top" IsTextSearchEnabled="False" SelectedIndex="0" Height="20" Width="220" HorizontalAlignment="Left" Padding="6,1,5,0"
                       SelectedValue="{Binding SitePublishModel.SiteName, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}"
-                      ItemsSource="{Binding SiteNamesModel.SiteNames, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}">
+                      ItemsSource="{Binding SiteNamesModel.Items, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}">
             </ComboBox>
-            
+
             <TextBox x:Name="textApplicationPath" Margin="103,143,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding SitePublishModel.AppPath, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Height="20" HorizontalAlignment="Left" Width="220" Style="{DynamicResource ValidatingControl}" Padding="3,1,3,0"/>
             <TextBox x:Name="textDefaultSchema" Margin="103,171,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding SitePublishModel.DefaultSchema, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Height="20" HorizontalAlignment="Left" Width="220" Style="{DynamicResource ValidatingControl}" Padding="3,1,3,0"/>
 

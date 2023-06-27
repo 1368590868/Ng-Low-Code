@@ -20,6 +20,7 @@ namespace Setup
     /// </summary>
     public partial class MainWindow : Window
     {
+        public SetupOptionModel SetupOption { get; set; } = new SetupOptionModel() { IsSetupNew = true };
         public DatabaseProvider DatabaseProvider { get; set; } = new DatabaseProvider() { Value = "SqlConnection" };
 
         public ObservableCollection<DatabaseConnection> ConnectionList =
@@ -31,6 +32,7 @@ namespace Setup
         public SitePublishModel SitePublishModel { get; set; } = new SitePublishModel();
         public ConsoleOutputModel ConsoleOutput { get; set; } = new ConsoleOutputModel();
         public ComboBoxModel SiteNamesModel { get; set; } = new ComboBoxModel();
+        public ComboBoxModel SiteApplicationsModel { get; set; } = new ComboBoxModel();
 
         public MainWindow()
         {
@@ -50,8 +52,123 @@ namespace Setup
             SitePublishModel.AppPath = "Data Editor Portal";
             SitePublishModel.DefaultSchema = "DATA_EDITOR_PORTAL";
 
-            SiteNamesModel.SiteNames = GetAllSitesInIIS();
+            SiteNamesModel.Items = GetAllSitesInIIS();
         }
+
+        #region Setup Options
+
+        private async void btnGoNext_Click(object sender, RoutedEventArgs e)
+        {
+            if (SetupOption.IsSetupNew)
+            {
+                containerInstall.Visibility = Visibility.Hidden;
+                containerConnection.Visibility = Visibility.Visible;
+            }
+            if (SetupOption.IsUpgrade)
+            {
+                using (ServerManager serverManager = new ServerManager())
+                {
+                    var site = serverManager.Sites.FirstOrDefault(s => s.Name.Equals(SetupOption.SiteName, StringComparison.OrdinalIgnoreCase));
+                    if (site == null) return;
+
+                    var app = site.Applications.FirstOrDefault(a => a.Path.Equals(SetupOption.Application, StringComparison.OrdinalIgnoreCase));
+                    if (app == null) return;
+
+                    var appPool = serverManager.ApplicationPools.FirstOrDefault(p => p.Name.Equals(app.ApplicationPoolName, StringComparison.OrdinalIgnoreCase));
+                    if (appPool == null) return;
+
+                    var targetPath = app.VirtualDirectories["/"].PhysicalPath;
+                    var indexFilePath = Path.Combine(targetPath, @"ClientApp\dist\index.html");
+                    if (!File.Exists(indexFilePath))
+                    {
+                        MessageBox.Show("Website files were not detected. Please confirm if the website installation directory is correct.");
+                    }
+
+                    containerInstall.Visibility = Visibility.Hidden;
+                    containerOutput.Visibility = Visibility.Visible;
+
+                    using (StreamWriter sw = File.AppendText("info.log"))
+                    {
+                        sw.WriteLine($"Stop site: {SetupOption.SiteName}");
+                        ConsoleOutput.Text += $"Stop site: {SetupOption.SiteName}\r\n";
+                        scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+                        site.Stop();
+
+                        sw.WriteLine($"Stop application pool: {SetupOption.Application}");
+                        ConsoleOutput.Text += $"Stop application pool: {SetupOption.Application}\r\n";
+                        scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+                        appPool.Stop();
+                        serverManager.CommitChanges();
+
+                        Directory.Delete(Path.Combine(targetPath, "ClientApp"), true);
+                        sw.WriteLine($"Remove ClientApp at: {Path.Combine(targetPath, "ClientApp")}");
+                    }
+
+                    var sourcePath = AppDomain.CurrentDomain.BaseDirectory;
+
+                    await Task.Run(async () =>
+                    {
+                        await Task.Delay(2000);
+                        using (StreamWriter sw = File.AppendText("info.log"))
+                        {
+                            try
+                            {
+                                var pattern = @"^(?!.*\\(?:appsettings(?:\.Development)?\.json|web(?:\.Development|\.Production)?\.config)$).+$";
+                                CopyFiles($"{sourcePath}\\web", targetPath, sw, pattern);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message);
+                                sw.WriteLine(ex.Message);
+                            }
+                        }
+                    });
+
+                    try
+                    {
+                        using (StreamWriter sw = File.AppendText("info.log"))
+                        {
+                            // set the base url
+                            sw.WriteLine($"Set the base url: {SetupOption.Application}");
+                            SetBaseElementValue(indexFilePath, $"{SetupOption.Application}/");
+
+                            MessageBox.Show("Upgrade Complete.");
+
+                            // start the website
+                            sw.WriteLine($"Start site: {SetupOption.SiteName}");
+                            ConsoleOutput.Text += $"Start site: {SetupOption.SiteName}\r\n";
+                            scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+                            site.Start();
+
+                            sw.WriteLine($"Start application pool: {SetupOption.Application}");
+                            ConsoleOutput.Text += $"Start application pool: {SetupOption.Application}\r\n";
+                            scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+                            appPool.Start();
+
+                            serverManager.CommitChanges();
+
+                            StartWebsite(SetupOption.SiteName, SetupOption.Application);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+
+                        using (StreamWriter sw = File.AppendText("info.log"))
+                        {
+                            sw.WriteLine(ex.Message);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void cmbSiteName_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SiteApplicationsModel.Items = GetSiteApplicationsInIIS(SetupOption.SiteName);
+        }
+
+        #endregion
 
         #region Connections
 
@@ -79,6 +196,12 @@ namespace Setup
                     ConnectionList.Add(result);
                 }
             }
+        }
+
+        private void btnConnectionBack_Click(object sender, RoutedEventArgs e)
+        {
+            containerInstall.Visibility = Visibility.Visible;
+            containerConnection.Visibility = Visibility.Hidden;
         }
 
         private void btnConnectionNext_Click(object sender, RoutedEventArgs e)
@@ -166,14 +289,15 @@ namespace Setup
             var targetPath = SitePublishModel.TargetFolder;
             var siteName = SitePublishModel.SiteName;
             var appPath = SitePublishModel.AppPath;
+            string appPathWithSlash = appPath.StartsWith("/") ? appPath : $"/{appPath}";
 
-            if (!IsValidApplicationPath($@"/{appPath}"))
+            if (!IsValidApplicationPath(appPathWithSlash))
             {
                 MessageBox.Show("The application path can not contain the following character:\n\\ ? ; : @ & = + $ , | ' < > *");
                 return;
             }
 
-            if (IsIisApplicationExists(siteName, $@"/{appPath}"))
+            if (IsIisApplicationExists(siteName, appPathWithSlash))
             {
                 MessageBox.Show("The Application Alias exists.");
                 return;
@@ -186,7 +310,15 @@ namespace Setup
             {
                 using (StreamWriter sw = File.AppendText("info.log"))
                 {
-                    CopyFiles($"{sourcePath}\\web", targetPath, sw);
+                    try
+                    {
+                        CopyFiles($"{sourcePath}\\web", targetPath, sw);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                        sw.WriteLine(ex.Message);
+                    }
                 }
             });
 
@@ -250,18 +382,18 @@ namespace Setup
                     File.WriteAllText(filePath, resultJson);
 
                     // set the base url
-                    sw.WriteLine($"Set the base url: {appPath}");
+                    sw.WriteLine($"Set the base url: {appPathWithSlash}/");
                     filePath = Path.Combine(targetPath, "ClientApp/dist/index.html");
-                    SetBaseElementValue(filePath, $"/{appPath}/");
+                    SetBaseElementValue(filePath, $"{appPathWithSlash}/");
 
                     //CreateIISApplication
-                    sw.WriteLine($"Create IIS Application: {siteName}, {appPath}, {targetPath}");
-                    CreateIISApplication(siteName, appPath, targetPath);
+                    sw.WriteLine($"Create IIS Application: {siteName}, {appPathWithSlash}, {targetPath}");
+                    CreateIISApplication(siteName, appPathWithSlash, targetPath);
 
                     MessageBox.Show("Publish Complete.");
 
                     // start the website
-                    StartWebsite(siteName, appPath);
+                    StartWebsite(siteName, appPathWithSlash);
                 }
             }
             catch (Exception ex)
@@ -298,8 +430,30 @@ namespace Setup
             return siteNames;
         }
 
+        private List<string> GetSiteApplicationsInIIS(string siteName)
+        {
+            List<string> apps = new List<string>();
+
+            using (ServerManager serverManager = new ServerManager())
+            {
+                Site site = serverManager.Sites.FirstOrDefault(s => s.Name.Equals(siteName, StringComparison.OrdinalIgnoreCase));
+
+                if (site != null)
+                {
+                    foreach (var app in site.Applications)
+                    {
+                        apps.Add(app.Path);
+                    }
+                }
+            }
+
+            return apps;
+        }
+
         private bool IsIisApplicationExists(string siteName, string applicationPath)
         {
+            string appPathWithSlash = applicationPath.StartsWith("/") ? applicationPath : $"/{applicationPath}";
+
             using (ServerManager serverManager = new ServerManager())
             {
                 Site site = serverManager.Sites.FirstOrDefault(s => s.Name.Equals(siteName, StringComparison.OrdinalIgnoreCase));
@@ -310,7 +464,7 @@ namespace Setup
 
                     foreach (Microsoft.Web.Administration.Application application in applications)
                     {
-                        if (string.Equals(application.Path, applicationPath, StringComparison.OrdinalIgnoreCase))
+                        if (string.Equals(application.Path, appPathWithSlash, StringComparison.OrdinalIgnoreCase))
                         {
                             return true;
                         }
@@ -340,7 +494,7 @@ namespace Setup
                 Site site = serverManager.Sites.FirstOrDefault(s => s.Name == siteName);
                 if (site != null)
                 {
-                    Microsoft.Web.Administration.Application application = site.Applications.FirstOrDefault(a => a.Path.Trim('/') == appPath.Trim('/'));
+                    Microsoft.Web.Administration.Application application = site.Applications.FirstOrDefault(a => a.Path == appPath);
                     if (application != null)
                     {
                         Binding binding = site.Bindings.FirstOrDefault();
@@ -350,7 +504,7 @@ namespace Setup
                             string host = string.IsNullOrEmpty(binding.Host) ? "localhost" : binding.Host;
                             string port = binding.EndPoint.Port.ToString();
 
-                            string encodedAppPath = Uri.EscapeDataString(appPath);
+                            string encodedAppPath = Uri.EscapeDataString(appPath.Trim('/'));
                             string url = $"{protocol}://{host}:{port}/{encodedAppPath}";
 
                             // Start a new browser window that opens the URL
@@ -404,7 +558,7 @@ namespace Setup
             File.WriteAllText(filePath, html);
         }
 
-        public void CopyFiles(string sourceFolder, string destinationFolder, StreamWriter sw)
+        public void CopyFiles(string sourceFolder, string destinationFolder, StreamWriter sw, string filePattern = null)
         {
             DirectoryInfo sourceDir = new DirectoryInfo(sourceFolder);
             DirectoryInfo destinationDir = new DirectoryInfo(destinationFolder);
@@ -423,6 +577,8 @@ namespace Setup
 
             foreach (FileInfo file in files)
             {
+                if (filePattern != null && !Regex.IsMatch(file.FullName, filePattern, RegexOptions.IgnoreCase)) continue;
+
                 string destinationFilePath = Path.Combine(destinationDir.FullName, file.Name);
                 file.CopyTo(destinationFilePath, true);
 
