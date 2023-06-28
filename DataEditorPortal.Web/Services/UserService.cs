@@ -3,6 +3,7 @@ using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace DataEditorPortal.Web.Services
         bool IsAdmin(string username);
         bool HasAdmin();
         Guid CreateUser(User model, List<string> roleNames = null);
+        void ClearUserCache(Guid userId);
     }
 
     public class UserService : IUserService
@@ -24,17 +26,20 @@ namespace DataEditorPortal.Web.Services
         private readonly ILogger<UserService> _logger;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMemoryCache _memoryCache;
 
         public UserService(
             DepDbContext depDbContext,
             ILogger<UserService> logger,
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IMemoryCache memoryCache)
         {
             _depDbContext = depDbContext;
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _memoryCache = memoryCache;
         }
 
         public Dictionary<string, bool> GetUserPermissions()
@@ -92,12 +97,20 @@ namespace DataEditorPortal.Web.Services
 
         public bool IsAdmin(string username)
         {
-            var query = from u in _depDbContext.Users
-                        join up in _depDbContext.UserPermissions on u.Id equals up.UserId
-                        join sr in _depDbContext.SiteRoles on up.PermissionGrantId equals sr.Id
-                        where up.GrantType == "GROUP" && u.Username == username && sr.RoleName == "Administrators"
-                        select u.Id;
-            return query.Any();
+            var cacheKey = $"IsAdmin_{username}";
+
+            return _memoryCache.GetOrCreate(cacheKey, entry =>
+            {
+                entry.SlidingExpiration = TimeSpan.FromMinutes(60); // Cache the result for 60 minutes
+
+                var query = from u in _depDbContext.Users
+                            join up in _depDbContext.UserPermissions on u.Id equals up.UserId
+                            join sr in _depDbContext.SiteRoles on up.PermissionGrantId equals sr.Id
+                            where up.GrantType == "GROUP" && u.Username == username && sr.RoleName == "Administrators"
+                            select u.Id;
+
+                return query.Any();
+            });
         }
 
         public bool HasAdmin()
@@ -153,5 +166,11 @@ namespace DataEditorPortal.Web.Services
             return dep_user.Id;
         }
 
+        public void ClearUserCache(Guid userId)
+        {
+            var user = _depDbContext.Users.FirstOrDefault(x => x.Id == userId);
+            if (user != null)
+                _memoryCache.Remove($"IsAdmin_{user.Username}");
+        }
     }
 }

@@ -248,6 +248,8 @@ namespace DataEditorPortal.Web.Controllers
             }
             _depDbContext.SaveChanges();
 
+            _userService.ClearUserCache(userId);
+
             return true;
         }
     }

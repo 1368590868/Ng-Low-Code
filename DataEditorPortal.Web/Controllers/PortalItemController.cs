@@ -25,6 +25,7 @@ using System.Text.RegularExpressions;
 namespace DataEditorPortal.Web.Controllers
 {
     [Authorize]
+    [AdminAuthorizationFilter]
     [ApiController]
     [Route("api/portal-item")]
     public class PortalItemController : ControllerBase
