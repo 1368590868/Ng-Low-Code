@@ -112,7 +112,7 @@ namespace Setup
 
                 var builder = new OracleConnectionStringBuilder();
 
-                builder.DataSource = $"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={con.DatabaseName})));";
+                builder.DataSource = $"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={con.DatabaseName})))";
 
                 if (con.Authentication == "OS Authentication")
                 {

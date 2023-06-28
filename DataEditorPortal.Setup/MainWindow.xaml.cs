@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -79,48 +80,69 @@ namespace Setup
 
                     var targetPath = app.VirtualDirectories["/"].PhysicalPath;
                     var indexFilePath = Path.Combine(targetPath, @"ClientApp\dist\index.html");
-                    if (!File.Exists(indexFilePath))
-                    {
-                        MessageBox.Show("Website files were not detected. Please confirm if the website installation directory is correct.");
-                    }
+                    //if (!File.Exists(indexFilePath))
+                    //{
+                    //    MessageBox.Show("Website files were not detected. Please confirm if the website installation directory is correct.");
+                    //}
 
                     containerInstall.Visibility = Visibility.Hidden;
                     containerOutput.Visibility = Visibility.Visible;
 
                     using (StreamWriter sw = File.AppendText("info.log"))
                     {
-                        sw.WriteLine($"Stop site: {SetupOption.SiteName}");
-                        ConsoleOutput.Text += $"Stop site: {SetupOption.SiteName}\r\n";
-                        scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
-                        site.Stop();
+                        if (site.State != ObjectState.Stopped)
+                        {
+                            LogInfo($"Stop site: {SetupOption.SiteName}", sw);
+                            site.Stop();
+                        }
 
-                        sw.WriteLine($"Stop application pool: {SetupOption.Application}");
-                        ConsoleOutput.Text += $"Stop application pool: {SetupOption.Application}\r\n";
-                        scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
-                        appPool.Stop();
+                        if (appPool.State != ObjectState.Stopped)
+                        {
+                            LogInfo($"Stop application pool: {SetupOption.Application}", sw);
+                            appPool.Stop();
+                        }
                         serverManager.CommitChanges();
 
-                        Directory.Delete(Path.Combine(targetPath, "ClientApp"), true);
-                        sw.WriteLine($"Remove ClientApp at: {Path.Combine(targetPath, "ClientApp")}");
+                        if (Directory.Exists(Path.Combine(targetPath, "ClientApp")))
+                        {
+                            Directory.Delete(Path.Combine(targetPath, "ClientApp"), true);
+                            LogInfo($"Remove ClientApp at: {Path.Combine(targetPath, "ClientApp")}", sw);
+                        }
                     }
 
                     var sourcePath = AppDomain.CurrentDomain.BaseDirectory;
 
                     await Task.Run(async () =>
                     {
-                        await Task.Delay(2000);
-                        using (StreamWriter sw = File.AppendText("info.log"))
+                        var retryTimes = 0;
+                        while (true)
                         {
                             try
                             {
-                                var pattern = @"^(?!.*\\(?:appsettings(?:\.Development)?\.json|web(?:\.Development|\.Production)?\.config)$).+$";
-                                CopyFiles($"{sourcePath}\\web", targetPath, sw, pattern);
+                                using (StreamWriter sw = File.AppendText("info.log"))
+                                {
+                                    var pattern = @"^(?!.*\\(?:appsettings(?:\.Development)?\.json|web(?:\.Development|\.Production)?\.config)$).+$";
+                                    CopyFiles($"{sourcePath}\\web", targetPath, sw, pattern);
+                                }
+                                break;
                             }
                             catch (Exception ex)
                             {
-                                MessageBox.Show(ex.Message);
-                                sw.WriteLine(ex.Message);
+                                //MessageBox.Show(ex.Message);
+                                using (StreamWriter sw = File.AppendText("error.log"))
+                                {
+                                    sw.WriteLine(ex.Message);
+                                }
                             }
+
+                            retryTimes++;
+                            if (retryTimes > 10) break;
+
+                            using (StreamWriter sw = File.AppendText("info.log"))
+                            {
+                                LogInfo($"Could not copy files. Beginning retry {retryTimes} in 2000ms.", sw);
+                            }
+                            await Task.Delay(2000);
                         }
                     });
 
@@ -129,23 +151,20 @@ namespace Setup
                         using (StreamWriter sw = File.AppendText("info.log"))
                         {
                             // set the base url
-                            sw.WriteLine($"Set the base url: {SetupOption.Application}");
+                            LogInfo($"Set the base url: {SetupOption.Application}", sw);
                             SetBaseElementValue(indexFilePath, $"{SetupOption.Application}/");
 
-                            MessageBox.Show("Upgrade Complete.");
-
                             // start the website
-                            sw.WriteLine($"Start site: {SetupOption.SiteName}");
-                            ConsoleOutput.Text += $"Start site: {SetupOption.SiteName}\r\n";
-                            scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+                            LogInfo($"Start site: {SetupOption.SiteName}", sw);
                             site.Start();
 
-                            sw.WriteLine($"Start application pool: {SetupOption.Application}");
-                            ConsoleOutput.Text += $"Start application pool: {SetupOption.Application}\r\n";
-                            scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+                            LogInfo($"Start application pool: {SetupOption.Application}", sw);
                             appPool.Start();
 
                             serverManager.CommitChanges();
+
+                            LogInfo("Upgrade Complete.", sw);
+                            MessageBox.Show("Upgrade Complete.");
 
                             StartWebsite(SetupOption.SiteName, SetupOption.Application);
                         }
@@ -154,7 +173,7 @@ namespace Setup
                     {
                         MessageBox.Show(ex.Message);
 
-                        using (StreamWriter sw = File.AppendText("info.log"))
+                        using (StreamWriter sw = File.AppendText("error.log"))
                         {
                             sw.WriteLine(ex.Message);
                         }
@@ -327,7 +346,7 @@ namespace Setup
                 using (StreamWriter sw = File.AppendText("info.log"))
                 {
                     // update connection string.
-                    sw.WriteLine("Update connection string");
+                    LogInfo("Update connection string", sw);
 
                     var filePath = Path.Combine(targetPath, "appSettings.json");
                     string json = File.ReadAllText(filePath);
@@ -382,14 +401,19 @@ namespace Setup
                     File.WriteAllText(filePath, resultJson);
 
                     // set the base url
-                    sw.WriteLine($"Set the base url: {appPathWithSlash}/");
+                    LogInfo($"Set the base url: {appPathWithSlash}/", sw);
                     filePath = Path.Combine(targetPath, "ClientApp/dist/index.html");
                     SetBaseElementValue(filePath, $"{appPathWithSlash}/");
 
                     //CreateIISApplication
-                    sw.WriteLine($"Create IIS Application: {siteName}, {appPathWithSlash}, {targetPath}");
+                    LogInfo($"Create IIS Application: {siteName}, {appPathWithSlash}, {targetPath}", sw);
                     CreateIISApplication(siteName, appPathWithSlash, targetPath);
 
+                    // Grant IIS_IUSER permissions
+                    LogInfo($"Grant Folder Permissions", sw);
+                    GrantFolderPermissions(targetPath);
+
+                    LogInfo($"Publish Complete.", sw);
                     MessageBox.Show("Publish Complete.");
 
                     // start the website
@@ -582,9 +606,7 @@ namespace Setup
                 string destinationFilePath = Path.Combine(destinationDir.FullName, file.Name);
                 file.CopyTo(destinationFilePath, true);
 
-                sw.WriteLine(destinationFilePath);
-                ConsoleOutput.Text += $"{destinationFilePath}\r\n";
-                scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+                LogInfo(destinationFilePath, sw);
             }
 
             DirectoryInfo[] subDirectories = sourceDir.GetDirectories();
@@ -607,8 +629,15 @@ namespace Setup
                     string appPathWithSlash = appPath.StartsWith("/") ? appPath : $"/{appPath}";
                     string physicalPath = targetPath.TrimEnd('\\');
 
+                    var applicationPoolName = $"{site.Applications["/"].ApplicationPoolName}_{appPathWithSlash.Trim('/')}";
+                    var applicationPool = serverManager.ApplicationPools.Add(applicationPoolName);
+                    applicationPool.ManagedRuntimeVersion = "";
+                    TimeSpan timeout = TimeSpan.FromMinutes(1740);
+                    applicationPool.ProcessModel.IdleTimeout = timeout;
+                    applicationPool.Recycling.PeriodicRestart.Time = timeout;
+
                     Microsoft.Web.Administration.Application application = site.Applications.Add(appPathWithSlash, physicalPath);
-                    application.ApplicationPoolName = site.Applications["/"].ApplicationPoolName;
+                    application.ApplicationPoolName = applicationPool.Name;
 
                     serverManager.CommitChanges();
                 }
@@ -625,11 +654,6 @@ namespace Setup
                     // If IIS is installed, accessing the Sites collection should succeed
                     SiteCollection sites = serverManager.Sites;
 
-                    using (StreamWriter sw = File.AppendText("error.log"))
-                    {
-                        sw.WriteLine("IIS Installed");
-                    }
-
                     // If the Sites collection is accessible, IIS is installed
                     return true;
                 }
@@ -643,6 +667,7 @@ namespace Setup
             {
                 using (StreamWriter sw = File.AppendText("error.log"))
                 {
+                    sw.WriteLine("IIS is not installed. Please install it first.");
                     sw.WriteLine(ex.Message);
                 }
                 // If an exception occurs while accessing the Sites collection, IIS is not installed
@@ -651,6 +676,35 @@ namespace Setup
 
                 return false;
             }
+        }
+
+        private void LogInfo(string msg, StreamWriter sw)
+        {
+            sw.WriteLine(msg);
+            ConsoleOutput.Text += $"{msg}\r\n";
+            scrollViewerOutput.Dispatcher.Invoke(new Action(() => { scrollViewerOutput.ScrollToBottom(); }));
+        }
+
+        public void GrantFolderPermissions(string folderPath)
+        {
+            // Get the DirectoryInfo object for the folder
+            DirectoryInfo directoryInfo = new DirectoryInfo(folderPath);
+
+            // Get the existing access control for the folder
+            DirectorySecurity directorySecurity = directoryInfo.GetAccessControl();
+
+            // Create a rule to grant full control permission to the "Everyone" group
+            FileSystemAccessRule accessRule = new FileSystemAccessRule("IIS_IUSRS",
+                FileSystemRights.FullControl,
+                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                PropagationFlags.None,
+                AccessControlType.Allow);
+
+            // Add the access rule to the access control list
+            directorySecurity.AddAccessRule(accessRule);
+
+            // Set the modified access control list back to the folder
+            directoryInfo.SetAccessControl(directorySecurity);
         }
 
         #endregion
