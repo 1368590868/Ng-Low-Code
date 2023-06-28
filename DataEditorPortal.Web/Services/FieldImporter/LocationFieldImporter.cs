@@ -103,6 +103,8 @@ namespace DataEditorPortal.Web.Services.FieldImporter
                 {
                     using (JsonDocument doc = JsonDocument.Parse(field.props.ToString()))
                     {
+                        entry.SetSlidingExpiration(TimeSpan.FromMinutes(60));
+
                         var props = doc.RootElement.EnumerateObject();
                         var locationType = props.FirstOrDefault(x => x.Name == "locationType").Value.GetInt32();
                         var optionsLookupProp = props.FirstOrDefault(x => x.Name == "system").Value;
