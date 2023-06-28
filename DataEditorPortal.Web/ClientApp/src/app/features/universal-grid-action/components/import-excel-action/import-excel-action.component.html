@@ -316,7 +316,8 @@
       styleClass="p-button-text"></p-button>
     <p-button
       [disabled]="validDisabled(currentStep) || isLoading"
-      icon="pi pi-check"
+      [iconPos]="okLabel !== 'Next' ? 'left' : 'right'"
+      [icon]="'pi ' + (okLabel !== 'Next' ? 'pi-check' : 'pi-angle-right')"
       (onClick)="onOk()"
       [label]="okLabel"
       [loading]="isLoading"></p-button>
