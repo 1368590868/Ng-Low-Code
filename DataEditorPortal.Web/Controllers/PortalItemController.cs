@@ -597,7 +597,7 @@ namespace DataEditorPortal.Web.Controllers
 
                 var builder = new OracleConnectionStringBuilder();
 
-                builder.DataSource = $"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={con.DbName})));";
+                builder.DataSource = $"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={con.DbName})))";
 
                 if (con.Authentication == "OS Authentication")
                 {
