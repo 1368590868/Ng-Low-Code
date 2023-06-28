@@ -15,12 +15,19 @@
             [model]="addNewMenuModels"
             appendTo="body"
             [style]="{ width: 'auto' }"></p-menu>
-          <p-button
-            icon="pi pi-plus"
-            class="ml-auto"
-            styleClass="p-button-outlined"
-            label="New"
-            (click)="addNewMenu.toggle($event)"></p-button>
+          <div class="ml-auto flex justify-content-between">
+            <p-button
+              class="mr-2"
+              icon="pi pi-file-import"
+              styleClass="p-button-outlined"
+              label="Import"
+              (click)="importDialog.showDialog()"></p-button>
+            <p-button
+              icon="pi pi-plus"
+              styleClass="p-button-outlined"
+              label="New"
+              (click)="addNewMenu.toggle($event)"></p-button>
+          </div>
         </div>
       </ng-template>
       <ng-template pTemplate="header">
@@ -99,6 +106,10 @@
 <app-add-portal-dialog
   #addDialog
   (saved)="onDiaglogSaved()"></app-add-portal-dialog>
+
+<app-import-dialog
+  #importDialog
+  (saved)="onImportDialogSaved()"></app-import-dialog>
 
 <app-custom-actions #customActions></app-custom-actions>
 <p-confirmDialog

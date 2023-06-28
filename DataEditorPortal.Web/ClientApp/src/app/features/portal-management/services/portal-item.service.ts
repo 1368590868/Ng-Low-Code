@@ -12,6 +12,7 @@ import {
   GridColumn,
   GridCustomAction,
   GridSearchField,
+  ImportPortal,
   LinkedDataSourceConfig,
   LinkedSingleConfig,
   PortalItem,
@@ -387,5 +388,26 @@ export class PortalItemService {
     return this.http.post(`${this._apiUrl}portal-item/${id}/export`, null, {
       responseType: 'blob'
     });
+  }
+
+  importPortalItem(data: {
+    parentId: string | null;
+    attachment: any;
+  }): Observable<ApiResponse<ImportPortal[]>> {
+    return this.http.post<ApiResponse<ImportPortal[]>>(
+      `${this._apiUrl}portal-item/preview-import`,
+      data
+    );
+  }
+
+  confirmPortalItem(data: {
+    parentId: string | null;
+    attachment: any;
+    selectedObjects: string[];
+  }): Observable<ApiResponse<ImportPortal[]>> {
+    return this.http.post<ApiResponse<ImportPortal[]>>(
+      `${this._apiUrl}portal-item/confirm-import`,
+      data
+    );
   }
 }

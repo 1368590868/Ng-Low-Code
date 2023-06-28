@@ -1,0 +1,129 @@
+<p-dialog
+  [header]="header"
+  [(visible)]="visible"
+  [style]="dialogStyle"
+  [modal]="true"
+  contentStyleClass="border-top-1 surface-border pt-4 pb-0"
+  appendTo="body">
+  <div #container class="dialog-content">
+    <!-- Select File -->
+    <div *ngIf="step === 1">
+      <div class="mb-3">
+        <label class="line-height-3 flex align-items-center"
+          >Parent Folder</label
+        >
+        <p-dropdown
+          styleClass="w-full"
+          [options]="options"
+          [required]="true"
+          [formControl]="parentFolderControl"
+          appendTo="body"
+          placeholder="Please Select"></p-dropdown>
+      </div>
+      <div class="upload-label flex py-3">
+        <p-fileUpload
+          #upload
+          name="files"
+          styleClass="p-button-outlined"
+          chooseIcon="pi pi-upload"
+          mode="basic"
+          accept=".zip,.rar"
+          [url]="apiUrl + 'attachment/upload-temp-file'"
+          [auto]="true"
+          [maxFileSize]="20 * 1000 * 1000"
+          (onProgress)="onFileUploadProgress($event)"
+          (onSelect)="onSelect($event)"
+          (onUpload)="onUpload($event)"
+          (onError)="onUploadError($event, upload)"
+          [chooseLabel]="'Select file'">
+        </p-fileUpload>
+
+        <p-progressBar
+          *ngIf="progress > 0 && !file?.fileName"
+          [value]="progress"
+          class="w-15rem ml-2"
+          styleClass="h-full"></p-progressBar>
+        <p-button
+          *ngIf="file?.fileName"
+          icon="pi pi-file"
+          styleClass="p-button-link"
+          [label]="file?.fileName"></p-button>
+      </div>
+    </div>
+
+    <div *ngIf="step === 2" class="preview-data flex flex-column overflow-auto">
+      <p class="mb-3">
+        Please select the objects to import. Existing objects are marked with a
+        warning and will be overwritten if checked.
+      </p>
+      <p-table
+        class="data-table overflow-auto"
+        [value]="dataSource"
+        [selectionMode]="'multiple'"
+        [rowHover]="true"
+        [(selection)]="selection"
+        [showCurrentPageReport]="false"
+        scrollHeight="flex"
+        [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+
+              <span class="ml-3">Import</span>
+            </th>
+            <th [style.min-width]="'3rem !important'">Type</th>
+            <th>Display name</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-infoList>
+          <tr [pSelectableRow]="infoList">
+            <td>
+              <p-tableCheckbox
+                [index]="infoList.key"
+                [value]="infoList"
+                (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
+            </td>
+            <td>{{ infoList.type }}</td>
+            <td style="vertical-align: middle">
+              {{ infoList.displayName }}
+              <i
+                *ngIf="infoList.exist"
+                class="fa-solid fa-triangle-exclamation ml-3 text-lg text-yellow-500"
+                pTooltip=" Object exists and will be overwritten, if checked.
+                ">
+              </i>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-between">
+      <div>
+        <p-button
+          *ngIf="step !== 1"
+          icon="pi pi-angle-left"
+          (onClick)="onBack()"
+          label="Back"
+          styleClass="p-button-text"></p-button>
+      </div>
+      <div>
+        <p-button
+          *ngIf="cancelText"
+          icon="pi pi-times"
+          (onClick)="onCancel()"
+          [label]="cancelText"
+          styleClass="p-button-text"></p-button>
+        <p-button
+          [iconPos]="iconPos"
+          [icon]="'pi ' + (step === 2 ? 'pi-check' : 'pi-angle-right')"
+          [disabled]="validDisabled() || isLoading"
+          (onClick)="onOk()"
+          [label]="okText"
+          [loading]="isLoading"></p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
