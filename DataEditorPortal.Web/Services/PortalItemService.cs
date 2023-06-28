@@ -10,6 +10,7 @@ using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,8 @@ namespace DataEditorPortal.Web.Services
         LinkedDataSourceConfig GetLinkedDataSourceConfig(Guid id);
         bool SaveLinkedDataSourceConfig(Guid id, LinkedDataSourceConfig model);
         MemoryStream ExportPortalItem(Guid id);
+        List<PortalItemPreviewModel> PreviewImport(PortalItemImportModel model);
+        void ConfirmImport(PortalItemImportModel model);
     }
 
     public class PortalItemService : IPortalItemService
@@ -59,6 +62,7 @@ namespace DataEditorPortal.Web.Services
         private readonly IMapper _mapper;
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMemoryCache _memoryCache;
+        private readonly IHostEnvironment _hostEnvironment;
 
         public PortalItemService(
             IServiceProvider serviceProvider,
@@ -67,7 +71,8 @@ namespace DataEditorPortal.Web.Services
             ILogger<PortalItemService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            IHostEnvironment hostEnvironment)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
@@ -76,6 +81,7 @@ namespace DataEditorPortal.Web.Services
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _memoryCache = memoryCache;
+            _hostEnvironment = hostEnvironment;
         }
 
         public bool ExistName(string name, Guid? id)
@@ -139,7 +145,7 @@ namespace DataEditorPortal.Web.Services
             _depDbContext.UniversalGridConfigurations.Add(item);
 
             // create permissions
-            CreateOrUpdatePermission(siteMenu, model);
+            CreateOrUpdatePermission(siteMenu, item);
 
             _depDbContext.SaveChanges();
 
@@ -153,13 +159,11 @@ namespace DataEditorPortal.Web.Services
             {
                 throw new ApiException("Not Found", 404);
             }
+            var oldName = siteMenu.Name;
 
             if (string.IsNullOrEmpty(model.Name))
                 model.Name = GetCodeName(model.Label);
             if (ExistName(model.Name, id)) throw new DepException("Portal Name does already exist.");
-
-            // update permissions
-            CreateOrUpdatePermission(siteMenu, model);
 
             var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             item.Name = model.Name;
@@ -176,6 +180,9 @@ namespace DataEditorPortal.Web.Services
             _mapper.Map(model, siteMenu);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
             siteMenu.Type = model.ItemType == GridItemType.LINKED_SINGLE ? "Sub Portal Item" : "Portal Item";
+
+            // update permissions
+            CreateOrUpdatePermission(siteMenu, item, oldName);
 
             _depDbContext.SaveChanges();
             return siteMenu.Id;
@@ -199,13 +206,25 @@ namespace DataEditorPortal.Web.Services
         {
             if (siteMenu != null)
             {
+                var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+
+                // remove lookups
+                var lookups = _depDbContext.Lookups.Where(x => x.UniversalGridConfigurationId == config.Id).ToList();
+                lookups.ForEach(l => _depDbContext.Lookups.Remove(l));
+
                 // remove permission
-                var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"Portal Item: { siteMenu.Label }").ToList();
+                var types = new List<string>();
+                if (config.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
+                if (config.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
+                if (config.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
+
+                // get old permissions
+                var oldPermissionNames = types.Select(t => $"{t}_{ config.Name.Replace("-", "_") }".ToUpper());
+                var permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
                 permissions.ForEach(p => _depDbContext.SitePermissions.Remove(p));
 
                 // remove configuration
-                var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
-                _depDbContext.UniversalGridConfigurations.Remove(item);
+                _depDbContext.UniversalGridConfigurations.Remove(config);
 
                 // remove linked table
                 var childrenMenus = _depDbContext.SiteMenus.Where(x => x.ParentId == siteMenu.Id).ToList();
@@ -216,30 +235,38 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        private void CreateOrUpdatePermission(SiteMenu siteMenu, PortalItemData model)
+        private void CreateOrUpdatePermission(SiteMenu siteMenu, UniversalGridConfiguration config, string oldMenuName = null)
         {
             var types = new List<string>();
-            if (model.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
-            if (model.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
-            if (model.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
+            if (config.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
+            if (config.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
+            if (config.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
 
-            // get old permissions
-            var oldPermissionNames = types.Select(t => $"{t}_{ siteMenu.Name.Replace("-", "_") }".ToUpper());
-            var permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
+            List<SitePermission> permissions = new List<SitePermission>();
+            if (!string.IsNullOrEmpty(oldMenuName))
+            {
+                // get old permissions
+                var oldPermissionNames = types.Select(t => $"{t}_{ oldMenuName.Replace("-", "_") }".ToUpper());
+                permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
+            }
 
             types.ForEach(t =>
             {
-                var oldName = $"{t}_{ siteMenu.Name.Replace("-", "_") }".ToUpper();
-                var permission = permissions.FirstOrDefault(p => p.PermissionName == oldName);
+                SitePermission permission = null;
+                if (!string.IsNullOrEmpty(oldMenuName))
+                {
+                    var oldName = $"{t}_{ oldMenuName.Replace("-", "_") }".ToUpper();
+                    permission = permissions.FirstOrDefault(p => p.PermissionName == oldName);
+                }
 
                 if (permission == null)
                 {
                     permission = new SitePermission() { Id = Guid.NewGuid() };
                     _depDbContext.Add(permission);
                 }
-                permission.Category = $"Portal Item: { model.Label }";
-                permission.PermissionName = $"{t}_{ model.Name.Replace("-", "_") }".ToUpper();
-                permission.PermissionDescription = $"{t} { model.Label }";
+                permission.Category = $"Portal Item: { siteMenu.Label }";
+                permission.PermissionName = $"{t}_{ siteMenu.Name.Replace("-", "_") }".ToUpper();
+                permission.PermissionDescription = $"{t} { siteMenu.Label }";
             });
         }
 
@@ -692,6 +719,8 @@ namespace DataEditorPortal.Web.Services
             _memoryCache.Remove($"grid.{name}.attachment.cols");
         }
 
+        #region Export & Import
+
         public MemoryStream ExportPortalItem(Guid id)
         {
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
@@ -704,17 +733,10 @@ namespace DataEditorPortal.Web.Services
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
 
-            var ds = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == config.DataSourceConnectionName);
+            var ds = _depDbContext.DataSourceConnections.Where(x => x.Name == config.DataSourceConnectionName).ToList();
             var menus = _depDbContext.SiteMenus.Where(x => x.Id == id || x.ParentId == id).OrderByDescending(x => x.ParentId).ToList();
             var configs = _depDbContext.UniversalGridConfigurations.Where(x => menus.Select(m => m.Name).Contains(x.Name)).ToList();
             var lookups = _depDbContext.Lookups.Where(x => configs.Select(c => c.Id).Contains(x.UniversalGridConfigurationId.Value)).ToList();
-
-            var types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
-
-            // get old permissions
-            var permissionNames = new List<string>();
-            menus.ForEach(m => permissionNames.AddRange(types.Select(t => $"{t}_{ m.Name.Replace("-", "_") }".ToUpper())));
-            var permissions = _depDbContext.SitePermissions.Where(x => permissionNames.Contains(x.PermissionName)).ToList();
 
             var zipMemoryStream = new MemoryStream();
             using (var archive = new ZipArchive(zipMemoryStream, ZipArchiveMode.Create, true))
@@ -728,6 +750,243 @@ namespace DataEditorPortal.Web.Services
 
             zipMemoryStream.Position = 0;
             return zipMemoryStream;
+        }
+
+        public List<PortalItemPreviewModel> PreviewImport(PortalItemImportModel model)
+        {
+            if (model.ParentId.HasValue)
+            {
+                var parentExist = _depDbContext.SiteMenus.Any(x => x.Id == model.ParentId && x.Type == "Folder");
+                if (!parentExist)
+                {
+                    throw new ApiException("Parent Not Found", 404);
+                }
+            }
+
+            string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data\\FileUploadTemp");
+            var tempFilePath = Path.Combine(tempFolder, $"{model.Attachment.FileId} - {model.Attachment.FileName}");
+            if (!File.Exists(tempFilePath)) throw new DepException("Uploaded File doesn't exist.");
+
+            var result = new List<PortalItemPreviewModel>();
+            try
+            {
+                using (var archive = ZipFile.OpenRead(tempFilePath))
+                {
+                    #region datasource entry
+
+                    var dsEntry = archive.Entries.FirstOrDefault(e => e.Name == "DataSourceConnections.xml");
+                    if (dsEntry == null) throw new FileNotFoundException();
+
+                    var connections = GetObjects<List<DataSourceConnection>>(dsEntry);
+                    if (connections.Count == 0) throw new ApiException("No DataSource Connection exists.");
+                    var connectionKeys = connections.Select(c => c.Name);
+                    var existConnectionKeys = _depDbContext.DataSourceConnections
+                        .Where(x => connectionKeys.Contains(x.Name))
+                        .Select(x => x.Name)
+                        .ToList();
+
+                    result.AddRange(connections.Select(x =>
+                        new PortalItemPreviewModel()
+                        {
+                            Key = x.Name,
+                            DisplayName = x.Name,
+                            Type = "DataSource Connection",
+                            Exist = existConnectionKeys.Contains(x.Name)
+                        }
+                    ));
+
+                    #endregion
+
+                    #region portal item entry
+
+                    var smEntry = archive.Entries.FirstOrDefault(e => e.Name == "SiteMenus.xml");
+                    var configEntry = archive.Entries.FirstOrDefault(e => e.Name == "UniversalGridConfigurations.xml");
+                    if (smEntry == null || configEntry == null) throw new FileNotFoundException();
+
+                    var siteMenus = GetObjects<List<SiteMenu>>(smEntry);
+                    var configs = GetObjects<List<UniversalGridConfiguration>>(configEntry);
+                    if (siteMenus.Count == 0) throw new ApiException("No Site Menus exists.");
+                    if (configs.Count == 0) throw new ApiException("No Universal Grid Config exists.");
+
+                    var keys = siteMenus.Select(c => c.Name);
+                    var exists = _depDbContext.SiteMenus.Where(x => keys.Contains(x.Name)).Select(x => x.Name).ToList();
+
+                    result.AddRange(configs.Select(x =>
+                        new PortalItemPreviewModel()
+                        {
+                            Key = x.Name.ToString(),
+                            DisplayName = x.Name,
+                            Type = "Portal Item",
+                            Exist = exists.Contains(x.Name)
+                        }
+                    ));
+
+                    #endregion
+
+                    #region lookups entry
+
+                    var lookupEntry = archive.Entries.FirstOrDefault(e => e.Name == "Lookups.xml");
+                    if (lookupEntry != null)
+                    {
+                        var lookups = GetObjects<List<Lookup>>(lookupEntry).Where(x => model.SelectedObjects.Contains(x.Id.ToString()));
+                        var lookupKeys = lookups.Select(c => c.Id);
+                        var existLookups = _depDbContext.Lookups.Where(x => lookupKeys.Contains(x.Id)).Select(x => x.Id).ToList();
+
+                        result.AddRange(lookups.Select(x =>
+                            new PortalItemPreviewModel()
+                            {
+                                Key = x.Id.ToString(),
+                                DisplayName = x.Name,
+                                Type = "Lookup",
+                                Exist = existLookups.Contains(x.Id)
+                            }
+                        ));
+                    }
+                    #endregion
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                _logger.LogError(e, e.Message);
+                throw new ApiException("The uploaded file doesn't contains files required. Please make sure it is exported from the application and without any changes.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public void ConfirmImport(PortalItemImportModel model)
+        {
+            if (model.ParentId.HasValue)
+            {
+                var parentExist = _depDbContext.SiteMenus.Any(x => x.Id == model.ParentId && x.Type == "Folder");
+                if (!parentExist)
+                {
+                    throw new ApiException("Parent Not Found", 404);
+                }
+            }
+            string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data\\FileUploadTemp");
+            var tempFilePath = Path.Combine(tempFolder, $"{model.Attachment.FileId} - {model.Attachment.FileName}");
+            if (!File.Exists(tempFilePath)) throw new DepException("Uploaded File doesn't exist.");
+
+            var result = new List<PortalItemPreviewModel>();
+            try
+            {
+                using (var archive = ZipFile.OpenRead(tempFilePath))
+                {
+                    #region datasource entry
+
+                    var dsEntry = archive.Entries.FirstOrDefault(e => e.Name == "DataSourceConnections.xml");
+                    if (dsEntry == null) throw new FileNotFoundException();
+
+                    var connections = GetObjects<List<DataSourceConnection>>(dsEntry).Where(x => model.SelectedObjects.Contains(x.Name));
+                    var connectionKeys = connections.Select(c => c.Name);
+                    var existConnectionKeys = _depDbContext.DataSourceConnections.Where(x => connectionKeys.Contains(x.Name)).ToList();
+
+                    foreach (var connection in connections)
+                    {
+                        var item = existConnectionKeys.FirstOrDefault(x => x.Name == connection.Name);
+                        if (item != null)
+                        {
+                            item.ConnectionString = connection.ConnectionString;
+                        }
+                        else
+                        {
+                            _depDbContext.Add(connection);
+                        }
+                    }
+
+                    #endregion
+
+                    #region portal item entry
+
+                    var smEntry = archive.Entries.FirstOrDefault(e => e.Name == "SiteMenus.xml");
+                    var configEntry = archive.Entries.FirstOrDefault(e => e.Name == "UniversalGridConfigurations.xml");
+                    if (smEntry == null || configEntry == null) throw new FileNotFoundException();
+
+                    var siteMenus = GetObjects<List<SiteMenu>>(smEntry);
+                    var configs = GetObjects<List<UniversalGridConfiguration>>(configEntry);
+                    if (siteMenus.Count == 0) throw new ApiException("No site menus exists");
+
+                    var parentIds = siteMenus.Select(c => c.ParentId);
+                    var parentSiteMenu = siteMenus.FirstOrDefault(m => parentIds.Contains(m.Id));
+                    if (parentSiteMenu == null) parentSiteMenu = siteMenus[0];
+
+                    var exists = _depDbContext.SiteMenus.FirstOrDefault(x => parentSiteMenu.Name == x.Name);
+                    if (exists != null)
+                        DeleteInternal(exists);
+
+                    var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
+                    var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+
+                    foreach (var siteMenu in siteMenus)
+                    {
+                        var config = configs.FirstOrDefault(c => c.Name == siteMenu.Name);
+                        if (config == null) continue;
+
+                        if (siteMenu.Id == parentSiteMenu.Id)
+                            siteMenu.ParentId = model.ParentId;
+                        siteMenu.Order = _depDbContext.SiteMenus
+                            .Where(x => x.ParentId == model.ParentId)
+                            .OrderByDescending(x => x.Order)
+                            .Select(x => x.Order)
+                            .FirstOrDefault() + 1;
+
+                        config.CreatedBy = userId;
+                        config.CreatedDate = DateTime.UtcNow;
+
+                        _depDbContext.SiteMenus.Add(siteMenu);
+                        _depDbContext.UniversalGridConfigurations.Add(config);
+
+                        CreateOrUpdatePermission(siteMenu, config);
+                    }
+
+                    #endregion
+
+                    #region lookups entry
+
+                    var lookupEntry = archive.Entries.FirstOrDefault(e => e.Name == "Lookups.xml");
+                    if (lookupEntry != null)
+                    {
+                        var lookups = GetObjects<List<Lookup>>(lookupEntry).Where(x => model.SelectedObjects.Contains(x.Id.ToString()));
+                        var lookupKeys = lookups.Select(c => c.Id);
+                        var existLookups = _depDbContext.Lookups.Where(x => lookupKeys.Contains(x.Id)).ToList();
+
+                        foreach (var lookup in existLookups)
+                        {
+                            var item = existLookups.FirstOrDefault(x => x.Id == lookup.Id);
+                            if (item != null)
+                            {
+                                item.QueryText = lookup.QueryText;
+                                item.Name = lookup.Name;
+                            }
+                            else
+                            {
+                                _depDbContext.Add(lookup);
+                            }
+                        }
+                    }
+                    #endregion
+
+                    _depDbContext.SaveChanges();
+                }
+
+                try { File.Delete(tempFilePath); } catch { };
+            }
+            catch (FileNotFoundException e)
+            {
+                _logger.LogError(e, e.Message);
+                throw new ApiException("The uploaded file doesn't contains files required. Please make sure it is exported from the application and without any changes.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                throw;
+            }
         }
 
         private string GetXml<T>(T obj)
@@ -744,6 +1003,18 @@ namespace DataEditorPortal.Web.Services
                 return stringWriter.ToString();
             }
         }
+        private T GetObjects<T>(ZipArchiveEntry entry)
+        {
+            var serializer = new XmlSerializer(typeof(T));
+
+            using (Stream entryStream = entry.Open())
+            {
+                using (StreamReader reader = new StreamReader(entryStream))
+                {
+                    return (T)serializer.Deserialize(reader);
+                }
+            }
+        }
         private void AddFileToZipArchive(ZipArchive archive, string xmlString, string fileName)
         {
             using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(xmlString)))
@@ -755,5 +1026,7 @@ namespace DataEditorPortal.Web.Services
                 }
             }
         }
+
+        #endregion
     }
 }

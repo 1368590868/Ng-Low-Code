@@ -814,11 +814,27 @@ namespace DataEditorPortal.Web.Controllers
         [HttpPost]
         [Route("{id}/export")]
         [AutoWrapIgnore]
-        public IActionResult ExportData(Guid id)
+        public IActionResult ExportPortalItem(Guid id)
         {
             var fs = _portalItemService.ExportPortalItem(id);
 
             return File(fs, "application/octet-stream", $"Export_{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.zip");
+        }
+
+        [HttpPost]
+        [Route("preview-import")]
+        public List<PortalItemPreviewModel> PreviewImport([FromBody] PortalItemImportModel model)
+        {
+            return _portalItemService.PreviewImport(model);
+        }
+
+        [HttpPost]
+        [Route("confirm-import")]
+        public bool ConfirmImport([FromBody] PortalItemImportModel model)
+        {
+            _portalItemService.ConfirmImport(model);
+
+            return true;
         }
     }
 }
