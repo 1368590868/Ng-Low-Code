@@ -12,7 +12,9 @@
   [modal]="true"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0 flex flex-column"
   appendTo="body">
-  <div #container></div>
+  <div #container>
+    <app-global-loading></app-global-loading>
+  </div>
   <ng-template pTemplate="footer" *ngIf="!hideFooter">
     <p-button
       *ngIf="cancelText"
