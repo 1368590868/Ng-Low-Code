@@ -772,14 +772,44 @@ namespace DataEditorPortal.Web.Services
             {
                 using (var archive = ZipFile.OpenRead(tempFilePath))
                 {
+                    #region portal item entry
+
+                    var smEntry = archive.Entries.FirstOrDefault(e => e.Name == "SiteMenus.xml");
+                    var configEntry = archive.Entries.FirstOrDefault(e => e.Name == "UniversalGridConfigurations.xml");
+                    if (smEntry == null || configEntry == null) throw new FileNotFoundException();
+
+                    var siteMenus = GetObjects<List<SiteMenu>>(smEntry);
+                    var configs = GetObjects<List<UniversalGridConfiguration>>(configEntry);
+                    if (siteMenus.Count == 0) throw new ApiException("No Site Menus exists.");
+                    if (configs.Count == 0) throw new ApiException("No Universal Grid Config exists.");
+
+                    // find parent site menu
+                    var parentIds = siteMenus.Select(c => c.ParentId);
+                    var parentSiteMenu = siteMenus.Where(m => parentIds.Contains(m.Id)).ToList();
+                    if (!parentSiteMenu.Any()) parentSiteMenu = siteMenus;
+
+                    var siteMenukeys = parentSiteMenu.Select(c => c.Id).ToList();
+                    var existSiteMenus = _depDbContext.SiteMenus.Where(x => siteMenukeys.Contains(x.Id)).Select(x => x.Id).ToList();
+
+                    result.AddRange(parentSiteMenu.Select(x =>
+                        new PortalItemPreviewModel()
+                        {
+                            Key = x.Id.ToString(),
+                            DisplayName = x.Name,
+                            Type = "Portal Item",
+                            Exist = existSiteMenus.Contains(x.Id)
+                        }
+                    ));
+
+                    #endregion
+
                     #region datasource entry
 
                     var dsEntry = archive.Entries.FirstOrDefault(e => e.Name == "DataSourceConnections.xml");
                     if (dsEntry == null) throw new FileNotFoundException();
 
                     var connections = GetObjects<List<DataSourceConnection>>(dsEntry);
-                    if (connections.Count == 0) throw new ApiException("No DataSource Connection exists.");
-                    var connectionKeys = connections.Select(c => c.Name);
+                    var connectionKeys = connections.Select(c => c.Name).ToList();
                     var existConnectionKeys = _depDbContext.DataSourceConnections
                         .Where(x => connectionKeys.Contains(x.Name))
                         .Select(x => x.Name)
@@ -797,51 +827,25 @@ namespace DataEditorPortal.Web.Services
 
                     #endregion
 
-                    #region portal item entry
-
-                    var smEntry = archive.Entries.FirstOrDefault(e => e.Name == "SiteMenus.xml");
-                    var configEntry = archive.Entries.FirstOrDefault(e => e.Name == "UniversalGridConfigurations.xml");
-                    if (smEntry == null || configEntry == null) throw new FileNotFoundException();
-
-                    var siteMenus = GetObjects<List<SiteMenu>>(smEntry);
-                    var configs = GetObjects<List<UniversalGridConfiguration>>(configEntry);
-                    if (siteMenus.Count == 0) throw new ApiException("No Site Menus exists.");
-                    if (configs.Count == 0) throw new ApiException("No Universal Grid Config exists.");
-
-                    var keys = siteMenus.Select(c => c.Name);
-                    var exists = _depDbContext.SiteMenus.Where(x => keys.Contains(x.Name)).Select(x => x.Name).ToList();
-
-                    result.AddRange(configs.Select(x =>
-                        new PortalItemPreviewModel()
-                        {
-                            Key = x.Name.ToString(),
-                            DisplayName = x.Name,
-                            Type = "Portal Item",
-                            Exist = exists.Contains(x.Name)
-                        }
-                    ));
-
-                    #endregion
-
                     #region lookups entry
 
                     var lookupEntry = archive.Entries.FirstOrDefault(e => e.Name == "Lookups.xml");
-                    if (lookupEntry != null)
-                    {
-                        var lookups = GetObjects<List<Lookup>>(lookupEntry).Where(x => model.SelectedObjects.Contains(x.Id.ToString()));
-                        var lookupKeys = lookups.Select(c => c.Id);
-                        var existLookups = _depDbContext.Lookups.Where(x => lookupKeys.Contains(x.Id)).Select(x => x.Id).ToList();
+                    if (lookupEntry == null) throw new FileNotFoundException();
 
-                        result.AddRange(lookups.Select(x =>
-                            new PortalItemPreviewModel()
-                            {
-                                Key = x.Id.ToString(),
-                                DisplayName = x.Name,
-                                Type = "Lookup",
-                                Exist = existLookups.Contains(x.Id)
-                            }
-                        ));
-                    }
+                    var lookups = GetObjects<List<Lookup>>(lookupEntry);
+                    var lookupKeys = lookups.Select(c => c.Id).ToList();
+                    var existLookups = _depDbContext.Lookups.Where(x => lookupKeys.Contains(x.Id)).Select(x => x.Id).ToList();
+
+                    result.AddRange(lookups.Select(x =>
+                        new PortalItemPreviewModel()
+                        {
+                            Key = x.Id.ToString(),
+                            DisplayName = x.Name,
+                            Type = "Lookup",
+                            Exist = existLookups.Contains(x.Id)
+                        }
+                    ));
+
                     #endregion
                 }
             }
@@ -879,20 +883,21 @@ namespace DataEditorPortal.Web.Services
                 using (var archive = ZipFile.OpenRead(tempFilePath))
                 {
                     #region datasource entry
-
+                    // get zip archive entry
                     var dsEntry = archive.Entries.FirstOrDefault(e => e.Name == "DataSourceConnections.xml");
                     if (dsEntry == null) throw new FileNotFoundException();
 
+                    // get connections and cache existing keys
                     var connections = GetObjects<List<DataSourceConnection>>(dsEntry).Where(x => model.SelectedObjects.Contains(x.Name));
-                    var connectionKeys = connections.Select(c => c.Name);
-                    var existConnectionKeys = _depDbContext.DataSourceConnections.Where(x => connectionKeys.Contains(x.Name)).ToList();
+                    var connectionKeys = connections.Select(c => c.Name).ToList();
+                    var existConnections = _depDbContext.DataSourceConnections.Where(x => connectionKeys.Contains(x.Name)).ToList();
 
                     foreach (var connection in connections)
                     {
-                        var item = existConnectionKeys.FirstOrDefault(x => x.Name == connection.Name);
-                        if (item != null)
+                        var entity = existConnections.FirstOrDefault(x => x.Name == connection.Name);
+                        if (entity != null)
                         {
-                            item.ConnectionString = connection.ConnectionString;
+                            entity.ConnectionString = connection.ConnectionString;
                         }
                         else
                         {
@@ -904,72 +909,136 @@ namespace DataEditorPortal.Web.Services
 
                     #region portal item entry
 
+                    // get zip archive entry
                     var smEntry = archive.Entries.FirstOrDefault(e => e.Name == "SiteMenus.xml");
                     var configEntry = archive.Entries.FirstOrDefault(e => e.Name == "UniversalGridConfigurations.xml");
                     if (smEntry == null || configEntry == null) throw new FileNotFoundException();
 
+                    // get site menus and cache existing keys
                     var siteMenus = GetObjects<List<SiteMenu>>(smEntry);
+                    var siteMenuKeys = siteMenus.Select(c => c.Id).ToList();
+                    var existSitemenus = _depDbContext.SiteMenus.Where(x => siteMenuKeys.Contains(x.Id)).ToList();
+
+                    // get configs and cache existing keys
                     var configs = GetObjects<List<UniversalGridConfiguration>>(configEntry);
+                    var configKeys = configs.Select(c => c.Id).ToList();
+                    var existConfigs = _depDbContext.UniversalGridConfigurations.Where(x => configKeys.Contains(x.Id)).ToList();
+
                     if (siteMenus.Count == 0) throw new ApiException("No site menus exists");
 
+                    // find parent site menu
                     var parentIds = siteMenus.Select(c => c.ParentId);
                     var parentSiteMenu = siteMenus.FirstOrDefault(m => parentIds.Contains(m.Id));
                     if (parentSiteMenu == null) parentSiteMenu = siteMenus[0];
 
-                    var exists = _depDbContext.SiteMenus.FirstOrDefault(x => parentSiteMenu.Name == x.Name);
-                    if (exists != null)
-                        DeleteInternal(exists);
-
+                    // cache userid and allNames
                     var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
                     var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+                    var allNames = _depDbContext.SiteMenus.Select(m => new { m.Id, m.Name }).ToList();
 
                     foreach (var siteMenu in siteMenus)
                     {
-                        var config = configs.FirstOrDefault(c => c.Name == siteMenu.Name);
-                        if (config == null) continue;
+                        // find unique name
+                        var tempName = GetCodeName(siteMenu.Name);
+                        var dup = 0;
+                        while (allNames.Any(n => n.Id != siteMenu.Id && n.Name == tempName))
+                        {
+                            dup++;
+                            tempName = $"{tempName}-{dup}";
+                        }
+                        allNames.Add(new { Id = siteMenu.Id, Name = tempName });
 
+                        // change parent if the site menu is the parent site menu. 
                         if (siteMenu.Id == parentSiteMenu.Id)
                             siteMenu.ParentId = model.ParentId;
-                        siteMenu.Order = _depDbContext.SiteMenus
-                            .Where(x => x.ParentId == model.ParentId)
-                            .OrderByDescending(x => x.Order)
-                            .Select(x => x.Order)
-                            .FirstOrDefault() + 1;
 
-                        config.CreatedBy = userId;
-                        config.CreatedDate = DateTime.UtcNow;
+                        var siteMenuEntity = existSitemenus.FirstOrDefault(x => x.Id == siteMenu.Id);
+                        if (siteMenuEntity != null)
+                        {
+                            var oldOrder = siteMenuEntity.Order; // cache old order.
 
-                        _depDbContext.SiteMenus.Add(siteMenu);
-                        _depDbContext.UniversalGridConfigurations.Add(config);
+                            _mapper.Map(siteMenu, siteMenuEntity); // update site menu
+                            siteMenuEntity.Name = tempName;
 
-                        CreateOrUpdatePermission(siteMenu, config);
+                            if (siteMenuEntity.Id == parentSiteMenu.Id && siteMenuEntity.ParentId != model.ParentId)
+                            {
+                                // site menu exist, and parentId is changed. update order.
+                                siteMenuEntity.Order = _depDbContext.SiteMenus
+                                    .Where(x => x.ParentId == model.ParentId)
+                                    .OrderByDescending(x => x.Order)
+                                    .Select(x => x.Order)
+                                    .FirstOrDefault() + 1;
+                            }
+                            else
+                            {
+                                siteMenuEntity.Order = oldOrder;
+                            }
+                        }
+                        else
+                        {
+                            siteMenuEntity = _mapper.Map<SiteMenu>(siteMenu);
+                            siteMenuEntity.Name = tempName;
+                            siteMenuEntity.Order = _depDbContext.SiteMenus
+                                .Where(x => x.ParentId == model.ParentId)
+                                .OrderByDescending(x => x.Order)
+                                .Select(x => x.Order)
+                                .FirstOrDefault() + 1;
+
+                            _depDbContext.SiteMenus.Add(siteMenuEntity); // add new site menu
+                        }
+
+                        // find the config for current site menu
+                        var config = configs.FirstOrDefault(c => c.Name == siteMenu.Name);
+                        var configEntity = existConfigs.FirstOrDefault(x => x.Id == config.Id);
+                        if (configEntity != null)
+                        {
+                            var oldName = configEntity.Name; // cache old name.
+
+                            _mapper.Map(config, configEntity); // update config
+                            configEntity.Name = tempName;
+
+                            CreateOrUpdatePermission(siteMenuEntity, configEntity, oldName);
+                        }
+                        else
+                        {
+                            // add config
+                            configEntity = _mapper.Map<UniversalGridConfiguration>(config);
+                            configEntity.Name = tempName;
+                            configEntity.CreatedBy = userId;
+                            configEntity.CreatedDate = DateTime.UtcNow;
+
+                            _depDbContext.UniversalGridConfigurations.Add(configEntity);
+
+                            CreateOrUpdatePermission(siteMenuEntity, configEntity);
+                        }
                     }
 
                     #endregion
 
                     #region lookups entry
-
+                    // get zip archive entry
                     var lookupEntry = archive.Entries.FirstOrDefault(e => e.Name == "Lookups.xml");
-                    if (lookupEntry != null)
-                    {
-                        var lookups = GetObjects<List<Lookup>>(lookupEntry).Where(x => model.SelectedObjects.Contains(x.Id.ToString()));
-                        var lookupKeys = lookups.Select(c => c.Id);
-                        var existLookups = _depDbContext.Lookups.Where(x => lookupKeys.Contains(x.Id)).ToList();
+                    if (lookupEntry == null) throw new FileNotFoundException();
 
-                        foreach (var lookup in existLookups)
+                    // get lookups and cache existing keys
+                    var lookups = GetObjects<List<Lookup>>(lookupEntry).Where(x => model.SelectedObjects.Contains(x.Id.ToString()));
+                    var lookupKeys = lookups.Select(c => c.Id).ToList();
+                    var existLookups = _depDbContext.Lookups.Where(x => lookupKeys.Contains(x.Id)).ToList();
+
+                    foreach (var lookup in lookups)
+                    {
+                        var entity = existLookups.FirstOrDefault(x => x.Id == lookup.Id);
+                        if (entity != null)
                         {
-                            var item = existLookups.FirstOrDefault(x => x.Id == lookup.Id);
-                            if (item != null)
-                            {
-                                item.QueryText = lookup.QueryText;
-                                item.Name = lookup.Name;
-                            }
-                            else
-                            {
-                                _depDbContext.Add(lookup);
-                            }
+                            entity.QueryText = lookup.QueryText;
+                            entity.Name = lookup.Name;
+                        }
+                        else
+                        {
+                            _depDbContext.Add(lookup);
                         }
                     }
+
                     #endregion
 
                     _depDbContext.SaveChanges();

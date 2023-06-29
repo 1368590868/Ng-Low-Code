@@ -13,6 +13,10 @@ namespace DataEditorPortal.Web.Common.MapperProfiles
             CreateMap<SiteMenu, PortalItemData>().ReverseMap();
             CreateMap<DbColumn, DataSourceTableColumn>();
             CreateMap<DetailConfig, GridConfig>();
+            CreateMap<SiteMenu, SiteMenu>()
+                .ForMember(d => d.Parent, opt => opt.Ignore()); ;
+            CreateMap<UniversalGridConfiguration, UniversalGridConfiguration>()
+                .ForMember(d => d.DataSourceConnection, opt => opt.Ignore());
         }
     }
 }
