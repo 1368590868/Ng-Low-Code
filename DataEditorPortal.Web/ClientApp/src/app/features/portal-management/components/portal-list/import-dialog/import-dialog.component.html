@@ -8,23 +8,13 @@
   <div #container class="dialog-content">
     <!-- Select File -->
     <div *ngIf="step === 1">
-      <div class="mb-3">
-        <label class="line-height-3 flex align-items-center"
-          >Parent Folder</label
-        >
-        <p-dropdown
-          styleClass="w-full"
-          [options]="options"
-          [required]="true"
-          [formControl]="parentFolderControl"
-          appendTo="body"
-          placeholder="Please Select"></p-dropdown>
-      </div>
-      <div class="upload-label flex py-3">
+      <label class="line-height-3 flex align-items-center">Upload File</label>
+      <div class="upload-label flex pb-3">
         <p-fileUpload
+          class="flex-none"
           #upload
           name="files"
-          styleClass="p-button-outlined"
+          styleClass="p-button-outlined "
           chooseIcon="pi pi-upload"
           mode="basic"
           accept=".zip,.rar"
@@ -46,8 +36,21 @@
         <p-button
           *ngIf="file?.fileName"
           icon="pi pi-file"
-          styleClass="p-button-link"
+          styleClass="p-button-link flex-nowrap"
           [label]="file?.fileName"></p-button>
+      </div>
+
+      <div class="mb-3">
+        <label class="line-height-3 flex align-items-center"
+          >Parent Folder</label
+        >
+        <p-dropdown
+          styleClass="w-full"
+          [options]="options"
+          [required]="true"
+          [formControl]="parentFolderControl"
+          appendTo="body"
+          placeholder="Please Select"></p-dropdown>
       </div>
     </div>
 
@@ -67,12 +70,10 @@
         [scrollable]="true">
         <ng-template pTemplate="header">
           <tr>
-            <th>
+            <th [style.width]="'2.875rem !important'">
               <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-
-              <span class="ml-3">Import</span>
             </th>
-            <th [style.min-width]="'3rem !important'">Type</th>
+            <th [style.width]="'12rem !important'">Type</th>
             <th>Display name</th>
           </tr>
         </ng-template>
@@ -117,11 +118,11 @@
           [label]="cancelText"
           styleClass="p-button-text"></p-button>
         <p-button
-          [iconPos]="iconPos"
+          [iconPos]="step === 2 ? 'left' : 'right'"
           [icon]="'pi ' + (step === 2 ? 'pi-check' : 'pi-angle-right')"
           [disabled]="validDisabled() || isLoading"
           (onClick)="onOk()"
-          [label]="okText"
+          [label]="step === 2 ? 'Import' : 'Next'"
           [loading]="isLoading"></p-button>
       </div>
     </div>

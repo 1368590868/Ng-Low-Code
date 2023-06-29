@@ -10,15 +10,13 @@ import { ImportPortal } from '../../../models/portal-item';
 })
 export class ImportDialogComponent {
   @Input() header = 'Import Portal Item';
-  @Input() okText = 'Next';
   @Input() cancelText = 'Cancel';
-  @Input() dialogStyle = { width: '50rem', height: '30rem' };
+  @Input() dialogStyle = { width: '45rem', height: '30rem' };
 
   @Output() saved = new EventEmitter<string>();
 
   visible = false;
   isLoading = false;
-  iconPos: 'left' | 'right' | 'top' | 'bottom' = 'right';
 
   selection: ImportPortal[] = [];
   dataSource: ImportPortal[] = [];
@@ -127,7 +125,6 @@ export class ImportDialogComponent {
           .subscribe(res => {
             if (!res.isError) {
               this.step = 2;
-              this.okText = 'Import';
               this.dataSource = res.result || [];
               this.selection = res.result || [];
             }
