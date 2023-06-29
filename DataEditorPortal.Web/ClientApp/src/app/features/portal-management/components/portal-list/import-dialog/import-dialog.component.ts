@@ -1,8 +1,16 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { NotifyService } from 'src/app/shared';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { ImportPortal } from '../../../models/portal-item';
+import { Dialog } from 'primeng/dialog';
 @Component({
   selector: 'app-import-dialog',
   templateUrl: './import-dialog.component.html',
@@ -11,9 +19,9 @@ import { ImportPortal } from '../../../models/portal-item';
 export class ImportDialogComponent {
   @Input() header = 'Import Portal Item';
   @Input() cancelText = 'Cancel';
-  @Input() dialogStyle = { width: '45rem', height: '30rem' };
 
   @Output() saved = new EventEmitter<string>();
+  @ViewChild(Dialog) dialog!: Dialog;
 
   visible = false;
   isLoading = false;
@@ -27,6 +35,7 @@ export class ImportDialogComponent {
 
   progress = 0;
   file: any = null;
+  fileLabel = '';
 
   constructor(
     private portalItemService: PortalItemService,
@@ -69,7 +78,6 @@ export class ImportDialogComponent {
   }
 
   onRowCheckBoxClick(event: MouseEvent) {
-    console.log(this.selection);
     event.stopPropagation();
   }
 
@@ -78,6 +86,11 @@ export class ImportDialogComponent {
       for (const file of event.originalEvent.body.result) {
         if (file) {
           this.file = file;
+          this.fileLabel = this.file.fileName;
+          if (this.fileLabel.length > 30) {
+            const regex = /^(.{14}).*(.{14})$/;
+            this.fileLabel = this.fileLabel.replace(regex, '$1...$2');
+          }
         }
       }
     }
@@ -90,7 +103,6 @@ export class ImportDialogComponent {
 
   validDisabled() {
     if (this.step === 1) {
-      console.log(1);
       return !this.file;
     }
 
@@ -127,6 +139,7 @@ export class ImportDialogComponent {
               this.step = 2;
               this.dataSource = res.result || [];
               this.selection = res.result || [];
+              (this.dialog as any).cd.markForCheck();
             }
             this.isLoading = false;
           });
