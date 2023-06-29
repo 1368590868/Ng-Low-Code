@@ -467,9 +467,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
     const fromProps = this.fields[0].props;
     const toProps = this.fields[2].props;
 
-    if (fromProps && toProps) fromProps['emptyMessage'] = 'Loading...';
-
     if (this._systemName && this.systemNameChange) {
+      if (fromProps && toProps) fromProps['emptyMessage'] = 'Loading...';
       this.locationEditorService
         .getPipeOptions(this.system.id, allModel?.value)
         .subscribe(res => {
