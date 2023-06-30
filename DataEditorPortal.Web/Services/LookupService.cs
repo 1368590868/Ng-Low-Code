@@ -46,7 +46,7 @@ namespace DataEditorPortal.Web.Services
             var item = _depDbContext.Lookups.FirstOrDefault(x => x.Id == id);
             if (item == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new ApiException("Lookup Not Found", 404);
             }
 
             return new LookupItem()

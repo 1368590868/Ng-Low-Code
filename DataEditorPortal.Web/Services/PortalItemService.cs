@@ -207,24 +207,26 @@ namespace DataEditorPortal.Web.Services
             if (siteMenu != null)
             {
                 var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+                if (config != null)
+                {
+                    // remove lookups
+                    var lookups = _depDbContext.Lookups.Where(x => x.UniversalGridConfigurationId == config.Id).ToList();
+                    lookups.ForEach(l => _depDbContext.Lookups.Remove(l));
 
-                // remove lookups
-                var lookups = _depDbContext.Lookups.Where(x => x.UniversalGridConfigurationId == config.Id).ToList();
-                lookups.ForEach(l => _depDbContext.Lookups.Remove(l));
+                    // remove permission
+                    var types = new List<string>();
+                    if (config.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
+                    if (config.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
+                    if (config.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
 
-                // remove permission
-                var types = new List<string>();
-                if (config.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
-                if (config.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
-                if (config.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
+                    // get old permissions
+                    var oldPermissionNames = types.Select(t => $"{t}_{ config.Name.Replace("-", "_") }".ToUpper());
+                    var permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
+                    permissions.ForEach(p => _depDbContext.SitePermissions.Remove(p));
 
-                // get old permissions
-                var oldPermissionNames = types.Select(t => $"{t}_{ config.Name.Replace("-", "_") }".ToUpper());
-                var permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
-                permissions.ForEach(p => _depDbContext.SitePermissions.Remove(p));
-
-                // remove configuration
-                _depDbContext.UniversalGridConfigurations.Remove(config);
+                    // remove configuration
+                    _depDbContext.UniversalGridConfigurations.Remove(config);
+                }
 
                 // remove linked table
                 var childrenMenus = _depDbContext.SiteMenus.Where(x => x.ParentId == siteMenu.Id).ToList();
@@ -978,12 +980,14 @@ namespace DataEditorPortal.Web.Services
                         {
                             siteMenuEntity = _mapper.Map<SiteMenu>(siteMenu);
                             siteMenuEntity.Name = tempName;
-                            siteMenuEntity.Order = _depDbContext.SiteMenus
+                            if (siteMenuEntity.Id == parentSiteMenu.Id)
+                            {
+                                siteMenuEntity.Order = _depDbContext.SiteMenus
                                 .Where(x => x.ParentId == model.ParentId)
                                 .OrderByDescending(x => x.Order)
                                 .Select(x => x.Order)
                                 .FirstOrDefault() + 1;
-
+                            }
                             _depDbContext.SiteMenus.Add(siteMenuEntity); // add new site menu
                         }
 
