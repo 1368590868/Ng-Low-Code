@@ -34,126 +34,87 @@
   appendTo="body"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0">
   <div #container class="dialog-content">
-    <div class="flex justify-content-between">
-      <div class="flex flex-column mb-3">
+    <div class="flex align-items-center mb-3">
+      <div class="flex flex-column flex-1 mr-4">
         <label for="" class="mb-1">Field Name</label>
-        <div class="flex align-items-center">
-          <input
-            type="text"
-            pInputText
-            [ngModel]="'From'"
-            [disabled]="true"
-            [style]="{ minWidth: '20rem' }" />
-        </div>
+        <input type="text" pInputText [ngModel]="'From'" [disabled]="true" />
       </div>
-      <div class="flex flex-column mb-3">
-        <ng-container>
-          <label for="tableName" class="mb-1">Map To</label>
-          <div class="flex align-items-center">
-            <p-dropdown
-              [formControl]="formControlFrom"
-              class="mr-1 flex-grow-1"
-              [style]="{ minWidth: '20rem' }"
-              appendTo="body"
-              placeholder="Please Select"
-              [showClear]="true"
-              [options]="filedMapping">
-            </p-dropdown>
-          </div>
-        </ng-container>
+      <div class="flex flex-column flex-1">
+        <label for="tableName" class="mb-1">Map To</label>
+        <p-dropdown
+          [formControl]="formControlFrom"
+          class="mr-1 flex-grow-1"
+          styleClass="w-full"
+          appendTo="body"
+          placeholder="Please Select"
+          [showClear]="true"
+          [options]="filedMapping">
+        </p-dropdown>
       </div>
     </div>
 
-    <div class="flex justify-content-between">
-      <div class="flex flex-column mb-3">
+    <div class="flex align-items-center mb-3">
+      <div class="flex flex-column mr-4 flex-1">
         <label for="" class="mb-1"></label>
-        <div class="flex align-items-center">
-          <input
-            type="text"
-            pInputText
-            [ngModel]="locationType === 2 ? 'Measure' : ' From Measure'"
-            [disabled]="true"
-            [style]="{ minWidth: '20rem' }" />
-        </div>
+        <input
+          type="text"
+          pInputText
+          [ngModel]="locationType === 2 ? 'Measure' : ' From Measure'"
+          [disabled]="true" />
       </div>
-      <div class="flex flex-column mb-3">
-        <ng-container>
-          <label for="tableName" class="mb-1"></label>
-
-          <div class="flex align-items-center">
-            <p-dropdown
-              [formControl]="formControlFromMeasure"
-              class="mr-1 flex-grow-1"
-              [style]="{ minWidth: '20rem' }"
-              appendTo="body"
-              placeholder="Please Select"
-              [showClear]="true"
-              [options]="filedMapping">
-            </p-dropdown>
-          </div>
-        </ng-container>
+      <div class="flex flex-column flex-1">
+        <label for="tableName" class="mb-1"></label>
+        <p-dropdown
+          [formControl]="formControlFromMeasure"
+          class="mr-1 flex-grow-1"
+          styleClass="w-full"
+          appendTo="body"
+          placeholder="Please Select"
+          [showClear]="true"
+          [options]="filedMapping">
+        </p-dropdown>
       </div>
     </div>
 
-    <div class="flex justify-content-between" *ngIf="locationType !== 2">
-      <div class="flex flex-column mb-3">
+    <div class="flex align-items-center mb-3" *ngIf="locationType !== 2">
+      <div class="flex flex-column mr-4 flex-1">
         <label for="" class="mb-1"></label>
-        <div class="flex align-items-center">
-          <input
-            type="text"
-            pInputText
-            [ngModel]="'To'"
-            [disabled]="true"
-            [style]="{ minWidth: '20rem' }" />
-        </div>
+        <input type="text" pInputText [ngModel]="'To'" [disabled]="true" />
       </div>
-      <div class="flex flex-column mb-3">
-        <ng-container>
-          <label for="tableName" class="mb-1"></label>
-
-          <div class="flex align-items-center">
-            <p-dropdown
-              [formControl]="formControlTo"
-              class="mr-1 flex-grow-1"
-              [style]="{ minWidth: '20rem' }"
-              appendTo="body"
-              placeholder="Please Select"
-              [showClear]="true"
-              [options]="filedMapping">
-            </p-dropdown>
-          </div>
-        </ng-container>
+      <div class="flex flex-column flex-1">
+        <label for="tableName" class="mb-1"></label>
+        <p-dropdown
+          [formControl]="formControlTo"
+          class="mr-1 flex-grow-1"
+          styleClass="w-full"
+          appendTo="body"
+          placeholder="Please Select"
+          [showClear]="true"
+          [options]="filedMapping">
+        </p-dropdown>
       </div>
     </div>
 
-    <div class="flex justify-content-between" *ngIf="locationType !== 2">
-      <div class="flex flex-column mb-3">
+    <div class="flex align-items-center mb-3" *ngIf="locationType !== 2">
+      <div class="flex flex-column mr-4 flex-1">
         <label for="" class="mb-1"></label>
-        <div class="flex align-items-center">
-          <input
-            type="text"
-            pInputText
-            [ngModel]="'To Measure'"
-            [disabled]="true"
-            [style]="{ minWidth: '20rem' }" />
-        </div>
+        <input
+          type="text"
+          pInputText
+          [ngModel]="'To Measure'"
+          [disabled]="true" />
       </div>
-      <div class="flex flex-column mb-3">
-        <ng-container>
-          <label for="tableName" class="mb-1"></label>
-
-          <div class="flex align-items-center">
-            <p-dropdown
-              [formControl]="formControlToMeasure"
-              class="mr-1 flex-grow-1"
-              [style]="{ minWidth: '20rem' }"
-              appendTo="body"
-              placeholder="Please Select"
-              [showClear]="true"
-              [options]="filedMapping">
-            </p-dropdown>
-          </div>
-        </ng-container>
+      <div class="flex flex-column flex-1">
+        <label for="tableName" class="mb-1"></label>
+        <p-dropdown
+          [formControl]="formControlToMeasure"
+          class="mr-1 flex-grow-1"
+          styleClass="w-full"
+          appendTo="body"
+          placeholder="Please Select"
+          [showClear]="true"
+          [options]="filedMapping">
+        </p-dropdown>
       </div>
     </div>
   </div>

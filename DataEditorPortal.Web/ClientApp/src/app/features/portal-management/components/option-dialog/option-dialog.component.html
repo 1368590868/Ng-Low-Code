@@ -76,8 +76,8 @@
       <ng-template #advancedRef>
         <ng-container>
           <!-- <p-divider>Add new lookup</p-divider> -->
-          <div class="flex justify-content-between">
-            <div class="mb-3 flex flex-column mr-4 flex-grow-1">
+          <div class="flex align-items-center mb-3">
+            <div class="flex flex-column mr-4 flex-grow-1">
               <label class="line-height-3"
                 >Database Connection
                 <i
@@ -93,7 +93,7 @@
                 placeholder="Please Select"
                 appendTo="body"></p-dropdown>
             </div>
-            <div class="mb-3 flex flex-column flex-grow-1">
+            <div class="flex flex-column flex-grow-1">
               <label class="line-height-3">Name</label>
               <input
                 [formControl]="formControlName"
