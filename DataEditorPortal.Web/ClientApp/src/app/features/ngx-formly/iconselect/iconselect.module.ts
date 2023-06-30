@@ -6,6 +6,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { FormlySelectModule as FormlyCoreSelectModule } from '@ngx-formly/core/select';
 import { IconSelectComponent } from './iconselect.component';
 import { ButtonModule } from 'primeng/button';
+import { AvatarModule } from 'primeng/avatar';
 
 import { FormlyFieldIconSelectComponent } from './iconselect.type';
 
@@ -17,6 +18,7 @@ import { FormlyFieldIconSelectComponent } from './iconselect.type';
     DropdownModule,
     FormlyCoreSelectModule,
     ButtonModule,
+    AvatarModule,
     FormlyModule.forChild({
       types: [
         {
