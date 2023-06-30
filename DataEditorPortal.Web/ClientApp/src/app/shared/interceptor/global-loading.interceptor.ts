@@ -5,7 +5,7 @@ import {
   HttpInterceptor
 } from '@angular/common/http';
 import { GlobalLoadingService } from '../services/global-loading.service';
-import { tap } from 'rxjs';
+import { finalize } from 'rxjs';
 
 @Injectable()
 export class globalLoadingInterceptor implements HttpInterceptor {
@@ -14,13 +14,8 @@ export class globalLoadingInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): any {
     this.formLoadingService.onAdd();
     return next.handle(request).pipe(
-      tap({
-        complete: () => {
-          this.formLoadingService.onEnd();
-        },
-        error: () => {
-          this.formLoadingService.onEnd();
-        }
+      finalize(() => {
+        this.formLoadingService.onEnd();
       })
     );
   }

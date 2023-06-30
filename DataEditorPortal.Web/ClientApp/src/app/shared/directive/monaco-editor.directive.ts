@@ -8,15 +8,17 @@ import {
   Self,
   OnInit,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
+  OnDestroy
 } from '@angular/core';
 import { EditorComponent } from 'ngx-monaco-editor';
+import { Subscription } from 'rxjs';
 
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'ngx-monaco-editor'
 })
-export class MonacoEditorDirective implements OnInit, OnChanges {
+export class MonacoEditorDirective implements OnInit, OnChanges, OnDestroy {
   constructor(@Host() @Self() @Optional() private ngxEditor: EditorComponent) {}
 
   @Input()
@@ -25,9 +27,16 @@ export class MonacoEditorDirective implements OnInit, OnChanges {
   libSource?: string;
 
   private widget!: PlaceholderContentWidget;
+  private subscription!: Subscription;
 
   ngOnInit(): void {
-    this.ngxEditor.onInit.subscribe(editor => this.onMonacoEditorInit(editor));
+    this.subscription = this.ngxEditor.onInit.subscribe(editor =>
+      this.onMonacoEditorInit(editor)
+    );
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) this.subscription.unsubscribe();
   }
 
   onMonacoEditorInit(editor: any) {
