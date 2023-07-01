@@ -147,3 +147,10 @@ export interface LinkedSingleConfig {
   details: LinkedSingleConfigDetails[];
   idColumn?: string;
 }
+
+export interface ImportPortal {
+  key: string;
+  displayName: string;
+  type: string;
+  exist: boolean;
+}

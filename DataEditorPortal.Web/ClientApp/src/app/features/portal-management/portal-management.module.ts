@@ -37,6 +37,7 @@ import { MessageModule } from 'primeng/message';
 import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabViewModule } from 'primeng/tabview';
+import { FileUploadModule } from 'primeng/fileupload';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
@@ -78,6 +79,7 @@ import {
 import { FROM_DESIGNER_CONTROLS } from './directives/form-designer.directive';
 import { MonacoEditorConfig } from './monaco-editor-config';
 import { PortalEditStepDirective } from './directives/portal-edit-step.directive';
+import { ImportDialogComponent } from './components/portal-list/import-dialog/import-dialog.component';
 
 @NgModule({
   declarations: [
@@ -112,7 +114,8 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
     FileUploadConfigurationComponent,
     FormlyFieldFileUploadConfigurationComponent,
     LocationConfigurationComponent,
-    FormlyFieldLocationConfigurationComponent
+    FormlyFieldLocationConfigurationComponent,
+    ImportDialogComponent
   ],
   imports: [
     CoreModule,
@@ -186,7 +189,8 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
     ContextMenuModule,
     MessageModule,
     ConfirmDialogModule,
-    TabViewModule
+    TabViewModule,
+    FileUploadModule
   ],
   providers: [
     {

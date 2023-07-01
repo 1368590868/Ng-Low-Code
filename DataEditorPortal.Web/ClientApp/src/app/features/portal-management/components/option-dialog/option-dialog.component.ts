@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input
+} from '@angular/core';
 import {
   FormControl,
   ControlValueAccessor,
@@ -61,7 +66,8 @@ export class OptionDialogComponent implements ControlValueAccessor {
   constructor(
     private lookupService: LookupService,
     private portalItemService: PortalItemService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private cdr: ChangeDetectorRef
   ) {
     this.formControlConnection.disable();
   }
@@ -124,12 +130,18 @@ export class OptionDialogComponent implements ControlValueAccessor {
       this.formControlConnection.setValue(this.dataSourceConnectionName);
       if (this.optionsLookup) {
         this.lookupService.getOptionQuery(this.optionsLookup).subscribe(res => {
-          this.formControlName.setValue(res?.name);
-          this.formControlQuery.setValue(res?.queryText);
+          if (res) {
+            this.formControlName.setValue(res?.name);
+            this.formControlQuery.setValue(res?.queryText);
+          } else {
+            this.optionsLookup = undefined;
+            this.onChange(null);
+          }
         });
       }
 
       this.formControlQuery.markAsPristine();
+      this.cdr.markForCheck();
     });
   }
 

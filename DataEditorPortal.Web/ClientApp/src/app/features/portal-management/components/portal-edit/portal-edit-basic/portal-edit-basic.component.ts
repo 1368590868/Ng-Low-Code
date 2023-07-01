@@ -69,15 +69,20 @@ export class PortalEditBasicComponent
       asyncValidators: {
         exist: {
           expression: (c: AbstractControl) => {
+            const currVal = c.value;
             if (this.timer) clearTimeout(this.timer);
             return new Promise((resolve, reject) => {
-              this.timer = setTimeout(() => {
-                this.portalItemService
-                  .nameExists(c.value, this.itemId)
-                  .subscribe(res => {
-                    !res.isError ? resolve(!res.result) : reject(res.message);
-                  });
-              }, 100);
+              if (!currVal) {
+                resolve(true);
+              } else {
+                this.timer = setTimeout(() => {
+                  this.portalItemService
+                    .nameExists(currVal, this.itemId)
+                    .subscribe(res => {
+                      !res.isError ? resolve(!res.result) : reject(res.message);
+                    });
+                }, 100);
+              }
             });
           },
           message: () => {
@@ -88,11 +93,13 @@ export class PortalEditBasicComponent
       hooks: {
         onInit: field => {
           field.formControl?.valueChanges.subscribe(val => {
-            this.portalItemService.getCodeName(val).subscribe(res => {
-              field.formControl?.setValue(res.result, { emitEvent: false });
-              this.model['name'] = res.result;
-              field.formControl?.markAsDirty();
-            });
+            if (val) {
+              this.portalItemService.getCodeName(val).subscribe(res => {
+                field.formControl?.setValue(res.result, { emitEvent: false });
+                this.model['name'] = res.result + '';
+                field.formControl?.markAsDirty();
+              });
+            }
           });
         }
       }

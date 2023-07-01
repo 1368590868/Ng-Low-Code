@@ -383,4 +383,8 @@ export class PortalListComponent implements OnInit {
     this.getPortalList();
     this.configDataService.menuChange$.next(null);
   }
+
+  onImportDialogSaved() {
+    this.getPortalList();
+  }
 }
