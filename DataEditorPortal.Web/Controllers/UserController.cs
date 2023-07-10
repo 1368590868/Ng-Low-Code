@@ -1,6 +1,6 @@
-﻿using AutoWrapper.Wrappers;
-using DataEditorPortal.Data.Contexts;
+﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Common.License;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Services;
@@ -105,7 +105,7 @@ namespace DataEditorPortal.Web.Controllers
             var dep_user = _depDbContext.Users.Where(x => x.Id == userId).FirstOrDefault();
             if (dep_user == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             return dep_user;
@@ -125,7 +125,7 @@ namespace DataEditorPortal.Web.Controllers
             var dep_user = _depDbContext.Users.FirstOrDefault(u => u.Id == userId);
             if (dep_user == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             dep_user.Username = model.Username;

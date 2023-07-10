@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoWrapper.Wrappers;
 using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
@@ -157,7 +156,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
             var oldName = siteMenu.Name;
 
@@ -193,7 +192,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type != "System");
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             DeleteInternal(siteMenu);
@@ -392,7 +391,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -427,7 +426,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -460,7 +459,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -492,7 +491,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -513,7 +512,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -534,7 +533,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -582,7 +581,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -603,7 +602,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -626,7 +625,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -647,7 +646,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -668,7 +667,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -692,7 +691,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             if (model.PrimaryTable != null && model.PrimaryTable.Id == Guid.Empty) model.PrimaryTable = null;
@@ -730,7 +729,7 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -763,7 +762,7 @@ namespace DataEditorPortal.Web.Services
                 var parentExist = _depDbContext.SiteMenus.Any(x => x.Id == model.ParentId && x.Type == "Folder");
                 if (!parentExist)
                 {
-                    throw new ApiException("Parent Not Found", 404);
+                    throw new DepException("Parent Not Found", 404);
                 }
             }
 
@@ -784,8 +783,8 @@ namespace DataEditorPortal.Web.Services
 
                     var siteMenus = GetObjects<List<SiteMenu>>(smEntry);
                     var configs = GetObjects<List<UniversalGridConfiguration>>(configEntry);
-                    if (siteMenus.Count == 0) throw new ApiException("No Site Menus exists.");
-                    if (configs.Count == 0) throw new ApiException("No Universal Grid Config exists.");
+                    if (siteMenus.Count == 0) throw new DepException("No Site Menus exists.");
+                    if (configs.Count == 0) throw new DepException("No Universal Grid Config exists.");
 
                     // find parent site menu
                     var parentIds = siteMenus.Select(c => c.ParentId);
@@ -856,7 +855,7 @@ namespace DataEditorPortal.Web.Services
             catch (FileNotFoundException e)
             {
                 _logger.LogError(e, e.Message);
-                throw new ApiException("The uploaded file doesn't contains files required. Please make sure it is exported from the application and without any changes.");
+                throw new DepException("The uploaded file doesn't contains files required. Please make sure it is exported from the application and without any changes.");
             }
             catch (Exception e)
             {
@@ -874,7 +873,7 @@ namespace DataEditorPortal.Web.Services
                 var parentExist = _depDbContext.SiteMenus.Any(x => x.Id == model.ParentId && x.Type == "Folder");
                 if (!parentExist)
                 {
-                    throw new ApiException("Parent Not Found", 404);
+                    throw new DepException("Parent Not Found", 404);
                 }
             }
             string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data\\FileUploadTemp");
@@ -928,7 +927,7 @@ namespace DataEditorPortal.Web.Services
                     var configKeys = configs.Select(c => c.Id).ToList();
                     var existConfigs = _depDbContext.UniversalGridConfigurations.Where(x => configKeys.Contains(x.Id)).ToList();
 
-                    if (siteMenus.Count == 0) throw new ApiException("No site menus exists");
+                    if (siteMenus.Count == 0) throw new DepException("No site menus exists");
 
                     // find parent site menu
                     var parentIds = siteMenus.Select(c => c.ParentId);
@@ -1055,7 +1054,7 @@ namespace DataEditorPortal.Web.Services
             catch (FileNotFoundException e)
             {
                 _logger.LogError(e, e.Message);
-                throw new ApiException("The uploaded file doesn't contains files required. Please make sure it is exported from the application and without any changes.");
+                throw new DepException("The uploaded file doesn't contains files required. Please make sure it is exported from the application and without any changes.");
             }
             catch (Exception e)
             {

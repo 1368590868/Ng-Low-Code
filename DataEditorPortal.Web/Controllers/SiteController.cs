@@ -1,5 +1,4 @@
-﻿using AutoWrapper.Wrappers;
-using DataEditorPortal.Data.Contexts;
+﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Common.License;
@@ -213,7 +212,7 @@ namespace DataEditorPortal.Web.Controllers
             var item = _depDbContext.SiteContents.FirstOrDefault(x => x.ContentName == contentName);
             if (item == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             return item.Content;
@@ -226,7 +225,7 @@ namespace DataEditorPortal.Web.Controllers
             var item = _depDbContext.SiteContents.FirstOrDefault(x => x.ContentName == contentName);
             if (item == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             item.Content = siteContent.Content;
@@ -260,7 +259,7 @@ namespace DataEditorPortal.Web.Controllers
             var item = _depDbContext.SiteContents.FirstOrDefault();
             if (item == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             _licenseService.SetLicense(setting.License);

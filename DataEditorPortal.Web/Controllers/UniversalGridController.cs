@@ -1,5 +1,4 @@
-﻿using AutoWrapper.Filters;
-using DataEditorPortal.Web.Common;
+﻿using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
@@ -122,7 +121,6 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("{name}/data/export")]
-        [AutoWrapIgnore]
         public IActionResult ExportData(string name, [FromBody] ExportParam exportParam)
         {
             exportParam.IndexCount = 0;

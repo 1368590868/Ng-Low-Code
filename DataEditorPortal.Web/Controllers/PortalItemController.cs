@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using AutoWrapper.Filters;
-using AutoWrapper.Wrappers;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Common;
@@ -170,7 +168,7 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type != "Portal Item");
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             model.Type = siteMenu.Type;
@@ -215,12 +213,12 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type != "Portal Item" && x.Type != "System");
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var isNotEmpty = _depDbContext.SiteMenus.Any(x => x.ParentId == id);
             if (isNotEmpty)
-                throw new ApiException("Folder is not empty");
+                throw new DepException("Folder is not empty");
 
             _depDbContext.Remove(siteMenu);
             _depDbContext.SaveChanges();
@@ -237,7 +235,7 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -267,7 +265,7 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
             siteMenu.Status = Data.Common.PortalItemStatus.UnPublished;
 
@@ -283,7 +281,7 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var prevSiteMenu = _depDbContext.SiteMenus
@@ -310,7 +308,7 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var nextSiteMenu = _depDbContext.SiteMenus
@@ -339,7 +337,7 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -354,7 +352,7 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -371,7 +369,7 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -488,7 +486,7 @@ namespace DataEditorPortal.Web.Controllers
 
             var dsc = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == model.Name);
             if (dsc != null)
-                throw new ApiException("Name has already exist. Please use another one.");
+                throw new DepException("Name has already exist. Please use another one.");
 
             var connectionStr = GetConnectionString(model);
 
@@ -508,7 +506,7 @@ namespace DataEditorPortal.Web.Controllers
             var item = _depDbContext.DataSourceConnections.FirstOrDefault(x => x.Name == name);
             if (item == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.ServerName)
@@ -624,9 +622,9 @@ namespace DataEditorPortal.Web.Controllers
                 .Include(x => x.UniversalGridConfigurations)
                 .FirstOrDefault(x => x.Name == name);
             if (dsc == null)
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             if (dsc.UniversalGridConfigurations.Count > 0)
-                throw new ApiException("Connnection is in use.");
+                throw new DepException("Connnection is in use.");
 
             _depDbContext.DataSourceConnections.Remove(dsc);
             _depDbContext.SaveChanges();
@@ -784,7 +782,7 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             var item = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
@@ -814,7 +812,6 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("{id}/export")]
-        [AutoWrapIgnore]
         public IActionResult ExportPortalItem(Guid id)
         {
             var fs = _portalItemService.ExportPortalItem(id);

@@ -1,8 +1,9 @@
-using AutoWrapper;
+using Cuture.AspNetCore.ResponseAutoWrapper;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Common.Install;
 using DataEditorPortal.Web.Common.License;
+using DataEditorPortal.Web.Common.ResponseAutoWrapper;
 using DataEditorPortal.Web.Jobs;
 using DataEditorPortal.Web.Services;
 using DataEditorPortal.Web.Services.FieldImporter;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -139,6 +141,17 @@ namespace DataEditorPortal.Web
             services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
 
             services.AddAutoMapper(typeof(Startup));
+            services.AddResponseAutoWrapper(options =>
+            {
+                options.HandleAuthorizationResult = true;
+                options.RewriteStatusCode = null;
+            })
+                .ConfigureWrappers(builder =>
+            {
+                builder.AddWrapper<DepExceptionWrapper, IExceptionWrapper<GenericApiResponse<int, string, object>, int, string>>();
+                builder.AddWrapper<DepNotOKStatusCodeWrapper, INotOKStatusCodeWrapper<GenericApiResponse<int, string, object>, int, string>>();
+                builder.AddWrapper<DepInvalidModelStateWrapper, IInvalidModelStateWrapper<GenericApiResponse<int, string, object>, int, string>>();
+            });
 
             services.AddControllersWithViews(configure =>
             {
@@ -147,6 +160,8 @@ namespace DataEditorPortal.Web
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new IsoDateTimeConverter());
+                options.JsonSerializerOptions.IgnoreNullValues = true;
+                options.JsonSerializerOptions.WriteIndented = false;
             });
 
             // In production, the Angular files will be served from this directory
@@ -202,17 +217,6 @@ namespace DataEditorPortal.Web
             app.UseStaticFiles();
             app.UseSpaStaticFiles(new StaticFileOptions() { HttpsCompression = HttpsCompressionMode.Compress });
 
-            app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions()
-            {
-                BypassHTMLValidation = true,
-                IsApiOnly = false,
-                WrapWhenApiPathStartsWith = "/api",
-                ExcludePaths = new AutoWrapperExcludePath[]
-                {
-                    new AutoWrapperExcludePath("/")
-                }
-            });
-
             app.UseRouting();
 
             if (env.IsDevelopment())
@@ -222,6 +226,8 @@ namespace DataEditorPortal.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseResponseAutoWrapper();
 
             app.UseEndpoints(endpoints =>
             {

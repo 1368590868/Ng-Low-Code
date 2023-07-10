@@ -1,7 +1,7 @@
-﻿using AutoWrapper.Wrappers;
-using DataEditorPortal.Data.Common;
+﻿using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -80,7 +80,7 @@ namespace DataEditorPortal.Web.Controllers
             var item = _depDbContext.DataDictionaries.FirstOrDefault(x => x.Id == id);
             if (item == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             return item;
@@ -104,7 +104,7 @@ namespace DataEditorPortal.Web.Controllers
             var item = _depDbContext.DataDictionaries.FirstOrDefault(x => x.Id == id);
             if (item == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             item.Label = model.Label;
@@ -125,7 +125,7 @@ namespace DataEditorPortal.Web.Controllers
             var item = _depDbContext.DataDictionaries.FirstOrDefault(x => x.Id == id);
             if (item == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             _depDbContext.DataDictionaries.Remove(item);

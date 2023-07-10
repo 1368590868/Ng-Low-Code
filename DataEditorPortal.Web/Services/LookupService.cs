@@ -1,5 +1,4 @@
-﻿using AutoWrapper.Wrappers;
-using Dapper;
+﻿using Dapper;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Common;
@@ -46,7 +45,7 @@ namespace DataEditorPortal.Web.Services
             var item = _depDbContext.Lookups.FirstOrDefault(x => x.Id == id);
             if (item == null)
             {
-                throw new ApiException("Lookup Not Found", 404);
+                throw new DepException("Lookup Not Found", 404);
             }
 
             return new LookupItem()
@@ -91,7 +90,7 @@ namespace DataEditorPortal.Web.Services
             var item = _depDbContext.Lookups.FirstOrDefault(x => x.Id == id);
             if (item == null)
             {
-                throw new ApiException("Not Found", 404);
+                throw new DepException("Not Found", 404);
             }
 
             ValidateLookupItem(model);
