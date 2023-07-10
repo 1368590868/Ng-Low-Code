@@ -24,7 +24,7 @@ export class GridTableService {
       .get<ApiResponse<GridConfig>>(
         `${this._apiUrl}universal-grid/${name}/grid-config`
       )
-      .pipe(map(res => res.result || { dataKey: 'Id' }));
+      .pipe(map(res => res.data || { dataKey: 'Id' }));
   }
 
   getLinkedTableConfig(name: string): Observable<LinkedGridConfig> {
@@ -33,9 +33,7 @@ export class GridTableService {
         `${this._apiUrl}universal-grid/${name}/linked/grid-config`
       )
       .pipe(
-        map(
-          res => res.result || { primaryTableName: '', secondaryTableName: '' }
-        )
+        map(res => res.data || { primaryTableName: '', secondaryTableName: '' })
       );
   }
 
@@ -48,7 +46,7 @@ export class GridTableService {
         `${this._apiUrl}universal-grid/${table1Name}/linked/grid-data-ids`,
         { params: { table2Id } }
       )
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   getTableColumns(name: string): Observable<GridColumn[]> {
@@ -56,7 +54,7 @@ export class GridTableService {
       .get<ApiResponse<GridColumn[]>>(
         `${this._apiUrl}universal-grid/${name}/config/columns`
       )
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   getTableColumnFilterOptions(name: string, column: string): Observable<any[]> {
@@ -64,7 +62,7 @@ export class GridTableService {
       .get<ApiResponse<any[]>>(
         `${this._apiUrl}universal-grid/${name}/config/column/filter-options?column=${column}`
       )
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   getTableData(name: string, tableParams: GridParam): Observable<GridResult> {
@@ -73,7 +71,7 @@ export class GridTableService {
         `${this._apiUrl}universal-grid/${name}/data`,
         tableParams
       )
-      .pipe(map(res => res.result || { data: [], total: 0 }));
+      .pipe(map(res => res.data || { data: [], total: 0 }));
   }
 
   getSearchConfig(name: string): Observable<GridSearchConfig[]> {
@@ -81,6 +79,6 @@ export class GridTableService {
       .get<ApiResponse<GridSearchConfig[]>>(
         `${this._apiUrl}universal-grid/${name}/config/search`
       )
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 }

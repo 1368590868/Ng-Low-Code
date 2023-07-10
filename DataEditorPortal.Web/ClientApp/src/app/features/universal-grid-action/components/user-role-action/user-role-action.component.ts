@@ -44,7 +44,7 @@ export class UserRoleActionComponent
     this.userManagerService
       .saveUserRole(this.rolesArr, this.selectedRecords[0][this.recordKey])
       .subscribe(res => {
-        if (!res.isError) {
+        if (res.code === 200) {
           this.notifyService.notifySuccess(
             'Success',
             'Save Successfully Completed.'

@@ -109,16 +109,16 @@
           appendTo="body"></p-dropdown>
       </div>
 
-      <div
-        class="flex flex-column flex-1"
-        *ngIf="storageTypeColumn === 'FileSystem'">
-        <label for="" class="mb-1">Base Path</label>
-        <input
-          pInputText
-          #dropdownList="ngModel"
-          [required]="true"
-          [(ngModel)]="basePathColumn"
-          placeholder="" />
+      <div class="flex flex-column flex-1">
+        <ng-container *ngIf="storageTypeColumn === 'FileSystem'">
+          <label for="" class="mb-1">Base Path</label>
+          <input
+            pInputText
+            #dropdownList="ngModel"
+            [required]="true"
+            [(ngModel)]="basePathColumn"
+            placeholder="" />
+        </ng-container>
       </div>
     </div>
 
@@ -395,7 +395,7 @@
     <p-button
       icon="pi pi-check"
       (onClick)="onOk()"
-      label="Save"
+      label="Ok"
       [loading]="isLoading"></p-button>
   </ng-template>
 </p-dialog>

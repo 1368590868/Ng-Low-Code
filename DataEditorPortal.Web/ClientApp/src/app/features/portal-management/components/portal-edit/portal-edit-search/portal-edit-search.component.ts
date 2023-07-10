@@ -188,7 +188,7 @@ export class PortalEditSearchComponent
         .saveGridSearchConfig(this.targetColumns)
         .pipe(
           tap(res => {
-            if (res && !res.isError) {
+            if (res && res.code === 200) {
               this.saveSucess();
             }
 

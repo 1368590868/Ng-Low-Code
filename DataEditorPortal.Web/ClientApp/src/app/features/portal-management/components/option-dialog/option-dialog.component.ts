@@ -2,7 +2,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  Input
+  Input,
+  ViewChild
 } from '@angular/core';
 import {
   FormControl,
@@ -15,6 +16,7 @@ import { DataSourceConnection } from '../../models/portal-item';
 import { LookupService } from '../../services/lookup.service';
 import { PortalItemService } from '../../services/portal-item.service';
 import { Lookup } from '../../models/lookup';
+import { Dialog } from 'primeng/dialog';
 
 interface OptionItem {
   formControl: FormControl;
@@ -62,6 +64,8 @@ export class OptionDialogComponent implements ControlValueAccessor {
   get dataSourceConnectionName() {
     return this.portalItemService.dataSourceConnectionName;
   }
+
+  @ViewChild(Dialog) dialog!: Dialog;
 
   constructor(
     private lookupService: LookupService,
@@ -202,9 +206,9 @@ export class OptionDialogComponent implements ControlValueAccessor {
         };
         this.lookupService.saveOptionQuery(data).subscribe(res => {
           this.isLoading = false;
-          if (res && !res.isError) {
+          if (res && res.code === 200) {
             this.options = [];
-            this.optionsLookup = res.result;
+            this.optionsLookup = res.data;
 
             const matches = [
               ...data.queryText.matchAll(/##([a-zA-Z]{1}[a-zA-Z0-9_]+?)##/g)
@@ -216,6 +220,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
             this.onChange({ id: this.optionsLookup, deps });
             this.visible = false;
           }
+          this.markDialogForChange();
         });
       } else {
         this.optionsLookup = undefined;
@@ -235,7 +240,9 @@ export class OptionDialogComponent implements ControlValueAccessor {
     this.visible = false;
   }
 
-  /* db connection dialog */
+  markDialogForChange() {
+    (this.dialog as any).cd.markForCheck();
+  }
 }
 
 @Component({

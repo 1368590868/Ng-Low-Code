@@ -217,7 +217,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
           this.portalItemService
             .publish(this.itemId as string)
             .subscribe(res => {
-              if (!res.isError) {
+              if (res.code === 200) {
                 if (!isLinkedSingle) {
                   this.notifyService.notifySuccess(
                     'Success',

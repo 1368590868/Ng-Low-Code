@@ -43,6 +43,7 @@ export class ViewRecordActionComponent
           .map(key => {
             const field = res.find(x => x.field === key);
             return {
+              key:field?.field,
               name: field?.header,
               value: this.selectedRecords[0][key],
               type: field?.type,
@@ -55,6 +56,7 @@ export class ViewRecordActionComponent
         // sort by res
         const result = res.map(x => {
           return {
+            key: x.field,
             name: x.header,
             value: key.find(y => y.name === x.header)?.value,
             type: x.type,

@@ -102,9 +102,9 @@ export class SystemLogComponent implements OnInit {
       .getTableData(fetchDataParam)
       .pipe(
         tap(res => {
-          if (!res.isError) {
-            this.data = res.result?.data;
-            this.totalRecords = res.result?.total ?? 0;
+          if (res.code === 200) {
+            this.data = res.data?.data;
+            this.totalRecords = res.data?.total ?? 0;
           }
         })
       )

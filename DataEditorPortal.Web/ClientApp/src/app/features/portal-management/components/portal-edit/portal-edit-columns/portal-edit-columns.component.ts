@@ -431,7 +431,7 @@ export class PortalEditColumnsComponent
         .saveGridColumnsConfig(data)
         .pipe(
           tap(res => {
-            if (res && !res.isError) {
+            if (res && res.code === 200) {
               this.saveSucess();
             }
 

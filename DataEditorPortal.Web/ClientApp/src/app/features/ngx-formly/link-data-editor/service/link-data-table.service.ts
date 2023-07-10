@@ -22,7 +22,7 @@ export class LinkDataTableService {
       .pipe(
         map(
           res =>
-            res.result || {
+            res.data || {
               columns: [],
               table2IdColumn: '',
               table2Name: ''
@@ -37,6 +37,6 @@ export class LinkDataTableService {
         `${this._apiUrl}universal-grid/${name}/linked-table-editor/table-data`,
         tableParams
       )
-      .pipe(map(res => res.result?.data || []));
+      .pipe(map(res => res.data?.data || []));
   }
 }

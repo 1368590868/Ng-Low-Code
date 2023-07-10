@@ -30,7 +30,7 @@ export class FormLayoutComponent {
     if (val === 'UPDATE') {
       this.helperMessage =
         'E.g. <br /><br />' +
-        'UPDATE DEMO_TABLE <br />SET NAME = ##NAME##, FIRS_TNAME = ##FIRST_NAME##, TOTAL = ##TOTAL## WHERE ID = ##ID##';
+        'UPDATE DEMO_TABLE <br />SET NAME = ##NAME##, FIRST_NAME = ##FIRST_NAME##, TOTAL = ##TOTAL## WHERE ID = ##ID##';
     }
   }
 

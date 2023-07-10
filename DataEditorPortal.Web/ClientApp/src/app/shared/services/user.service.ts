@@ -29,10 +29,10 @@ export class UserService {
   login() {
     return this.getLoggedInUser().pipe(
       tap(res => {
-        if (!res.isError && res.result) {
+        if (res.code == 200 && res.data) {
           this.isLogin = true;
           this.loginAfter();
-          this.USER = res.result;
+          this.USER = res.data;
         }
       })
     );
@@ -52,7 +52,7 @@ export class UserService {
   getUserDetail(id: string): Observable<ManageRoleForm> {
     return this.http
       .get<ApiResponse<ManageRoleForm>>(`${this._apiUrl}user/detail/${id}`)
-      .pipe(map(res => res.result || {}));
+      .pipe(map(res => res.data || {}));
   }
 
   updateUser(data: ManageRoleForm) {

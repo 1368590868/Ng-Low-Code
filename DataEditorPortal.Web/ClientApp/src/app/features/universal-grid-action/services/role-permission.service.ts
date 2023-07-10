@@ -22,19 +22,19 @@ export class RolePermissionService {
   getRoleList() {
     return this.http
       .get<ApiResponse<RoleItem[]>>(`${this._apiUrl}role/list`)
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   getRolePermissions(roleId: string) {
     return this.http
       .get<ApiResponse<TreeNode[]>>(`${this._apiUrl}role/${roleId}/permissions`)
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   getSitePermissions() {
     return this.http
       .get<ApiResponse<TreeNode[]>>(`${this._apiUrl}role/all-site-permissions`)
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   updateRole(data: ManageRoleForm) {

@@ -207,6 +207,9 @@ export class PortalEditDatasourceComponent
       this.filters = [];
       this.sortBy = [];
 
+      this.formControlDbTable.reset();
+      this.formControlIdColumn.reset();
+
       this.getDbTables();
     }
   }
@@ -255,7 +258,7 @@ export class PortalEditDatasourceComponent
           this.formControlConnection.value,
           this.datasourceConfig.queryText
         )
-        .subscribe(res => this.setColumns(res.result || []));
+        .subscribe(res => this.setColumns(res.data || []));
     } else {
       const selectedDbTable = this.formControlDbTable.value;
       if (!selectedDbTable) return;
@@ -348,7 +351,7 @@ export class PortalEditDatasourceComponent
           .saveDataSourceConfig(data)
           .pipe(
             tap(res => {
-              if (res && !res.isError) {
+              if (res && res.code === 200) {
                 if (this.dataSourceChanged()) {
                   // if user changed the tableSchema or tableName, user need to continue config column, search, form
                   this.portalItemService.configCompleted = false;

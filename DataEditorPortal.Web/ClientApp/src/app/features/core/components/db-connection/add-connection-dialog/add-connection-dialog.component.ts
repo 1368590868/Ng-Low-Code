@@ -192,18 +192,18 @@ export class AddConnectionDialogComponent {
           .updateConnection(model.name, model)
           .subscribe(res => {
             this.visible = false;
-            this.saved.emit(res.result);
+            this.saved.emit(res.data);
             this.isLoading = false;
           });
       } else {
         this.dbConnectionService.createConnection(model).subscribe(res => {
-          if (!res.isError && res.result) {
+          if (res.code === 200 && res.data) {
             this.notifyService.notifySuccess(
               'Success',
               'Save Successfully Completed.'
             );
             this.visible = false;
-            this.saved.emit(res.result);
+            this.saved.emit(res.data);
           } else {
             this.isLoading = false;
           }

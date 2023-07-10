@@ -63,7 +63,9 @@ export class UserManagerActionComponent
                         : this.selectedRecords[0][this.recordKey]
                     )
                     .subscribe(res =>
-                      !res.isError ? resolve(!res.result) : reject(res.message)
+                      res.code === 200
+                        ? resolve(!res.data)
+                        : reject(res.message)
                     );
                 });
               },
@@ -121,7 +123,9 @@ export class UserManagerActionComponent
                         : this.selectedRecords[0][this.recordKey]
                     )
                     .subscribe(res =>
-                      !res.isError ? resolve(!res.result) : reject(res.message)
+                      res.code === 200
+                        ? resolve(!res.data)
+                        : reject(res.message)
                     );
                 });
               },
@@ -321,7 +325,7 @@ export class UserManagerActionComponent
               id: this.selectedRecords[0][this.recordKey]
             }
       ).subscribe(res => {
-        if (!res.isError && res.result) {
+        if (res.code === 200 && res.data) {
           this.notifyService.notifySuccess(
             'Success',
             'Save Successfully Completed.'

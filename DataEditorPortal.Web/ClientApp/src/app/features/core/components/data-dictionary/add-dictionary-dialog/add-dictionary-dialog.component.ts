@@ -125,26 +125,26 @@ export class AddDictionaryDialogComponent {
       this.isLoading = true;
       if (model['ID']) {
         this.dataDictionaryService.updateDictionary(model).subscribe(res => {
-          if (!res.isError && res.result) {
+          if (res.code === 200 && res.data) {
             this.notifyService.notifySuccess(
               'Success',
               'Save Successfully Completed.'
             );
             this.visible = false;
-            this.saved.emit(res.result);
+            this.saved.emit(res.data);
           } else {
             this.isLoading = false;
           }
         });
       } else {
         this.dataDictionaryService.createDictionary(model).subscribe(res => {
-          if (!res.isError && res.result) {
+          if (res.code === 200 && res.data) {
             this.notifyService.notifySuccess(
               'Success',
               'Save Successfully Completed.'
             );
             this.visible = false;
-            this.saved.emit(res.result);
+            this.saved.emit(res.data);
           } else {
             this.isLoading = false;
           }

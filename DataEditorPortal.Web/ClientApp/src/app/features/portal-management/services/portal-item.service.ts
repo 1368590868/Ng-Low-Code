@@ -62,7 +62,7 @@ export class PortalItemService {
       .get<ApiResponse<string>>(
         `${this._apiUrl}portal-item/${this.itemId}/current-step`
       )
-      .pipe(map(x => x.result || 'basic'));
+      .pipe(map(x => x.data || 'basic'));
   }
 
   saveCurrentStep(step: string) {
@@ -94,13 +94,13 @@ export class PortalItemService {
       .get<ApiResponse<LinkedSingleConfig>>(
         `${this._apiUrl}portal-item/${id}/linked-single-config`
       )
-      .pipe(map(x => x.result || { details: [], gridColumns: [] }));
+      .pipe(map(x => x.data || { details: [], gridColumns: [] }));
   }
 
   getPortalList(): Observable<PortalItem[]> {
     return this.http
       .get<ApiResponse<PortalItem[]>>(`${this._apiUrl}portal-item/list`)
-      .pipe(map(x => x.result || []));
+      .pipe(map(x => x.data || []));
   }
 
   createMenuItem(data: PortalItemData): Observable<ApiResponse<string>> {
@@ -190,7 +190,7 @@ export class PortalItemService {
       .get<ApiResponse<PortalItemData>>(
         `${this._apiUrl}portal-item/${id}/details`
       )
-      .pipe(map(x => x.result || {}));
+      .pipe(map(x => x.data || {}));
   }
 
   createPortalDetails(data: PortalItemData): Observable<ApiResponse<string>> {
@@ -223,7 +223,7 @@ export class PortalItemService {
       .get<ApiResponse<DataSourceConnection[]>>(
         `${this._apiUrl}portal-item/datasource/connections`
       )
-      .pipe(map(x => x.result || []));
+      .pipe(map(x => x.data || []));
   }
 
   createDataSourceConnection(
@@ -250,7 +250,7 @@ export class PortalItemService {
       .get<ApiResponse<DataSourceTable[]>>(
         `${this._apiUrl}portal-item/datasource/${connectionName}/tables`
       )
-      .pipe(map(x => x.result || []));
+      .pipe(map(x => x.data || []));
   }
 
   getDataSourceTableColumns(
@@ -268,7 +268,7 @@ export class PortalItemService {
           }
         }
       )
-      .pipe(map(x => x.result || []));
+      .pipe(map(x => x.data || []));
   }
 
   getDataSourceTableColumnsByQuery(
@@ -289,7 +289,7 @@ export class PortalItemService {
         `${this._apiUrl}portal-item/${this.itemId}/datasource/columns`,
         { params: { forForm } }
       )
-      .pipe(map(x => x.result || []));
+      .pipe(map(x => x.data || []));
   }
 
   getDataSourceConfig(): Observable<DataSourceConfig> {
@@ -300,7 +300,7 @@ export class PortalItemService {
       .pipe(
         map(
           x =>
-            x.result || {
+            x.data || {
               dataSourceConnectionName: '',
               pageSize: 100,
               idColumn: ''
@@ -323,7 +323,7 @@ export class PortalItemService {
       .get<ApiResponse<GridColumn[]>>(
         `${this._apiUrl}portal-item/${this.itemId}/grid-columns`
       )
-      .pipe(map(x => x.result || []));
+      .pipe(map(x => x.data || []));
   }
 
   saveGridColumnsConfig(data: GridColumn[]) {
@@ -340,7 +340,7 @@ export class PortalItemService {
       .get<ApiResponse<GridSearchField[]>>(
         `${this._apiUrl}portal-item/${this.itemId}/grid-search`
       )
-      .pipe(map(x => x.result || []));
+      .pipe(map(x => x.data || []));
   }
 
   saveGridSearchConfig(data: GridSearchField[]) {
@@ -357,7 +357,7 @@ export class PortalItemService {
       .get<ApiResponse<GirdDetailConfig>>(
         `${this._apiUrl}portal-item/${this.itemId}/grid-form`
       )
-      .pipe(map(x => x.result || {}));
+      .pipe(map(x => x.data || {}));
   }
 
   saveGridFormConfig(data: GirdDetailConfig) {
@@ -374,7 +374,7 @@ export class PortalItemService {
       .get<ApiResponse<GridCustomAction[]>>(
         `${this._apiUrl}portal-item/${id}/custom-actions`
       )
-      .pipe(map(x => x.result || []));
+      .pipe(map(x => x.data || []));
   }
 
   saveCustomActions(id: string, data: GridCustomAction[]) {

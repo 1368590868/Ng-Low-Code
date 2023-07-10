@@ -16,7 +16,7 @@ export class ImportActionService {
       .get<ApiResponse<ImportHistories[]>>(
         `${this.apiUrl}import-data/${gridName}/histories`
       )
-      .pipe(map(res => res.result ?? []));
+      .pipe(map(res => res.data ?? []));
   }
 
   getUploadTemplate(file: any, gridName: string, type: string) {
@@ -25,7 +25,7 @@ export class ImportActionService {
         `${this.apiUrl}import-data/${gridName}/${type}/upload-excel-template`,
         file
       )
-      .pipe(map(res => res.result));
+      .pipe(map(res => res.data));
   }
 
   getImportState(fileId: string, gridName: string) {
@@ -33,7 +33,7 @@ export class ImportActionService {
       .get<ApiResponse<ImportHistories>>(
         `${this.apiUrl}import-data/${gridName}/${fileId}/import-status`
       )
-      .pipe(map(res => res.result));
+      .pipe(map(res => res.data));
   }
 
   confirmImport(file: any, gridName: string, type: string) {

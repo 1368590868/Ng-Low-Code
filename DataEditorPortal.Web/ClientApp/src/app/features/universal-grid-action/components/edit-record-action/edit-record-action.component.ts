@@ -273,7 +273,7 @@ export class EditRecordActionComponent
       });
 
       this.gridService.addGridData(this.gridName, model).subscribe(res => {
-        if (!res.isError && res.result) {
+        if (res.code === 200 && res.data) {
           this.notifyService.notifySuccess(
             'Success',
             'Save Successfully Completed.'
@@ -299,7 +299,7 @@ export class EditRecordActionComponent
       this.gridService
         .updateGridData(this.gridName, this.dataKey as string, this.model)
         .subscribe(res => {
-          if (!res.isError && res.result) {
+          if (res.code === 200 && res.data) {
             this.notifyService.notifySuccess(
               'Success',
               'Save Successfully Completed.'

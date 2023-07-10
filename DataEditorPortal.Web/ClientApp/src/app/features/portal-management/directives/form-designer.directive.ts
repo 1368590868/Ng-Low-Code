@@ -165,7 +165,7 @@ export class FormDesignerDirective {
         }
       ],
       expressions: {
-        hide: `formState.hideComputedValue === field.parent.model.type || 'fileUpload' === field.parent.model.type || 'locationEditor'=== field.parent.model.type `
+        hide: `formState.hideComputedValue  || 'fileUpload' === field.parent.model.type || 'locationEditor'=== field.parent.model.type `
       }
     },
     {
@@ -510,7 +510,7 @@ export class FormDesignerDirective {
         }
       ],
       expressions: {
-        hide: `formState.hideValidation === field.parent.model.type || 'fileUpload' === field.parent.model.type || 'locationEditor' === field.parent.model.type || field.parent.model.computedConfig`
+        hide: `formState.hideValidation  || 'fileUpload' === field.parent.model.type || 'locationEditor' === field.parent.model.type || field.parent.model.computedConfig`
       }
     }
   ];

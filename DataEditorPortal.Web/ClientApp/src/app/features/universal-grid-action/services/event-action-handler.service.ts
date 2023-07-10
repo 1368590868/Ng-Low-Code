@@ -42,7 +42,7 @@ export class AsyncQueryTextActionHandler extends EventActionHandlerService {
         params?.data
       )
       .pipe(
-        map(res => res.result || false),
+        map(res => res.data || false),
         tap(res => {
           if (!res && params?.errorMsg)
             this.notifyService.notifyWarning('', params?.errorMsg);

@@ -61,7 +61,7 @@ export class DbConnectionComponent {
     this.loading = true;
 
     this.dbConnectionService.getDbConnectionList().subscribe(res => {
-      if (!res.isError) {
+      if (res.code === 200) {
         this.data = res;
         this.type = res[0].type;
         this.totalRecords = res.length;
@@ -123,7 +123,7 @@ export class DbConnectionComponent {
 
       accept: () => {
         this.dbConnectionService.deleteConnection(rowData).subscribe(res => {
-          if (!res.isError) {
+          if (res.code === 200) {
             this.notifyService.notifySuccess(
               'Success',
               'Record deleted successfully'

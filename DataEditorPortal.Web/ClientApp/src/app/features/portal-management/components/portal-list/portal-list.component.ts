@@ -290,7 +290,7 @@ export class PortalListComponent implements OnInit {
       .publish(row['id'])
       .pipe(
         tap(res => {
-          if (res && !res.isError) {
+          if (res && res.code === 200) {
             row['status'] = 1;
           }
         })
@@ -303,7 +303,7 @@ export class PortalListComponent implements OnInit {
       .unpublish(row['id'])
       .pipe(
         tap(res => {
-          if (res && !res.isError) {
+          if (res && res.code === 200) {
             row['status'] = 2;
           }
         })
@@ -316,7 +316,7 @@ export class PortalListComponent implements OnInit {
       .moveUp(row['id'])
       .pipe(
         tap(res => {
-          if (res && !res.isError) {
+          if (res && res.code === 200) {
             this.getPortalList();
           }
         })
@@ -329,7 +329,7 @@ export class PortalListComponent implements OnInit {
       .moveDown(row['id'])
       .pipe(
         tap(res => {
-          if (res && !res.isError) {
+          if (res && res.code === 200) {
             this.getPortalList();
           }
         })
@@ -369,7 +369,7 @@ export class PortalListComponent implements OnInit {
         this.portalItemService[deleteMethod](row['id'])
           .pipe(
             tap(res => {
-              if (res && !res.isError) {
+              if (res && res.code === 200) {
                 this.getPortalList();
               }
             })

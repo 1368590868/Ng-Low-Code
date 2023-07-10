@@ -29,7 +29,7 @@ export class UserManagerService {
   getUserDetail(id: string): Observable<ManageRoleForm> {
     return this.http
       .get<ApiResponse<ManageRoleForm>>(`${this._apiUrl}user/detail/${id}`)
-      .pipe(map(res => res.result || {}));
+      .pipe(map(res => res.data || {}));
   }
 
   updateUser(data: ManageRoleForm) {
@@ -42,12 +42,12 @@ export class UserManagerService {
   getUserPermissions(id: string) {
     return this.http
       .get<ApiResponse<UserData[]>>(`${this._apiUrl}user/${id}/permissions`)
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
   getUserRole(id: string) {
     return this.http
       .get<ApiResponse<UserData[]>>(`${this._apiUrl}user/${id}/roles`)
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   saveUserRole(data: UserData[], id: string) {

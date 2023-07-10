@@ -18,6 +18,12 @@
       @media screen and (min-width: 1904px) {
         max-width: 25rem;
       }
+
+      .p-picklist-item {
+        .remove-btn {
+          display: none;
+        }
+      }
     }
     .p-picklist-target-wrapper {
       .p-picklist-item {

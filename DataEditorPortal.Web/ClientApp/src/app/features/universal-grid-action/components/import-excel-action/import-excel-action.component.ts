@@ -99,8 +99,8 @@ export class ImportExcelActionComponent
   }
 
   onUpload(event: any) {
-    if (event?.originalEvent?.body?.result) {
-      for (const file of event.originalEvent.body.result) {
+    if (event?.originalEvent?.body?.data) {
+      for (const file of event.originalEvent.body.data) {
         if (file) {
           this.file = file;
           // upload file to server
@@ -193,7 +193,7 @@ export class ImportExcelActionComponent
     this.importExcelService
       .confirmImport(this.file, this.gridName, this.stepType.toLowerCase())
       .subscribe(res => {
-        if (!res.isError) {
+        if (res.code === 200) {
           this.file = null;
           setTimeout(() => {
             this.initImportFileList();

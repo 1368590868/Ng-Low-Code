@@ -51,7 +51,7 @@ export class AddPortalDialogComponent {
               this.portalItemService
                 .nameExists(c.value, this.model['id'])
                 .subscribe(res =>
-                  !res.isError ? resolve(!res.result) : reject(res.message)
+                  res.code === 200 ? resolve(!res.data) : reject(res.message)
                 );
             });
           },
@@ -166,26 +166,26 @@ export class AddPortalDialogComponent {
         this.portalItemService
           .updateMenuItem(model['id'] as string, model)
           .subscribe(res => {
-            if (!res.isError && res.result) {
+            if (res.code === 200 && res.data) {
               this.notifyService.notifySuccess(
                 'Success',
                 'Save Successfully Completed.'
               );
               this.visible = false;
-              this.saved.emit(res.result);
+              this.saved.emit(res.data);
             } else {
               this.isLoading = false;
             }
           });
       } else {
         this.portalItemService.createMenuItem(model).subscribe(res => {
-          if (!res.isError && res.result) {
+          if (res.code === 200 && res.data) {
             this.notifyService.notifySuccess(
               'Success',
               'Save Successfully Completed.'
             );
             this.visible = false;
-            this.saved.emit(res.result);
+            this.saved.emit(res.data);
           } else {
             this.isLoading = false;
           }
