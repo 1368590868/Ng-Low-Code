@@ -432,6 +432,8 @@ namespace DataEditorPortal.Web.Services.FieldImporter
         {
             if (obj.ContainsKey(field.key))
             {
+                if (obj[field.key] == null || obj[field.key] == DBNull.Value) return;
+
                 if (IsOptionField(field))
                 {
                     obj[field.key] = TransformOptionLabel(field, obj[field.key]);
@@ -453,6 +455,8 @@ namespace DataEditorPortal.Web.Services.FieldImporter
 
         protected object TransformOptionLabel(FormFieldConfig field, object value)
         {
+            if (value == null || value == DBNull.Value) return value;
+
             var options = GetFieldOptions(field);
             if (options != null)
             {
