@@ -46,6 +46,7 @@ export class ImportDialogComponent {
   showDialog() {
     this.isLoading = false;
     this.visible = true;
+    this.progress = 0;
 
     this.portalItemService.getPortalList().subscribe(res => {
       this.options = res
