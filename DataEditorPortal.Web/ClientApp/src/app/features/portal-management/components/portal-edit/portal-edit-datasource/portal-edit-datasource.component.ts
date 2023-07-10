@@ -207,6 +207,9 @@ export class PortalEditDatasourceComponent
       this.filters = [];
       this.sortBy = [];
 
+      this.formControlDbTable.reset();
+      this.formControlIdColumn.reset();
+
       this.getDbTables();
     }
   }
