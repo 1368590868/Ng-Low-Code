@@ -320,6 +320,8 @@ namespace DataEditorPortal.Web.Services
             var result = new List<DataSourceTableColumn>();
 
             var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(c => c.Name == name);
+            if (dsConnection == null)
+                return result;
 
             using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
             {
