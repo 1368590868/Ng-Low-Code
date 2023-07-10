@@ -143,6 +143,8 @@ export class TableComponent implements OnInit, OnDestroy {
       .pipe(
         tap(model => {
           this.searchModel = model;
+          this.first = 0;
+          this.rows = this.tableConfig.pageSize || 100;
           this.fetchData();
         }),
         takeUntil(this.destroy$)

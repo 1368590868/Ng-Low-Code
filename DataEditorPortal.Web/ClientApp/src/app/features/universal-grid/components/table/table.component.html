@@ -245,12 +245,13 @@
     [pageLinkSize]="5"
     styleClass="p-paginator-bottom"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries  "
-    [alwaysShow]="false"
+    [alwaysShow]="true"
     (onPageChange)="onPageChange($event)"
     [rowsPerPageOptions]="rowsPerPageOptions"
     [showFirstLastIcon]="true"
     [showCurrentPageReport]="true"
-    [showPageLinks]="true"></p-paginator>
+    [showPageLinks]="true"
+    dropdownAppendTo="body"></p-paginator>
 </div>
 
 <p-sidebar
