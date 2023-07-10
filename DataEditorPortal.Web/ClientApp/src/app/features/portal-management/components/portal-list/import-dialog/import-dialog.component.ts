@@ -140,7 +140,7 @@ export class ImportDialogComponent {
               this.step = 2;
               this.dataSource = res.data || [];
               this.selection = res.data || [];
-              (this.dialog as any).cd.markForCheck();
+              this.markDialogForChange();
             }
             this.isLoading = false;
           });
@@ -177,5 +177,9 @@ export class ImportDialogComponent {
           this.isLoading = false;
         });
     }
+  }
+
+  markDialogForChange() {
+    (this.dialog as any).cd.markForCheck();
   }
 }
