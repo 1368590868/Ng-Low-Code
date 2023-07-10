@@ -136,7 +136,7 @@ export class PortalEditFormComponent
         .saveGridFormConfig(data)
         .pipe(
           tap(res => {
-            if (res && !res.isError) {
+            if (res && res.code === 200) {
               this.saveSucess();
             }
             this.isSaving = false;

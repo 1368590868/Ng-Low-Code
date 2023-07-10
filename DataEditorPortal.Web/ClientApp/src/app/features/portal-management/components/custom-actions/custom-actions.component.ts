@@ -72,7 +72,7 @@ export class CustomActionsComponent {
       this.portalItemService
         .saveCustomActions(this.portalItemId, data)
         .subscribe(res => {
-          if (res && !res.isError) {
+          if (res && res.code === 200) {
             this.notifyService.notifySuccess(
               'Success',
               'Custom Actions Successfully Saved.'

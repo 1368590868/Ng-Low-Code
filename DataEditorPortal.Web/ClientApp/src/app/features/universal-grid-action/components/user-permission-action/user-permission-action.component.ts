@@ -109,7 +109,7 @@ export class UserPermissionActionComponent
         this.selectedRecords[0][this.recordKey]
       )
       .subscribe(res => {
-        if (!res?.isError) {
+        if (res.code === 200) {
           this.notifyService.notifySuccess(
             'Success',
             'Permissions saved successfully'

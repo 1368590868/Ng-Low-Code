@@ -29,7 +29,7 @@ export class UniversalGridService {
         `${this._apiUrl}universal-grid/${name}/config/form`,
         { params: { type } }
       )
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   getEventConfig(
@@ -41,7 +41,7 @@ export class UniversalGridService {
         `${this._apiUrl}universal-grid/${name}/config/event`,
         { params: { type } }
       )
-      .pipe(map(res => res.result || {}));
+      .pipe(map(res => res.data || {}));
   }
 
   getDetailData(name: string, id: string): Observable<EditFormData> {
@@ -49,7 +49,7 @@ export class UniversalGridService {
       .get<ApiResponse<EditFormData>>(
         `${this._apiUrl}universal-grid/${name}/data/${id}`
       )
-      .pipe(map(res => res.result || {}));
+      .pipe(map(res => res.data || {}));
   }
 
   addGridData(
@@ -96,7 +96,7 @@ export class UniversalGridService {
       .get<ApiResponse<GridColumn[]>>(
         `${this._apiUrl}universal-grid/${name}/config/columns`
       )
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   getSearchConfig(name: string): Observable<GridSearchConfig[]> {
@@ -104,6 +104,6 @@ export class UniversalGridService {
       .get<ApiResponse<GridSearchConfig[]>>(
         `${this._apiUrl}universal-grid/${name}/config/search`
       )
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 }

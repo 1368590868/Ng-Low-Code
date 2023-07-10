@@ -15,17 +15,17 @@ export class SystemLogDialogComponent {
 
   show(row: SystemLogData) {
     this.systemLogService.getRowData(row.ID).subscribe(res => {
-      if (!res.isError) {
-        const { result } = res;
+      if (res.code === 200) {
+        const { data } = res;
         this.viewData = {
-          'Event time': result?.eventTime,
-          'Category ': result?.category,
-          'Event Section': result?.eventSection,
-          'Event Name': result?.eventName,
-          'User Name ': result?.username,
-          'Details ': result?.details,
-          'Params ': result?.params,
-          'Result ': result?.result
+          'Event time': data?.eventTime,
+          'Category ': data?.category,
+          'Event Section': data?.eventSection,
+          'Event Name': data?.eventName,
+          'User Name ': data?.username,
+          'Details ': data?.details,
+          'Params ': data?.params,
+          'Result ': data?.result
         };
         this.viewData = Object.keys(this.viewData).map(key => {
           return {

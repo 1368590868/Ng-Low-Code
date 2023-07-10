@@ -21,13 +21,13 @@ export class LookupService {
   getLookups(): Observable<Lookup[]> {
     return this.http
       .get<ApiResponse<Lookup[]>>(`${this._apiUrl}lookup/list`)
-      .pipe(map(x => x.result || []));
+      .pipe(map(x => x.data || []));
   }
 
   getOptionQuery(id: string): Observable<Lookup | undefined> {
     return this.http
       .get<ApiResponse<Lookup | undefined>>(`${this._apiUrl}lookup/${id}`)
-      .pipe(map(x => x.result));
+      .pipe(map(x => x.data));
   }
 
   saveOptionQuery(data: Lookup) {

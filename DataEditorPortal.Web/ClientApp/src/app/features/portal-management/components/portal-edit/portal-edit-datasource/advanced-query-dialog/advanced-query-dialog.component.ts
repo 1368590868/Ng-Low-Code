@@ -52,10 +52,10 @@ export class AdvancedQueryDialogComponent {
             this.formControlQuery.value
           )
           .subscribe(res => {
-            if (!res.isError) {
+            if (res.code === 200) {
               this.queryChange.emit({
                 queryText: this.formControlQuery.value,
-                columns: res.result || []
+                columns: res.data || []
               });
               this.advanceDialogVisible = false;
             }

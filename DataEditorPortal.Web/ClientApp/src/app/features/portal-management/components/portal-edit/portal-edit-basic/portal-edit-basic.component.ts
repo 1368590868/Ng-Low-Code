@@ -79,7 +79,9 @@ export class PortalEditBasicComponent
                   this.portalItemService
                     .nameExists(currVal, this.itemId)
                     .subscribe(res => {
-                      !res.isError ? resolve(!res.result) : reject(res.message);
+                      res.code === 200
+                        ? resolve(!res.data)
+                        : reject(res.message);
                     });
                 }, 100);
               }
@@ -95,8 +97,8 @@ export class PortalEditBasicComponent
           field.formControl?.valueChanges.subscribe(val => {
             if (val) {
               this.portalItemService.getCodeName(val).subscribe(res => {
-                field.formControl?.setValue(res.result, { emitEvent: false });
-                this.model['name'] = res.result + '';
+                field.formControl?.setValue(res.data, { emitEvent: false });
+                this.model['name'] = res.data + '';
                 field.formControl?.markAsDirty();
               });
             }
@@ -240,7 +242,7 @@ export class PortalEditBasicComponent
           .updatePortalDetails(data)
           .pipe(
             tap(res => {
-              if (res && !res.isError) {
+              if (res && res.code === 200) {
                 this.itemCaption = data['label'];
                 this.saveSucess();
               }
@@ -256,10 +258,10 @@ export class PortalEditBasicComponent
           .createPortalDetails(data)
           .pipe(
             tap(res => {
-              if (res && !res.isError) {
-                this.itemId = res.result;
+              if (res && res.code === 200) {
+                this.itemId = res.data;
                 this.itemCaption = data['label'];
-                this.saveSucess(res.result);
+                this.saveSucess(res.data);
               }
               this.isSaving = false;
               this.isSavingAndExit = false;

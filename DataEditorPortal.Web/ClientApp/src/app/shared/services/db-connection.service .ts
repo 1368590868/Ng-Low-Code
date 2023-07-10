@@ -27,7 +27,7 @@ export class DbConnectionService {
       .get<ApiResponse<any>>(
         `${this._apiUrl}portal-item/datasource/connections/list`
       )
-      .pipe(map(x => x.result || []));
+      .pipe(map(x => x.data || []));
   }
 
   createConnection(data: DbConnectionData) {

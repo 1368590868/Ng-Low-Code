@@ -83,8 +83,8 @@ export class ImportDialogComponent {
   }
 
   onUpload(event: any) {
-    if (event?.originalEvent?.body?.result) {
-      for (const file of event.originalEvent.body.result) {
+    if (event?.originalEvent?.body?.data) {
+      for (const file of event.originalEvent.body.data) {
         if (file) {
           this.file = file;
           this.fileLabel = this.file.fileName;
@@ -136,10 +136,10 @@ export class ImportDialogComponent {
                 : this.parentFolderControl.value
           })
           .subscribe(res => {
-            if (!res.isError) {
+            if (res.code === 200) {
               this.step = 2;
-              this.dataSource = res.result || [];
-              this.selection = res.result || [];
+              this.dataSource = res.data || [];
+              this.selection = res.data || [];
               (this.dialog as any).cd.markForCheck();
             }
             this.isLoading = false;
@@ -166,7 +166,7 @@ export class ImportDialogComponent {
           selectedObjects
         })
         .subscribe(res => {
-          if (!res.isError && res.result) {
+          if (res.code === 200 && res.data) {
             this.visible = false;
             this.saved.emit();
             this.notifyService.notifySuccess(

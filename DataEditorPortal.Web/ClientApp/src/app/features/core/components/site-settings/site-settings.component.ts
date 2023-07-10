@@ -32,9 +32,9 @@ export class SiteSettingsComponent implements OnInit {
         .getSiteSettings()
         .pipe(
           tap(res => {
-            if (!res.isError && res.result) {
-              this.siteLogo = res.result.siteLogo || '';
-              this.formControlSiteName.setValue(res.result.siteName);
+            if (res.code === 200 && res.data) {
+              this.siteLogo = res.data.siteLogo || '';
+              this.formControlSiteName.setValue(res.data.siteName);
             }
           })
         )
@@ -110,8 +110,8 @@ export class SiteSettingsComponent implements OnInit {
           siteLogo: this.siteLogo
         })
         .pipe(
-          tap((res: { isError: boolean }) => {
-            if (!res.isError) {
+          tap(res => {
+            if (res.code === 200) {
               this.configDataService.siteSettings = {
                 siteName: this.formControlSiteName.value || '',
                 siteLogo: this.siteLogo
@@ -135,7 +135,7 @@ export class SiteSettingsComponent implements OnInit {
         html: this.formControlAboutEditor.value
       })
       .subscribe(res => {
-        if (!res.isError) {
+        if (res.code === 200) {
           this.notifyService.notifySuccess('Success', 'Save Success');
         }
       });
@@ -152,7 +152,7 @@ export class SiteSettingsComponent implements OnInit {
         html: this.formControlContactEditor.value
       })
       .subscribe(res => {
-        if (!res.isError) {
+        if (res.code === 200) {
           this.notifyService.notifySuccess('Success', 'Save Success');
         }
       });
@@ -169,7 +169,7 @@ export class SiteSettingsComponent implements OnInit {
     this.configDataService
       .saveLicense(this.formControlLicense.value)
       .subscribe(res => {
-        if (!res.isError) {
+        if (res.code === 200) {
           this.notifyService.notifySuccess('Success', 'Save Success');
           this.configDataService.licenseExpiredChange$.next(false);
           this.onCancel();

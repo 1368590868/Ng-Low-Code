@@ -15,6 +15,6 @@ export class LocationEditorService {
   getPipeOptions(id: string, data = {}) {
     return this.http
       .post<ApiResponse<any[]>>(`${this.apiUrl}lookup/${id}/options`, data)
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 }

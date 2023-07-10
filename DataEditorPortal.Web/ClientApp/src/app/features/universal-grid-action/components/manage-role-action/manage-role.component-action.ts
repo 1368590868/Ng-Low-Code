@@ -223,7 +223,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
         ...model,
         permissions: permissionSelect as RolePermissions[]
       }).subscribe(res => {
-        if (!res?.isError) {
+        if (res.code === 200) {
           this.notifyService.notifySuccess(
             'Success',
             'Save Successfully Completed.'

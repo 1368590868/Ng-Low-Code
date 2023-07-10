@@ -101,9 +101,9 @@ export class PortalEditLinkComponent
     this.portalItemService
       .getLinkedDatasource(this.itemId as string)
       .subscribe(res => {
-        if (!res.isError) {
-          const { result } = res;
-          this.dataSourceConfig = result || {};
+        if (res.code === 200) {
+          const { data } = res;
+          this.dataSourceConfig = data || {};
           this.isLoading = false;
 
           this.primarySelected =
@@ -117,13 +117,13 @@ export class PortalEditLinkComponent
             this.dataSourceConfig.linkTable?.secondaryForeignKey
           );
 
-          this.showQuery = !!result?.linkTable?.queryInsert;
+          this.showQuery = !!data?.linkTable?.queryInsert;
 
-          this.formControlQueryText.setValue(result?.linkTable?.queryInsert);
+          this.formControlQueryText.setValue(data?.linkTable?.queryInsert);
 
-          if (result?.primaryTable?.id != null) {
+          if (data?.primaryTable?.id != null) {
             this.portalItemService
-              .getLinkedSingleTableConfig(result.primaryTable.id)
+              .getLinkedSingleTableConfig(data.primaryTable.id)
               .subscribe(item => {
                 this.primaryTableConfig = item;
                 const filteredData = this.primarySelected.filter(
@@ -140,9 +140,9 @@ export class PortalEditLinkComponent
               });
           }
 
-          if (result?.secondaryTable?.id != null) {
+          if (data?.secondaryTable?.id != null) {
             this.portalItemService
-              .getLinkedSingleTableConfig(result.secondaryTable.id)
+              .getLinkedSingleTableConfig(data.secondaryTable.id)
               .subscribe(item => {
                 this.secondaryTableConfig = item;
                 const filteredData = this.secondarySelected.filter(
@@ -159,8 +159,8 @@ export class PortalEditLinkComponent
               });
           }
 
-          if (result?.linkTable) {
-            this.dsConfig = result.linkTable;
+          if (data?.linkTable) {
+            this.dsConfig = data.linkTable;
           }
         }
       });
@@ -197,7 +197,7 @@ export class PortalEditLinkComponent
 
   onEditTable(tableId: string) {
     this.onSave().subscribe(res => {
-      if (!res.isError) {
+      if (res.code === 200) {
         this.saveSucess();
         this.router.navigate([`./edit/${tableId}`], {
           relativeTo: this.route
@@ -209,7 +209,7 @@ export class PortalEditLinkComponent
 
   onAddPrimaryTable() {
     this.onSave().subscribe(res => {
-      if (!res.isError) {
+      if (res.code === 200) {
         this.saveSucess();
         this.router.navigate(['./add'], { relativeTo: this.route });
       }
@@ -225,7 +225,7 @@ export class PortalEditLinkComponent
       );
     } else {
       this.onSave().subscribe(res => {
-        if (!res.isError) {
+        if (res.code === 200) {
           this.saveSucess();
           this.router.navigate(['./add'], { relativeTo: this.route });
         }
@@ -274,7 +274,7 @@ export class PortalEditLinkComponent
 
     if (this.valid()) {
       this.onSave().subscribe(res => {
-        if (!res.isError) {
+        if (res.code === 200) {
           this.saveSucess();
         }
         this.clearStatus();
@@ -286,7 +286,7 @@ export class PortalEditLinkComponent
     if (!this.validate()) return;
     this.isSavingAndExit = true;
     this.onSave().subscribe(res => {
-      if (!res.isError) {
+      if (res.code === 200) {
         this.saveSucess();
       }
       this.clearStatus();
@@ -439,7 +439,7 @@ export class PortalEditLinkComponent
           this.formControlConnection.value,
           this.dsConfig.queryText
         )
-        .subscribe(res => this.setColumns(res.result || []));
+        .subscribe(res => this.setColumns(res.data || []));
     } else {
       const selectedDbTable = this.formControlDbTable.value;
       if (!selectedDbTable) return;

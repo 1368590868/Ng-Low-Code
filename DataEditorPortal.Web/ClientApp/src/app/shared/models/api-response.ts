@@ -1,8 +1,8 @@
 export interface ApiResponse<T> {
-  isError: boolean;
   responseException?: {
     exceptionMessage: string;
   };
-  result?: T;
+  code: number;
+  data?: T;
   message?: string;
 }

@@ -148,8 +148,8 @@ export class FileUploadComponent implements ControlValueAccessor {
 
   onUpload(event: any) {
     this.progress = 0;
-    if (event?.originalEvent?.body?.result) {
-      for (const file of event.originalEvent.body.result) {
+    if (event?.originalEvent?.body?.data) {
+      for (const file of event.originalEvent.body.data) {
         this.newAttachments.push(file);
       }
       this.newAttachments = JSON.parse(JSON.stringify(this.newAttachments));

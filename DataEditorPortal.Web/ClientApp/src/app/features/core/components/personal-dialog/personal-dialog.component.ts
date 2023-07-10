@@ -68,7 +68,9 @@ export class PersonalDialogComponent {
                   this.userService
                     .userNameExists(control.value, this.userService.USER.id)
                     .subscribe(res =>
-                      !res.isError ? resolve(!res.result) : reject(res.message)
+                      res.code === 200
+                        ? resolve(!res.data)
+                        : reject(res.message)
                     );
                 });
               },
@@ -121,7 +123,9 @@ export class PersonalDialogComponent {
                   this.userService
                     .emailExists(control.value, this.userService.USER.id)
                     .subscribe(res =>
-                      !res.isError ? resolve(!res.result) : reject(res.message)
+                      res.code === 200
+                        ? resolve(!res.data)
+                        : reject(res.message)
                     );
                 });
               },
@@ -243,7 +247,7 @@ export class PersonalDialogComponent {
           id: this.userService.USER.id
         })
         .subscribe(res => {
-          if (!res.isError && res.result) {
+          if (res.code === 200 && res.data) {
             this.notifyService.notifySuccess(
               'Success',
               'Save Successfully Completed.'

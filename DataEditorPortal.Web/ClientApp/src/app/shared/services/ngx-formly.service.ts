@@ -28,7 +28,7 @@ export class NgxFormlyService {
         `${this._apiUrl}lookup/${id}/options`,
         data || {}
       )
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   initFieldOptions(field: any, data?: any) {

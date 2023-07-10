@@ -6,7 +6,7 @@ import {
   HttpErrorResponse,
   HttpResponse
 } from '@angular/common/http';
-import { catchError, of, throwError } from 'rxjs';
+import { catchError, finalize, of, tap, throwError } from 'rxjs';
 import { NotifyService } from '../utils/notify.service';
 import { ConfigDataService } from '../services/config-data.service';
 
@@ -20,20 +20,17 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): any {
     return next.handle(request).pipe(
       catchError(error => {
-        if (error instanceof HttpErrorResponse && error.status !== 440)
+        if (error instanceof HttpErrorResponse && error.status !== 440) {
           this.notifyService.notifyError(
-            error.error?.responseException?.exceptionTitle ||
-              error.statusText ||
-              error.name,
-            error.error?.responseException?.exceptionMessage?.title ||
-              error.error?.responseException?.exceptionMessage ||
-              error.message
+            error.statusText || error.name,
+            error.error?.message || error.message
           );
+        }
 
         if (error.status === 401) {
           return of(
             new HttpResponse({
-              body: { isError: true }
+              body: { code: 401, message: 'Unauthorized' }
             })
           );
         }

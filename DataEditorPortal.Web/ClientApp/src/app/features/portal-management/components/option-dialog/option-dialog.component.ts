@@ -202,9 +202,9 @@ export class OptionDialogComponent implements ControlValueAccessor {
         };
         this.lookupService.saveOptionQuery(data).subscribe(res => {
           this.isLoading = false;
-          if (res && !res.isError) {
+          if (res && res.code === 200) {
             this.options = [];
-            this.optionsLookup = res.result;
+            this.optionsLookup = res.data;
 
             const matches = [
               ...data.queryText.matchAll(/##([a-zA-Z]{1}[a-zA-Z0-9_]+?)##/g)

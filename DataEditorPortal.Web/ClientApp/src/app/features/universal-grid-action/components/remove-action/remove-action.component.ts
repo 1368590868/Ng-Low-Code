@@ -91,7 +91,7 @@ export class RemoveActionComponent
         this.selectedRecords.map((x: any) => x[this.recordKey])
       )
       .subscribe(res => {
-        if (!res.isError && res.result) {
+        if (res.code === 200 && res.data) {
           this.notifyService.notifySuccess(
             'Success',
             'Remove Successfully Completed.'

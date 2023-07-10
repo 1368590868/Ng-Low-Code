@@ -60,11 +60,11 @@ export class ConfigDataService {
   getSiteEnvironment() {
     return this.http
       .get<{
-        result: HeaderText;
+        data: HeaderText;
       }>(`${this._apiUrl}site/env`)
       .pipe(
         tap(res => {
-          this.headerText = res.result;
+          this.headerText = res.data;
         })
       );
   }
@@ -72,13 +72,13 @@ export class ConfigDataService {
   getSiteMenus(): Observable<SiteMenu[]> {
     return this.http
       .post<ApiResponse<SiteMenu[]>>(`${this._apiUrl}site/menus`, null)
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   getHomeMenus(): Observable<SiteMenu[]> {
     return this.http
       .post<ApiResponse<SiteMenu[]>>(`${this._apiUrl}site/menus`, null)
-      .pipe(map(res => res.result || []));
+      .pipe(map(res => res.data || []));
   }
 
   public siteSettings: SiteSettings = {
@@ -92,8 +92,8 @@ export class ConfigDataService {
       .get<ApiResponse<SiteSettings>>(`${this._apiUrl}site/settings`)
       .pipe(
         tap(res => {
-          if (!res.isError) {
-            this.siteSettings = res.result ?? {
+          if (res.code === 200) {
+            this.siteSettings = res.data ?? {
               siteName: '',
               dbProvider: 'SqlConnection'
             };
@@ -105,7 +105,7 @@ export class ConfigDataService {
   getHTMLData(pageName: string) {
     return this.http
       .get<ApiResponse<string>>(`${this._apiUrl}site/content/${pageName}`)
-      .pipe(map(res => res.result ?? ''));
+      .pipe(map(res => res.data ?? ''));
   }
 
   saveData(data: SiteSettings) {
@@ -127,7 +127,7 @@ export class ConfigDataService {
       .get<ApiResponse<{ isExpired: boolean; license: string }>>(
         `${this._apiUrl}site/license`
       )
-      .pipe(map(res => res.result ?? { isExpired: false, license: '' }));
+      .pipe(map(res => res.data ?? { isExpired: false, license: '' }));
   }
 
   saveLicense(license: string) {

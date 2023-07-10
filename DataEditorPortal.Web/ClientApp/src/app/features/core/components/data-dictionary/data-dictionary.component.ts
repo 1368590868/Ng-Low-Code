@@ -77,9 +77,9 @@ export class DataDictionaryComponent implements OnInit {
     this.dataDictionaryService
       .getDictionaryList(fetchDataParam)
       .subscribe(res => {
-        if (!res.isError) {
-          this.data = res.result?.data ?? [];
-          this.totalRecords = res.result?.total ?? 0;
+        if (res.code === 200) {
+          this.data = res.data?.data ?? [];
+          this.totalRecords = res.data?.total ?? 0;
         }
         this.loading = false;
       });
@@ -128,7 +128,7 @@ export class DataDictionaryComponent implements OnInit {
 
       accept: () => {
         this.dataDictionaryService.deleteDictionary(rowData).subscribe(res => {
-          if (!res.isError) {
+          if (res.code === 200) {
             this.notifyService.notifySuccess(
               'Success',
               'Record deleted successfully'
