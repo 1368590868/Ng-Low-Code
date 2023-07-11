@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -462,44 +463,101 @@ namespace DataEditorPortal.Web.Services
 
         public MemoryStream ExportExcel(string name, ExportParam param)
         {
-            var columns = GetGridColumnsConfig(name).Where(x => x.type == "DataBaseField").ToList();
+            var columns = GetGridColumnsConfig(name)
+                .Where(x => x.type == "DataBaseField" || x.filterType == "attachments")
+                .ToList();
+
+            var attachmentCols = columns.Where(x => x.filterType == "attachments");
+
             var result = GetGridData(name, param);
+
+            #region Process Attachment Columns 
+
+            IDictionary<string, int> attatchmentColCounts = null;
+            if (attachmentCols.Any())
+            {
+                // convert attachment json string to excel hyper link
+                attatchmentColCounts = ProcessAttachmentColumns(name, attachmentCols, result);
+            }
+
+            #endregion
 
             var stream = new MemoryStream();
             using (var p = new ExcelPackage(stream))
             {
                 var ws = p.Workbook.Worksheets.Add("Data");
-
-                var headerRange = ws.Cells[1, 1, 1, columns.Count];
-                headerRange.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                headerRange.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                headerRange.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml($"#ccc"));
-                headerRange.Style.Font.Size = 11;
-                headerRange.Style.Font.Bold = true;
-                headerRange.Style.WrapText = true;
                 ws.Row(1).Height = 30;
 
-                var rowIndex = 1;
-                foreach (var row in result.Data)
+                var columnIndex = 1;
+                foreach (var column in columns)
                 {
-                    var columnIndex = 1;
-                    foreach (var column in columns)
+                    if (column.filterType == "attachments")
                     {
-                        if (rowIndex == 1)
+                        var count = attatchmentColCounts[column.field];
+
+                        #region Set Header
+
+                        for (var index = 0; index < count; index++)
                         {
-                            ws.Column(columnIndex).Width = 20;
-                            ws.Column(columnIndex).AutoFit(20);
-                            ws.Cells[rowIndex, columnIndex].Value = column.header;
+                            ws.Column(columnIndex + index).Width = 20;
+                            ws.Column(columnIndex + index).AutoFit(20);
+                            SetHeaderStyle(ws.Cells[1, columnIndex + index]);
+                        }
+                        ws.Cells[1, columnIndex, 1, columnIndex + count - 1].Merge = true;
+                        ws.Cells[1, columnIndex].Value = column.header;
+
+                        #endregion
+
+                        #region Set Cell data
+
+                        var rowIndex = 2;
+                        foreach (var row in result.Data)
+                        {
+                            if (row[column.field] != null)
+                            {
+                                var links = (List<ExcelHyperLink>)row[column.field];
+                                for (var index = 0; index < links.Count; index++)
+                                {
+                                    ws.Cells[rowIndex, columnIndex + index].Hyperlink = links[index];
+                                    ws.Cells[rowIndex, columnIndex + index].Style.Font.Color.SetColor(System.Drawing.ColorTranslator.FromHtml("#0A63BC"));
+                                    ws.Cells[rowIndex, columnIndex + index].Style.Font.UnderLine = true;
+                                }
+                            }
+                            rowIndex++;
                         }
 
-                        SetExcelCellValue(ws.Cells[rowIndex + 1, columnIndex], column, row[column.field]);
+                        #endregion
+
+                        columnIndex = columnIndex + count;
+                    }
+                    else
+                    {
+                        #region Set Header
+
+                        ws.Column(columnIndex).Width = 20;
+                        ws.Column(columnIndex).AutoFit(20);
+                        ws.Cells[1, columnIndex].Value = column.header;
+                        SetHeaderStyle(ws.Cells[1, columnIndex]);
+
+                        #endregion
+
+                        #region Set Cell data
+
+                        var rowIndex = 2;
+                        foreach (var row in result.Data)
+                        {
+                            SetExcelCellValue(ws.Cells[rowIndex, columnIndex], column, row[column.field]);
+                            rowIndex++;
+                        }
+
+                        #endregion
+
                         columnIndex++;
                     }
-                    rowIndex++;
                 }
 
-                var range = ws.Cells[1, 1, result.Data.Count, columns.Count];
-                range.AutoFilter = true;
+                //var range = ws.Cells[1, 1, result.Data.Count, columnIndex-1];
+                //range.AutoFilter = true;
 
                 ws.View.ShowGridLines = true;
                 ws.View.FreezePanes(2, 1);
@@ -510,6 +568,16 @@ namespace DataEditorPortal.Web.Services
 
             stream.Seek(0, SeekOrigin.Begin);
             return stream;
+        }
+
+        private void SetHeaderStyle(ExcelRange headerRange)
+        {
+            headerRange.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            headerRange.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+            headerRange.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml($"#ccc"));
+            headerRange.Style.Font.Size = 11;
+            headerRange.Style.Font.Bold = true;
+            headerRange.Style.WrapText = true;
         }
 
         private void SetExcelCellValue(ExcelRange range, GridColConfig column, object value)
@@ -556,6 +624,60 @@ namespace DataEditorPortal.Web.Services
                 range.Value = value;
             }
         }
+
+        #region Attachment
+
+        private IDictionary<string, int> ProcessAttachmentColumns(string gridName, IEnumerable<GridColConfig> columns, GridData result)
+        {
+            var attatchmentColCounts = new Dictionary<string, int>();
+
+            var schema = _httpContextAccessor.HttpContext.Request.Scheme;
+            var host = _httpContextAccessor.HttpContext.Request.Host;
+            string apiPrefix = "/api/";
+            Match match = Regex.Match(_httpContextAccessor.HttpContext.Request.Path, @"^(/[^/]/api/)", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                apiPrefix = match.Groups[1].Value;
+            }
+            var apiUrl = $"{schema}://{host}{apiPrefix}attachment/download-file/{gridName}";
+
+            foreach (var column in columns)
+            {
+                var max = 1;
+                foreach (var row in result.Data)
+                {
+                    var value = row[column.field];
+                    if (row[column.field] != null)
+                    {
+                        var links = GetHyperLinks(value, $"{apiUrl}/{column.field}");
+                        if (links.Count > max) max = links.Count;
+
+                        row[column.field] = links;
+                    }
+                }
+                attatchmentColCounts.Add(column.field, max);
+            }
+
+            return attatchmentColCounts;
+        }
+
+        private List<ExcelHyperLink> GetHyperLinks(object value, string apiUrl)
+        {
+            var files = JsonSerializer.Deserialize<List<UploadedFileModel>>(value.ToString(), new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            var links = files.Where(f => f.Status == UploadedFileStatus.Current)
+            .Select(f =>
+            {
+                var url = $"{apiUrl}/{f.FileId}/{f.FileName}";
+                var hyperLink = new ExcelHyperLink(url, UriKind.Absolute);
+                hyperLink.Display = f.FileName;
+                hyperLink.ToolTip = f.Comments;
+                return hyperLink;
+            }).ToList();
+
+            return links;
+        }
+
+        #endregion 
 
         #endregion
 
