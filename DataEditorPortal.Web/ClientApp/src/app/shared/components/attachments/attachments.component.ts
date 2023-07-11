@@ -26,13 +26,7 @@ export class AttachmentsComponent {
     this.fileList = parseVal.filter(item => item?.status !== 'Deleted');
     const msg = this.fileList
       .map(item => {
-        const comments = item?.comments;
-        if (!comments) return '';
-        const commentsList = comments.split('\n');
-        return commentsList.map(comment => {
-          if (comment === '') return '';
-          return `<li >${item.fileName}</li>`;
-        });
+        return `<li >${item.fileName}</li>`;
       })
       .join('');
     const html = `<ul style='padding-left:1.5rem'>${msg}</ul>`;

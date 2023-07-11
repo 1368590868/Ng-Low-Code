@@ -61,12 +61,10 @@ export class DbConnectionComponent {
     this.loading = true;
 
     this.dbConnectionService.getDbConnectionList().subscribe(res => {
-      if (res.code === 200) {
-        this.data = res;
-        this.type = res[0].type;
-        this.totalRecords = res.length;
-        this.cdRef.detectChanges();
-      }
+      this.data = res;
+      this.type = res[0].type;
+      this.totalRecords = res.length;
+      this.cdRef.detectChanges();
       this.loading = false;
     });
   }

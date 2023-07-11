@@ -69,6 +69,13 @@ export class ImportDialogComponent {
     this.file = null;
   }
 
+  disableRow(row: any) {
+    return (
+      row.type === 'Portal Item' ||
+      (row.type === 'DataSource Connection' && !row.exist)
+    );
+  }
+
   onFileUploadProgress(event: any) {
     this.progress = event.progress;
   }
@@ -79,6 +86,7 @@ export class ImportDialogComponent {
   }
 
   onRowCheckBoxClick(event: MouseEvent) {
+    console.log(event);
     event.stopPropagation();
   }
 
