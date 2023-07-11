@@ -1,5 +1,4 @@
-﻿using AutoWrapper.Filters;
-using DataEditorPortal.Data.Contexts;
+﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Services;
@@ -97,7 +96,6 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("download-temp-file/{fileId}/{fileName}")]
-        [AutoWrapIgnore]
         public ActionResult DownloadTempFile(string fileId, string fileName)
         {
             try
@@ -122,7 +120,6 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("download-file/{gridName}/{fieldName}/{fileId}/{fileName}")]
-        [AutoWrapIgnore]
         public ActionResult DownloadFile(string gridName, string fieldName, string fileId)
         {
             try

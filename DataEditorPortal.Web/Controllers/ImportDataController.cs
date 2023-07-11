@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using AutoWrapper.Filters;
-using AutoWrapper.Wrappers;
 using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Jobs;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.ImportData;
@@ -64,7 +63,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{gridName}/{id}/import-status")]
-        public async Task<ApiResponse> GetImportStatus(string gridName, Guid id)
+        public async Task<ImportHistoryModel> GetImportStatus(string gridName, Guid id)
         {
             var entity = _depDbContext.DataImportHistories
                 .Include(x => x.CreatedBy)
@@ -72,7 +71,7 @@ namespace DataEditorPortal.Web.Controllers
                 .Where(x => x.Id == id)
                 .FirstOrDefault();
 
-            if (entity == null) throw new ApiException("Not Found", 404);
+            if (entity == null) throw new DepException("Not Found", 404);
 
             var item = _mapper.Map<ImportHistoryModel>(entity);
             if (entity.Status == Data.Common.DataImportResult.InProgress)
@@ -99,7 +98,7 @@ namespace DataEditorPortal.Web.Controllers
                 item.Progress = 100;
             }
 
-            return new ApiResponse(item);
+            return item;
         }
 
         [HttpPost]
@@ -153,7 +152,6 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{gridName}/{type}/download-template")]
-        [AutoWrapIgnore]
         public IActionResult DownloadTemplate(string gridName, ImportType type)
         {
             var fs = _importDataServcie.GenerateImportTemplate(gridName, type);

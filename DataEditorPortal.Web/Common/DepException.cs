@@ -1,22 +1,13 @@
-﻿using AutoWrapper.Wrappers;
+﻿using System;
 
 namespace DataEditorPortal.Web.Common
 {
-    public class DepException : ApiException
+    public class DepException : Exception
     {
-        //public DepException(string msg, string title, int statusCode)
-        //    : base(new { exceptionTitle = title, exceptionMessage = msg }, statusCode)
-        //{
-        //}
-
-        public DepException(string msg)
-            : base(msg, 500)
+        public int StatusCode { get; set; }
+        public DepException(string msg, int statusCode = 500, Exception innerException = null) : base(msg, innerException)
         {
+            StatusCode = statusCode;
         }
-
-        //public DepException(string msg, int statusCode)
-        //    : this(msg, "Error", statusCode)
-        //{
-        //}
     }
 }
