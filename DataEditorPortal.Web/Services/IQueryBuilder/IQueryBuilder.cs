@@ -106,7 +106,7 @@ namespace DataEditorPortal.Web.Services
                 throw new DepException("The paged query cannot be executed without the orderBy set");
 
             var orderby = GenerateOrderClause(sortParams);
-            var queryWithoutOrderBy = RemoveOrderBy(query);
+            var queryWithoutOrderBy = RemoveOrderBy(query, out var _);
 
             var queryText = $@"
                 WITH AllData AS
@@ -132,7 +132,7 @@ namespace DataEditorPortal.Web.Services
 
             if (string.IsNullOrEmpty(orderByClause))
             {
-                query = RemoveOrderBy(query);
+                query = RemoveOrderBy(query, out var _);
             }
             else
             {
@@ -141,12 +141,23 @@ namespace DataEditorPortal.Web.Services
             return query;
         }
 
-        protected virtual string RemoveOrderBy(string queryText)
+        protected virtual string RemoveOrderBy(string queryText, out string orderByQuery)
         {
-            queryText = queryText.Replace("##ORDERBY##", "1");
-            var noOrderByRegExp = new Regex("(?:\\s+order\\s+by\\s+1)", RegexOptions.IgnoreCase);
-            queryText = noOrderByRegExp.Replace(queryText, "");
-            return queryText;
+            queryText = queryText.Replace("##ORDERBY##", "~ORDERBY~");
+
+            var pattern = @"ORDER\s+BY\s+~ORDERBY~";
+            var queryWithoutOrderby = string.Empty;
+            orderByQuery = string.Empty;
+            Match match = Regex.Match(queryText, pattern, RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                orderByQuery = match.Groups[0].Value.Replace("~ORDERBY~", "##ORDERBY##");
+                queryWithoutOrderby = Regex.Replace(queryText, pattern, string.Empty, RegexOptions.IgnoreCase);
+            }
+            else
+                queryWithoutOrderby = queryText;
+
+            return queryWithoutOrderby;
         }
 
         public virtual string UseFilters(string query, List<FilterParam> filterParams = null)
@@ -288,7 +299,7 @@ namespace DataEditorPortal.Web.Services
             var queryText = GenerateSqlTextForList(config);
             queryText = UseSearches(queryText);
             queryText = UseFilters(queryText);
-            queryText = RemoveOrderBy(queryText);
+            queryText = RemoveOrderBy(queryText, out var _);
             return queryText;
         }
 
@@ -357,7 +368,7 @@ namespace DataEditorPortal.Web.Services
                 var queryText = GenerateSqlTextForList(config);
                 queryText = UseSearches(queryText);
                 queryText = UseFilters(queryText);
-                queryText = RemoveOrderBy(queryText);
+                queryText = RemoveOrderBy(queryText, out var _);
 
                 return $@"SELECT DISTINCT {columns} FROM ({queryText}) A";
             }
@@ -380,7 +391,7 @@ namespace DataEditorPortal.Web.Services
             var queryText = GenerateSqlTextForList(config);
             queryText = UseSearches(queryText);
             queryText = UseFilters(queryText);
-            queryText = RemoveOrderBy(queryText);
+            queryText = RemoveOrderBy(queryText, out var _);
 
             return $@"SELECT {EscapeColumnName(config.IdColumn)} FROM ({queryText}) A WHERE {EscapeColumnName(config.IdColumn)} IN {ParameterPrefix}{ParameterName(config.IdColumn)}";
         }

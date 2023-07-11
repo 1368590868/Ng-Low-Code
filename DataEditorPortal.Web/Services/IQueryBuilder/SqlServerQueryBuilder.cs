@@ -197,11 +197,14 @@ namespace DataEditorPortal.Web.Services
 
             var selectQuery = string.Join(",", attachmentCols.Select(col => $"{col.field}_ATTACHMENTS.ATTACHMENTS AS {EscapeColumnName(col.field)}"));
 
+            var queryWithoutOrderby = RemoveOrderBy(query, out var orderByQuery);
+
             var result = $@"
                 SELECT ALL_DATA.*, {selectQuery} FROM (
-                    {query}
+                    {queryWithoutOrderby}
                 ) ALL_DATA
                 {leftJoinQuery}
+                {orderByQuery}
             ";
             return result;
         }
@@ -222,7 +225,7 @@ namespace DataEditorPortal.Web.Services
                 var sqlText = GenerateSqlTextForList(config);
                 sqlText = UseSearches(sqlText);
                 sqlText = UseFilters(sqlText);
-                sqlText = RemoveOrderBy(sqlText);
+                sqlText = RemoveOrderBy(sqlText, out var _);
 
                 return $"SELECT TOP 1 * FROM ({sqlText}) A";
             }
