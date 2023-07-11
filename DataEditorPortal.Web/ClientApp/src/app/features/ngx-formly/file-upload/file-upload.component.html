@@ -1,25 +1,26 @@
 <p-table
   styleClass="mb-3"
+  [tableStyle]="{ tableLayout: 'fixed' }"
   [value]="newAttachments"
   *ngIf="newAttachments.length > 0">
   <ng-template pTemplate="header">
     <tr>
-      <th class="w-5">Name</th>
+      <th style="width: 38.5%">Name</th>
       <th>Comment</th>
-      <th style="width: 50px"></th>
+      <th style="width: 3rem"></th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-file>
     <tr>
       <td [class]="file.status === 'Deleted' ? 'line-through' : null">
         <div
-          class="white-space-nowrap overflow-hidden overflow-ellipsis"
+          class="white-space-nowrap overflow-hidden text-overflow-ellipsis"
           *ngIf="file.status === 'Deleted'; else download">
           {{ file.fileName }}
         </div>
         <ng-template #download>
           <div
-            class="cursor-pointer text-primary white-space-nowrap overflow-hidden overflow-ellipsis"
+            class="cursor-pointer text-primary white-space-nowrap overflow-hidden text-overflow-ellipsis"
             (click)="tempAttachmentDownload(file)">
             {{ file.fileName }}
           </div>
