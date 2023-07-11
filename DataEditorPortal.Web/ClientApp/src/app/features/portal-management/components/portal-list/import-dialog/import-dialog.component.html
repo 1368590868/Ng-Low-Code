@@ -75,16 +75,19 @@
         <ng-template pTemplate="header">
           <tr>
             <th [style.width]="'2.875rem !important'">
-              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              <!-- <p-tableHeaderCheckbox></p-tableHeaderCheckbox> -->
             </th>
             <th [style.width]="'13rem !important'">Type</th>
             <th>Display name</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-infoList>
-          <tr [pSelectableRow]="infoList">
+          <tr
+            [pSelectableRow]="infoList"
+            [pSelectableRowDisabled]="disableRow(infoList)">
             <td>
               <p-tableCheckbox
+                [disabled]="disableRow(infoList)"
                 [index]="infoList.key"
                 [value]="infoList"
                 (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
