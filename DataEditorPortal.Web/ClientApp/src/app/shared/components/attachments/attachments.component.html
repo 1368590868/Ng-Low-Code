@@ -1,7 +1,7 @@
-<div class="flex align-items-start flex-column">
+<div class="flex align-items-start flex-column overflow-hidden">
   <ng-container *ngIf="showAll">
     <a
-      class="no-underline cursor-pointer text-primary flex flex-shrink-0"
+      class="no-underline cursor-pointer text-primary flex flex-shrink-0 overflow-hidden text-overflow-ellipsis max-w-full"
       *ngFor="let file of fileList"
       href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
         fieldName
@@ -14,7 +14,7 @@
   </ng-container>
   <ng-container *ngIf="!showAll && fileList.length === 1">
     <a
-      class="no-underline cursor-pointer text-primary"
+      class="no-underline cursor-pointer text-primary overflow-hidden text-overflow-ellipsis max-w-full"
       *ngFor="let file of fileList"
       href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
         fieldName
