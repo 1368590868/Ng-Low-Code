@@ -107,8 +107,9 @@ namespace DataEditorPortal.Web.Controllers
 
                 return File(stream, "application/octet-stream", fileName);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e, e.Message);
                 return new ContentResult
                 {
                     Content = "<h1 style='text-align:center'>File Not Found</h1><script>setTimeout(function(){window.close()}, 2000)</script>",
@@ -136,8 +137,9 @@ namespace DataEditorPortal.Web.Controllers
 
                 return File(result.stream, result.contentType, result.fileName);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e, e.Message);
                 return new ContentResult
                 {
                     Content = "<h1 style='text-align:center'>File Not Found</h1><script>setTimeout(function(){window.close()}, 2000)</script>",
