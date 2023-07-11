@@ -247,7 +247,7 @@ namespace DataEditorPortal.Web.Services
                 else
                 {
                     byte[] fileBytes = (byte[])(uploadedFile as IDictionary<string, object>)[fileByteColumn];
-                    new MemoryStream(fileBytes);
+                    stream = new MemoryStream(fileBytes);
                     stream.Position = 0;
                 }
             }
