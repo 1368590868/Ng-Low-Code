@@ -19,7 +19,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -633,13 +632,9 @@ namespace DataEditorPortal.Web.Services
 
             var schema = _httpContextAccessor.HttpContext.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host;
-            string apiPrefix = "/api/";
-            Match match = Regex.Match(_httpContextAccessor.HttpContext.Request.Path, @"^(/[^/]/api/)", RegexOptions.IgnoreCase);
-            if (match.Success)
-            {
-                apiPrefix = match.Groups[1].Value;
-            }
-            var apiUrl = $"{schema}://{host}{apiPrefix}attachment/download-file/{gridName}";
+            var pathBase = _httpContextAccessor.HttpContext.Request.PathBase;
+
+            var apiUrl = $"{schema}://{host}{pathBase}/api/attachment/download-file/{gridName}";
 
             foreach (var column in columns)
             {
