@@ -173,7 +173,12 @@ export class EditRecordActionComponent
   private configFieldDefaultValue(fields: FormlyFieldConfig[]) {
     // set default value
     fields
-      .filter(f => f.defaultValue)
+      .filter(
+        f =>
+          (f.type === 'input' || f.type === 'textarea') &&
+          f.defaultValue &&
+          typeof f.defaultValue === 'string'
+      )
       .forEach(f => {
         const matches = [
           ...f.defaultValue.matchAll(
@@ -218,6 +223,7 @@ export class EditRecordActionComponent
     fields
       .filter(f => f.type === 'checkbox')
       .forEach(x => {
+        if (x.defaultValue === undefined) x.defaultValue = false;
         if (x.props) {
           x.props['hideLabel'] = this.layout === 'vertical';
         }
