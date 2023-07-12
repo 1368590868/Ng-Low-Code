@@ -51,9 +51,9 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   set value(val: any[]) {
     this.innerValue = val || [];
 
-    this.selection = this.dataSource.filter((item: any) =>
-      this.innerValue.find((x: any) => x.table2Id === item[this.table2IdColumn])
-    );
+    this.setLinkedFlag();
+    this.setSelection();
+    this.sortBySelection();
   }
 
   constructor(
@@ -124,16 +124,17 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
       .getTableData(this.table1Name, this.fetchDataParam)
       .subscribe(dataSource => {
         this.dataSource = dataSource || [];
-        this.selection = dataSource.filter((item: any) =>
-          this.innerValue.find(
-            (x: any) => x.table2Id === item[this.table2IdColumn]
-          )
-        );
+        this.setLinkedFlag();
+        this.setSelection();
         this.cdr.detectChanges();
       });
   }
 
   onSort(sortMeta: any) {
+    if (sortMeta && sortMeta.field === 'linked') {
+      this.sortBySelection(sortMeta.order);
+      return;
+    }
     this.sortMeta = sortMeta;
     this.fetchData();
   }
@@ -152,11 +153,11 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
         this.dataSource = dataSource || [];
         this.table2IdColumn = tableConfig.table2IdColumn;
         this.table2Name = tableConfig.table2Name;
-        this.selection = dataSource.filter((item: any) =>
-          this.innerValue.find(
-            (x: any) => x.table2Id === item[this.table2IdColumn]
-          )
-        );
+
+        this.setLinkedFlag();
+        this.setSelection();
+        this.sortBySelection();
+
         this.cdr.detectChanges();
       });
     }
@@ -188,5 +189,23 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
       fetchParam.sorts = [this.sortMeta];
     }
     return fetchParam;
+  }
+
+  setLinkedFlag() {
+    this.dataSource.forEach(item => {
+      item.__LINKED__ = !!this.innerValue.find(
+        (x: any) => x.table2Id === item[this.table2IdColumn]
+      );
+    });
+  }
+
+  setSelection() {
+    this.selection = this.dataSource.filter(x => x.__LINKED__);
+  }
+
+  sortBySelection(order = -1) {
+    const data = [...this.dataSource];
+    data.sort((a, b) => order * (a.__LINKED__ - b.__LINKED__));
+    this.dataSource = data;
   }
 }

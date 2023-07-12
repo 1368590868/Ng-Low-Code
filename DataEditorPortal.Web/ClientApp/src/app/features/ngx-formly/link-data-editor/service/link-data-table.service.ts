@@ -31,7 +31,7 @@ export class LinkDataTableService {
       );
   }
 
-  getTableData(name: string, tableParams: any) {
+  getTableData(name: string, tableParams: any): Observable<any[]> {
     return this.http
       .post<ApiResponse<any>>(
         `${this._apiUrl}universal-grid/${name}/linked-table-editor/table-data`,
