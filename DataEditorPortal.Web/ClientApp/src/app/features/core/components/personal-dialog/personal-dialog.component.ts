@@ -231,10 +231,10 @@ export class PersonalDialogComponent {
         this.form.setValue({
           name: res.name,
           username: res.username,
-          email: res.email,
-          phone: res.phone,
-          vendor: res.vendor,
-          employer: res.employer,
+          email: res?.email ?? '',
+          phone: res?.phone ?? '',
+          vendor: res?.vendor ?? '',
+          employer: res?.employer ?? '',
           autoEmail: res.autoEmail
         });
       });
