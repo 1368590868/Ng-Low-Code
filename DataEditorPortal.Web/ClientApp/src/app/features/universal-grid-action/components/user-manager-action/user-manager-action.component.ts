@@ -32,250 +32,7 @@ export class UserManagerActionComponent
       isAddForm: this.isAddForm
     }
   };
-  fields: FormlyFieldConfig[] = [
-    {
-      fieldGroup: [
-        {
-          className: 'w-6',
-          key: 'username',
-          type: 'input',
-          props: {
-            required: true,
-            type: 'text',
-            label: 'User ID',
-            placeholder: 'User ID'
-          },
-          expressions: {
-            'props.disabled': 'formState.isAddForm'
-          },
-          modelOptions: {
-            updateOn: 'blur'
-          },
-          asyncValidators: {
-            exist: {
-              expression: (control: AbstractControl) => {
-                return new Promise((resolve, reject) => {
-                  this.userService
-                    .userNameExists(
-                      control.value,
-                      this.isAddForm
-                        ? ''
-                        : this.selectedRecords[0][this.recordKey]
-                    )
-                    .subscribe(res =>
-                      res.code === 200
-                        ? resolve(!res.data)
-                        : reject(res.message)
-                    );
-                });
-              },
-              message: () => {
-                return 'The User ID has already been exist.';
-              }
-            }
-          }
-        },
-        {
-          className: 'w-6 pl-2',
-          key: 'name',
-          type: 'input',
-          props: {
-            required: true,
-            type: 'text',
-            label: 'Name',
-            placeholder: 'Name'
-          }
-        },
-        {
-          className: 'w-6',
-          key: 'email',
-          type: 'input',
-          props: {
-            required: true,
-            type: 'text',
-            label: 'Email',
-            placeholder: 'Email'
-          },
-          modelOptions: {
-            updateOn: 'blur'
-          },
-          asyncValidators: {
-            emailFormat: {
-              expression: (control: AbstractControl) => {
-                return new Promise((resolve, reject) => {
-                  const emailRegex =
-                    /^([a-zA-Z\d][\w-]{2,})@(\w{2,})\.([a-z]{2,})(\.[a-z]{2,})?$/;
-                  resolve(emailRegex.test(control.value));
-                });
-              },
-              message: () => {
-                return 'Email format error.';
-              }
-            },
-            emailExist: {
-              expression: (control: AbstractControl) => {
-                return new Promise((resolve, reject) => {
-                  this.userService
-                    .emailExists(
-                      control.value,
-                      this.isAddForm
-                        ? ''
-                        : this.selectedRecords[0][this.recordKey]
-                    )
-                    .subscribe(res =>
-                      res.code === 200
-                        ? resolve(!res.data)
-                        : reject(res.message)
-                    );
-                });
-              },
-              message: () => {
-                return 'The  Email has already been exist.';
-              }
-            }
-          }
-        },
-        {
-          className: 'w-6 pl-2',
-          key: 'phone',
-          type: 'inputMask',
-          defaultValue: '',
-          props: {
-            required: true,
-            type: 'text',
-            mask: '(999) 999-9999',
-            label: 'Phone',
-            placeholder: 'Phone'
-          }
-        }
-      ]
-    },
-    {
-      fieldGroup: [
-        {
-          className: 'w-6',
-          key: 'vendor',
-          type: 'select',
-          defaultValue: null,
-          props: {
-            label: 'Vendor',
-            placeholder: 'Please select',
-            optionsLookup: {
-              id: 'E1F3E2C7-25CA-4D69-9405-ABC54923864D'
-            },
-            options: []
-          },
-          hooks: {
-            onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
-          }
-        },
-        {
-          className: 'w-6',
-          key: 'employer',
-          type: 'select',
-          defaultValue: null,
-          props: {
-            label: 'Employer',
-            placeholder: 'Please select',
-            optionsLookup: {
-              id: '8BE7B1D6-F09A-4EEE-B8EC-4DFCF689005B',
-              deps: ['vendor']
-            },
-            options: []
-          },
-          hooks: {
-            onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
-          }
-        }
-      ]
-    },
-    {
-      fieldGroup: [
-        {
-          key: 'autoEmail',
-          type: 'checkbox',
-          defaultValue: true,
-          props: {
-            label: 'Receive Email Notifications',
-            binary: true,
-            required: true
-          }
-        }
-      ]
-    },
-    {
-      wrappers: ['divider'],
-      props: {
-        label: 'Roles'
-      },
-      hide: true
-    },
-    {
-      wrappers: ['chip'],
-      props: {
-        forArray: []
-      },
-      expressions: {
-        hide: () => {
-          this.isAddForm;
-        }
-      },
-      hooks: {
-        onInit: field => {
-          if (!this.isAddForm) {
-            this.userManagerService
-              .getUserRole(this.selectedRecords[0][this.recordKey])
-              .subscribe(res => {
-                const roles = res.filter(item => {
-                  item.label = item.roleName;
-                  return item.selected;
-                });
-
-                if (field.props) field.props['forArray'] = roles;
-                if (field.parent?.fieldGroup) {
-                  field.parent.fieldGroup[3].hide = roles.length === 0;
-                }
-              });
-          }
-        }
-      }
-    },
-    {
-      wrappers: ['divider'],
-      props: {
-        label: 'Permissions'
-      },
-      hide: true
-    },
-    {
-      wrappers: ['chip'],
-      props: {
-        forArray: []
-      },
-      expressions: {
-        hide: () => this.isAddForm
-      },
-      hooks: {
-        onInit: field => {
-          if (!this.isAddForm) {
-            this.userManagerService
-              .getUserPermissions(this.selectedRecords[0][this.recordKey])
-              .subscribe(res => {
-                const permissions = res.filter(item => {
-                  item.label = item.permissionName;
-                  return item.selected;
-                });
-
-                if (field.props) field.props['forArray'] = permissions;
-                if (field.parent?.fieldGroup) {
-                  field.parent.fieldGroup[5].hide = permissions.length === 0;
-                }
-              });
-          }
-        }
-      }
-    }
-  ];
+  fields: FormlyFieldConfig[] = [];
 
   constructor(
     private userManagerService: UserManagerService,
@@ -295,18 +52,258 @@ export class UserManagerActionComponent
       this.userManagerService
         .getUserDetail(this.selectedRecords[0][this.recordKey])
         .subscribe(res => {
-          this.form.setValue({
-            name: res.name,
-            username: res.username,
-            email: res?.email ?? '',
-            phone: res?.phone ?? '',
-            vendor: res?.vendor ?? '',
-            employer: res?.employer ?? '',
-            autoEmail: res.autoEmail
-          });
+          this.model = res;
+          this.fields = this.getFields();
         });
     }
     this.loadedEvent.emit();
+  }
+
+  getFields(): FormlyFieldConfig[] {
+    return [
+      {
+        fieldGroup: [
+          {
+            className: 'w-6',
+            key: 'username',
+            type: 'input',
+            props: {
+              required: true,
+              type: 'text',
+              label: 'User ID',
+              placeholder: 'User ID'
+            },
+            expressions: {
+              'props.disabled': 'formState.isAddForm'
+            },
+            modelOptions: {
+              updateOn: 'blur'
+            },
+            asyncValidators: {
+              exist: {
+                expression: (control: AbstractControl) => {
+                  return new Promise((resolve, reject) => {
+                    this.userService
+                      .userNameExists(
+                        control.value,
+                        this.isAddForm
+                          ? ''
+                          : this.selectedRecords[0][this.recordKey]
+                      )
+                      .subscribe(res =>
+                        res.code === 200
+                          ? resolve(!res.data)
+                          : reject(res.message)
+                      );
+                  });
+                },
+                message: () => {
+                  return 'The User ID has already been exist.';
+                }
+              }
+            }
+          },
+          {
+            className: 'w-6 pl-2',
+            key: 'name',
+            type: 'input',
+            props: {
+              required: true,
+              type: 'text',
+              label: 'Name',
+              placeholder: 'Name'
+            }
+          },
+          {
+            className: 'w-6',
+            key: 'email',
+            type: 'input',
+            props: {
+              required: true,
+              type: 'text',
+              label: 'Email',
+              placeholder: 'Email'
+            },
+            modelOptions: {
+              updateOn: 'blur'
+            },
+            asyncValidators: {
+              emailFormat: {
+                expression: (control: AbstractControl) => {
+                  return new Promise((resolve, reject) => {
+                    const emailRegex =
+                      /^([a-zA-Z\d][\w-]{2,})@(\w{2,})\.([a-z]{2,})(\.[a-z]{2,})?$/;
+                    resolve(emailRegex.test(control.value));
+                  });
+                },
+                message: () => {
+                  return 'Email format error.';
+                }
+              },
+              emailExist: {
+                expression: (control: AbstractControl) => {
+                  return new Promise((resolve, reject) => {
+                    this.userService
+                      .emailExists(
+                        control.value,
+                        this.isAddForm
+                          ? ''
+                          : this.selectedRecords[0][this.recordKey]
+                      )
+                      .subscribe(res =>
+                        res.code === 200
+                          ? resolve(!res.data)
+                          : reject(res.message)
+                      );
+                  });
+                },
+                message: () => {
+                  return 'The  Email has already been exist.';
+                }
+              }
+            }
+          },
+          {
+            className: 'w-6 pl-2',
+            key: 'phone',
+            type: 'inputMask',
+            defaultValue: '',
+            props: {
+              required: true,
+              type: 'text',
+              mask: '(999) 999-9999',
+              label: 'Phone',
+              placeholder: 'Phone'
+            }
+          }
+        ]
+      },
+      {
+        fieldGroup: [
+          {
+            className: 'w-6',
+            key: 'vendor',
+            type: 'select',
+            defaultValue: null,
+            props: {
+              label: 'Vendor',
+              placeholder: 'Please select',
+              optionsLookup: {
+                id: 'E1F3E2C7-25CA-4D69-9405-ABC54923864D'
+              },
+              options: []
+            },
+            hooks: {
+              onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
+            }
+          },
+          {
+            className: 'w-6',
+            key: 'employer',
+            type: 'select',
+            defaultValue: null,
+            props: {
+              label: 'Employer',
+              placeholder: 'Please select',
+              optionsLookup: {
+                id: '8BE7B1D6-F09A-4EEE-B8EC-4DFCF689005B',
+                deps: ['vendor']
+              },
+              options: []
+            },
+            hooks: {
+              onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
+            }
+          }
+        ]
+      },
+      {
+        fieldGroup: [
+          {
+            key: 'autoEmail',
+            type: 'checkbox',
+            defaultValue: true,
+            props: {
+              label: 'Receive Email Notifications',
+              binary: true,
+              required: true
+            }
+          }
+        ]
+      },
+      {
+        wrappers: ['divider'],
+        props: {
+          label: 'Roles'
+        },
+        hide: true
+      },
+      {
+        wrappers: ['chip'],
+        props: {
+          forArray: []
+        },
+        expressions: {
+          hide: () => {
+            this.isAddForm;
+          }
+        },
+        hooks: {
+          onInit: field => {
+            if (!this.isAddForm) {
+              this.userManagerService
+                .getUserRole(this.selectedRecords[0][this.recordKey])
+                .subscribe(res => {
+                  const roles = res.filter(item => {
+                    item.label = item.roleName;
+                    return item.selected;
+                  });
+
+                  if (field.props) field.props['forArray'] = roles;
+                  if (field.parent?.fieldGroup) {
+                    field.parent.fieldGroup[3].hide = roles.length === 0;
+                  }
+                });
+            }
+          }
+        }
+      },
+      {
+        wrappers: ['divider'],
+        props: {
+          label: 'Permissions'
+        },
+        hide: true
+      },
+      {
+        wrappers: ['chip'],
+        props: {
+          forArray: []
+        },
+        expressions: {
+          hide: () => this.isAddForm
+        },
+        hooks: {
+          onInit: field => {
+            if (!this.isAddForm) {
+              this.userManagerService
+                .getUserPermissions(this.selectedRecords[0][this.recordKey])
+                .subscribe(res => {
+                  const permissions = res.filter(item => {
+                    item.label = item.permissionName;
+                    return item.selected;
+                  });
+
+                  if (field.props) field.props['forArray'] = permissions;
+                  if (field.parent?.fieldGroup) {
+                    field.parent.fieldGroup[5].hide = permissions.length === 0;
+                  }
+                });
+            }
+          }
+        }
+      }
+    ];
   }
 
   onFormSubmit(model: ManageRoleForm) {

@@ -44,164 +44,7 @@ export class PersonalDialogComponent {
   model = {};
   userId = '';
   options: FormlyFormOptions = {};
-  fields: FormlyFieldConfig[] = [
-    {
-      fieldGroup: [
-        {
-          className: 'w-6',
-          key: 'username',
-          type: 'input',
-          props: {
-            disabled: true,
-            required: true,
-            type: 'text',
-            label: 'User ID',
-            placeholder: 'User ID'
-          },
-          modelOptions: {
-            updateOn: 'blur'
-          },
-          asyncValidators: {
-            exist: {
-              expression: (control: AbstractControl) => {
-                return new Promise((resolve, reject) => {
-                  this.userService
-                    .userNameExists(control.value, this.userService.USER.id)
-                    .subscribe(res =>
-                      res.code === 200
-                        ? resolve(!res.data)
-                        : reject(res.message)
-                    );
-                });
-              },
-              message: () => {
-                return 'The User ID has already been exist.';
-              }
-            }
-          }
-        },
-        {
-          className: 'w-6',
-          key: 'name',
-          type: 'input',
-          props: {
-            required: true,
-            type: 'text',
-            label: 'Name',
-            placeholder: 'Name'
-          }
-        },
-        {
-          className: 'w-6',
-          key: 'email',
-          type: 'input',
-          props: {
-            required: true,
-            type: 'text',
-            label: 'Email',
-            placeholder: 'Email'
-          },
-          modelOptions: {
-            updateOn: 'blur'
-          },
-          asyncValidators: {
-            emailFormat: {
-              expression: (control: AbstractControl) => {
-                return new Promise((resolve, reject) => {
-                  const emailRegex =
-                    /^([a-zA-Z\d][\w-]{2,})@(\w{2,})\.([a-z]{2,})(\.[a-z]{2,})?$/;
-                  resolve(emailRegex.test(control.value));
-                });
-              },
-              message: () => {
-                return 'Email format error.';
-              }
-            },
-            emailExist: {
-              expression: (control: AbstractControl) => {
-                return new Promise((resolve, reject) => {
-                  this.userService
-                    .emailExists(control.value, this.userService.USER.id)
-                    .subscribe(res =>
-                      res.code === 200
-                        ? resolve(!res.data)
-                        : reject(res.message)
-                    );
-                });
-              },
-              message: () => {
-                return 'The  Email has already been exist.';
-              }
-            }
-          }
-        },
-        {
-          className: 'w-6',
-          key: 'phone',
-          type: 'inputMask',
-          defaultValue: '',
-          props: {
-            required: true,
-            type: 'text',
-            mask: '(999) 999-9999',
-            label: 'Phone',
-            placeholder: 'Phone'
-          }
-        }
-      ]
-    },
-    {
-      fieldGroup: [
-        {
-          className: 'w-6',
-          key: 'vendor',
-          type: 'select',
-          props: {
-            label: 'Vendor',
-            placeholder: 'Please select',
-            optionsLookup: {
-              id: 'E1F3E2C7-25CA-4D69-9405-ABC54923864D'
-            },
-            options: []
-          },
-          hooks: {
-            onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
-          }
-        },
-        {
-          className: 'w-6',
-          key: 'employer',
-          type: 'select',
-          props: {
-            label: 'Employer',
-            placeholder: 'Please select',
-            optionsLookup: {
-              id: '8BE7B1D6-F09A-4EEE-B8EC-4DFCF689005B',
-              deps: ['vendor']
-            },
-            options: []
-          },
-          hooks: {
-            onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
-          }
-        }
-      ]
-    },
-    {
-      fieldGroup: [
-        {
-          key: 'autoEmail',
-          type: 'checkbox',
-          defaultValue: true,
-          props: {
-            label: 'Receive Email Notifications',
-            binary: true,
-            required: true
-          }
-        }
-      ]
-    }
-  ];
+  fields: FormlyFieldConfig[] = [];
   constructor(
     public configDataService: ConfigDataService,
     public userService: UserService,
@@ -224,19 +67,173 @@ export class PersonalDialogComponent {
     ];
   }
 
+  getFileds(): FormlyFieldConfig[] {
+    return [
+      {
+        fieldGroup: [
+          {
+            className: 'w-6',
+            key: 'username',
+            type: 'input',
+            props: {
+              disabled: true,
+              required: true,
+              type: 'text',
+              label: 'User ID',
+              placeholder: 'User ID'
+            },
+            modelOptions: {
+              updateOn: 'blur'
+            },
+            asyncValidators: {
+              exist: {
+                expression: (control: AbstractControl) => {
+                  return new Promise((resolve, reject) => {
+                    this.userService
+                      .userNameExists(control.value, this.userService.USER.id)
+                      .subscribe(res =>
+                        res.code === 200
+                          ? resolve(!res.data)
+                          : reject(res.message)
+                      );
+                  });
+                },
+                message: () => {
+                  return 'The User ID has already been exist.';
+                }
+              }
+            }
+          },
+          {
+            className: 'w-6',
+            key: 'name',
+            type: 'input',
+            props: {
+              required: true,
+              type: 'text',
+              label: 'Name',
+              placeholder: 'Name'
+            }
+          },
+          {
+            className: 'w-6',
+            key: 'email',
+            type: 'input',
+            props: {
+              required: true,
+              type: 'text',
+              label: 'Email',
+              placeholder: 'Email'
+            },
+            modelOptions: {
+              updateOn: 'blur'
+            },
+            asyncValidators: {
+              emailFormat: {
+                expression: (control: AbstractControl) => {
+                  return new Promise((resolve, reject) => {
+                    const emailRegex =
+                      /^([a-zA-Z\d][\w-]{2,})@(\w{2,})\.([a-z]{2,})(\.[a-z]{2,})?$/;
+                    resolve(emailRegex.test(control.value));
+                  });
+                },
+                message: () => {
+                  return 'Email format error.';
+                }
+              },
+              emailExist: {
+                expression: (control: AbstractControl) => {
+                  return new Promise((resolve, reject) => {
+                    this.userService
+                      .emailExists(control.value, this.userService.USER.id)
+                      .subscribe(res =>
+                        res.code === 200
+                          ? resolve(!res.data)
+                          : reject(res.message)
+                      );
+                  });
+                },
+                message: () => {
+                  return 'The  Email has already been exist.';
+                }
+              }
+            }
+          },
+          {
+            className: 'w-6',
+            key: 'phone',
+            type: 'inputMask',
+            defaultValue: '',
+            props: {
+              required: true,
+              type: 'text',
+              mask: '(999) 999-9999',
+              label: 'Phone',
+              placeholder: 'Phone'
+            }
+          }
+        ]
+      },
+      {
+        fieldGroup: [
+          {
+            className: 'w-6',
+            key: 'vendor',
+            type: 'select',
+            props: {
+              label: 'Vendor',
+              placeholder: 'Please select',
+              optionsLookup: {
+                id: 'E1F3E2C7-25CA-4D69-9405-ABC54923864D'
+              },
+              options: []
+            },
+            hooks: {
+              onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
+            }
+          },
+          {
+            className: 'w-6',
+            key: 'employer',
+            type: 'select',
+            props: {
+              label: 'Employer',
+              placeholder: 'Please select',
+              optionsLookup: {
+                id: '8BE7B1D6-F09A-4EEE-B8EC-4DFCF689005B',
+                deps: ['vendor']
+              },
+              options: []
+            },
+            hooks: {
+              onInit: this.ngxFormlyService.getFieldLookupOnInit(this.$destory)
+            }
+          }
+        ]
+      },
+      {
+        fieldGroup: [
+          {
+            key: 'autoEmail',
+            type: 'checkbox',
+            defaultValue: true,
+            props: {
+              label: 'Receive Email Notifications',
+              binary: true,
+              required: true
+            }
+          }
+        ]
+      }
+    ];
+  }
+
   onpenDialog() {
     this.userService
       .getUserDetail(this.userService.USER.id || '')
       .subscribe(res => {
-        this.form.setValue({
-          name: res.name,
-          username: res.username,
-          email: res?.email ?? '',
-          phone: res?.phone ?? '',
-          vendor: res?.vendor ?? '',
-          employer: res?.employer ?? '',
-          autoEmail: res.autoEmail
-        });
+        this.model = res;
+        this.fields = this.getFileds();
       });
   }
   onFormSubmit(model: ManageRoleForm) {
