@@ -3,7 +3,9 @@ import {
   ViewChild,
   CUSTOM_ELEMENTS_SCHEMA,
   forwardRef,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  Input,
+  Inject
 } from '@angular/core';
 import { SelectItem } from 'primeng/api';
 import { Dropdown } from 'primeng/dropdown';
@@ -12,6 +14,8 @@ import {
   FormControl,
   NG_VALUE_ACCESSOR
 } from '@angular/forms';
+import { NotifyService } from 'src/app/shared';
+import { FileUpload } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-icon-select',
@@ -31,6 +35,12 @@ import {
   ]
 })
 export class IconSelectComponent implements ControlValueAccessor {
+  @Input() accept = 'image/*';
+  @Input() maxFileSize = 1000 * 1000 * 2;
+  @Input() chooseLabel = 'Browse';
+  @Input() multiple = false;
+  @Input() fileLimit = 1;
+
   public initIcon = [
     'pi pi-eraser',
     'pi pi-stopwatch',
@@ -296,14 +306,17 @@ export class IconSelectComponent implements ControlValueAccessor {
   ];
   public iconList: SelectItem[];
   @ViewChild('dropdown') dropdown!: Dropdown;
+  @ViewChild(FileUpload) fileUpload!: FileUpload;
 
   public onChange!: (value: any) => void;
   public onTouch!: () => void;
   public disabled!: boolean;
+  progress = 0;
+  apiUrl = '';
 
   set value(val: any) {
-    if (/^data:image\/([a-z]+);base64,/.test(val)) {
-      this.iconLogo = val;
+    if (/^icons\/.*/.test(val)) {
+      this.iconLogo = `${this.apiUrl}attachment/${val}`;
       this.cdr.detectChanges();
       return;
     }
@@ -314,7 +327,12 @@ export class IconSelectComponent implements ControlValueAccessor {
 
   public iconLogo = '';
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private notifyService: NotifyService,
+    @Inject('API_URL') apiUrl: string
+  ) {
+    this.apiUrl = apiUrl;
     this.iconList = this.initIcon.map(icon => ({
       label: icon.replace('pi ', ''),
       value: icon
@@ -338,47 +356,86 @@ export class IconSelectComponent implements ControlValueAccessor {
     this.onChange(event.value);
   }
 
-  picChange(event: Event) {
-    const files = (event.target as HTMLInputElement).files || {};
-    const filePromise = Object.entries(files).map((item: any) => {
-      return new Promise((resolve, reject) => {
-        const [, file] = item;
-
-        if (file.type.split('/')[0] !== 'image') {
-          return reject('Only Support Image');
-        }
-        if (file.size > 1024 * 1024 * 2) {
-          return reject('File Size Max 2M');
-        }
-
-        const reader = new FileReader();
-        reader.readAsBinaryString(file);
-        reader.onload = (event: ProgressEvent<FileReader>) => {
-          const result = event.target?.result;
-          if (typeof result === 'string') {
-            const picture = `data:${file.type};base64,${btoa(result)}`;
-            resolve(picture);
-          }
-        };
-      });
-    });
-
-    Promise.all(filePromise)
-      .then((res: Array<string | unknown>) => {
-        if (res[0] !== undefined) {
-          this.iconLogo = res[0] as string;
-          this.formControl.reset()
-          this.onChange?.(this.iconLogo);
-          this.cdr.detectChanges();
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }
-
   removePic() {
     this.iconLogo = '';
     this.onChange?.(null);
+  }
+
+  onFileUploadSelect(event: any) {
+    const files = event.currentFiles;
+    if (!files || files.length === 0) return;
+
+    // check fileType
+    let errorFile = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (this.accept && !(this.fileUpload as any).isFileTypeValid(file)) {
+        errorFile.push(file);
+      }
+    }
+    if (errorFile.length > 0) {
+      this.notifyService.notifyError(
+        'Invalid file type',
+        `<ul class="pl-3"><li class="py-1">${errorFile
+          .map(f => f.name)
+          .join('</li><li class="py-1">')}</li></ul>`
+      );
+      this.fileUpload.clear();
+      return;
+    }
+
+    // check maxFileSize
+    errorFile = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (this.maxFileSize && file.size > this.maxFileSize) {
+        errorFile.push(file);
+      }
+    }
+    if (errorFile.length > 0) {
+      this.notifyService.notifyError(
+        'Maximum upload size exceeded',
+        `<ul class="pl-3"><li>${errorFile
+          .map(f => f.name)
+          .join('</li><li>')}</li></ul>`
+      );
+      this.fileUpload.clear();
+      return;
+    }
+
+    // check filelimit
+    if (this.fileLimit) {
+      if (files.length > this.fileLimit) {
+        this.notifyService.notifyError(
+          'Error',
+          `Maximum number of files exceeded, limit is ${this.fileLimit} at most.`
+        );
+        this.fileUpload.clear();
+        return;
+      }
+    }
+
+    // no errors, start to upload.
+    this.fileUpload.upload();
+  }
+
+  onUpload(event: any) {
+    this.progress = 0;
+    if (event?.originalEvent?.body?.data) {
+      const file = event.originalEvent.body.data[0];
+      this.iconLogo = `${this.apiUrl}attachment/download-temp-file/${file.fileId}/${file.fileName}`;
+      this.formControl.reset();
+      this.onChange?.(this.iconLogo);
+      this.cdr.detectChanges();
+    }
+  }
+
+  onUploadError(event: any) {
+    this.fileUpload.clear();
+    this.notifyService.notifyError('Error', 'File Upload Failed');
+  }
+
+  onFileUploadProgress(event: any) {
+    this.progress = event.progress;
   }
 }

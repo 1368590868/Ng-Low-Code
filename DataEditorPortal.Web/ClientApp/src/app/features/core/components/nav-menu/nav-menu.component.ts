@@ -5,7 +5,7 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ConfigDataService, UserService, SiteMenu } from 'src/app/shared';
@@ -30,7 +30,8 @@ export class NavMenuComponent implements OnInit {
   constructor(
     public userService: UserService,
     public configDataService: ConfigDataService,
-    private router: Router
+    private router: Router,
+    @Inject('API_URL') private apiUrl: string
   ) {}
 
   ngOnInit(): void {
@@ -75,9 +76,9 @@ export class NavMenuComponent implements OnInit {
       menu.badgeStyleClass = 'p-badge p-badge-warning';
     }
 
-    if (menu.icon && /^data:image\/([a-z]+);base64,/.test(menu.icon)) {
+    if (menu.icon && /^icons\/.*/.test(menu.icon)) {
       menu.iconStyle = {
-        backgroundImage: `url(${menu.icon})`,
+        backgroundImage: `url(${this.apiUrl}attachment/${menu.icon})`,
         width: '1rem',
         height: '1rem',
         backgroundRepeat: 'no-repeat',
