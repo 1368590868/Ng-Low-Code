@@ -50,23 +50,21 @@
     </div>
   </div>
 
-  <!-- Upload Button -->
-  <div
+  <p-fileUpload
     *ngIf="!iconLogo"
-    class="upload flex justify-content-center align-items-center">
-    <p-button
-      tabindex="0"
-      icon="pi pi-plus"
-      class="ml-auto relative padding-0"
-      label="Upload"
-      styleClass="p-button-outlined">
-      <input
-        #file
-        (change)="picChange($event)"
-        type="file"
-        accept="image/*"
-        class="opacity-0 cursor-pointer absolute left-0" />
-      <span class="p-ink"> </span>
-    </p-button>
-  </div>
+    styleClass="p-button-outlined"
+    name="files"
+    mode="basic"
+    [url]="apiUrl + 'attachment/upload-temp-file'"
+    [multiple]="multiple"
+    [auto]="false"
+    (onProgress)="onFileUploadProgress($event)"
+    (onSelect)="onFileUploadSelect($event)"
+    [chooseLabel]="chooseLabel"
+    [uploadLabel]="chooseLabel"
+    [accept]="accept"
+    [disabled]="progress > 0 && progress < 100"
+    (onUpload)="onUpload($event)"
+    (onError)="onUploadError($event)">
+  </p-fileUpload>
 </div>

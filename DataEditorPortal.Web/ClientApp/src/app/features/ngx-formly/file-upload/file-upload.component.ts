@@ -92,6 +92,7 @@ export class FileUploadComponent implements ControlValueAccessor {
 
   onFileUploadSelect(event: any) {
     const files = event.currentFiles;
+    if (!files || files.length === 0) return;
 
     // check fileType
     let errorFile = [];
@@ -127,6 +128,8 @@ export class FileUploadComponent implements ControlValueAccessor {
           .map(f => f.name)
           .join('</li><li>')}</li></ul>`
       );
+      this.fileUpload.clear();
+      return;
     }
 
     // check filelimit
@@ -173,7 +176,9 @@ export class FileUploadComponent implements ControlValueAccessor {
   tempAttachmentDownload(data: any) {
     const url =
       data.status === 'New'
-        ? `${this.apiUrl}attachment/download-temp-file/${data.fileId}/${data.fileName}`
+        ? `${this.apiUrl}attachment/download-temp-file/${
+            data.fileId
+          }/${encodeURIComponent(data.fileName || '')}`
         : `${this.apiUrl}attachment/download-file/${this.gridName}/${
             this.fieldName
           }/${data.fileId}/${encodeURIComponent(data.fileName || '')}`;

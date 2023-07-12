@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { TreeNode } from 'primeng/api';
@@ -43,6 +43,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
 
               const role = this.roleList.find(x => this.roleId == x.id);
               if (role) {
+                console.log(role);
                 this.setFormValue(role);
               }
             },
@@ -122,7 +123,8 @@ export class ManageRoleActionComponent extends GridActionDirective {
   constructor(
     private notifyService: NotifyService,
     private rolePermissionService: RolePermissionService,
-    private systemLogService: SystemLogService
+    private systemLogService: SystemLogService,
+    @Inject('API_URL') private apiUrl: string
   ) {
     super();
   }
@@ -134,16 +136,17 @@ export class ManageRoleActionComponent extends GridActionDirective {
     this.form.setValue({
       roleId: role.id,
       roleName: this.roleName,
-      roleDescription: role.id === '<new_role>' ? '' : role.roleDescription
+      roleDescription:
+        role.id === '<new_role>' ? '' : role?.roleDescription ?? ''
     });
   }
 
   childrenSelected(node: TreeNode) {
     if (node?.children) {
       node.children.forEach((child: any) => {
-        if (child.icon && /^data:image\/([a-z]+);base64,/.test(child.icon)) {
+        if (child.icon && /^icons\/.*/.test(child.icon)) {
           child.iconStyle = {
-            backgroundImage: `url(${child.icon})`,
+            backgroundImage: `url(${this.apiUrl}attachment/${child.icon})`,
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
@@ -170,9 +173,9 @@ export class ManageRoleActionComponent extends GridActionDirective {
         this.permissionSelect.push(item);
       }
 
-      if (item.icon && /^data:image\/([a-z]+);base64,/.test(item.icon)) {
+      if (item.icon && /^icons\/.*/.test(item.icon)) {
         item.iconStyle = {
-          backgroundImage: `url(${item.icon})`,
+          backgroundImage: `url(${this.apiUrl}attachment/${item.icon})`,
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',

@@ -7,6 +7,7 @@ import { FormlySelectModule as FormlyCoreSelectModule } from '@ngx-formly/core/s
 import { IconSelectComponent } from './iconselect.component';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
+import { FileUploadModule } from 'primeng/fileupload';
 
 import { FormlyFieldIconSelectComponent } from './iconselect.type';
 
@@ -19,6 +20,7 @@ import { FormlyFieldIconSelectComponent } from './iconselect.type';
     FormlyCoreSelectModule,
     ButtonModule,
     AvatarModule,
+    FileUploadModule,
     FormlyModule.forChild({
       types: [
         {

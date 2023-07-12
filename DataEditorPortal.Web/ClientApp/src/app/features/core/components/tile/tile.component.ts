@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { tap } from 'rxjs';
 import { ConfigDataService, SiteMenu } from 'src/app/shared';
 
@@ -10,7 +10,10 @@ import { ConfigDataService, SiteMenu } from 'src/app/shared';
 export class TileComponent implements OnInit {
   public homeMenus: SiteMenu[] = [];
   public loading = false;
-  constructor(private configDataService: ConfigDataService) {}
+  constructor(
+    private configDataService: ConfigDataService,
+    @Inject('API_URL') private apiUrl: string
+  ) {}
   ngOnInit() {
     this.configDataService
       .getHomeMenus()
@@ -32,12 +35,10 @@ export class TileComponent implements OnInit {
                     ? menu.link
                     : undefined
               };
-              if (
-                data.icon &&
-                /^data:image\/([a-z]+);base64,/.test(data.icon)
-              ) {
+
+              if (data.icon && /^icons\/.*/.test(data.icon)) {
                 data.iconStyle = {
-                  backgroundImage: `url(${data.icon})`,
+                  backgroundImage: `url(${this.apiUrl}attachment/${menu.icon})`,
                   width: '4rem',
                   height: '4rem',
                   backgroundRepeat: 'no-repeat',
