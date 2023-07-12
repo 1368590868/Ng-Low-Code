@@ -98,6 +98,7 @@ export class EditRecordActionComponent
         .getSearchConfig(this.gridName)
         .pipe(
           tap(searchConfig => {
+            this.onLoadUrlParams();
             this.searchConfig(searchConfig);
           }),
           tap(() => this.getFormConfig()),
@@ -139,7 +140,6 @@ export class EditRecordActionComponent
           this.configFieldExpressions(fields);
           this.configFieldProps(fields);
           this.fields = fields;
-          this.onLoadUrlParams();
 
           if (fields.length > 0) this.loadedEvent.emit();
         })
