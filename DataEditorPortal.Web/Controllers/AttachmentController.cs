@@ -87,7 +87,7 @@ namespace DataEditorPortal.Web.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError(ex, ex.Message);
                 throw new DepException(ex.Message);
             }
 

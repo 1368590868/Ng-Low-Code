@@ -302,7 +302,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex.Message, ex);
+                    _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
                 finally
@@ -353,7 +353,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex.Message, ex);
+                    _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
                 finally

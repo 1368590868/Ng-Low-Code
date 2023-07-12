@@ -403,7 +403,7 @@ namespace DataEditorPortal.Web.Services
             {
                 if (writeLog)
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, gridName, queryText, queryParams, ex.Message);
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError(ex, ex.Message);
                 throw new DepException("An Error in the query has occurred: " + ex.Message);
             }
 
@@ -719,7 +719,7 @@ namespace DataEditorPortal.Web.Services
                 catch (Exception ex)
                 {
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
-                    _logger.LogError(ex.Message, ex);
+                    _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
 
@@ -821,7 +821,7 @@ namespace DataEditorPortal.Web.Services
                 catch (Exception ex)
                 {
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
-                    _logger.LogError(ex.Message, ex);
+                    _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
@@ -922,7 +922,7 @@ namespace DataEditorPortal.Web.Services
                     trans.Rollback();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
-                    _logger.LogError(ex.Message, ex);
+                    _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
@@ -1021,7 +1021,7 @@ namespace DataEditorPortal.Web.Services
                     trans.Rollback();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
-                    _logger.LogError(ex.Message, ex);
+                    _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
@@ -1114,7 +1114,7 @@ namespace DataEditorPortal.Web.Services
                     trans.Rollback();
 
                     _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
-                    _logger.LogError(ex.Message, ex);
+                    _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
             }
@@ -1145,7 +1145,7 @@ namespace DataEditorPortal.Web.Services
                             catch (Exception ex)
                             {
                                 _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, "Get Computed Value", query.Item1, query.Item2, ex.Message);
-                                _logger.LogError(ex.Message, ex);
+                                _logger.LogError(ex, ex.Message);
                                 throw new DepException($"An Error has occurred when calculate computed value for field: {field.key}. Error: {ex.Message}");
                             }
                         }
@@ -1269,7 +1269,7 @@ namespace DataEditorPortal.Web.Services
                     Params = JsonSerializer.Serialize(model),
                     Result = ex.Message
                 });
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError(ex, ex.Message);
             }
         }
 
@@ -1354,7 +1354,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError(ex, ex.Message);
             }
 
             return table1Ids;
@@ -1585,7 +1585,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex.Message, ex);
+                    _logger.LogError(ex, ex.Message);
                 }
             }
 

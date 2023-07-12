@@ -221,7 +221,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError(ex, ex.Message);
                 throw;
             }
         }
@@ -262,7 +262,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex.Message, ex);
+                    _logger.LogError(ex, ex.Message);
                     throw;
                 }
             }

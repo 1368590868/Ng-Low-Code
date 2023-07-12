@@ -55,7 +55,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError(ex, ex.Message);
             }
         }
 
@@ -78,7 +78,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError(ex, ex.Message);
             }
         }
 
@@ -101,7 +101,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError(ex, ex.Message);
             }
         }
     }
