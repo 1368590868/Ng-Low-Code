@@ -6,6 +6,7 @@ import { SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { ExportForm, ExportParam } from '../../models/export';
 import { UniversalGridService } from '../../services/universal-grid.service';
+import { GlobalLoadingService } from 'src/app/shared/services/global-loading.service';
 
 @Component({
   selector: 'app-export-excel-action',
@@ -35,7 +36,8 @@ export class ExportExcelActionComponent
 
   constructor(
     private gridService: UniversalGridService,
-    private systemLogService: SystemLogService
+    private systemLogService: SystemLogService,
+    private globalLoadingService: GlobalLoadingService
   ) {
     super();
   }
@@ -65,6 +67,7 @@ export class ExportExcelActionComponent
       )}`
     };
 
+    this.globalLoadingService.end();
     this.loadedEvent.emit();
   }
 

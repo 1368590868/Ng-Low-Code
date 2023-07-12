@@ -70,7 +70,7 @@ export class ActionWrapperComponent implements OnInit {
   showDialog() {
     this.isLoading = false;
     this.dialogVisible = true;
-    this.globalLoadingService.onStart();
+    this.globalLoadingService.start();
     this.renderAction();
   }
 

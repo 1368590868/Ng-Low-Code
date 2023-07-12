@@ -10,13 +10,13 @@ export class GlobalLoadingService {
   count = 0;
   callback: any;
 
-  onStart() {
+  start() {
     this.count = 0;
     this.isStart = true;
     this.loading$.next(false);
   }
 
-  onAdd() {
+  add() {
     if (!this.isStart) return;
     if (this.callback) clearTimeout(this.callback);
 
@@ -28,7 +28,7 @@ export class GlobalLoadingService {
     }
   }
 
-  onEnd() {
+  remove() {
     if (!this.isStart) return;
     if (this.callback) clearTimeout(this.callback);
 
@@ -39,5 +39,11 @@ export class GlobalLoadingService {
         this.loading$.next(false);
       }
     }, 100);
+  }
+
+  end() {
+    this.count = 0;
+    this.isStart = false;
+    this.loading$.next(false);
   }
 }
