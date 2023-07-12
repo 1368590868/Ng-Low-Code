@@ -12,10 +12,10 @@ export class globalLoadingInterceptor implements HttpInterceptor {
   constructor(private formLoadingService: GlobalLoadingService) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): any {
-    this.formLoadingService.onAdd();
+    this.formLoadingService.add();
     return next.handle(request).pipe(
       finalize(() => {
-        this.formLoadingService.onEnd();
+        this.formLoadingService.remove();
       })
     );
   }
