@@ -148,5 +148,29 @@ namespace DataEditorPortal.Web.Controllers
                 };
             }
         }
+
+        [HttpGet]
+        [Route("icons/{fileName}")]
+        public ActionResult GetIcon(string fileName)
+        {
+            try
+            {
+                string iconsFolder = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data\\Icons");
+                var iconFilePath = Path.Combine(iconsFolder, $"{fileName}");
+                var stream = System.IO.File.OpenRead(iconFilePath);
+
+                return File(stream, "application/octet-stream");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return new ContentResult
+                {
+                    Content = "<h1 style='text-align:center'>File Not Found</h1><script>setTimeout(function(){window.close()}, 2000)</script>",
+                    ContentType = "text/html",
+                    StatusCode = 404
+                };
+            }
+        }
     }
 }

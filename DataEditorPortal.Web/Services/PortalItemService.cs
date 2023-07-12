@@ -198,6 +198,16 @@ namespace DataEditorPortal.Web.Services
             DeleteInternal(siteMenu);
             _depDbContext.SaveChanges();
 
+            if (siteMenu.Icon != null && siteMenu.Icon.StartsWith("icons/"))
+            {
+                // remove icon file, ignore error
+                try
+                {
+                    File.Delete(Path.Combine(_hostEnvironment.ContentRootPath, "App_Data", $"{ siteMenu.Icon}"));
+                }
+                catch { };
+            }
+
             return true;
         }
 

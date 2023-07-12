@@ -11,11 +11,13 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -35,6 +37,7 @@ namespace DataEditorPortal.Web.Controllers
         private readonly IPortalItemService _portalItemService;
         private readonly IQueryBuilder _queryBuilder;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IHostEnvironment _hostEnvironment;
 
         public PortalItemController(
             ILogger<PortalItemController> logger,
@@ -43,7 +46,8 @@ namespace DataEditorPortal.Web.Controllers
             IMapper mapper,
             IPortalItemService portalItemService,
             IQueryBuilder queryBuilder,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IHostEnvironment hostEnvironment)
         {
             _logger = logger;
             _depDbContext = depDbContext;
@@ -52,6 +56,7 @@ namespace DataEditorPortal.Web.Controllers
             _portalItemService = portalItemService;
             _queryBuilder = queryBuilder;
             _serviceProvider = serviceProvider;
+            _hostEnvironment = hostEnvironment;
         }
 
         [HttpGet]
@@ -139,6 +144,8 @@ namespace DataEditorPortal.Web.Controllers
                     .Select(x => x.Order)
                     .FirstOrDefault() + 1;
 
+            EnsureIconProcessed(model);
+
             var siteMenu = _mapper.Map<SiteMenu>(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
             _depDbContext.SiteMenus.Add(siteMenu);
@@ -185,6 +192,8 @@ namespace DataEditorPortal.Web.Controllers
                     .FirstOrDefault() + 1;
             }
 
+            EnsureIconProcessed(model);
+
             if (siteMenu.Type == "External")
             {
                 // update permissions
@@ -205,7 +214,6 @@ namespace DataEditorPortal.Web.Controllers
             return siteMenu.Id;
         }
 
-
         [HttpDelete]
         [Route("menu-item/{id}/delete")]
         public Guid DeleteMenuItem(Guid id)
@@ -223,7 +231,55 @@ namespace DataEditorPortal.Web.Controllers
             _depDbContext.Remove(siteMenu);
             _depDbContext.SaveChanges();
 
+            if (siteMenu.Icon != null && siteMenu.Icon.StartsWith("icons/"))
+            {
+                // remove icon file, ignore error
+                try
+                {
+                    System.IO.File.Delete(Path.Combine(_hostEnvironment.ContentRootPath, "App_Data", $"{ siteMenu.Icon}"));
+                }
+                catch { };
+            }
+
             return siteMenu.Id;
+        }
+
+        private void EnsureIconProcessed(PortalItemData model)
+        {
+            string pattern = @"/api/attachment/download-temp-file/(?<fileId>[^/]+)/(?<fileName>[^/]+)";
+            Match match = Regex.Match(model.Icon, pattern);
+            if (match.Success)
+            {
+                string fileId = match.Groups["fileId"].Value;
+                string fileName = match.Groups["fileName"].Value;
+
+                if (model.Id == Guid.Empty) model.Id = Guid.NewGuid();
+
+                string tempFolder = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data\\FileUploadTemp");
+                var tempFilePath = Path.Combine(tempFolder, $"{fileId} - {fileName}");
+
+                string iconsFolder = Path.Combine(_hostEnvironment.ContentRootPath, $"App_Data\\Icons");
+                if (!Directory.Exists(iconsFolder)) Directory.CreateDirectory(iconsFolder);
+
+                var iconName = $"{model.Id}{Path.GetExtension(fileName)}";
+                var destFilePath = Path.Combine(iconsFolder, iconName);
+
+                // remove old icon, ignore error
+                try
+                {
+                    var oldIcons = Directory.GetFiles(iconsFolder, $"{model.Id}*").ToList();
+                    oldIcons.ForEach(f => System.IO.File.Delete(f));
+                }
+                catch { }
+
+                // copy new icon
+                System.IO.File.Copy(tempFilePath, destFilePath, true);
+
+                // remove temp file, ignore error
+                try { System.IO.File.Delete(tempFilePath); } catch { };
+
+                model.Icon = $"icons/{iconName}";
+            }
         }
 
         #endregion
@@ -388,6 +444,8 @@ namespace DataEditorPortal.Web.Controllers
         [Route("create")]
         public Guid CreatePortalItem([FromBody] PortalItemData model)
         {
+            EnsureIconProcessed(model);
+
             return _portalItemService.Create(model);
         }
 
@@ -395,6 +453,8 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{id}/update")]
         public Guid UpdatePortalItem(Guid id, [FromBody] PortalItemData model)
         {
+            EnsureIconProcessed(model);
+
             return _portalItemService.Update(id, model);
         }
 
