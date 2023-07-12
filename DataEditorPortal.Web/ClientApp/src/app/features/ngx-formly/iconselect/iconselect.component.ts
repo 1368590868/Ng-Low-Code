@@ -367,6 +367,7 @@ export class IconSelectComponent implements ControlValueAccessor {
       .then((res: Array<string | unknown>) => {
         if (res[0] !== undefined) {
           this.iconLogo = res[0] as string;
+          this.formControl.reset()
           this.onChange?.(this.iconLogo);
           this.cdr.detectChanges();
         }
