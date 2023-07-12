@@ -33,14 +33,19 @@ export class NgxFormlyService {
 
   initFieldOptions(field: any, data?: any) {
     if (field.props && field.props.optionsLookup) {
-      // get lookups from server
+      // clear options, show empty message
       field.props.options = [];
       field.props.emptyMessage = 'Loading...';
+
+      // get lookups from server
       this.getLookup(field.props.optionsLookup.id, data)
         .pipe(
           tap(result => {
             if (field.props) {
+              // restore empty message
               field.props.emptyMessage = 'No records found';
+
+              // set new options
               field.props.options = result;
               if (field.type === 'select') {
                 const control = field.formControl as FormControl;
