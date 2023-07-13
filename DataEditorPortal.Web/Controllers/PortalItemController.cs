@@ -246,6 +246,8 @@ namespace DataEditorPortal.Web.Controllers
 
         private void EnsureIconProcessed(PortalItemData model)
         {
+            if (string.IsNullOrEmpty(model.Icon)) return;
+
             string pattern = @"/api/attachment/download-temp-file/(?<fileId>[^/]+)/(?<fileName>[^/]+)";
             Match match = Regex.Match(model.Icon, pattern);
             if (match.Success)
@@ -493,7 +495,7 @@ namespace DataEditorPortal.Web.Controllers
                     var dsItem = new DataSourceConnectionModel()
                     {
                         Name = x.ds.Name,
-                        ConnectionString = Regex.Replace(x.ds.ConnectionString, pattern, replacement),
+                        ConnectionString = Regex.Replace(x.ds.ConnectionString, pattern, replacement, RegexOptions.IgnoreCase),
                         UsedCount = x.uCount + x.lCount
                     };
 
