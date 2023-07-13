@@ -55,6 +55,8 @@ export class UserManagerActionComponent
           this.model = res;
           this.fields = this.getFields();
         });
+    } else {
+      this.fields = this.getFields();
     }
     this.loadedEvent.emit();
   }

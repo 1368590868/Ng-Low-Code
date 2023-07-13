@@ -62,7 +62,6 @@ export class FormDesignerConfigComponent
 
     // add expressions.
     this.fields.push({
-      key: 'expressionsConfig',
       fieldGroup: [
         {
           wrappers: ['divider'],
@@ -71,7 +70,7 @@ export class FormDesignerConfigComponent
           }
         },
         {
-          key: 'customExpression',
+          key: 'expressionsConfig',
           type: 'monacoEditor',
           props: {
             label: 'expression =',
