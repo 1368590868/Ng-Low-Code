@@ -249,6 +249,11 @@ export class PersonalDialogComponent {
               'Success',
               'Save Successfully Completed.'
             );
+            this.userService.USER = {
+              ...this.userService.USER,
+              displayName: model.name,
+              vendor: model.vendor
+            };
             this.visible = false;
           }
         });
