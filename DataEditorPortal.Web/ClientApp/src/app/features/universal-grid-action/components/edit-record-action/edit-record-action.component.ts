@@ -245,19 +245,11 @@ export class EditRecordActionComponent
     fields
       .filter((x: any) => x.expressionsConfig)
       .forEach((x: any) => {
-        x.expressions = {};
-        let customExpression: any = {};
-        Object.keys(x.expressionsConfig).forEach(key => {
-          if (x.expressionsConfig[key]) {
-            if (key === 'customExpression') {
-              customExpression = JSON.parse(
-                x.expressionsConfig['customExpression']
-              );
-            } else
-              x.expressions[key.replace('_', '.')] = x.expressionsConfig[key];
-          }
-        });
-        x.expressions = { ...x.expressions, ...customExpression };
+        try {
+          x.expressions = JSON.parse(x.expressionsConfig);
+        } catch {
+          /* empty */
+        }
         x.expressionsConfig = undefined;
       });
   }
