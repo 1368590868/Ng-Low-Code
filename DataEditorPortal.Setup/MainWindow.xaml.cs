@@ -50,7 +50,7 @@ namespace Setup
             dataGridConnection.DataContext = ConnectionList;
 
             SitePublishModel.TargetFolder = $@"C:\inetpub\DataEditorPortal";
-            SitePublishModel.AppPath = "Data Editor Portal";
+            SitePublishModel.AppPath = "DataEditorPortal";
             SitePublishModel.DefaultSchema = "DATA_EDITOR_PORTAL";
 
             SiteNamesModel.Items = GetAllSitesInIIS();
@@ -331,7 +331,8 @@ namespace Setup
                 {
                     try
                     {
-                        CopyFiles($"{sourcePath}\\web", targetPath, sw);
+                        var pattern = @"^(?!.*\\(?:appsettings\.Development\.json|web(?:\.Development|\.Production){1}\.config)$).+$";
+                        CopyFiles($"{sourcePath}\\web", targetPath, sw, pattern);
                     }
                     catch (Exception ex)
                     {

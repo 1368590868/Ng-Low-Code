@@ -8,6 +8,7 @@
     <AssemblyName>Setup</AssemblyName>
     <RootNamespace>Setup</RootNamespace>
     <WebDirectory>web</WebDirectory>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
