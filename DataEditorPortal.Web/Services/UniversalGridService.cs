@@ -1473,7 +1473,8 @@ namespace DataEditorPortal.Web.Services
                 );
 
                 var table1IsPrimary = primary.Name == table1Name;
-                linkTable.Query_Delete = _queryBuilder.GenerateSqlTextForDeleteLinkData(dsLink.LinkTable, table1IsPrimary ? primary : secondary);
+                linkTable.Query_DeleteByTable1Id = _queryBuilder.GenerateSqlTextForDeleteLinkData(dsLink.LinkTable, table1IsPrimary ? primary : secondary);
+                linkTable.Query_DeleteById = _queryBuilder.GenerateSqlTextForDelete(dsLink.LinkTable);
 
                 return new LinkedTableInfo()
                 {

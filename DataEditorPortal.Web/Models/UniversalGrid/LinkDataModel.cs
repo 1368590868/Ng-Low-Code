@@ -32,6 +32,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string ForeignKey { get; set; }
         public string ConnectionString { get; set; }
         public string Query_Insert { get; set; }
-        public string Query_Delete { get; set; }
+        public string Query_DeleteByTable1Id { get; set; }
+        public string Query_DeleteById { get; set; }
     }
 }

@@ -76,7 +76,7 @@ namespace DataEditorPortal.Web.Services
                 if (_linkedTableInfo == null)
                     _linkedTableInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetLinkedTableInfo(Config.Name);
 
-                _queryToDelete = _linkedTableInfo.LinkTable.Query_Delete;
+                _queryToDelete = _linkedTableInfo.LinkTable.Query_DeleteByTable1Id;
                 _parameterToDelete = _queryBuilder.GenerateDynamicParameter(
                     new List<KeyValuePair<string, object>>()
                     {
@@ -212,7 +212,7 @@ namespace DataEditorPortal.Web.Services
 
                 if (toDelete.Any())
                 {
-                    var deleteSql = _linkedTableInfo.LinkTable.Query_Delete;
+                    var deleteSql = _linkedTableInfo.LinkTable.Query_DeleteById;
                     var deleteParam = _queryBuilder.GenerateDynamicParameter(
                         new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(linkTable.IdColumn, toDelete) }
                     );
