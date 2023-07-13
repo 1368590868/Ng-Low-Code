@@ -162,32 +162,32 @@ export class PortalEditLinkComponent
           if (data?.linkTable) {
             this.dsConfig = data.linkTable;
           }
+
+          // load database tables
+          this.portalItemService.getDataSourceConnections().subscribe(res => {
+            this.isLoading = false;
+            const connections: DataSourceConnection[] = res;
+            if (connections.length === 0) return;
+            this.dbConnections = connections.map(x => {
+              return { label: x.name, value: x.name || '' };
+            });
+            // check if current selected connections exists, if not exist, use the first
+            if (
+              !connections.find(
+                x => x.name === this.dsConfig?.dataSourceConnectionName
+              )
+            ) {
+              this.formControlConnection.setValue(connections[0].name);
+            } else {
+              this.formControlConnection.setValue(
+                this.dsConfig?.dataSourceConnectionName
+              );
+            }
+
+            this.getDbTables();
+          });
         }
       });
-
-    // load database tables
-    this.portalItemService.getDataSourceConnections().subscribe(res => {
-      this.isLoading = false;
-      const connections: DataSourceConnection[] = res;
-      if (connections.length === 0) return;
-      this.dbConnections = connections.map(x => {
-        return { label: x.name, value: x.name || '' };
-      });
-      // check if current selected connections exists, if not exist, use the first
-      if (
-        !connections.find(
-          x => x.name === this.dsConfig?.dataSourceConnectionName
-        )
-      ) {
-        this.formControlConnection.setValue(connections[0].name);
-      } else {
-        this.formControlConnection.setValue(
-          this.dsConfig?.dataSourceConnectionName
-        );
-      }
-
-      this.getDbTables();
-    });
   }
 
   onShowAction(id: string) {
