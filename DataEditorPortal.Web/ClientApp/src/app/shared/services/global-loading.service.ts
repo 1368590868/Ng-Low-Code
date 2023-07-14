@@ -7,34 +7,36 @@ import { Subject } from 'rxjs';
 export class GlobalLoadingService {
   loading$ = new Subject<boolean>();
   isStart = false;
-  count = 0;
+  requestArr: number[] = [];
   callback: any;
 
   start() {
-    this.count = 0;
+    this.requestArr = [];
     this.isStart = true;
     this.loading$.next(false);
   }
 
-  add() {
+  add(timestep: number) {
     if (!this.isStart) return;
     if (this.callback) clearTimeout(this.callback);
 
-    this.count += 1;
-    if (this.count === 1) {
+    this.requestArr.push(timestep);
+    if (this.requestArr.length === 1) {
       setTimeout(() => {
         this.loading$.next(true);
       }, 0);
     }
   }
 
-  remove() {
+  remove(timestep: number) {
     if (!this.isStart) return;
     if (this.callback) clearTimeout(this.callback);
+    const index = this.requestArr.findIndex(x => x === timestep);
+    if (index === -1) return;
+    this.requestArr.splice(index, 1);
 
-    this.count -= 1;
     this.callback = setTimeout(() => {
-      if (this.count === 0) {
+      if (this.requestArr.length === 0) {
         this.isStart = false;
         this.loading$.next(false);
       }
@@ -42,7 +44,7 @@ export class GlobalLoadingService {
   }
 
   end() {
-    this.count = 0;
+    this.requestArr = [];
     this.isStart = false;
     this.loading$.next(false);
   }
