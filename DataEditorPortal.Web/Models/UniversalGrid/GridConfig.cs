@@ -17,6 +17,10 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string DataKey { get; set; }
         public int PageSize { get; set; } = 100;
 
+        public bool AllowAdding { get; set; }
+        public bool AllowEditing { get; set; }
+        public bool AllowDeleting { get; set; }
+
         public string CustomAddFormName { get; set; }
         public string CustomEditFormName { get; set; }
         public string CustomViewFormName { get; set; }
@@ -35,6 +39,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public object validatorConfig { get; set; }
         public ComputedConfig computedConfig { get; set; }
         public object expressionsConfig { get; set; }
+        public bool excludeFromImport { get; set; }
     }
 
     public class ComputedConfig
@@ -108,6 +113,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class GridFormLayout
     {
+        public bool Enabled { get; set; }
         public bool UseAddingFormLayout { get; set; } = true;
         public bool UseCustomForm { get; set; }
         public string CustomFormName { get; set; }
