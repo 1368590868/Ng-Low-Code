@@ -15,7 +15,9 @@ export class FormLayoutDeleteComponent {
     'DELETE DEMO_TABLE WHERE ID IN ##ID##<br /><br />' +
     'Note: Please always use IN operator to support batch delete.';
 
-  _formConfig: GridFormConfig = {};
+  _formConfig: GridFormConfig = {
+    enabled: false
+  };
   showOnValidate = false;
   @Input() type!: string;
   @Input()
@@ -58,6 +60,7 @@ export class FormLayoutDeleteComponent {
   }
 
   validate() {
+    if (!this._formConfig.enabled) return true;
     if (this._formConfig.useCustomForm) {
       if (!this._formConfig.customFormName) {
         this.notifyService.notifyWarning(

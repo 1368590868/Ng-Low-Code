@@ -39,7 +39,8 @@ export class FormLayoutComponent {
     'INSERT INTO DEMO_TABLE (ID, NAME, FIRST_NAME, TOTAL, CREATED_DATE) <br />VALUES (NEWID(), ##NAME##, ##FIRST_NAME##, ##TOTAL##, GETDATE())';
 
   _formConfig: GridFormConfig = {
-    useAddingFormLayout: true
+    useAddingFormLayout: true,
+    enabled: false
   };
   @Input()
   set config(val: GridFormConfig) {
@@ -168,6 +169,7 @@ export class FormLayoutComponent {
   }
 
   validate() {
+    if (!this._formConfig.enabled) return true;
     if (this._formConfig.useCustomForm) {
       if (!this._formConfig.customFormName) {
         this.notifyService.notifyWarning(

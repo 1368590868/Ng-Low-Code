@@ -88,5 +88,25 @@ export class FormDesignerConfigComponent
         hide: `field.parent.model.computedConfig`
       }
     });
+
+    // add exclude Import
+    this.fields.push({
+      fieldGroup: [
+        {
+          wrappers: ['divider'],
+          props: {
+            label: 'Import'
+          }
+        },
+        {
+          key: 'excludeFromImport',
+          type: 'checkbox',
+          defaultValue: false,
+          props: {
+            label: 'Exclude From Import Template'
+          }
+        }
+      ]
+    });
   }
 }

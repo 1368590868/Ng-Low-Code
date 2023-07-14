@@ -79,8 +79,10 @@ export class OptionDialogComponent implements ControlValueAccessor {
   set value(val: { id: string } | any[]) {
     if (Array.isArray(val)) {
       this.options = val;
+      this.optionsLookup = undefined;
     } else if (val) {
       this.optionsLookup = val.id || (val as unknown as string);
+      this.options = [];
     } else {
       this.options = [];
       this.optionsLookup = undefined;
