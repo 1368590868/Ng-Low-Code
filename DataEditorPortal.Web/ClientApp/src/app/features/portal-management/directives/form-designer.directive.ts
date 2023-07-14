@@ -205,7 +205,7 @@ export class FormDesignerDirective {
             placeholder: 'Enter placeholder'
           },
           expressions: {
-            hide: `['checkbox', 'radio', 'checkboxList' , 'fileUpload'].indexOf(field.parent.parent.model.type) >= 0`
+            hide: `['checkbox', 'radio', 'checkboxList' , 'fileUpload', 'locationEditor'].indexOf(field.parent.parent.model.type) >= 0`
           }
         },
         // props for select, mutiSelect, checkboxList, radio
@@ -337,15 +337,6 @@ export class FormDesignerDirective {
         {
           fieldGroup: [
             {
-              key: 'system',
-              type: 'optionsEditor',
-              props: {
-                label: 'From/To Options',
-                onlyAdvanced: true,
-                dialogTitle: 'From/To Options'
-              }
-            },
-            {
               key: 'locationType',
               type: 'select',
               props: {
@@ -362,6 +353,35 @@ export class FormDesignerDirective {
                 }
               }
             },
+            {
+              key: 'system',
+              type: 'optionsEditor',
+              props: {
+                label: 'From/To Options',
+                onlyAdvanced: true,
+                dialogTitle: 'From/To Options'
+              }
+            },
+            {
+              key: 'mappingColumns',
+              type: 'locationConfig',
+              props: {
+                label: 'Fields Mapping',
+                description: 'Set location fields mapping',
+                locationType: 2
+              },
+              expressions: {
+                'props.locationType': `field.parent.model.locationType`
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dbColumns) {
+                    field.props.mappingColumns = this.dbColumns;
+                  }
+                }
+              }
+            },
+
             {
               key: 'fromLabel',
               type: 'input',
@@ -451,25 +471,6 @@ export class FormDesignerDirective {
               props: {
                 label: 'Length Label',
                 placeholder: 'Enter length label'
-              }
-            },
-            {
-              key: 'mappingColumns',
-              type: 'locationConfig',
-              props: {
-                label: 'Fields Mapping',
-                description: 'Set location fields mapping',
-                locationType: 2
-              },
-              expressions: {
-                'props.locationType': `field.parent.model.locationType`
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dbColumns) {
-                    field.props.mappingColumns = this.dbColumns;
-                  }
-                }
               }
             }
           ],
