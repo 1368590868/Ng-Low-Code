@@ -2,180 +2,196 @@
   <div class="flex align-items-center py-2 mr-4">
     <p-inputSwitch
       class="mr-2"
-      [(ngModel)]="_formConfig.useCustomForm"></p-inputSwitch>
-    Use Custom Form
+      [(ngModel)]="_formConfig.enabled"></p-inputSwitch>
+    Allow
+    {{
+      _type === 'ADD' ? 'Adding' : _type === 'UPDATE' ? 'Editing' : 'Deleting'
+    }}
   </div>
-  <div
-    class="flex align-items-center py-2 mr-4"
-    *ngIf="_type === 'UPDATE' && !_formConfig.useCustomForm">
-    <p-inputSwitch
-      class="mr-2"
-      [(ngModel)]="_formConfig.useAddingFormLayout"></p-inputSwitch>
-    Use the layout of adding form for updating
-  </div>
-  <div *ngIf="_formConfig.useCustomForm" class="flex align-items-center">
-    <p-dropdown
-      [(ngModel)]="_formConfig.customFormName"
-      styleClass="w-15rem"
-      appendTo="body"
-      [showClear]="true"
-      placeholder="Please Select"
-      [options]="customActions"></p-dropdown>
-    <i
-      class="pi pi-question-circle ml-3 text-lg"
-      pTooltip="Select one Custom Action that pre-defined by developers used for adding new record."></i>
-  </div>
+  <ng-container *ngIf="_formConfig.enabled">
+    <div class="flex align-items-center py-2 mr-4">
+      <p-inputSwitch
+        class="mr-2"
+        [(ngModel)]="_formConfig.useCustomForm"></p-inputSwitch>
+      Use Custom Form
+    </div>
+    <div
+      class="flex align-items-center py-2 mr-4"
+      *ngIf="_type === 'UPDATE' && !_formConfig.useCustomForm">
+      <p-inputSwitch
+        class="mr-2"
+        [(ngModel)]="_formConfig.useAddingFormLayout"></p-inputSwitch>
+      Use the layout of adding form for updating
+    </div>
+    <div *ngIf="_formConfig.useCustomForm" class="flex align-items-center">
+      <p-dropdown
+        [(ngModel)]="_formConfig.customFormName"
+        styleClass="w-15rem"
+        appendTo="body"
+        [showClear]="true"
+        placeholder="Please Select"
+        [options]="customActions"></p-dropdown>
+      <i
+        class="pi pi-question-circle ml-3 text-lg"
+        pTooltip="Select one Custom Action that pre-defined by developers used for adding new record."></i>
+    </div>
+  </ng-container>
 </div>
-<div *ngIf="!_formConfig.useCustomForm">
-  <div *ngIf="_type === 'ADD' || !_formConfig.useAddingFormLayout">
-    <p-divider>Layout</p-divider>
-    <div class="flex">
-      <p-pickList
-        #pickList
-        class="flex-grow-1 mr-3"
-        [source]="sourceColumns"
-        [target]="targetColumns"
-        sourceHeader="Available Fields"
-        targetHeader="Form Fields"
-        [dragdrop]="true"
-        [responsive]="true"
-        [sourceStyle]="{ height: '32.1542rem' }"
-        [targetStyle]="{ height: '36.5714rem' }"
-        filterBy="key"
-        sourceFilterPlaceholder="Search by name"
-        [showTargetFilter]="false"
-        [showSourceControls]="false"
-        [showTargetControls]="false"
-        (onMoveToTarget)="onMoveToTarget($event)"
-        (onMoveToSource)="onMoveToSource($event)"
-        (onMoveAllToTarget)="onMoveToTarget($event)"
-        (onMoveAllToSource)="onMoveToSource($event)"
-        (onTargetSelect)="onTargetSelect($event)">
-        <ng-template pTemplate="targetHeader">
-          <div
-            class="p-picklist-title flex align-items-center justify-content-between">
-            <span>Form Fields</span>
-            <p-menu
-              #addNewMenu
-              [popup]="true"
-              [model]="addCustomControlModel"
-              appendTo="body"
-              styleClass="mt-2"
-              [style]="{ width: 'auto', minWidth: '12.5833rem' }"></p-menu>
-            <p-button
-              label="Add Custom Control"
-              styleClass="p-button-sm p-button-text"
-              (onClick)="addNewMenu.toggle($event)"></p-button>
-          </div>
-        </ng-template>
-        <ng-template let-column pTemplate="item">
-          <div *ngIf="!column.selected">
-            [{{ column.key }}]<span
-              class="text-red-500"
-              *ngIf="isRequired(column)"
-              >*</span
-            >
-          </div>
-          <app-form-designer-view
-            *ngIf="column.selected && !column.computedConfig"
-            layout="horizontal"
-            [config]="column"></app-form-designer-view>
 
-          <div
-            *ngIf="column.selected && column.computedConfig"
-            class="flex align-items-center py-2">
-            <label style="width: 40%">{{ column.props.label }}</label>
-            <p-tag severity="warning">Computed Field</p-tag>
-          </div>
-
-          <p-button
-            *ngIf="column.key.indexOf('CUSTOM_CONTROL_') === 0"
-            icon="pi pi-trash"
-            class="remove-btn"
-            styleClass="p-button-text p-button-rounded"
-            (onClick)="onRemoveCustomControl($event, column)"></p-button>
-        </ng-template>
-        <ng-template pTemplate="emptymessagetarget">
-          <div class="w-full relative">
-            <app-svg-drag></app-svg-drag>
-          </div>
-        </ng-template>
-      </p-pickList>
-      <div class="config-form p-picklist">
-        <div class="p-picklist-header">
-          <div class="p-picklist-title">Configuration Form</div>
-        </div>
-        <div class="p-picklist-list flex-grow-1">
-          <div *ngIf="this.model && this.model.key; else emptyMessage">
-            <app-form-designer-config
-              [dbColumns]="_dbColumns"
-              [config]="model"
-              (configChange)="configChange($event)"></app-form-designer-config>
-          </div>
-          <ng-template #emptyMessage>
-            <div class="pt-4">
-              Please select one row in <b>Form Fields</b> panel to configure.
+<ng-container *ngIf="_formConfig.enabled">
+  <div *ngIf="!_formConfig.useCustomForm">
+    <div *ngIf="_type === 'ADD' || !_formConfig.useAddingFormLayout">
+      <p-divider>Layout</p-divider>
+      <div class="flex">
+        <p-pickList
+          #pickList
+          class="flex-grow-1 mr-3"
+          [source]="sourceColumns"
+          [target]="targetColumns"
+          sourceHeader="Available Fields"
+          targetHeader="Form Fields"
+          [dragdrop]="true"
+          [responsive]="true"
+          [sourceStyle]="{ height: '32.1542rem' }"
+          [targetStyle]="{ height: '36.5714rem' }"
+          filterBy="key"
+          sourceFilterPlaceholder="Search by name"
+          [showTargetFilter]="false"
+          [showSourceControls]="false"
+          [showTargetControls]="false"
+          (onMoveToTarget)="onMoveToTarget($event)"
+          (onMoveToSource)="onMoveToSource($event)"
+          (onMoveAllToTarget)="onMoveToTarget($event)"
+          (onMoveAllToSource)="onMoveToSource($event)"
+          (onTargetSelect)="onTargetSelect($event)">
+          <ng-template pTemplate="targetHeader">
+            <div
+              class="p-picklist-title flex align-items-center justify-content-between">
+              <span>Form Fields</span>
+              <p-menu
+                #addNewMenu
+                [popup]="true"
+                [model]="addCustomControlModel"
+                appendTo="body"
+                styleClass="mt-2"
+                [style]="{ width: 'auto', minWidth: '12.5833rem' }"></p-menu>
+              <p-button
+                label="Add Custom Control"
+                styleClass="p-button-sm p-button-text"
+                (onClick)="addNewMenu.toggle($event)"></p-button>
             </div>
           </ng-template>
+          <ng-template let-column pTemplate="item">
+            <div *ngIf="!column.selected">
+              [{{ column.key }}]<span
+                class="text-red-500"
+                *ngIf="isRequired(column)"
+                >*</span
+              >
+            </div>
+            <app-form-designer-view
+              *ngIf="column.selected && !column.computedConfig"
+              layout="horizontal"
+              [config]="column"></app-form-designer-view>
+
+            <div
+              *ngIf="column.selected && column.computedConfig"
+              class="flex align-items-center py-2">
+              <label style="width: 40%">{{ column.props.label }}</label>
+              <p-tag severity="warning">Computed Field</p-tag>
+            </div>
+
+            <p-button
+              *ngIf="column.key.indexOf('CUSTOM_CONTROL_') === 0"
+              icon="pi pi-trash"
+              class="remove-btn"
+              styleClass="p-button-text p-button-rounded"
+              (onClick)="onRemoveCustomControl($event, column)"></p-button>
+          </ng-template>
+          <ng-template pTemplate="emptymessagetarget">
+            <div class="w-full relative">
+              <app-svg-drag></app-svg-drag>
+            </div>
+          </ng-template>
+        </p-pickList>
+        <div class="config-form p-picklist">
+          <div class="p-picklist-header">
+            <div class="p-picklist-title">Configuration Form</div>
+          </div>
+          <div class="p-picklist-list flex-grow-1">
+            <div *ngIf="this.model && this.model.key; else emptyMessage">
+              <app-form-designer-config
+                [dbColumns]="_dbColumns"
+                [config]="model"
+                (configChange)="
+                  configChange($event)
+                "></app-form-designer-config>
+            </div>
+            <ng-template #emptyMessage>
+              <div class="pt-4">
+                Please select one row in <b>Form Fields</b> panel to configure.
+              </div>
+            </ng-template>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- For ADD and UPDATE -->
-  <p-divider>
-    <p-button
-      [label]="_type === 'ADD' ? 'Query for Adding' : 'Query for Updating'"
-      [icon]="showQuery || queryTextRequired ? 'pi pi-minus' : 'pi pi-plus'"
-      styleClass="p-button-text p-button-sm"
-      (onClick)="showQuery = !showQuery || queryTextRequired"></p-button>
-  </p-divider>
-  <p *ngIf="showQuery || queryTextRequired" class="line-height-2 mb-1">
-    Enter your query text that will be run when
-    {{ _type === 'ADD' ? 'creating new data' : 'updating details' }}. This is
-    required if you use <b>custom query</b> as the Grid Datasource.
-  </p>
-  <ngx-monaco-editor
-    *ngIf="showQuery || queryTextRequired"
-    [formControl]="formControlQueryText"
-    [placeholder]="helperMessage"
-    [style]="{ height: '20rem' }"
-    class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
-    [options]="{}"></ngx-monaco-editor>
-  <!-- For ADD and UPDATE -->
-  <!-- For UPDATE -->
-  <!-- <div *ngIf="_type === 'UPDATE'">
+    <!-- For ADD and UPDATE -->
     <p-divider>
       <p-button
-        label="Query for Fetching details"
-        [icon]="showFetchQuery ? 'pi pi-minus' : 'pi pi-plus'"
+        [label]="_type === 'ADD' ? 'Query for Adding' : 'Query for Updating'"
+        [icon]="showQuery || queryTextRequired ? 'pi pi-minus' : 'pi pi-plus'"
         styleClass="p-button-text p-button-sm"
-        (onClick)="showFetchQuery = !showFetchQuery"></p-button>
+        (onClick)="showQuery = !showQuery || queryTextRequired"></p-button>
     </p-divider>
-    <p *ngIf="showFetchQuery" class="mb-1">
-      Enter your query text that will be run when fetching details for updating.
-      This is required if you use <b>custom query</b> as the Grid Datasource.
+    <p *ngIf="showQuery || queryTextRequired" class="line-height-2 mb-1">
+      Enter your query text that will be run when
+      {{ _type === 'ADD' ? 'creating new data' : 'updating details' }}. This is
+      required if you use <b>custom query</b> as the Grid Datasource.
     </p>
     <ngx-monaco-editor
-      *ngIf="showFetchQuery"
-      [(ngModel)]="_formConfig.fetchDetailQueryText"
+      *ngIf="showQuery || queryTextRequired"
+      [formControl]="formControlQueryText"
+      [placeholder]="helperMessage"
       [style]="{ height: '20rem' }"
       class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
       [options]="{}"></ngx-monaco-editor>
-  </div> -->
-  <!-- For UPDATE -->
-  <p-divider>
-    <p-button
-      label="Event Settings"
-      [icon]="showOnValidate ? 'pi pi-minus' : 'pi pi-plus'"
-      styleClass="p-button-text p-button-sm"
-      (onClick)="showOnValidate = !showOnValidate"></p-button>
-  </p-divider>
-  <app-event-config
-    *ngIf="showOnValidate"
-    [formControl]="formControlOnValidateConfig"></app-event-config>
-  <p class="mt-3"></p>
-  <app-event-config
-    *ngIf="showOnValidate"
-    labelName="On After Saved"
-    [formControl]="formControlOnAfterSavedConfig"></app-event-config>
-</div>
+    <!-- For ADD and UPDATE -->
+    <!-- For UPDATE -->
+    <!-- <div *ngIf="_type === 'UPDATE'">
+      <p-divider>
+        <p-button
+          label="Query for Fetching details"
+          [icon]="showFetchQuery ? 'pi pi-minus' : 'pi pi-plus'"
+          styleClass="p-button-text p-button-sm"
+          (onClick)="showFetchQuery = !showFetchQuery"></p-button>
+      </p-divider>
+      <p *ngIf="showFetchQuery" class="mb-1">
+        Enter your query text that will be run when fetching details for updating.
+        This is required if you use <b>custom query</b> as the Grid Datasource.
+      </p>
+      <ngx-monaco-editor
+        *ngIf="showFetchQuery"
+        [(ngModel)]="_formConfig.fetchDetailQueryText"
+        [style]="{ height: '20rem' }"
+        class="pt-3 border-round monaco-editor-wrapper overflow-hidden mb-2"
+        [options]="{}"></ngx-monaco-editor>
+    </div> -->
+    <!-- For UPDATE -->
+    <p-divider>
+      <p-button
+        label="Event Settings"
+        [icon]="showOnValidate ? 'pi pi-minus' : 'pi pi-plus'"
+        styleClass="p-button-text p-button-sm"
+        (onClick)="showOnValidate = !showOnValidate"></p-button>
+    </p-divider>
+    <app-event-config
+      *ngIf="showOnValidate"
+      [formControl]="formControlOnValidateConfig"></app-event-config>
+    <p class="mt-3"></p>
+    <app-event-config
+      *ngIf="showOnValidate"
+      labelName="On After Saved"
+      [formControl]="formControlOnAfterSavedConfig"></app-event-config>
+  </div>
+</ng-container>

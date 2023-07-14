@@ -82,9 +82,9 @@ export class TableComponent implements OnInit, OnDestroy {
   tableConfig: GridConfig = { dataKey: 'Id' };
   rowActions: GridActionOption[] = [];
   tableActions: GridActionOption[] = [];
-  allowAdd = false;
-  allowEdit = false;
-  allowDelete = false;
+  allowAdd: boolean | undefined = false;
+  allowEdit: boolean | undefined = false;
+  allowDelete: boolean | undefined = false;
   allowExport = false;
 
   firstLoadDone = false;
@@ -189,17 +189,15 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   setAllows() {
-    if (this.userService.USER.isAdmin) {
-      this.allowAdd = true;
-      this.allowEdit = true;
-      this.allowDelete = true;
-      this.allowExport = true;
-    } else {
-      this.allowAdd = this.getPermission('ADD_');
-      this.allowEdit = this.getPermission('EDIT_');
-      this.allowDelete = this.getPermission('DELETE_');
-      this.allowExport = this.getPermission('EXPORT_');
-    }
+    const isAdmin = this.userService.USER.isAdmin;
+    this.allowAdd =
+      this.tableConfig.allowAdding && (isAdmin || this.getPermission('ADD_'));
+    this.allowEdit =
+      this.tableConfig.allowEditing && (isAdmin || this.getPermission('EDIT_'));
+    this.allowDelete =
+      this.tableConfig.allowDeleting &&
+      (isAdmin || this.getPermission('DELETE_'));
+    this.allowExport = isAdmin || this.getPermission('EXPORT_');
   }
 
   setRowActions() {

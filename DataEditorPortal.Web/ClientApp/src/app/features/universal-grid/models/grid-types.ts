@@ -21,6 +21,9 @@ export interface GridConfig {
   customActions?: GridActionOption[];
   pageSize?: number;
   helpUrl?: string;
+  allowAdding?: boolean;
+  allowEditing?: boolean;
+  allowDeleting?: boolean;
 }
 
 export interface GridColumn {
