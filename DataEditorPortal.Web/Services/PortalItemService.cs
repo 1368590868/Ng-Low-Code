@@ -718,9 +718,14 @@ namespace DataEditorPortal.Web.Services
 
             RemoveGridCache(config.Name);
 
-            var linkedTableNames = _depDbContext.SiteMenus.Where(x => x.ParentId == siteMenu.Id).Select(x => x.Name).ToList();
-            if (linkedTableNames.Count > 0) _memoryCache.Remove($"grid.{linkedTableNames[0]}.linked.table.info");
-            if (linkedTableNames.Count > 1) _memoryCache.Remove($"grid.{linkedTableNames[1]}.linked.table.info");
+            var linkedTables = _depDbContext.SiteMenus.Where(x => x.ParentId == siteMenu.Id).ToList();
+            foreach (var linkedTable in linkedTables)
+            {
+                var dsConfig = GetDataSourceConfig(linkedTable.Id);
+                dsConfig.DataSourceConnectionName = config.DataSourceConnectionName;
+                SaveDataSourceConfig(linkedTable.Id, dsConfig);
+                _memoryCache.Remove($"grid.{linkedTable.Name}.linked.table.info");
+            }
 
             return true;
         }

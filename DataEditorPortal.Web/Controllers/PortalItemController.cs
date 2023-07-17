@@ -858,8 +858,17 @@ namespace DataEditorPortal.Web.Controllers
             var datasource = JsonSerializer.Deserialize<DataSourceConfig>(!string.IsNullOrEmpty(item.DataSourceConfig) ? item.DataSourceConfig : "{}");
             var columns = JsonSerializer.Deserialize<List<GridColConfig>>(!string.IsNullOrEmpty(item.ColumnsConfig) ? item.ColumnsConfig : "[]"); ;
 
-            var sqlText = _queryBuilder.GetSqlTextForDatabaseSource(datasource);
-            var fields = _portalItemService.GetDataSourceTableColumns(datasource.DataSourceConnectionName, sqlText);
+            var fields = new List<DataSourceTableColumn>();
+            try
+            {
+                var sqlText = _queryBuilder.GetSqlTextForDatabaseSource(datasource);
+                fields = _portalItemService.GetDataSourceTableColumns(datasource.DataSourceConnectionName, sqlText);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Failed to get database columns for linked single table " + siteMenu.Name + " due to DataSourceConnectionName changed.");
+                _logger.LogError(e, e.Message);
+            }
 
             return new
             {
