@@ -99,17 +99,6 @@ export class PortalEditLinkComponent
     );
     this.formControlConnection.valueChanges.subscribe(value => {
       this.dsConfig.dataSourceConnectionName = value;
-
-      if (this.dataSourceChanged()) {
-        this.confirmationService.confirm({
-          message:
-            'You are going to change the <b>Data Source</b>.<br><br>' +
-            'The column settings, search settings and form settings based on previous data source may not work any more, ' +
-            'the fields that do not exist will be removed, ' +
-            'and you need to review the settings before preview this portal item. <br> <br>' +
-            'Are you sure that you want to perform this action?'
-        });
-      }
     });
 
     this.portalItemService.saveCurrentStep('datasource');
@@ -301,11 +290,8 @@ export class PortalEditLinkComponent
   dataSourceChanged() {
     return (
       this.orginalConfig &&
-      (this.orginalConfig.queryText || this.orginalConfig.tableName) &&
-      (this.dsConfig.dataSourceConnectionName !=
-        this.orginalConfig.dataSourceConnectionName ||
-        this.dsConfig.queryText != this.orginalConfig.queryText ||
-        this.dsConfig.tableSchema != this.orginalConfig.tableSchema)
+      this.dsConfig.dataSourceConnectionName !=
+        this.orginalConfig.dataSourceConnectionName
     );
   }
 
@@ -379,6 +365,17 @@ export class PortalEditLinkComponent
       // db connection changed, need to clear configurations base on previous connection.
       this.dsConfig.queryText = undefined;
 
+      if (this.dataSourceChanged()) {
+        this.confirmationService.confirm({
+          message:
+            'You are going to change the <b>Database Connection</b>' +
+            'The linked table settings, primary and secondary settings based on previous' +
+            'database connection may not work any more, ' +
+            'You need to review the settings before preview this portal item.'
+        });
+        this.primaryTableConfig.details[0].configCompleted = false;
+        this.secondaryTableConfig.details[0].configCompleted = false;
+      }
       this.getDbTables();
     }
   }

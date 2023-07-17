@@ -56,9 +56,7 @@
               <td>
                 {{ primary.label }}
                 <i
-                  *ngIf="
-                    primary?.configCompleted === false || dataSourceChanged()
-                  "
+                  *ngIf="primary?.configCompleted === false"
                   class="pi pi-exclamation-circle ml-3 text-lg"
                   style="color: var(--yellow-600)"
                   pTooltip="You have't completed all configurations"></i>
@@ -69,7 +67,7 @@
                   type="button"
                   pButton
                   [label]="
-                    primary?.configCompleted === false || dataSourceChanged()
+                    primary?.configCompleted === false
                       ? 'Continue Editing'
                       : 'Edit'
                   "
@@ -138,9 +136,7 @@
               <td>
                 {{ secondary.label }}
                 <i
-                  *ngIf="
-                    secondary?.configCompleted === false || dataSourceChanged()
-                  "
+                  *ngIf="secondary?.configCompleted === false"
                   class="pi pi-exclamation-circle ml-3 text-lg"
                   style="color: var(--yellow-600)"
                   pTooltip="You have't completed all configurations"></i>
@@ -151,7 +147,7 @@
                   type="button"
                   pButton
                   [label]="
-                    secondary?.configCompleted === false || dataSourceChanged()
+                    secondary?.configCompleted === false
                       ? 'Continue Editing'
                       : 'Edit'
                   "
@@ -204,7 +200,6 @@
   <!-- Link Relation  -->
   <ng-container
     *ngIf="
-      !dataSourceChanged() &&
       primaryTableConfig?.details &&
       primaryTableConfig.details.length > 0 &&
       primaryTableConfig.details[0].configCompleted &&
