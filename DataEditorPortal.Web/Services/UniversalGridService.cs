@@ -128,14 +128,30 @@ namespace DataEditorPortal.Web.Services
             var detailConfig = JsonSerializer.Deserialize<DetailConfig>(config.DetailConfig);
             if (detailConfig != null)
             {
-                if (detailConfig.AddingForm != null && detailConfig.AddingForm.UseCustomForm)
-                    result.CustomAddFormName = detailConfig.AddingForm.CustomFormName;
-                if (detailConfig.UpdatingForm != null && detailConfig.UpdatingForm.UseCustomForm)
-                    result.CustomEditFormName = detailConfig.UpdatingForm.CustomFormName;
-                if (detailConfig.InfoForm != null && detailConfig.InfoForm.UseCustomForm)
-                    result.CustomViewFormName = detailConfig.InfoForm.CustomFormName;
-                if (detailConfig.DeletingForm != null && detailConfig.DeletingForm.UseCustomForm)
-                    result.CustomDeleteFormName = detailConfig.DeletingForm.CustomFormName;
+                if (detailConfig.AddingForm != null)
+                {
+                    result.AllowAdding = detailConfig.AddingForm.Enabled;
+                    if (detailConfig.AddingForm.UseCustomForm)
+                        result.CustomAddFormName = detailConfig.AddingForm.CustomFormName;
+                }
+                if (detailConfig.UpdatingForm != null)
+                {
+                    result.AllowEditing = detailConfig.UpdatingForm.Enabled;
+                    if (detailConfig.UpdatingForm.UseCustomForm)
+                        result.CustomEditFormName = detailConfig.UpdatingForm.CustomFormName;
+                }
+                //if (detailConfig.InfoForm != null)
+                //{
+                //    result.AllowAdding = detailConfig.InfoForm.Enabled;
+                //    if (detailConfig.InfoForm.UseCustomForm)
+                //        result.CustomViewFormName = detailConfig.InfoForm.CustomFormName;
+                //}
+                if (detailConfig.DeletingForm != null)
+                {
+                    result.AllowDeleting = detailConfig.DeletingForm.Enabled;
+                    if (detailConfig.DeletingForm.UseCustomForm)
+                        result.CustomDeleteFormName = detailConfig.DeletingForm.CustomFormName;
+                }
             }
 
             _mapper.Map(detailConfig, result);
