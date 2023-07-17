@@ -56,7 +56,9 @@
               <td>
                 {{ primary.label }}
                 <i
-                  *ngIf="primary?.configCompleted === false"
+                  *ngIf="
+                    primary?.configCompleted === false || dataSourceChanged()
+                  "
                   class="pi pi-exclamation-circle ml-3 text-lg"
                   style="color: var(--yellow-600)"
                   pTooltip="You have't completed all configurations"></i>
@@ -67,7 +69,7 @@
                   type="button"
                   pButton
                   [label]="
-                    primary?.configCompleted === false
+                    primary?.configCompleted === false || dataSourceChanged()
                       ? 'Continue Editing'
                       : 'Edit'
                   "
@@ -136,7 +138,9 @@
               <td>
                 {{ secondary.label }}
                 <i
-                  *ngIf="secondary?.configCompleted === false"
+                  *ngIf="
+                    secondary?.configCompleted === false || dataSourceChanged()
+                  "
                   class="pi pi-exclamation-circle ml-3 text-lg"
                   style="color: var(--yellow-600)"
                   pTooltip="You have't completed all configurations"></i>
@@ -147,7 +151,7 @@
                   type="button"
                   pButton
                   [label]="
-                    secondary?.configCompleted === false
+                    secondary?.configCompleted === false || dataSourceChanged()
                       ? 'Continue Editing'
                       : 'Edit'
                   "
@@ -200,6 +204,7 @@
   <!-- Link Relation  -->
   <ng-container
     *ngIf="
+      !dataSourceChanged() &&
       primaryTableConfig?.details &&
       primaryTableConfig.details.length > 0 &&
       primaryTableConfig.details[0].configCompleted &&
@@ -382,3 +387,10 @@
 </p-card>
 
 <app-custom-actions #customActions></app-custom-actions>
+
+<p-confirmDialog
+  header="Confirmation"
+  icon="pi pi-exclamation-triangle"
+  rejectButtonStyleClass="p-button-text"
+  [acceptVisible]="false"
+  [style]="{ maxWidth: '40rem' }"></p-confirmDialog>

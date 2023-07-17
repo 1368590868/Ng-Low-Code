@@ -15,10 +15,12 @@ import {
 import { FormControl, NgModel } from '@angular/forms';
 import { AdvancedQueryModel } from '..';
 import { CustomActionsComponent } from '../..';
+import { ConfirmationService } from 'primeng/api';
 @Component({
   selector: 'app-portal-edit-link',
   templateUrl: './portal-edit-link.component.html',
-  styleUrls: ['./portal-edit-link.component.scss']
+  styleUrls: ['./portal-edit-link.component.scss'],
+  providers: [ConfirmationService]
 })
 export class PortalEditLinkComponent
   extends PortalEditStepDirective
@@ -44,6 +46,7 @@ export class PortalEditLinkComponent
   secondarySelected: string[] = [];
   primarySelected: string[] = [];
 
+  orginalConfig?: DataSourceConfig;
   dbConnections: { label: string; value: string }[] = [];
   dsConfig: DataSourceConfig = {
     dataSourceConnectionName: '',
@@ -74,7 +77,8 @@ export class PortalEditLinkComponent
     private portalItemService: PortalItemService,
     private router: Router,
     private route: ActivatedRoute,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private confirmationService: ConfirmationService
   ) {
     super();
   }
@@ -93,9 +97,20 @@ export class PortalEditLinkComponent
     this.formControlIdColumn.valueChanges.subscribe(
       value => (this.dsConfig.idColumn = value)
     );
-    this.formControlConnection.valueChanges.subscribe(
-      value => (this.dsConfig.dataSourceConnectionName = value)
-    );
+    this.formControlConnection.valueChanges.subscribe(value => {
+      this.dsConfig.dataSourceConnectionName = value;
+
+      if (this.dataSourceChanged()) {
+        this.confirmationService.confirm({
+          message:
+            'You are going to change the <b>Data Source</b>.<br><br>' +
+            'The column settings, search settings and form settings based on previous data source may not work any more, ' +
+            'the fields that do not exist will be removed, ' +
+            'and you need to review the settings before preview this portal item. <br> <br>' +
+            'Are you sure that you want to perform this action?'
+        });
+      }
+    });
 
     this.portalItemService.saveCurrentStep('datasource');
     this.portalItemService
@@ -161,6 +176,7 @@ export class PortalEditLinkComponent
 
           if (data?.linkTable) {
             this.dsConfig = data.linkTable;
+            this.orginalConfig = { ...data.linkTable };
           }
 
           // load database tables
@@ -280,6 +296,17 @@ export class PortalEditLinkComponent
         this.clearStatus();
       });
     }
+  }
+
+  dataSourceChanged() {
+    return (
+      this.orginalConfig &&
+      (this.orginalConfig.queryText || this.orginalConfig.tableName) &&
+      (this.dsConfig.dataSourceConnectionName !=
+        this.orginalConfig.dataSourceConnectionName ||
+        this.dsConfig.queryText != this.orginalConfig.queryText ||
+        this.dsConfig.tableSchema != this.orginalConfig.tableSchema)
+    );
   }
 
   onSaveAndExit() {
