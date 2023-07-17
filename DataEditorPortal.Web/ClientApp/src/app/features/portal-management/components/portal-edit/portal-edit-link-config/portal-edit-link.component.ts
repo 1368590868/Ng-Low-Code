@@ -368,10 +368,11 @@ export class PortalEditLinkComponent
       if (this.dataSourceChanged()) {
         this.confirmationService.confirm({
           message:
-            'You are going to change the <b>Database Connection</b>' +
-            'The linked table settings, primary and secondary settings based on previous' +
+            'You are going to change the <b>Database Connection</b>.<br><br>' +
+            'The linked table settings, primary and secondary settings based on previous , ' +
             'database connection may not work any more, ' +
-            'You need to review the settings before preview this portal item.'
+            'you need to review the settings before preview this portal item. <br> <br>' +
+            'Are you sure that you want to perform this action?'
         });
         this.primaryTableConfig.details[0].configCompleted = false;
         this.secondaryTableConfig.details[0].configCompleted = false;
