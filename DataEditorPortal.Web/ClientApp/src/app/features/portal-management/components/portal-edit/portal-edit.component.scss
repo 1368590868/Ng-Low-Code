@@ -8,18 +8,20 @@
   .layout-content {
     min-height: calc(100vh - 7rem);
     @include flex-column-grow-1;
-
-    ::ng-deep {
-      router-outlet + * {
-        @include flex-column-grow-1;
-        p-card {
+    .loading-wrap {
+      @include flex-column-grow-1;
+      ::ng-deep {
+        router-outlet + * {
           @include flex-column-grow-1;
-          .p-card {
+          p-card {
             @include flex-column-grow-1;
-            .p-card-body {
+            .p-card {
               @include flex-column-grow-1;
-              .p-card-footer {
-                margin-top: auto;
+              .p-card-body {
+                @include flex-column-grow-1;
+                .p-card-footer {
+                  margin-top: auto;
+                }
               }
             }
           }

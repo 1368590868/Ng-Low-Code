@@ -15,10 +15,12 @@ import {
 import { FormControl, NgModel } from '@angular/forms';
 import { AdvancedQueryModel } from '..';
 import { CustomActionsComponent } from '../..';
+import { ConfirmationService } from 'primeng/api';
 @Component({
   selector: 'app-portal-edit-link',
   templateUrl: './portal-edit-link.component.html',
-  styleUrls: ['./portal-edit-link.component.scss']
+  styleUrls: ['./portal-edit-link.component.scss'],
+  providers: [ConfirmationService]
 })
 export class PortalEditLinkComponent
   extends PortalEditStepDirective
@@ -44,6 +46,7 @@ export class PortalEditLinkComponent
   secondarySelected: string[] = [];
   primarySelected: string[] = [];
 
+  orginalConfig?: DataSourceConfig;
   dbConnections: { label: string; value: string }[] = [];
   dsConfig: DataSourceConfig = {
     dataSourceConnectionName: '',
@@ -74,7 +77,8 @@ export class PortalEditLinkComponent
     private portalItemService: PortalItemService,
     private router: Router,
     private route: ActivatedRoute,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private confirmationService: ConfirmationService
   ) {
     super();
   }
@@ -93,9 +97,9 @@ export class PortalEditLinkComponent
     this.formControlIdColumn.valueChanges.subscribe(
       value => (this.dsConfig.idColumn = value)
     );
-    this.formControlConnection.valueChanges.subscribe(
-      value => (this.dsConfig.dataSourceConnectionName = value)
-    );
+    this.formControlConnection.valueChanges.subscribe(value => {
+      this.dsConfig.dataSourceConnectionName = value;
+    });
 
     this.portalItemService.saveCurrentStep('datasource');
     this.portalItemService
@@ -161,6 +165,7 @@ export class PortalEditLinkComponent
 
           if (data?.linkTable) {
             this.dsConfig = data.linkTable;
+            this.orginalConfig = { ...data.linkTable };
           }
 
           // load database tables
@@ -282,6 +287,14 @@ export class PortalEditLinkComponent
     }
   }
 
+  dataSourceChanged() {
+    return (
+      this.orginalConfig &&
+      this.dsConfig.dataSourceConnectionName !=
+        this.orginalConfig.dataSourceConnectionName
+    );
+  }
+
   onSaveAndExit() {
     if (!this.validate()) return;
     this.isSavingAndExit = true;
@@ -352,6 +365,18 @@ export class PortalEditLinkComponent
       // db connection changed, need to clear configurations base on previous connection.
       this.dsConfig.queryText = undefined;
 
+      if (this.dataSourceChanged()) {
+        this.confirmationService.confirm({
+          message:
+            'You are going to change the <b>Database Connection</b>.<br><br>' +
+            'The linked table settings, primary and secondary settings based on previous , ' +
+            'database connection may not work any more, ' +
+            'you need to review the settings before preview this portal item. <br> <br>' +
+            'Are you sure that you want to perform this action?'
+        });
+        this.primaryTableConfig.details[0].configCompleted = false;
+        this.secondaryTableConfig.details[0].configCompleted = false;
+      }
       this.getDbTables();
     }
   }

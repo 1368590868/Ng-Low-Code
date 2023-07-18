@@ -62,7 +62,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
                     ...res,
                     {
                       id: '<new_role>',
-                      roleName: '...',
+                      roleName: '<New Role>',
                       roleDescription: ''
                     }
                   ];
