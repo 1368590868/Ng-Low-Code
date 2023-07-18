@@ -5,7 +5,6 @@ const currentDate = new Date().toLocaleDateString();
 const beforeTodayValidator = () => {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = new Date(control.value).toLocaleDateString();
-    console.log(value, currentDate);
     if (value != null && value < currentDate) {
       return null;
     }
@@ -16,7 +15,6 @@ const beforeTodayValidator = () => {
 const afterTodayValidator = () => {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = new Date(control.value).toLocaleDateString();
-    console.log(value, currentDate);
     if (value != null && value > currentDate) {
       return null;
     }
@@ -27,7 +25,6 @@ const afterTodayValidator = () => {
 const beforeIsTodayValidator = () => {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = new Date(control.value).toLocaleDateString();
-    console.log(value, currentDate);
     if (value != null && value <= currentDate) {
       return null;
     }
@@ -38,7 +35,6 @@ const beforeIsTodayValidator = () => {
 const afterIsTodayValidator = () => {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = new Date(control.value).toLocaleDateString();
-    console.log(value, currentDate);
     if (value != null && value >= currentDate) {
       return null;
     }

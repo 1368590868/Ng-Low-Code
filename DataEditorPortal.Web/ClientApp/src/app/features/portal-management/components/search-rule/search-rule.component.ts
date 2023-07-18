@@ -124,7 +124,6 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
       });
   }
   onFormControlFieldBlur() {
-    console.log('test');
     const val = this.formControlField.value;
     if (!val) {
       this.formControlField.setValue(this.field);
