@@ -43,7 +43,6 @@ export class ManageRoleActionComponent extends GridActionDirective {
 
               const role = this.roleList.find(x => this.roleId == x.id);
               if (role) {
-                console.log(role);
                 this.setFormValue(role);
               }
             },

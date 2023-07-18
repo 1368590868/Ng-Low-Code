@@ -94,7 +94,6 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
         this.innerValue.splice(removeIds, 1);
       });
     }
-    console.log(this.innerValue);
     this.onChange(this.innerValue);
   }
 
