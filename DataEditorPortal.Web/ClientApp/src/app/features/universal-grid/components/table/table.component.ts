@@ -142,10 +142,14 @@ export class TableComponent implements OnInit, OnDestroy {
     this.gridTableService.searchClicked$
       .pipe(
         tap(model => {
-          this.searchModel = model;
-          this.first = 0;
-          this.rows = this.tableConfig.pageSize || 100;
-          this.fetchData();
+          if (model) {
+            this.searchModel = model;
+            this.first = 0;
+            this.rows = this.tableConfig.pageSize || 100;
+            this.fetchData();
+          } else {
+            this.resetAndClear();
+          }
         }),
         takeUntil(this.destroy$)
       )
@@ -381,6 +385,21 @@ export class TableComponent implements OnInit, OnDestroy {
     this.table.reset();
     this.table.saveState();
     this.fetchData();
+  }
+
+  resetAndClear() {
+    this.reset();
+
+    this.searchModel = undefined;
+    this.first = 0;
+    this.rows = this.tableConfig.pageSize || 100;
+    this.fetchDataParam = this.getFetchParam();
+    this.records = [];
+    this.totalRecords = 0;
+    this.firstLoadDone = false;
+
+    this.table.reset();
+    this.table.saveState();
   }
 
   reset() {
