@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
+import { RouterModule, Routes } from '@angular/router';
 
 import { FormlyModule } from '@ngx-formly/core';
 
@@ -25,6 +26,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { TabViewModule } from 'primeng/tabview';
 import { EditorModule } from 'primeng/editor';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 import {
   HeaderComponent,
@@ -43,11 +45,30 @@ import {
   SystemLogDialogComponent,
   DbConnectionComponent
 } from './components';
+import { GroupLayoutComponent } from './layout/group-layout.component';
+import { FolderLayoutComponent } from './layout/folder-layout.component';
 
-import { SharedModule } from 'src/app/shared';
-import { ProgressBarModule } from 'primeng/progressbar';
+import {
+  AdminPermissionGuard,
+  AuthRouterGuard,
+  SharedModule
+} from 'src/app/shared';
 
 export * from './components';
+
+export const routes: Routes = [
+  { path: '', component: TileComponent, canActivate: [AuthRouterGuard] },
+  {
+    path: 'about',
+    component: AboutComponent
+  },
+  {
+    path: 'contact',
+    component: ContactComponent
+  },
+  { path: 'login', component: LoginComponent },
+  { path: '**', component: ErrorPageComponent, canActivate: [AuthRouterGuard] }
+];
 
 @NgModule({
   declarations: [
@@ -65,15 +86,17 @@ export * from './components';
     AddConnectionDialogComponent,
     SystemLogComponent,
     SystemLogDialogComponent,
-    DbConnectionComponent
+    DbConnectionComponent,
+    GroupLayoutComponent,
+    FolderLayoutComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     HttpClientModule,
     ReactiveFormsModule,
     FormlyModule,
-
     SharedModule,
     ButtonModule,
     ToastModule,

@@ -1,13 +1,12 @@
 <div
   class="flex justify-content-center pt-8 bg-gray-300"
   [style]="{
-    minHeight:
-      homeMenus.length > 0 ? 'calc(100% - 7rem)' : 'calc(100% - 4.25rem)'
+    minHeight: menus.length > 0 ? 'calc(100% - 7rem)' : 'calc(100% - 4.25rem)'
   }">
   <div
     class="w-10 flex align-content-start flex-wrap"
-    *ngIf="homeMenus.length > 0; else emptyMessage">
-    <ng-container *ngFor="let menu of homeMenus">
+    *ngIf="menus.length > 0; else emptyMessage">
+    <ng-container *ngFor="let menu of menus">
       <div
         *ngIf="menu.routerLink"
         class="tile-block bg-white m-3 p-2 flex flex-column align-items-center cursor-pointer shadow-2"
@@ -36,7 +35,7 @@
   </div>
   <ng-template #emptyMessage>
     <div
-      *ngIf="loading"
+      *ngIf="!loading"
       class="flex flex-column justify-content-center align-items-center">
       <!-- <h3 class="text-8xl">No Pages</h3> -->
       <span class="text-5xl text-center"

@@ -15,18 +15,17 @@ import { UserService } from 'src/app/shared';
 export class PermissionRouterGuard implements CanActivate {
   constructor(private userService: UserService, private router: Router) {}
   canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
+    route: ActivatedRouteSnapshot
   ):
     | Observable<boolean | UrlTree>
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
     if (!this.userService.USER.isAdmin) {
-      if (route.params['name']) {
+      if (route.data['name']) {
         const routerParam =
-          'VIEW_' + route.params['name'].toUpperCase().replace(/-/g, '_');
-        if (!this.userService.USER.permissions![routerParam]) {
+          'VIEW_' + route.data['name'].toUpperCase().replace(/-/g, '_');
+        if (!this.userService.USER.permissions?.[routerParam]) {
           this.router.navigate(['error-page'], {
             queryParams: { code: '401' }
           });

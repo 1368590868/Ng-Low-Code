@@ -5,15 +5,8 @@ import { PermissionRouterGuard } from './permission-router.guard';
 
 const routes: Routes = [
   {
-    path: 'single/:name',
+    path: '',
     component: SplitAreaComponent,
-    data: { type: 'single' },
-    canActivate: [PermissionRouterGuard]
-  },
-  {
-    path: 'linked/:name',
-    component: SplitAreaComponent,
-    data: { type: 'linked' },
     canActivate: [PermissionRouterGuard]
   }
 ];
