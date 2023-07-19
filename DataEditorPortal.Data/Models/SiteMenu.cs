@@ -30,6 +30,12 @@ namespace DataEditorPortal.Data.Models
         public int Order { get; set; }
         [Column("STATUS")]
         public PortalItemStatus Status { get; set; }
+        [Column("COMPONENT")]
+        public string Component { get; set; }
+        [Column("REQUIRE_AUTH")]
+        public bool RequireAuth { get; set; }
+        [Column("REQUIRE_ADMIN")]
+        public bool RequireAdmin { get; set; }
 
         [XmlIgnore]
         public SiteMenu Parent { get; set; }

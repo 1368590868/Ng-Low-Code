@@ -78,6 +78,7 @@ namespace DataEditorPortal.Web.Controllers
             if (!user.Disabled)
             {
                 user.Permissions = _userService.GetUserPermissions();
+                user.UserMenus = _userService.GetUserMenus(user.Username);
             }
             user.IsAdmin = _userService.IsAdmin(user.Username);
 

@@ -63,53 +63,55 @@ namespace DataEditorPortal.Web.Controllers
         [Route("list")]
         public IEnumerable<PortalItem> List()
         {
-            var query = from m in _depDbContext.SiteMenus
-                        join p in _depDbContext.UniversalGridConfigurations on m.Name equals p.Name into mps
-                        from mp in mps.DefaultIfEmpty()
-                        where m.Type != "Sub Portal Item"
-                        select new
-                        {
-                            menu = m,
-                            configCompleted = mp != null ? mp.ConfigCompleted : (bool?)null,
-                            itemType = mp != null ? mp.ItemType : null
-                        };
-
-            var menus = query.ToList();
-
-            var root = menus
-                .Where(x => x.menu.ParentId == null)
-                .OrderBy(x => x.menu.Order)
-                .ThenBy(x => x.menu.Name)
+            var menus = (
+                    from m in _depDbContext.SiteMenus
+                    join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name into us
+                    from u in us.DefaultIfEmpty()
+                    where m.Type != "Sub Portal Item"
+                    select new { m, configCompleted = u != null ? u.ConfigCompleted : (bool?)null, itemType = u != null ? u.ItemType : null }
+                )
+                .ToList()
                 .Select(x =>
                 {
-                    var children = menus
-                            .Where(m => m.menu.ParentId == x.menu.Id)
-                            .OrderBy(x => x.menu.Order)
-                            .ThenBy(x => x.menu.Name)
-                            .Select(m =>
-                            {
-                                var item = new PortalItem()
-                                {
-                                    Data = _mapper.Map<PortalItemData>(m.menu)
-                                };
-                                item.Data.ConfigCompleted = m.configCompleted;
-                                item.Data.ItemType = m.itemType;
-                                return item;
-                            })
-                            .ToList();
-
                     var item = new PortalItem()
                     {
-                        Data = _mapper.Map<PortalItemData>(x.menu),
-                        Children = children.Any() ? children : null
+                        Data = _mapper.Map<PortalItemData>(x.m)
                     };
                     item.Data.ConfigCompleted = x.configCompleted;
                     item.Data.ItemType = x.itemType;
                     return item;
-                });
+                }).ToList();
 
-            return root;
+            var menuItems = menus
+                .Where(m => m.Data.ParentId == null)
+                .Select(m =>
+                {
+                    m.Children = GetChildrenItems(menus, m.Data.Id);
+                    return m;
+                })
+                .OrderBy(m => m.Data.Order)
+                .ThenBy(m => m.Data.Name)
+                .ToList();
+
+            return menuItems;
         }
+
+        private List<PortalItem> GetChildrenItems(IEnumerable<PortalItem> menus, Guid? parentId)
+        {
+            var menuItems = menus
+                    .Where(m => m.Data.ParentId == parentId)
+                    .Select(m =>
+                    {
+                        m.Children = GetChildrenItems(menus, m.Data.Id);
+                        return m;
+                    })
+                    .OrderBy(m => m.Data.Order)
+                    .ThenBy(m => m.Data.Name)
+                    .ToList();
+
+            return menuItems.Any() ? menuItems : null;
+        }
+
 
         [HttpGet]
         [Route("name-exists")]
@@ -134,9 +136,6 @@ namespace DataEditorPortal.Web.Controllers
         public Guid CreateMenuItem([FromBody] PortalItemData model)
         {
             model.Name = _portalItemService.GetCodeName(model.Label);
-
-            if (model.Type == "Folder")
-                model.ParentId = null;
 
             model.Order = _depDbContext.SiteMenus
                     .Where(x => x.ParentId == model.ParentId)
@@ -179,8 +178,6 @@ namespace DataEditorPortal.Web.Controllers
             }
 
             model.Type = siteMenu.Type;
-            if (model.Type == "Folder")
-                model.ParentId = null;
 
             if (siteMenu.ParentId != model.ParentId)
             {
