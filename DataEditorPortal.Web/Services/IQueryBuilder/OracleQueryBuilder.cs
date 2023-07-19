@@ -293,15 +293,16 @@ namespace DataEditorPortal.Web.Services
         /// Sql to get all tables from database, the first column should be table name and second column should be table schema.
         /// </summary>
         /// <returns></returns>
-        public string GetSqlTextForDatabaseTables()
+        public string GetSqlTextForDatabaseTables(bool useSchemaRule, bool useTableNameRule)
         {
-            return $@"
-                SELECT TABLE_NAME AS TableName, OWNER AS TableSchema FROM all_tables 
-                WHERE OWNER NOT IN (
-                    'SYS', 'SYSTEM', 'OUTLN', 'DBSFWUSER', 'CTXSYS', 'HR', 'OJVMSYS', 'DVSYS', 'AUDSYS', 'MDSYS', 'OLAPSYS',
-                    'DBSNMP', 'APPQOSSYS', 'GSMADMIN_INTERNAL', 'XDB', 'LBACSYS', 'WMSYS', 'ORDSYS', 'ORDDATA'
-                ) AND TABLE_NAME <> '__EFMigrationsHistory'
-            ";
+            var sql = $@"SELECT TABLE_NAME AS TableName, OWNER AS TableSchema FROM all_tables WHERE TABLE_NAME != '__EFMigrationsHistory'";
+
+            if (useSchemaRule)
+                sql += $" AND OWNER IN {ParameterPrefix}{ParameterName("SCHEMAS")}";
+            if (useTableNameRule)
+                sql += $" AND REGEXP_LIKE(TABLE_NAME, {ParameterPrefix}{ParameterName("TABLE_NAME_RULE")})";
+
+            return sql;
         }
 
         public string GetSqlTextForDatabaseSource(DataSourceConfig config)

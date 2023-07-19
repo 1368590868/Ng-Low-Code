@@ -296,11 +296,34 @@ namespace DataEditorPortal.Web.Services
                 {
                     con.ConnectionString = dsConnection.ConnectionString;
 
-                    var sql = _queryBuilder.GetSqlTextForDatabaseTables();
+                    #region prepair sql and parameters
+
+                    var useSchemaRule = false;
+                    var useTableNameRule = false;
+                    var paramDic = new Dictionary<string, object>() { };
+                    if (!string.IsNullOrEmpty(dsConnection.IncludeSchemas))
+                    {
+                        var schemas = dsConnection.IncludeSchemas.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                        if (schemas.Any())
+                        {
+                            useSchemaRule = true;
+                            paramDic.Add("SCHEMAS", schemas);
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(dsConnection.TableNameRule))
+                    {
+                        useTableNameRule = true;
+                        paramDic.Add("TABLE_NAME_RULE", dsConnection.TableNameRule);
+                    }
+
+                    var param = _queryBuilder.GenerateDynamicParameter(paramDic);
+                    var sql = _queryBuilder.GetSqlTextForDatabaseTables(useSchemaRule, useTableNameRule);
+
+                    #endregion
 
                     try
                     {
-                        result = con.Query<DataSourceTable>(sql).ToList();
+                        result = con.Query<DataSourceTable>(sql, param).ToList();
                     }
                     catch (Exception ex)
                     {

@@ -106,6 +106,14 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("CONNECTION_STRING");
 
+                    b.Property<string>("IncludeSchemas")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("INCLUDE_SCHEMAS");
+
+                    b.Property<string>("TableNameRule")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("TABLE_NAME_RULE");
+
                     b.HasKey("Name");
 
                     b.ToTable("DATA_SOURCE_CONNECTIONS");

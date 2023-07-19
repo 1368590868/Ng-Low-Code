@@ -40,7 +40,7 @@ namespace DataEditorPortal.Web.Services
         string GenerateSqlTextForColumnFilterOption(DataSourceConfig config);
 
         // database
-        string GetSqlTextForDatabaseTables();
+        string GetSqlTextForDatabaseTables(bool useSchemaRule, bool useTableNameRule);
         string GetSqlTextForDatabaseSource(DataSourceConfig config);
 
         // for lookup

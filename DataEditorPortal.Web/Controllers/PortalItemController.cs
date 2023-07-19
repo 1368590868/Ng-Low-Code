@@ -554,7 +554,15 @@ namespace DataEditorPortal.Web.Controllers
 
             ValidateConnectionString(connectionStr);
 
-            _depDbContext.DataSourceConnections.Add(new DataSourceConnection() { Name = model.Name, ConnectionString = connectionStr });
+            _depDbContext.DataSourceConnections.Add(
+                new DataSourceConnection()
+                {
+                    Name = model.Name,
+                    ConnectionString = connectionStr,
+                    TableNameRule = model.TableNameRule,
+                    IncludeSchemas = model.IncludeSchemas
+                }
+            );
             _depDbContext.SaveChanges();
 
             return model.Name;
@@ -600,6 +608,9 @@ namespace DataEditorPortal.Web.Controllers
             ValidateConnectionString(connectionStr);
 
             item.ConnectionString = connectionStr;
+            item.TableNameRule = model.TableNameRule;
+            item.IncludeSchemas = model.IncludeSchemas;
+
             _depDbContext.SaveChanges();
 
             return model.Name;
