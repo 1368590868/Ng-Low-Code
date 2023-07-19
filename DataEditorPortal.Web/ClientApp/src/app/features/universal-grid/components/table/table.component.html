@@ -114,6 +114,7 @@
             [pSortableColumn]="col.field"
             [style.width]="col.width + 'px !important'"
             [style.max-width]="col.width + 'px !important'"
+            [style.text-align]="'center'"
             [pSortableColumnDisabled]="!col.sortable">
             <span style="vertical-align: middle">{{ col.header }}</span>
             <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
@@ -188,7 +189,8 @@
             *ngFor="let col of columns"
             [title]="
               col.filterType !== 'attachments' ? data[col.field] || '' : ''
-            ">
+            "
+            [style.text-align]="'center'">
             <ng-container
               *ngIf="!col.template"
               [ngTemplateOutlet]="
