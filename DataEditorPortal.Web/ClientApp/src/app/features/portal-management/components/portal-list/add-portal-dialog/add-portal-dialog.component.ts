@@ -9,6 +9,7 @@ import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { NotifyService } from 'src/app/shared';
 import { PortalItemService } from '../../../services/portal-item.service';
+import { PortalItem } from '../../../models/portal-item';
 
 @Component({
   selector: 'app-add-portal-dialog',
@@ -101,19 +102,25 @@ export class AddPortalDialogComponent {
               onInit: field => {
                 this.portalItemService.getPortalList().subscribe(res => {
                   if (field.props) {
-                    const options: any = res;
-                    const newOptions = this.getFolders(options, 1);
-                    newOptions.splice(0, 0, {
-                      label: 'Root',
-                      value: '<root>'
-                    });
+                    const options = this.getFolders(res, 1);
+                    if (this.model['type'] !== 'External') {
+                      options.splice(0, 0, {
+                        label: 'Root',
+                        value: '<root>'
+                      });
+                    }
 
-                    field.props.options = newOptions;
-
-                    // reset the dropdown value, if the options come after the model value, dropdown may has no options selected
-                    if (this.model && !this.model['parentId'])
-                      this.model = { ...this.model, parentId: '<root>' };
-                    else this.model = { ...this.model };
+                    const findItem = options.find(
+                      (x: any) => x.value === this.model['parentId']
+                    );
+                    if (!findItem) {
+                      this.model = {
+                        ...this.model,
+                        parentId: options[0].value
+                      };
+                    }
+                    field.props.options = options;
+                    this.options.detectChanges?.(field);
                   }
                 });
               }
@@ -154,9 +161,9 @@ export class AddPortalDialogComponent {
     this.editForm.onSubmit(new Event('submit'));
   }
 
-  getFolders(data: [], level: number) {
+  getFolders(data: PortalItem[], level: number) {
     let folders: any = [];
-    data.forEach((x: any) => {
+    data.forEach(x => {
       if (
         x.data?.['type'] === 'Folder' &&
         x.data?.['id'] !== this.model['id']

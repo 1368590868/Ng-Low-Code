@@ -31,6 +31,17 @@ export class PortalListComponent implements OnInit {
     },
 
     {
+      label: 'Create External Link',
+      icon: 'pi pi-fw pi-external-link',
+      command: () => {
+        this.addDialog.header = 'Create External Link';
+        this.addDialog.okText = 'Create';
+        this.addDialog.model = { type: 'External' };
+        this.addDialog.showDialog();
+      }
+    },
+
+    {
       label: 'Create Table Page',
       icon: 'pi pi-fw pi-desktop',
       command: () => {
