@@ -59,7 +59,6 @@ export class UrlParamsService {
     if (Object.keys(urlParams).length > 0 && urlParams['a']) {
       if (urlParams['p']) urlParams['p'] = qs.parse(urlParams['p'] as string);
       const payload = urlParams['p'] as any;
-      console.log(payload);
       return {
         action: <string>urlParams['a'],
         name: <string>urlParams['n'],

@@ -86,7 +86,6 @@ export class ImportDialogComponent {
   }
 
   onRowCheckBoxClick(event: MouseEvent) {
-    console.log(event);
     event.stopPropagation();
   }
 
