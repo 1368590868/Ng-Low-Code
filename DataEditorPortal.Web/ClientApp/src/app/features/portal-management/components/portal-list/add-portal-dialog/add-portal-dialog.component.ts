@@ -99,31 +99,10 @@ export class AddPortalDialogComponent {
             },
             hooks: {
               onInit: field => {
-                const getFolders = (data: [], level: number) => {
-                  let folders: any = [];
-                  data.forEach((x: any) => {
-                    if (
-                      x.data?.['type'] === 'Folder' &&
-                      x.data?.['id'] !== this.model['id']
-                    ) {
-                      const arr = {
-                        label: `${'-'.repeat(level)} ${x.data?.['label']}`,
-                        value: x.data?.['id']
-                      };
-                      folders.push(arr);
-                      if (x.children) {
-                        folders = folders.concat(
-                          getFolders(x.children, level + 1)
-                        );
-                      }
-                    }
-                  });
-                  return folders;
-                };
                 this.portalItemService.getPortalList().subscribe(res => {
                   if (field.props) {
                     const options: any = res;
-                    const newOptions = getFolders(options, 1);
+                    const newOptions = this.getFolders(options, 1);
                     newOptions.splice(0, 0, {
                       label: 'Root',
                       value: '<root>'
@@ -173,6 +152,26 @@ export class AddPortalDialogComponent {
 
   onOk() {
     this.editForm.onSubmit(new Event('submit'));
+  }
+
+  getFolders(data: [], level: number) {
+    let folders: any = [];
+    data.forEach((x: any) => {
+      if (
+        x.data?.['type'] === 'Folder' &&
+        x.data?.['id'] !== this.model['id']
+      ) {
+        const arr = {
+          label: `${'—'.repeat(level)}  ${x.data?.['label']}`,
+          value: x.data?.['id']
+        };
+        folders.push(arr);
+        if (x.children) {
+          folders = folders.concat(this.getFolders(x.children, level + 1));
+        }
+      }
+    });
+    return folders;
   }
 
   onFormSubmit(model: { [name: string]: unknown }) {
