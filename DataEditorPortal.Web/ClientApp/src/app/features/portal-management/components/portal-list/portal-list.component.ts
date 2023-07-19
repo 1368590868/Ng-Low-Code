@@ -172,15 +172,11 @@ export class PortalListComponent implements OnInit {
       });
 
       items.push({
-        separator: true
-      });
-
-      items.push({
-        label: 'Create Folder',
+        label: 'New Folder',
         icon: 'pi pi-fw pi-folder',
         command: () => {
-          this.addDialog.header = 'Create Folder';
-          this.addDialog.okText = 'Create Folder';
+          this.addDialog.header = 'New Folder';
+          this.addDialog.okText = 'New Folder';
           this.addDialog.model = {
             type: 'Folder',
             parentId: row['id'] ?? '<root>'
@@ -188,6 +184,11 @@ export class PortalListComponent implements OnInit {
           this.addDialog.showDialog();
         }
       });
+
+      items.push({
+        separator: true
+      });
+
       items.push({
         label: row['parentId'] == null ? 'Edit Group' : 'Edit Folder',
         icon: 'pi pi-fw pi-pencil',
