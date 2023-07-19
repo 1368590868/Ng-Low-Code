@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { skip, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
-import { PortalItemData } from '../../../models/portal-item';
+import { PortalItem, PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 
@@ -130,15 +130,19 @@ export class PortalEditBasicComponent
         onInit: field => {
           this.portalItemService.getPortalList().subscribe(res => {
             if (field.props) {
-              const options: any = res;
-              const newOptions = this.getFolders(options, 1);
+              const options = this.getFolders(res, 1);
 
-              field.props.options = newOptions;
-
-              // reset the dropdown value, if the options come after the model value, dropdown may has no options selected
-              if (this.model && !this.model['parentId'])
-                this.model = { ...this.model, parentId: '<root>' };
-              else this.model = { ...this.model };
+              const findItem = options.find(
+                (x: any) => x.value === this.model['parentId']
+              );
+              if (!findItem) {
+                this.model = {
+                  ...this.model,
+                  parentId: options[0].value
+                };
+              }
+              field.props.options = options;
+              this.options.detectChanges?.(field);
             }
           });
         }
@@ -202,7 +206,6 @@ export class PortalEditBasicComponent
     // load basic information
     if (this.itemId) {
       this.portalItemService.getPortalDetails(this.itemId).subscribe(res => {
-        if (!res['parentId']) res['parentId'] = '<root>';
         this.model = res;
 
         // enable buttons after data loaded.
@@ -219,7 +222,7 @@ export class PortalEditBasicComponent
     }
   }
 
-  getFolders(data: [], level: number) {
+  getFolders(data: PortalItem[], level: number) {
     let folders: any = [];
     data.forEach((x: any) => {
       if (
