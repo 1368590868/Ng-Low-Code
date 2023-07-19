@@ -1,16 +1,24 @@
 <div class="flex align-items-start flex-column overflow-hidden">
   <ng-container *ngIf="showAll">
-    <a
-      class="no-underline cursor-pointer text-primary flex flex-shrink-0 overflow-hidden text-overflow-ellipsis max-w-full"
-      *ngFor="let file of fileList"
-      href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
-        fieldName
-      }}/{{ file.fileId }}/{{ file.fileName || '' }}"
-      pTooltip="{{ file.comments || '' }}"
-      tooltipPosition="bottom"
-      target="_blank"
-      >{{ file.fileName }}</a
-    >
+    <table class="p-datatable-table attachment-table">
+      <tbody class="p-datatable-tbody">
+        <tr *ngFor="let file of fileList" style="background-color: #fff">
+          <td style="width: 30%">
+            <a
+              class="no-underline cursor-pointer text-primary flex flex-shrink-0 overflow-hidden text-overflow-ellipsis max-w-full"
+              href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
+                fieldName
+              }}/{{ file.fileId }}/{{ file.fileName || '' }}"
+              target="_blank"
+              >{{ file.fileName }}</a
+            >
+          </td>
+          <td style="width: 70%">
+            {{ file.comments }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </ng-container>
   <ng-container *ngIf="!showAll && fileList.length === 1">
     <a
