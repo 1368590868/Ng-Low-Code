@@ -11,9 +11,13 @@ export class TileComponent implements OnDestroy {
   loading = true;
   destroy$ = new Subject();
   get menus() {
-    return this.configDataService.menusInGroup
+    return this.flattenMenus(this.configDataService.menusInGroup);
+  }
+
+  private flattenMenus(menus: any[]): any[] {
+    return menus
       .map(menu => {
-        return menu.items ? menu.items : menu;
+        return menu.items ? this.flattenMenus(menu.items) : menu;
       })
       .flat()
       .filter(x => x.type !== 'Folder')
