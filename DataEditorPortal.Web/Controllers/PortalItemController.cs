@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -38,6 +39,7 @@ namespace DataEditorPortal.Web.Controllers
         private readonly IQueryBuilder _queryBuilder;
         private readonly IServiceProvider _serviceProvider;
         private readonly IHostEnvironment _hostEnvironment;
+        private readonly IMemoryCache _memoryCache;
 
         public PortalItemController(
             ILogger<PortalItemController> logger,
@@ -47,7 +49,8 @@ namespace DataEditorPortal.Web.Controllers
             IPortalItemService portalItemService,
             IQueryBuilder queryBuilder,
             IServiceProvider serviceProvider,
-            IHostEnvironment hostEnvironment)
+            IHostEnvironment hostEnvironment,
+            IMemoryCache memoryCache)
         {
             _logger = logger;
             _depDbContext = depDbContext;
@@ -57,6 +60,7 @@ namespace DataEditorPortal.Web.Controllers
             _queryBuilder = queryBuilder;
             _serviceProvider = serviceProvider;
             _hostEnvironment = hostEnvironment;
+            _memoryCache = memoryCache;
         }
 
         [HttpGet]
@@ -496,7 +500,9 @@ namespace DataEditorPortal.Web.Controllers
                     {
                         Name = x.ds.Name,
                         ConnectionString = Regex.Replace(x.ds.ConnectionString, pattern, replacement, RegexOptions.IgnoreCase),
-                        UsedCount = x.uCount + x.lCount
+                        UsedCount = x.uCount + x.lCount,
+                        IncludeSchemas = x.ds.IncludeSchemas,
+                        TableNameRule = x.ds.TableNameRule
                     };
 
                     if (type == "SqlConnection")
@@ -612,6 +618,8 @@ namespace DataEditorPortal.Web.Controllers
             item.IncludeSchemas = model.IncludeSchemas;
 
             _depDbContext.SaveChanges();
+
+            _memoryCache.Remove($"datasource_{name}_tables");
 
             return model.Name;
         }

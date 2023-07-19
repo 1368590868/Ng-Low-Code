@@ -295,12 +295,20 @@ namespace DataEditorPortal.Web.Services
         /// <returns></returns>
         public string GetSqlTextForDatabaseTables(bool useSchemaRule, bool useTableNameRule)
         {
-            var sql = $@"SELECT TABLE_NAME AS TableName, OWNER AS TableSchema FROM all_tables WHERE TABLE_NAME != '__EFMigrationsHistory'";
+            var sql = $@"
+                SELECT * FROM 
+                (
+                    SELECT TABLE_NAME AS TableName, OWNER AS TableSchema FROM all_tables
+                    UNION
+                    SELECT VIEW_NAME AS TableName, OWNER AS TableSchema FROM all_views
+                )
+                WHERE TableName != '__EFMigrationsHistory'
+            ";
 
             if (useSchemaRule)
-                sql += $" AND OWNER IN {ParameterPrefix}{ParameterName("SCHEMAS")}";
+                sql += $" AND TableSchema IN {ParameterPrefix}{ParameterName("SCHEMAS")}";
             if (useTableNameRule)
-                sql += $" AND REGEXP_LIKE(TABLE_NAME, {ParameterPrefix}{ParameterName("TABLE_NAME_RULE")})";
+                sql += $" AND REGEXP_LIKE(TableName, {ParameterPrefix}{ParameterName("TABLE_NAME_RULE")})";
 
             return sql;
         }
