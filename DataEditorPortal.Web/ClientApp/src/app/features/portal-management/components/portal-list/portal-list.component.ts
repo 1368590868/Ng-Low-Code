@@ -29,16 +29,7 @@ export class PortalListComponent implements OnInit {
         this.addDialog.showDialog();
       }
     },
-    {
-      label: 'Create External Link',
-      icon: 'pi pi-fw pi-external-link',
-      command: () => {
-        this.addDialog.header = 'Create External Link';
-        this.addDialog.okText = 'Create';
-        this.addDialog.model = { type: 'External', parentId: '<root>' };
-        this.addDialog.showDialog();
-      }
-    },
+
     {
       label: 'Create Table Page',
       icon: 'pi pi-fw pi-desktop',
@@ -198,21 +189,16 @@ export class PortalListComponent implements OnInit {
         }
       });
       items.push({
-        label:
-          row['type'] === 'Folder' && row['parentId'] == null
-            ? 'Edit Group'
-            : 'Edit Folder',
+        label: row['parentId'] == null ? 'Edit Group' : 'Edit Folder',
         icon: 'pi pi-fw pi-pencil',
         command: () => {
           // edit folder
           this.addDialog.header =
-            row['type'] === 'Folder' && row['parentId'] == null
+            row['parentId'] == null
               ? 'Update Group details'
               : 'Update Folder details';
           this.addDialog.okText =
-            row['type'] === 'Folder' && row['parentId'] == null
-              ? 'Update Group'
-              : 'Update Folder';
+            row['parentId'] == null ? 'Update Group' : 'Update Folder';
           this.addDialog.model = {
             ...row,
             parentId: row['parentId'] ?? '<root>'
