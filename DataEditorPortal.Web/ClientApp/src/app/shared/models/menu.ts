@@ -11,4 +11,5 @@ export interface SiteMenu extends MenuItem {
   requireAuth?: boolean;
   requireAdmin?: boolean;
   items?: SiteMenu[];
+  parentId?: string;
 }
