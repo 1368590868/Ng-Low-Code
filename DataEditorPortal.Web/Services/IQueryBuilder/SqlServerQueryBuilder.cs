@@ -9,6 +9,8 @@ namespace DataEditorPortal.Web.Services
 {
     public class SqlServerQueryBuilder : QueryBuilder, IQueryBuilder
     {
+        public SqlServerQueryBuilder(IUtcLocalConverter dateTimeValueConverter) : base(dateTimeValueConverter) { }
+
         protected override string ParameterPrefix => "@";
 
         #region Ultilities

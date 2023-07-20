@@ -12,6 +12,8 @@ namespace DataEditorPortal.Web.Services
 {
     public class OracleQueryBuilder : QueryBuilder, IQueryBuilder
     {
+        public OracleQueryBuilder(IUtcLocalConverter dateTimeValueConverter) : base(dateTimeValueConverter) { }
+
         protected override string ParameterPrefix => ":";
 
         #region Ultilities
@@ -164,7 +166,7 @@ namespace DataEditorPortal.Web.Services
                     return temp.ToString();
                 }
             }
-            return value;
+            return base.TransformValue(value, schema);
         }
 
         private bool TryParseHexToGuid(string text, out Guid guid)

@@ -6,7 +6,7 @@ namespace DataEditorPortal.Data.Contexts
 {
     public class DepDbContextSqlServer : DepDbContext
     {
-        public DepDbContextSqlServer(DbContextOptions<DepDbContext> options) : base(options)
+        public DepDbContextSqlServer(DbContextOptions<DepDbContext> options, IUtcLocalConverter utcLocalConverter) : base(options, utcLocalConverter)
         {
         }
 

@@ -1,4 +1,5 @@
 using Cuture.AspNetCore.ResponseAutoWrapper;
+using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Common.Install;
@@ -108,6 +109,7 @@ namespace DataEditorPortal.Web
                 else
                     throw new NotImplementedException();
             });
+            services.AddSingleton<IUtcLocalConverter, UtcLocalConverter>();
 
             services.AddScoped<IUniversalGridService, UniversalGridService>();
             services.AddScoped<IPortalItemService, PortalItemService>();
@@ -146,7 +148,7 @@ namespace DataEditorPortal.Web
                 options.HandleAuthorizationResult = true;
                 options.RewriteStatusCode = null;
             })
-                .ConfigureWrappers(builder =>
+            .ConfigureWrappers(builder =>
             {
                 builder.AddWrapper<DepExceptionWrapper, IExceptionWrapper<GenericApiResponse<int, string, object>, int, string>>();
                 builder.AddWrapper<DepNotOKStatusCodeWrapper, INotOKStatusCodeWrapper<GenericApiResponse<int, string, object>, int, string>>();
