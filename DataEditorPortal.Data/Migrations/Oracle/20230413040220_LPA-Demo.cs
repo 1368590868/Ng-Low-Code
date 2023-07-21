@@ -8,25 +8,25 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "GFORM_SITE_HIERARCHY_MV",
+                name: "DEMO_LINK_LOOKUP",
                 schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
-                    HIERARCHY_GLOBALID = table.Column<string>(type: "NVARCHAR2(450)", nullable: false),
-                    DOT_OPERATOR_NAME = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    SITETYPE = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    SITENAME = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    DIVISION_NAME = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    AREA_NAME = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    LOCATION = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true)
+                    LOOKUPID = table.Column<string>(type: "NVARCHAR2(450)", nullable: false),
+                    NAME1 = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    NAME2 = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    NAME3 = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    NAME4 = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    NAME5 = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    NAME6 = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GFORM_SITE_HIERARCHY_MV", x => x.HIERARCHY_GLOBALID);
+                    table.PrimaryKey("PK_GFORM_SITE_HIERARCHY_MV", x => x.LOOKUPID);
                 });
 
             migrationBuilder.CreateTable(
-                name: "LPAREMEDIATIONACTSITE",
+                name: "DEMO_LINK_SECONDARY",
                 schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
@@ -42,11 +42,11 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     FEATUREGLOBALID = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     STATUS = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     TYPE = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    LPAACTIVITYSTATUS = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    STATUS1 = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     COMMENTS = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     ASSIGNEDTO = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    REMEDIATIONPROPOSEDDATE = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true),
-                    REMEDIATIONACTUALDATE = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true)
+                    DATETIME3 = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true),
+                    DATETIME4 = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -54,7 +54,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                 });
 
             migrationBuilder.CreateTable(
-                name: "LPASITE",
+                name: "DEMO_LINK_PRIMARY",
                 schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
@@ -69,16 +69,16 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     BOUNDARYGLOBALID = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     FEATUREGLOBALID = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     STATUS = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    LPANAME = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    NAME = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     TYPE = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    LPASTATUS = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    STATUS1 = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     COMMENTS = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    DISCOVERYDATE = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true),
-                    D40CRITERIA = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    DATETIME1 = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true),
+                    CRITERIA = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     ASSESSEDBY = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    REQREMEDIATIONDATE = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true),
-                    REMEDIATIONPROPOSEDDATE = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true),
-                    REMEDIATIONACTUALDATE = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true)
+                    DATETIME2 = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true),
+                    DATETIME3 = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true),
+                    DATETIME4 = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -86,7 +86,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                 });
 
             migrationBuilder.CreateTable(
-                name: "LPASITE_RELATION",
+                name: "DEMO_LINK_RELATION",
                 schema: Data.Common.Constants.DEFAULT_SCHEMA,
                 columns: table => new
                 {
@@ -104,19 +104,19 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "GFORM_SITE_HIERARCHY_MV",
+                name: "DEMO_LINK_LOOKUP",
                 schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
-                name: "LPAREMEDIATIONACTSITE",
+                name: "DEMO_LINK_SECONDARY",
                 schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
-                name: "LPASITE",
+                name: "DEMO_LINK_PRIMARY",
                 schema: Data.Common.Constants.DEFAULT_SCHEMA);
 
             migrationBuilder.DropTable(
-                name: "LPASITE_RELATION",
+                name: "DEMO_LINK_RELATION",
                 schema: Data.Common.Constants.DEFAULT_SCHEMA);
         }
     }

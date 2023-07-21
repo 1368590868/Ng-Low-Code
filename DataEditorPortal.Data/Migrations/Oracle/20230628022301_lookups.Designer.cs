@@ -206,35 +206,35 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.ToTable("EVENT_LOGS");
                 });
 
-            modelBuilder.Entity("DataEditorPortal.Data.Models.GFORM_SITE_HIERARCHY_MV", b =>
+            modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_LOOKUP", b =>
                 {
-                    b.Property<string>("HIERARCHY_GLOBALID")
+                    b.Property<string>("LOOKUPID")
                         .HasColumnType("NVARCHAR2(450)");
 
-                    b.Property<string>("AREA_NAME")
+                    b.Property<string>("NAME5")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<string>("DIVISION_NAME")
+                    b.Property<string>("NAME4")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<string>("DOT_OPERATOR_NAME")
+                    b.Property<string>("NAME1")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<string>("LOCATION")
+                    b.Property<string>("NAME6")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<string>("SITENAME")
+                    b.Property<string>("NAME3")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<string>("SITETYPE")
+                    b.Property<string>("NAME2")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.HasKey("HIERARCHY_GLOBALID");
+                    b.HasKey("LOOKUPID");
 
-                    b.ToTable("GFORM_SITE_HIERARCHY_MV");
+                    b.ToTable("DEMO_LINK_LOOKUP");
                 });
 
-            modelBuilder.Entity("DataEditorPortal.Data.Models.LPAREMEDIATIONACTSITE", b =>
+            modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_SECONDARY", b =>
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
@@ -273,13 +273,13 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.Property<string>("LASTUSER")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<string>("LPAACTIVITYSTATUS")
+                    b.Property<string>("STATUS1")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<DateTime?>("REMEDIATIONACTUALDATE")
+                    b.Property<DateTime?>("DATETIME4")
                         .HasColumnType("TIMESTAMP(7)");
 
-                    b.Property<DateTime?>("REMEDIATIONPROPOSEDDATE")
+                    b.Property<DateTime?>("DATETIME3")
                         .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<string>("STATUS")
@@ -290,10 +290,10 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("LPAREMEDIATIONACTSITE");
+                    b.ToTable("DEMO_LINK_SECONDARY");
                 });
 
-            modelBuilder.Entity("DataEditorPortal.Data.Models.LPASITE", b =>
+            modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_PRIMARY", b =>
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
@@ -314,7 +314,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.Property<string>("CREATIONUSER")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<string>("D40CRITERIA")
+                    b.Property<string>("CRITERIA")
                         .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<DateTime?>("DATECREATED")
@@ -323,7 +323,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.Property<DateTime?>("DATEMODIFIED")
                         .HasColumnType("TIMESTAMP(7)");
 
-                    b.Property<DateTime?>("DISCOVERYDATE")
+                    b.Property<DateTime?>("DATETIME1")
                         .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<string>("EVENTID")
@@ -338,19 +338,19 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.Property<string>("LASTUSER")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<string>("LPANAME")
+                    b.Property<string>("NAME")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<string>("LPASTATUS")
+                    b.Property<string>("STATUS1")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<DateTime?>("REMEDIATIONACTUALDATE")
+                    b.Property<DateTime?>("DATETIME4")
                         .HasColumnType("TIMESTAMP(7)");
 
-                    b.Property<DateTime?>("REMEDIATIONPROPOSEDDATE")
+                    b.Property<DateTime?>("DATETIME3")
                         .HasColumnType("TIMESTAMP(7)");
 
-                    b.Property<DateTime?>("REQREMEDIATIONDATE")
+                    b.Property<DateTime?>("DATETIME2")
                         .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<string>("STATUS")
@@ -361,10 +361,10 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("LPASITE");
+                    b.ToTable("DEMO_LINK_PRIMARY");
                 });
 
-            modelBuilder.Entity("DataEditorPortal.Data.Models.LPASITE_RELATION", b =>
+            modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_RELATION", b =>
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
@@ -381,7 +381,7 @@ namespace DataEditorPortal.Data.Migrations.Oracle
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("LPASITE_RELATION");
+                    b.ToTable("DEMO_LINK_RELATION");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.Lookup", b =>

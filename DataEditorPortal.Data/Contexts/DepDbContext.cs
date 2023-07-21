@@ -33,12 +33,10 @@ namespace DataEditorPortal.Data.Contexts
         public virtual DbSet<DataImportHistory> DataImportHistories { get; set; }
 
         public virtual DbSet<DemoTable> DemoTables { get; set; }
-
-        // LPA Demo
-        public virtual DbSet<LPASITE> LPASITE { get; set; }
-        public virtual DbSet<LPAREMEDIATIONACTSITE> LPAREMEDIATIONACTSITE { get; set; }
-        public virtual DbSet<LPASITE_RELATION> LPASITE_RELATION { get; set; }
-        public virtual DbSet<GFORM_SITE_HIERARCHY_MV> GFORM_SITE_HIERARCHY_MV { get; set; }
+        public virtual DbSet<DEMO_LINK_PRIMARY> DEMO_LINK_PRIMARY { get; set; }
+        public virtual DbSet<DEMO_LINK_SECONDARY> DEMO_LINK_SECONDARY { get; set; }
+        public virtual DbSet<DEMO_LINK_RELATION> DEMO_LINK_RELATION { get; set; }
+        public virtual DbSet<DEMO_LINK_LOOKUP> DEMO_LINK_LOOKUP { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
