@@ -131,6 +131,11 @@ export class PortalEditBasicComponent
           this.portalItemService.getPortalList().subscribe(res => {
             if (field.props) {
               const options = this.getFolders(res, 1);
+              options.splice(0, 0, {
+                label: 'Root',
+                value: '<root>',
+                disabled: true
+              });
 
               const findItem = options.find(
                 (x: any) => x.value === this.model['parentId']
@@ -138,7 +143,7 @@ export class PortalEditBasicComponent
               if (!findItem) {
                 this.model = {
                   ...this.model,
-                  parentId: options[0].value
+                  parentId: options[1].value
                 };
               }
               field.props.options = options;

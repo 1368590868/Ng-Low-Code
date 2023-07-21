@@ -103,12 +103,12 @@ export class AddPortalDialogComponent {
                 this.portalItemService.getPortalList().subscribe(res => {
                   if (field.props) {
                     const options = this.getFolders(res, 1);
-                    if (this.model['type'] !== 'External') {
-                      options.splice(0, 0, {
-                        label: 'Root',
-                        value: '<root>'
-                      });
-                    }
+
+                    options.splice(0, 0, {
+                      label: 'Root',
+                      value: '<root>',
+                      disabled: this.model['type'] === 'External'
+                    });
 
                     const findItem = options.find(
                       (x: any) => x.value === this.model['parentId']
@@ -116,7 +116,9 @@ export class AddPortalDialogComponent {
                     if (!findItem) {
                       this.model = {
                         ...this.model,
-                        parentId: options[0].value
+                        parentId:
+                          options[this.model['type'] === 'External' ? 1 : 0]
+                            .value
                       };
                     }
                     field.props.options = options;
