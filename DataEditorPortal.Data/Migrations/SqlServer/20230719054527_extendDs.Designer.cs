@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    [Migration("20230718090644_extendMenu")]
-    partial class extendMenu
+    [Migration("20230719054527_extendDs")]
+    partial class extendDs
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema(Data.Common.Constants.DEFAULT_SCHEMA)
+                .HasDefaultSchema(Common.Constants.DEFAULT_SCHEMA)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -107,6 +107,14 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("ConnectionString")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("CONNECTION_STRING");
+
+                    b.Property<string>("IncludeSchemas")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("INCLUDE_SCHEMAS");
+
+                    b.Property<string>("TableNameRule")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("TABLE_NAME_RULE");
 
                     b.HasKey("Name");
 
@@ -437,10 +445,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("ID");
 
-                    b.Property<string>("Component")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("COMPONENT");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DESCRIPTION");
@@ -472,14 +476,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("PARENT_ID");
-
-                    b.Property<bool>("RequireAdmin")
-                        .HasColumnType("bit")
-                        .HasColumnName("REQUIRE_ADMIN");
-
-                    b.Property<bool>("RequireAuth")
-                        .HasColumnType("bit")
-                        .HasColumnName("REQUIRE_AUTH");
 
                     b.Property<int>("Status")
                         .HasColumnType("int")

@@ -102,6 +102,30 @@ export class AddConnectionDialogComponent {
         label: 'Database Name',
         required: true
       }
+    },
+    {
+      wrappers: ['divider'],
+      props: {
+        label: 'Other Configurations'
+      }
+    },
+    {
+      key: 'includeSchemas',
+      type: 'input',
+      props: {
+        label: 'Schema Filter',
+        description:
+          'Apply a filter to the query by specifying the schemas here, separated by commas.'
+      }
+    },
+    {
+      key: 'tableNameRule',
+      type: 'input',
+      props: {
+        label: 'Table Name Filter',
+        description:
+          'Enter a regular expression to filter table names based on their pattern. Only tables whose names match the provided regular expression will be included in the query results.'
+      }
     }
   ];
 
@@ -157,7 +181,6 @@ export class AddConnectionDialogComponent {
         }
       }
     });
-
     if (this.isEdit) {
       this.backup.password = new Date().valueOf().toString();
       this.model.password = this.backup.password;

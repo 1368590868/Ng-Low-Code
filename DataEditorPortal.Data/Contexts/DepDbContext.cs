@@ -1,12 +1,16 @@
-﻿using DataEditorPortal.Data.Models;
+﻿using DataEditorPortal.Data.Common;
+using DataEditorPortal.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace DataEditorPortal.Data.Contexts
 {
     public class DepDbContext : DbContext
     {
-        public DepDbContext(DbContextOptions<DepDbContext> options) : base(options)
+        private readonly IUtcLocalConverter _utcLocalConverter;
+        public DepDbContext(DbContextOptions<DepDbContext> options, IUtcLocalConverter utcLocalConverter) : base(options)
         {
+            _utcLocalConverter = utcLocalConverter;
         }
 
         public virtual DbSet<SiteSetting> SiteSettings { get; set; }
@@ -35,5 +39,30 @@ namespace DataEditorPortal.Data.Contexts
         public virtual DbSet<LPAREMEDIATIONACTSITE> LPAREMEDIATIONACTSITE { get; set; }
         public virtual DbSet<LPASITE_RELATION> LPASITE_RELATION { get; set; }
         public virtual DbSet<GFORM_SITE_HIERARCHY_MV> GFORM_SITE_HIERARCHY_MV { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (entityType.IsKeyless)
+                {
+                    continue;
+                }
+
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime))
+                    {
+                        property.SetValueConverter(_utcLocalConverter.Converter);
+                    }
+                    else if (property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetValueConverter(_utcLocalConverter.NullableConverter);
+                    }
+                }
+            }
+        }
     }
 }

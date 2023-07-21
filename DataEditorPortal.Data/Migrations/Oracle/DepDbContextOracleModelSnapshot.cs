@@ -106,6 +106,14 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("CONNECTION_STRING");
 
+                    b.Property<string>("IncludeSchemas")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("INCLUDE_SCHEMAS");
+
+                    b.Property<string>("TableNameRule")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("TABLE_NAME_RULE");
+
                     b.HasKey("Name");
 
                     b.ToTable("DATA_SOURCE_CONNECTIONS");
@@ -441,6 +449,10 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
+                    b.Property<string>("Component")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("COMPONENT");
+
                     b.Property<string>("Description")
                         .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("DESCRIPTION");
@@ -472,6 +484,14 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("RAW(16)")
                         .HasColumnName("PARENT_ID");
+
+                    b.Property<bool>("RequireAdmin")
+                        .HasColumnType("NUMBER(1)")
+                        .HasColumnName("REQUIRE_ADMIN");
+
+                    b.Property<bool>("RequireAuth")
+                        .HasColumnType("NUMBER(1)")
+                        .HasColumnName("REQUIRE_AUTH");
 
                     b.Property<int>("Status")
                         .HasColumnType("NUMBER(10)")

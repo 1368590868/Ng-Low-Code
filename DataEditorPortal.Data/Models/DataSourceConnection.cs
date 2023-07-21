@@ -13,7 +13,10 @@ namespace DataEditorPortal.Data.Models
         public string Name { get; set; }
         [Column("CONNECTION_STRING")]
         public string ConnectionString { get; set; }
-
+        [Column("INCLUDE_SCHEMAS")]
+        public string IncludeSchemas { get; set; }
+        [Column("TABLE_NAME_RULE")]
+        public string TableNameRule { get; set; }
         [XmlIgnore]
         public virtual ICollection<UniversalGridConfiguration> UniversalGridConfigurations { get; set; }
     }

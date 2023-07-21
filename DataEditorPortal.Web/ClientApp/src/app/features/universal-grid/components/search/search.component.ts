@@ -114,6 +114,6 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   onClear() {
     this.options.resetModel?.();
-    this.gridTableService.searchClicked$.next(this.model);
+    this.gridTableService.searchClicked$.next(undefined);
   }
 }
