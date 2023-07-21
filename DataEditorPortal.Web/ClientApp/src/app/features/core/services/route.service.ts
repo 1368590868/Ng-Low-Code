@@ -49,25 +49,7 @@ export class RouteService {
   buildPortalItemRoutes(menus: SiteMenu[], level = 1) {
     return menus
       .map(menu => {
-        let route: Route = {};
-        switch (level) {
-          case 1:
-            route = {
-              path: menu.name,
-              data: { group: { ...menu, items: undefined } },
-              component: GroupLayoutComponent,
-              children: [{ path: '', component: TileComponent }]
-            };
-            break;
-          case 2:
-            route = this.generateRoute(menu);
-            break;
-          case 3:
-            route = this.generateRoute(menu);
-            break;
-          default:
-            break;
-        }
+        const route = this.generateRoute(menu);
         if (menu.items && menu.items.length > 0) {
           route.children = [
             ...(route.children || []),
@@ -82,7 +64,14 @@ export class RouteService {
   }
 
   generateRoute(menu: SiteMenu): Route {
-    if (menu.type === 'Portal Item') {
+    if (!menu.parentId) {
+      return {
+        path: menu.name,
+        data: { group: { ...menu, items: undefined } },
+        component: GroupLayoutComponent,
+        children: [{ path: '', component: TileComponent }]
+      };
+    } else if (menu.type === 'Portal Item') {
       return {
         path: menu.name,
         loadChildren: () =>

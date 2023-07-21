@@ -3,7 +3,7 @@
     <div class="logo-wrapper flex justify-content-center align-items-center">
       <img class="logo" [src]="configDataService.siteSettings.siteLogo" />
     </div>
-    <div class="title-desc">
+    <div class="title-desc text-xl font-bold mb-1">
       {{ this.siteName || configDataService.siteSettings.siteName }}
     </div>
     <p-menubar [model]="items" class="page-link"></p-menubar>
