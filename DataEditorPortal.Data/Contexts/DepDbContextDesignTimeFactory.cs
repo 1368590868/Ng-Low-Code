@@ -1,3 +1,4 @@
+using DataEditorPortal.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -18,7 +19,7 @@ namespace DataEditorPortal.Data.Contexts
             var connection = @"Data Source=192.168.1.241;Initial Catalog=DataEditorPortal;Uid=sa;Pwd=123456;MultipleActiveResultSets=true;Enlist=true;Pooling=true;Max Pool Size=1024;Min Pool Size=0;";
             optionsBuilder.UseSqlServer(connection);
 
-            return new DepDbContextSqlServer(optionsBuilder.Options);
+            return new DepDbContextSqlServer(optionsBuilder.Options, new UtcLocalConverter(null));
         }
     }
 
@@ -37,7 +38,7 @@ namespace DataEditorPortal.Data.Contexts
             var connection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.246)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=dep.lan)));User ID=system;Password=123456";
             optionsBuilder.UseOracle(connection, b => b.UseOracleSQLCompatibility("11"));
 
-            return new DepDbContextOracle(optionsBuilder.Options);
+            return new DepDbContextOracle(optionsBuilder.Options, new UtcLocalConverter(null));
         }
     }
 }

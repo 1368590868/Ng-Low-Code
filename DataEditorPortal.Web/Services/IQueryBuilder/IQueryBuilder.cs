@@ -1,4 +1,5 @@
-﻿using DataEditorPortal.Web.Common;
+﻿using DataEditorPortal.Data.Common;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace DataEditorPortal.Web.Services
         string GenerateSqlTextForColumnFilterOption(DataSourceConfig config);
 
         // database
-        string GetSqlTextForDatabaseTables();
+        string GetSqlTextForDatabaseTables(bool useSchemaRule, bool useTableNameRule);
         string GetSqlTextForDatabaseSource(DataSourceConfig config);
 
         // for lookup
@@ -49,6 +50,12 @@ namespace DataEditorPortal.Web.Services
 
     public abstract class QueryBuilder
     {
+        protected readonly IUtcLocalConverter _utcLocalConverter;
+        public QueryBuilder(IUtcLocalConverter dateTimeValueConverter)
+        {
+            _utcLocalConverter = dateTimeValueConverter;
+        }
+
         protected abstract string ParameterPrefix { get; }
 
         #region Ultilities
@@ -227,11 +234,14 @@ namespace DataEditorPortal.Web.Services
             else if (jsonElement.ValueKind == JsonValueKind.False) return 0;
             else if (jsonElement.ValueKind == JsonValueKind.String)
             {
-                var formats = new string[] { "yyyy-MM-ddTHH:mm:ss.FFFFFFFK", "", "" };
-                DateTime date;
-                if (DateTime.TryParseExact(jsonElement.GetString(), formats, null, System.Globalization.DateTimeStyles.None, out date))
+                if (Regex.IsMatch(jsonElement.GetString(), @"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$"))
                 {
-                    return date;
+                    var formats = new string[] { "yyyy-MM-ddTHH:mm:ss.FFFFFFFK", "", "" };
+                    DateTime date;
+                    if (DateTime.TryParseExact(jsonElement.GetString(), formats, null, System.Globalization.DateTimeStyles.None, out date))
+                    {
+                        return _utcLocalConverter.Converter.ConvertToProvider.Invoke(date);
+                    }
                 }
                 return jsonElement.GetString();
             }
@@ -247,6 +257,15 @@ namespace DataEditorPortal.Web.Services
 
         public virtual object TransformValue(object value, DataRow schema)
         {
+            if (value == null || value == DBNull.Value) return value;
+
+            var type = value.GetType();
+
+            if (type == typeof(DateTime))
+            {
+                return _utcLocalConverter.Converter.ConvertFromProvider(value);
+            }
+
             return value;
         }
 

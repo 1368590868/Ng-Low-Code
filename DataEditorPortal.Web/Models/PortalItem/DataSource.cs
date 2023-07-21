@@ -27,5 +27,7 @@
         public string DbName { get; set; }
         public int UsedCount { get; set; }
         public string ConnectionString { get; set; }
+        public string IncludeSchemas { get; set; }
+        public string TableNameRule { get; set; }
     }
 }

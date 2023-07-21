@@ -6,7 +6,7 @@ namespace DataEditorPortal.Data.Contexts
 {
     public class DepDbContextOracle : DepDbContext
     {
-        public DepDbContextOracle(DbContextOptions<DepDbContext> options) : base(options)
+        public DepDbContextOracle(DbContextOptions<DepDbContext> options, IUtcLocalConverter utcLocalConverter) : base(options, utcLocalConverter)
         {
         }
 

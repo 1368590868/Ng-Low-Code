@@ -1,7 +1,6 @@
 <p-table
   *ngIf="!loading; else elseBlock"
   [value]="viewData"
-  [rowHover]="true"
   styleClass="p-datatable-striped">
   <ng-template pTemplate="header">
     <tr>
@@ -11,7 +10,7 @@
   </ng-template>
   <ng-template pTemplate="body" let-viewData>
     <tr>
-      <td>{{ viewData.name }}</td>
+      <td style="width: 30%">{{ viewData.name }}</td>
       <td>
         <ng-container
           *ngIf="!viewData.template"

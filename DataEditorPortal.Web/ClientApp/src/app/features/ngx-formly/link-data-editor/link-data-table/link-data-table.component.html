@@ -26,7 +26,7 @@
   [sortField]="'linked'">
   <ng-template pTemplate="header" let-columns>
     <tr>
-      <th style="width: 5.75rem" pSortableColumn="linked">
+      <th style="width: 4.6rem; max-width: 4.6rem" pSortableColumn="linked">
         <div class="flex align-items-center">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
           <p-sortIcon field="linked"></p-sortIcon>
@@ -37,6 +37,7 @@
         pResizableColumn
         [pSortableColumn]="col.field"
         [style.width]="'8rem'"
+        [style.text-align]="'center'"
         [pSortableColumnDisabled]="!col.sortable">
         <span style="vertical-align: middle">{{ col.header }}</span>
         <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
@@ -53,7 +54,8 @@
       </td>
       <td
         *ngFor="let col of columns"
-        [title]="col.filterType !== 'attachments' ? data[col.field] || '' : ''">
+        [title]="col.filterType !== 'attachments' ? data[col.field] || '' : ''"
+        [style.text-align]="'center'">
         <ng-container
           *ngIf="!col.template"
           [ngTemplateOutlet]="

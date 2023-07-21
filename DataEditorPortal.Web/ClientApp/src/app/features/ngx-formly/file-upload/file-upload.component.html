@@ -63,7 +63,7 @@
 
 <div class="flex">
   <p-fileUpload
-    *ngIf="(newAttachments | filter) < this.fileLimit"
+    *ngIf="this.fileLimit === 0 || (newAttachments | filter) < this.fileLimit"
     styleClass="p-button-outlined"
     name="files"
     mode="basic"

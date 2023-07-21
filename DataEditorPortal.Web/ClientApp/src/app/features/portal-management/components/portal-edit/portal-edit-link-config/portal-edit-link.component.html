@@ -223,16 +223,16 @@
               placeholder="Please Select"
               [style]="{ minWidth: '41.5rem' }"
               appendTo="body"></p-dropdown>
-            <p-button
+            <!-- <p-button
               [disabled]="!dsConfig.dataSourceConnectionName"
               class="ml-1"
               pTooltip="Create new Query"
               styleClass="p-button-text p-button-rounded"
               icon="pi pi-ellipsis-v"
-              (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button>
+              (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button> -->
           </div>
         </ng-container>
-        <ng-container *ngIf="dsConfig.queryText">
+        <!-- <ng-container *ngIf="dsConfig.queryText">
           <label class="line-height-3">Database Query</label>
           <div class="flex align-items-center">
             <div (click)="advancedQueryDialog.showAdvanceDialog()">
@@ -255,7 +255,7 @@
           #advancedQueryDialog
           [connectionName]="dsConfig.dataSourceConnectionName"
           [queryText]="dsConfig.queryText"
-          (queryChange)="queryChange($event)"></app-advanced-query-dialog>
+          (queryChange)="queryChange($event)"></app-advanced-query-dialog> -->
       </div>
       <div class="flex align-items-center mt-3">
         <div class="flex align-items-center">

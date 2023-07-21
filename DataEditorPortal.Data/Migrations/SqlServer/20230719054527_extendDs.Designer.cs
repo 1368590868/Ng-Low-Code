@@ -4,14 +4,16 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20230719054527_extendDs")]
+    partial class extendDs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -443,10 +445,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("ID");
 
-                    b.Property<string>("Component")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("COMPONENT");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DESCRIPTION");
@@ -478,14 +476,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("PARENT_ID");
-
-                    b.Property<bool>("RequireAdmin")
-                        .HasColumnType("bit")
-                        .HasColumnName("REQUIRE_ADMIN");
-
-                    b.Property<bool>("RequireAuth")
-                        .HasColumnType("bit")
-                        .HasColumnName("REQUIRE_AUTH");
 
                     b.Property<int>("Status")
                         .HasColumnType("int")

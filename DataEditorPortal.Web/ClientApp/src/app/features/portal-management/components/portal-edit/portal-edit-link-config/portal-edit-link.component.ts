@@ -386,7 +386,6 @@ export class PortalEditLinkComponent
       .getDataSourceTables(this.formControlConnection.value)
       .subscribe(res => {
         const tables: DataSourceTable[] = res;
-        if (tables.length === 0) return;
 
         // create label and value for dropdown
         tables.forEach(x => {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Dapper;
 using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
@@ -283,45 +284,60 @@ namespace DataEditorPortal.Web.Services
 
         public List<DataSourceTable> GetDataSourceTables(string name)
         {
-            var result = new List<DataSourceTable>();
-
-            var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(c => c.Name == name);
-
-            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
+            return _memoryCache.GetOrCreate($"datasource_{name}_tables", entry =>
             {
-                con.ConnectionString = dsConnection.ConnectionString;
+                entry.SetSlidingExpiration(TimeSpan.FromMinutes(60));
 
-                var cmd = con.CreateCommand();
-                cmd.Connection = con;
-                cmd.CommandText = _queryBuilder.GetSqlTextForDatabaseTables();
+                var result = new List<DataSourceTable>();
 
-                try
+                var dsConnection = _depDbContext.DataSourceConnections.FirstOrDefault(c => c.Name == name);
+
+                using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                 {
-                    con.Open();
-                    using (var dr = cmd.ExecuteReader())
+                    con.ConnectionString = dsConnection.ConnectionString;
+
+                    #region prepair sql and parameters
+
+                    var useSchemaRule = false;
+                    var useTableNameRule = false;
+                    var paramDic = new Dictionary<string, object>() { };
+                    if (!string.IsNullOrEmpty(dsConnection.IncludeSchemas))
                     {
-                        while (dr.Read())
+                        var schemas = dsConnection.IncludeSchemas.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                        if (schemas.Any())
                         {
-                            result.Add(new DataSourceTable()
-                            {
-                                TableName = dr[0].ToString(),
-                                TableSchema = dr[1].ToString()
-                            });
+                            useSchemaRule = true;
+                            paramDic.Add("SCHEMAS", schemas);
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    throw new DepException("An Error in the query has occurred: " + ex.Message);
-                }
-                finally
-                {
-                    con.Close();
-                }
-            }
+                    if (!string.IsNullOrEmpty(dsConnection.TableNameRule))
+                    {
+                        useTableNameRule = true;
+                        paramDic.Add("TABLE_NAME_RULE", dsConnection.TableNameRule);
+                    }
 
-            return result.OrderBy(t => t.TableSchema).ThenBy(t => t.TableName).ToList();
+                    var param = _queryBuilder.GenerateDynamicParameter(paramDic);
+                    var sql = _queryBuilder.GetSqlTextForDatabaseTables(useSchemaRule, useTableNameRule);
+
+                    #endregion
+
+                    try
+                    {
+                        result = con.Query<DataSourceTable>(sql, param).ToList();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, ex.Message);
+                        throw new DepException("An Error in the query has occurred: " + ex.Message);
+                    }
+                    finally
+                    {
+                        con.Close();
+                    }
+                }
+
+                return result.OrderBy(t => t.TableSchema).ThenBy(t => t.TableName).ToList();
+            });
         }
 
         public List<DataSourceTableColumn> GetDataSourceTableColumns(string name, string sqlText)

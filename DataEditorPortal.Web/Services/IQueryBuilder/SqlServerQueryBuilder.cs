@@ -9,6 +9,8 @@ namespace DataEditorPortal.Web.Services
 {
     public class SqlServerQueryBuilder : QueryBuilder, IQueryBuilder
     {
+        public SqlServerQueryBuilder(IUtcLocalConverter dateTimeValueConverter) : base(dateTimeValueConverter) { }
+
         protected override string ParameterPrefix => "@";
 
         #region Ultilities
@@ -96,11 +98,11 @@ namespace DataEditorPortal.Web.Services
                             break;
 
                         case "dateIs":
-                            clause = $"{field} = {parameter}";
+                            clause = $"{field} >= {parameter} AND {field} < DATEADD(DAY, 1, {parameter})";
                             break;
 
                         case "dateIsNot":
-                            clause = $"{field} <> {parameter}";
+                            clause = $"{field} < {parameter} AND {field} >= DATEADD(DAY, 1, {parameter})";
                             break;
 
                         case "dateBefore":
@@ -108,7 +110,7 @@ namespace DataEditorPortal.Web.Services
                             break;
 
                         case "dateAfter":
-                            clause = $"{field} > {parameter}";
+                            clause = $"{field} >= DATEADD(DAY, 1, {parameter})";
                             break;
                         default:
                             break;
@@ -213,9 +215,25 @@ namespace DataEditorPortal.Web.Services
 
         #region Database 
 
-        public string GetSqlTextForDatabaseTables()
+        public string GetSqlTextForDatabaseTables(bool useSchemaRule, bool useTableNameRule)
         {
-            return $"SELECT TABLE_NAME AS TableName, TABLE_SCHEMA AS TableSchema FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME != '__EFMigrationsHistory' AND TABLE_TYPE = 'BASE TABLE'";
+            var sql = $@"
+                SELECT * FROM 
+                (
+                    SELECT TABLE_NAME AS TableName, TABLE_SCHEMA AS TableSchema FROM INFORMATION_SCHEMA.TABLES
+                    WHERE TABLE_TYPE = 'BASE TABLE'
+                    UNION
+                    SELECT TABLE_NAME AS TableName, TABLE_SCHEMA AS TableSchema FROM INFORMATION_SCHEMA.VIEWS
+                ) A
+                WHERE TableName != '__EFMigrationsHistory'
+            ";
+
+            if (useSchemaRule)
+                sql += $" AND TableSchema IN {ParameterPrefix}{ParameterName("SCHEMAS")}";
+            if (useTableNameRule)
+                sql += $" AND TableName LIKE {ParameterPrefix}{ParameterName("TABLE_NAME_RULE")}";
+
+            return sql;
         }
 
         public string GetSqlTextForDatabaseSource(DataSourceConfig config)

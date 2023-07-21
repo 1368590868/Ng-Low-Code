@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class GridTableService {
-  public searchClicked$ = new Subject<SearchParam>();
+  public searchClicked$ = new Subject<SearchParam | undefined>();
 
   public _apiUrl: string;
   constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {

@@ -50,7 +50,7 @@ export class FileUploadComponent implements ControlValueAccessor {
   @Input() maxFileSize = 10000;
   @Input() chooseLabel = 'Browse';
   @Input() multiple = false;
-  @Input() fileLimit = 1;
+  @Input() fileLimit = 0;
   newAttachments: any[] = [];
   progress = 0;
 
@@ -227,7 +227,7 @@ export class FileUploadComponent implements ControlValueAccessor {
     [maxFileSize]="props.maxFileSize"
     [chooseLabel]="props.chooseLabel || 'Browse'"
     [multiple]="props.multiple"
-    [fileLimit]="props.fileLimit || 1"
+    [fileLimit]="props.fileLimit"
     [gridName]="props.gridName"
     [fieldName]="field.key"></app-file-upload>`,
   changeDetection: ChangeDetectionStrategy.OnPush
