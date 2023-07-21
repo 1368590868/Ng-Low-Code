@@ -90,6 +90,12 @@ export class AutoFilterDirective
     if (this.optionsChanged && this.overlayVisible) {
       this.optionsChanged = false;
       this.setVirtualItemSize(this.dropdown || this.multiSelect);
+
+      // Force the dom height to change
+      setTimeout(() => {
+        this.dropdown.scroller.elementViewChild.nativeElement.style.height =
+          this.dropdown.scrollHeight;
+      }, 0);
     }
   }
 
