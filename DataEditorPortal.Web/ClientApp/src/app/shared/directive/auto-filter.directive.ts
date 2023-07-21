@@ -90,12 +90,6 @@ export class AutoFilterDirective
     if (this.optionsChanged && this.overlayVisible) {
       this.optionsChanged = false;
       this.setVirtualItemSize(this.dropdown || this.multiSelect);
-
-      // Force the dom height to change
-      setTimeout(() => {
-        this.dropdown.scroller.elementViewChild.nativeElement.style.height =
-          this.dropdown.scrollHeight;
-      }, 0);
     }
   }
 
@@ -118,6 +112,11 @@ export class AutoFilterDirective
         // Set the item height as the virtual item size
         compRef.virtualScrollItemSize = itemHeight;
         compRef.cd.detectChanges();
+        // Force the dom height to change
+        setTimeout(() => {
+          compRef.scroller.elementViewChild.nativeElement.style.height =
+            compRef.scrollHeight;
+        }, 0);
       }
     }
   }

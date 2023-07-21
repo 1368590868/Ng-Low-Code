@@ -8,22 +8,18 @@ import {
   Self
 } from '@angular/core';
 import { Dropdown } from 'primeng/dropdown';
-import { MultiSelect } from 'primeng/multiselect';
 import { Subject, takeUntil } from 'rxjs';
 import { DomHandler } from 'primeng/dom';
 
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
-  selector: 'p-dropdown,p-multiSelect'
+  selector: 'p-dropdown'
 })
-export class ElementViewChildDirective implements OnInit, OnDestroy {
+export class DropdownFixDirective implements OnInit, OnDestroy {
   @Input() options!: any[];
   private destroy$ = new Subject<void>();
 
-  constructor(
-    @Host() @Self() @Optional() private dropdown: Dropdown,
-    @Host() @Self() @Optional() private multiSelect: MultiSelect
-  ) {}
+  constructor(@Host() @Self() @Optional() private dropdown: Dropdown) {}
 
   ngOnInit(): void {
     if (this.dropdown) {
@@ -62,8 +58,6 @@ export class ElementViewChildDirective implements OnInit, OnDestroy {
           }
         }, 0);
       });
-    } else if (this.multiSelect) {
-      //   multiSelect scroll to selected item
     }
   }
 
