@@ -168,4 +168,19 @@ export class ConfigDataService {
       license
     });
   }
+
+  public dropdownItemSize?: number;
+  calcDropdownItemSize() {
+    const htmlString =
+      '<div class="p-dropdown-panel"><div class="p-dropdown-items"><div class="p-dropdown-item">123</div></div></div>';
+    const divElement = document.createElement('div');
+    divElement.innerHTML = htmlString;
+
+    document.body.appendChild(divElement);
+    this.dropdownItemSize =
+      divElement.querySelector<HTMLDivElement>(
+        '.p-dropdown-item'
+      )?.offsetHeight;
+    document.body.removeChild(divElement);
+  }
 }

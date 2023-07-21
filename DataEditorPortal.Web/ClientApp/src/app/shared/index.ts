@@ -24,6 +24,7 @@ import { MonacoEditorDirective } from './directive/monaco-editor.directive';
 import { AttachmentsComponent } from './components/attachments/attachments.component';
 import { globalLoadingInterceptor } from './interceptor/global-loading.interceptor';
 import { GlobalLoadingComponent } from './components/global-loading/global-loading.component';
+import { ConfigDataService } from './services/config-data.service';
 
 export { AuthRouterGuard } from './guards/auth-router.guard';
 export { AdminPermissionGuard } from './guards/admin-permission.guard';
@@ -92,4 +93,8 @@ export { SystemLogData } from './models/system-log';
     DataFormatService
   ]
 })
-export class SharedModule {}
+export class SharedModule {
+  constructor(private configDataService: ConfigDataService) {
+    this.configDataService.calcDropdownItemSize();
+  }
+}
