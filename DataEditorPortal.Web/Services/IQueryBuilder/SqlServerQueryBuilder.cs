@@ -98,11 +98,11 @@ namespace DataEditorPortal.Web.Services
                             break;
 
                         case "dateIs":
-                            clause = $"{field} = {parameter}";
+                            clause = $"{field} >= {parameter} AND {field} < DATEADD(DAY, 1, {parameter})";
                             break;
 
                         case "dateIsNot":
-                            clause = $"{field} <> {parameter}";
+                            clause = $"{field} < {parameter} AND {field} >= DATEADD(DAY, 1, {parameter})";
                             break;
 
                         case "dateBefore":
@@ -110,7 +110,7 @@ namespace DataEditorPortal.Web.Services
                             break;
 
                         case "dateAfter":
-                            clause = $"{field} > {parameter}";
+                            clause = $"{field} >= DATEADD(DAY, 1, {parameter})";
                             break;
                         default:
                             break;
