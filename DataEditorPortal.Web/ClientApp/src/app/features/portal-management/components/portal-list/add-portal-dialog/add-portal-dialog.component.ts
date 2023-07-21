@@ -10,6 +10,7 @@ import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { NotifyService } from 'src/app/shared';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { PortalItem } from '../../../models/portal-item';
+import { Subject, skip, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-add-portal-dialog',
@@ -26,6 +27,8 @@ export class AddPortalDialogComponent {
 
   @ViewChild('editForm') editForm!: NgForm;
 
+  timer: any;
+
   visible = false;
   isLoading = false;
   buttonDisabled = true;
@@ -34,6 +37,8 @@ export class AddPortalDialogComponent {
   options: FormlyFormOptions = {};
   model: { [name: string]: any } = {};
   fields: FormlyFieldConfig[] = [];
+
+  destroy$ = new Subject();
 
   constructor(
     private portalItemService: PortalItemService,
@@ -44,7 +49,6 @@ export class AddPortalDialogComponent {
     this.isLoading = false;
     this.visible = true;
     this.buttonDisabled = false;
-
     this.fields = [
       {
         key: 'label',
@@ -57,20 +61,70 @@ export class AddPortalDialogComponent {
         modelOptions: {
           updateOn: 'blur'
         },
+        hooks: {
+          onInit: field => {
+            field.formControl?.valueChanges
+              .pipe(takeUntil(this.destroy$))
+              .subscribe(val => {
+                if (!val) return;
+                if (field && field.parent && field.parent.get) {
+                  const control = field.parent?.get('name').formControl;
+                  control?.setValue(val);
+                }
+              });
+          }
+        }
+      },
+      {
+        key: 'name',
+        type: 'input',
+        props: {
+          label: 'Name',
+          placeholder: 'Name',
+          required: true
+        },
+        modelOptions: {
+          updateOn: 'blur'
+        },
         asyncValidators: {
           exist: {
             expression: (c: AbstractControl) => {
+              const currVal = c.value;
+              if (this.timer) clearTimeout(this.timer);
               return new Promise((resolve, reject) => {
-                this.portalItemService
-                  .nameExists(c.value, this.model['id'])
-                  .subscribe(res =>
-                    res.code === 200 ? resolve(!res.data) : reject(res.message)
-                  );
+                if (!currVal) {
+                  resolve(true);
+                } else {
+                  this.timer = setTimeout(() => {
+                    this.portalItemService
+                      .nameExists(currVal, this.model['id'])
+                      .subscribe(res => {
+                        res.code === 200
+                          ? resolve(!res.data)
+                          : reject(res.message);
+                      });
+                  }, 100);
+                }
               });
             },
             message: () => {
               return 'The Menu Name has already been exist.';
             }
+          }
+        },
+        hooks: {
+          onInit: field => {
+            field.formControl?.valueChanges
+              .pipe(takeUntil(this.destroy$))
+              .subscribe(val => {
+                if (val) {
+                  this.portalItemService.getCodeName(val).subscribe(res => {
+                    field.formControl?.setValue(res.data, { emitEvent: false });
+                    this.model['name'] = res.data + '';
+                    field.formControl?.markAsDirty();
+                  });
+                }
+              });
           }
         }
       },
@@ -87,59 +141,54 @@ export class AddPortalDialogComponent {
         }
       },
       {
-        className: 'w-full',
-        fieldGroup: [
-          {
-            key: 'parentId',
-            type: 'select',
-            props: {
-              label: 'Parent Folder',
-              placeholder: 'Please Select',
-              required: true,
-              showClear: false
-            },
-            hooks: {
-              onInit: field => {
-                this.portalItemService.getPortalList().subscribe(res => {
-                  if (field.props) {
-                    const options = this.getFolders(res, 1);
+        key: 'parentId',
+        type: 'select',
+        props: {
+          label: 'Parent Folder',
+          placeholder: 'Please Select',
+          required: true,
+          showClear: false
+        },
+        hooks: {
+          onInit: field => {
+            this.portalItemService.getPortalList().subscribe(res => {
+              if (field.props) {
+                const options = this.getFolders(res, 1);
 
-                    options.splice(0, 0, {
-                      label: 'Root',
-                      value: '<root>',
-                      disabled: this.model['type'] === 'External'
-                    });
-
-                    const findItem = options.find(
-                      (x: any) => x.value === this.model['parentId']
-                    );
-                    if (!findItem) {
-                      this.model = {
-                        ...this.model,
-                        parentId:
-                          options[this.model['type'] === 'External' ? 1 : 0]
-                            .value
-                      };
-                    }
-                    field.props.options = options;
-                    this.options.detectChanges?.(field);
-                  }
+                options.splice(0, 0, {
+                  label: 'Root',
+                  value: '<root>',
+                  disabled: this.model['type'] === 'External'
                 });
+
+                const findItem = options.find(
+                  (x: any) => x.value === this.model['parentId']
+                );
+                if (!findItem) {
+                  this.model = {
+                    ...this.model,
+                    parentId:
+                      options[this.model['type'] === 'External' ? 1 : 0].value
+                  };
+                }
+                field.props.options = options;
+                this.options.detectChanges?.(field);
               }
-            },
-            expressions: { hide: `field.parent.model.parentId === null` }
-          },
-          {
-            key: 'link',
-            type: 'input',
-            props: {
-              label: 'External Url',
-              placeholder: 'External Url',
-              required: true
-            },
-            expressions: { hide: `field.parent.model.type !== 'External'` }
+            });
           }
-        ]
+        },
+        expressions: { hide: `field.parent.model.parentId === null` }
+      },
+      {
+        className: 'w-full',
+        key: 'link',
+        type: 'input',
+        props: {
+          label: 'External Url',
+          placeholder: 'External Url',
+          required: true
+        },
+        expressions: { hide: `field.parent.model.type !== 'External'` }
       },
       {
         key: 'description',
@@ -156,6 +205,7 @@ export class AddPortalDialogComponent {
   }
 
   onCancel() {
+    this.destroy$.next(null);
     this.visible = false;
   }
 
