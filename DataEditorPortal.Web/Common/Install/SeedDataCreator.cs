@@ -449,14 +449,17 @@ namespace DataEditorPortal.Web.Common.Install
                 {
                     AddingForm = new GridFormLayout
                     {
+                        Enabled = true,
                         UseCustomForm = true,
                         CustomFormName = "user-manager-add"
                     },
                     UpdatingForm = new GridFormLayout
                     {
+                        Enabled = true,
                         UseCustomForm = true,
                         CustomFormName = "user-manager-edit"
-                    }
+                    },
+                    DeletingForm = new GridFormLayout { Enabled = true }
                 }),
 
                 CustomActionConfig = JsonSerializer.Serialize(new CustomAction[] {
@@ -622,6 +625,7 @@ namespace DataEditorPortal.Web.Common.Install
                 {
                     AddingForm = new GridFormLayout
                     {
+                        Enabled = true,
                         UseCustomForm = false,
                         FormFields = new List<FormFieldConfig> {
                                 new FormFieldConfig
@@ -696,8 +700,10 @@ namespace DataEditorPortal.Web.Common.Install
                     },
                     UpdatingForm = new GridFormLayout
                     {
+                        Enabled = true,
                         UseAddingFormLayout = true
-                    }
+                    },
+                    DeletingForm = new GridFormLayout { Enabled = true }
                 }),
 
                 CustomActionConfig = JsonSerializer.Serialize(new CustomAction[] { })
