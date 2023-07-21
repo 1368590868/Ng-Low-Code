@@ -17,6 +17,7 @@ import { AttachmentsPipe } from './pipes/attachments.pipe';
 import { TemplatePipe } from './pipes/template.pipe';
 import { DataFormatService } from './services/data-format.service';
 import { AutoFilterDirective } from './directive/auto-filter.directive';
+import { ElementViewChildDirective } from './directive/elementViewChild.nativeElement';
 import { MonacoEditorDirective } from './directive/monaco-editor.directive';
 
 // public components
@@ -44,6 +45,7 @@ export { SystemLogData } from './models/system-log';
   declarations: [
     PermissionDirective,
     AutoFilterDirective,
+    ElementViewChildDirective,
     MonacoEditorDirective,
     BooleanTextPipe,
     AttachmentsPipe,
@@ -61,6 +63,7 @@ export { SystemLogData } from './models/system-log';
   exports: [
     PermissionDirective,
     AutoFilterDirective,
+    ElementViewChildDirective,
     MonacoEditorDirective,
     BooleanTextPipe,
     AttachmentsPipe,
