@@ -22,7 +22,7 @@
       </div>
       <a
         *ngIf="!menu.routerLink"
-        [href]="menu.link"
+        [href]="menu.url"
         target="_blank"
         class="tile-block bg-white m-3 p-2 flex flex-column align-items-center cursor-pointer shadow-2"
         [pTooltip]="menu.description || ''">

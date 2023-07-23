@@ -48,6 +48,7 @@ export class NavMenuComponent implements OnInit {
           this.setParentActive(menu, event.url);
 
           const menuItem: MenuItem = menu;
+          if (menuItem.url) menuItem.target = '_blank';
           return menuItem;
         });
       })
@@ -77,7 +78,6 @@ export class NavMenuComponent implements OnInit {
         backgroundSize: 'contain',
         backgroundPosition: 'center'
       };
-      menu.icon = 'pi ';
     }
 
     if (menu.items) {
