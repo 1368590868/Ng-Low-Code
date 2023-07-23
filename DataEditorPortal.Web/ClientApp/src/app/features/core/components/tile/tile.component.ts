@@ -1,5 +1,5 @@
 import { ApplicationRef, Component, Inject, OnDestroy } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, map, takeUntil } from 'rxjs';
 import { ConfigDataService, SiteMenu } from 'src/app/shared';
 
 @Component({
@@ -10,9 +10,8 @@ import { ConfigDataService, SiteMenu } from 'src/app/shared';
 export class TileComponent implements OnDestroy {
   loading = true;
   destroy$ = new Subject();
-  get menus(): SiteMenu[] {
-    return this.flattenMenus(this.configDataService.menusInGroup);
-  }
+
+  menus$?: Observable<SiteMenu[]>;
 
   private flattenMenus(menus: any[]): any[] {
     return menus
@@ -49,6 +48,12 @@ export class TileComponent implements OnDestroy {
     app.isStable.pipe(takeUntil(this.destroy$)).subscribe(x => {
       if (x) this.loading = false;
     });
+    this.menus$ = this.configDataService.menusInGroup$.pipe(
+      takeUntil(this.destroy$),
+      map(menus => {
+        return this.flattenMenus(menus);
+      })
+    );
   }
 
   ngOnDestroy(): void {
