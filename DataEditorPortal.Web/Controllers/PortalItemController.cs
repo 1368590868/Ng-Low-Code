@@ -139,7 +139,9 @@ namespace DataEditorPortal.Web.Controllers
         [Route("menu-item/create")]
         public Guid CreateMenuItem([FromBody] PortalItemData model)
         {
-            model.Name = _portalItemService.GetCodeName(model.Label);
+            if (string.IsNullOrEmpty(model.Name))
+                model.Name = _portalItemService.GetCodeName(model.Label);
+            if (_portalItemService.ExistName(model.Name, null)) throw new DepException("Name does already exist.");
 
             model.Order = _depDbContext.SiteMenus
                     .Where(x => x.ParentId == model.ParentId)
@@ -155,13 +157,7 @@ namespace DataEditorPortal.Web.Controllers
 
             if (siteMenu.Type == "External")
             {
-                var permission = new SitePermission()
-                {
-                    Category = $"External Link: { model.Label }",
-                    PermissionName = $"View_{ model.Name.Replace("-", "_") }".ToUpper(),
-                    PermissionDescription = $"View { model.Label }"
-                };
-                _depDbContext.Add(permission);
+                CreateOrUpdatePermission(siteMenu);
             }
 
             _depDbContext.SaveChanges();
@@ -173,13 +169,16 @@ namespace DataEditorPortal.Web.Controllers
         [Route("menu-item/{id}/update")]
         public Guid UpdateMenuItem(Guid id, [FromBody] PortalItemData model)
         {
-            model.Name = _portalItemService.GetCodeName(model.Label);
+            if (string.IsNullOrEmpty(model.Name))
+                model.Name = _portalItemService.GetCodeName(model.Label);
+            if (_portalItemService.ExistName(model.Name, id)) throw new DepException("Name does already exist.");
 
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type != "Portal Item");
             if (siteMenu == null)
             {
                 throw new DepException("Not Found", 404);
             }
+            var oldName = siteMenu.Name;
 
             model.Type = siteMenu.Type;
 
@@ -197,15 +196,7 @@ namespace DataEditorPortal.Web.Controllers
 
             if (siteMenu.Type == "External")
             {
-                // update permissions
-                var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"External Link: { siteMenu.Label }").ToList();
-
-                permissions.ForEach(p =>
-                {
-                    p.Category = p.Category.Replace(siteMenu.Label, model.Label);
-                    p.PermissionName = p.PermissionName.Replace(siteMenu.Name.Replace("-", "_").ToUpper(), model.Name.Replace("-", "_").ToUpper());
-                    p.PermissionDescription = p.PermissionDescription.Replace(siteMenu.Label, model.Label);
-                });
+                CreateOrUpdatePermission(siteMenu, oldName);
             }
 
             _mapper.Map(model, siteMenu);
@@ -214,6 +205,39 @@ namespace DataEditorPortal.Web.Controllers
 
             return siteMenu.Id;
         }
+
+        private void CreateOrUpdatePermission(SiteMenu siteMenu, string oldMenuName = null)
+        {
+            var types = new List<string> { "View" };
+
+            List<SitePermission> permissions = new List<SitePermission>();
+            if (!string.IsNullOrEmpty(oldMenuName))
+            {
+                // get old permissions
+                var oldPermissionNames = types.Select(t => $"{t}_{ oldMenuName.Replace("-", "_") }".ToUpper());
+                permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
+            }
+
+            types.ForEach(t =>
+            {
+                SitePermission permission = null;
+                if (!string.IsNullOrEmpty(oldMenuName))
+                {
+                    var oldName = $"{t}_{ oldMenuName.Replace("-", "_") }".ToUpper();
+                    permission = permissions.FirstOrDefault(p => p.PermissionName == oldName);
+                }
+
+                if (permission == null)
+                {
+                    permission = new SitePermission() { Id = Guid.NewGuid() };
+                    _depDbContext.Add(permission);
+                }
+                permission.Category = $"External Link: { siteMenu.Label }";
+                permission.PermissionName = $"{t}_{ siteMenu.Name.Replace("-", "_") }".ToUpper();
+                permission.PermissionDescription = $"{t} { siteMenu.Label }";
+            });
+        }
+
 
         [HttpDelete]
         [Route("menu-item/{id}/delete")]
