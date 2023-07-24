@@ -9,7 +9,7 @@ import {
 import { FormControl } from '@angular/forms';
 import { NotifyService } from 'src/app/shared';
 import { PortalItemService } from '../../../services/portal-item.service';
-import { ImportPortal } from '../../../models/portal-item';
+import { ImportPortal, PortalItem } from '../../../models/portal-item';
 import { Dialog } from 'primeng/dialog';
 @Component({
   selector: 'app-import-dialog',
@@ -29,7 +29,7 @@ export class ImportDialogComponent {
   selection: ImportPortal[] = [];
   dataSource: ImportPortal[] = [];
 
-  options: { label?: string; value?: string }[] = [];
+  options: { label?: string; value?: string; disabled?: boolean }[] = [];
   parentFolderControl = new FormControl();
   step = 1;
 
@@ -47,26 +47,38 @@ export class ImportDialogComponent {
     this.isLoading = false;
     this.visible = true;
     this.progress = 0;
+    this.parentFolderControl.reset();
 
     this.portalItemService.getPortalList().subscribe(res => {
-      this.options = res
-        .filter(x => x.data?.['type'] === 'Folder')
-        .map(x => {
-          return {
-            label: `- ${x.data?.['label']}`,
-            value: x.data?.['id']
-          };
-        });
+      this.options = this.getFolders(res, 1);
+
       this.options.splice(0, 0, {
         label: 'Root',
-        value: '<root>'
+        value: '<root>',
+        disabled: true
       });
+      this.parentFolderControl.setValue(this.options[1].value);
     });
 
-    this.parentFolderControl.reset();
-    this.parentFolderControl.setValue('<root>');
     this.step = 1;
     this.file = null;
+  }
+
+  getFolders(data: PortalItem[], level: number) {
+    let folders: any = [];
+    data.forEach(x => {
+      if (x.data?.['type'] === 'Folder') {
+        const arr = {
+          label: `${'—'.repeat(level)}  ${x.data?.['label']}`,
+          value: x.data?.['id']
+        };
+        folders.push(arr);
+        if (x.children) {
+          folders = folders.concat(this.getFolders(x.children, level + 1));
+        }
+      }
+    });
+    return folders;
   }
 
   disableRow(row: any) {

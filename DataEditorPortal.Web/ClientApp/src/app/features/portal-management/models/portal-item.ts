@@ -131,6 +131,7 @@ export interface LinkedDataSourceConfig {
   primaryTable?: LinkedTableConfig | null;
   secondaryTable?: LinkedTableConfig | null;
   linkTable?: DataSourceConfig | null;
+  useAsMasterDetailView?: boolean;
 }
 
 export interface LinkedSingleConfigDetails {

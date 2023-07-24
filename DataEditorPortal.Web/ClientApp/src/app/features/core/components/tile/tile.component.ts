@@ -1,6 +1,6 @@
 import { ApplicationRef, Component, Inject, OnDestroy } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
-import { ConfigDataService } from 'src/app/shared';
+import { Observable, Subject, map, takeUntil } from 'rxjs';
+import { ConfigDataService, SiteMenu } from 'src/app/shared';
 
 @Component({
   selector: 'app-tile',
@@ -10,9 +10,8 @@ import { ConfigDataService } from 'src/app/shared';
 export class TileComponent implements OnDestroy {
   loading = true;
   destroy$ = new Subject();
-  get menus() {
-    return this.flattenMenus(this.configDataService.menusInGroup);
-  }
+
+  menus$?: Observable<SiteMenu[]>;
 
   private flattenMenus(menus: any[]): any[] {
     return menus
@@ -24,7 +23,7 @@ export class TileComponent implements OnDestroy {
       .map(menu => {
         const data = {
           ...menu,
-          routerLink: `/${menu.routerLink}`
+          routerLink: menu.routerLink ? `/${menu.routerLink}` : undefined
         };
 
         if (data.icon && /^icons\/.*/.test(data.icon)) {
@@ -36,7 +35,6 @@ export class TileComponent implements OnDestroy {
             backgroundSize: 'contain',
             backgroundPosition: 'center'
           };
-          data.icon = 'pi ';
         }
         return data;
       });
@@ -50,6 +48,12 @@ export class TileComponent implements OnDestroy {
     app.isStable.pipe(takeUntil(this.destroy$)).subscribe(x => {
       if (x) this.loading = false;
     });
+    this.menus$ = this.configDataService.menusInGroup$.pipe(
+      takeUntil(this.destroy$),
+      map(menus => {
+        return this.flattenMenus(menus);
+      })
+    );
   }
 
   ngOnDestroy(): void {

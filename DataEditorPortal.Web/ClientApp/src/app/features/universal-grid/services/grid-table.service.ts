@@ -33,7 +33,14 @@ export class GridTableService {
         `${this._apiUrl}universal-grid/${name}/linked/grid-config`
       )
       .pipe(
-        map(res => res.data || { primaryTableName: '', secondaryTableName: '' })
+        map(
+          res =>
+            res.data || {
+              primaryTableName: '',
+              secondaryTableName: '',
+              useAsMasterDetailView: false
+            }
+        )
       );
   }
 

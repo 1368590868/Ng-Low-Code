@@ -1,5 +1,6 @@
 <div
   class="flex justify-content-center pt-8 bg-gray-300"
+  *ngIf="menus$ | async as menus"
   [style]="{
     minHeight: menus.length > 0 ? 'calc(100% - 7rem)' : 'calc(100% - 4.25rem)'
   }">
@@ -22,7 +23,7 @@
       </div>
       <a
         *ngIf="!menu.routerLink"
-        [href]="menu.link"
+        [href]="menu.url"
         target="_blank"
         class="tile-block bg-white m-3 p-2 flex flex-column align-items-center cursor-pointer shadow-2"
         [pTooltip]="menu.description || ''">

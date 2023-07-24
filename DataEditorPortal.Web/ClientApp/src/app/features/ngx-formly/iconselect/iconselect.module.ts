@@ -10,6 +10,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { FileUploadModule } from 'primeng/fileupload';
 
 import { FormlyFieldIconSelectComponent } from './iconselect.type';
+import { SharedModule } from 'src/app/shared';
 
 @NgModule({
   declarations: [IconSelectComponent, FormlyFieldIconSelectComponent],
@@ -21,6 +22,7 @@ import { FormlyFieldIconSelectComponent } from './iconselect.type';
     ButtonModule,
     AvatarModule,
     FileUploadModule,
+    SharedModule,
     FormlyModule.forChild({
       types: [
         {

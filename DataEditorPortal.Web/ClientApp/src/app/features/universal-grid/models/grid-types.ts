@@ -48,4 +48,5 @@ export interface GridSearchConfig {
 export interface LinkedGridConfig {
   primaryTableName: string;
   secondaryTableName: string;
+  useAsMasterDetailView: boolean;
 }

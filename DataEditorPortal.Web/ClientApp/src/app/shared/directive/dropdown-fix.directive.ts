@@ -28,14 +28,19 @@ export class DropdownFixDirective implements OnInit, OnDestroy {
           if (this.options && this.options.length) {
             // Set virtualScroll, scroll to selected item
             if (this.dropdown.virtualScroll) {
-              const selectedIndex = this.dropdown.selectedOption
-                ? this.dropdown.findOptionIndex(
-                    this.dropdown.getOptionValue(this.dropdown.selectedOption),
-                    this.dropdown.optionsToDisplay
-                  )
-                : -1;
-              if (selectedIndex !== -1) {
-                this.dropdown.scroller.scrollToIndex(selectedIndex);
+              if (this.dropdown.scroller.first === 0) {
+                // check if the dropdown scroller doesn't scroll, if first === 0, we need to scroll again
+                const selectedIndex = this.dropdown.selectedOption
+                  ? this.dropdown.findOptionIndex(
+                      this.dropdown.getOptionValue(
+                        this.dropdown.selectedOption
+                      ),
+                      this.dropdown.optionsToDisplay
+                    )
+                  : -1;
+                if (selectedIndex !== -1) {
+                  this.dropdown.scroller.scrollToIndex(selectedIndex);
+                }
               }
             } else {
               // Set appendTO to body, Requires a global re-lookup and scroll to the current highlighted option
