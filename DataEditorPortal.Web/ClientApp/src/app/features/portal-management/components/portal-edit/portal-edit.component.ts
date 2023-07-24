@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap, Data } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { switchMap, of, Subject, takeUntil } from 'rxjs';
+import { switchMap, of, Subject, takeUntil, tap, take } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { PortalItemService } from '../../services/portal-item.service';
 import { PortalEditStepDirective } from '../../directives/portal-edit-step.directive';
@@ -65,7 +65,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
     // get item type from route
     this.activatedRoute.data
       .pipe(
-        takeUntil(this.destroy$),
+        take(1),
         switchMap((data: Data) => {
           return of(data['type'] || '');
         })
@@ -74,45 +74,48 @@ export class PortalEditComponent implements OnInit, OnDestroy {
 
     // get item id from route
     this.activatedRoute.paramMap
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((params: ParamMap) => {
-        if (params.get('id')) {
-          // it is edit, get item details
-          this.itemId = params.get('id') || '';
-          this.portalItemService
-            .getPortalDetails(this.itemId)
-            .subscribe(res => {
-              this.configCompleted = res['configCompleted'];
-              this.itemCaption = res['label'];
-              this.dataSourceConnectionName = res['dataSourceConnectionName'];
-              const next = res['currentStep'] || 'basic';
+      .pipe(
+        take(1),
+        tap((params: ParamMap) => {
+          if (params.get('id')) {
+            // it is edit, get item details
+            this.itemId = params.get('id') || '';
+            this.portalItemService
+              .getPortalDetails(this.itemId)
+              .subscribe(res => {
+                this.configCompleted = res['configCompleted'];
+                this.itemCaption = res['label'];
+                this.dataSourceConnectionName = res['dataSourceConnectionName'];
+                const next = res['currentStep'] || 'basic';
 
-              // set activated index
-              this.activatedIndex = this.steps.findIndex(
-                x => x.routerLink === next
-              );
+                // set activated index
+                this.activatedIndex = this.steps.findIndex(
+                  x => x.routerLink === next
+                );
 
-              // navigate to the step that saved last time
-              this.router.navigate([next], {
-                relativeTo: this.activatedRoute,
-                replaceUrl: true
+                // navigate to the step that saved last time
+                this.router.navigate([next], {
+                  relativeTo: this.activatedRoute,
+                  replaceUrl: true
+                });
               });
+          } else {
+            // it is add
+            this.itemId = undefined;
+            this.configCompleted = false;
+            this.itemCaption = undefined;
+            this.activatedIndex = 0;
+            this.router.navigate(['basic'], {
+              relativeTo: this.activatedRoute,
+              replaceUrl: true
             });
-        } else {
-          // it is add
-          this.itemId = undefined;
-          this.configCompleted = false;
-          this.itemCaption = undefined;
-          this.activatedIndex = 0;
-          this.router.navigate(['basic'], {
-            relativeTo: this.activatedRoute,
-            replaceUrl: true
-          });
-        }
-        if (params.get('parentId')) {
-          this.parentId = params.get('parentId') || '';
-        }
-      });
+          }
+          if (params.get('parentId')) {
+            this.parentId = params.get('parentId') || '';
+          }
+        })
+      )
+      .subscribe();
 
     // set steps according to type
     if (this.itemType == 'single') {

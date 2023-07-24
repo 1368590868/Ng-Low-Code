@@ -4,18 +4,20 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20230718090644_extendMenu")]
+    partial class extendMenu
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema(Common.Constants.DEFAULT_SCHEMA)
+                .HasDefaultSchema(Data.Common.Constants.DEFAULT_SCHEMA)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -105,14 +107,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("ConnectionString")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("CONNECTION_STRING");
-
-                    b.Property<string>("IncludeSchemas")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("INCLUDE_SCHEMAS");
-
-                    b.Property<string>("TableNameRule")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("TABLE_NAME_RULE");
 
                     b.HasKey("Name");
 
@@ -212,35 +206,35 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.ToTable("EVENT_LOGS");
                 });
 
-            modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_LOOKUP", b =>
+            modelBuilder.Entity("DataEditorPortal.Data.Models.GFORM_SITE_HIERARCHY_MV", b =>
                 {
-                    b.Property<string>("LOOKUPID")
+                    b.Property<string>("HIERARCHY_GLOBALID")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NAME5")
+                    b.Property<string>("AREA_NAME")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NAME4")
+                    b.Property<string>("DIVISION_NAME")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NAME1")
+                    b.Property<string>("DOT_OPERATOR_NAME")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NAME6")
+                    b.Property<string>("LOCATION")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NAME3")
+                    b.Property<string>("SITENAME")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NAME2")
+                    b.Property<string>("SITETYPE")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("LOOKUPID");
+                    b.HasKey("HIERARCHY_GLOBALID");
 
-                    b.ToTable("DEMO_LINK_LOOKUP");
+                    b.ToTable("GFORM_SITE_HIERARCHY_MV");
                 });
 
-            modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_SECONDARY", b =>
+            modelBuilder.Entity("DataEditorPortal.Data.Models.LPAREMEDIATIONACTSITE", b =>
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
@@ -277,13 +271,13 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("LASTUSER")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("STATUS1")
+                    b.Property<string>("LPAACTIVITYSTATUS")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DATETIME4")
+                    b.Property<DateTime?>("REMEDIATIONACTUALDATE")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DATETIME3")
+                    b.Property<DateTime?>("REMEDIATIONPROPOSEDDATE")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("STATUS")
@@ -294,10 +288,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("DEMO_LINK_SECONDARY");
+                    b.ToTable("LPAREMEDIATIONACTSITE");
                 });
 
-            modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_PRIMARY", b =>
+            modelBuilder.Entity("DataEditorPortal.Data.Models.LPASITE", b =>
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
@@ -316,7 +310,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("CREATIONUSER")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CRITERIA")
+                    b.Property<string>("D40CRITERIA")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DATECREATED")
@@ -325,7 +319,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<DateTime?>("DATEMODIFIED")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DATETIME1")
+                    b.Property<DateTime?>("DISCOVERYDATE")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("EVENTID")
@@ -340,19 +334,19 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("LASTUSER")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NAME")
+                    b.Property<string>("LPANAME")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("STATUS1")
+                    b.Property<string>("LPASTATUS")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DATETIME4")
+                    b.Property<DateTime?>("REMEDIATIONACTUALDATE")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DATETIME3")
+                    b.Property<DateTime?>("REMEDIATIONPROPOSEDDATE")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DATETIME2")
+                    b.Property<DateTime?>("REQREMEDIATIONDATE")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("STATUS")
@@ -363,10 +357,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("DEMO_LINK_PRIMARY");
+                    b.ToTable("LPASITE");
                 });
 
-            modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_RELATION", b =>
+            modelBuilder.Entity("DataEditorPortal.Data.Models.LPASITE_RELATION", b =>
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
@@ -381,7 +375,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("DEMO_LINK_RELATION");
+                    b.ToTable("LPASITE_RELATION");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.Lookup", b =>

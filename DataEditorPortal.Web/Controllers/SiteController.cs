@@ -1,4 +1,5 @@
-﻿using DataEditorPortal.Data.Contexts;
+﻿using AutoMapper;
+using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Common.License;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -25,19 +26,22 @@ namespace DataEditorPortal.Web.Controllers
         private readonly IConfiguration _config;
         private readonly IUserService _userService;
         private readonly ILicenseService _licenseService;
+        private readonly IMapper _mapper;
 
         public SiteController(
             ILogger<SiteController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
             IUserService userService,
-            ILicenseService licenseService)
+            ILicenseService licenseService,
+            IMapper mapper)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _config = config;
             _userService = userService;
             _licenseService = licenseService;
+            _mapper = mapper;
         }
 
         #region site settings
@@ -128,77 +132,10 @@ namespace DataEditorPortal.Web.Controllers
         [HttpPost]
         [Route("menus")]
         [NoLicenseCheck]
-        public dynamic GetMenus()
+        public List<MenuItem> GetMenus()
         {
-            var username = AppUser.ParseUsername(User.Identity.Name).Username;
-            var isAdmin = _userService.IsAdmin(username);
-            var userPermissions = _userService.GetUserPermissions().Keys;
-
-            var list = (from m in _depDbContext.SiteMenus
-                        join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name into us
-                        from u in us.DefaultIfEmpty()
-                        where m.Type != "Sub Portal Item" && (u == null || u.ConfigCompleted)
-                        select new { m, itemType = u != null ? u.ItemType : null }).ToList();
-
-            var menus = list.Select(x => x.m);
-            var root = menus
-                .Where(x =>
-                {
-                    if (isAdmin) return x.ParentId == null;
-                    else
-                    {
-                        return x.Status == Data.Common.PortalItemStatus.Published
-                            && x.ParentId == null
-                            && (x.Type == "Folder" || userPermissions.Contains($"VIEW_{ x.Name.Replace("-", "_") }".ToUpper()));
-                    }
-                })
-                .OrderBy(x => x.Order)
-                .ThenBy(x => x.Name)
-                .Select(x =>
-                {
-                    var items = menus
-                            .Where(m =>
-                            {
-                                if (isAdmin) return m.ParentId == x.Id;
-                                else
-                                {
-                                    return m.Status == Data.Common.PortalItemStatus.Published
-                                        && m.ParentId == x.Id
-                                        && userPermissions.Contains($"VIEW_{ m.Name.Replace("-", "_") }".ToUpper());
-                                }
-                            })
-                            .OrderBy(x => x.Order)
-                            .ThenBy(x => x.Name)
-                            .Select(m => new
-                            {
-                                id = m.Id,
-                                name = m.Name,
-                                label = m.Label,
-                                icon = m.Icon,
-                                description = m.Description,
-                                type = m.Type,
-                                link = m.Link,
-                                status = m.Status,
-                                itemType = list.Where(x => x.m.Id == m.Id).Select(x => x.itemType).FirstOrDefault()
-                            });
-
-                    return new
-                    {
-                        id = x.Id,
-                        name = x.Name,
-                        label = x.Label,
-                        icon = x.Icon,
-                        description = x.Description,
-                        items = items.Any() ? items : null,
-                        type = x.Type,
-                        link = x.Link,
-                        status = x.Status,
-                        itemType = list.Where(l => l.m.Id == x.Id).Select(l => l.itemType).FirstOrDefault()
-                    };
-                })
-                .Where(x => x.type != "Folder" || x.items != null);
-
-            return root;
+            var user = AppUser.FromWindowsIdentity(User?.Identity);
+            return _userService.GetUserMenus(user.Username);
         }
 
         #region site content

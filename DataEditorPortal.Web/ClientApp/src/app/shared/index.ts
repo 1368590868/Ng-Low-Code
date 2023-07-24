@@ -17,12 +17,14 @@ import { AttachmentsPipe } from './pipes/attachments.pipe';
 import { TemplatePipe } from './pipes/template.pipe';
 import { DataFormatService } from './services/data-format.service';
 import { AutoFilterDirective } from './directive/auto-filter.directive';
+import { DropdownFixDirective } from './directive/dropdown-fix.directive';
 import { MonacoEditorDirective } from './directive/monaco-editor.directive';
 
 // public components
 import { AttachmentsComponent } from './components/attachments/attachments.component';
 import { globalLoadingInterceptor } from './interceptor/global-loading.interceptor';
 import { GlobalLoadingComponent } from './components/global-loading/global-loading.component';
+import { ConfigDataService } from './services/config-data.service';
 
 export { AuthRouterGuard } from './guards/auth-router.guard';
 export { AdminPermissionGuard } from './guards/admin-permission.guard';
@@ -44,6 +46,7 @@ export { SystemLogData } from './models/system-log';
   declarations: [
     PermissionDirective,
     AutoFilterDirective,
+    DropdownFixDirective,
     MonacoEditorDirective,
     BooleanTextPipe,
     AttachmentsPipe,
@@ -61,6 +64,7 @@ export { SystemLogData } from './models/system-log';
   exports: [
     PermissionDirective,
     AutoFilterDirective,
+    DropdownFixDirective,
     MonacoEditorDirective,
     BooleanTextPipe,
     AttachmentsPipe,
@@ -89,4 +93,8 @@ export { SystemLogData } from './models/system-log';
     DataFormatService
   ]
 })
-export class SharedModule {}
+export class SharedModule {
+  constructor(private configDataService: ConfigDataService) {
+    this.configDataService.calcDropdownItemSize();
+  }
+}

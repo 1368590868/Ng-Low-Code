@@ -5,9 +5,6 @@ using System.Security.Principal;
 
 namespace DataEditorPortal.Web.Models
 {
-    public class AppUserRole
-    {
-    }
 
     public class AppUser
     {
@@ -25,6 +22,8 @@ namespace DataEditorPortal.Web.Models
         public bool IsAdmin { get; set; }
 
         public bool Disabled { get; set; }
+
+        public List<MenuItem> UserMenus { get; set; } = new List<MenuItem>();
 
         public Dictionary<string, bool> Permissions { get; set; } = new Dictionary<string, bool>();
 

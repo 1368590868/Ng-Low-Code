@@ -66,6 +66,7 @@ export class PortalEditLinkComponent
   formControlSecondaryMap: FormControl = new FormControl();
   formControlPrimaryReference: FormControl = new FormControl();
   formControlSecondaryReference: FormControl = new FormControl();
+  formControlUseAsMasterDetailView: FormControl = new FormControl();
 
   showQuery = false;
   helperMessage =
@@ -109,6 +110,10 @@ export class PortalEditLinkComponent
           const { data } = res;
           this.dataSourceConfig = data || {};
           this.isLoading = false;
+
+          this.formControlUseAsMasterDetailView.setValue(
+            this.dataSourceConfig.useAsMasterDetailView
+          );
 
           this.primarySelected =
             this.dataSourceConfig.primaryTable?.columnsForLinkedField || [];
@@ -341,7 +346,8 @@ export class PortalEditLinkComponent
             columnsForLinkedField: this.secondarySelected
           }
         : null,
-      linkTable: data
+      linkTable: data,
+      useAsMasterDetailView: this.formControlUseAsMasterDetailView.value
     });
   }
 

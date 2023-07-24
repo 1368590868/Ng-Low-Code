@@ -7,5 +7,9 @@ export interface SiteMenu extends MenuItem {
   itemType?: string;
   status?: number;
   description?: string;
+  component?: string;
+  requireAuth?: boolean;
+  requireAdmin?: boolean;
   items?: SiteMenu[];
+  parentId?: string;
 }

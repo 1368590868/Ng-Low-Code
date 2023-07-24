@@ -13,6 +13,7 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IUserService
     {
+        List<MenuItem> GetUserMenus(string username);
         Dictionary<string, bool> GetUserPermissions();
         bool IsAdmin(string username);
         bool HasAdmin();
@@ -40,6 +41,91 @@ namespace DataEditorPortal.Web.Services
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _memoryCache = memoryCache;
+        }
+
+        public List<MenuItem> GetUserMenus(string username)
+        {
+            var isAdmin = IsAdmin(username);
+            var userPermissions = GetUserPermissions().Keys.ToList();
+
+            var menus = (
+                    from m in _depDbContext.SiteMenus
+                    join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name into us
+                    from u in us.DefaultIfEmpty()
+                    where m.Type != "Sub Portal Item" && (u == null || u.ConfigCompleted)
+                    select new { m, itemType = u != null ? u.ItemType : null }
+                )
+                .ToList()
+                .Select(x =>
+                {
+                    var item = _mapper.Map<MenuItem>(x.m);
+                    item.ItemType = x.itemType;
+                    return item;
+                }).ToList();
+
+            var menuItems = menus
+                .Where(m =>
+                {
+                    if (isAdmin) return m.ParentId == null;
+                    else
+                    {
+                        return m.Status == Data.Common.PortalItemStatus.Published
+                            && m.ParentId == null
+                            && (m.Type == "Folder" || userPermissions.Contains($"VIEW_{ m.Name.Replace("-", "_") }".ToUpper()));
+                    }
+                })
+                .Select(m =>
+                {
+                    var path = SetMenuLink(m);
+                    m.Items = GetChildrenItems(menus, m.Id, isAdmin, userPermissions, path);
+                    return m;
+                })
+                .Where(m => m.Type != "Folder" || m.Items != null)
+                .OrderBy(m => m.Order)
+                .ThenBy(m => m.Name)
+                .ToList();
+
+            return menuItems;
+        }
+
+        private List<MenuItem> GetChildrenItems(IEnumerable<MenuItem> menus, Guid parentId, bool isAdmin, List<string> userPermissions, string parentPath = "")
+        {
+            var menuItems = menus
+                    .Where(m =>
+                    {
+                        if (isAdmin) return m.ParentId == parentId;
+                        else
+                        {
+                            return m.Status == Data.Common.PortalItemStatus.Published
+                                && m.ParentId == parentId
+                                && userPermissions.Contains($"VIEW_{ m.Name.Replace("-", "_") }".ToUpper());
+                        }
+                    })
+                    .Select(m =>
+                    {
+                        var path = SetMenuLink(m, parentPath);
+                        m.Items = GetChildrenItems(menus, m.Id, isAdmin, userPermissions, path);
+                        return m;
+                    })
+                    .Where(m => m.Type != "Folder" || m.Items != null)
+                    .OrderBy(m => m.Order)
+                    .ThenBy(m => m.Name)
+                    .ToList();
+
+            return menuItems.Any() ? menuItems : null;
+        }
+
+        private string SetMenuLink(MenuItem menu, string parentPath = "")
+        {
+            var path = string.IsNullOrEmpty(parentPath) ? menu.Name : $"{parentPath}/{menu.Name}";
+            if (menu.Type == "Portal Item" || menu.Type == "System")
+                menu.RouterLink = path;
+            else if (menu.Type == "External")
+                menu.Url = menu.Link;
+            else
+                menu.RouterLink = menu.Link;
+
+            return path;
         }
 
         public Dictionary<string, bool> GetUserPermissions()

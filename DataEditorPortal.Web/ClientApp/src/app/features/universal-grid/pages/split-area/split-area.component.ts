@@ -79,16 +79,11 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
     // get item type from route
     this.route.data.pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.itemType = data['type'];
-    });
 
-    // subscribe route change to update currentPortalItem
-    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((param: any) => {
-      if (param && param.name) {
-        this.gridName = '';
-        this.changeDetectorRef.detectChanges();
-        this.gridName = param.name;
-        this.changeDetectorRef.detectChanges();
-      }
+      this.gridName = '';
+      this.changeDetectorRef.detectChanges();
+      this.gridName = data['name'];
+      this.changeDetectorRef.detectChanges();
     });
   }
 

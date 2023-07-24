@@ -67,52 +67,64 @@ namespace DataEditorPortal.Web.Controllers
         [Route("list")]
         public IEnumerable<PortalItem> List()
         {
-            var query = from m in _depDbContext.SiteMenus
-                        join p in _depDbContext.UniversalGridConfigurations on m.Name equals p.Name into mps
-                        from mp in mps.DefaultIfEmpty()
-                        where m.Type != "Sub Portal Item"
-                        select new
-                        {
-                            menu = m,
-                            configCompleted = mp != null ? mp.ConfigCompleted : (bool?)null,
-                            itemType = mp != null ? mp.ItemType : null
-                        };
-
-            var menus = query.ToList();
-
-            var root = menus
-                .Where(x => x.menu.ParentId == null)
-                .OrderBy(x => x.menu.Order)
-                .ThenBy(x => x.menu.Name)
+            var menus = (
+                    from m in _depDbContext.SiteMenus
+                    join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name into us
+                    from u in us.DefaultIfEmpty()
+                    where m.Type != "Sub Portal Item"
+                    select new { m, configCompleted = u != null ? u.ConfigCompleted : (bool?)null, itemType = u != null ? u.ItemType : null }
+                )
+                .ToList()
                 .Select(x =>
                 {
-                    var children = menus
-                            .Where(m => m.menu.ParentId == x.menu.Id)
-                            .OrderBy(x => x.menu.Order)
-                            .ThenBy(x => x.menu.Name)
-                            .Select(m =>
-                            {
-                                var item = new PortalItem()
-                                {
-                                    Data = _mapper.Map<PortalItemData>(m.menu)
-                                };
-                                item.Data.ConfigCompleted = m.configCompleted;
-                                item.Data.ItemType = m.itemType;
-                                return item;
-                            })
-                            .ToList();
-
                     var item = new PortalItem()
                     {
-                        Data = _mapper.Map<PortalItemData>(x.menu),
-                        Children = children.Any() ? children : null
+                        Data = _mapper.Map<PortalItemData>(x.m)
                     };
                     item.Data.ConfigCompleted = x.configCompleted;
                     item.Data.ItemType = x.itemType;
                     return item;
-                });
+                }).ToList();
 
-            return root;
+            var menuItems = menus
+                .Where(m => m.Data.ParentId == null)
+                .Select(m =>
+                {
+                    var path = SetRouterLink(m.Data);
+                    m.Children = GetChildrenItems(menus, m.Data.Id, path);
+                    return m;
+                })
+                .OrderBy(m => m.Data.Order)
+                .ThenBy(m => m.Data.Name)
+                .ToList();
+
+            return menuItems;
+        }
+
+        private List<PortalItem> GetChildrenItems(IEnumerable<PortalItem> menus, Guid? parentId, string parentPath)
+        {
+            var menuItems = menus
+                    .Where(m => m.Data.ParentId == parentId)
+                    .Select(m =>
+                    {
+                        var path = SetRouterLink(m.Data, parentPath);
+                        m.Children = GetChildrenItems(menus, m.Data.Id, path);
+                        return m;
+                    })
+                    .OrderBy(m => m.Data.Order)
+                    .ThenBy(m => m.Data.Name)
+                    .ToList();
+
+            return menuItems.Any() ? menuItems : null;
+        }
+
+        private string SetRouterLink(PortalItemData data, string parentPath = "")
+        {
+            var path = $"{parentPath}/{data.Name}";
+            if (data.ParentId == null || data.Type == "Portal Item" || data.Type == "System")
+                data.RouterLink = path;
+
+            return path;
         }
 
         [HttpGet]
@@ -137,10 +149,9 @@ namespace DataEditorPortal.Web.Controllers
         [Route("menu-item/create")]
         public Guid CreateMenuItem([FromBody] PortalItemData model)
         {
-            model.Name = _portalItemService.GetCodeName(model.Label);
-
-            if (model.Type == "Folder")
-                model.ParentId = null;
+            if (string.IsNullOrEmpty(model.Name))
+                model.Name = _portalItemService.GetCodeName(model.Label);
+            if (_portalItemService.ExistName(model.Name, null)) throw new DepException("Name does already exist.");
 
             model.Order = _depDbContext.SiteMenus
                     .Where(x => x.ParentId == model.ParentId)
@@ -156,13 +167,7 @@ namespace DataEditorPortal.Web.Controllers
 
             if (siteMenu.Type == "External")
             {
-                var permission = new SitePermission()
-                {
-                    Category = $"External Link: { model.Label }",
-                    PermissionName = $"View_{ model.Name.Replace("-", "_") }".ToUpper(),
-                    PermissionDescription = $"View { model.Label }"
-                };
-                _depDbContext.Add(permission);
+                CreateOrUpdatePermission(siteMenu);
             }
 
             _depDbContext.SaveChanges();
@@ -174,17 +179,18 @@ namespace DataEditorPortal.Web.Controllers
         [Route("menu-item/{id}/update")]
         public Guid UpdateMenuItem(Guid id, [FromBody] PortalItemData model)
         {
-            model.Name = _portalItemService.GetCodeName(model.Label);
+            if (string.IsNullOrEmpty(model.Name))
+                model.Name = _portalItemService.GetCodeName(model.Label);
+            if (_portalItemService.ExistName(model.Name, id)) throw new DepException("Name does already exist.");
 
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type != "Portal Item");
             if (siteMenu == null)
             {
                 throw new DepException("Not Found", 404);
             }
+            var oldName = siteMenu.Name;
 
             model.Type = siteMenu.Type;
-            if (model.Type == "Folder")
-                model.ParentId = null;
 
             if (siteMenu.ParentId != model.ParentId)
             {
@@ -198,25 +204,50 @@ namespace DataEditorPortal.Web.Controllers
 
             EnsureIconProcessed(model);
 
+            _mapper.Map(model, siteMenu);
+
             if (siteMenu.Type == "External")
             {
-                // update permissions
-                var permissions = _depDbContext.SitePermissions.Where(x => x.Category == $"External Link: { siteMenu.Label }").ToList();
-
-                permissions.ForEach(p =>
-                {
-                    p.Category = p.Category.Replace(siteMenu.Label, model.Label);
-                    p.PermissionName = p.PermissionName.Replace(siteMenu.Name.Replace("-", "_").ToUpper(), model.Name.Replace("-", "_").ToUpper());
-                    p.PermissionDescription = p.PermissionDescription.Replace(siteMenu.Label, model.Label);
-                });
+                CreateOrUpdatePermission(siteMenu, oldName);
             }
-
-            _mapper.Map(model, siteMenu);
 
             _depDbContext.SaveChanges();
 
             return siteMenu.Id;
         }
+
+        private void CreateOrUpdatePermission(SiteMenu siteMenu, string oldMenuName = null)
+        {
+            var types = new List<string> { "View" };
+
+            List<SitePermission> permissions = new List<SitePermission>();
+            if (!string.IsNullOrEmpty(oldMenuName))
+            {
+                // get old permissions
+                var oldPermissionNames = types.Select(t => $"{t}_{ oldMenuName.Replace("-", "_") }".ToUpper());
+                permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
+            }
+
+            types.ForEach(t =>
+            {
+                SitePermission permission = null;
+                if (!string.IsNullOrEmpty(oldMenuName))
+                {
+                    var oldName = $"{t}_{ oldMenuName.Replace("-", "_") }".ToUpper();
+                    permission = permissions.FirstOrDefault(p => p.PermissionName == oldName);
+                }
+
+                if (permission == null)
+                {
+                    permission = new SitePermission() { Id = Guid.NewGuid() };
+                    _depDbContext.Add(permission);
+                }
+                permission.Category = $"External Link: { siteMenu.Label }";
+                permission.PermissionName = $"{t}_{ siteMenu.Name.Replace("-", "_") }".ToUpper();
+                permission.PermissionDescription = $"{t} { siteMenu.Label }";
+            });
+        }
+
 
         [HttpDelete]
         [Route("menu-item/{id}/delete")]

@@ -3,10 +3,12 @@
   [(visible)]="visible"
   [style]="dialogStyle"
   [modal]="true"
+  (onHide)="onCancel()"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0"
   appendTo="body">
   <div #container class="dialog-content">
     <form
+      *ngIf="visible"
       [formGroup]="form"
       #editForm="ngForm"
       (ngSubmit)="onFormSubmit(model)">

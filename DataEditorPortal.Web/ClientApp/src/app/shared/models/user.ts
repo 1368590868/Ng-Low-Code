@@ -13,4 +13,5 @@ export interface AppUser {
   authenticated?: boolean;
   permissions?: UserPermissions;
   isAdmin?: boolean;
+  userMenus?: any;
 }

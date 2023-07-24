@@ -6,8 +6,9 @@ import {
   trigger
 } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { Observable, combineLatest, filter, map } from 'rxjs';
 import { ConfigDataService, UserService, SiteMenu } from 'src/app/shared';
 
 @Component({
@@ -24,8 +25,7 @@ import { ConfigDataService, UserService, SiteMenu } from 'src/app/shared';
   ]
 })
 export class NavMenuComponent implements OnInit {
-  public menuItems: MenuItem[] = [];
-  public currentUrl?: string;
+  public menuItemsInGroup$?: Observable<MenuItem[]>;
 
   constructor(
     public userService: UserService,
@@ -35,24 +35,24 @@ export class NavMenuComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.router.events.subscribe((event: any) => {
-      if (event.type === 1) {
-        this.currentUrl = event.url;
-
-        this.menuItems.forEach(menu => {
-          this.setParentActive(menu, event.url);
-        });
-      }
-    });
-    this.configDataService.menuChange$.subscribe(() => {
-      this.configDataService.getSiteMenus().subscribe(res => {
-        res.forEach(menu => {
+    this.menuItemsInGroup$ = combineLatest([
+      this.router.events.pipe(
+        filter(e => e instanceof NavigationEnd && e.type === 1),
+        map(e => e as NavigationEnd)
+      ),
+      this.configDataService.menusInGroup$
+    ]).pipe(
+      map(([event, menus]) => {
+        return menus.map(menu => {
           this.setMenu(menu);
-          this.setParentActive(menu, this.currentUrl);
+          this.setParentActive(menu, event.url);
+
+          const menuItem: MenuItem = menu;
+          if (menuItem.url) menuItem.target = '_blank';
+          return menuItem;
         });
-        this.menuItems = res;
-      });
-    });
+      })
+    );
   }
 
   setMenu(menu: SiteMenu) {
@@ -63,13 +63,6 @@ export class NavMenuComponent implements OnInit {
         tooltipLabel: menu.description
       };
     }
-    if (menu.type === 'Portal Item') {
-      menu.routerLink = `/portal-item/${
-        menu.itemType
-      }/${menu.name.toLowerCase()}`;
-    } else if (menu.type === 'External') {
-      menu.url = menu.link;
-    } else menu.routerLink = menu.link;
 
     if (menu.status !== 1) {
       menu.badge = 'Draft';
@@ -85,7 +78,6 @@ export class NavMenuComponent implements OnInit {
         backgroundSize: 'contain',
         backgroundPosition: 'center'
       };
-      menu.icon = 'pi ';
     }
 
     if (menu.items) {
@@ -96,7 +88,7 @@ export class NavMenuComponent implements OnInit {
   }
 
   setParentActive(menu: SiteMenu | MenuItem, url?: string) {
-    if (menu.items && menu.items.find(x => x.routerLink === url)) {
+    if (menu.items && menu.items.find(x => `/${x.routerLink}` === url)) {
       menu.styleClass = 'active-parent-menu';
     } else {
       menu.styleClass = '';

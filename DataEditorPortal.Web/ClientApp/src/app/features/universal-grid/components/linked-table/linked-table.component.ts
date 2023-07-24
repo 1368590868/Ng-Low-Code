@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { TableComponent } from '../table/table.component';
 
@@ -7,22 +7,14 @@ import { TableComponent } from '../table/table.component';
   templateUrl: './linked-table.component.html',
   styleUrls: ['./linked-table.component.scss']
 })
-export class LinkedTableComponent implements OnInit {
-  @Input() gridName!: string;
-
+export class LinkedTableComponent {
   @ViewChild('primaryTable') primaryTable!: TableComponent;
   @ViewChild('secondaryTable') secondaryTable!: TableComponent;
-  primaryTableName!: string;
-  secondaryTableName!: string;
+  @Input() primaryTableName!: string;
+  @Input() secondaryTableName!: string;
+  useAsMasterDetailView = false;
 
   constructor(private gridTableService: GridTableService) {}
-
-  ngOnInit(): void {
-    this.gridTableService.getLinkedTableConfig(this.gridName).subscribe(res => {
-      this.primaryTableName = res.primaryTableName;
-      this.secondaryTableName = res.secondaryTableName;
-    });
-  }
 
   onPrimaryRowSelect(event: any) {
     // mark linked data highlighted

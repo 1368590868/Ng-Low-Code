@@ -1,7 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { map, Observable, Subject, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  filter,
+  map,
+  Observable,
+  share,
+  Subject,
+  switchMap,
+  tap
+} from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 import { SiteMenu } from '../models/menu';
 
@@ -32,9 +42,20 @@ export class ConfigDataService {
     webHeaderMessage: ''
   };
   public sidebarCollapsed = false;
+  public isLogin = false;
   public licenseExpired = false;
 
   public menuChange$ = new Subject();
+  public siteMenus$ = this.menuChange$.asObservable().pipe(
+    filter(() => this.isLogin),
+    switchMap(() => {
+      return this.getSiteMenus();
+    }),
+    share()
+  );
+
+  public menuGroupChange$ = new Subject<SiteMenu | undefined>();
+  public menusInGroup$ = new BehaviorSubject<SiteMenu[]>([]);
   public licenseExpiredChange$ = new Subject<boolean>();
 
   constructor(
@@ -51,6 +72,19 @@ export class ConfigDataService {
       }
       this.licenseExpired = val;
     });
+
+    combineLatest([this.siteMenus$, this.menuGroupChange$.asObservable()])
+      .pipe(
+        map(([menus, group]) => {
+          if (group) {
+            const item = menus.find(m => m.name === group.name);
+            return item ? item.items || [] : [];
+          } else {
+            return menus.map(m => m.items || []).flat() || [];
+          }
+        })
+      )
+      .subscribe(menus => this.menusInGroup$.next(menus));
   }
 
   getSiteVersion() {
@@ -134,5 +168,20 @@ export class ConfigDataService {
     return this.http.post<ApiResponse<string>>(`${this._apiUrl}site/license`, {
       license
     });
+  }
+
+  public dropdownItemSize?: number;
+  calcDropdownItemSize() {
+    const htmlString =
+      '<div class="p-dropdown-panel"><div class="p-dropdown-items"><div class="p-dropdown-item">123</div></div></div>';
+    const divElement = document.createElement('div');
+    divElement.innerHTML = htmlString;
+
+    document.body.appendChild(divElement);
+    this.dropdownItemSize =
+      divElement.querySelector<HTMLDivElement>(
+        '.p-dropdown-item'
+      )?.offsetHeight;
+    document.body.removeChild(divElement);
   }
 }

@@ -39,6 +39,7 @@ export class UserService {
   }
 
   loginAfter() {
+    this.configData.isLogin = true;
     this.configData.getSiteEnvironment().subscribe();
     this.configData.menuChange$.next(null);
   }
