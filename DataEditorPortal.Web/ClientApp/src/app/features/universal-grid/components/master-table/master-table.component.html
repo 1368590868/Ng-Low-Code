@@ -1,0 +1,29 @@
+<p-splitter
+  #splitter
+  layout="vertical"
+  class="h-full"
+  [panelSizes]="[99.9, 0.1]"
+  [gutterSize]="0">
+  <ng-template pTemplate>
+    <app-table
+      *ngIf="masterTableName"
+      #masterTable
+      class="flex-grow-1"
+      headerSize="compact"
+      [gridName]="masterTableName"
+      selectionMode="single"
+      (rowSelect)="onMasterRowSelect($event)"
+      (rowUnselect)="onMasterRowUnselect()"
+      (resetData)="onMasterRowUnselect()"></app-table>
+  </ng-template>
+  <ng-template pTemplate>
+    <app-table
+      *ngIf="detailTableName && showDetail"
+      #detailTable
+      class="flex-grow-1"
+      headerSize="compact"
+      [gridName]="detailTableName"
+      [connectToSearch]="false"
+      selectionMode="single"></app-table>
+  </ng-template>
+</p-splitter>
