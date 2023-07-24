@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  BehaviorSubject,
   combineLatest,
   filter,
   map,
@@ -52,22 +53,9 @@ export class ConfigDataService {
     }),
     share()
   );
-  public menusInGroup: SiteMenu[] = [];
+
   public menuGroupChange$ = new Subject<SiteMenu | undefined>();
-  public menusInGroup$ = combineLatest([
-    this.siteMenus$,
-    this.menuGroupChange$.asObservable()
-  ]).pipe(
-    map(([menus, group]) => {
-      if (group) {
-        const item = menus.find(m => m.name === group.name);
-        return item ? item.items || [] : [];
-      } else {
-        return menus.map(m => m.items || []).flat() || [];
-      }
-    }),
-    tap(x => (this.menusInGroup = x))
-  );
+  public menusInGroup$ = new BehaviorSubject<SiteMenu[]>([]);
   public licenseExpiredChange$ = new Subject<boolean>();
 
   constructor(
@@ -84,6 +72,19 @@ export class ConfigDataService {
       }
       this.licenseExpired = val;
     });
+
+    combineLatest([this.siteMenus$, this.menuGroupChange$.asObservable()])
+      .pipe(
+        map(([menus, group]) => {
+          if (group) {
+            const item = menus.find(m => m.name === group.name);
+            return item ? item.items || [] : [];
+          } else {
+            return menus.map(m => m.items || []).flat() || [];
+          }
+        })
+      )
+      .subscribe(menus => this.menusInGroup$.next(menus));
   }
 
   getSiteVersion() {

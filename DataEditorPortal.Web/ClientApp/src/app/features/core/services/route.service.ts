@@ -41,6 +41,10 @@ export class RouteService {
       { name: '', items: menus },
       true
     );
+    const defaultRoute = this.router.config.find(r => r.path === '');
+    if (defaultRoute) {
+      defaultRoute.redirectTo = this.router.config[0].path;
+    }
   }
 
   updateRoute(route: Route, menu: SiteMenu, isRoot = false) {
