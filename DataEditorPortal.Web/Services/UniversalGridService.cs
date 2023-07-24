@@ -1391,7 +1391,8 @@ namespace DataEditorPortal.Web.Services
             return new
             {
                 PrimaryTableName = primary != null ? primary.Name : null,
-                SecondaryTableName = secondary != null ? secondary.Name : null
+                SecondaryTableName = secondary != null ? secondary.Name : null,
+                UseAsMasterDetailView = dataSourceConfig.UseAsMasterDetailView
             };
         }
 

@@ -27,5 +27,6 @@ namespace DataEditorPortal.Web.Models.PortalItem
         public string CurrentStep { get; set; }
         public string ItemType { get; set; }
         public string DataSourceConnectionName { get; set; }
+        public string RouterLink { get; set; }
     }
 }

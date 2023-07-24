@@ -90,7 +90,8 @@ namespace DataEditorPortal.Web.Controllers
                 .Where(m => m.Data.ParentId == null)
                 .Select(m =>
                 {
-                    m.Children = GetChildrenItems(menus, m.Data.Id);
+                    var path = SetRouterLink(m.Data);
+                    m.Children = GetChildrenItems(menus, m.Data.Id, path);
                     return m;
                 })
                 .OrderBy(m => m.Data.Order)
@@ -100,13 +101,14 @@ namespace DataEditorPortal.Web.Controllers
             return menuItems;
         }
 
-        private List<PortalItem> GetChildrenItems(IEnumerable<PortalItem> menus, Guid? parentId)
+        private List<PortalItem> GetChildrenItems(IEnumerable<PortalItem> menus, Guid? parentId, string parentPath)
         {
             var menuItems = menus
                     .Where(m => m.Data.ParentId == parentId)
                     .Select(m =>
                     {
-                        m.Children = GetChildrenItems(menus, m.Data.Id);
+                        var path = SetRouterLink(m.Data, parentPath);
+                        m.Children = GetChildrenItems(menus, m.Data.Id, path);
                         return m;
                     })
                     .OrderBy(m => m.Data.Order)
@@ -116,6 +118,14 @@ namespace DataEditorPortal.Web.Controllers
             return menuItems.Any() ? menuItems : null;
         }
 
+        private string SetRouterLink(PortalItemData data, string parentPath = "")
+        {
+            var path = $"{parentPath}/{data.Name}";
+            if (data.ParentId == null || data.Type == "Portal Item" || data.Type == "System")
+                data.RouterLink = path;
+
+            return path;
+        }
 
         [HttpGet]
         [Route("name-exists")]
@@ -194,12 +204,12 @@ namespace DataEditorPortal.Web.Controllers
 
             EnsureIconProcessed(model);
 
+            _mapper.Map(model, siteMenu);
+
             if (siteMenu.Type == "External")
             {
                 CreateOrUpdatePermission(siteMenu, oldName);
             }
-
-            _mapper.Map(model, siteMenu);
 
             _depDbContext.SaveChanges();
 
