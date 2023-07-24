@@ -29,10 +29,11 @@
         @fadeInOut
         *ngIf="itemType === 'single' && gridName"
         [gridName]="gridName"></app-table>
-      <app-linked-table
-        @fadeInOut
-        *ngIf="itemType === 'linked' && gridName"
-        [gridName]="gridName"></app-linked-table>
+      <ng-container *ngIf="itemType === 'linked' && gridName">
+        <app-linked-or-master
+          @fadeInOut
+          [gridName]="gridName"></app-linked-or-master>
+      </ng-container>
     </div>
   </ng-template>
 </p-splitter>

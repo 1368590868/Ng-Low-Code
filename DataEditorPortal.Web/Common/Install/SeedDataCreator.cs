@@ -61,7 +61,7 @@ namespace DataEditorPortal.Web.Common.Install
                     Name = "settings",
                     Label = "Settings",
                     Icon = "pi pi-cog",
-                    Type = "System",
+                    Type = "Folder",
                     Link = "",
                     Order = 999,
                     Status = PortalItemStatus.Published

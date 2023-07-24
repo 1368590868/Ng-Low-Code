@@ -8,7 +8,14 @@ import {
   ViewChild
 } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
-import { finalize, forkJoin, Subject, takeUntil, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  finalize,
+  forkJoin,
+  Subject,
+  takeUntil,
+  tap
+} from 'rxjs';
 import {
   GridActionOption,
   GridActionWrapperOption
@@ -16,7 +23,12 @@ import {
 import { GridColumn, GridConfig, GridData } from '../../models/grid-types';
 import { Table } from 'primeng/table';
 import { ConfirmationService, TableState } from 'primeng/api';
-import { GridParam, SearchParam, UserService } from 'src/app/shared';
+import {
+  GridFilterParam,
+  GridParam,
+  SearchParam,
+  UserService
+} from 'src/app/shared';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DomHandler } from 'primeng/dom';
 import { UrlParamsService } from '../../services/url-params.service';
@@ -32,6 +44,7 @@ export class TableComponent implements OnInit, OnDestroy {
   @Input() headerSize: 'compact' | 'normal' = 'normal';
   @Input() gridName!: string;
   @Input() selectionMode = 'multiple';
+  @Input() connectToSearch = true;
   @Output() rowSelect = new EventEmitter<any>();
   @Output() rowUnselect = new EventEmitter<any>();
   @Output() resetData = new EventEmitter<any>();
@@ -63,6 +76,7 @@ export class TableComponent implements OnInit, OnDestroy {
   helpUrl?: SafeResourceUrl;
 
   loading = false;
+  loaded$ = new BehaviorSubject(false);
   @ViewChild('dataTable') table!: Table;
 
   columnsConfig: GridColumn[] = [];
@@ -88,6 +102,9 @@ export class TableComponent implements OnInit, OnDestroy {
   allowExport = false;
 
   firstLoadDone = false;
+
+  // default filter
+  defaultFilter: GridFilterParam[] = [];
 
   constructor(
     private gridTableService: GridTableService,
@@ -137,23 +154,26 @@ export class TableComponent implements OnInit, OnDestroy {
       });
       this.initUrlParams();
       this.loading = false;
+      this.loaded$.next(true);
     });
 
-    this.gridTableService.searchClicked$
-      .pipe(
-        tap(model => {
-          if (model) {
-            this.searchModel = model;
-            this.first = 0;
-            this.rows = this.tableConfig.pageSize || 100;
-            this.fetchData();
-          } else {
-            this.resetAndClear();
-          }
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe();
+    if (this.connectToSearch) {
+      this.gridTableService.searchClicked$
+        .pipe(
+          tap(model => {
+            if (model) {
+              this.searchModel = model;
+              this.first = 0;
+              this.rows = this.tableConfig.pageSize || 100;
+              this.fetchData();
+            } else {
+              this.resetAndClear();
+            }
+          }),
+          takeUntil(this.destroy$)
+        )
+        .subscribe();
+    }
   }
 
   initUrlParams() {
@@ -346,6 +366,11 @@ export class TableComponent implements OnInit, OnDestroy {
           }
         }
       }
+    }
+
+    // add default filter
+    if (this.defaultFilter) {
+      fetchParam.filters = fetchParam.filters.concat(this.defaultFilter);
     }
 
     // set sorts from table onSort event

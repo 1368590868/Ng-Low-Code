@@ -17,6 +17,9 @@ import { SplitAreaComponent } from './pages/split-area/split-area.component';
 import { SearchComponent } from './components/search/search.component';
 import { TableComponent } from './components/table/table.component';
 import { LinkedTableComponent } from './components/linked-table/linked-table.component';
+import { MasterTableComponent } from './components/master-table/master-table.component';
+import { LinkedOrMasterComponent } from './pages/linked-or-master';
+
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
 import { GridTableService } from './services/grid-table.service';
 import { SharedModule } from 'src/app/shared';
@@ -50,7 +53,9 @@ import { ConfirmationService } from 'primeng/api';
     SplitAreaComponent,
     SearchComponent,
     TableComponent,
-    LinkedTableComponent
+    LinkedTableComponent,
+    MasterTableComponent,
+    LinkedOrMasterComponent
   ],
   imports: [
     CommonModule,

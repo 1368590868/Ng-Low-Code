@@ -146,6 +146,8 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public LinkedTableConfig SecondaryTable { get; set; }
 
         public RelationDataSourceConfig LinkTable { get; set; }
+
+        public bool UseAsMasterDetailView { get; set; }
     }
 
     public class RelationDataSourceConfig : DataSourceConfig
