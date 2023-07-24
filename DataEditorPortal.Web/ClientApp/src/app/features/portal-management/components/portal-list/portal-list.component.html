@@ -48,8 +48,32 @@
               {{ rowData.label }}
             </div>
           </td>
-          <td style="width: 18%">{{ rowData.name }}</td>
-          <td style="width: 12%">{{ rowData.type }}</td>
+          <td style="width: 18%" style="vertical-align: middle">
+            <div class="flex align-items-center">
+              <span class="text-center">
+                {{ rowData.name }}
+              </span>
+              <a
+                class="ml-3 text-primary"
+                *ngIf="rowData.routerLink"
+                [routerLink]="rowData.routerLink"
+                ><i class="pi pi-link cursor-pointer"></i
+              ></a>
+
+              <a
+                class="ml-3 text-primary"
+                *ngIf="rowData.type === 'External' && rowData.link"
+                [href]="rowData.link"
+                target="_blank"
+                ><i class="pi pi-link cursor-pointer"></i
+              ></a>
+            </div>
+          </td>
+          <td style="width: 12%">
+            <p-chip
+              styleClass="font-medium"
+              [label]="!rowData.parentId ? 'Group' : rowData.type"></p-chip>
+          </td>
           <td>{{ rowData.description }}</td>
           <td style="width: 12rem">
             <div class="flex align-items-center">

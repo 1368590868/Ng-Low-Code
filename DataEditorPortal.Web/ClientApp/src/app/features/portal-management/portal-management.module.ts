@@ -38,6 +38,7 @@ import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabViewModule } from 'primeng/tabview';
 import { FileUploadModule } from 'primeng/fileupload';
+import { ChipModule } from 'primeng/chip';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
@@ -190,7 +191,8 @@ import { ImportDialogComponent } from './components/portal-list/import-dialog/im
     MessageModule,
     ConfirmDialogModule,
     TabViewModule,
-    FileUploadModule
+    FileUploadModule,
+    ChipModule
   ],
   providers: [
     {
