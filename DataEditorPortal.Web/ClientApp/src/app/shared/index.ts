@@ -15,6 +15,7 @@ import { PermissionDirective } from './directive/permission.directive';
 import { BooleanTextPipe } from './pipes/boolean-text.pipe';
 import { AttachmentsPipe } from './pipes/attachments.pipe';
 import { TemplatePipe } from './pipes/template.pipe';
+import { NumeralPipe } from './pipes/numeral.pipe';
 import { DataFormatService } from './services/data-format.service';
 import { AutoFilterDirective } from './directive/auto-filter.directive';
 import { DropdownFixDirective } from './directive/dropdown-fix.directive';
@@ -51,6 +52,7 @@ export { SystemLogData } from './models/system-log';
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
+    NumeralPipe,
     AttachmentsComponent,
     GlobalLoadingComponent
   ],
@@ -69,6 +71,7 @@ export { SystemLogData } from './models/system-log';
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
+    NumeralPipe,
     AttachmentsComponent,
     GlobalLoadingComponent
   ],

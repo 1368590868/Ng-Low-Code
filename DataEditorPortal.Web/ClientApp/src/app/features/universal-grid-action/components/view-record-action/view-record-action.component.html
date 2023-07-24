@@ -32,7 +32,7 @@
         }}</ng-template>
         <ng-template #numeric>{{
           viewData.value
-            | number : (viewData.format === '' ? undefined : viewData.format)
+            | numeral : (viewData.format === '' ? undefined : viewData.format)
         }}</ng-template>
         <ng-template #attachments>
           <app-attachments
