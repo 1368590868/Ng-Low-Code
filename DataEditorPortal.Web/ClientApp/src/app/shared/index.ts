@@ -26,6 +26,7 @@ import { AttachmentsComponent } from './components/attachments/attachments.compo
 import { globalLoadingInterceptor } from './interceptor/global-loading.interceptor';
 import { GlobalLoadingComponent } from './components/global-loading/global-loading.component';
 import { ConfigDataService } from './services/config-data.service';
+import { registerNumeral } from './utils';
 
 export { AuthRouterGuard } from './guards/auth-router.guard';
 export { AdminPermissionGuard } from './guards/admin-permission.guard';
@@ -42,6 +43,8 @@ export { SystemLogService } from './services/system-log.service';
 export { DataFormatService } from './services/data-format.service';
 export * from './models/universal.type';
 export { SystemLogData } from './models/system-log';
+
+registerNumeral();
 
 @NgModule({
   declarations: [
