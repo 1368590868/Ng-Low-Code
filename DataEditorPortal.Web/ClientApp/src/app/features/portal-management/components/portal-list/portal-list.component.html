@@ -55,7 +55,7 @@
               </span>
               <a
                 class="ml-3 text-primary"
-                *ngIf="rowData.routerLink"
+                *ngIf="rowData.routerLink && rowData.type !== 'Folder'"
                 [routerLink]="rowData.routerLink"
                 ><i class="pi pi-link cursor-pointer"></i
               ></a>
