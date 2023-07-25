@@ -172,6 +172,8 @@ namespace DataEditorPortal.Web
                 configuration.RootPath = "ClientApp/dist";
             });
 
+            services.AddResponseCompression(options => { options.EnableForHttps = true; });
+
             services.AddQuartz(q =>
             {
                 q.UseMicrosoftDependencyInjectionJobFactory();
