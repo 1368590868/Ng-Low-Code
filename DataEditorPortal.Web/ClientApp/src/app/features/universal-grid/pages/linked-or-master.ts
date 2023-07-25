@@ -4,12 +4,10 @@ import { GridTableService } from '../services/grid-table.service';
 @Component({
   selector: 'app-linked-or-master',
   template: `<app-linked-table
-      @fadeInOut
       *ngIf="!useAsMasterDetailView"
       [primaryTableName]="primaryTableName"
       [secondaryTableName]="secondaryTableName"></app-linked-table>
     <app-master-table
-      @fadeInOut
       *ngIf="useAsMasterDetailView"
       [masterTableName]="primaryTableName"
       [detailTableName]="secondaryTableName"></app-master-table>`,

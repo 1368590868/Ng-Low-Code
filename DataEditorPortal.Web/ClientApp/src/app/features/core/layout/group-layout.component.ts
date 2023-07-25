@@ -17,7 +17,7 @@ export class GroupLayoutComponent implements OnInit {
   ngOnInit(): void {
     this.route.data.subscribe(data => {
       this.group = data['group'];
-      this.configDataService.menuGroupChange$.next(this.group);
+      // this.configDataService.menuGroupChange$.next(this.group);
     });
   }
 }

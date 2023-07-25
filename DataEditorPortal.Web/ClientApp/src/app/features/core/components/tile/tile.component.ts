@@ -48,7 +48,7 @@ export class TileComponent implements OnDestroy {
     app.isStable.pipe(takeUntil(this.destroy$)).subscribe(x => {
       if (x) this.loading = false;
     });
-    this.menus$ = this.configDataService.menusInGroup$.pipe(
+    this.menus$ = this.configDataService.siteMenus$.pipe(
       takeUntil(this.destroy$),
       map(menus => {
         return this.flattenMenus(menus);

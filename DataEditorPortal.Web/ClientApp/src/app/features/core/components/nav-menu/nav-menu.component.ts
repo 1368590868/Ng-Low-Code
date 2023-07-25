@@ -40,7 +40,7 @@ export class NavMenuComponent implements OnInit {
         filter(e => e instanceof NavigationEnd && e.type === 1),
         map(e => e as NavigationEnd)
       ),
-      this.configDataService.menusInGroup$
+      this.configDataService.siteMenus$
     ]).pipe(
       map(([event, menus]) => {
         return menus.map(menu => {

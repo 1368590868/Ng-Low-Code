@@ -41,10 +41,6 @@ export class RouteService {
       { name: '', items: menus },
       true
     );
-    const defaultRoute = this.router.config.find(r => r.path === '');
-    if (defaultRoute) {
-      defaultRoute.redirectTo = this.router.config[0].path;
-    }
   }
 
   updateRoute(route: Route, menu: SiteMenu, isRoot = false) {
@@ -116,14 +112,7 @@ export class RouteService {
   }
 
   generateRoute(menu: SiteMenu): Route {
-    if (!menu.parentId) {
-      return {
-        path: menu.name,
-        data: { group: { ...menu, items: undefined } },
-        component: GroupLayoutComponent,
-        children: [{ path: '', component: TileComponent }]
-      };
-    } else if (menu.type === 'Portal Item') {
+    if (menu.type === 'Portal Item') {
       return {
         path: menu.name,
         loadChildren: () =>
