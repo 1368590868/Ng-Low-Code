@@ -211,7 +211,7 @@
             }}</ng-template>
             <ng-template #numeric>{{
               data[col.field]
-                | number : (col.format === '' ? undefined : col.format)
+                | numeral : (col.format === '' ? undefined : col.format)
             }}</ng-template>
             <ng-template #attachments>
               <app-attachments

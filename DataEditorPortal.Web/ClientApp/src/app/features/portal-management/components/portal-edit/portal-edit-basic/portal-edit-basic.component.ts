@@ -133,8 +133,7 @@ export class PortalEditBasicComponent
               const options = this.getFolders(res, 1);
               options.splice(0, 0, {
                 label: 'Root',
-                value: '<root>',
-                disabled: true
+                value: '<root>'
               });
 
               const findItem = options.find(
