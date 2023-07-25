@@ -308,12 +308,11 @@ export class PortalEditColumnsComponent
           key: 'format',
           type: 'input',
           props: {
-            label: 'Data Format',
-            description:
-              'Please enter value format.\n<a href="http://numeraljs.com/#format" target="_blank">See more</a>'
+            label: 'Data Format'
           },
           expressions: {
-            hide: `['numeric','date'].indexOf(field.parent.model.filterType) < 0`
+            hide: `['numeric','date'].indexOf(field.parent.model.filterType) < 0`,
+            'props.description': `field.parent.model.filterType === 'numeric' && 'Please enter value format. <br/> <a href="http://numeraljs.com/#format" target="_blank">See more</a>'`
           }
         }
       ],
