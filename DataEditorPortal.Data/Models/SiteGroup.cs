@@ -13,7 +13,7 @@ namespace DataEditorPortal.Data.Models
         public Guid Id { get; set; }
         [Column("NAME")]
         public string Name { get; set; }
-        [Column("Title")]
+        [Column("TITLE")]
         public string Title { get; set; }
         [Column("DESCRIPTION")]
         public string Description { get; set; }

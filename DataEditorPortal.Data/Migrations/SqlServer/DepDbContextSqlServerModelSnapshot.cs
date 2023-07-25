@@ -457,7 +457,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Title");
+                        .HasColumnName("TITLE");
 
                     b.HasKey("Id");
 

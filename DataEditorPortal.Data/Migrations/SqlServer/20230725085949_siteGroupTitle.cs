@@ -7,7 +7,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Title",
+                name: "TITLE",
                 schema: Common.Constants.DEFAULT_SCHEMA,
                 table: "SITE_GROUPS",
                 type: "nvarchar(max)",
@@ -17,7 +17,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Title",
+                name: "TITLE",
                 schema: Common.Constants.DEFAULT_SCHEMA,
                 table: "SITE_GROUPS");
         }
