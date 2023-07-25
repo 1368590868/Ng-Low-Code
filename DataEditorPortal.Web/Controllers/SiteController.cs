@@ -133,10 +133,10 @@ namespace DataEditorPortal.Web.Controllers
         [HttpPost]
         [Route("menus")]
         [NoLicenseCheck]
-        public List<MenuItem> GetMenus()
+        public List<MenuItem> GetMenus([FromQuery] string siteGroupName)
         {
             var user = AppUser.FromWindowsIdentity(User?.Identity);
-            return _userService.GetUserMenus(user.Username);
+            return _userService.GetUserMenus(user.Username, siteGroupName);
         }
 
         #region site content

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -39,7 +40,7 @@ namespace DataEditorPortal.Web.Controllers
         [HttpGet]
         [NoLicenseCheck]
         [Route("getLoggedInUser")]
-        public AppUser GetLoggedInUser()
+        public AppUser GetLoggedInUser([FromQuery] string url)
         {
             var user = AppUser.FromWindowsIdentity(User?.Identity);
 
@@ -78,7 +79,19 @@ namespace DataEditorPortal.Web.Controllers
             if (!user.Disabled)
             {
                 user.Permissions = _userService.GetUserPermissions();
-                user.UserMenus = _userService.GetUserMenus(user.Username);
+
+                // get the group from the return url
+                var group = string.Empty;
+                if (!string.IsNullOrEmpty(url))
+                {
+                    Match match = Regex.Match(url, @"^/([^/]+)(?:/[^/])*/*$");
+                    if (match.Success)
+                    {
+                        group = match.Groups[1].Value;
+                    }
+                }
+
+                user.UserMenus = _userService.GetUserMenus(user.Username, group);
             }
             user.IsAdmin = _userService.IsAdmin(user.Username);
 

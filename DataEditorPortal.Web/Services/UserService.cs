@@ -13,7 +13,7 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IUserService
     {
-        List<MenuItem> GetUserMenus(string username);
+        List<MenuItem> GetUserMenus(string username, string group);
         Dictionary<string, bool> GetUserPermissions();
         bool IsAdmin(string username);
         bool HasAdmin();
@@ -43,13 +43,31 @@ namespace DataEditorPortal.Web.Services
             _memoryCache = memoryCache;
         }
 
-        public List<MenuItem> GetUserMenus(string username)
+        public List<MenuItem> GetUserMenus(string username, string groupName)
         {
             var isAdmin = IsAdmin(username);
             var userPermissions = GetUserPermissions().Keys.ToList();
 
+            // find site group
+            SiteGroup siteGroup = null;
+            if (!string.IsNullOrEmpty(groupName))
+                siteGroup = _depDbContext.SiteGroups.FirstOrDefault(x => x.Name.ToUpper() == groupName.ToUpper());
+
+            var groupPath = string.Empty;
+            if (siteGroup != null) groupPath = siteGroup.Name;
+
+            var menusQuery = from m in _depDbContext.SiteMenus select m;
+            if (siteGroup != null)
+            {
+                menusQuery = from m in _depDbContext.SiteMenus
+                             where
+                                // all the root menus that in this group AND all the children menus.
+                                m.ParentId != null || (m.ParentId == null && m.SiteGroups.Any(g => g.Id == siteGroup.Id))
+                             select m;
+            }
+
             var menus = (
-                    from m in _depDbContext.SiteMenus
+                    from m in menusQuery
                     join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name into us
                     from u in us.DefaultIfEmpty()
                     where m.Type != "Sub Portal Item" && (u == null || u.ConfigCompleted)
@@ -76,7 +94,7 @@ namespace DataEditorPortal.Web.Services
                 })
                 .Select(m =>
                 {
-                    var path = SetMenuLink(m);
+                    var path = SetMenuLink(m, groupPath);
                     m.Items = GetChildrenItems(menus, m.Id, isAdmin, userPermissions, path);
                     return m;
                 })
@@ -84,6 +102,21 @@ namespace DataEditorPortal.Web.Services
                 .OrderBy(m => m.Order)
                 .ThenBy(m => m.Name)
                 .ToList();
+
+            if (siteGroup != null)
+            {
+                menuItems = new List<MenuItem>() {
+                    new MenuItem()
+                    {
+                        Name = siteGroup.Name,
+                        Description = siteGroup.Description,
+                        Id = siteGroup.Id,
+                        Component = "GroupLayoutComponent",
+                        Type = "Group",
+                        Items = menuItems
+                    }
+                };
+            }
 
             return menuItems;
         }
