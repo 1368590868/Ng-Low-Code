@@ -131,6 +131,11 @@ export class RouteService {
     } else {
       const route: Route = { path: menu.name, canActivate: [] };
       switch (menu.component) {
+        case 'GroupLayoutComponent':
+          route.data = { group: { ...menu, items: undefined } };
+          route.component = GroupLayoutComponent;
+          route.children = [{ path: '', component: TileComponent }];
+          break;
         case 'UniversalGridModule':
           route.loadChildren = () =>
             import(

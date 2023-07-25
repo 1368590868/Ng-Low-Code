@@ -47,9 +47,8 @@ export class ConfigDataService {
 
   public menuChange$ = new Subject();
   public siteMenus$ = new BehaviorSubject<SiteMenu[]>([]);
+  public siteGroupName: string | undefined;
 
-  // public menuGroupChange$ = new Subject<SiteMenu | undefined>();
-  // public menusInGroup$ = new BehaviorSubject<SiteMenu[]>([]);
   public licenseExpiredChange$ = new Subject<boolean>();
 
   constructor(
@@ -77,19 +76,6 @@ export class ConfigDataService {
         share()
       )
       .subscribe(menus => this.siteMenus$.next(menus));
-
-    // combineLatest([this.siteMenus$, this.menuGroupChange$.asObservable()])
-    //   .pipe(
-    //     map(([menus, group]) => {
-    //       if (group) {
-    //         const item = menus.find(m => m.name === group.name);
-    //         return item ? item.items || [] : [];
-    //       } else {
-    //         return menus.map(m => m.items || []).flat() || [];
-    //       }
-    //     })
-    //   )
-    //   .subscribe(menus => this.menusInGroup$.next(menus));
   }
 
   getSiteVersion() {
@@ -110,7 +96,9 @@ export class ConfigDataService {
 
   getSiteMenus(): Observable<SiteMenu[]> {
     return this.http
-      .post<ApiResponse<SiteMenu[]>>(`${this._apiUrl}site/menus`, null)
+      .post<ApiResponse<SiteMenu[]>>(`${this._apiUrl}site/menus`, null, {
+        params: { siteGroupName: this.siteGroupName || '' }
+      })
       .pipe(map(res => res.data || []));
   }
 

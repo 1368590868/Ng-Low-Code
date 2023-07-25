@@ -26,27 +26,35 @@ export class UserService {
     this._apiUrl = apiUrl;
   }
 
-  login() {
-    return this.getLoggedInUser().pipe(
+  login(url?: string) {
+    return this.getLoggedInUser(url).pipe(
       tap(res => {
         if (res.code == 200 && res.data) {
           this.isLogin = true;
-          this.loginAfter();
+          this.configData.isLogin = true;
           this.USER = res.data;
+
+          // set site group
+          const menus = res.data.userMenus;
+          if (menus) {
+            const siteGroup = menus.find(m => m.type === 'Group');
+            if (siteGroup) this.configData.siteGroupName = siteGroup.name;
+          }
+
+          // trigger load menus
+          this.configData.menuChange$.next(null);
+
+          // load site env
+          this.configData.getSiteEnvironment().subscribe();
         }
       })
     );
   }
 
-  loginAfter() {
-    this.configData.isLogin = true;
-    this.configData.getSiteEnvironment().subscribe();
-    this.configData.menuChange$.next(null);
-  }
-
-  getLoggedInUser() {
+  getLoggedInUser(url?: string) {
     return this.http.get<ApiResponse<AppUser>>(
-      `${this._apiUrl}User/GetLoggedInUser`
+      `${this._apiUrl}User/GetLoggedInUser`,
+      { params: { url: url || '' } }
     );
   }
 

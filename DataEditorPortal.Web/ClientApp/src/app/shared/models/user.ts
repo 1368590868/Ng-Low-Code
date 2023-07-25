@@ -1,3 +1,5 @@
+import { SiteMenu } from './menu';
+
 interface UserPermissions {
   [propName: string]: boolean;
 }
@@ -13,5 +15,5 @@ export interface AppUser {
   authenticated?: boolean;
   permissions?: UserPermissions;
   isAdmin?: boolean;
-  userMenus?: any;
+  userMenus?: SiteMenu[];
 }

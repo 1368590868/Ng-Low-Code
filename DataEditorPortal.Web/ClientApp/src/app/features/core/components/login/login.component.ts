@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, tap } from 'rxjs';
+import { finalize, first, tap } from 'rxjs';
 import { UserService } from 'src/app/shared';
 import { RouteService } from '../../services/route.service';
 
@@ -21,36 +21,32 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.attemptLogin();
+    this.route.queryParams
+      .pipe(
+        first(),
+        tap(qp => {
+          const returnUrl = qp && qp['returnUrl'];
+          this.attemptLogin(returnUrl);
+        })
+      )
+      .subscribe();
   }
 
-  attemptLogin() {
+  attemptLogin(returnUrl: string | undefined) {
     this.isLoading = true;
     this.hasLoginError = false;
 
     this.userService
-      .login()
+      .login(returnUrl)
       .pipe(
         tap(res => {
           if (this.userService.isLogin) {
-            this.routeService.resetRoutesConfig(res.data?.userMenus);
-
-            this.route.queryParams
-              .pipe(
-                tap(qp => {
-                  if (qp && qp['returnUrl']) {
-                    this.router.navigateByUrl(qp['returnUrl']);
-                  } else {
-                    this.router.navigate(['']);
-                  }
-                })
-              )
-              .subscribe();
+            this.routeService.resetRoutesConfig(res.data?.userMenus || []);
+            this.router.navigateByUrl(returnUrl || '');
           } else {
             this.hasLoginError = true;
           }
         }),
-
         finalize(() => (this.isLoading = false))
       )
       .subscribe();
