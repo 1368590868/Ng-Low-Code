@@ -14,5 +14,8 @@ namespace DataEditorPortal.Data.Models
         public string ContentName { get; set; }
         [Column("CONTENT")]
         public string Content { get; set; }
+
+        [Column("SITE_GROUP_ID")]
+        public Guid? SiteGroupId { get; set; }
     }
 }

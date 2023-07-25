@@ -22,6 +22,7 @@ namespace DataEditorPortal.Data.Contexts
         public virtual DbSet<SitePermission> SitePermissions { get; set; }
         public virtual DbSet<SiteRolePermission> SiteRolePermissions { get; set; }
 
+        public virtual DbSet<SiteGroup> SiteGroups { get; set; }
         public virtual DbSet<SiteMenu> SiteMenus { get; set; }
         public virtual DbSet<Lookup> Lookups { get; set; }
         public virtual DbSet<DataDictionary> DataDictionaries { get; set; }
@@ -41,6 +42,19 @@ namespace DataEditorPortal.Data.Contexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<SiteGroup>(entity =>
+            {
+                entity.HasMany(x => x.SiteMenus).WithMany(x => x.SiteGroups)
+                .UsingEntity(
+                    e =>
+                    {
+                        e.ToTable("SITE_GROUP_SITE_MENU");
+                        e.Property<Guid>("SiteGroupsId").HasColumnName("SITE_GROUP_ID");
+                        e.Property<Guid>("SiteMenusId").HasColumnName("SITE_MENU_ID");
+                    }
+                );
+            });
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {

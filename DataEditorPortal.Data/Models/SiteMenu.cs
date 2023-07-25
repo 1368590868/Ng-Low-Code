@@ -1,5 +1,6 @@
 ﻿using DataEditorPortal.Data.Common;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
@@ -41,5 +42,7 @@ namespace DataEditorPortal.Data.Models
         public SiteMenu Parent { get; set; }
         [Column("PARENT_ID")]
         public Guid? ParentId { get; set; }
+
+        public virtual ICollection<SiteGroup> SiteGroups { get; set; }
     }
 }
