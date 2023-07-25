@@ -23,18 +23,21 @@ namespace DataEditorPortal.Web.Controllers
         private readonly DepDbContext _depDbContext;
         private readonly IQueryBuilder _queryBuilder;
         private readonly IUniversalGridService _universalGridService;
+        private readonly IPortalItemService _portalItemService;
 
         public SiteGroupController(
             ILogger<SiteGroupController> logger,
             DepDbContext depDbContext,
             IConfiguration config,
             IQueryBuilder queryBuilder,
-            IUniversalGridService universalGridService)
+            IUniversalGridService universalGridService,
+            IPortalItemService portalItemService)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _queryBuilder = queryBuilder;
             _universalGridService = universalGridService;
+            _portalItemService = portalItemService;
         }
 
         [HttpPost]
@@ -102,19 +105,34 @@ namespace DataEditorPortal.Web.Controllers
         [Route("name-exists")]
         public bool ExistName([FromQuery] string name, [FromQuery] Guid? id)
         {
-            return _depDbContext.SiteGroups.Where(x => x.Name.ToUpper() == name.ToUpper() && x.Id != id).Any();
+            if (string.IsNullOrEmpty(name)) return true;
+
+            return _portalItemService.ExistName(name, id);
+        }
+
+
+        [HttpGet]
+        [Route("get-code-name")]
+        public string GetCodeNamme([FromQuery] string name)
+        {
+            return _portalItemService.GetCodeName(name);
         }
 
         [HttpPost]
         [Route("create")]
         public Guid Create(SiteGroupModel model)
         {
-            if (string.IsNullOrEmpty(model.Name)) throw new DepException("Name cannot be empty.");
-            if (ExistName(model.Name, null)) throw new DepException("Name does exist.");
+            if (string.IsNullOrEmpty(model.Title)) throw new DepException("Title cannot be empty.");
+
+            if (string.IsNullOrEmpty(model.Name))
+                model.Name = _portalItemService.GetCodeName(model.Title);
+
+            if (_portalItemService.ExistName(model.Name, null)) throw new DepException("Name does already exist.");
 
             var item = new SiteGroup();
             item.Id = Guid.NewGuid();
             item.Name = model.Name;
+            item.Title = model.Title;
             item.Description = model.Description;
             _depDbContext.SiteGroups.Add(item);
 
@@ -139,8 +157,12 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{id}/update")]
         public Guid Update(Guid id, SiteGroupModel model)
         {
-            if (string.IsNullOrEmpty(model.Name)) throw new DepException("Name cannot be empty.");
-            if (ExistName(model.Name, id)) throw new DepException("Name does exist.");
+            if (string.IsNullOrEmpty(model.Title)) throw new DepException("Title cannot be empty.");
+
+            if (string.IsNullOrEmpty(model.Name))
+                model.Name = _portalItemService.GetCodeName(model.Title);
+
+            if (_portalItemService.ExistName(model.Name, id)) throw new DepException("Name does exist.");
 
             var item = _depDbContext.SiteGroups.FirstOrDefault(x => x.Id == id);
             if (item == null)
@@ -149,6 +171,7 @@ namespace DataEditorPortal.Web.Controllers
             }
 
             item.Name = model.Name;
+            item.Title = model.Title;
             item.Description = model.Description;
 
             var aboutSiteContent = _depDbContext.SiteContents.FirstOrDefault(x => x.SiteGroupId.Value == id && x.ContentName == "about");

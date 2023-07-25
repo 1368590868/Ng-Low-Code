@@ -87,7 +87,11 @@ namespace DataEditorPortal.Web.Services
         public bool ExistName(string name, Guid? id)
         {
             var codeName = GetCodeName(name);
-            return _depDbContext.SiteMenus.Where(x => x.Name == codeName && x.Id != id).Any();
+
+            var existInGroup = _depDbContext.SiteGroups.Where(x => x.Name == codeName && x.Id != id).Any();
+            var existInMenu = _depDbContext.SiteMenus.Where(x => x.Name == codeName && x.Id != id).Any();
+
+            return existInGroup || existInMenu;
         }
 
         public string GetCodeName(string name)

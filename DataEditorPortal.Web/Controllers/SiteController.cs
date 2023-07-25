@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -144,9 +145,9 @@ namespace DataEditorPortal.Web.Controllers
         [Route("content/{contentName}")]
         [AllowAnonymous]
         [NoLicenseCheck]
-        public string GetSiteContent(string contentName)
+        public string GetSiteContent(string contentName, [FromQuery] Guid? siteGroup)
         {
-            var item = _depDbContext.SiteContents.FirstOrDefault(x => x.ContentName == contentName);
+            var item = _depDbContext.SiteContents.FirstOrDefault(x => x.ContentName == contentName && x.SiteGroupId == siteGroup);
             if (item == null)
             {
                 throw new DepException("Not Found", 404);
@@ -159,7 +160,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("content/{contentName}")]
         public bool UpdateSiteContent(string contentName, [FromBody] SiteContent siteContent)
         {
-            var item = _depDbContext.SiteContents.FirstOrDefault(x => x.ContentName == contentName);
+            var item = _depDbContext.SiteContents.FirstOrDefault(x => x.ContentName == contentName && x.SiteGroupId == null);
             if (item == null)
             {
                 throw new DepException("Not Found", 404);
