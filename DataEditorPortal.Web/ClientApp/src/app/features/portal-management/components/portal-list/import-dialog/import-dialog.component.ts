@@ -54,8 +54,7 @@ export class ImportDialogComponent {
 
       this.options.splice(0, 0, {
         label: 'Root',
-        value: '<root>',
-        disabled: true
+        value: '<root>'
       });
       this.parentFolderControl.setValue(this.options[1].value);
     });

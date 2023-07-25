@@ -70,9 +70,7 @@
             </div>
           </td>
           <td style="width: 12%">
-            <p-chip
-              styleClass="font-medium"
-              [label]="!rowData.parentId ? 'Group' : rowData.type"></p-chip>
+            <p-chip styleClass="font-medium" [label]="rowData.type"></p-chip>
           </td>
           <td>{{ rowData.description }}</td>
           <td style="width: 12rem">

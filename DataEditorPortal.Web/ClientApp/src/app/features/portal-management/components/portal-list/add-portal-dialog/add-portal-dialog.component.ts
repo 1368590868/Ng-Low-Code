@@ -157,8 +157,7 @@ export class AddPortalDialogComponent {
 
                 options.splice(0, 0, {
                   label: 'Root',
-                  value: '<root>',
-                  disabled: this.model['type'] === 'External'
+                  value: '<root>'
                 });
 
                 const findItem = options.find(
@@ -167,8 +166,7 @@ export class AddPortalDialogComponent {
                 if (!findItem) {
                   this.model = {
                     ...this.model,
-                    parentId:
-                      options[this.model['type'] === 'External' ? 1 : 0].value
+                    parentId: options[0].value
                   };
                 }
                 field.props.options = options;

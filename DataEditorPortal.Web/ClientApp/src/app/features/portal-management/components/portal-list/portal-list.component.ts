@@ -20,11 +20,11 @@ export class PortalListComponent implements OnInit {
   data!: PortalItem[];
   addNewMenuModels: MenuItem[] = [
     {
-      label: 'Create Group',
+      label: 'Create Folder',
       icon: 'pi pi-fw pi-folder',
       command: () => {
-        this.addDialog.header = 'Create Group';
-        this.addDialog.okText = 'Create Group';
+        this.addDialog.header = 'Create Folder';
+        this.addDialog.okText = 'Create Folder';
         this.addDialog.model = { type: 'Folder', parentId: null };
         this.addDialog.showDialog();
       }
@@ -201,16 +201,12 @@ export class PortalListComponent implements OnInit {
       });
 
       items.push({
-        label: row['parentId'] == null ? 'Edit Group' : 'Edit Folder',
+        label: 'Edit Folder',
         icon: 'pi pi-fw pi-pencil',
         command: () => {
           // edit folder
-          this.addDialog.header =
-            row['parentId'] == null
-              ? 'Update Group details'
-              : 'Update Folder details';
-          this.addDialog.okText =
-            row['parentId'] == null ? 'Update Group' : 'Update Folder';
+          this.addDialog.header = 'Update Folder details';
+          this.addDialog.okText = 'Update Folder';
           this.addDialog.model = {
             ...row,
             parentId: row['parentId'] ?? '<root>'
