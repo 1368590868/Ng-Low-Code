@@ -47,103 +47,7 @@ export class AddGroupComponent {
   form = new FormGroup({});
   options: FormlyFormOptions = {};
   model: GroupDetail = {};
-  fields: FormlyFieldConfig[] = [
-    {
-      fieldGroup: [
-        {
-          className: 'w-6',
-          key: 'title',
-          type: 'input',
-          props: {
-            label: 'Title',
-            placeholder: 'Title',
-            required: true
-          },
-          modelOptions: {
-            updateOn: 'blur'
-          },
-          hooks: {
-            onInit: field => {
-              field.formControl?.valueChanges
-                .pipe(takeUntil(this.destroy$))
-                .subscribe(val => {
-                  if (!val) return;
-                  if (field && field.parent && field.parent.get) {
-                    const control = field.parent?.get('name').formControl;
-                    control?.setValue(val);
-                  }
-                });
-            }
-          }
-        },
-        {
-          className: 'w-6',
-          key: 'name',
-          type: 'input',
-          props: {
-            label: 'Name',
-            placeholder: 'Name',
-            required: true
-          },
-          modelOptions: {
-            updateOn: 'blur'
-          },
-          asyncValidators: {
-            exist: {
-              expression: (c: AbstractControl) => {
-                const currVal = c.value;
-                if (this.timer) clearTimeout(this.timer);
-                return new Promise((resolve, reject) => {
-                  if (!currVal) {
-                    resolve(true);
-                  } else {
-                    this.timer = setTimeout(() => {
-                      this.siteGroupService
-                        .nameExists(currVal, this.id)
-                        .subscribe(res => {
-                          res.code === 200
-                            ? resolve(!res.data)
-                            : reject(res.message);
-                        });
-                    }, 100);
-                  }
-                });
-              },
-              message: () => {
-                return 'The Name has already been exist.';
-              }
-            }
-          },
-          hooks: {
-            onInit: field => {
-              field.formControl?.valueChanges
-                .pipe(takeUntil(this.destroy$))
-                .subscribe(val => {
-                  if (val) {
-                    this.siteGroupService.getCodeName(val).subscribe(res => {
-                      field.formControl?.setValue(res.data, {
-                        emitEvent: false
-                      });
-                      this.model['name'] = res.data + '';
-                      field.formControl?.markAsDirty();
-                    });
-                  }
-                });
-            }
-          }
-        }
-      ]
-    },
-
-    {
-      key: 'description',
-      type: 'textarea',
-      props: {
-        label: 'Description',
-        placeholder: 'Description'
-      }
-    }
-  ];
+  fields: FormlyFieldConfig[] = [];
 
   constructor(
     private siteGroupService: SiteGroupService,
@@ -176,12 +80,113 @@ export class AddGroupComponent {
         );
         this.isLoading = false;
       }
+
+      this.fields = [
+        {
+          fieldGroup: [
+            {
+              className: 'w-6',
+              key: 'title',
+              type: 'input',
+              props: {
+                label: 'Title',
+                placeholder: 'Title',
+                required: true
+              },
+              modelOptions: {
+                updateOn: 'blur'
+              },
+              hooks: {
+                onInit: field => {
+                  field.formControl?.valueChanges
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe(val => {
+                      if (!val) return;
+                      if (field && field.parent && field.parent.get) {
+                        const control = field.parent?.get('name').formControl;
+                        control?.setValue(val);
+                      }
+                    });
+                }
+              }
+            },
+            {
+              className: 'w-6',
+              key: 'name',
+              type: 'input',
+              props: {
+                label: 'Name',
+                placeholder: 'Name',
+                required: true
+              },
+              modelOptions: {
+                updateOn: 'blur'
+              },
+              asyncValidators: {
+                exist: {
+                  expression: (c: AbstractControl) => {
+                    const currVal = c.value;
+                    if (this.timer) clearTimeout(this.timer);
+                    return new Promise((resolve, reject) => {
+                      if (!currVal) {
+                        resolve(true);
+                      } else {
+                        this.timer = setTimeout(() => {
+                          this.siteGroupService
+                            .nameExists(currVal, this.id)
+                            .subscribe(res => {
+                              res.code === 200
+                                ? resolve(!res.data)
+                                : reject(res.message);
+                            });
+                        }, 100);
+                      }
+                    });
+                  },
+                  message: () => {
+                    return 'The Name has already been exist.';
+                  }
+                }
+              },
+              hooks: {
+                onInit: field => {
+                  field.formControl?.valueChanges
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe(val => {
+                      if (val) {
+                        this.siteGroupService
+                          .getCodeName(val)
+                          .subscribe(res => {
+                            field.formControl?.setValue(res.data, {
+                              emitEvent: false
+                            });
+                            this.model['name'] = res.data + '';
+                            field.formControl?.markAsDirty();
+                          });
+                      }
+                    });
+                }
+              }
+            }
+          ]
+        },
+
+        {
+          key: 'description',
+          type: 'textarea',
+          props: {
+            label: 'Description',
+            placeholder: 'Description'
+          }
+        }
+      ];
       this.isLoading = false;
     });
   }
 
   onHide() {
     this.options.resetModel?.();
+    this.destroy$.next(null);
   }
 
   onCancel() {
