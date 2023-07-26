@@ -140,9 +140,14 @@ export class PortalListComponent implements OnInit {
         icon: 'pi pi-fw pi-pencil',
         command: () => {
           // edit folder
+          let siteGroupIds;
+          if (row['siteGroups']) {
+            siteGroupIds = row['siteGroups'].map((x: any) => x.id);
+          }
+          const { siteGroups, ...rest } = row;
           this.addDialog.header = 'Update details';
           this.addDialog.okText = 'Update';
-          this.addDialog.model = { ...row };
+          this.addDialog.model = { ...rest, siteGroupIds };
           this.addDialog.showDialog();
         }
       });
@@ -205,10 +210,16 @@ export class PortalListComponent implements OnInit {
         icon: 'pi pi-fw pi-pencil',
         command: () => {
           // edit folder
+          let siteGroupIds;
+          if (row['siteGroups']) {
+            siteGroupIds = row['siteGroups'].map((x: any) => x.id);
+          }
+          const { siteGroups, ...rest } = row;
           this.addDialog.header = 'Update Folder details';
           this.addDialog.okText = 'Update Folder';
           this.addDialog.model = {
-            ...row,
+            ...rest,
+            siteGroupIds,
             parentId: row['parentId'] ?? '<root>'
           };
           this.addDialog.showDialog();

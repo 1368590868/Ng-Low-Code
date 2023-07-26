@@ -11,6 +11,7 @@ import { NotifyService } from 'src/app/shared';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { PortalItem } from '../../../models/portal-item';
 import { Subject, skip, takeUntil } from 'rxjs';
+import { SiteGroupService } from 'src/app/shared/services/site-group.service';
 
 @Component({
   selector: 'app-add-portal-dialog',
@@ -42,7 +43,8 @@ export class AddPortalDialogComponent {
 
   constructor(
     private portalItemService: PortalItemService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private siteGroupService: SiteGroupService
   ) {}
 
   showDialog() {
@@ -176,6 +178,31 @@ export class AddPortalDialogComponent {
           }
         },
         expressions: { hide: `field.parent.model.parentId === null` }
+      },
+      {
+        className: 'w-full',
+        key: 'siteGroupIds',
+        type: 'multiSelect',
+        props: {
+          label: 'Site Groups',
+          placeholder: 'Group'
+        },
+        hooks: {
+          onInit: field => {
+            this.siteGroupService
+              .getGroupList({ indexCount: 999 })
+              .subscribe(res => {
+                if (res.code === 200 && res.data?.data && field.props) {
+                  const options = res.data.data.map(x => ({
+                    label: x.TITLE,
+                    value: x.ID
+                  }));
+                  field.props.options = options;
+                  this.options.detectChanges?.(field);
+                }
+              });
+          }
+        }
       },
       {
         className: 'w-full',

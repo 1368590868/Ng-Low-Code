@@ -32,9 +32,10 @@
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 18%">Label</th>
-          <th style="width: 18%">Name</th>
-          <th style="width: 12%">Type</th>
+          <th style="width: 16%">Label</th>
+          <th style="width: 16%">Name</th>
+          <th style="width: 10%">Type</th>
+          <th style="width: 10%">Groups</th>
           <th>Description</th>
           <th style="width: 12rem">Status</th>
           <th style="width: 5rem"></th>
@@ -42,13 +43,13 @@
       </ng-template>
       <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
         <tr [ttContextMenuRow]="rowNode">
-          <td style="width: 18%">
+          <td style="width: 16%">
             <div class="flex align-items-center">
               <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
               {{ rowData.label }}
             </div>
           </td>
-          <td style="width: 18%" style="vertical-align: middle">
+          <td style="width: 16%" style="vertical-align: middle">
             <div class="flex align-items-center">
               <span class="text-center">
                 {{ rowData.name }}
@@ -69,8 +70,19 @@
               ></a>
             </div>
           </td>
-          <td style="width: 12%">
+          <td style="width: 10%">
             <p-chip styleClass="font-medium" [label]="rowData.type"></p-chip>
+          </td>
+          <td style="width: 10%">
+            <div class="flex align-items-center flex-wrap">
+              <div *ngFor="let item of rowData.siteGroups; let i = index">
+                <p-chip
+                  [class]="i > 1 ? 'mt-3' : ''"
+                  [ngClass]="i % 2 !== 0 ? 'ml-3' : ''"
+                  styleClass="font-medium "
+                  [label]="item.title"></p-chip>
+              </div>
+            </div>
           </td>
           <td>{{ rowData.description }}</td>
           <td style="width: 12rem">
