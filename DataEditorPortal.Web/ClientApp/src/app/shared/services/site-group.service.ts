@@ -1,8 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { ApiResponse } from '../models/api-response';
-import { DictionaryResult, GroupData, GroupDetail } from '../models/site-group';
+import { GroupData, GroupDetail } from '../models/site-group';
 import { Observable } from 'rxjs';
+import { GridResult } from '../models/universal.type';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class SiteGroupService {
   }
 
   getGroupList(fetchDataParam: any) {
-    return this.http.post<ApiResponse<DictionaryResult>>(
+    return this.http.post<ApiResponse<GridResult<GroupData>>>(
       `${this._apiUrl}site-group/list`,
       fetchDataParam
     );
@@ -34,16 +35,16 @@ export class SiteGroupService {
     );
   }
 
-  updateGroup(data: GroupDetail) {
+  updateGroup(data: GroupDetail, id: string) {
     return this.http.put<ApiResponse<string>>(
-      `${this._apiUrl}site-group/${data.id}/update`,
+      `${this._apiUrl}site-group/${id}/update`,
       data
     );
   }
 
-  deleteGroup(data: GroupData) {
+  deleteGroup(id: string) {
     return this.http.delete<ApiResponse<string>>(
-      `${this._apiUrl}site-group/${data.ID}/delete`
+      `${this._apiUrl}site-group/${id}/delete`
     );
   }
 

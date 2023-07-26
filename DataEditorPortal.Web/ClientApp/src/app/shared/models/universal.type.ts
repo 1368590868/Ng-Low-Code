@@ -27,3 +27,8 @@ export interface SortMetaEvent {
   field: string;
   order: number;
 }
+
+export interface GridResult<T> {
+  data: T[];
+  total: number;
+}

@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { GridResult } from 'src/app/features/universal-grid/models/grid-types';
-import { ApiResponse, GridParam } from '..';
+import { ApiResponse, GridParam, GridResult } from '..';
 import { SystemLogViewInfo } from '../models/system-log';
 
 @Injectable({
@@ -14,7 +13,7 @@ export class SystemLogService {
   }
 
   getTableData(tableParams: GridParam) {
-    return this.http.post<ApiResponse<GridResult>>(
+    return this.http.post<ApiResponse<GridResult<SystemLogViewInfo>>>(
       `${this._apiUrl}event-log/list`,
       tableParams
     );
@@ -27,11 +26,6 @@ export class SystemLogService {
   }
 
   addSiteVisitLog(data: { action: string; section: string; params: string }) {
-    this.http
-      .post<ApiResponse<GridResult>>(
-        `${this._apiUrl}event-log/page-request`,
-        data
-      )
-      .subscribe();
+    this.http.post(`${this._apiUrl}event-log/page-request`, data).subscribe();
   }
 }

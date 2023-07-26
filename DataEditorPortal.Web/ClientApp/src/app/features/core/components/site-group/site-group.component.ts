@@ -126,7 +126,7 @@ export class SiteGroupComponent implements OnInit {
       icon: 'pi pi-info-circle',
 
       accept: () => {
-        this.siteGroupService.deleteGroup(rowData).subscribe(res => {
+        this.siteGroupService.deleteGroup(rowData.ID || '').subscribe(res => {
           if (res.code === 200) {
             this.notifyService.notifySuccess(
               'Success',

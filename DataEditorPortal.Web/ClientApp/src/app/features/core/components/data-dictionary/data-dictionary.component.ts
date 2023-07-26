@@ -127,15 +127,17 @@ export class DataDictionaryComponent implements OnInit {
       icon: 'pi pi-info-circle',
 
       accept: () => {
-        this.dataDictionaryService.deleteDictionary(rowData).subscribe(res => {
-          if (res.code === 200) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Record deleted successfully'
-            );
-            this.fetchData();
-          }
-        });
+        this.dataDictionaryService
+          .deleteDictionary(rowData.ID ?? '')
+          .subscribe(res => {
+            if (res.code === 200) {
+              this.notifyService.notifySuccess(
+                'Success',
+                'Record deleted successfully'
+              );
+              this.fetchData();
+            }
+          });
       }
     });
   }

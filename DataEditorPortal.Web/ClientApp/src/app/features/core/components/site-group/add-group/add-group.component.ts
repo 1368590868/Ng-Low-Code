@@ -110,7 +110,7 @@ export class AddGroupComponent {
                 });
               },
               message: () => {
-                return 'The Menu Name has already been exist.';
+                return 'The Name has already been exist.';
               }
             }
           },
@@ -198,12 +198,14 @@ export class AddGroupComponent {
       this.isLoading = true;
       if (this.id) {
         this.siteGroupService
-          .updateGroup({
-            ...model,
-            id: this.id,
-            aboutPageContent: this.formControlAboutEditor.value ?? '',
-            contactPageContent: this.formControlContactEditor.value ?? ''
-          })
+          .updateGroup(
+            {
+              ...model,
+              aboutPageContent: this.formControlAboutEditor.value ?? '',
+              contactPageContent: this.formControlContactEditor.value ?? ''
+            },
+            this.id
+          )
           .subscribe(res => {
             if (res.code === 200 && res.data) {
               this.notifyService.notifySuccess(

@@ -30,7 +30,20 @@
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 40%" pSortableColumn="NAME">
+          <th style="width: 20%" pSortableColumn="Title">
+            <span style="vertical-align: middle">TITLE</span>
+            <p-sortIcon field="Title"></p-sortIcon>
+            <p-columnFilter
+              style="vertical-align: middle"
+              type="text"
+              field="Title"
+              display="menu"
+              [hideOnClear]="true"
+              [showOperator]="false"
+              [showAddButton]="false"
+              [maxFractionDigits]="2"></p-columnFilter>
+          </th>
+          <th style="width: 20%" pSortableColumn="NAME">
             <span style="vertical-align: middle">NAME</span>
             <p-sortIcon field="NAME"></p-sortIcon>
             <p-columnFilter
@@ -62,7 +75,10 @@
       </ng-template>
       <ng-template pTemplate="body" let-rowData>
         <tr>
-          <td style="width: 40%">
+          <td style="width: 20%">
+            {{ rowData.Title }}
+          </td>
+          <td style="width: 20%">
             {{ rowData.NAME }}
           </td>
           <td>{{ rowData.DESCRIPTION }}</td>
