@@ -24,26 +24,24 @@ export function evalExpression(
 export function registerNumeral() {
   numeral.register('format', 'special', {
     regexps: {
-      format: /^\S+(\.\d{1,5})?\s\{[\s\S]\}$/,
-      unformat: /^\S+(\.\d{1,5})?\s\{[\s\S]\}$/
+      format: /^0+\+[0[\]().]+$/,
+      unformat: /^0+\+[0[\]().]+$/
     },
     format: function (value, format, roundingFunction) {
-      let output;
+      let output = '';
+      const result = /^(0+)\+([0[\]().]+)+$/.exec(format);
+      if (result && result.length >= 3) {
+        const precision = 10 ** result[1].length;
+        const fractionFormat = result[2];
+        const integerNum = Math.floor(value / precision);
+        const fractionNum = value - integerNum * precision;
 
-      output = value;
-      const newFormat = format.split(' ')[0];
-      const operator = format.split(' ')[1][1];
-      const left = format.split('.')[0].match(/0/g)?.join('') ?? '';
-      // Splice divisor
-      const precision = Number('1' + left);
-
-      const integerNum = Math.floor(value / precision);
-      const fractionaNum = value - integerNum * precision;
-      output = `${integerNum}${operator}${numeral._.numberToFormat(
-        fractionaNum,
-        newFormat,
-        roundingFunction
-      )}`;
+        output = `${integerNum}+${numeral._.numberToFormat(
+          fractionNum,
+          fractionFormat,
+          roundingFunction
+        )}`;
+      }
 
       return output;
     },
