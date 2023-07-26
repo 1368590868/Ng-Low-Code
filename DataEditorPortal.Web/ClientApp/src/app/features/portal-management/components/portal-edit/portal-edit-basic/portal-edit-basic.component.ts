@@ -7,6 +7,7 @@ import { NotifyService } from 'src/app/shared';
 import { PortalItem, PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
+import { SiteGroupService } from 'src/app/shared/services/site-group.service';
 
 @Component({
   selector: 'app-portal-edit-basic',
@@ -162,6 +163,35 @@ export class PortalEditBasicComponent
       }
     },
     {
+      className: 'w-full',
+      key: 'siteGroupIds',
+      type: 'multiSelect',
+      props: {
+        label: 'Group',
+        placeholder: 'Group',
+        options: [
+          { label: 'Group1', value: 1 },
+          { label: 'Group2', value: 2 }
+        ]
+      },
+      hooks: {
+        onInit: field => {
+          this.siteGroupService
+            .getGroupList({ indexCount: 999 })
+            .subscribe(res => {
+              if (res.code === 200 && res.data?.data && field.props) {
+                const options = res.data.data.map(x => ({
+                  label: x.TITLE,
+                  value: x.ID
+                }));
+                field.props.options = options;
+                this.options.detectChanges?.(field);
+              }
+            });
+        }
+      }
+    },
+    {
       key: 'description',
       type: 'textarea',
       className: 'w-full',
@@ -201,7 +231,8 @@ export class PortalEditBasicComponent
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private portalItemService: PortalItemService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private siteGroupService: SiteGroupService
   ) {
     super();
   }
