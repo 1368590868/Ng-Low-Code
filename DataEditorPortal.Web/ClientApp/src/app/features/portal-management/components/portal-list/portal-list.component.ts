@@ -43,7 +43,7 @@ export class PortalListComponent implements OnInit {
 
     {
       label: 'Create Table Page',
-      icon: 'pi pi-fw pi-desktop',
+      icon: 'pi pi-fw pi-table',
       command: () => {
         this.portalItemService.parentFolder = undefined;
         this.router.navigate([`../add-single`], {
@@ -53,7 +53,7 @@ export class PortalListComponent implements OnInit {
     },
     {
       label: 'Create Linked Table Page',
-      icon: 'pi pi-fw pi-server',
+      icon: 'pi pi-fw pi-sitemap',
       command: () => {
         this.portalItemService.parentFolder = undefined;
         this.router.navigate([`../add-linked`], {
