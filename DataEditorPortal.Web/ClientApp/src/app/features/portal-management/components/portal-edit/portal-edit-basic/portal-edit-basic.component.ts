@@ -185,6 +185,9 @@ export class PortalEditBasicComponent
               }
             });
         }
+      },
+      expressions: {
+        hide: `field.parent.model.parentId !== '<root>' `
       }
     },
     {
