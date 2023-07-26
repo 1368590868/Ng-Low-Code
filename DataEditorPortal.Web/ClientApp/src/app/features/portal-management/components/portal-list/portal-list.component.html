@@ -77,9 +77,7 @@
             <div class="flex align-items-center flex-wrap">
               <div *ngFor="let item of rowData.siteGroups; let i = index">
                 <p-chip
-                  [class]="i > 1 ? 'mt-3' : ''"
-                  [ngClass]="i % 2 !== 0 ? 'ml-3' : ''"
-                  styleClass="font-medium "
+                  styleClass="my-1 mr-2 font-medium "
                   [label]="item.title"></p-chip>
               </div>
             </div>
