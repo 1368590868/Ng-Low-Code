@@ -202,6 +202,9 @@ export class AddPortalDialogComponent {
                 }
               });
           }
+        },
+        expressions: {
+          hide: `field.parent.model.parentId !== '<root>' `
         }
       },
       {
