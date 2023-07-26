@@ -74,13 +74,15 @@
             <p-chip styleClass="font-medium" [label]="rowData.type"></p-chip>
           </td>
           <td style="width: 10%">
-            <div class="flex align-items-center flex-wrap">
-              <div *ngFor="let item of rowData.siteGroups; let i = index">
-                <p-chip
-                  styleClass="my-1 mr-2 font-medium "
-                  [label]="item.title"></p-chip>
+            <ng-container *ngIf="!rowData?.parentId">
+              <div class="flex align-items-center flex-wrap">
+                <div *ngFor="let item of rowData.siteGroups; let i = index">
+                  <p-chip
+                    styleClass="my-1 mr-2 font-medium "
+                    [label]="item.title"></p-chip>
+                </div>
               </div>
-            </div>
+            </ng-container>
           </td>
           <td>{{ rowData.description }}</td>
           <td style="width: 12rem">
