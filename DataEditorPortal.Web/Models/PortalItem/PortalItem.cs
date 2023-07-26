@@ -1,4 +1,5 @@
 ﻿using DataEditorPortal.Data.Common;
+using DataEditorPortal.Data.Models;
 using System;
 using System.Collections.Generic;
 
@@ -28,5 +29,7 @@ namespace DataEditorPortal.Web.Models.PortalItem
         public string ItemType { get; set; }
         public string DataSourceConnectionName { get; set; }
         public string RouterLink { get; set; }
+        public List<SiteGroup> SiteGroups { get; set; }
+        public List<Guid> SiteGroupIds { get; set; }
     }
 }

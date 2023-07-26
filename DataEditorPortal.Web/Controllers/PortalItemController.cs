@@ -68,11 +68,16 @@ namespace DataEditorPortal.Web.Controllers
         public IEnumerable<PortalItem> List()
         {
             var menus = (
-                    from m in _depDbContext.SiteMenus
+                    from m in _depDbContext.SiteMenus.Include(m => m.SiteGroups)
                     join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name into us
                     from u in us.DefaultIfEmpty()
                     where m.Type != "Sub Portal Item"
-                    select new { m, configCompleted = u != null ? u.ConfigCompleted : (bool?)null, itemType = u != null ? u.ItemType : null }
+                    select new
+                    {
+                        m,
+                        configCompleted = u != null ? u.ConfigCompleted : (bool?)null,
+                        itemType = u != null ? u.ItemType : null
+                    }
                 )
                 .ToList()
                 .Select(x =>
@@ -164,6 +169,14 @@ namespace DataEditorPortal.Web.Controllers
             var siteMenu = _mapper.Map<SiteMenu>(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
             siteMenu.Component = "FolderLayoutComponent";
+
+            // add site group
+            siteMenu.SiteGroups = new List<SiteGroup>();
+            if (model.SiteGroupIds == null) model.SiteGroupIds = new List<Guid>();
+            var idsToAdd = model.SiteGroupIds.Where(x => siteMenu.SiteGroups.All(g => x != g.Id));
+            var siteGroupsToAdd = _depDbContext.SiteGroups.Where(x => idsToAdd.Contains(x.Id)).ToList();
+            siteGroupsToAdd.ForEach(g => siteMenu.SiteGroups.Add(g));
+
             _depDbContext.SiteMenus.Add(siteMenu);
 
             if (siteMenu.Type == "External")
@@ -184,7 +197,7 @@ namespace DataEditorPortal.Web.Controllers
                 model.Name = _portalItemService.GetCodeName(model.Label);
             if (_portalItemService.ExistName(model.Name, id)) throw new DepException("Name does already exist.");
 
-            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id && x.Type != "Portal Item");
+            var siteMenu = _depDbContext.SiteMenus.Include(x => x.SiteGroups).FirstOrDefault(x => x.Id == id && x.Type != "Portal Item");
             if (siteMenu == null)
             {
                 throw new DepException("Not Found", 404);
@@ -206,6 +219,14 @@ namespace DataEditorPortal.Web.Controllers
             EnsureIconProcessed(model);
 
             _mapper.Map(model, siteMenu);
+
+            // update site group
+            if (model.SiteGroupIds == null) model.SiteGroupIds = new List<Guid>();
+            var idsToAdd = model.SiteGroupIds.Where(x => siteMenu.SiteGroups.All(g => x != g.Id));
+            var siteGroupsToAdd = _depDbContext.SiteGroups.Where(x => idsToAdd.Contains(x.Id)).ToList();
+            siteGroupsToAdd.ForEach(g => siteMenu.SiteGroups.Add(g));
+            var siteGroupsToRemove = siteMenu.SiteGroups.Where(g => model.SiteGroupIds.All(x => x != g.Id)).ToList();
+            siteGroupsToRemove.ForEach(g => siteMenu.SiteGroups.Remove(g));
 
             if (siteMenu.Type == "External")
             {
@@ -460,7 +481,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{id}/details")]
         public PortalItemData Details(Guid id)
         {
-            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            var siteMenu = _depDbContext.SiteMenus.Include(x => x.SiteGroups).FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
                 throw new DepException("Not Found", 404);
@@ -474,6 +495,8 @@ namespace DataEditorPortal.Web.Controllers
             result.ConfigCompleted = item.ConfigCompleted;
             result.ItemType = item.ItemType;
             result.DataSourceConnectionName = item.DataSourceConnectionName;
+            result.SiteGroupIds = result.SiteGroups.Select(x => x.Id).ToList();
+            result.SiteGroups = null;
 
             return result;
         }

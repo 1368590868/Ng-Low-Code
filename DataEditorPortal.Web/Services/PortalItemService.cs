@@ -8,6 +8,7 @@ using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.PortalItem;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -140,6 +141,14 @@ namespace DataEditorPortal.Web.Services
             siteMenu.Type = model.ItemType == GridItemType.LINKED_SINGLE ? "Sub Portal Item" : "Portal Item";
             siteMenu.Component = "UniversalGridModule";
             siteMenu.RequireAuth = true;
+
+            // add site group
+            siteMenu.SiteGroups = new List<SiteGroup>();
+            if (model.SiteGroupIds == null) model.SiteGroupIds = new List<Guid>();
+            var idsToAdd = model.SiteGroupIds.Where(x => siteMenu.SiteGroups.All(g => x != g.Id));
+            var siteGroupsToAdd = _depDbContext.SiteGroups.Where(x => idsToAdd.Contains(x.Id)).ToList();
+            siteGroupsToAdd.ForEach(g => siteMenu.SiteGroups.Add(g));
+
             _depDbContext.SiteMenus.Add(siteMenu);
 
             // create universal grid configuration
@@ -160,7 +169,7 @@ namespace DataEditorPortal.Web.Services
 
         public Guid Update(Guid id, PortalItemData model)
         {
-            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            var siteMenu = _depDbContext.SiteMenus.Include(x => x.SiteGroups).FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
             {
                 throw new DepException("Not Found", 404);
@@ -186,6 +195,14 @@ namespace DataEditorPortal.Web.Services
             _mapper.Map(model, siteMenu);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
             siteMenu.Type = model.ItemType == GridItemType.LINKED_SINGLE ? "Sub Portal Item" : "Portal Item";
+
+            // update site group
+            if (model.SiteGroupIds == null) model.SiteGroupIds = new List<Guid>();
+            var idsToAdd = model.SiteGroupIds.Where(x => siteMenu.SiteGroups.All(g => x != g.Id));
+            var siteGroupsToAdd = _depDbContext.SiteGroups.Where(x => idsToAdd.Contains(x.Id)).ToList();
+            siteGroupsToAdd.ForEach(g => siteMenu.SiteGroups.Add(g));
+            var siteGroupsToRemove = siteMenu.SiteGroups.Where(g => model.SiteGroupIds.All(x => x != g.Id)).ToList();
+            siteGroupsToRemove.ForEach(g => siteMenu.SiteGroups.Remove(g));
 
             // update permissions
             CreateOrUpdatePermission(siteMenu, item, oldName);

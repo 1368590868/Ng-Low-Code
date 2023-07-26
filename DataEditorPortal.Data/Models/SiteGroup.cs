@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace DataEditorPortal.Data.Models
 {
@@ -18,6 +19,7 @@ namespace DataEditorPortal.Data.Models
         [Column("DESCRIPTION")]
         public string Description { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<SiteMenu> SiteMenus { get; set; }
 
     }

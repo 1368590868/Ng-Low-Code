@@ -55,7 +55,7 @@ namespace DataEditorPortal.Web.Controllers
 
             if (param.IndexCount > 0)
             {
-                if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = "NAME", order = 0 } };
+                if (!param.Sorts.Any()) param.Sorts = new List<SortParam>() { new SortParam { field = "TITLE", order = 1 } };
                 queryText = _queryBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
             }
             else
