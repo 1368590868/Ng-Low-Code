@@ -13,3 +13,5 @@ export { SystemLogComponent } from './system-log/system-log.component';
 export { SystemLogDialogComponent } from './system-log/system-log-dialog/system-log-dialog.component';
 export { DbConnectionComponent } from './db-connection/db-connection.component';
 export { AddConnectionDialogComponent } from './db-connection/add-connection-dialog/add-connection-dialog.component';
+export { SiteGroupComponent } from './site-group/site-group.component';
+export { AddGroupComponent } from './site-group/add-group/add-group.component';

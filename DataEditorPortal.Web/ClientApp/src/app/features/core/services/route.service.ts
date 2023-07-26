@@ -13,7 +13,8 @@ import {
   DataDictionaryComponent,
   DbConnectionComponent,
   SystemLogComponent,
-  TileComponent
+  TileComponent,
+  SiteGroupComponent
 } from '../components';
 import { FolderLayoutComponent } from '../layout/folder-layout.component';
 
@@ -154,6 +155,9 @@ export class RouteService {
           break;
         case 'DataDictionaryComponent':
           route.component = DataDictionaryComponent;
+          break;
+        case 'SiteGroupComponent':
+          route.component = SiteGroupComponent;
           break;
         default:
           break;

@@ -43,16 +43,14 @@ import {
   AddConnectionDialogComponent,
   SystemLogComponent,
   SystemLogDialogComponent,
-  DbConnectionComponent
+  DbConnectionComponent,
+  SiteGroupComponent,
+  AddGroupComponent
 } from './components';
 import { GroupLayoutComponent } from './layout/group-layout.component';
 import { FolderLayoutComponent } from './layout/folder-layout.component';
 
-import {
-  AdminPermissionGuard,
-  AuthRouterGuard,
-  SharedModule
-} from 'src/app/shared';
+import { AuthRouterGuard, SharedModule } from 'src/app/shared';
 
 export * from './components';
 
@@ -88,7 +86,9 @@ export const routes: Routes = [
     SystemLogDialogComponent,
     DbConnectionComponent,
     GroupLayoutComponent,
-    FolderLayoutComponent
+    FolderLayoutComponent,
+    SiteGroupComponent,
+    AddGroupComponent
   ],
   imports: [
     CommonModule,
