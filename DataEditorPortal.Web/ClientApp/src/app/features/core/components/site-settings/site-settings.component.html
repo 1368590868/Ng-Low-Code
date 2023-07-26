@@ -57,7 +57,7 @@
             <p class="mb-2">Site Title</p>
             <div>
               <input
-                class="w-full"
+                class="w-6"
                 pInputText
                 [required]="true"
                 [formControl]="this.formControlSiteName"
@@ -77,7 +77,7 @@
           header="Content for About"
           *ngIf="!configDataService.licenseExpired">
           <div class="w-full mb-4 mt-3">
-            <p class="mb-2">Site About</p>
+            <!-- <p class="mb-2">Site About</p> -->
             <div>
               <p-editor [formControl]="formControlAboutEditor"></p-editor>
             </div>
@@ -95,7 +95,7 @@
           header="Content for Contact"
           *ngIf="!configDataService.licenseExpired">
           <div class="w-full mb-4 mt-3">
-            <p class="mb-2">Site Contact</p>
+            <!-- <p class="mb-2">Site Contact</p> -->
             <div>
               <p-editor [formControl]="formControlContactEditor"></p-editor>
             </div>
