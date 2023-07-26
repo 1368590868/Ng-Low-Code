@@ -1,5 +1,5 @@
 export interface GroupData {
-  Title?: string;
+  TITLE?: string;
   NAME?: string;
   DESCRIPTION?: string;
   ID?: string;
