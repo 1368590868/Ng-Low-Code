@@ -167,12 +167,8 @@ export class PortalEditBasicComponent
       key: 'siteGroupIds',
       type: 'multiSelect',
       props: {
-        label: 'Group',
-        placeholder: 'Group',
-        options: [
-          { label: 'Group1', value: 1 },
-          { label: 'Group2', value: 2 }
-        ]
+        label: 'Site Groups',
+        placeholder: 'Site Groups'
       },
       hooks: {
         onInit: field => {
