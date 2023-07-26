@@ -89,7 +89,8 @@ namespace DataEditorPortal.Web.Controllers
             var model = new SiteGroupModel()
             {
                 Name = item.Name,
-                Description = item.Description
+                Description = item.Description,
+                Title = item.Title
             };
 
             var aboutSiteContent = _depDbContext.SiteContents.FirstOrDefault(x => x.SiteGroupId.Value == id && x.ContentName == "about");

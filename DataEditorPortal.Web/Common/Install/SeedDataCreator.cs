@@ -63,9 +63,11 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "Settings",
                     Icon = "pi pi-cog",
                     Type = "Folder",
-                    Link = "",
                     Order = 999,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "FolderLayoutComponent",
+                    RequireAuth = true,
+                    RequireAdmin = true
                 },
                 // Portal Management
                 new SiteMenu()
@@ -75,10 +77,12 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "Portal Management",
                     Icon = "pi pi-desktop",
                     Type = "System",
-                    Link = "/portal-management/list",
                     ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
                     Order = 0,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "PortalManagementModule",
+                    RequireAuth = true,
+                    RequireAdmin = true
                 },
                 // User Management
                 new SiteMenu()
@@ -88,10 +92,12 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "User Management",
                     Icon = "pi pi-user",
                     Type = "System",
-                    Link = "/portal-item/single/user-management",
                     ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
                     Order = 1,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "UniversalGridModule",
+                    RequireAuth = true,
+                    RequireAdmin = true
                 },
                 // data dictionary
                 new SiteMenu()
@@ -101,10 +107,12 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "Data Dictionaries",
                     Icon = "pi pi-book",
                     Type = "System",
-                    Link = "/data-dictionaries",
                     ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
                     Order = 2,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "DataDictionaryComponent",
+                    RequireAuth = true,
+                    RequireAdmin = true
                 },
                 // site settings
                 new SiteMenu()
@@ -114,10 +122,12 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "Site Settings",
                     Icon = "pi pi-wrench",
                     Type = "System",
-                    Link = "/site-settings",
                     ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
                     Order = 3,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "SiteSettingsComponent",
+                    RequireAuth = true,
+                    RequireAdmin = true
                 },
                 // system event log
                 new SiteMenu()
@@ -127,10 +137,12 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "System Event Logs",
                     Icon = "pi pi-clock",
                     Type = "System",
-                    Link = "/system-event-logs",
                     ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
                     Order = 4,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "SystemLogComponent",
+                    RequireAuth = true,
+                    RequireAdmin = true
                 },
                 // datasource connection
                 new SiteMenu()
@@ -140,10 +152,27 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "Datasource Connections",
                     Icon = "pi pi-database",
                     Type = "System",
-                    Link = "/datasource-connections",
                     ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
                     Order = 5,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "DbConnectionComponent",
+                    RequireAuth = true,
+                    RequireAdmin = true
+                },
+                // site groups
+                new SiteMenu()
+                {
+                    Id = new Guid("D1CD248B-CF2A-4B35-B4FB-F02A3A376434"),
+                    Name = "site-groups",
+                    Label = "Site Groups",
+                    Icon = "pi pi-tags",
+                    Type = "System",
+                    ParentId = new Guid("B82DFE59-E51A-4771-B876-05D62F4207E3"),
+                    Order = 6,
+                    Status = PortalItemStatus.Published,
+                    Component = "SiteGroupComponent",
+                    RequireAuth = true,
+                    RequireAdmin = true
                 },
                 // demo items
                 new SiteMenu()
@@ -153,9 +182,10 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "Demo Items",
                     Icon = "pi pi-list",
                     Type = "Folder",
-                    Link = "",
                     Order = 998,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "FolderLayoutComponent",
+                    RequireAuth = true
                 },
                 new SiteMenu()
                 {
@@ -164,10 +194,11 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "Demo Item",
                     Icon = "pi pi-table",
                     Type = "Portal Item",
-                    Link = "",
                     ParentId = new Guid("41D85A79-9E84-4AB8-AF96-08DAF9CD4412"),
                     Order = 0,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "UniversalGridModule",
+                    RequireAuth = true
                 }};
 
             foreach (var item in menus)
@@ -870,10 +901,11 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "Link Table Demo",
                     Icon = "pi pi-sitemap",
                     Type = "Portal Item",
-                    Link = "",
                     ParentId = new Guid("41D85A79-9E84-4AB8-AF96-08DAF9CD4412"),
                     Order = 1,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "UniversalGridModule",
+                    RequireAuth = true
                 },
                 new SiteMenu()
                 {
@@ -882,10 +914,11 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "Primary Table",
                     Icon = "pi pi-table",
                     Type = "Sub Portal Item",
-                    Link = "",
                     ParentId = new Guid("863C0321-F5BE-4145-B182-9F229DDBD792"),
                     Order = 0,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "UniversalGridModule",
+                    RequireAuth = true
                 },
                 new SiteMenu()
                 {
@@ -894,10 +927,11 @@ namespace DataEditorPortal.Web.Common.Install
                     Label = "Secondary Table",
                     Icon = "pi pi-table",
                     Type = "Sub Portal Item",
-                    Link = "",
                     ParentId = new Guid("863C0321-F5BE-4145-B182-9F229DDBD792"),
                     Order = 1,
-                    Status = PortalItemStatus.Published
+                    Status = PortalItemStatus.Published,
+                    Component = "UniversalGridModule",
+                    RequireAuth = true
                 }
             };
             foreach (var item in linkDemoMenus)

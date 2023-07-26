@@ -138,6 +138,8 @@ namespace DataEditorPortal.Web.Services
             var siteMenu = _mapper.Map<SiteMenu>(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
             siteMenu.Type = model.ItemType == GridItemType.LINKED_SINGLE ? "Sub Portal Item" : "Portal Item";
+            siteMenu.Component = "UniversalGridModule";
+            siteMenu.RequireAuth = true;
             _depDbContext.SiteMenus.Add(siteMenu);
 
             // create universal grid configuration

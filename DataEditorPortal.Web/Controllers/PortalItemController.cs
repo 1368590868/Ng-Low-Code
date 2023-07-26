@@ -163,6 +163,7 @@ namespace DataEditorPortal.Web.Controllers
 
             var siteMenu = _mapper.Map<SiteMenu>(model);
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
+            siteMenu.Component = "FolderLayoutComponent";
             _depDbContext.SiteMenus.Add(siteMenu);
 
             if (siteMenu.Type == "External")
