@@ -21,14 +21,16 @@
         <p class="mb-2">Content for About</p>
         <div>
           <p-editor
-            class="w-10rem"
+            [style]="{ height: '27rem' }"
             [formControl]="formControlAboutEditor"></p-editor>
         </div>
       </div>
       <div class="w-full mb-4 mt-3">
         <p class="mb-2">Content for Contact</p>
         <div>
-          <p-editor [formControl]="formControlContactEditor"></p-editor>
+          <p-editor
+            [style]="{ height: '27rem' }"
+            [formControl]="formControlContactEditor"></p-editor>
         </div>
       </div>
       <div
