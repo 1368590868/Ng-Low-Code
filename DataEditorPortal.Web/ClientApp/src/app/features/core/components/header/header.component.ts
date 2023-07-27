@@ -38,19 +38,19 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     this.configDataService.getSiteSettings().subscribe();
-    this.configDataService.menuGroupChange$.subscribe(x => {
-      if (x) {
-        const [_, ...rest] = this.items;
-        this.items = [
-          {
-            label: 'Home',
-            routerLink: ['/' + x.name],
-            routerLinkActiveOptions: { exact: true }
-          },
-          ...rest
-        ];
-        this.siteName = x.label;
-      }
-    });
+    // this.configDataService.menuGroupChange$.subscribe(x => {
+    //   if (x) {
+    //     const [_, ...rest] = this.items;
+    //     this.items = [
+    //       {
+    //         label: 'Home',
+    //         routerLink: ['/' + x.name],
+    //         routerLinkActiveOptions: { exact: true }
+    //       },
+    //       ...rest
+    //     ];
+    //     this.siteName = x.label;
+    //   }
+    // });
   }
 }

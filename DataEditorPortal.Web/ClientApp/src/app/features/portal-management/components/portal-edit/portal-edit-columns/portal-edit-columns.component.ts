@@ -311,7 +311,8 @@ export class PortalEditColumnsComponent
             label: 'Data Format'
           },
           expressions: {
-            hide: `['numeric','date'].indexOf(field.parent.model.filterType) < 0`
+            hide: `['numeric','date'].indexOf(field.parent.model.filterType) < 0`,
+            'props.description': `field.parent.model.filterType === 'numeric' && 'Please enter value format. <br/> <a href="http://numeraljs.com/#format" target="_blank">See more</a>'`
           }
         }
       ],

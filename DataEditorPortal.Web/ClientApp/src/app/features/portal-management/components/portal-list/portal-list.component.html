@@ -34,7 +34,7 @@
         <tr>
           <th style="width: 18%">Label</th>
           <th style="width: 18%">Name</th>
-          <th style="width: 12%">Type</th>
+          <th style="width: 18%">Groups</th>
           <th>Description</th>
           <th style="width: 12rem">Status</th>
           <th style="width: 5rem"></th>
@@ -45,6 +45,23 @@
           <td style="width: 18%">
             <div class="flex align-items-center">
               <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+              <i
+                class="mr-2"
+                [class]="
+                  rowData.type === 'Folder'
+                    ? rowNode.node.expanded
+                      ? 'pi pi-folder-open'
+                      : 'pi pi-folder'
+                    : rowData.type === 'Portal Item'
+                    ? rowData.itemType === 'linked'
+                      ? 'pi pi-sitemap'
+                      : 'pi pi-table'
+                    : rowData.type === 'System'
+                    ? 'pi pi-shield'
+                    : rowData.type === 'External'
+                    ? 'pi pi-external-link'
+                    : ''
+                "></i>
               {{ rowData.label }}
             </div>
           </td>
@@ -55,7 +72,7 @@
               </span>
               <a
                 class="ml-3 text-primary"
-                *ngIf="rowData.routerLink"
+                *ngIf="rowData.routerLink && rowData.type !== 'Folder'"
                 [routerLink]="rowData.routerLink"
                 ><i class="pi pi-link cursor-pointer"></i
               ></a>
@@ -69,10 +86,16 @@
               ></a>
             </div>
           </td>
-          <td style="width: 12%">
-            <p-chip
-              styleClass="font-medium"
-              [label]="!rowData.parentId ? 'Group' : rowData.type"></p-chip>
+          <td style="width: 18%">
+            <ng-container *ngIf="!rowData?.parentId">
+              <div class="flex align-items-center flex-wrap">
+                <div *ngFor="let item of rowData.siteGroups; let i = index">
+                  <p-chip
+                    styleClass="my-1 mr-2 font-medium border-round"
+                    [label]="item.title"></p-chip>
+                </div>
+              </div>
+            </ng-container>
           </td>
           <td>{{ rowData.description }}</td>
           <td style="width: 12rem">

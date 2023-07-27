@@ -124,18 +124,20 @@ export class AddDictionaryDialogComponent {
     if (this.form.valid) {
       this.isLoading = true;
       if (model['ID']) {
-        this.dataDictionaryService.updateDictionary(model).subscribe(res => {
-          if (res.code === 200 && res.data) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Save Successfully Completed.'
-            );
-            this.visible = false;
-            this.saved.emit(res.data);
-          } else {
-            this.isLoading = false;
-          }
-        });
+        this.dataDictionaryService
+          .updateDictionary(model, model.ID)
+          .subscribe(res => {
+            if (res.code === 200 && res.data) {
+              this.notifyService.notifySuccess(
+                'Success',
+                'Save Successfully Completed.'
+              );
+              this.visible = false;
+              this.saved.emit(res.data);
+            } else {
+              this.isLoading = false;
+            }
+          });
       } else {
         this.dataDictionaryService.createDictionary(model).subscribe(res => {
           if (res.code === 200 && res.data) {

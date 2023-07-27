@@ -21,8 +21,3 @@ export interface SystemLogViewInfo {
   params?: string;
   result?: string;
 }
-
-export interface GridResult {
-  data: SystemLogData[];
-  total: number;
-}

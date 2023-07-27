@@ -20,11 +20,11 @@ export class PortalListComponent implements OnInit {
   data!: PortalItem[];
   addNewMenuModels: MenuItem[] = [
     {
-      label: 'Create Group',
+      label: 'Create Folder',
       icon: 'pi pi-fw pi-folder',
       command: () => {
-        this.addDialog.header = 'Create Group';
-        this.addDialog.okText = 'Create Group';
+        this.addDialog.header = 'Create Folder';
+        this.addDialog.okText = 'Create Folder';
         this.addDialog.model = { type: 'Folder', parentId: null };
         this.addDialog.showDialog();
       }
@@ -43,7 +43,7 @@ export class PortalListComponent implements OnInit {
 
     {
       label: 'Create Table Page',
-      icon: 'pi pi-fw pi-desktop',
+      icon: 'pi pi-fw pi-table',
       command: () => {
         this.portalItemService.parentFolder = undefined;
         this.router.navigate([`../add-single`], {
@@ -53,7 +53,7 @@ export class PortalListComponent implements OnInit {
     },
     {
       label: 'Create Linked Table Page',
-      icon: 'pi pi-fw pi-server',
+      icon: 'pi pi-fw pi-sitemap',
       command: () => {
         this.portalItemService.parentFolder = undefined;
         this.router.navigate([`../add-linked`], {
@@ -140,9 +140,14 @@ export class PortalListComponent implements OnInit {
         icon: 'pi pi-fw pi-pencil',
         command: () => {
           // edit folder
+          let siteGroupIds;
+          if (row['siteGroups']) {
+            siteGroupIds = row['siteGroups'].map((x: any) => x.id);
+          }
+          const { siteGroups, ...rest } = row;
           this.addDialog.header = 'Update details';
           this.addDialog.okText = 'Update';
-          this.addDialog.model = { ...row };
+          this.addDialog.model = { ...rest, siteGroupIds };
           this.addDialog.showDialog();
         }
       });
@@ -201,18 +206,20 @@ export class PortalListComponent implements OnInit {
       });
 
       items.push({
-        label: row['parentId'] == null ? 'Edit Group' : 'Edit Folder',
+        label: 'Edit Folder',
         icon: 'pi pi-fw pi-pencil',
         command: () => {
           // edit folder
-          this.addDialog.header =
-            row['parentId'] == null
-              ? 'Update Group details'
-              : 'Update Folder details';
-          this.addDialog.okText =
-            row['parentId'] == null ? 'Update Group' : 'Update Folder';
+          let siteGroupIds;
+          if (row['siteGroups']) {
+            siteGroupIds = row['siteGroups'].map((x: any) => x.id);
+          }
+          const { siteGroups, ...rest } = row;
+          this.addDialog.header = 'Update Folder details';
+          this.addDialog.okText = 'Update Folder';
           this.addDialog.model = {
-            ...row,
+            ...rest,
+            siteGroupIds,
             parentId: row['parentId'] ?? '<root>'
           };
           this.addDialog.showDialog();

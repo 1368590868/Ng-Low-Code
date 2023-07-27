@@ -1,0 +1,16 @@
+.dialog-content {
+  ::ng-deep {
+    formly-group {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -0.5rem;
+      & > formly-field {
+        width: 100%;
+        padding: 0 0.5rem;
+      }
+    }
+    .ql-editor {
+      min-height: 10rem;
+    }
+  }
+}

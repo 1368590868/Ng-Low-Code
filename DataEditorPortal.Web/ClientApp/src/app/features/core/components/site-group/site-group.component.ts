@@ -2,24 +2,24 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MenuItem, ConfirmationService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import {
-  DictionaryData,
   NotifyService,
-  DataDictionaryService,
   PaginationEvent,
   SortMetaEvent,
   GridParam
 } from 'src/app/shared';
-import { AddDictionaryDialogComponent } from './add-dictionary-dialog/add-dictionary-dialog.component';
+import { SiteGroupService } from 'src/app/shared/services/site-group.service';
+import { AddGroupComponent } from './add-group/add-group.component';
+import { GroupData } from 'src/app/shared/models/site-group';
 
 @Component({
-  selector: 'app-data-dictionary',
-  templateUrl: './data-dictionary.component.html',
-  styleUrls: ['./data-dictionary.component.scss'],
+  selector: 'app-site-group',
+  templateUrl: './site-group.component.html',
+  styleUrls: ['./site-group.component.scss'],
   providers: [ConfirmationService]
 })
-export class DataDictionaryComponent implements OnInit {
-  @ViewChild('addDialog') addDialog!: AddDictionaryDialogComponent;
-  public data: DictionaryData[] = [];
+export class SiteGroupComponent implements OnInit {
+  @ViewChild('addDialog') addDialog!: AddGroupComponent;
+  public data: GroupData[] = [];
 
   loading = false;
   totalRecords = 0;
@@ -42,7 +42,7 @@ export class DataDictionaryComponent implements OnInit {
   ];
 
   constructor(
-    private dataDictionaryService: DataDictionaryService,
+    private siteGroupService: SiteGroupService,
     private notifyService: NotifyService,
     private confirmationService: ConfirmationService
   ) {}
@@ -74,38 +74,37 @@ export class DataDictionaryComponent implements OnInit {
     this.loading = true;
     const fetchDataParam = this.getFetchParam();
 
-    this.dataDictionaryService
-      .getDictionaryList(fetchDataParam)
-      .subscribe(res => {
-        if (res.code === 200) {
-          this.data = res.data?.data ?? [];
-          this.totalRecords = res.data?.total ?? 0;
-        }
-        this.loading = false;
-      });
+    this.siteGroupService.getGroupList(fetchDataParam).subscribe(res => {
+      if (res.code === 200) {
+        this.data = res.data?.data ?? [];
+        this.totalRecords = res.data?.total ?? 0;
+      }
+      this.loading = false;
+    });
   }
 
-  onShowMenu(menu: Menu, $event: any, rowData: DictionaryData) {
+  onShowMenu(menu: Menu, $event: any, rowData: GroupData) {
     this.getMenuList(rowData);
     menu.toggle($event);
   }
 
   onNewOpen() {
-    this.addDialog.header = 'Create Data Dictionaries';
+    this.addDialog.header = 'Create Site Group';
     this.addDialog.model = {};
-    this.addDialog.okText = 'Create Dictionary';
+    this.addDialog.id = '';
+    this.addDialog.okText = 'Create Group';
     this.addDialog.showDialog();
   }
 
-  getMenuList(rowData: DictionaryData) {
+  getMenuList(rowData: GroupData) {
     this.contextMenuItems.map(res => {
       switch (res.label) {
         case 'Edit':
           {
             res.command = () => {
-              this.addDialog.model = JSON.parse(JSON.stringify(rowData));
-              this.addDialog.header = 'Update Data Dictionary';
-              this.addDialog.okText = 'Update Dictionary';
+              this.addDialog.id = rowData.ID || '';
+              this.addDialog.header = 'Update Site Group';
+              this.addDialog.okText = 'Update Group';
               this.addDialog.showDialog();
             };
           }
@@ -120,24 +119,22 @@ export class DataDictionaryComponent implements OnInit {
     });
   }
 
-  deleteConfirm(rowData: DictionaryData) {
+  deleteConfirm(rowData: GroupData) {
     this.confirmationService.confirm({
-      message: 'Do you want to delete this data dictionary?',
-      header: 'Delete Data Dictionary',
+      message: 'Do you want to delete this site group?',
+      header: 'Delete Site Group',
       icon: 'pi pi-info-circle',
 
       accept: () => {
-        this.dataDictionaryService
-          .deleteDictionary(rowData.ID ?? '')
-          .subscribe(res => {
-            if (res.code === 200) {
-              this.notifyService.notifySuccess(
-                'Success',
-                'Record deleted successfully'
-              );
-              this.fetchData();
-            }
-          });
+        this.siteGroupService.deleteGroup(rowData.ID || '').subscribe(res => {
+          if (res.code === 200) {
+            this.notifyService.notifySuccess(
+              'Success',
+              'Record deleted successfully'
+            );
+            this.fetchData();
+          }
+        });
       }
     });
   }

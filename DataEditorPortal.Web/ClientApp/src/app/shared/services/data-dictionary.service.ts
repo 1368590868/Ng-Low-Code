@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { ApiResponse, ConfigDataService } from 'src/app/shared';
-import { DictionaryData, DictionaryResult } from '../models/dictionary';
+import { DictionaryData } from '../models/dictionary';
+import { ConfigDataService } from './config-data.service';
+import { ApiResponse } from '../models/api-response';
+import { GridResult } from '../models/universal.type';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +20,7 @@ export class DataDictionaryService {
   }
 
   getDictionaryList(fetchDataParam: any) {
-    return this.http.post<ApiResponse<DictionaryResult>>(
+    return this.http.post<ApiResponse<GridResult<DictionaryData>>>(
       `${this._apiUrl}dictionary/list`,
       fetchDataParam
     );
@@ -31,16 +33,16 @@ export class DataDictionaryService {
     );
   }
 
-  updateDictionary(data: DictionaryData) {
+  updateDictionary(data: DictionaryData, id: string) {
     return this.http.put<ApiResponse<string>>(
-      `${this._apiUrl}dictionary/${data.ID}/update`,
+      `${this._apiUrl}dictionary/${id}/update`,
       data
     );
   }
 
-  deleteDictionary(data: DictionaryData) {
+  deleteDictionary(id: string) {
     return this.http.delete<ApiResponse<string>>(
-      `${this._apiUrl}dictionary/${data.ID}/delete`
+      `${this._apiUrl}dictionary/${id}/delete`
     );
   }
 }

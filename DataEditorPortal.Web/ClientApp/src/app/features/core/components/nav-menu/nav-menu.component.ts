@@ -40,10 +40,19 @@ export class NavMenuComponent implements OnInit {
         filter(e => e instanceof NavigationEnd && e.type === 1),
         map(e => e as NavigationEnd)
       ),
-      this.configDataService.menusInGroup$
+      this.configDataService.siteMenus$
     ]).pipe(
       map(([event, menus]) => {
-        return menus.map(menu => {
+        let items: SiteMenu[] = menus;
+        if (this.configDataService.siteGroupName) {
+          // if site group exist, use its children to show in nav and tile
+          const group = menus.find(
+            m => m.name === this.configDataService.siteGroupName
+          );
+          if (group) items = group.items || [];
+        }
+
+        return items.map(menu => {
           this.setMenu(menu);
           this.setParentActive(menu, event.url);
 
