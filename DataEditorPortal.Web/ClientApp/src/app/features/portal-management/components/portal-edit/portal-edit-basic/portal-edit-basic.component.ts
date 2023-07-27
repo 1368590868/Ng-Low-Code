@@ -143,7 +143,7 @@ export class PortalEditBasicComponent
               if (!findItem) {
                 this.model = {
                   ...this.model,
-                  parentId: options[1].value
+                  parentId: options[0].value
                 };
               }
               field.props.options = options;
