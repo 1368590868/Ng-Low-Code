@@ -84,7 +84,7 @@ namespace DataEditorPortal.Web.Controllers
                 var group = string.Empty;
                 if (!string.IsNullOrEmpty(url))
                 {
-                    Match match = Regex.Match(url, @"^/([^/]+)(?:/[^/])*/*$");
+                    Match match = Regex.Match(url, @"^/([^/]+)(?:/[^/]+)*/*$");
                     if (match.Success)
                     {
                         group = match.Groups[1].Value;
