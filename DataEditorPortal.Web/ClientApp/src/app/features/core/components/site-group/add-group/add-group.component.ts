@@ -226,18 +226,24 @@ export class AddGroupComponent {
             }
           });
       } else {
-        this.siteGroupService.createGroup(model).subscribe(res => {
-          if (res.code === 200 && res.data) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Save Successfully Completed.'
-            );
-            this.visible = false;
-            this.saved.emit(res.data);
-          } else {
-            this.isLoading = false;
-          }
-        });
+        this.siteGroupService
+          .createGroup({
+            ...model,
+            aboutPageContent: this.formControlAboutEditor.value ?? '',
+            contactPageContent: this.formControlContactEditor.value ?? ''
+          })
+          .subscribe(res => {
+            if (res.code === 200 && res.data) {
+              this.notifyService.notifySuccess(
+                'Success',
+                'Save Successfully Completed.'
+              );
+              this.visible = false;
+              this.saved.emit(res.data);
+            } else {
+              this.isLoading = false;
+            }
+          });
       }
     }
   }
