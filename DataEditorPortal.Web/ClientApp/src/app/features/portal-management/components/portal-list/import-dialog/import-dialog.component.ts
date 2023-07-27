@@ -56,7 +56,7 @@ export class ImportDialogComponent {
         label: 'Root',
         value: '<root>'
       });
-      this.parentFolderControl.setValue(this.options[1].value);
+      this.parentFolderControl.setValue(this.options[0].value);
     });
 
     this.step = 1;
