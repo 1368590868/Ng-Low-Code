@@ -145,9 +145,9 @@ namespace DataEditorPortal.Web.Controllers
         [Route("content/{contentName}")]
         [AllowAnonymous]
         [NoLicenseCheck]
-        public string GetSiteContent(string contentName, [FromQuery] Guid? siteGroup)
+        public string GetSiteContent(string contentName, [FromQuery] Guid? siteGroupId)
         {
-            var item = _depDbContext.SiteContents.FirstOrDefault(x => x.ContentName == contentName && x.SiteGroupId == siteGroup);
+            var item = _depDbContext.SiteContents.FirstOrDefault(x => x.ContentName == contentName && x.SiteGroupId == siteGroupId);
             if (item == null)
             {
                 throw new DepException("Not Found", 404);

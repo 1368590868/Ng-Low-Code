@@ -109,6 +109,7 @@ namespace DataEditorPortal.Web.Services
                     new MenuItem()
                     {
                         Name = siteGroup.Name,
+                        Label = siteGroup.Title,
                         Description = siteGroup.Description,
                         Id = siteGroup.Id,
                         Component = "GroupLayoutComponent",
