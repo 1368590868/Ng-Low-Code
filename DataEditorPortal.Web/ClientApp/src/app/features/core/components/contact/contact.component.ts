@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Observable, switchMap, tap } from 'rxjs';
+import { Observable, map, switchMap, tap } from 'rxjs';
 import { ConfigDataService } from 'src/app/shared';
 
 @Component({
@@ -20,7 +20,7 @@ export class ContactComponent implements OnInit {
       switchMap(siteGroup => {
         return this.configDataService.getHTMLData('contact', siteGroup?.id);
       }),
-      tap(res => {
+      map(res => {
         return this.domSanitizer.bypassSecurityTrustHtml(res);
       })
     );
