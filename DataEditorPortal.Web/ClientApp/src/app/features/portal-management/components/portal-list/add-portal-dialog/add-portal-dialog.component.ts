@@ -130,18 +130,7 @@ export class AddPortalDialogComponent {
           }
         }
       },
-      {
-        key: 'icon',
-        type: 'iconSelect',
-        props: {
-          label: 'Icon',
-          placeholder: 'Icon',
-          virtualScroll: false,
-          required: true,
-          description:
-            'Find more icons on <a href="https://fontawesome.com/search?o=r&m=free&s=regular" target="__blank">Font Awesome</a>'
-        }
-      },
+
       {
         key: 'parentId',
         type: 'select',
@@ -178,6 +167,18 @@ export class AddPortalDialogComponent {
           }
         },
         expressions: { hide: `field.parent.model.parentId === null` }
+      },
+      {
+        key: 'icon',
+        type: 'iconSelect',
+        props: {
+          label: 'Icon',
+          placeholder: 'Icon',
+          virtualScroll: false,
+          required: true,
+          description:
+            'Find more icons on <a href="https://fontawesome.com/search?o=r&m=free&s=regular" target="__blank">Font Awesome</a>'
+        }
       },
       {
         className: 'w-full',

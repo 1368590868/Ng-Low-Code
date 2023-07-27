@@ -107,17 +107,7 @@ export class PortalEditBasicComponent
         }
       }
     },
-    {
-      key: 'icon',
-      type: 'iconSelect',
-      props: {
-        label: 'Icon',
-        placeholder: 'Icon',
-        required: true,
-        description:
-          'Find more icons on <a href="https://fontawesome.com/search?o=r&m=free&s=regular" target="__blank">Font Awesome</a>'
-      }
-    },
+
     {
       key: 'parentId',
       type: 'select',
@@ -151,6 +141,17 @@ export class PortalEditBasicComponent
             }
           });
         }
+      }
+    },
+    {
+      key: 'icon',
+      type: 'iconSelect',
+      props: {
+        label: 'Icon',
+        placeholder: 'Icon',
+        required: true,
+        description:
+          'Find more icons on <a href="https://fontawesome.com/search?o=r&m=free&s=regular" target="__blank">Font Awesome</a>'
       }
     },
     {
