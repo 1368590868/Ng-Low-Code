@@ -58,9 +58,9 @@ export class AddGroupComponent {
     this.isLoading = false;
     this.visible = true;
     this.buttonDisabled = false;
-    this.globalLoadingService.start();
 
     if (this.id) {
+      this.globalLoadingService.start();
       this.getDetail();
     } else {
       this.getFields();
