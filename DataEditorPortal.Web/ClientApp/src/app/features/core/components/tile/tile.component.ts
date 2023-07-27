@@ -48,19 +48,9 @@ export class TileComponent implements OnDestroy {
     app.isStable.pipe(takeUntil(this.destroy$)).subscribe(x => {
       if (x) this.loading = false;
     });
-    this.menus$ = this.configDataService.siteMenus$.pipe(
-      takeUntil(this.destroy$),
+    this.menus$ = this.configDataService.menusInGroup$.pipe(
       map(menus => {
-        let items: SiteMenu[] = menus;
-        if (this.configDataService.siteGroupName) {
-          // if site group exist, use its children to show in nav and tile
-          const group = menus.find(
-            m => m.name === this.configDataService.siteGroupName
-          );
-          if (group) items = group.items || [];
-        }
-
-        return this.flattenMenus(items);
+        return this.flattenMenus(menus);
       })
     );
   }

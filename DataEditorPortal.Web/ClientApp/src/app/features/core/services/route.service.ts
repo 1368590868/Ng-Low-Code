@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@angular/core';
+import { Component, Inject, Injectable } from '@angular/core';
 import { Route, Router, Routes } from '@angular/router';
-import { tap } from 'rxjs';
+import { tap, withLatestFrom } from 'rxjs';
 import {
   SiteMenu,
   ConfigDataService,
@@ -29,19 +29,34 @@ export class RouteService {
   ) {
     this.configDataService.siteMenus$
       .pipe(
-        tap(menus => {
-          this.resetRoutesConfig(menus);
+        withLatestFrom(this.configDataService.siteGroup$),
+        tap(([menus, siteGroup]) => {
+          this.resetRoutesConfig(menus, siteGroup?.name);
         })
       )
       .subscribe();
   }
 
-  resetRoutesConfig(menus: SiteMenu[]) {
+  resetRoutesConfig(menus: SiteMenu[], siteGroupName: string | undefined) {
     this.updateRoute(
       { path: '', children: this.router.config },
       { name: '', items: menus },
       true
     );
+
+    // update home and static pages to site group
+    if (siteGroupName) {
+      const homeRoute = this.router.config.find(r => r.path === '');
+      if (homeRoute) {
+        homeRoute.redirectTo = siteGroupName;
+      }
+      const groupRoute = this.router.config.find(r => r.path === siteGroupName);
+      if (groupRoute) {
+        this.staticRoutes
+          .filter(r => r.path !== '')
+          .forEach(r => groupRoute.children?.push(r));
+      }
+    }
   }
 
   updateRoute(route: Route, menu: SiteMenu, isRoot = false) {

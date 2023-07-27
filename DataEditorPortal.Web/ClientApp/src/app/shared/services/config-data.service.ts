@@ -8,9 +8,11 @@ import {
   map,
   Observable,
   share,
+  shareReplay,
   Subject,
   switchMap,
-  tap
+  tap,
+  withLatestFrom
 } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 import { SiteMenu } from '../models/menu';
@@ -46,8 +48,24 @@ export class ConfigDataService {
   public licenseExpired = false;
 
   public menuChange$ = new Subject();
-  public siteMenus$ = new BehaviorSubject<SiteMenu[]>([]);
-  public siteGroupName: string | undefined;
+  public siteGroup$ = new BehaviorSubject<SiteMenu | undefined>(undefined);
+  public siteMenus$ = this.menuChange$.asObservable().pipe(
+    filter(() => this.isLogin),
+    withLatestFrom(this.siteGroup$),
+    switchMap(([_, siteGroup]) => {
+      return this.getSiteMenus(siteGroup?.name);
+    }),
+    shareReplay(1)
+  );
+
+  public menusInGroup$ = this.siteMenus$.pipe(
+    map(menus => {
+      // if site group exist, use its children to show in nav and tile
+      const group = menus.find(m => m.type === 'Group');
+      if (group) return group.items || [];
+      return menus;
+    })
+  );
 
   public licenseExpiredChange$ = new Subject<boolean>();
 
@@ -65,17 +83,6 @@ export class ConfigDataService {
       }
       this.licenseExpired = val;
     });
-
-    this.menuChange$
-      .asObservable()
-      .pipe(
-        filter(() => this.isLogin),
-        switchMap(() => {
-          return this.getSiteMenus();
-        }),
-        share()
-      )
-      .subscribe(menus => this.siteMenus$.next(menus));
   }
 
   getSiteVersion() {
@@ -94,10 +101,10 @@ export class ConfigDataService {
       );
   }
 
-  getSiteMenus(): Observable<SiteMenu[]> {
+  getSiteMenus(siteGroupName: string | undefined): Observable<SiteMenu[]> {
     return this.http
       .post<ApiResponse<SiteMenu[]>>(`${this._apiUrl}site/menus`, null, {
-        params: { siteGroupName: this.siteGroupName || '' }
+        params: { siteGroupName: siteGroupName || '' }
       })
       .pipe(map(res => res.data || []));
   }
@@ -129,9 +136,11 @@ export class ConfigDataService {
       );
   }
 
-  getHTMLData(pageName: string) {
+  getHTMLData(pageName: string, siteGroupId?: string) {
     return this.http
-      .get<ApiResponse<string>>(`${this._apiUrl}site/content/${pageName}`)
+      .get<ApiResponse<string>>(`${this._apiUrl}site/content/${pageName}`, {
+        params: { siteGroupId: siteGroupId || '' }
+      })
       .pipe(map(res => res.data ?? ''));
   }
 

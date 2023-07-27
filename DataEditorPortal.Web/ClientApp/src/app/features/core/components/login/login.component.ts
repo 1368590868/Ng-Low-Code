@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, first, tap } from 'rxjs';
-import { UserService } from 'src/app/shared';
+import { finalize, first, tap, withLatestFrom } from 'rxjs';
+import { ConfigDataService, UserService } from 'src/app/shared';
 import { RouteService } from '../../services/route.service';
 
 @Component({
@@ -17,7 +17,8 @@ export class LoginComponent implements OnInit {
     private userService: UserService,
     private route: ActivatedRoute,
     private router: Router,
-    private routeService: RouteService
+    private routeService: RouteService,
+    private configDataServce: ConfigDataService
   ) {}
 
   ngOnInit(): void {
@@ -39,9 +40,13 @@ export class LoginComponent implements OnInit {
     this.userService
       .login(returnUrl)
       .pipe(
-        tap(res => {
+        withLatestFrom(this.configDataServce.siteGroup$),
+        tap(([res, siteGroup]) => {
           if (this.userService.isLogin) {
-            this.routeService.resetRoutesConfig(res.data?.userMenus || []);
+            this.routeService.resetRoutesConfig(
+              res.data?.userMenus || [],
+              siteGroup?.name
+            );
             this.router.navigateByUrl(returnUrl || '');
           } else {
             this.hasLoginError = true;

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Observable, switchMap, tap } from 'rxjs';
 import { ConfigDataService } from 'src/app/shared';
 
 @Component({
@@ -8,15 +9,20 @@ import { ConfigDataService } from 'src/app/shared';
   styleUrls: ['./about.component.scss']
 })
 export class AboutComponent implements OnInit {
-  public HTML: SafeHtml = '';
+  public content$!: Observable<SafeHtml>;
   constructor(
     private configDataService: ConfigDataService,
     private domSanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
-    this.configDataService.getHTMLData('about').subscribe(res => {
-      this.HTML = this.domSanitizer.bypassSecurityTrustHtml(res);
-    });
+    this.content$ = this.configDataService.siteGroup$.pipe(
+      switchMap(siteGroup => {
+        return this.configDataService.getHTMLData('about', siteGroup?.id);
+      }),
+      tap(res => {
+        return this.domSanitizer.bypassSecurityTrustHtml(res);
+      })
+    );
   }
 }

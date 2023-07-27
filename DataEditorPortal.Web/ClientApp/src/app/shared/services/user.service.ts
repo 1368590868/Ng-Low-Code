@@ -38,7 +38,7 @@ export class UserService {
           const menus = res.data.userMenus;
           if (menus) {
             const siteGroup = menus.find(m => m.type === 'Group');
-            if (siteGroup) this.configData.siteGroupName = siteGroup.name;
+            this.configData.siteGroup$.next(siteGroup);
           }
 
           // trigger load menus
