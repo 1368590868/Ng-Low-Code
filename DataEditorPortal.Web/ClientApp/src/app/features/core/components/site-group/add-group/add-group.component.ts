@@ -27,7 +27,7 @@ export class AddGroupComponent {
   @Input() header = 'Add / Edit';
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
-  @Input() dialogStyle = { width: '58rem' };
+  @Input() dialogStyle = { width: '62rem' };
 
   @Output() saved = new EventEmitter<string>();
 

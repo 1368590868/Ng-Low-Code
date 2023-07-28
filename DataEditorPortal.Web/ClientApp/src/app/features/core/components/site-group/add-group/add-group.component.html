@@ -17,25 +17,29 @@
         [model]="model"
         [options]="options"
         class="p-fluid"></formly-form>
-      <div class="w-full mb-4 mt-3">
-        <p class="mb-2">Content for About</p>
-        <div>
-          <p-editor
-            [style]="{ height: '27rem' }"
-            [bounds]="container"
-            [modules]="{ toggleFullscreen: true, blotFormatter: {} }"
-            [formControl]="formControlAboutEditor"></p-editor>
+      <ng-container *ngIf="visible">
+        <div class="w-full mb-4 mt-3">
+          <p class="mb-2">Content for About</p>
+          <div>
+            <p-editor
+              [style]="{ height: '27rem' }"
+              [bounds]="container"
+              [modules]="{ toggleFullscreen: true, blotFormatter: {} }"
+              [formControl]="formControlAboutEditor"></p-editor>
+          </div>
         </div>
-      </div>
-      <div class="w-full mb-4 mt-3">
-        <p class="mb-2">Content for Contact</p>
-        <div>
-          <p-editor
-            [bounds]="container"
-            [style]="{ height: '27rem' }"
-            [formControl]="formControlContactEditor"></p-editor>
+        <div class="w-full mb-4 mt-3">
+          <p class="mb-2">Content for Contact</p>
+          <div>
+            <p-editor
+              [bounds]="container"
+              [modules]="{ toggleFullscreen: true, blotFormatter: {} }"
+              [style]="{ height: '27rem' }"
+              [formControl]="formControlContactEditor"></p-editor>
+          </div>
         </div>
-      </div>
+      </ng-container>
+      <div *ngIf="!visible" [style.height]="'54rem'"></div>
       <div
         *ngIf="!fields || fields.length <= 0"
         class="flex flex-wrap"
