@@ -26,8 +26,7 @@ import { AttachmentsComponent } from './components/attachments/attachments.compo
 import { globalLoadingInterceptor } from './interceptor/global-loading.interceptor';
 import { GlobalLoadingComponent } from './components/global-loading/global-loading.component';
 import { ConfigDataService } from './services/config-data.service';
-import { registerNumeral } from './utils';
-import { registerQuill } from './utils/global-register';
+import { registerNumeral, registerQuill } from './utils';
 
 export { AuthRouterGuard } from './guards/auth-router.guard';
 export { AdminPermissionGuard } from './guards/admin-permission.guard';
