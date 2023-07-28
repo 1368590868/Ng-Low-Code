@@ -44,6 +44,14 @@ export { DataFormatService } from './services/data-format.service';
 export * from './models/universal.type';
 export { SystemLogData } from './models/system-log';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import Quill from 'quill';
+import QuillToggleFullscreenButton from 'quill-toggle-fullscreen-button';
+import BlotFormatter from 'quill-blot-formatter';
+Quill.register('modules/blotFormatter', BlotFormatter);
+Quill.register('modules/toggleFullscreen', QuillToggleFullscreenButton);
+
 registerNumeral();
 
 @NgModule({
