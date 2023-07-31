@@ -372,8 +372,10 @@ export class PortalEditLinkComponent
     } else {
       data = {
         ...data,
+        primaryForeignKey: this.formControlSecondaryOneToMany.value,
         primaryReferenceKey: this.formControlPrimaryOneToMany.value,
-        secondaryForeignKey: this.formControlSecondaryOneToMany.value
+        secondaryForeignKey: this.formControlPrimaryOneToMany.value,
+        secondaryReferenceKey: this.formControlSecondaryOneToMany.value
       };
     }
     if (!this.dsConfig.queryText) {
