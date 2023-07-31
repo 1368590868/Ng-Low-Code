@@ -1,11 +1,16 @@
-﻿using DataEditorPortal.Web.Common;
+﻿using DataEditorPortal.Data.Contexts;
+using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 
 namespace DataEditorPortal.Web.Controllers
 {
@@ -16,13 +21,16 @@ namespace DataEditorPortal.Web.Controllers
     {
         private readonly ILogger<UniversalGridController> _logger;
         private readonly IUniversalGridService _universalGridService;
+        private readonly DepDbContext _depDbContext;
 
         public UniversalGridController(
             ILogger<UniversalGridController> logger,
-            IUniversalGridService universalGridService)
+            IUniversalGridService universalGridService,
+            DepDbContext depDbContext)
         {
             _logger = logger;
             _universalGridService = universalGridService;
+            _depDbContext = depDbContext;
         }
 
         [HttpGet]
@@ -128,6 +136,72 @@ namespace DataEditorPortal.Web.Controllers
 
             return File(fs, "application/ms-excel", exportParam.FileName);
         }
+
+        // Saved Search API
+
+        [HttpGet]
+        [Route("{name}/saved-search/list")]
+        public List<SavedSearchModel> GetSavedSearch(string name)
+        {
+            var config = _universalGridService.GetUniversalGridConfiguration(name);
+
+            var result = _depDbContext.SavedSearches.Where(x => x.UniversalGridConfigurationId == config.Id)
+                .ToList()
+                .Select(x =>
+                     new SavedSearchModel
+                     {
+                         Id = x.Id,
+                         Name = x.Name,
+                         Searches = JsonSerializer.Deserialize<Dictionary<string, object>>(x.SearchParams)
+                     }
+                ).ToList();
+
+            return result;
+        }
+
+
+        [HttpPost]
+        [Route("{name}/saved-search/create")]
+        public Guid CreateSavedSearch(string name, [FromBody] SavedSearchModel model)
+        {
+            if (string.IsNullOrEmpty(model.Name)) throw new DepException("Name cannot be empty.");
+            if (model.Searches == null) throw new DepException("Searches cannot be empty.");
+
+            var config = _universalGridService.GetUniversalGridConfiguration(name);
+
+            var item = new SavedSearch()
+            {
+                Name = model.Name,
+                SearchParams = JsonSerializer.Serialize(model.Searches),
+                UniversalGridConfigurationId = config.Id
+            };
+            _depDbContext.SavedSearches.Add(item);
+            _depDbContext.SaveChanges();
+
+            return item.Id;
+        }
+
+        [HttpPut]
+        [Route("{name}/saved-search/{id}/update")]
+        public Guid UpdateSavedSearch(string name, Guid id, [FromBody] SavedSearchModel model)
+        {
+            if (string.IsNullOrEmpty(model.Name)) throw new DepException("Name cannot be empty.");
+            if (model.Searches == null) throw new DepException("Searches cannot be empty.");
+
+            var config = _universalGridService.GetUniversalGridConfiguration(name);
+
+            var item = _depDbContext.SavedSearches.FirstOrDefault(x => x.Id == id && x.UniversalGridConfigurationId == config.Id);
+            if (item == null) throw new DepException("Saved Search does not exist.", 404);
+
+            item.Name = model.Name;
+            item.SearchParams = JsonSerializer.Serialize(model.Searches);
+
+            _depDbContext.SaveChanges();
+
+            return item.Id;
+        }
+
+        // Link Data API
 
         [HttpGet]
         [Route("{name}/linked/grid-config")]
