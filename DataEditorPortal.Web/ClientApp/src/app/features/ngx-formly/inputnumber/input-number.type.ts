@@ -26,19 +26,14 @@ export interface FormlySelectFieldConfig
   template: `
     <p-inputNumber
       updateOn="blur"
-      [useGrouping]="props.useGrouping ?? true"
+      [useGrouping]="props.useGrouping ?? false"
       [showButtons]="props.showButtons ?? true"
       [placeholder]="props.placeholder || ''"
       [prefix]="props.prefix || ''"
       [min]="props.min ?? null"
       [max]="props.max ?? null"
       [mode]="props.mode || 'decimal'"
-      [maxFractionDigits]="
-        props.maxFractionDigits === null ||
-        props.maxFractionDigits === undefined
-          ? 2
-          : props.maxFractionDigits
-      "
+      [maxFractionDigits]="props.maxFractionDigits ?? 2"
       [formControl]="formControl">
     </p-inputNumber>
   `,
