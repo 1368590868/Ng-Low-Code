@@ -17,6 +17,8 @@ export interface TableConfig {
   columns: ColumnsConfig[];
   table2IdColumn: string;
   table2Name: string;
+  table1IsPrimary?: boolean;
+  isOneToMany?: boolean;
 }
 
 interface LinkDataEditorProps extends FormlyFieldProps {

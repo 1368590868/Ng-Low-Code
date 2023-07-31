@@ -8,7 +8,7 @@
   scrollHeight="17.5rem"
   [resizableColumns]="true"
   columnResizeMode="expand"
-  selectionMode="multiple"
+  [selectionMode]="selectionMode"
   [tableStyle]="{ tableLayout: 'fixed' }"
   [value]="dataSource"
   [(selection)]="selection"
@@ -27,7 +27,9 @@
   <ng-template pTemplate="header" let-columns>
     <tr>
       <th style="width: 4.6rem; max-width: 4.6rem" pSortableColumn="linked">
-        <div class="flex align-items-center">
+        <div
+          class="flex align-items-center"
+          *ngIf="selectionMode === 'multiple'">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
           <p-sortIcon field="linked"></p-sortIcon>
         </div>
@@ -36,7 +38,7 @@
         *ngFor="let col of columns"
         pResizableColumn
         [pSortableColumn]="col.field"
-        [style.width]="'8rem'"
+        [style.width]="columns.length > 4 ? '8rem' : ''"
         [style.text-align]="'center'"
         [pSortableColumnDisabled]="!col.sortable">
         <span style="vertical-align: middle">{{ col.header }}</span>
@@ -49,8 +51,12 @@
     <tr [pSelectableRow]="data">
       <td>
         <p-tableCheckbox
+          *ngIf="selectionMode === 'multiple'"
           [value]="data"
           (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
+        <p-tableRadioButton
+          *ngIf="selectionMode === 'single'"
+          [value]="data"></p-tableRadioButton>
       </td>
       <td
         *ngFor="let col of columns"

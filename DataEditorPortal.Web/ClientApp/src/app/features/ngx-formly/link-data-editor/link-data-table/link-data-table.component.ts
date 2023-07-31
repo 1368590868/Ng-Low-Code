@@ -38,6 +38,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   table2IdColumn = '';
   table2Name = '';
 
+  selectionMode = 'multiple';
   selection: any = [];
   onChange?: any;
   onTouch?: any;
@@ -109,7 +110,9 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   onRowSelect(event: any) {
     const { data } = event;
-    this.innerValue.push({ table2Id: data[this.table2IdColumn] });
+    if (this.selectionMode === 'multiple')
+      this.innerValue.push({ table2Id: data[this.table2IdColumn] });
+    else this.innerValue = [{ table2Id: data[this.table2IdColumn] }];
     this.onChange(this.innerValue);
   }
 
@@ -152,6 +155,11 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
         this.dataSource = dataSource || [];
         this.table2IdColumn = tableConfig.table2IdColumn;
         this.table2Name = tableConfig.table2Name;
+
+        this.selectionMode =
+          tableConfig.isOneToMany && !tableConfig.table1IsPrimary
+            ? 'single'
+            : 'multiple';
 
         this.setLinkedFlag();
         this.setSelection();
@@ -199,7 +207,9 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   }
 
   setSelection() {
-    this.selection = this.dataSource.filter(x => x.__LINKED__);
+    if (this.selectionMode === 'multiple')
+      this.selection = this.dataSource.filter(x => x.__LINKED__);
+    else this.selection = this.dataSource.find(x => x.__LINKED__);
   }
 
   sortBySelection(order = -1) {
