@@ -39,6 +39,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabViewModule } from 'primeng/tabview';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ChipModule } from 'primeng/chip';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
@@ -192,7 +193,8 @@ import { ImportDialogComponent } from './components/portal-list/import-dialog/im
     ConfirmDialogModule,
     TabViewModule,
     FileUploadModule,
-    ChipModule
+    ChipModule,
+    RadioButtonModule
   ],
   providers: [
     {

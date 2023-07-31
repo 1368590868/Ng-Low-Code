@@ -218,110 +218,40 @@
       secondaryTableConfig.details.length > 0 &&
       secondaryTableConfig.details[0].configCompleted
     ">
-    <p-divider styleClass="w-6 mt-4 font-semibold">Link Table</p-divider>
-    <div class="w-6 mb-3">
-      <div class="flex flex-column mb-3">
-        <ng-container *ngIf="!dsConfig.queryText">
-          <label for="tableName" class="mb-1">Database Table</label>
-          <div class="flex align-items-center">
-            <p-dropdown
-              #dbTableDropdown
-              *ngIf="!dsConfig.queryText"
-              [required]="true"
-              [options]="dbTables"
-              (onChange)="onTableNameChange($event)"
-              [formControl]="formControlDbTable"
-              placeholder="Please Select"
-              [style]="{ minWidth: '41.5rem' }"
-              appendTo="body"></p-dropdown>
-            <!-- <p-button
-              [disabled]="!dsConfig.dataSourceConnectionName"
-              class="ml-1"
-              pTooltip="Create new Query"
-              styleClass="p-button-text p-button-rounded"
-              icon="pi pi-ellipsis-v"
-              (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button> -->
-          </div>
-        </ng-container>
-        <!-- <ng-container *ngIf="dsConfig.queryText">
-          <label class="line-height-3">Database Query</label>
-          <div class="flex align-items-center">
-            <div (click)="advancedQueryDialog.showAdvanceDialog()">
-              <ngx-monaco-editor
-                [ngModel]="dsConfig.queryText"
-                [style]="{ minWidth: '41.5rem' }"
-                class="pt-3 border-round monaco-editor-wrapper display-only overflow-hidden"
-                [options]="{
-                  readOnly: true,
-                  domReadOnly: true
-                }"></ngx-monaco-editor>
-            </div>
-            <p-button
-              styleClass="p-button-text p-button-rounded ml-2"
-              icon="pi pi-times-circle"
-              (onClick)="removeAdvancedQuery()"></p-button>
-          </div>
-        </ng-container>
-        <app-advanced-query-dialog
-          #advancedQueryDialog
-          [connectionName]="dsConfig.dataSourceConnectionName"
-          [queryText]="dsConfig.queryText"
-          (queryChange)="queryChange($event)"></app-advanced-query-dialog> -->
+    <p-divider styleClass="w-6 mt-4 font-semibold">Link Relation</p-divider>
+    <!-- Relation Button -->
+    <div class="w-6 flex align-items-center my-3">
+      <div class="flex align-items-center w-20rem">
+        <p-radioButton
+          name="relation"
+          [value]="false"
+          [(ngModel)]="isOneToMany"
+          (ngModelChange)="onRadioChange($event)"
+          inputId="mtm"></p-radioButton>
+        <label for="mtm" class="ml-2">Many To Many</label>
       </div>
-      <div class="flex align-items-center mt-3">
-        <div class="flex align-items-center">
-          <div class="flex flex-column mb-2 mr-4">
-            <label for="idColumn" class="mb-1">Id Column</label>
-            <div class="flex align-items-center">
-              <p-dropdown
-                [required]="true"
-                [formControl]="formControlIdColumn"
-                [options]="dbTableColumns"
-                placeholder="Please Select"
-                [style]="{ minWidth: '20rem' }"
-                optionLabel="columnName"
-                optionValue="columnName"
-                appendTo="body"></p-dropdown>
-            </div>
-          </div>
-        </div>
+
+      <div class="flex align-items-center mb-2 ml-4">
+        <p-radioButton
+          name="relation"
+          [value]="true"
+          [(ngModel)]="isOneToMany"
+          (ngModelChange)="onRadioChange($event)"
+          inputId="otm"></p-radioButton>
+        <label for="otm" class="ml-2">One To Many</label>
       </div>
+    </div>
+
+    <!-- One To Many -->
+    <ng-container *ngIf="isOneToMany">
       <div class="flex align-items-center mt-3">
         <div class="flex flex-column mb-2">
           <label for="idColumn" class="mb-1">Reference Key (Primary)</label>
           <div class="flex align-items-center">
             <p-dropdown
               [required]="true"
-              [formControl]="formControlPrimaryReference"
+              [formControl]="formControlPrimaryOneToMany"
               [options]="primaryTableConfig.databaseColumns || []"
-              placeholder="Please Select"
-              [style]="{ minWidth: '20rem' }"
-              appendTo="body"></p-dropdown>
-          </div>
-        </div>
-        <div class="flex flex-column mb-2 ml-4">
-          <label for="idColumn" class="mb-1">Foreign Key (Primary)</label>
-          <div class="flex align-items-center">
-            <p-dropdown
-              [required]="true"
-              [formControl]="formControlPrimaryMap"
-              [options]="dbTableColumns"
-              placeholder="Please Select"
-              [style]="{ minWidth: '20rem' }"
-              optionLabel="columnName"
-              optionValue="columnName"
-              appendTo="body"></p-dropdown>
-          </div>
-        </div>
-      </div>
-      <div class="flex align-items-center mt-3">
-        <div class="flex flex-column mb-2">
-          <label for="idColumn" class="mb-1">Reference Key (Secondary)</label>
-          <div class="flex align-items-center">
-            <p-dropdown
-              [required]="true"
-              [formControl]="formControlSecondaryReference"
-              [options]="secondaryTableConfig.databaseColumns || []"
               placeholder="Please Select"
               [style]="{ minWidth: '20rem' }"
               appendTo="body"></p-dropdown>
@@ -332,17 +262,143 @@
           <div class="flex align-items-center">
             <p-dropdown
               [required]="true"
-              [formControl]="formControlSecondaryMap"
-              [options]="dbTableColumns"
+              [formControl]="formControlSecondaryOneToMany"
+              [options]="secondaryTableConfig.databaseColumns || []"
               placeholder="Please Select"
               [style]="{ minWidth: '20rem' }"
-              optionLabel="columnName"
-              optionValue="columnName"
               appendTo="body"></p-dropdown>
           </div>
         </div>
       </div>
-    </div>
+    </ng-container>
+
+    <!-- Many To Many -->
+    <ng-container *ngIf="!isOneToMany">
+      <div class="w-6 mb-3">
+        <div class="flex flex-column mb-3">
+          <ng-container *ngIf="!dsConfig.queryText">
+            <label for="tableName" class="mb-1">Database Table</label>
+            <div class="flex align-items-center">
+              <p-dropdown
+                #dbTableDropdown
+                *ngIf="!dsConfig.queryText"
+                [required]="true"
+                [options]="dbTables"
+                (onChange)="onTableNameChange($event)"
+                [formControl]="formControlDbTable"
+                placeholder="Please Select"
+                [style]="{ minWidth: '41.5rem' }"
+                appendTo="body"></p-dropdown>
+              <!-- <p-button
+            [disabled]="!dsConfig.dataSourceConnectionName"
+            class="ml-1"
+            pTooltip="Create new Query"
+            styleClass="p-button-text p-button-rounded"
+            icon="pi pi-ellipsis-v"
+            (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button> -->
+            </div>
+          </ng-container>
+          <!-- <ng-container *ngIf="dsConfig.queryText">
+        <label class="line-height-3">Database Query</label>
+        <div class="flex align-items-center">
+          <div (click)="advancedQueryDialog.showAdvanceDialog()">
+            <ngx-monaco-editor
+              [ngModel]="dsConfig.queryText"
+              [style]="{ minWidth: '41.5rem' }"
+              class="pt-3 border-round monaco-editor-wrapper display-only overflow-hidden"
+              [options]="{
+                readOnly: true,
+                domReadOnly: true
+              }"></ngx-monaco-editor>
+          </div>
+          <p-button
+            styleClass="p-button-text p-button-rounded ml-2"
+            icon="pi pi-times-circle"
+            (onClick)="removeAdvancedQuery()"></p-button>
+        </div>
+      </ng-container>
+      <app-advanced-query-dialog
+        #advancedQueryDialog
+        [connectionName]="dsConfig.dataSourceConnectionName"
+        [queryText]="dsConfig.queryText"
+        (queryChange)="queryChange($event)"></app-advanced-query-dialog> -->
+        </div>
+        <div class="flex align-items-center mt-3">
+          <div class="flex align-items-center">
+            <div class="flex flex-column mb-2 mr-4">
+              <label for="idColumn" class="mb-1">Id Column</label>
+              <div class="flex align-items-center">
+                <p-dropdown
+                  [required]="true"
+                  [formControl]="formControlIdColumn"
+                  [options]="dbTableColumns"
+                  placeholder="Please Select"
+                  [style]="{ minWidth: '20rem' }"
+                  optionLabel="columnName"
+                  optionValue="columnName"
+                  appendTo="body"></p-dropdown>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex align-items-center mt-3">
+          <div class="flex flex-column mb-2">
+            <label for="idColumn" class="mb-1">Reference Key (Primary)</label>
+            <div class="flex align-items-center">
+              <p-dropdown
+                [required]="true"
+                [formControl]="formControlPrimaryReference"
+                [options]="primaryTableConfig.databaseColumns || []"
+                placeholder="Please Select"
+                [style]="{ minWidth: '20rem' }"
+                appendTo="body"></p-dropdown>
+            </div>
+          </div>
+          <div class="flex flex-column mb-2 ml-4">
+            <label for="idColumn" class="mb-1">Foreign Key (Primary)</label>
+            <div class="flex align-items-center">
+              <p-dropdown
+                [required]="true"
+                [formControl]="formControlPrimaryMap"
+                [options]="dbTableColumns"
+                placeholder="Please Select"
+                [style]="{ minWidth: '20rem' }"
+                optionLabel="columnName"
+                optionValue="columnName"
+                appendTo="body"></p-dropdown>
+            </div>
+          </div>
+        </div>
+        <div class="flex align-items-center mt-3">
+          <div class="flex flex-column mb-2">
+            <label for="idColumn" class="mb-1">Reference Key (Secondary)</label>
+            <div class="flex align-items-center">
+              <p-dropdown
+                [required]="true"
+                [formControl]="formControlSecondaryReference"
+                [options]="secondaryTableConfig.databaseColumns || []"
+                placeholder="Please Select"
+                [style]="{ minWidth: '20rem' }"
+                appendTo="body"></p-dropdown>
+            </div>
+          </div>
+          <div class="flex flex-column mb-2 ml-4">
+            <label for="idColumn" class="mb-1">Foreign Key (Secondary)</label>
+            <div class="flex align-items-center">
+              <p-dropdown
+                [required]="true"
+                [formControl]="formControlSecondaryMap"
+                [options]="dbTableColumns"
+                placeholder="Please Select"
+                [style]="{ minWidth: '20rem' }"
+                optionLabel="columnName"
+                optionValue="columnName"
+                appendTo="body"></p-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
   </ng-container>
   <!-- Link Relation  -->
 

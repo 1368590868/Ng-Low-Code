@@ -33,6 +33,8 @@ export class PortalEditLinkComponent
   isSavingAndNext = false;
   isSavingAndExit = false;
 
+  isOneToMany = false;
+
   set itemId(val: string | undefined) {
     this.portalItemService.itemId = val;
   }
@@ -67,6 +69,9 @@ export class PortalEditLinkComponent
   formControlPrimaryReference: FormControl = new FormControl();
   formControlSecondaryReference: FormControl = new FormControl();
   formControlUseAsMasterDetailView: FormControl = new FormControl();
+
+  formControlPrimaryOneToMany: FormControl = new FormControl();
+  formControlSecondaryOneToMany: FormControl = new FormControl();
 
   showQuery = false;
   helperMessage =
@@ -110,7 +115,7 @@ export class PortalEditLinkComponent
           const { data } = res;
           this.dataSourceConfig = data || {};
           this.isLoading = false;
-
+          this.isOneToMany = data?.linkTable?.isOneToMany ?? false;
           this.formControlUseAsMasterDetailView.setValue(
             this.dataSourceConfig.useAsMasterDetailView
           );
@@ -146,6 +151,11 @@ export class PortalEditLinkComponent
                   this.dataSourceConfig.linkTable?.primaryReferenceKey ??
                     item?.idColumn
                 );
+
+                this.formControlPrimaryOneToMany.setValue(
+                  this.dataSourceConfig.linkTable?.primaryReferenceKey ??
+                    item?.idColumn
+                );
               });
           }
 
@@ -162,6 +172,10 @@ export class PortalEditLinkComponent
                 }
 
                 this.formControlSecondaryReference.setValue(
+                  this.dataSourceConfig.linkTable?.secondaryReferenceKey ??
+                    item?.idColumn
+                );
+                this.formControlSecondaryOneToMany.setValue(
                   this.dataSourceConfig.linkTable?.secondaryReferenceKey ??
                     item?.idColumn
                 );
@@ -198,6 +212,17 @@ export class PortalEditLinkComponent
           });
         }
       });
+  }
+
+  onRadioChange(event: boolean) {
+    this.formControlPrimaryMap.reset();
+    this.formControlSecondaryMap.reset();
+    this.formControlPrimaryReference.reset();
+    this.formControlSecondaryReference.reset();
+    this.formControlIdColumn.reset();
+
+    this.formControlPrimaryOneToMany.reset();
+    this.formControlSecondaryOneToMany.reset();
   }
 
   onShowAction(id: string) {
@@ -245,15 +270,27 @@ export class PortalEditLinkComponent
   }
 
   valid() {
+    if (this.isOneToMany) {
+      if (
+        !this.formControlPrimaryOneToMany.value ||
+        !this.formControlSecondaryOneToMany.value
+      ) {
+        this.formControlPrimaryOneToMany.markAsDirty();
+        this.formControlSecondaryOneToMany.markAsDirty();
+        return false;
+      }
+      return true;
+    }
+
     if (
       this.primarySelected.length === 0 ||
       this.secondarySelected.length === 0 ||
-      this.dsConfig.dataSourceConnectionName == null ||
-      this.dsConfig.idColumn == null ||
-      this.formControlPrimaryMap.value == null ||
-      this.formControlSecondaryMap.value == null ||
-      this.formControlPrimaryReference.value == null ||
-      this.formControlSecondaryReference.value == null
+      !this.dsConfig.dataSourceConnectionName ||
+      !this.dsConfig.idColumn ||
+      !this.formControlPrimaryMap.value ||
+      !this.formControlSecondaryMap.value ||
+      !this.formControlPrimaryReference.value ||
+      !this.formControlSecondaryReference.value
     ) {
       this.formControlSecondaryMap.markAsDirty();
       this.formControlPrimaryMap.markAsDirty();
@@ -318,18 +355,32 @@ export class PortalEditLinkComponent
   }
 
   onSave() {
-    const data: DataSourceConfig = {
+    let data: DataSourceConfig = {
       dataSourceConnectionName: this.dsConfig.dataSourceConnectionName,
-      idColumn: this.dsConfig.idColumn,
-      primaryForeignKey: this.formControlPrimaryMap.value,
-      secondaryForeignKey: this.formControlSecondaryMap.value,
-      primaryReferenceKey: this.formControlPrimaryReference.value,
-      secondaryReferenceKey: this.formControlSecondaryReference.value,
-      queryInsert: this.formControlQueryText.value
+      queryInsert: this.formControlQueryText.value,
+      isOneToMany: this.isOneToMany
     };
+    if (!this.isOneToMany) {
+      data = {
+        ...data,
+        idColumn: this.dsConfig.idColumn,
+        primaryForeignKey: this.formControlPrimaryMap.value,
+        secondaryForeignKey: this.formControlSecondaryMap.value,
+        primaryReferenceKey: this.formControlPrimaryReference.value,
+        secondaryReferenceKey: this.formControlSecondaryReference.value
+      };
+    } else {
+      data = {
+        ...data,
+        primaryReferenceKey: this.formControlPrimaryOneToMany.value,
+        secondaryForeignKey: this.formControlSecondaryOneToMany.value
+      };
+    }
     if (!this.dsConfig.queryText) {
-      data.tableName = this.dsConfig.tableName;
-      data.tableSchema = this.dsConfig.tableSchema;
+      if (!this.isOneToMany) {
+        data.tableName = this.dsConfig.tableName;
+        data.tableSchema = this.dsConfig.tableSchema;
+      }
     } else {
       data.queryText = this.dsConfig.queryText;
     }

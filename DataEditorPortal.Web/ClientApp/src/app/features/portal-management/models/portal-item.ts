@@ -34,7 +34,7 @@ export interface DataSourceConfig {
   dataSourceConnectionName: string;
   tableName?: string;
   tableSchema?: string;
-  idColumn: string;
+  idColumn?: string;
   filters?: DataSourceFilter[];
   sortBy?: DataSourceSortBy[];
   queryText?: string;
@@ -44,6 +44,7 @@ export interface DataSourceConfig {
   secondaryForeignKey?: string;
   secondaryReferenceKey?: string;
   queryInsert?: string;
+  isOneToMany?: boolean;
 }
 
 export interface DataSourceFilter {
