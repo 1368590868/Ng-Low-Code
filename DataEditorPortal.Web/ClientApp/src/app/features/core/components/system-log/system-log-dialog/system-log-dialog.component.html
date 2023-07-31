@@ -21,10 +21,10 @@
         <td>{{ viewData.name }}</td>
         <td>
           <ng-container>
-            <ng-container *ngIf="viewData.name === 'eventTime'">
-              {{ viewData.value | date : 'dd/MM/yyyy HH:mm:ss' }}
+            <ng-container *ngIf="viewData.name === 'Event time'">
+              {{ viewData.value | date : 'M/dd/yyyy hh:mm a' }}
             </ng-container>
-            <ng-container *ngIf="viewData.name !== 'eventTime'">
+            <ng-container *ngIf="viewData.name !== 'Event time'">
               {{ viewData.value }}
             </ng-container>
           </ng-container>
