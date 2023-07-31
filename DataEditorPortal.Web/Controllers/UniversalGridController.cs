@@ -221,7 +221,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{table1Name}/linked-table-editor/table-data")]
         public GridData GetLinkedTableDataForFieldControl(string table1Name, GridParam gridParam)
         {
-            return _universalGridService.GetRelationDataForFieldControl(table1Name, gridParam);
+            return _universalGridService.GetGridDataForFieldControl(table1Name, gridParam);
         }
 
         [HttpPost]
