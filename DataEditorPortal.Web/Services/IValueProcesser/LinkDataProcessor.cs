@@ -16,7 +16,7 @@ namespace DataEditorPortal.Web.Services
     {
         private List<RelationDataModel> _inputModel;
         private List<RelationDataModel> _existingModel;
-        private LinkedTableInfo _linkedTableInfo;
+        private RelationInfo _relationInfo;
 
         private readonly IServiceProvider _serviceProvider;
         private readonly IQueryBuilder _queryBuilder;
@@ -38,8 +38,8 @@ namespace DataEditorPortal.Web.Services
 
         public override void PreProcess(IDictionary<string, object> model)
         {
-            if (_linkedTableInfo == null)
-                _linkedTableInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetLinkedTableInfo(Config.Name);
+            if (_relationInfo == null)
+                _relationInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetRelationInfo(Config.Name);
 
             _inputModel = ProcessLinkDataField(model);
             _existingModel = GetLinkDataModelForForm(Config.Name, model);
@@ -66,17 +66,17 @@ namespace DataEditorPortal.Web.Services
         {
             if (dataIds.Any())
             {
-                if (_linkedTableInfo == null)
-                    _linkedTableInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetLinkedTableInfo(Config.Name);
+                if (_relationInfo == null)
+                    _relationInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetRelationInfo(Config.Name);
 
                 // delete secondary table data, donot need to update relation in one to many mode.
-                if (_linkedTableInfo.IsOneToMany && !_linkedTableInfo.Table1IsPrimary) return;
+                if (_relationInfo.IsOneToMany && !_relationInfo.Table1IsPrimary) return;
 
-                _queryToDelete = _linkedTableInfo.Table1.Query_RemoveRelationById;
+                _queryToDelete = _relationInfo.Table1.Query_RemoveRelationById;
                 _parameterToDelete = _queryBuilder.GenerateDynamicParameter(
                     new List<KeyValuePair<string, object>>()
                     {
-                        new KeyValuePair<string, object>(_linkedTableInfo.Table1.IdColumn, dataIds)
+                        new KeyValuePair<string, object>(_relationInfo.Table1.IdColumn, dataIds)
                     }
                 );
                 Conn.Execute(_queryToDelete, _parameterToDelete, Trans);
@@ -110,29 +110,29 @@ namespace DataEditorPortal.Web.Services
 
         private void UpdateLinkData(string table1Name, IDictionary<string, object> model)
         {
-            if (_linkedTableInfo == null)
-                _linkedTableInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetLinkedTableInfo(table1Name);
-            var table1Id = model[_linkedTableInfo.Table1.IdColumn];
+            if (_relationInfo == null)
+                _relationInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetRelationInfo(table1Name);
+            var table1Id = model[_relationInfo.Table1.IdColumn];
             _inputModel.ForEach(m => { m.Table1Id = table1Id; });
 
-            if (!_linkedTableInfo.IsOneToMany || (_linkedTableInfo.IsOneToMany && _linkedTableInfo.Table1IsPrimary))
+            if (!_relationInfo.IsOneToMany || (_relationInfo.IsOneToMany && _relationInfo.Table1IsPrimary))
             {
                 // Set table1RefValue, if ReferenceKey Key is not the same as Id Column, query it from database
                 _inputModel.ForEach(m => { m.Table1RefValue = table1Id; });
-                if (_linkedTableInfo.Table1.IdColumn != _linkedTableInfo.Table1.ReferenceKey)
+                if (_relationInfo.Table1.IdColumn != _relationInfo.Table1.ReferenceKey)
                 {
                     var table1Ids = new List<object>() { table1Id };
-                    var queryText = _queryBuilder.GenerateSqlTextForQueryForeignKeyValue(_linkedTableInfo.Table1);
+                    var queryText = _queryBuilder.GenerateSqlTextForQueryForeignKeyValue(_relationInfo.Table1);
                     var param = _queryBuilder.GenerateDynamicParameter(
-                        new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(_linkedTableInfo.Table1.IdColumn, table1Ids) }
+                        new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(_relationInfo.Table1.IdColumn, table1Ids) }
                     );
                     // get the table1RefValue
                     var datas = Conn.Query(queryText, param, Trans)
                         .Cast<IDictionary<string, object>>()
                         .Select(d => new
                         {
-                            TableId = d[_linkedTableInfo.Table1.IdColumn],
-                            TableRefValue = d[_linkedTableInfo.Table1.ReferenceKey]
+                            TableId = d[_relationInfo.Table1.IdColumn],
+                            TableRefValue = d[_relationInfo.Table1.ReferenceKey]
                         });
 
                     _inputModel.ForEach(m =>
@@ -145,24 +145,24 @@ namespace DataEditorPortal.Web.Services
                 }
             }
 
-            if (!_linkedTableInfo.IsOneToMany || (_linkedTableInfo.IsOneToMany && !_linkedTableInfo.Table1IsPrimary))
+            if (!_relationInfo.IsOneToMany || (_relationInfo.IsOneToMany && !_relationInfo.Table1IsPrimary))
             {
                 // Set table2RefValue, if ReferenceKey Key is not the same as Id Column, query it from database
                 _inputModel.ForEach(m => m.Table2RefValue = m.Table2Id);
-                if (_linkedTableInfo.Table2.IdColumn != _linkedTableInfo.Table2.ReferenceKey)
+                if (_relationInfo.Table2.IdColumn != _relationInfo.Table2.ReferenceKey)
                 {
                     var table2Ids = _inputModel.Select(m => m.Table2Id);
-                    var queryText = _queryBuilder.GenerateSqlTextForQueryForeignKeyValue(_linkedTableInfo.Table2);
+                    var queryText = _queryBuilder.GenerateSqlTextForQueryForeignKeyValue(_relationInfo.Table2);
                     var param = _queryBuilder.GenerateDynamicParameter(
-                        new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(_linkedTableInfo.Table2.IdColumn, table2Ids) }
+                        new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(_relationInfo.Table2.IdColumn, table2Ids) }
                     );
 
                     var datas = Conn.Query(queryText, param, Trans)
                         .Cast<IDictionary<string, object>>()
                         .Select(d => new
                         {
-                            TableId = d[_linkedTableInfo.Table2.IdColumn],
-                            TableRefValue = d[_linkedTableInfo.Table2.ReferenceKey]
+                            TableId = d[_relationInfo.Table2.IdColumn],
+                            TableRefValue = d[_relationInfo.Table2.ReferenceKey]
                         });
 
                     _inputModel.ForEach(m =>
@@ -187,28 +187,28 @@ namespace DataEditorPortal.Web.Services
                 );
                 if (toAdd.Any())
                 {
-                    var sql = _linkedTableInfo.Query_AddRelation;
+                    var sql = _relationInfo.Query_AddRelation;
 
                     foreach (var item in toAdd)
                     {
                         var value = new List<KeyValuePair<string, object>>();
-                        if (_linkedTableInfo.IsOneToMany)
+                        if (_relationInfo.IsOneToMany)
                         {
-                            if (_linkedTableInfo.Table1IsPrimary)
+                            if (_relationInfo.Table1IsPrimary)
                             {
-                                value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table2.ForeignKey, item.Table1RefValue));
-                                value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table2.IdColumn, item.Table2Id));
+                                value.Add(new KeyValuePair<string, object>(_relationInfo.Table1.ForeignKey, item.Table1RefValue));
+                                value.Add(new KeyValuePair<string, object>(_relationInfo.Table2.IdColumn, item.Table2Id));
                             }
                             else
                             {
-                                value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, item.Table2RefValue));
-                                value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.IdColumn, item.Table1Id));
+                                value.Add(new KeyValuePair<string, object>(_relationInfo.Table2.ForeignKey, item.Table2RefValue));
+                                value.Add(new KeyValuePair<string, object>(_relationInfo.Table1.IdColumn, item.Table1Id));
                             }
                         }
                         else
                         {
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, item.Table1RefValue));
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table2.ForeignKey, item.Table2RefValue));
+                            value.Add(new KeyValuePair<string, object>(_relationInfo.Table1.ForeignKey, item.Table1RefValue));
+                            value.Add(new KeyValuePair<string, object>(_relationInfo.Table2.ForeignKey, item.Table2RefValue));
                         }
                         var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
 
@@ -227,20 +227,28 @@ namespace DataEditorPortal.Web.Services
 
                 if (toDelete.Any())
                 {
-                    var sql = _linkedTableInfo.Query_RemoveRelation;
+                    var sql = _relationInfo.Query_RemoveRelation;
 
                     foreach (var item in toDelete)
                     {
                         var value = new List<KeyValuePair<string, object>>();
-                        if (_linkedTableInfo.IsOneToMany)
+                        if (_relationInfo.IsOneToMany)
                         {
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, null));
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table2.IdColumn, item.Table2Id));
+                            if (_relationInfo.Table1IsPrimary)
+                            {
+                                value.Add(new KeyValuePair<string, object>(_relationInfo.Table1.ForeignKey, null));
+                                value.Add(new KeyValuePair<string, object>(_relationInfo.Table2.IdColumn, item.Table2Id));
+                            }
+                            else
+                            {
+                                value.Add(new KeyValuePair<string, object>(_relationInfo.Table2.ForeignKey, null));
+                                value.Add(new KeyValuePair<string, object>(_relationInfo.Table1.IdColumn, item.Table1Id));
+                            }
                         }
                         else
                         {
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table1.ForeignKey, item.Table1RefValue));
-                            value.Add(new KeyValuePair<string, object>(_linkedTableInfo.Table2.ForeignKey, item.Table2RefValue));
+                            value.Add(new KeyValuePair<string, object>(_relationInfo.Table1.ForeignKey, item.Table1RefValue));
+                            value.Add(new KeyValuePair<string, object>(_relationInfo.Table2.ForeignKey, item.Table2RefValue));
                         }
                         var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
 
@@ -257,18 +265,18 @@ namespace DataEditorPortal.Web.Services
 
         private List<RelationDataModel> GetLinkDataModelForForm(string table1Name, IDictionary<string, object> model)
         {
-            if (_linkedTableInfo == null)
-                _linkedTableInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetLinkedTableInfo(table1Name);
+            if (_relationInfo == null)
+                _relationInfo = _serviceProvider.GetRequiredService<IUniversalGridService>().GetRelationInfo(table1Name);
 
             object table1Id = null;
-            if (model.Keys.Contains(_linkedTableInfo.Table1.IdColumn))
-                table1Id = model[_linkedTableInfo.Table1.IdColumn];
+            if (model.Keys.Contains(_relationInfo.Table1.IdColumn))
+                table1Id = model[_relationInfo.Table1.IdColumn];
 
             List<RelationDataModel> relationData = new List<RelationDataModel>();
             if (table1Id != null)
             {
-                var queryText = _linkedTableInfo.Table1.Query_GetLinkedDataById;
-                var param = _queryBuilder.GenerateDynamicParameter(new Dictionary<string, object>() { { _linkedTableInfo.Table1.IdColumn, table1Id } });
+                var queryText = _relationInfo.Table1.Query_GetRelationDataById;
+                var param = _queryBuilder.GenerateDynamicParameter(new Dictionary<string, object>() { { _relationInfo.Table1.IdColumn, table1Id } });
 
                 var table2Ids = Enumerable.Empty<object>();
                 try
@@ -281,10 +289,10 @@ namespace DataEditorPortal.Web.Services
 
                         return new RelationDataModel()
                         {
-                            Table1Id = item[$"T1_{_linkedTableInfo.Table1.IdColumn}"],
-                            Table2Id = item[$"T2_{_linkedTableInfo.Table2.IdColumn}"],
-                            Table1RefValue = item[$"F1_{_linkedTableInfo.Table1.ForeignKey}"],
-                            Table2RefValue = item[$"F2_{_linkedTableInfo.Table2.ForeignKey}"]
+                            Table1Id = item[$"T1_{_relationInfo.Table1.IdColumn}"],
+                            Table2Id = item[$"T2_{_relationInfo.Table2.IdColumn}"],
+                            Table1RefValue = item[$"F1_{_relationInfo.Table1.ForeignKey}"],
+                            Table2RefValue = item[$"F2_{_relationInfo.Table2.ForeignKey}"]
                         };
                     }).ToList();
                 }

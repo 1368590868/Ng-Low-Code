@@ -13,11 +13,10 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public object Table2RefValue { get; set; }
     }
 
-    public class LinkedTableInfo
+    public class RelationInfo
     {
         public TableMeta Table1 { get; set; }
         public TableMeta Table2 { get; set; }
-        //public TableMeta LinkTable { get; set; }
 
         public bool IsOneToMany { get; set; }
         public bool Table1IsPrimary { get; set; }
@@ -33,15 +32,12 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string IdColumn { get; set; }
         public string TableSchema { get; set; }
         public string TableName { get; set; }
-        public string Query_AllData { get; set; }
         public List<string> EditorColumns { get; set; }
-        public string Query_GetLinkedDataById { get; set; }
-        public string Query_RemoveRelationById { get; set; }
         public string ReferenceKey { get; set; }
         public string ForeignKey { get; set; }
         public string ConnectionString { get; set; }
-        //public string Query_Insert { get; set; }
-        //public string Query_DeleteByTable1Id { get; set; }
-        //public string Query_DeleteById { get; set; }
+        public string Query_AllData { get; set; }
+        public string Query_GetRelationDataById { get; set; }
+        public string Query_RemoveRelationById { get; set; }
     }
 }

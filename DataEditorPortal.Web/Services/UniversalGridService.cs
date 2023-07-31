@@ -48,10 +48,10 @@ namespace DataEditorPortal.Web.Services
 
         // linked table api
         dynamic GetLinkedGridConfig(string name);
-        GridData GetLinkedTableDataForFieldControl(string table1Name, GridParam param);
-        dynamic GetLinkedTableConfigForFieldControl(string tableName);
+        GridData GetRelationDataForFieldControl(string table1Name, GridParam param);
+        dynamic GetRelationConfigForFieldControl(string tableName);
         IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id);
-        LinkedTableInfo GetLinkedTableInfo(string table1Name);
+        RelationInfo GetRelationInfo(string table1Name);
 
         // utility
         UniversalGridConfiguration GetUniversalGridConfiguration(string name);
@@ -1319,22 +1319,24 @@ namespace DataEditorPortal.Web.Services
 
         #region Linked Data API
 
-        public GridData GetLinkedTableDataForFieldControl(string table1Name, GridParam gridParam)
+        public GridData GetRelationDataForFieldControl(string table1Name, GridParam gridParam)
         {
-            var linkedTableInfo = GetLinkedTableInfo(table1Name);
+            var relationInfo = GetRelationInfo(table1Name);
             gridParam.IndexCount = 0;
-            return GetGridData(linkedTableInfo.Table2.Name, gridParam);
+            return GetGridData(relationInfo.Table2.Name, gridParam);
         }
-        public dynamic GetLinkedTableConfigForFieldControl(string table1Name)
+        public dynamic GetRelationConfigForFieldControl(string table1Name)
         {
-            var linkedTableInfo = GetLinkedTableInfo(table1Name);
-            var columns = GetGridColumnsConfig(linkedTableInfo.Table2.Name);
+            var relationInfo = GetRelationInfo(table1Name);
+            var columns = GetGridColumnsConfig(relationInfo.Table2.Name);
 
             return new
             {
-                columns = columns.Where(c => linkedTableInfo.Table2.EditorColumns.Contains(c.field)).ToList(),
-                table2Name = linkedTableInfo.Table2.Name,
-                table2IdColumn = linkedTableInfo.Table2.IdColumn
+                columns = columns.Where(c => relationInfo.Table2.EditorColumns.Contains(c.field)).ToList(),
+                table2Name = relationInfo.Table2.Name,
+                table2IdColumn = relationInfo.Table2.IdColumn,
+                table1IsPrimary = relationInfo.Table1IsPrimary,
+                isOneToMany = relationInfo.IsOneToMany
             };
         }
 
@@ -1346,24 +1348,24 @@ namespace DataEditorPortal.Web.Services
         /// <returns>Values of IdColumn of Table1 that linked to table2Id</returns>
         public IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id)
         {
-            var linkedTableInfo = GetLinkedTableInfo(table1Name);
+            var relationInfo = GetRelationInfo(table1Name);
 
-            var queryText = linkedTableInfo.Table2.Query_GetLinkedDataById;
-            var param = _queryBuilder.GenerateDynamicParameter(new Dictionary<string, object>() { { linkedTableInfo.Table2.IdColumn, table2Id } });
+            var queryText = relationInfo.Table2.Query_GetRelationDataById;
+            var param = _queryBuilder.GenerateDynamicParameter(new Dictionary<string, object>() { { relationInfo.Table2.IdColumn, table2Id } });
 
             var table1Ids = Enumerable.Empty<object>();
             try
             {
                 using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                 {
-                    con.ConnectionString = linkedTableInfo.ConnectionString;
+                    con.ConnectionString = relationInfo.ConnectionString;
                     con.Open();
                     var datas = con.Query(queryText, param);
 
                     table1Ids = datas.Select(data =>
                     {
                         var item = (IDictionary<string, object>)data;
-                        return item[$"T2_{linkedTableInfo.Table1.IdColumn}"];
+                        return item[$"T2_{relationInfo.Table1.IdColumn}"];
                     });
                 }
             }
@@ -1395,7 +1397,7 @@ namespace DataEditorPortal.Web.Services
             };
         }
 
-        public LinkedTableInfo GetLinkedTableInfo(string table1Name)
+        public RelationInfo GetRelationInfo(string table1Name)
         {
             return _memoryCache.GetOrCreate($"grid.{table1Name}.linked.table.info", entry =>
             {
@@ -1421,22 +1423,6 @@ namespace DataEditorPortal.Web.Services
                 var linkedDataSourceConfig = tables.Where(x => x.ItemType == GridItemType.LINKED).Select(t => t.DataSource).FirstOrDefault();
                 var dsLink = JsonSerializer.Deserialize<LinkedDataSourceConfig>(linkedDataSourceConfig);
                 var relationInfo = dsLink.LinkTable;
-
-                //var linkTable = tables.Where(x => x.ItemType == GridItemType.LINKED)
-                //.Select(t =>
-                //{
-                //    var ds = JsonSerializer.Deserialize<LinkedDataSourceConfig>(t.DataSource);
-                //    ds.LinkTable.Columns = new List<string>() { ds.LinkTable.IdColumn, dsLink.LinkTable.PrimaryForeignKey, dsLink.LinkTable.SecondaryForeignKey };
-                //    var query = _queryBuilder.GenerateSqlTextForDatasource(ds.LinkTable);
-                //    return new TableMeta()
-                //    {
-                //        Name = t.Name,
-                //        MenuId = t.Id,
-                //        IdColumn = ds.LinkTable.IdColumn,
-                //        Query_AllData = query,
-                //        ConnectionString = t.ConnectionString,
-                //    };
-                //}).FirstOrDefault();
 
                 var primary = tables.Where(x => x.ItemType == GridItemType.LINKED_SINGLE)
                     .OrderBy(t => t.Order)
@@ -1481,27 +1467,26 @@ namespace DataEditorPortal.Web.Services
                     .FirstOrDefault();
 
                 // compose relation info result
-
                 var table1IsPrimary = primary.Name == table1Name;
 
                 #region query relations by table 1 id.
 
                 if (relationInfo.IsOneToMany)
                 {
-                    primary.Query_GetLinkedDataById = _queryBuilder.GenerateSqlTextForLinkData(primary, secondary, null, true);
-                    secondary.Query_GetLinkedDataById = _queryBuilder.GenerateSqlTextForLinkData(secondary, primary, null, false);
+                    primary.Query_GetRelationDataById = _queryBuilder.GenerateSqlTextForGetRelation(primary, secondary);
+                    secondary.Query_GetRelationDataById = _queryBuilder.GenerateSqlTextForGetRelation(secondary, primary);
                 }
                 else
                 {
-                    var queryAllRelations = _queryBuilder.GenerateSqlTextForDatasource(new DataSourceConfig()
+                    var relationTableDs = new DataSourceConfig()
                     {
                         Columns = new List<string>() { relationInfo.IdColumn, relationInfo.PrimaryForeignKey, relationInfo.SecondaryForeignKey },
                         TableName = relationInfo.TableName,
                         TableSchema = relationInfo.TableSchema,
                         IdColumn = relationInfo.IdColumn
-                    });
-                    primary.Query_GetLinkedDataById = _queryBuilder.GenerateSqlTextForLinkData(primary, secondary, queryAllRelations);
-                    secondary.Query_GetLinkedDataById = _queryBuilder.GenerateSqlTextForLinkData(secondary, primary, queryAllRelations);
+                    };
+                    primary.Query_GetRelationDataById = _queryBuilder.GenerateSqlTextForGetRelation(primary, secondary, relationTableDs);
+                    secondary.Query_GetRelationDataById = _queryBuilder.GenerateSqlTextForGetRelation(secondary, primary, relationTableDs);
                 }
 
                 #endregion
@@ -1514,7 +1499,7 @@ namespace DataEditorPortal.Web.Services
                     query_AddRelation = _queryBuilder.GenerateSqlTextForAddRelation(
                         new DataSourceConfig()
                         {
-                            Columns = new List<string>() { secondary.ForeignKey },
+                            Columns = new List<string>() { primary.ForeignKey },
                             TableName = secondary.TableName,
                             TableSchema = secondary.TableSchema,
                             IdColumn = secondary.IdColumn,
@@ -1543,7 +1528,7 @@ namespace DataEditorPortal.Web.Services
                     query_RemoveRelation = _queryBuilder.GenerateSqlTextForRemoveRelation(
                         new DataSourceConfig()
                         {
-                            Columns = new List<string>() { secondary.ForeignKey },
+                            Columns = new List<string>() { primary.ForeignKey },
                             TableName = secondary.TableName,
                             TableSchema = secondary.TableSchema,
                             IdColumn = secondary.IdColumn,
@@ -1571,18 +1556,18 @@ namespace DataEditorPortal.Web.Services
                 var query_RemoveRelationByTable1Id = string.Empty;
                 if (relationInfo.IsOneToMany)
                 {
-                    primary.Query_RemoveRelationById = _queryBuilder.GenerateSqlTextForDeleteLinkData(dsLink.LinkTable, primary, secondary);
+                    primary.Query_RemoveRelationById = _queryBuilder.GenerateSqlTextForBatchRemoveRelation(primary, secondary);
                     secondary.Query_RemoveRelationById = string.Empty; // do not need to remove any relation in one to many mode for secondary table.
                 }
                 else
                 {
-                    primary.Query_RemoveRelationById = _queryBuilder.GenerateSqlTextForDeleteLinkData(dsLink.LinkTable, primary, secondary);
-                    secondary.Query_RemoveRelationById = _queryBuilder.GenerateSqlTextForDeleteLinkData(dsLink.LinkTable, secondary, primary);
+                    primary.Query_RemoveRelationById = _queryBuilder.GenerateSqlTextForBatchRemoveRelation(primary, secondary, dsLink.LinkTable);
+                    secondary.Query_RemoveRelationById = _queryBuilder.GenerateSqlTextForBatchRemoveRelation(secondary, primary, dsLink.LinkTable);
                 }
 
                 #endregion
 
-                return new LinkedTableInfo()
+                return new RelationInfo()
                 {
                     Table1 = table1IsPrimary ? primary : secondary,
                     Table2 = table1IsPrimary ? secondary : primary,

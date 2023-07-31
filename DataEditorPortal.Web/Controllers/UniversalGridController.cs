@@ -147,14 +147,14 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{table1Name}/linked-table-editor/table-data")]
         public GridData GetLinkedTableDataForFieldControl(string table1Name, GridParam gridParam)
         {
-            return _universalGridService.GetLinkedTableDataForFieldControl(table1Name, gridParam);
+            return _universalGridService.GetRelationDataForFieldControl(table1Name, gridParam);
         }
 
         [HttpPost]
         [Route("{table1Name}/linked-table-editor/table-config")]
         public dynamic GetLinkedTableConfigForFieldControl(string table1Name)
         {
-            return _universalGridService.GetLinkedTableConfigForFieldControl(table1Name);
+            return _universalGridService.GetRelationConfigForFieldControl(table1Name);
         }
     }
 }

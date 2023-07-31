@@ -34,9 +34,9 @@ namespace DataEditorPortal.Web.Services
         string GenerateSqlTextForUpdate(DataSourceConfig config);
         string GenerateSqlTextForDelete(DataSourceConfig config);
         string GenerateSqlTextForExist(DataSourceConfig config);
-        string GenerateSqlTextForLinkData(TableMeta t1, TableMeta t2, string queryAllRelations = null, bool inputIsPrimary = true);
-        string GenerateSqlTextForDeleteLinkData(RelationDataSourceConfig config, TableMeta input, TableMeta output);
-        string GenerateSqlTextForQueryForeignKeyValue(TableMeta input);
+        string GenerateSqlTextForGetRelation(TableMeta t1, TableMeta t2, DataSourceConfig config = null);
+        string GenerateSqlTextForBatchRemoveRelation(TableMeta t1, TableMeta t2, DataSourceConfig config = null);
+        string GenerateSqlTextForQueryForeignKeyValue(TableMeta t1);
         string GenerateSqlTextForRemoveRelation(DataSourceConfig config, bool isOneToMany);
         string GenerateSqlTextForAddRelation(DataSourceConfig config, bool isOneToMany);
 
@@ -420,59 +420,47 @@ namespace DataEditorPortal.Web.Services
 
         #region query for link table
 
-        public virtual string GenerateSqlTextForLinkData(TableMeta input, TableMeta output, string queryAllRelations = null, bool inputIsPrimary = true)
+        public virtual string GenerateSqlTextForGetRelation(TableMeta t1, TableMeta t2, DataSourceConfig config = null)
         {
-            if (!string.IsNullOrEmpty(queryAllRelations))
+            if (config != null)
             {
+                var queryAllRelations = GenerateSqlTextForDatasource(config);
                 // many to many
                 return $@"
                     SELECT 
-                        t1.{EscapeColumnName(input.IdColumn)} AS ""T1_{input.IdColumn}"", 
-                        t2.{EscapeColumnName(output.IdColumn)} AS ""T2_{output.IdColumn}"",
-                        link.{EscapeColumnName(input.ForeignKey)} AS ""F1_{input.ForeignKey}"", 
-                        link.{EscapeColumnName(output.ForeignKey)} AS ""F2_{output.ForeignKey}""
-                    FROM ({input.Query_AllData}) t1
-                    INNER JOIN ({queryAllRelations}) link ON t1.{EscapeColumnName(input.ReferenceKey)} = link.{EscapeColumnName(input.ForeignKey)} 
-                    INNER JOIN ({output.Query_AllData}) t2 ON t2.{EscapeColumnName(output.ReferenceKey)} = link.{EscapeColumnName(output.ForeignKey)} 
-                    WHERE t1.{input.IdColumn} = {ParameterPrefix}{ParameterName(input.IdColumn)}
+                        t1.{EscapeColumnName(t1.IdColumn)} AS ""T1_{t1.IdColumn}"", 
+                        t2.{EscapeColumnName(t2.IdColumn)} AS ""T2_{t2.IdColumn}"",
+                        link.{EscapeColumnName(t1.ForeignKey)} AS ""F1_{t1.ForeignKey}"", 
+                        link.{EscapeColumnName(t2.ForeignKey)} AS ""F2_{t2.ForeignKey}""
+                    FROM ({t1.Query_AllData}) t1
+                    INNER JOIN ({queryAllRelations}) link ON t1.{EscapeColumnName(t1.ReferenceKey)} = link.{EscapeColumnName(t1.ForeignKey)} 
+                    INNER JOIN ({t2.Query_AllData}) t2 ON t2.{EscapeColumnName(t2.ReferenceKey)} = link.{EscapeColumnName(t2.ForeignKey)} 
+                    WHERE t1.{t1.IdColumn} = {ParameterPrefix}{ParameterName(t1.IdColumn)}
                 ";
             }
             else
             {
-                if (inputIsPrimary)
-                {
-                    return $@"
+                // one to many
+                return $@"
                         SELECT 
-                            t1.{EscapeColumnName(input.IdColumn)} AS ""T1_{input.IdColumn}"", 
-                            t2.{EscapeColumnName(output.IdColumn)} AS ""T2_{output.IdColumn}""
-                        FROM ({input.Query_AllData}) t1
-                        INNER JOIN ({output.Query_AllData}) t2 ON t1.{EscapeColumnName(output.ReferenceKey)} = t2.{EscapeColumnName(output.ForeignKey)} 
-                        WHERE t1.{input.IdColumn} = {ParameterPrefix}{ParameterName(input.IdColumn)}
+                            t1.{EscapeColumnName(t1.IdColumn)} AS ""T1_{t1.IdColumn}"", 
+                            t2.{EscapeColumnName(t2.IdColumn)} AS ""T2_{t2.IdColumn}""
+                        FROM ({t1.Query_AllData}) t1
+                        INNER JOIN ({t2.Query_AllData}) t2 ON t1.{EscapeColumnName(t1.ReferenceKey)} = t2.{EscapeColumnName(t1.ForeignKey)} 
+                        WHERE t1.{t1.IdColumn} = {ParameterPrefix}{ParameterName(t1.IdColumn)}
                     ";
-                }
-                else
-                {
-                    return $@"
-                        SELECT 
-                            t1.{EscapeColumnName(input.IdColumn)} AS ""T1_{input.IdColumn}"", 
-                            t2.{EscapeColumnName(output.IdColumn)} AS ""T2_{output.IdColumn}""
-                        FROM ({input.Query_AllData}) t1
-                        INNER JOIN ({output.Query_AllData}) t2 ON t2.{EscapeColumnName(output.ReferenceKey)} = t1.{EscapeColumnName(output.ForeignKey)} 
-                        WHERE t1.{input.IdColumn} = {ParameterPrefix}{ParameterName(input.IdColumn)}
-                    ";
-                }
             }
         }
 
-        public virtual string GenerateSqlTextForDeleteLinkData(RelationDataSourceConfig config, TableMeta input, TableMeta output)
+        public virtual string GenerateSqlTextForBatchRemoveRelation(TableMeta t1, TableMeta t2, DataSourceConfig config = null)
         {
-            if (config.IsOneToMany)
+            if (config == null)
             {
                 return $@"
-                    UPDATE {output.TableSchema}.{output.TableName} SET {output.ForeignKey} = NULL 
-                    WHERE {output.ForeignKey} IN (
-                        SELECT {input.ReferenceKey} FROM ({input.Query_AllData}) t1
-                        WHERE t1.{input.IdColumn} IN {ParameterPrefix}{ParameterName(input.IdColumn)}
+                    UPDATE {t2.TableSchema}.{t2.TableName} SET {t2.ForeignKey} = NULL 
+                    WHERE {t2.ForeignKey} IN (
+                        SELECT {t1.ReferenceKey} FROM ({t1.Query_AllData}) t1
+                        WHERE t1.{t1.IdColumn} IN {ParameterPrefix}{ParameterName(t1.IdColumn)}
                     )
                 ";
             }
@@ -480,38 +468,33 @@ namespace DataEditorPortal.Web.Services
             {
                 return $@"
                     DELETE FROM {config.TableSchema}.{config.TableName}
-                    WHERE {EscapeColumnName(input.ForeignKey)} IN (
-                        SELECT link.{EscapeColumnName(input.ForeignKey)} 
+                    WHERE {EscapeColumnName(t1.ForeignKey)} IN (
+                        SELECT link.{EscapeColumnName(t1.ForeignKey)} 
                         FROM {config.TableSchema}.{config.TableName} link
-                        INNER JOIN ({input.Query_AllData}) t1 ON link.{EscapeColumnName(input.ForeignKey)} = t1.{EscapeColumnName(input.ReferenceKey)}
-                        WHERE t1.{input.IdColumn} IN {ParameterPrefix}{ParameterName(input.IdColumn)}
+                        INNER JOIN ({t1.Query_AllData}) t1 ON link.{EscapeColumnName(t1.ForeignKey)} = t1.{EscapeColumnName(t1.ReferenceKey)}
+                        WHERE t1.{t1.IdColumn} IN {ParameterPrefix}{ParameterName(t1.IdColumn)}
                     )
                 ";
             }
         }
 
-        public virtual string GenerateSqlTextForQueryForeignKeyValue(TableMeta input)
+        public virtual string GenerateSqlTextForQueryForeignKeyValue(TableMeta t1)
         {
-            var columns = new List<string>() { EscapeColumnName(input.IdColumn) };
-            if (input.IdColumn != input.ReferenceKey)
-                columns.Add(EscapeColumnName(input.ReferenceKey));
+            var columns = new List<string>() { EscapeColumnName(t1.IdColumn) };
+            if (t1.IdColumn != t1.ReferenceKey)
+                columns.Add(EscapeColumnName(t1.ReferenceKey));
 
-            return $@"SELECT {string.Join(",", columns)} FROM ({input.Query_AllData}) A WHERE {EscapeColumnName(input.IdColumn)} IN {ParameterPrefix}{ParameterName(input.IdColumn)}";
+            return $@"SELECT {string.Join(",", columns)} FROM ({t1.Query_AllData}) A WHERE {EscapeColumnName(t1.IdColumn)} IN {ParameterPrefix}{ParameterName(t1.IdColumn)}";
         }
 
         public virtual string GenerateSqlTextForAddRelation(DataSourceConfig config, bool isOneToMany)
         {
             if (isOneToMany)
             {
-                //var sets = string.Join(", ", config.Columns.Select(x => $"{EscapeColumnName(x)}={ParameterPrefix}{ParameterName(x)}"));
-
-                //var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
-                //return $@"UPDATE {source} SET {sets} WHERE {EscapeColumnName(config.IdColumn)} = {ParameterPrefix}{ParameterName(config.IdColumn)}";
                 return GenerateSqlTextForUpdate(config);
             }
             else
             {
-                //return GenerateSqlTextForInsert(config);
                 if (!string.IsNullOrEmpty(config.QueryText))
                 {
                     return ReplaceQueryParamters(config.QueryText);
@@ -536,10 +519,6 @@ namespace DataEditorPortal.Web.Services
         {
             if (isOneToMany)
             {
-                //var sets = string.Join(", ", config.Columns.Select(x => $"{EscapeColumnName(x)}=NULL"));
-
-                //var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
-                //return $@"UPDATE {source} SET {sets} WHERE {EscapeColumnName(config.IdColumn)} = {ParameterPrefix}{ParameterName(config.IdColumn)}";
                 return GenerateSqlTextForUpdate(config);
             }
             else
