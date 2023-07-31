@@ -1334,8 +1334,7 @@ namespace DataEditorPortal.Web.Services
             {
                 columns = columns.Where(c => linkedTableInfo.Table2.EditorColumns.Contains(c.field)).ToList(),
                 table2Name = linkedTableInfo.Table2.Name,
-                table2IdColumn = linkedTableInfo.Table2.IdColumn,
-                table2ReferenceKey = linkedTableInfo.Table2.ReferenceKey
+                table2IdColumn = linkedTableInfo.Table2.IdColumn
             };
         }
 
@@ -1357,7 +1356,7 @@ namespace DataEditorPortal.Web.Services
             {
                 using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                 {
-                    con.ConnectionString = linkedTableInfo.LinkTable.ConnectionString;
+                    con.ConnectionString = linkedTableInfo.ConnectionString;
                     con.Open();
                     var datas = con.Query(queryText, param);
 
@@ -1421,22 +1420,23 @@ namespace DataEditorPortal.Web.Services
 
                 var linkedDataSourceConfig = tables.Where(x => x.ItemType == GridItemType.LINKED).Select(t => t.DataSource).FirstOrDefault();
                 var dsLink = JsonSerializer.Deserialize<LinkedDataSourceConfig>(linkedDataSourceConfig);
+                var relationInfo = dsLink.LinkTable;
 
-                var linkTable = tables.Where(x => x.ItemType == GridItemType.LINKED)
-                .Select(t =>
-                {
-                    var ds = JsonSerializer.Deserialize<LinkedDataSourceConfig>(t.DataSource);
-                    ds.LinkTable.Columns = new List<string>() { ds.LinkTable.IdColumn, dsLink.LinkTable.PrimaryForeignKey, dsLink.LinkTable.SecondaryForeignKey };
-                    var query = _queryBuilder.GenerateSqlTextForDatasource(ds.LinkTable);
-                    return new TableMeta()
-                    {
-                        Name = t.Name,
-                        MenuId = t.Id,
-                        IdColumn = ds.LinkTable.IdColumn,
-                        Query_AllData = query,
-                        ConnectionString = t.ConnectionString,
-                    };
-                }).FirstOrDefault();
+                //var linkTable = tables.Where(x => x.ItemType == GridItemType.LINKED)
+                //.Select(t =>
+                //{
+                //    var ds = JsonSerializer.Deserialize<LinkedDataSourceConfig>(t.DataSource);
+                //    ds.LinkTable.Columns = new List<string>() { ds.LinkTable.IdColumn, dsLink.LinkTable.PrimaryForeignKey, dsLink.LinkTable.SecondaryForeignKey };
+                //    var query = _queryBuilder.GenerateSqlTextForDatasource(ds.LinkTable);
+                //    return new TableMeta()
+                //    {
+                //        Name = t.Name,
+                //        MenuId = t.Id,
+                //        IdColumn = ds.LinkTable.IdColumn,
+                //        Query_AllData = query,
+                //        ConnectionString = t.ConnectionString,
+                //    };
+                //}).FirstOrDefault();
 
                 var primary = tables.Where(x => x.ItemType == GridItemType.LINKED_SINGLE)
                     .OrderBy(t => t.Order)
@@ -1447,11 +1447,13 @@ namespace DataEditorPortal.Web.Services
                         {
                             Name = t.Name,
                             MenuId = t.Id,
+                            TableSchema = ds.TableSchema,
+                            TableName = ds.TableName,
                             IdColumn = ds.IdColumn,
                             Query_AllData = _queryBuilder.GenerateSqlTextForDatasource(ds),
                             EditorColumns = dsLink.PrimaryTable.ColumnsForLinkedField,
-                            ReferenceKey = dsLink.LinkTable.PrimaryReferenceKey,
-                            ForeignKey = dsLink.LinkTable.PrimaryForeignKey,
+                            ReferenceKey = relationInfo.PrimaryReferenceKey,
+                            ForeignKey = relationInfo.PrimaryForeignKey,
                             ConnectionString = t.ConnectionString
                         };
                     })
@@ -1466,38 +1468,129 @@ namespace DataEditorPortal.Web.Services
                         {
                             Name = t.Name,
                             MenuId = t.Id,
+                            TableSchema = ds.TableSchema,
+                            TableName = ds.TableName,
                             IdColumn = ds.IdColumn,
                             Query_AllData = _queryBuilder.GenerateSqlTextForDatasource(ds),
                             EditorColumns = dsLink.SecondaryTable.ColumnsForLinkedField,
-                            ReferenceKey = dsLink.LinkTable.SecondaryReferenceKey,
-                            ForeignKey = dsLink.LinkTable.SecondaryForeignKey,
+                            ReferenceKey = relationInfo.SecondaryReferenceKey,
+                            ForeignKey = relationInfo.SecondaryForeignKey,
                             ConnectionString = t.ConnectionString
                         };
                     })
                     .FirstOrDefault();
 
-                primary.Query_GetLinkedDataById = _queryBuilder.GenerateSqlTextForLinkData(linkTable, primary, secondary);
-                secondary.Query_GetLinkedDataById = _queryBuilder.GenerateSqlTextForLinkData(linkTable, secondary, primary);
-                linkTable.Query_Insert = _queryBuilder.GenerateSqlTextForInsert(
-                    new DataSourceConfig()
-                    {
-                        Columns = new List<string>() { primary.ForeignKey, secondary.ForeignKey },
-                        TableName = dsLink.LinkTable.TableName,
-                        TableSchema = dsLink.LinkTable.TableSchema,
-                        IdColumn = dsLink.LinkTable.IdColumn,
-                        QueryText = dsLink.LinkTable.QueryInsert
-                    }
-                );
+                // compose relation info result
 
                 var table1IsPrimary = primary.Name == table1Name;
-                linkTable.Query_DeleteByTable1Id = _queryBuilder.GenerateSqlTextForDeleteLinkData(dsLink.LinkTable, table1IsPrimary ? primary : secondary);
-                linkTable.Query_DeleteById = _queryBuilder.GenerateSqlTextForDelete(dsLink.LinkTable);
+
+                #region query relations by table 1 id.
+
+                if (relationInfo.IsOneToMany)
+                {
+                    primary.Query_GetLinkedDataById = _queryBuilder.GenerateSqlTextForLinkData(primary, secondary, null, true);
+                    secondary.Query_GetLinkedDataById = _queryBuilder.GenerateSqlTextForLinkData(secondary, primary, null, false);
+                }
+                else
+                {
+                    var queryAllRelations = _queryBuilder.GenerateSqlTextForDatasource(new DataSourceConfig()
+                    {
+                        Columns = new List<string>() { relationInfo.IdColumn, relationInfo.PrimaryForeignKey, relationInfo.SecondaryForeignKey },
+                        TableName = relationInfo.TableName,
+                        TableSchema = relationInfo.TableSchema,
+                        IdColumn = relationInfo.IdColumn
+                    });
+                    primary.Query_GetLinkedDataById = _queryBuilder.GenerateSqlTextForLinkData(primary, secondary, queryAllRelations);
+                    secondary.Query_GetLinkedDataById = _queryBuilder.GenerateSqlTextForLinkData(secondary, primary, queryAllRelations);
+                }
+
+                #endregion
+
+                #region query_AddRelation
+                var query_AddRelation = string.Empty;
+                if (relationInfo.IsOneToMany)
+                {
+                    // Generate update sql to table2
+                    query_AddRelation = _queryBuilder.GenerateSqlTextForAddRelation(
+                        new DataSourceConfig()
+                        {
+                            Columns = new List<string>() { secondary.ForeignKey },
+                            TableName = secondary.TableName,
+                            TableSchema = secondary.TableSchema,
+                            IdColumn = secondary.IdColumn,
+                        }, true);
+                }
+                else
+                {
+                    // Genearte insert sql to link table
+                    query_AddRelation = _queryBuilder.GenerateSqlTextForAddRelation(
+                        new DataSourceConfig()
+                        {
+                            Columns = new List<string>() { relationInfo.PrimaryForeignKey, relationInfo.SecondaryForeignKey },
+                            TableName = relationInfo.TableName,
+                            TableSchema = relationInfo.TableSchema,
+                            IdColumn = relationInfo.IdColumn,
+                            QueryText = relationInfo.QueryInsert
+                        }, false);
+                }
+                #endregion
+
+                #region query_RemoveRelation
+                var query_RemoveRelation = string.Empty;
+                if (relationInfo.IsOneToMany)
+                {
+                    // Generate update sql to table2
+                    query_RemoveRelation = _queryBuilder.GenerateSqlTextForRemoveRelation(
+                        new DataSourceConfig()
+                        {
+                            Columns = new List<string>() { secondary.ForeignKey },
+                            TableName = secondary.TableName,
+                            TableSchema = secondary.TableSchema,
+                            IdColumn = secondary.IdColumn,
+                        }, true);
+                }
+                else
+                {
+                    // Genearte delete sql to link table
+                    query_RemoveRelation = _queryBuilder.GenerateSqlTextForRemoveRelation(
+                        new DataSourceConfig()
+                        {
+                            TableName = relationInfo.TableName,
+                            TableSchema = relationInfo.TableSchema,
+                            IdColumn = relationInfo.IdColumn,
+                            Filters = new List<FilterParam>() {
+                                new FilterParam() { field = primary.ForeignKey },
+                                new FilterParam() { field = secondary.ForeignKey }
+                            }
+                        }, false);
+                }
+                #endregion
+
+                #region query to batch remove relation
+
+                var query_RemoveRelationByTable1Id = string.Empty;
+                if (relationInfo.IsOneToMany)
+                {
+                    primary.Query_RemoveRelationById = _queryBuilder.GenerateSqlTextForDeleteLinkData(dsLink.LinkTable, primary, secondary);
+                    secondary.Query_RemoveRelationById = string.Empty; // do not need to remove any relation in one to many mode for secondary table.
+                }
+                else
+                {
+                    primary.Query_RemoveRelationById = _queryBuilder.GenerateSqlTextForDeleteLinkData(dsLink.LinkTable, primary, secondary);
+                    secondary.Query_RemoveRelationById = _queryBuilder.GenerateSqlTextForDeleteLinkData(dsLink.LinkTable, secondary, primary);
+                }
+
+                #endregion
 
                 return new LinkedTableInfo()
                 {
                     Table1 = table1IsPrimary ? primary : secondary,
                     Table2 = table1IsPrimary ? secondary : primary,
-                    LinkTable = linkTable
+                    Query_AddRelation = query_AddRelation,
+                    Query_RemoveRelation = query_RemoveRelation,
+                    ConnectionString = primary.ConnectionString,
+                    IsOneToMany = relationInfo.IsOneToMany,
+                    Table1IsPrimary = table1IsPrimary
                 };
             });
         }
