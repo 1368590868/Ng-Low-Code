@@ -1,6 +1,11 @@
 <div class="p-card pt-3 pb-1">
-  <div class="flex mb-4 px-3">
-    <h3 class="flex-1">Search Inputs</h3>
+  <div class="flex mb-4 px-3 align-items-center">
+    <h3>Search Inputs</h3>
+    <i
+      *ngIf="showStar"
+      title="Save Current Search"
+      class="pi pi-star ml-3 cursor-pointer"
+      (click)="showDialog()"></i>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit(model)" class="px-3 pb-3">
@@ -10,6 +15,20 @@
       [model]="model"
       [options]="options"
       class="p-fluid"></formly-form>
+    <div class="mb-3" *ngIf="searchHistoryOptions.length > 0">
+      <label class="line-height-3 flex align-items-center"
+        >Saved Searches</label
+      >
+      <p-dropdown
+        styleClass="w-full"
+        [options]="searchHistoryOptions"
+        [showClear]="true"
+        (onClear)="onHistoryClear()"
+        [formControl]="formControlSearchHistory"
+        appendTo="body"
+        placeholder="Please Select"></p-dropdown>
+    </div>
+
     <div class="flex justify-content-end">
       <p-button styleClass="p-button-outlined mr-2" (onClick)="onClear()">
         Clear
@@ -18,3 +37,50 @@
     </div>
   </form>
 </div>
+
+<p-dialog
+  header="Save Search Inputs"
+  [(visible)]="visible"
+  [style]="dialogStyle"
+  [modal]="true"
+  contentStyleClass="border-top-1 surface-border pt-4 pb-0"
+  appendTo="body">
+  <div #container class="dialog-content">
+    <div class="mb-3">
+      <label class="line-height-3 flex align-items-center"
+        >New Search Name</label
+      >
+      <input
+        type="text"
+        class="w-full"
+        pInputText
+        [required]="true"
+        [formControl]="formControlDialogName" />
+    </div>
+    <div class="mb-3">
+      <label class="line-height-3 flex align-items-center"
+        >Replace Existing Saved Search</label
+      >
+      <p-dropdown
+        styleClass="w-full"
+        [required]="true"
+        [options]="dialogHistoryOptions"
+        [formControl]="formControlDialogSearchHistory"
+        appendTo="body"
+        placeholder="Please Select"></p-dropdown>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button
+      icon="pi pi-times"
+      (onClick)="onCancel()"
+      label="Cancel"
+      styleClass="p-button-text"></p-button>
+    <p-button
+      icon="pi pi-check"
+      (onClick)="onOk()"
+      label="Save"
+      [disabled]="isLoading"
+      [loading]="isLoading"></p-button>
+  </ng-template>
+</p-dialog>

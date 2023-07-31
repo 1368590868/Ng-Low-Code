@@ -6,16 +6,18 @@ import {
   OnInit,
   Output
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { Subject } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import {
   NgxFormlyService,
+  NotifyService,
   SearchParam,
   SystemLogService
 } from 'src/app/shared';
 import { GridTableService } from '../../services/grid-table.service';
 import { UrlParamsService } from '../../services/url-params.service';
+import { SearchService } from '../../services/search.service';
 
 @Component({
   selector: 'app-search',
@@ -35,11 +37,41 @@ export class SearchComponent implements OnInit, OnDestroy {
   } = {};
   fields!: FormlyFieldConfig[];
 
+  isLoading = false;
+  visible = false;
+  dialogStyle = { width: '45rem' };
+  showStar = false;
+
+  formControlSearchHistory = new FormControl();
+  formControlDialogSearchHistory = new FormControl();
+  formControlDialogName = new FormControl();
+  dialogHistoryOptions: {
+    label: string;
+    value: {
+      [name: string]: any;
+    };
+    id?: string;
+  }[] = [
+    {
+      label: '...',
+      value: {}
+    }
+  ];
+  searchHistoryOptions: {
+    label: string;
+    value: {
+      [name: string]: any;
+    };
+    id?: string;
+  }[] = [];
+
   constructor(
     private gridTableService: GridTableService,
     private ngxFormlyService: NgxFormlyService,
     private systemLogService: SystemLogService,
-    private urlParamsService: UrlParamsService
+    private urlParamsService: UrlParamsService,
+    private searchService: SearchService,
+    private notifyService: NotifyService
   ) {}
 
   ngOnInit(): void {
@@ -94,6 +126,36 @@ export class SearchComponent implements OnInit, OnDestroy {
         });
       }
     });
+
+    // get search history
+    this.searchService.getSearchHistory(this.gridName).subscribe(res => {
+      if (res.code === 200 && res.data) {
+        this.dialogHistoryOptions = res.data.map(x => ({
+          label: x.name,
+          value: x.model,
+          id: x.id
+        }));
+        this.searchHistoryOptions = [...this.dialogHistoryOptions];
+      }
+    });
+
+    this.formControlSearchHistory.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => {
+        if (value && Object.keys(value).length > 0) {
+          this.model = { ...this.model, ...value };
+        }
+      });
+
+    this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
+      const hasValue = Object.keys(value).map(key => {
+        const newValue = (value as { [key: string]: any })[key];
+        if (newValue != null && newValue !== '') return true;
+        return false;
+      });
+
+      this.showStar = hasValue.indexOf(true) >= 0;
+    });
   }
 
   ngOnDestroy(): void {
@@ -112,8 +174,71 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
+  showDialog() {
+    this.visible = true;
+    this.formControlDialogSearchHistory.setValue({});
+    this.formControlDialogName.reset();
+  }
+
   onClear() {
     this.options.resetModel?.();
     this.gridTableService.searchClicked$.next(undefined);
+    this.formControlSearchHistory.reset();
+  }
+
+  onHistoryClear() {
+    this.options.resetModel?.();
+  }
+
+  onOk() {
+    this.formControlDialogName.markAsDirty();
+    this.formControlDialogSearchHistory.markAsDirty();
+
+    if (
+      this.formControlDialogSearchHistory.valid &&
+      this.formControlDialogName.valid
+    ) {
+      const name = this.formControlDialogName.value;
+      if (Object.keys(this.formControlDialogSearchHistory.value).length === 0) {
+        // Create
+
+        this.searchService
+          .addSearchHistory(this.gridName, name, this.model)
+          .subscribe(res => {
+            if (res.code === 200) {
+              this.notifyService.notifySuccess(
+                'Success',
+                'Create successfully'
+              );
+              this.visible = false;
+            }
+          });
+      } else {
+        // Update
+        const selectedOption = this.dialogHistoryOptions.find(
+          option => option.value === this.formControlDialogSearchHistory.value
+        );
+        this.searchService
+          .updateSearcHistory(
+            this.gridName,
+            selectedOption?.id || '',
+            name,
+            this.model
+          )
+          .subscribe(res => {
+            if (res.code === 200) {
+              this.notifyService.notifySuccess(
+                'Success',
+                'Create successfully'
+              );
+              this.visible = false;
+            }
+          });
+      }
+    }
+  }
+
+  onCancel() {
+    this.visible = false;
   }
 }
