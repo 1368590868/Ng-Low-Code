@@ -10,7 +10,7 @@ import { ColumnsConfig } from '../link-data-editor.type';
 import { LinkDataTableService } from '../service/link-data-table.service';
 import { forkJoin } from 'rxjs';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { GridParam } from 'src/app/shared';
+import { GridParam, SystemLogService } from 'src/app/shared';
 
 @Component({
   selector: 'app-link-data-table',
@@ -59,7 +59,8 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   constructor(
     private linkDataTableService: LinkDataTableService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private systemLogService: SystemLogService
   ) {}
 
   writeValue(value: any): void {
@@ -143,6 +144,11 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   ngOnInit(): void {
     if (this.table1Name !== '') {
+      this.systemLogService.addSiteVisitLog({
+        action: 'Search Link Data',
+        section: this.table1Name,
+        params: JSON.stringify(this.getFetchParam())
+      });
       this.fetchDataParam = this.getFetchParam();
       forkJoin([
         this.linkDataTableService.getTableConfig(this.table1Name),
