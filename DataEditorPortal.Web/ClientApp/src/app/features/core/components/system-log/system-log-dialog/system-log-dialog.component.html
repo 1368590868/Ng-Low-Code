@@ -1,7 +1,7 @@
 <p-dialog
   header="Event Log Details"
   [(visible)]="visible"
-  [style]="{ width: '50rem' }"
+  [style]="{ width: '60rem' }"
   [modal]="true"
   contentStyleClass="border-top-1 surface-border pt-4"
   appendTo="body">
@@ -12,20 +12,41 @@
     styleClass="p-datatable-striped">
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 30%">Name</th>
+        <th style="width: 25%">Name</th>
         <th>Value</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-viewData>
-      <tr>
+      <tr *ngIf="viewData.value">
         <td>{{ viewData.name }}</td>
         <td>
           <ng-container>
             <ng-container *ngIf="viewData.name === 'Event time'">
               {{ viewData.value | date : 'M/d/yyyy h:mm a' }}
             </ng-container>
-            <ng-container *ngIf="viewData.name !== 'Event time'">
+            <ng-container
+              *ngIf="
+                viewData.name !== 'Event time' &&
+                viewData.name !== 'Details' &&
+                viewData.name !== 'Params'
+              ">
               {{ viewData.value }}
+            </ng-container>
+            <ng-container *ngIf="viewData.name === 'Details'">
+              <ngx-monaco-editor
+                #editorSql
+                [ngModel]="viewData.value"
+                class="monaco-editor-readonly border-none display-only overflow-hidden"
+                [options]="sqlConfig"
+                (onInit)="onMonacoInit($event, editorSql)"></ngx-monaco-editor>
+            </ng-container>
+            <ng-container *ngIf="viewData.name === 'Params'">
+              <ngx-monaco-editor
+                #editorJson
+                [ngModel]="viewData.value"
+                class="monaco-editor-readonly border-none display-only overflow-hidden"
+                [options]="jsonConfig"
+                (onInit)="onMonacoInit($event, editorJson)"></ngx-monaco-editor>
             </ng-container>
           </ng-container>
         </td>

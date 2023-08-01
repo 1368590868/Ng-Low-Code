@@ -27,6 +27,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { EditorModule } from 'primeng/editor';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { MonacoEditorModule } from 'ngx-monaco-editor';
 
 import {
   HeaderComponent,
@@ -116,7 +117,8 @@ export const routes: Routes = [
     TabViewModule,
     EditorModule,
     InputTextareaModule,
-    ProgressBarModule
+    ProgressBarModule,
+    MonacoEditorModule.forRoot()
   ],
   exports: [
     HeaderComponent,

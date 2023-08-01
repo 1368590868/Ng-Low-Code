@@ -1,0 +1,16 @@
+.monaco-editor-readonly {
+  height: auto;
+  ::ng-deep {
+    .monaco-editor {
+      background: transparent;
+      .monaco-editor-background {
+        background: transparent;
+      }
+      .decorationsOverviewRuler,
+      .scroll-decoration,
+      .view-overlays {
+        display: none !important;
+      }
+    }
+  }
+}
