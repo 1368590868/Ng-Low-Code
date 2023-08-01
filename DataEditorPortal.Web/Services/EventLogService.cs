@@ -12,7 +12,6 @@ namespace DataEditorPortal.Web.Services
     {
         string CurrentUsername { get; set; }
         void AddPageRequestLog(EventLogModel model);
-        void AddEventLog(EventLogModel eventLog);
         void AddEventLog(string category, string section, string name, string details = null, object param = null, string result = "");
     }
 
@@ -73,28 +72,6 @@ namespace DataEditorPortal.Web.Services
                     Details = details,
                     Params = param != null ? JsonSerializer.Serialize(param) : "",
                     Result = result
-                });
-                _depDbContext.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-            }
-        }
-        public void AddEventLog(EventLogModel eventLog)
-        {
-            try
-            {
-                _depDbContext.Add(new EventLog()
-                {
-                    Category = eventLog.Category,
-                    EventSection = eventLog.Section.Replace("-", "_").ToUpper(),
-                    EventName = eventLog.Action,
-                    EventTime = DateTime.UtcNow,
-                    Username = eventLog.Username,
-                    Details = eventLog.Details,
-                    Params = eventLog.Params,
-                    Result = eventLog.Result
                 });
                 _depDbContext.SaveChanges();
             }

@@ -429,6 +429,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
+                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                 _logger.LogError(ex, ex.Message);
                 throw new DepException("An Error in the query has occurred: " + ex.Message);
             }
@@ -744,6 +745,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -845,6 +847,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -931,20 +934,14 @@ namespace DataEditorPortal.Web.Services
                     // run after saved event handler
                     if (formLayout?.AfterSaved != null)
                     {
-                        AfterSaved(new EventActionModel()
-                        {
-                            EventName = "After Inserting",
-                            EventSection = config.Name,
-                            EventConfig = formLayout.AfterSaved,
-                            Username = _currentUsername,
-                            ConnectionString = config.DataSourceConnection.ConnectionString
-                        }, model);
+                        AfterSaved(formLayout.AfterSaved, config.Name, config.DataSourceConnection.ConnectionString, model);
                     }
                 }
                 catch (Exception ex)
                 {
                     _dapperService.Rollback(trans);
 
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -1029,20 +1026,14 @@ namespace DataEditorPortal.Web.Services
                     // run after saved event
                     if (formLayout?.AfterSaved != null)
                     {
-                        AfterSaved(new EventActionModel()
-                        {
-                            EventName = "After Updating",
-                            EventSection = config.Name,
-                            EventConfig = formLayout.AfterSaved,
-                            Username = _currentUsername,
-                            ConnectionString = config.DataSourceConnection.ConnectionString
-                        }, model);
+                        AfterSaved(formLayout.AfterSaved, config.Name, config.DataSourceConnection.ConnectionString, model);
                     }
                 }
                 catch (Exception ex)
                 {
                     _dapperService.Rollback(trans);
 
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -1121,20 +1112,14 @@ namespace DataEditorPortal.Web.Services
                     // run after saved event
                     if (detailConfig.DeletingForm?.AfterSaved != null)
                     {
-                        AfterSaved(new EventActionModel()
-                        {
-                            EventName = "After Deleting",
-                            EventSection = config.Name,
-                            EventConfig = detailConfig.DeletingForm?.AfterSaved,
-                            Username = _currentUsername,
-                            ConnectionString = config.DataSourceConnection.ConnectionString
-                        }, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
+                        AfterSaved(detailConfig.DeletingForm?.AfterSaved, config.Name, config.DataSourceConnection.ConnectionString, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
                     }
                 }
                 catch (Exception ex)
                 {
                     _dapperService.Rollback(trans);
 
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -1209,9 +1194,9 @@ namespace DataEditorPortal.Web.Services
                 model.Add(key, value);
         }
 
-        private void AfterSaved(EventActionModel actionConfig, IDictionary<string, object> model)
+        private void AfterSaved(FormEventConfig eventConfig, string name, string connectionString, IDictionary<string, object> model)
         {
-            var eventConfig = actionConfig.EventConfig;
+            _dapperService.EventSection = $"{name} | AfterSaved";
 
             if (eventConfig == null || string.IsNullOrEmpty(eventConfig.Script)) return;
 
@@ -1225,20 +1210,10 @@ namespace DataEditorPortal.Web.Services
 
                     using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                     {
-                        con.ConnectionString = actionConfig.ConnectionString;
+                        con.ConnectionString = connectionString;
 
-                        con.Execute(queryText, param, null, null, commandType);
+                        _dapperService.Execute(con, queryText, param, null, null, commandType);
                     }
-
-                    _eventLogService.AddEventLog(new EventLogModel()
-                    {
-                        Category = EventLogCategory.INFO,
-                        Section = actionConfig.EventSection,
-                        Action = actionConfig.EventName,
-                        Username = actionConfig.Username,
-                        Details = queryText,
-                        Params = param != null ? JsonSerializer.Serialize(param) : ""
-                    });
                 }
 
                 if (eventConfig.EventType == FormEventType.CommandLine)
@@ -1264,30 +1239,12 @@ namespace DataEditorPortal.Web.Services
                             }
                         }
                     }
-
-                    _eventLogService.AddEventLog(new EventLogModel()
-                    {
-                        Category = EventLogCategory.INFO,
-                        Section = actionConfig.EventSection,
-                        Action = actionConfig.EventName,
-                        Username = actionConfig.Username,
-                        Details = eventConfig.Script
-                    });
-
+                    _eventLogService.AddEventLog(EventLogCategory.INFO, _dapperService.EventSection, "Execute Command Line", eventConfig.Script);
                 }
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(new EventLogModel()
-                {
-                    Category = EventLogCategory.ERROR,
-                    Section = actionConfig.EventSection,
-                    Action = actionConfig.EventName,
-                    Username = actionConfig.Username,
-                    Details = JsonSerializer.Serialize(eventConfig),
-                    Params = JsonSerializer.Serialize(model),
-                    Result = ex.Message
-                });
+                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "", JsonSerializer.Serialize(eventConfig), JsonSerializer.Serialize(model), ex.Message);
                 _logger.LogError(ex, ex.Message);
             }
         }
@@ -1376,6 +1333,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
+                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                 _logger.LogError(ex, ex.Message);
             }
 
@@ -1689,6 +1647,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                 }
             }
