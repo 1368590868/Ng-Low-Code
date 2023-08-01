@@ -41,6 +41,17 @@ export class SystemLogComponent implements OnInit {
     this.fetchData();
   }
 
+  onRefresh(table: any) {
+    this.filters = null;
+    this.sortMeta = null;
+    this.multiSortMeta = null;
+    this.first = 0;
+
+    table.reset();
+
+    this.fetchData();
+  }
+
   onFilter({ filters }: any) {
     this.first = 0;
     this.filters = filters;
