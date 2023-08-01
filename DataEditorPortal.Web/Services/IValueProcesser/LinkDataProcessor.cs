@@ -216,6 +216,9 @@ namespace DataEditorPortal.Web.Services
                     }
                 }
 
+                // when editing relation on secondary table in one to many mode, we don't need to process toDelete.
+                if (_relationInfo.IsOneToMany && !_relationInfo.Table1IsPrimary) return;
+
                 var toDelete = _existingModel.Where(
                     existing => _inputModel.All(
                         input => !(
