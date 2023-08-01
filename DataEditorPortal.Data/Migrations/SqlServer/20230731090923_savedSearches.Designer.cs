@@ -437,6 +437,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("UNIVERSAL_GRID_CONFIG_ID");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("RAW(16)")
+                        .HasColumnName("USERID");
+
                     b.HasKey("Id");
 
                     b.ToTable("SAVED_SEARCHES");

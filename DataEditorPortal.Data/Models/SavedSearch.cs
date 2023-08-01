@@ -14,7 +14,8 @@ namespace DataEditorPortal.Data.Models
         public string Name { get; set; }
         [Column("SEARCH_PARAMS")]
         public string SearchParams { get; set; }
-
+        [Column("USERID")]
+        public Guid? UserId { get; set; }
         [Column("UNIVERSAL_GRID_CONFIG_ID")]
         public Guid? UniversalGridConfigurationId { get; set; }
     }

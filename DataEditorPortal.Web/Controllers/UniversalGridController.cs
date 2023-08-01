@@ -144,8 +144,10 @@ namespace DataEditorPortal.Web.Controllers
         public List<SavedSearchModel> GetSavedSearch(string name)
         {
             var config = _universalGridService.GetUniversalGridConfiguration(name);
+            var username = AppUser.ParseUsername(HttpContext.User.Identity.Name).Username;
+            var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
 
-            var result = _depDbContext.SavedSearches.Where(x => x.UniversalGridConfigurationId == config.Id)
+            var result = _depDbContext.SavedSearches.Where(x => x.UserId == userId && x.UniversalGridConfigurationId == config.Id)
                 .ToList()
                 .Select(x =>
                      new SavedSearchModel
@@ -168,10 +170,13 @@ namespace DataEditorPortal.Web.Controllers
             if (model.Searches == null) throw new DepException("Searches cannot be empty.");
 
             var config = _universalGridService.GetUniversalGridConfiguration(name);
+            var username = AppUser.ParseUsername(HttpContext.User.Identity.Name).Username;
+            var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
 
             var item = new SavedSearch()
             {
                 Name = model.Name,
+                UserId = userId,
                 SearchParams = JsonSerializer.Serialize(model.Searches),
                 UniversalGridConfigurationId = config.Id
             };
@@ -189,8 +194,10 @@ namespace DataEditorPortal.Web.Controllers
             if (model.Searches == null) throw new DepException("Searches cannot be empty.");
 
             var config = _universalGridService.GetUniversalGridConfiguration(name);
+            var username = AppUser.ParseUsername(HttpContext.User.Identity.Name).Username;
+            var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
 
-            var item = _depDbContext.SavedSearches.FirstOrDefault(x => x.Id == id && x.UniversalGridConfigurationId == config.Id);
+            var item = _depDbContext.SavedSearches.FirstOrDefault(x => x.Id == id && x.UserId == userId && x.UniversalGridConfigurationId == config.Id);
             if (item == null) throw new DepException("Saved Search does not exist.", 404);
 
             item.Name = model.Name;

@@ -257,6 +257,10 @@ namespace DataEditorPortal.Web.Services
                     var permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
                     permissions.ForEach(p => _depDbContext.SitePermissions.Remove(p));
 
+                    // remove saved searches
+                    var searches = _depDbContext.SavedSearches.Where(x => x.UniversalGridConfigurationId == config.Id).ToList();
+                    searches.ForEach(s => _depDbContext.SavedSearches.Remove(s));
+
                     // remove configuration
                     _depDbContext.UniversalGridConfigurations.Remove(config);
                 }
