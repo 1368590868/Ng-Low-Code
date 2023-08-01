@@ -27,6 +27,7 @@ import {
   GridFilterParam,
   GridParam,
   SearchParam,
+  SystemLogService,
   UserService
 } from 'src/app/shared';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -111,7 +112,8 @@ export class TableComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private domSanitizer: DomSanitizer,
     private confirmationService: ConfirmationService,
-    private urlParamsService: UrlParamsService
+    private urlParamsService: UrlParamsService,
+    private systemLogService: SystemLogService
   ) {}
 
   ngOnInit() {
@@ -399,6 +401,12 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   refresh() {
+    this.systemLogService.addSiteVisitLog({
+      action: 'Refresh',
+      section: this.gridName,
+      params: JSON.stringify(this.searchModel || {})
+    });
+
     this.selection = [];
     this.resetData.emit();
     this.table.saveState();
@@ -406,6 +414,12 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   resetAndRefresh() {
+    this.systemLogService.addSiteVisitLog({
+      action: 'Reset & Refresh',
+      section: this.gridName,
+      params: JSON.stringify({})
+    });
+
     this.reset();
     this.table.reset();
     this.table.saveState();
