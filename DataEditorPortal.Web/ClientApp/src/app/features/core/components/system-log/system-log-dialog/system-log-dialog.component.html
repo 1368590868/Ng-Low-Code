@@ -22,7 +22,7 @@
         <td>
           <ng-container>
             <ng-container *ngIf="viewData.name === 'Event time'">
-              {{ viewData.value | date : 'M/dd/yyyy hh:mm a' }}
+              {{ viewData.value | date : 'M/d/yyyy h:mm a' }}
             </ng-container>
             <ng-container *ngIf="viewData.name !== 'Event time'">
               {{ viewData.value }}

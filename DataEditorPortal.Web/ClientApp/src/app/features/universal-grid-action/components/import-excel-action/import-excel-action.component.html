@@ -89,7 +89,7 @@
           <p-tag>{{ fileList.importType }}</p-tag>
         </td>
         <td>{{ fileList.createdByUser }}</td>
-        <td>{{ fileList.createdDate | date : 'M/dd/yyyy hh:mm a' }}</td>
+        <td>{{ fileList.createdDate | date : 'M/d/yyyy h:mm a' }}</td>
         <td>
           <app-import-status
             [rowData]="fileList"
