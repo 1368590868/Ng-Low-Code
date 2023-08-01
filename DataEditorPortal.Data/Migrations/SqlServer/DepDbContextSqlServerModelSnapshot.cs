@@ -436,7 +436,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnName("UNIVERSAL_GRID_CONFIG_ID");
 
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("RAW(16)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("USERID");
 
                     b.HasKey("Id");
