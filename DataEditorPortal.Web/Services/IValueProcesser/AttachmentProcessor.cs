@@ -1,5 +1,4 @@
-﻿using Dapper;
-using DataEditorPortal.Web.Models;
+﻿using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -16,11 +15,13 @@ namespace DataEditorPortal.Web.Services
 
         private readonly IServiceProvider _serviceProvider;
         private readonly IQueryBuilder _queryBuilder;
+        private readonly IDapperService _dapperService;
 
-        public AttachmentProcessor(IServiceProvider serviceProvider, IQueryBuilder queryBuilder)
+        public AttachmentProcessor(IServiceProvider serviceProvider, IQueryBuilder queryBuilder, IDapperService dapperService)
         {
             _serviceProvider = serviceProvider;
             _queryBuilder = queryBuilder;
+            _dapperService = dapperService;
         }
 
         public override void PreProcess(IDictionary<string, object> model)
@@ -94,7 +95,7 @@ namespace DataEditorPortal.Web.Services
                 var param = _queryBuilder.GenerateDynamicParameter(
                     new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(dsConfig.IdColumn, dataIds) }
                 );
-                refValues = Conn.Query(queryText, param, Trans).Cast<IDictionary<string, object>>().Select(x => x[referenceDataKey]);
+                refValues = _dapperService.Query(Conn, queryText, param, Trans).Cast<IDictionary<string, object>>().Select(x => x[referenceDataKey]);
             }
 
             var attachmentService = _serviceProvider.GetRequiredService<IAttachmentService>();
@@ -116,7 +117,7 @@ namespace DataEditorPortal.Web.Services
             var param = _queryBuilder.GenerateDynamicParameter(
                 new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(dsConfig.IdColumn, model[dsConfig.IdColumn]) }
             );
-            return Conn.QueryFirst(queryText, param, Trans) as IDictionary<string, object>;
+            return _dapperService.QueryFirst(Conn, queryText, param, Trans) as IDictionary<string, object>;
         }
     }
 }

@@ -12,8 +12,8 @@ namespace DataEditorPortal.Web.Services
     {
         string CurrentUsername { get; set; }
         void AddPageRequestLog(EventLogModel model);
-        void AddDbQueryLog(string category, string section, string details, object param = null, string result = "");
         void AddEventLog(EventLogModel eventLog);
+        void AddEventLog(string category, string section, string name, string details = null, object param = null, string result = "");
     }
 
     public class EventLogService : IEventLogService
@@ -44,7 +44,7 @@ namespace DataEditorPortal.Web.Services
                 _depDbContext.Add(new EventLog()
                 {
                     Category = EventLogCategory.PAGE_REQUEST,
-                    EventSection = model.Section.Replace("-", "_").ToUpper(),
+                    EventSection = model.Section.ToUpper(),
                     EventName = model.Action,
                     EventTime = DateTime.UtcNow,
                     Username = CurrentUsername,
@@ -59,15 +59,15 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public void AddDbQueryLog(string category, string section, string details, object param = null, string result = "")
+        public void AddEventLog(string category, string section, string name, string details = null, object param = null, string result = "")
         {
             try
             {
                 _depDbContext.Add(new EventLog()
                 {
                     Category = category,
-                    EventSection = section.Replace("-", "_").ToUpper(),
-                    EventName = "Database Query",
+                    EventSection = section.ToUpper(),
+                    EventName = name,
                     EventTime = DateTime.UtcNow,
                     Username = CurrentUsername,
                     Details = details,
@@ -81,7 +81,6 @@ namespace DataEditorPortal.Web.Services
                 _logger.LogError(ex, ex.Message);
             }
         }
-
         public void AddEventLog(EventLogModel eventLog)
         {
             try

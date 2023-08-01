@@ -30,6 +30,7 @@ namespace DataEditorPortal.Web.Services
         private readonly IQueryBuilder _queryBuilder;
         private readonly DepDbContext _depDbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IDapperService _dapperService;
 
         private FileUploadConfig DEFAULT_CONFIG = new FileUploadConfig()
         {
@@ -48,20 +49,30 @@ namespace DataEditorPortal.Web.Services
             }
         };
 
-        public string CurrentUsername { get; set; }
+        private string _currentUsername;
+        public string CurrentUsername
+        {
+            set
+            {
+                _currentUsername = value;
+                _dapperService.CurrentUsername = value;
+            }
+        }
 
         public AttachmentService(
             IHostEnvironment hostEnvironment,
             IServiceProvider serviceProvider,
             IQueryBuilder queryBuilder,
             DepDbContext depDbContext,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IDapperService dapperService)
         {
             _hostEnvironment = hostEnvironment;
             _serviceProvider = serviceProvider;
             _queryBuilder = queryBuilder;
             _depDbContext = depDbContext;
             _httpContextAccessor = httpContextAccessor;
+            _dapperService = dapperService;
 
             if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
                 CurrentUsername = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
@@ -134,7 +145,7 @@ namespace DataEditorPortal.Web.Services
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("CREATED_DATE")))
                         value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("CREATED_DATE"), DateTime.UtcNow));
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("CREATED_BY")))
-                        value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("CREATED_BY"), CurrentUsername));
+                        value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("CREATED_BY"), _currentUsername));
 
                     // Custom Optional Fields
                     if (config.CustomFields != null)
@@ -163,7 +174,7 @@ namespace DataEditorPortal.Web.Services
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("MODIFIED_DATE")))
                         value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("MODIFIED_DATE"), DateTime.UtcNow));
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("MODIFIED_BY")))
-                        value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("MODIFIED_BY"), CurrentUsername));
+                        value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("MODIFIED_BY"), _currentUsername));
 
                     if (!string.IsNullOrEmpty(config.GetMappedColumn("COMMENTS")))
                         value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("COMMENTS"), uploadedFile.Comments));
@@ -175,10 +186,10 @@ namespace DataEditorPortal.Web.Services
 
             if (insertParameters.Any())
             {
-                con.Execute(insertScript, insertParameters, trans);
+                _dapperService.Execute(con, insertScript, insertParameters, trans);
             }
             if (updateParameters.Any())
-                con.Execute(updateScript, updateParameters, trans);
+                _dapperService.Execute(con, updateScript, updateParameters, trans);
 
             try
             {
@@ -191,6 +202,8 @@ namespace DataEditorPortal.Web.Services
 
         public dynamic GetFileStream(string fileId, FileUploadConfig config)
         {
+            _dapperService.EventSection = $"GetFileStream";
+
             if (config == null) config = DEFAULT_CONFIG;
             var storageType = config.FileStorageType;
             var fileByteColumn = config.GetMappedColumn("FILE_BYTES");
@@ -230,7 +243,7 @@ namespace DataEditorPortal.Web.Services
             using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
             {
                 con.ConnectionString = dsConnection.ConnectionString;
-                var uploadedFile = con.QueryFirst(queryScript, param);
+                var uploadedFile = _dapperService.QueryFirst(con, queryScript, param);
                 if (uploadedFile == null) throw new DepException($"File [{fileId}] doesn't exist.");
 
                 fileName = (string)(uploadedFile as IDictionary<string, object>)[fileNameColumn];
@@ -375,7 +388,7 @@ namespace DataEditorPortal.Web.Services
                         IdColumn = foreignKeyColumn
                     }, true);
 
-                    files = con.Query(queryText, param, trans)
+                    files = _dapperService.Query(con, queryText, param, trans)
                         .Cast<IDictionary<string, object>>()
                         .Select(file =>
                         {
@@ -400,7 +413,7 @@ namespace DataEditorPortal.Web.Services
                         new KeyValuePair<string, object>(config.GetMappedColumn("FOREIGN_KEY"), ids)
                     }
                 );
-                con.Execute(queryToDelete, parameterToDelete, trans);
+                _dapperService.Execute(con, queryToDelete, parameterToDelete, trans);
 
                 try
                 {

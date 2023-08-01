@@ -15,8 +15,7 @@
     {
         public static readonly string PAGE_REQUEST = "Page Request";
         public static readonly string INFO = "Information";
-        public static readonly string Error = "Error";
-        public static readonly string DB_SUCCESS = "Database Success";
-        public static readonly string DB_ERROR = "Database Error";
+        public static readonly string ERROR = "Error";
+        public static readonly string DATABASE = "Database";
     }
 }
