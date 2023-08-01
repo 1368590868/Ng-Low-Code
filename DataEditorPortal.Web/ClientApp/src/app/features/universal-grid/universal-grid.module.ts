@@ -47,6 +47,7 @@ import { SidebarModule } from 'primeng/sidebar';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmationService } from 'primeng/api';
+import { DividerModule } from 'primeng/divider';
 
 @NgModule({
   declarations: [
@@ -86,7 +87,8 @@ import { ConfirmationService } from 'primeng/api';
     PaginatorModule,
     SidebarModule,
     CheckboxModule,
-    ConfirmPopupModule
+    ConfirmPopupModule,
+    DividerModule
   ],
   providers: [
     GridTableService,

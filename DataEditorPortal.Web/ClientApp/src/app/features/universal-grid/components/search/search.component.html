@@ -8,6 +8,17 @@
       (click)="showDialog()"></i>
   </div>
 
+  <div class="px-3" *ngIf="searchHistoryOptions.length > 0">
+    <p-dropdown
+      styleClass="w-full"
+      [options]="searchHistoryOptions"
+      [showClear]="true"
+      (onClear)="onHistoryClear()"
+      [formControl]="formControlSearchHistory"
+      appendTo="body"
+      placeholder="Saved Searches"></p-dropdown>
+    <p-divider></p-divider>
+  </div>
   <form [formGroup]="form" (ngSubmit)="onSubmit(model)" class="px-3 pb-3">
     <formly-form
       [form]="form"
@@ -15,19 +26,6 @@
       [model]="model"
       [options]="options"
       class="p-fluid"></formly-form>
-    <div class="mb-3" *ngIf="searchHistoryOptions.length > 0">
-      <label class="line-height-3 flex align-items-center"
-        >Saved Searches</label
-      >
-      <p-dropdown
-        styleClass="w-full"
-        [options]="searchHistoryOptions"
-        [showClear]="true"
-        (onClear)="onHistoryClear()"
-        [formControl]="formControlSearchHistory"
-        appendTo="body"
-        placeholder="Please Select"></p-dropdown>
-    </div>
 
     <div class="flex justify-content-end">
       <p-button styleClass="p-button-outlined mr-2" (onClick)="onClear()">

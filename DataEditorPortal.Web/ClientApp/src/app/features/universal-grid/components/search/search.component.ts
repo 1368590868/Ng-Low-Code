@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -71,7 +72,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     private systemLogService: SystemLogService,
     private urlParamsService: UrlParamsService,
     private searchService: SearchService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -130,12 +132,16 @@ export class SearchComponent implements OnInit, OnDestroy {
     // get search history
     this.searchService.getSearchHistory(this.gridName).subscribe(res => {
       if (res.code === 200 && res.data) {
-        this.dialogHistoryOptions = res.data.map(x => ({
+        const newOptions = res.data.map(x => ({
           label: x.name,
-          value: x.model,
+          value: x.searches,
           id: x.id
         }));
-        this.searchHistoryOptions = [...this.dialogHistoryOptions];
+        this.dialogHistoryOptions = [
+          ...this.dialogHistoryOptions,
+          ...newOptions
+        ];
+        this.searchHistoryOptions = [...newOptions];
       }
     });
 
@@ -144,6 +150,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       .subscribe(value => {
         if (value && Object.keys(value).length > 0) {
           this.model = { ...this.model, ...value };
+          this.onSubmit(this.model);
         }
       });
 
@@ -155,6 +162,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       });
 
       this.showStar = hasValue.indexOf(true) >= 0;
+      this.cdr.detectChanges();
     });
   }
 
@@ -182,12 +190,14 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   onClear() {
     this.options.resetModel?.();
+    this.form.reset();
     this.gridTableService.searchClicked$.next(undefined);
     this.formControlSearchHistory.reset();
   }
 
   onHistoryClear() {
     this.options.resetModel?.();
+    this.form.reset();
   }
 
   onOk() {
@@ -211,6 +221,10 @@ export class SearchComponent implements OnInit, OnDestroy {
                 'Create successfully'
               );
               this.visible = false;
+              this.searchHistoryOptions.push({
+                label: name,
+                value: this.model
+              });
             }
           });
       } else {
@@ -232,6 +246,16 @@ export class SearchComponent implements OnInit, OnDestroy {
                 'Create successfully'
               );
               this.visible = false;
+
+              this.searchHistoryOptions.forEach(option => {
+                if (
+                  option.value === this.formControlDialogSearchHistory.value
+                ) {
+                  option.label = name;
+                  option.value = this.model;
+                }
+              });
+              this.formControlSearchHistory.setValue(this.model);
             }
           });
       }

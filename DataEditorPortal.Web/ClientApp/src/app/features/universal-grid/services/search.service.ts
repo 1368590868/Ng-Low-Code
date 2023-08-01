@@ -15,19 +15,19 @@ export class SearchService {
   getSearchHistory(gridName: string) {
     return this.http.get<
       ApiResponse<
-        { id: string; name: string; model: { [name: string]: any } }[]
+        { id: string; name: string; searches: { [name: string]: any } }[]
       >
-    >(`${this._apiUrl}search/${gridName}/saved-search`);
+    >(`${this._apiUrl}universal-grid/${gridName}/saved-search/list`);
   }
 
   addSearchHistory(
     gridName: string,
     name: string,
-    model: { [name: string]: any }
+    searches: { [name: string]: any }
   ) {
     return this.http.post<ApiResponse<any>>(
-      `${this._apiUrl}search/${gridName}/saved-search/create`,
-      { name, model }
+      `${this._apiUrl}universal-grid/${gridName}/saved-search/create`,
+      { name, searches }
     );
   }
 
@@ -35,11 +35,11 @@ export class SearchService {
     gridName: string,
     id: string,
     name: string,
-    model: { [name: string]: any }
+    searches: { [name: string]: any }
   ) {
     return this.http.put<ApiResponse<any>>(
-      `${this._apiUrl}search/${gridName}/saved-search/${id}/update`,
-      { name, model }
+      `${this._apiUrl}universal-grid/${gridName}/saved-search/${id}/update`,
+      { name, searches }
     );
   }
 }
