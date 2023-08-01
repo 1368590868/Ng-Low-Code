@@ -162,7 +162,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  updateModel(value: any) {
+  modelChange(value: any) {
     const hasValue = Object.keys(value).map(key => {
       const newValue = (value as { [key: string]: any })[key];
       if (newValue != null && newValue !== '') return true;
