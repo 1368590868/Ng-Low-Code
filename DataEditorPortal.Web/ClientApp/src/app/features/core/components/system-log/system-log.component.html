@@ -103,7 +103,12 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-rowData>
-        <tr>
+        <tr
+          [style]="{
+            background: ['Error', 'Exception'].includes(rowData.CATEGORY)
+              ? 'var(--red-50)'
+              : null
+          }">
           <td>
             <div class="row-actions flex">
               <p-button
@@ -117,7 +122,9 @@
           <td>
             {{ rowData.EVENT_TIME | date : 'M/dd/yyyy hh:mm a' }}
           </td>
-          <td>{{ rowData.CATEGORY }}</td>
+          <td>
+            {{ rowData.CATEGORY }}
+          </td>
           <td>{{ rowData.EVENT_SECTION }}</td>
           <td>{{ rowData.EVENT_NAME }}</td>
           <td>{{ rowData.USERNAME }}</td>
