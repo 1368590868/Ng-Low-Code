@@ -422,6 +422,34 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.ToTable("LOOKUPS");
                 });
 
+            modelBuilder.Entity("DataEditorPortal.Data.Models.SavedSearch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("RAW(16)")
+                        .HasColumnName("ID");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("NAME");
+
+                    b.Property<byte[]>("SearchParams")
+                        .HasColumnType("BLOB")
+                        .HasColumnName("SEARCH_PARAMS");
+
+                    b.Property<Guid?>("UniversalGridConfigurationId")
+                        .HasColumnType("RAW(16)")
+                        .HasColumnName("UNIVERSAL_GRID_CONFIG_ID");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("RAW(16)")
+                        .HasColumnName("USERID");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SAVED_SEARCHES");
+                });
+
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteContent", b =>
                 {
                     b.Property<Guid>("Id")

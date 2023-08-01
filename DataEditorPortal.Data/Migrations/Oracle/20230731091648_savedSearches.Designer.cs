@@ -3,45 +3,47 @@ using System;
 using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Oracle.EntityFrameworkCore.Metadata;
 
-namespace DataEditorPortal.Data.Migrations.SqlServer
+namespace DataEditorPortal.Data.Migrations.Oracle
 {
-    [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [DbContext(typeof(DepDbContextOracle))]
+    [Migration("20230731091648_savedSearches")]
+    partial class savedSearches
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema(Common.Constants.DEFAULT_SCHEMA)
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("Relational:MaxIdentifierLength", 30)
                 .HasAnnotation("ProductVersion", "5.0.17")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_LOOKUP", b =>
                 {
                     b.Property<string>("LOOKUPID")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("NVARCHAR2(450)");
 
                     b.Property<string>("NAME1")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("NAME2")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("NAME3")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("NAME4")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("NAME5")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("NAME6")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("LOOKUPID");
 
@@ -52,65 +54,67 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("NUMBER(10)")
+                        .HasAnnotation("Oracle:IdentityIncrement", 1)
+                        .HasAnnotation("Oracle:IdentitySeed", 1)
+                        .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ASSESSEDBY")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("BOUNDARYGLOBALID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("COMMENTS")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("CREATIONUSER")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("CRITERIA")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<DateTime?>("DATECREATED")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<DateTime?>("DATEMODIFIED")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<DateTime?>("DATETIME1")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<DateTime?>("DATETIME2")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<DateTime?>("DATETIME3")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<DateTime?>("DATETIME4")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<string>("EVENTID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("FEATUREGLOBALID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("GLOBALID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("LASTUSER")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("NAME")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("STATUS")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("STATUS1")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("TYPE")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("OBJECTID");
 
@@ -121,14 +125,16 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("NUMBER(10)")
+                        .HasAnnotation("Oracle:IdentityIncrement", 1)
+                        .HasAnnotation("Oracle:IdentitySeed", 1)
+                        .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("LEFTID")
-                        .HasColumnType("int");
+                        .HasColumnType("NUMBER(10)");
 
                     b.Property<int>("RIGHTID")
-                        .HasColumnType("int");
+                        .HasColumnType("NUMBER(10)");
 
                     b.HasKey("OBJECTID");
 
@@ -139,53 +145,55 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("NUMBER(10)")
+                        .HasAnnotation("Oracle:IdentityIncrement", 1)
+                        .HasAnnotation("Oracle:IdentitySeed", 1)
+                        .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ASSIGNEDTO")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("BOUNDARYGLOBALID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("COMMENTS")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("CREATIONUSER")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<DateTime?>("DATECREATED")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<DateTime?>("DATEMODIFIED")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<DateTime?>("DATETIME3")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<DateTime?>("DATETIME4")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TIMESTAMP(7)");
 
                     b.Property<string>("EVENTID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("FEATUREGLOBALID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("GLOBALID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("LASTUSER")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("STATUS")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("STATUS1")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<string>("TYPE")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("OBJECTID");
 
@@ -196,27 +204,27 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<string>("Category")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("CATEGORY");
 
                     b.Property<string>("Label")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("LABEL");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("VALUE");
 
                     b.Property<string>("Value1")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("VALUE1");
 
                     b.Property<string>("Value2")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("VALUE2");
 
                     b.HasKey("Id");
@@ -228,35 +236,35 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<Guid>("CreatedById")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("CREATED_BY");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TIMESTAMP(7)")
                         .HasColumnName("CREATED_DATE");
 
                     b.Property<Guid>("GridConfigurationId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("GRID_COINFG_ID");
 
                     b.Property<int>("ImportType")
-                        .HasColumnType("int")
+                        .HasColumnType("NUMBER(10)")
                         .HasColumnName("IMPORT_TYPE");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("NAME");
 
                     b.Property<string>("Result")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("RESULT");
 
                     b.Property<int>("Status")
-                        .HasColumnType("int")
+                        .HasColumnType("NUMBER(10)")
                         .HasColumnName("STATUS");
 
                     b.HasKey("Id");
@@ -271,19 +279,19 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
             modelBuilder.Entity("DataEditorPortal.Data.Models.DataSourceConnection", b =>
                 {
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("NVARCHAR2(450)")
                         .HasColumnName("NAME");
 
                     b.Property<string>("ConnectionString")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("CONNECTION_STRING");
 
                     b.Property<string>("IncludeSchemas")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("INCLUDE_SCHEMAS");
 
                     b.Property<string>("TableNameRule")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("TABLE_NAME_RULE");
 
                     b.HasKey("Name");
@@ -295,44 +303,44 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID")
-                        .HasDefaultValueSql("NEWID()");
+                        .HasDefaultValueSql("sys_guid()");
 
                     b.Property<bool>("Checked")
-                        .HasColumnType("bit")
+                        .HasColumnType("NUMBER(1)")
                         .HasColumnName("CHECKED");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TIMESTAMP(7)")
                         .HasColumnName("CREATE_DATE");
 
                     b.Property<string>("Division")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("DIVISION");
 
                     b.Property<string>("Employor")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("EMPLOYOR");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("FIRST_NAME");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("NAME");
 
                     b.Property<int>("Number")
-                        .HasColumnType("int")
+                        .HasColumnType("NUMBER(10)")
                         .HasColumnName("NUMBER");
 
                     b.Property<decimal>("Total")
-                        .HasColumnType("decimal(18,2)")
+                        .HasColumnType("DECIMAL(18,2)")
                         .HasColumnName("TOTAL");
 
                     b.Property<string>("Vendor")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("VENDOR");
 
                     b.HasKey("Id");
@@ -344,39 +352,39 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<string>("Category")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("CATEGORY");
 
                     b.Property<string>("Details")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("DETAILS");
 
                     b.Property<string>("EventName")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("EVENT_NAME");
 
                     b.Property<string>("EventSection")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("EVENT_SECTION");
 
                     b.Property<DateTime>("EventTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TIMESTAMP(7)")
                         .HasColumnName("EVENT_TIME");
 
                     b.Property<string>("Params")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("PARAMS");
 
                     b.Property<string>("Result")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("RESULT");
 
                     b.Property<string>("Username")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("USERNAME");
 
                     b.HasKey("Id");
@@ -388,23 +396,23 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<string>("DataSourceConnectionName")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("NVARCHAR2(450)")
                         .HasColumnName("DATA_SOURCE_CONNECTION_NAME");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("NAME");
 
                     b.Property<string>("QueryText")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("QUERY_TEXT");
 
                     b.Property<Guid?>("UniversalGridConfigurationId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("UNIVERSAL_GRID_CONFIG_ID");
 
                     b.HasKey("Id");
@@ -420,19 +428,19 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("NAME");
 
-                    b.Property<string>("SearchParams")
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<byte[]>("SearchParams")
+                        .HasColumnType("BLOB")
                         .HasColumnName("SEARCH_PARAMS");
 
                     b.Property<Guid?>("UniversalGridConfigurationId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("UNIVERSAL_GRID_CONFIG_ID");
 
                     b.Property<Guid?>("UserId")
@@ -448,19 +456,19 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("CLOB")
                         .HasColumnName("CONTENT");
 
                     b.Property<string>("ContentName")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("CONTENT_NAME");
 
                     b.Property<Guid?>("SiteGroupId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("SITE_GROUP_ID");
 
                     b.HasKey("Id");
@@ -472,19 +480,19 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("DESCRIPTION");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("NAME");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("TITLE");
 
                     b.HasKey("Id");
@@ -496,59 +504,59 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<string>("Component")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("COMPONENT");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("DESCRIPTION");
 
                     b.Property<string>("HelpUrl")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("HELP_URL");
 
                     b.Property<string>("Icon")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("ICON");
 
                     b.Property<string>("Label")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("LABEL");
 
                     b.Property<string>("Link")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("LINK");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("NAME");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int")
+                        .HasColumnType("NUMBER(10)")
                         .HasColumnName("ORDER");
 
                     b.Property<Guid?>("ParentId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("PARENT_ID");
 
                     b.Property<bool>("RequireAdmin")
-                        .HasColumnType("bit")
+                        .HasColumnType("NUMBER(1)")
                         .HasColumnName("REQUIRE_ADMIN");
 
                     b.Property<bool>("RequireAuth")
-                        .HasColumnType("bit")
+                        .HasColumnType("NUMBER(1)")
                         .HasColumnName("REQUIRE_AUTH");
 
                     b.Property<int>("Status")
-                        .HasColumnType("int")
+                        .HasColumnType("NUMBER(10)")
                         .HasColumnName("STATUS");
 
                     b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("TYPE");
 
                     b.HasKey("Id");
@@ -562,19 +570,19 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<string>("Category")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("CATEGORY");
 
                     b.Property<string>("PermissionDescription")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("PERMISSION_DESCRIPTION");
 
                     b.Property<string>("PermissionName")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("PERMISSION_NAME");
 
                     b.HasKey("Id");
@@ -586,15 +594,15 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<string>("RoleDescription")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("ROLE_DESCRIPTION");
 
                     b.Property<string>("RoleName")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("ROLE_NAME");
 
                     b.HasKey("Id");
@@ -606,30 +614,31 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("CREATED_BY");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TIMESTAMP(7)")
                         .HasColumnName("CREATED_DATE");
 
                     b.Property<Guid>("SitePermissionId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("SITE_PERMISSION_ID");
 
                     b.Property<Guid>("SiteRoleId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("SITE_ROLE_ID");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SitePermissionId");
 
-                    b.HasIndex("SiteRoleId");
+                    b.HasIndex("SiteRoleId")
+                        .HasDatabaseName("IX_SITE_ROLE_PERMISSIONS_SIT~1");
 
                     b.ToTable("SITE_ROLE_PERMISSIONS");
                 });
@@ -638,23 +647,23 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<bool>("Installed")
-                        .HasColumnType("bit")
+                        .HasColumnType("NUMBER(1)")
                         .HasColumnName("INSTALLED");
 
                     b.Property<string>("License")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("LICENSE");
 
                     b.Property<string>("SiteLogo")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("CLOB")
                         .HasColumnName("SITE_LOGO");
 
                     b.Property<string>("SiteName")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("SITE_NAME");
 
                     b.HasKey("Id");
@@ -666,55 +675,55 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<string>("ColumnsConfig")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("CLOB")
                         .HasColumnName("COLUMNS_CONFIG");
 
                     b.Property<bool>("ConfigCompleted")
-                        .HasColumnType("bit")
+                        .HasColumnType("NUMBER(1)")
                         .HasColumnName("CONFIG_COMPLETED");
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("CREATED_BY");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TIMESTAMP(7)")
                         .HasColumnName("CREATED_DATE");
 
                     b.Property<string>("CurrentStep")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("CURRENT_STEP");
 
                     b.Property<string>("CustomActionConfig")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("CUSTOMACTION_CONFIG");
 
                     b.Property<string>("DataSourceConfig")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("DATA_SOURCE_CONFIG");
 
                     b.Property<string>("DataSourceConnectionName")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("NVARCHAR2(450)")
                         .HasColumnName("DATA_SOURCE_CONNECTION_NAME");
 
                     b.Property<string>("DetailConfig")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("CLOB")
                         .HasColumnName("DETAIL_CONFIG");
 
                     b.Property<string>("ItemType")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("ITEM_TYPE");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("NAME");
 
                     b.Property<string>("SearchConfig")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("CLOB")
                         .HasColumnName("SEARCH_CONFIG");
 
                     b.HasKey("Id");
@@ -727,35 +736,35 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
             modelBuilder.Entity("DataEditorPortal.Data.Models.UploadedFile", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("NVARCHAR2(450)")
                         .HasColumnName("ID");
 
                     b.Property<string>("Comments")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("COMMENTS");
 
                     b.Property<string>("ContentType")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("CONTENT_TYPE");
 
                     b.Property<string>("DataId")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("DATA_ID");
 
                     b.Property<byte[]>("FileBytes")
-                        .HasColumnType("varbinary(max)")
+                        .HasColumnType("BLOB")
                         .HasColumnName("FILE_BYTES");
 
                     b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("FILE_NAME");
 
                     b.Property<string>("FilePath")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("FILE_PATH");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("STATUS");
 
                     b.HasKey("Id");
@@ -767,52 +776,52 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID")
-                        .HasDefaultValueSql("NEWID()");
+                        .HasDefaultValueSql("sys_guid()");
 
                     b.Property<bool>("AutoEmail")
-                        .HasColumnType("bit")
+                        .HasColumnType("NUMBER(1)")
                         .HasColumnName("AUTO_EMAIL");
 
                     b.Property<string>("Comments")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("COMMENTS");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("EMAIL");
 
                     b.Property<string>("Employer")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("EMPLOYER");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("NAME");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("PHONE");
 
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("NUMBER(10)")
                         .HasColumnName("USER_ID")
-                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
-                        .HasAnnotation("SqlServer:IdentitySeed", 1)
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasAnnotation("Oracle:IdentityIncrement", 1)
+                        .HasAnnotation("Oracle:IdentitySeed", 1)
+                        .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("UserType")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("USER_TYPE");
 
                     b.Property<string>("Username")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("USERNAME");
 
                     b.Property<string>("Vendor")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("VENDOR");
 
                     b.HasKey("Id");
@@ -824,27 +833,27 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("ID");
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("CREATED_BY");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TIMESTAMP(7)")
                         .HasColumnName("CREATED_DATE");
 
                     b.Property<string>("GrantType")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("GRANT_TYPE");
 
                     b.Property<Guid>("PermissionGrantId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("PERMISSION_GRANT_ID");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("USER_ID");
 
                     b.HasKey("Id");
@@ -857,11 +866,11 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
             modelBuilder.Entity("SiteGroupSiteMenu", b =>
                 {
                     b.Property<Guid>("SiteGroupsId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("SITE_GROUP_ID");
 
                     b.Property<Guid>("SiteMenusId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("RAW(16)")
                         .HasColumnName("SITE_MENU_ID");
 
                     b.HasKey("SiteGroupsId", "SiteMenusId");
@@ -923,6 +932,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.HasOne("DataEditorPortal.Data.Models.SiteRole", "SiteRole")
                         .WithMany()
                         .HasForeignKey("SiteRoleId")
+                        .HasConstraintName("FK_SITE_ROLE_PERMISSIONS_SIT~1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -962,6 +972,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.HasOne("DataEditorPortal.Data.Models.SiteMenu", null)
                         .WithMany()
                         .HasForeignKey("SiteMenusId")
+                        .HasConstraintName("FK_SITE_GROUP_SITE_MENU_SITE~1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

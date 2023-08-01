@@ -152,6 +152,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
     public class RelationDataSourceConfig : DataSourceConfig
     {
+        public bool IsOneToMany { get; set; }
         public string PrimaryReferenceKey { get; set; }
         public string PrimaryForeignKey { get; set; }
         public string SecondaryReferenceKey { get; set; }
