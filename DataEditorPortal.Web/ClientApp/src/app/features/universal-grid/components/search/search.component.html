@@ -13,11 +13,11 @@
       styleClass="w-full"
       [options]="searchHistoryOptions"
       [showClear]="true"
-      (onClear)="onHistoryClear()"
+      (onClear)="onClear()"
       [formControl]="formControlSearchHistory"
       appendTo="body"
       placeholder="Saved Searches"></p-dropdown>
-    <p-divider></p-divider>
+    <p-divider styleClass="mb-2"></p-divider>
   </div>
   <form [formGroup]="form" (ngSubmit)="onSubmit(model)" class="px-3 pb-3">
     <formly-form
@@ -25,6 +25,7 @@
       [fields]="fields"
       [model]="model"
       [options]="options"
+      (modelChange)="updateModel($event)"
       class="p-fluid"></formly-form>
 
     <div class="flex justify-content-end">

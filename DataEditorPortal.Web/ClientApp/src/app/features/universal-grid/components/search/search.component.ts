@@ -1,12 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output
-} from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
@@ -40,7 +32,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   isLoading = false;
   visible = false;
-  dialogStyle = { width: '45rem' };
+  dialogStyle = { width: '35rem' };
   showStar = false;
 
   formControlSearchHistory = new FormControl();
@@ -72,8 +64,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private systemLogService: SystemLogService,
     private urlParamsService: UrlParamsService,
     private searchService: SearchService,
-    private notifyService: NotifyService,
-    private cdr: ChangeDetectorRef
+    private notifyService: NotifyService
   ) {}
 
   ngOnInit(): void {
@@ -153,17 +144,6 @@ export class SearchComponent implements OnInit, OnDestroy {
           this.onSubmit(this.model);
         }
       });
-
-    this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
-      const hasValue = Object.keys(value).map(key => {
-        const newValue = (value as { [key: string]: any })[key];
-        if (newValue != null && newValue !== '') return true;
-        return false;
-      });
-
-      this.showStar = hasValue.indexOf(true) >= 0;
-      this.cdr.detectChanges();
-    });
   }
 
   ngOnDestroy(): void {
@@ -182,6 +162,16 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
+  updateModel(value: any) {
+    const hasValue = Object.keys(value).map(key => {
+      const newValue = (value as { [key: string]: any })[key];
+      if (newValue != null && newValue !== '') return true;
+      return false;
+    });
+
+    this.showStar = hasValue.indexOf(true) >= 0;
+  }
+
   showDialog() {
     this.visible = true;
     this.formControlDialogSearchHistory.setValue({});
@@ -189,21 +179,12 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   onClear() {
-    this.options.resetModel?.();
-    this.form.reset();
+    this.options.resetModel?.({});
     this.gridTableService.searchClicked$.next(undefined);
     this.formControlSearchHistory.reset();
   }
 
-  onHistoryClear() {
-    this.options.resetModel?.();
-    this.form.reset();
-  }
-
   onOk() {
-    this.formControlDialogName.markAsDirty();
-    this.formControlDialogSearchHistory.markAsDirty();
-
     if (
       this.formControlDialogSearchHistory.valid &&
       this.formControlDialogName.valid
@@ -222,6 +203,10 @@ export class SearchComponent implements OnInit, OnDestroy {
               );
               this.visible = false;
               this.searchHistoryOptions.push({
+                label: name,
+                value: this.model
+              });
+              this.dialogHistoryOptions.push({
                 label: name,
                 value: this.model
               });
@@ -259,6 +244,9 @@ export class SearchComponent implements OnInit, OnDestroy {
             }
           });
       }
+    } else {
+      this.formControlDialogName.markAsDirty();
+      this.formControlDialogSearchHistory.markAsDirty();
     }
   }
 
