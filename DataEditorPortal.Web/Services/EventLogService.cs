@@ -48,13 +48,27 @@ namespace DataEditorPortal.Web.Services
                     EventTime = DateTime.UtcNow,
                     Username = CurrentUsername,
                     Details = model.Details,
-                    Params = model.Params
+                    Params = FormatJson(model.Params)
                 });
                 _depDbContext.SaveChanges();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
+            }
+        }
+
+        private string FormatJson(string jsonString)
+        {
+            if (string.IsNullOrEmpty(jsonString)) return "";
+            try
+            {
+                var json = JsonSerializer.Deserialize<object>(jsonString);
+                return JsonSerializer.Serialize(json, new JsonSerializerOptions() { WriteIndented = true });
+            }
+            catch
+            {
+                return jsonString;
             }
         }
 
@@ -70,7 +84,7 @@ namespace DataEditorPortal.Web.Services
                     EventTime = DateTime.UtcNow,
                     Username = CurrentUsername,
                     Details = details,
-                    Params = param != null ? JsonSerializer.Serialize(param) : "",
+                    Params = param != null ? JsonSerializer.Serialize(param, new JsonSerializerOptions() { WriteIndented = true }) : "",
                     Result = result
                 });
                 _depDbContext.SaveChanges();
