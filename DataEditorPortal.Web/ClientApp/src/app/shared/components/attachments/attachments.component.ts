@@ -46,7 +46,7 @@ export class AttachmentsComponent {
     private systemLogService: SystemLogService
   ) {}
 
-  onEventLog(file: AttachmentType) {
+  onAttachmentClick(file: AttachmentType) {
     this.systemLogService.addSiteVisitLog({
       action: 'Download Attachment',
       section: this.gridName,

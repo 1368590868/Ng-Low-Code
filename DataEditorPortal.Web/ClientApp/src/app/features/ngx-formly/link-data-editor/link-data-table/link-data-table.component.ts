@@ -145,7 +145,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   ngOnInit(): void {
     if (this.table1Name !== '') {
       this.systemLogService.addSiteVisitLog({
-        action: 'Get Link Data',
+        action: 'Get Table Data',
         section: this.table1Name,
         params: JSON.stringify(this.getFetchParam())
       });

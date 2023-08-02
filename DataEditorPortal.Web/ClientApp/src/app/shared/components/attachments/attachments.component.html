@@ -6,7 +6,7 @@
           <td style="width: 30%">
             <a
               class="no-underline cursor-pointer text-primary flex flex-shrink-0 overflow-hidden text-overflow-ellipsis max-w-full"
-              (click)="onEventLog(file)"
+              (click)="onAttachmentClick(file)"
               href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
                 fieldName
               }}/{{ file.fileId }}/{{ file.fileName || '' }}"
@@ -25,7 +25,7 @@
     <a
       class="no-underline cursor-pointer text-primary overflow-hidden text-overflow-ellipsis max-w-full"
       *ngFor="let file of fileList"
-      (click)="onEventLog(file)"
+      (click)="onAttachmentClick(file)"
       href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
         fieldName
       }}/{{ file.fileId }}/{{ file.fileName || '' }}"
