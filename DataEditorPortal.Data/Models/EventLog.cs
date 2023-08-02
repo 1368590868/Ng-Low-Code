@@ -26,5 +26,7 @@ namespace DataEditorPortal.Data.Models
         public string Params { get; set; }
         [Column("RESULT")]
         public string Result { get; set; }
+        [Column("CONNECTION")]
+        public string Connection { get; set; }
     }
 }

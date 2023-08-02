@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -12,7 +13,7 @@ namespace DataEditorPortal.Web.Services
     {
         string CurrentUsername { get; set; }
         void AddPageRequestLog(EventLogModel model);
-        void AddEventLog(string category, string section, string name, string details = null, object param = null, string result = "");
+        void AddEventLog(string category, string section, string name, string details = null, object param = null, string result = "", string connection = "");
     }
 
     public class EventLogService : IEventLogService
@@ -72,10 +73,13 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public void AddEventLog(string category, string section, string name, string details = null, object param = null, string result = "")
+        public void AddEventLog(string category, string section, string name, string details = null, object param = null, string result = "", string connection = "")
         {
             try
             {
+                string pattern = @"(Pwd|Password)=(\w+)";
+                string replacement = "$1=******";
+
                 _depDbContext.Add(new EventLog()
                 {
                     Category = category,
@@ -85,7 +89,8 @@ namespace DataEditorPortal.Web.Services
                     Username = CurrentUsername,
                     Details = details,
                     Params = param != null ? JsonSerializer.Serialize(param, new JsonSerializerOptions() { WriteIndented = true }) : "",
-                    Result = result
+                    Result = result,
+                    Connection = connection != null ? Regex.Replace(connection, pattern, replacement, RegexOptions.IgnoreCase) : ""
                 });
                 _depDbContext.SaveChanges();
             }

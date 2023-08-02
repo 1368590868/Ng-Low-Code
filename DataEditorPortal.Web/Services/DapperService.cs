@@ -57,7 +57,7 @@ namespace DataEditorPortal.Web.Services
 
         public IDbTransaction BeginTransaction(IDbConnection con)
         {
-            _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Begin Transaction", null);
+            _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Begin Transaction", null, null, null, con.ConnectionString);
             return con.BeginTransaction();
         }
         public void Commit(IDbTransaction tran)
@@ -65,11 +65,11 @@ namespace DataEditorPortal.Web.Services
             try
             {
                 tran.Commit();
-                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Commit Transaction", null);
+                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Commit Transaction", null, null, null, tran.Connection.ConnectionString);
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Commit Transaction Failed", ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Commit Transaction Failed", null, null, ex.Message, tran.Connection.ConnectionString);
                 throw;
             }
         }
@@ -78,11 +78,11 @@ namespace DataEditorPortal.Web.Services
             try
             {
                 tran.Rollback();
-                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Rollback Transaction", null);
+                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Rollback Transaction", null, null, null, tran.Connection.ConnectionString);
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Rollback Transaction Failed", ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Rollback Transaction Failed", null, null, ex.Message, tran.Connection.ConnectionString);
                 throw;
             }
         }
@@ -92,13 +92,13 @@ namespace DataEditorPortal.Web.Services
             {
                 var result = con.Query(sql, param, transaction, buffered, commandTimeout, commandType);
 
-                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Query Database", sql, param);
+                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Query Database", sql, param, null, con.ConnectionString);
 
                 return result;
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Query Database", sql, param, ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Query Database", sql, param, ex.Message, con.ConnectionString);
                 //_logger.LogError(ex, ex.Message);
 
                 throw;
@@ -110,13 +110,13 @@ namespace DataEditorPortal.Web.Services
             {
                 var result = con.QueryFirst(sql, param, transaction, commandTimeout, commandType);
 
-                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Query Database", sql, param);
+                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Query Database", sql, param, null, con.ConnectionString);
 
                 return result;
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Query Database", sql, param, ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Query Database", sql, param, ex.Message, con.ConnectionString);
                 //_logger.LogError(ex, ex.Message);
 
                 throw;
@@ -128,13 +128,13 @@ namespace DataEditorPortal.Web.Services
             {
                 var result = con.ExecuteReader(sql, param, transaction, commandTimeout, commandType);
 
-                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Execute Query", sql, param);
+                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Execute Query", sql, param, null, con.ConnectionString);
 
                 return result;
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Execute Query", sql, param, ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Execute Query", sql, param, ex.Message, con.ConnectionString);
                 //_logger.LogError(ex, ex.Message);
 
                 throw;
@@ -146,13 +146,13 @@ namespace DataEditorPortal.Web.Services
             {
                 var result = con.ExecuteScalar(sql, param, transaction, commandTimeout, commandType);
 
-                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Execute Query", sql, param);
+                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Execute Query", sql, param, null, con.ConnectionString);
 
                 return result;
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Execute Query", sql, param, ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Execute Query", sql, param, ex.Message, con.ConnectionString);
                 //_logger.LogError(ex, ex.Message);
 
                 throw;
@@ -164,13 +164,13 @@ namespace DataEditorPortal.Web.Services
             {
                 var affected = con.Execute(sql, param, transaction, commandTimeout, commandType);
 
-                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Execute Query", sql, param, $"{affected} rows affected.");
+                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Execute Query", sql, param, $"{affected} row{(affected == 1 ? "" : "s")} affected.", con.ConnectionString);
 
                 return affected;
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Execute Query", sql, param, ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Execute Query", sql, param, ex.Message, con.ConnectionString);
                 //_logger.LogError(ex, ex.Message);
 
                 throw;
