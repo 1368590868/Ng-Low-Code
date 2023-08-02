@@ -52,6 +52,8 @@ namespace DataEditorPortal.Web.Controllers
                 IdColumn = "ID"
             };
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
+
+            var filtersApplied = _universalGridService.ProcessFilterParam(param.Filters, new List<FilterParam>());
             queryText = _queryBuilder.UseFilters(queryText, param.Filters);
             queryText = _queryBuilder.UseSearches(queryText);
 
@@ -66,7 +68,6 @@ namespace DataEditorPortal.Web.Controllers
             }
 
             var output = new GridData();
-            var filtersApplied = _universalGridService.ProcessFilterParam(param.Filters, new List<FilterParam>());
             var keyValues = filtersApplied.Select(x => new KeyValuePair<string, object>($"{x.field}_{x.index}", x.value));
             var queryParams = _queryBuilder.GenerateDynamicParameter(keyValues);
 

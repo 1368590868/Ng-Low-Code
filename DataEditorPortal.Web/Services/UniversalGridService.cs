@@ -379,7 +379,7 @@ namespace DataEditorPortal.Web.Services
 
             foreach (var filter in filters)
             {
-                filter.index = filtersApplied.Count(x => x.field == x.field);
+                filter.index = filtersApplied.Count(x => x.field == filter.field);
                 filtersApplied.Add(filter);
             };
 
