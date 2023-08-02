@@ -68,8 +68,9 @@
             <ngx-monaco-editor
               [ngModel]="datasourceConfig.queryText"
               [style]="{ minWidth: '41.5rem' }"
-              class="pt-3 border-round monaco-editor-wrapper display-only overflow-hidden"
+              class="pt-2 pl-2 border-round monaco-editor-wrapper display-only overflow-hidden"
               [options]="{
+                folding: false,
                 readOnly: true,
                 domReadOnly: true
               }"></ngx-monaco-editor>

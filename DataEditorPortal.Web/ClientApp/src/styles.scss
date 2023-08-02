@@ -145,6 +145,17 @@ formly-form {
   transition: var(--transition-duration);
   margin-bottom: 0.25rem;
 
+  .monaco-editor {
+    background: transparent;
+    .monaco-editor-background {
+      background: transparent;
+    }
+    .decorationsOverviewRuler,
+    .scroll-decoration {
+      display: none !important;
+    }
+  }
+
   &.ng-dirty.ng-invalid {
     border-color: #e24c4c;
   }
