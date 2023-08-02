@@ -1,4 +1,5 @@
 import { Component, Inject, Input } from '@angular/core';
+import { SystemLogService } from '../../services/system-log.service';
 type AttachmentType = {
   fileId?: string;
   fileName?: string;
@@ -40,5 +41,16 @@ export class AttachmentsComponent {
   tooltipList: any = [];
   fileList: AttachmentType[] = [];
 
-  constructor(@Inject('API_URL') public apiUrl: string) {}
+  constructor(
+    @Inject('API_URL') public apiUrl: string,
+    private systemLogService: SystemLogService
+  ) {}
+
+  onEventLog(file: AttachmentType) {
+    this.systemLogService.addSiteVisitLog({
+      action: 'Download Attachment',
+      section: this.gridName,
+      params: JSON.stringify(file)
+    });
+  }
 }

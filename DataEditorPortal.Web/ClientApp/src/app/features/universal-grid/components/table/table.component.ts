@@ -503,6 +503,12 @@ export class TableComponent implements OnInit, OnDestroy {
   highlightLinkedData(table2Id: string) {
     this.table2Id = table2Id;
     if (table2Id) {
+      this.systemLogService.addSiteVisitLog({
+        action: 'Get Relation Data',
+        section: this.gridName,
+        params: JSON.stringify(table2Id)
+      });
+
       this.selection = [];
       this.gridTableService
         .getHighlightLinkedData(this.gridName, table2Id)

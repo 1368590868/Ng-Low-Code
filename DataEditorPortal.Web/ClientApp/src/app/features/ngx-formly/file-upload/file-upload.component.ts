@@ -14,7 +14,7 @@ import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
 import { startWith } from 'rxjs';
-import { NotifyService } from 'src/app/shared';
+import { NotifyService, SystemLogService } from 'src/app/shared';
 @Pipe({
   name: 'filter'
 })
@@ -85,7 +85,8 @@ export class FileUploadComponent implements ControlValueAccessor {
     private confirmationService: ConfirmationService,
     private notifyService: NotifyService,
     @Inject('API_URL') apiUrl: string,
-    private filterPipe: FilterPipe
+    private filterPipe: FilterPipe,
+    private systemLogService: SystemLogService
   ) {
     this.apiUrl = apiUrl;
   }
@@ -174,6 +175,15 @@ export class FileUploadComponent implements ControlValueAccessor {
   }
 
   tempAttachmentDownload(data: any) {
+    this.systemLogService.addSiteVisitLog({
+      action:
+        data.status !== 'New'
+          ? 'Download Attachment'
+          : 'Download Temporary Attachment',
+      section: this.gridName,
+      params: JSON.stringify(data)
+    });
+
     const url =
       data.status === 'New'
         ? `${this.apiUrl}attachment/download-temp-file/${
