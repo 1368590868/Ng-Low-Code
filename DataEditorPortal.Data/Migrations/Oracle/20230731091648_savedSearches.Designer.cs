@@ -435,8 +435,8 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                         .HasColumnType("NVARCHAR2(2000)")
                         .HasColumnName("NAME");
 
-                    b.Property<byte[]>("SearchParams")
-                        .HasColumnType("BLOB")
+                    b.Property<string>("SearchParams")
+                        .HasColumnType("CLOB")
                         .HasColumnName("SEARCH_PARAMS");
 
                     b.Property<Guid?>("UniversalGridConfigurationId")
