@@ -46,8 +46,10 @@ namespace DataEditorPortal.Web.Controllers
         {
             var dataSourceConfig = new DataSourceConfig()
             {
+                Columns = new List<string> { "ID", "EVENT_TIME", "EVENT_SECTION", "CATEGORY", "EVENT_NAME", "USERNAME" },
                 TableSchema = Constants.DEFAULT_SCHEMA,
-                TableName = "EVENT_LOGS"
+                TableName = "EVENT_LOGS",
+                IdColumn = "ID"
             };
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
             queryText = _queryBuilder.UseFilters(queryText, param.Filters);

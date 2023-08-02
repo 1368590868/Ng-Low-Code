@@ -43,7 +43,8 @@ namespace DataEditorPortal.Web.Controllers
             var dataSourceConfig = new DataSourceConfig()
             {
                 TableSchema = Constants.DEFAULT_SCHEMA,
-                TableName = "DATA_DICTIONARIES"
+                TableName = "DATA_DICTIONARIES",
+                IdColumn = "ID"
             };
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
             queryText = _queryBuilder.UseFilters(queryText, param.Filters);

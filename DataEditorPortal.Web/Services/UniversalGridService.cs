@@ -429,7 +429,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
                 _logger.LogError(ex, ex.Message);
                 throw new DepException("An Error in the query has occurred: " + ex.Message);
             }
@@ -745,7 +745,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -847,7 +847,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -941,7 +941,7 @@ namespace DataEditorPortal.Web.Services
                 {
                     _dapperService.Rollback(trans);
 
-                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -1033,7 +1033,7 @@ namespace DataEditorPortal.Web.Services
                 {
                     _dapperService.Rollback(trans);
 
-                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -1119,7 +1119,7 @@ namespace DataEditorPortal.Web.Services
                 {
                     _dapperService.Rollback(trans);
 
-                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -1244,7 +1244,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "", JsonSerializer.Serialize(eventConfig), JsonSerializer.Serialize(model), ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, JsonSerializer.Serialize(eventConfig), ex.Message);
                 _logger.LogError(ex, ex.Message);
             }
         }
@@ -1333,7 +1333,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
                 _logger.LogError(ex, ex.Message);
             }
 
@@ -1647,7 +1647,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
                     _logger.LogError(ex, ex.Message);
                 }
             }
