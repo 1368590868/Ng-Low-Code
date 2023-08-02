@@ -37,6 +37,12 @@ namespace DataEditorPortal.Data.Contexts
                 entity.Property(e => e.DetailConfig).HasColumnType("CLOB");
             });
 
+            modelBuilder.Entity<EventLog>(entity =>
+            {
+                entity.Property(e => e.Details).HasColumnType("CLOB");
+                entity.Property(e => e.Params).HasColumnType("CLOB");
+            });
+
             modelBuilder.Entity<SavedSearch>(entity =>
             {
                 entity.Property(e => e.SearchParams).HasColumnType("CLOB");
