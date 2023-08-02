@@ -56,7 +56,8 @@
           (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
         <p-tableRadioButton
           *ngIf="selectionMode === 'single'"
-          [value]="data"></p-tableRadioButton>
+          [value]="data"
+          (click)="onRowCheckBoxClick($event)"></p-tableRadioButton>
       </td>
       <td
         *ngFor="let col of columns"
