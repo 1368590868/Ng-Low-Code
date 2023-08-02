@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -12,8 +13,7 @@ namespace DataEditorPortal.Web.Services
     {
         string CurrentUsername { get; set; }
         void AddPageRequestLog(EventLogModel model);
-        void AddDbQueryLog(string category, string section, string details, object param = null, string result = "");
-        void AddEventLog(EventLogModel eventLog);
+        void AddEventLog(string category, string section, string name, string details = null, object param = null, string result = "", string connection = "");
     }
 
     public class EventLogService : IEventLogService
@@ -44,12 +44,12 @@ namespace DataEditorPortal.Web.Services
                 _depDbContext.Add(new EventLog()
                 {
                     Category = EventLogCategory.PAGE_REQUEST,
-                    EventSection = model.Section.Replace("-", "_").ToUpper(),
+                    EventSection = model.Section.ToUpper(),
                     EventName = model.Action,
                     EventTime = DateTime.UtcNow,
                     Username = CurrentUsername,
                     Details = model.Details,
-                    Params = model.Params
+                    Params = FormatJson(model.Params)
                 });
                 _depDbContext.SaveChanges();
             }
@@ -59,43 +59,38 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public void AddDbQueryLog(string category, string section, string details, object param = null, string result = "")
+        private string FormatJson(string jsonString)
+        {
+            if (string.IsNullOrEmpty(jsonString)) return "";
+            try
+            {
+                var json = JsonSerializer.Deserialize<object>(jsonString);
+                return JsonSerializer.Serialize(json, new JsonSerializerOptions() { WriteIndented = true });
+            }
+            catch
+            {
+                return jsonString;
+            }
+        }
+
+        public void AddEventLog(string category, string section, string name, string details = null, object param = null, string result = "", string connection = "")
         {
             try
             {
+                string pattern = @"(Pwd|Password)=(\w+)";
+                string replacement = "$1=******";
+
                 _depDbContext.Add(new EventLog()
                 {
                     Category = category,
-                    EventSection = section.Replace("-", "_").ToUpper(),
-                    EventName = "Database Query",
+                    EventSection = section.ToUpper(),
+                    EventName = name,
                     EventTime = DateTime.UtcNow,
                     Username = CurrentUsername,
                     Details = details,
-                    Params = param != null ? JsonSerializer.Serialize(param) : "",
-                    Result = result
-                });
-                _depDbContext.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-            }
-        }
-
-        public void AddEventLog(EventLogModel eventLog)
-        {
-            try
-            {
-                _depDbContext.Add(new EventLog()
-                {
-                    Category = eventLog.Category,
-                    EventSection = eventLog.Section.Replace("-", "_").ToUpper(),
-                    EventName = eventLog.Action,
-                    EventTime = DateTime.UtcNow,
-                    Username = eventLog.Username,
-                    Details = eventLog.Details,
-                    Params = eventLog.Params,
-                    Result = eventLog.Result
+                    Params = param != null ? JsonSerializer.Serialize(param, new JsonSerializerOptions() { WriteIndented = true }) : "",
+                    Result = result,
+                    Connection = connection != null ? Regex.Replace(connection, pattern, replacement, RegexOptions.IgnoreCase) : ""
                 });
                 _depDbContext.SaveChanges();
             }

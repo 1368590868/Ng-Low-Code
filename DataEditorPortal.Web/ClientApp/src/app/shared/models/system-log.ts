@@ -20,4 +20,5 @@ export interface SystemLogViewInfo {
   details?: string;
   params?: string;
   result?: string;
+  connection?: string;
 }

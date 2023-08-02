@@ -21,6 +21,7 @@ namespace DataEditorPortal.Web.Services
         private readonly IServiceProvider _serviceProvider;
         private readonly IQueryBuilder _queryBuilder;
         private readonly ILogger<LinkDataProcessor> _logger;
+        private readonly IDapperService _dapperService;
 
         // for delete
         private string _queryToDelete { get; set; }
@@ -29,11 +30,13 @@ namespace DataEditorPortal.Web.Services
         public LinkDataProcessor(
             IServiceProvider serviceProvider,
             IQueryBuilder queryBuilder,
-            ILogger<LinkDataProcessor> logger)
+            ILogger<LinkDataProcessor> logger,
+            IDapperService dapperService)
         {
             _serviceProvider = serviceProvider;
             _queryBuilder = queryBuilder;
             _logger = logger;
+            _dapperService = dapperService;
         }
 
         public override void PreProcess(IDictionary<string, object> model)
@@ -79,7 +82,7 @@ namespace DataEditorPortal.Web.Services
                         new KeyValuePair<string, object>(_relationInfo.Table1.IdColumn, dataIds)
                     }
                 );
-                Conn.Execute(_queryToDelete, _parameterToDelete, Trans);
+                _dapperService.Execute(Conn, _queryToDelete, _parameterToDelete, Trans);
             }
         }
 
@@ -127,7 +130,7 @@ namespace DataEditorPortal.Web.Services
                         new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(_relationInfo.Table1.IdColumn, table1Ids) }
                     );
                     // get the table1RefValue
-                    var datas = Conn.Query(queryText, param, Trans)
+                    var datas = _dapperService.Query(Conn, queryText, param, Trans)
                         .Cast<IDictionary<string, object>>()
                         .Select(d => new
                         {
@@ -157,7 +160,7 @@ namespace DataEditorPortal.Web.Services
                         new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(_relationInfo.Table2.IdColumn, table2Ids) }
                     );
 
-                    var datas = Conn.Query(queryText, param, Trans)
+                    var datas = _dapperService.Query(Conn, queryText, param, Trans)
                         .Cast<IDictionary<string, object>>()
                         .Select(d => new
                         {
@@ -212,9 +215,12 @@ namespace DataEditorPortal.Web.Services
                         }
                         var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
 
-                        Conn.Execute(sql, dynamicParameters, Trans);
+                        _dapperService.Execute(Conn, sql, dynamicParameters, Trans);
                     }
                 }
+
+                // when editing relation on secondary table in one to many mode, we don't need to process toDelete.
+                if (_relationInfo.IsOneToMany && !_relationInfo.Table1IsPrimary) return;
 
                 var toDelete = _existingModel.Where(
                     existing => _inputModel.All(
@@ -252,7 +258,7 @@ namespace DataEditorPortal.Web.Services
                         }
                         var dynamicParameters = new DynamicParameters(_queryBuilder.GenerateDynamicParameter(value));
 
-                        Conn.Execute(sql, dynamicParameters, Trans);
+                        _dapperService.Execute(Conn, sql, dynamicParameters, Trans);
                     }
                 }
             }
@@ -281,7 +287,7 @@ namespace DataEditorPortal.Web.Services
                 var table2Ids = Enumerable.Empty<object>();
                 try
                 {
-                    var datas = Conn.Query(queryText, param, Trans);
+                    var datas = _dapperService.Query(Conn, queryText, param, Trans);
 
                     relationData = datas.Select(data =>
                     {

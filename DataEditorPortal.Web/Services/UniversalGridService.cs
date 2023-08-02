@@ -24,7 +24,7 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IUniversalGridService
     {
-        string CurrentUsername { get; set; }
+        string CurrentUsername { set; }
         GridConfig GetGridConfig(string name);
         List<GridColConfig> GetGridColumnsConfig(string name);
         List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column);
@@ -71,8 +71,18 @@ namespace DataEditorPortal.Web.Services
         private readonly IEventLogService _eventLogService;
         private readonly IAttachmentService _attachmentService;
         private readonly IMemoryCache _memoryCache;
+        private readonly IDapperService _dapperService;
 
-        public string CurrentUsername { get; set; }
+        private string _currentUsername;
+        public string CurrentUsername
+        {
+            set
+            {
+                _currentUsername = value;
+                _dapperService.CurrentUsername = value;
+                _eventLogService.CurrentUsername = value;
+            }
+        }
 
         public UniversalGridService(
             IServiceProvider serviceProvider,
@@ -83,7 +93,8 @@ namespace DataEditorPortal.Web.Services
             IHttpContextAccessor httpContextAccessor,
             IEventLogService eventLogService,
             IAttachmentService attachmentService,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            IDapperService dapperService)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
@@ -91,14 +102,13 @@ namespace DataEditorPortal.Web.Services
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _eventLogService = eventLogService;
             _attachmentService = attachmentService;
             _memoryCache = memoryCache;
+            _dapperService = dapperService;
 
             if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
                 CurrentUsername = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
-
-            _eventLogService = eventLogService;
-            _eventLogService.CurrentUsername = CurrentUsername;
         }
 
         #region Grid cofnig, columns config, search config and detail form config
@@ -378,10 +388,16 @@ namespace DataEditorPortal.Web.Services
 
         public GridData QueryGridData(IDbConnection con, string queryText, object queryParams, string gridName, bool writeLog = true)
         {
+            _dapperService.EventSection = $"{gridName} | QueryGridData";
+
             var output = new GridData();
             try
             {
                 con.Open();
+
+                var data = writeLog
+                    ? _dapperService.Query(con, queryText, queryParams).ToList()
+                    : con.Query(queryText, queryParams).ToList();
 
                 DataTable schema;
                 using (var dr = con.ExecuteReader(queryText, queryParams))
@@ -389,7 +405,6 @@ namespace DataEditorPortal.Web.Services
                     schema = dr.GetSchemaTable();
                 }
 
-                var data = con.Query(queryText, queryParams).ToList();
                 data.ForEach(item =>
                 {
                     var row = (IDictionary<string, object>)item;
@@ -411,14 +426,10 @@ namespace DataEditorPortal.Web.Services
                     if (item.Keys.Contains("DEP_TOTAL")) item.Remove("DEP_TOTAL");
                     if (item.Keys.Contains("DEP_ROWNUMBER")) item.Remove("DEP_ROWNUMBER");
                 }
-
-                if (writeLog)
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, gridName, queryText, queryParams);
             }
             catch (Exception ex)
             {
-                if (writeLog)
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, gridName, queryText, queryParams, ex.Message);
+                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                 _logger.LogError(ex, ex.Message);
                 throw new DepException("An Error in the query has occurred: " + ex.Message);
             }
@@ -428,6 +439,8 @@ namespace DataEditorPortal.Web.Services
 
         public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column)
         {
+            _dapperService.EventSection = $"{name} | GetGridColumnFilterOptions";
+
             var config = GetUniversalGridConfiguration(name);
 
             var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
@@ -446,16 +459,13 @@ namespace DataEditorPortal.Web.Services
 
                     try
                     {
-                        result = con.Query(query)
+                        result = _dapperService.Query(con, query)
                             .Select(x => ((IDictionary<string, object>)x)[columnConfig.field])
                             .Where(x => x != null && x != DBNull.Value)
                             .ToList();
-
-                        _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, query, null);
                     }
                     catch (Exception ex)
                     {
-                        _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, query, null, ex.Message);
                         throw new DepException("An Error in the query has occurred: " + ex.Message);
                     }
                     finally
@@ -696,6 +706,8 @@ namespace DataEditorPortal.Web.Services
 
         public IDictionary<string, object> GetGridDataDetail(string name, string id)
         {
+            _dapperService.EventSection = $"{name} | GetGridDataDetail";
+
             var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
@@ -717,24 +729,23 @@ namespace DataEditorPortal.Web.Services
                 try
                 {
                     con.Open();
+                    details = (IDictionary<string, object>)_dapperService.QueryFirst(con, queryText, param);
 
                     DataTable schema;
                     using (var dr = con.ExecuteReader(queryText, param))
                     {
                         schema = dr.GetSchemaTable();
                     }
-                    details = (IDictionary<string, object>)con.QueryFirst(queryText, param);
+
                     foreach (var key in details.Keys)
                     {
                         var index = details.Keys.ToList().IndexOf(key);
                         details[key] = _queryBuilder.TransformValue(details[key], schema.Rows[index]);
                     }
-
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param);
                 }
                 catch (Exception ex)
                 {
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -758,6 +769,8 @@ namespace DataEditorPortal.Web.Services
 
         public bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model)
         {
+            _dapperService.EventSection = $"{name} | ValidateGridData";
+
             var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
@@ -824,19 +837,17 @@ namespace DataEditorPortal.Web.Services
                 try
                 {
                     var commandType = formLayout.OnValidate.EventType == FormEventType.QueryText ? CommandType.Text : CommandType.StoredProcedure;
-                    var data = con.ExecuteScalar(queryText, param, null, null, commandType);
+                    var data = _dapperService.ExecuteScalar(con, queryText, param, null, null, commandType);
                     if (data != DBNull.Value && data != null)
                     {
                         var temp = 0;
                         int.TryParse(data.ToString(), out temp);
                         result = temp == 1;
                     }
-
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, result.ToString());
                 }
                 catch (Exception ex)
                 {
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -847,6 +858,8 @@ namespace DataEditorPortal.Web.Services
 
         public bool AddGridData(string name, IDictionary<string, object> model)
         {
+            _dapperService.EventSection = $"{name} | AddGridData";
+
             var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
@@ -869,7 +882,7 @@ namespace DataEditorPortal.Web.Services
                 ProcessComputedValues(formLayout.FormFields, model, con);
 
                 // excute command
-                var trans = con.BeginTransaction();
+                var trans = _dapperService.BeginTransaction(con);
 
                 // use value processor to convert values in model
                 var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
@@ -903,7 +916,7 @@ namespace DataEditorPortal.Web.Services
                     var paramReturnId = _queryBuilder.ParameterName($"RETURNED_{dataSourceConfig.IdColumn}");
                     dynamicParameters.Add(paramReturnId, dbType: null, direction: ParameterDirection.Output, size: 40);
 
-                    var affected = con.Execute(queryText, dynamicParameters, trans);
+                    var affected = _dapperService.Execute(con, queryText, dynamicParameters, trans);
                     var returnedId = dynamicParameters.Get<object>(paramReturnId);
 
                     if (model.Keys.Contains(dataSourceConfig.IdColumn))
@@ -916,28 +929,19 @@ namespace DataEditorPortal.Web.Services
                         processor.PostProcess(model);
                     }
 
-                    trans.Commit();
-
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
+                    _dapperService.Commit(trans);
 
                     // run after saved event handler
                     if (formLayout?.AfterSaved != null)
                     {
-                        AfterSaved(new EventActionModel()
-                        {
-                            EventName = "After Inserting",
-                            EventSection = config.Name,
-                            EventConfig = formLayout.AfterSaved,
-                            Username = CurrentUsername,
-                            ConnectionString = config.DataSourceConnection.ConnectionString
-                        }, model);
+                        AfterSaved(formLayout.AfterSaved, config.Name, config.DataSourceConnection.ConnectionString, model);
                     }
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
+                    _dapperService.Rollback(trans);
 
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -948,6 +952,8 @@ namespace DataEditorPortal.Web.Services
 
         public bool UpdateGridData(string name, string id, IDictionary<string, object> model)
         {
+            _dapperService.EventSection = $"{name} | UpdateGridData";
+
             var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
@@ -977,7 +983,7 @@ namespace DataEditorPortal.Web.Services
                 ProcessComputedValues(formLayout.FormFields, model, con);
 
                 // excute command
-                var trans = con.BeginTransaction();
+                var trans = _dapperService.BeginTransaction(con);
 
                 // use value processor to convert values in model
                 var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
@@ -1007,7 +1013,7 @@ namespace DataEditorPortal.Web.Services
 
                 try
                 {
-                    var affected = con.Execute(queryText, param, trans);
+                    var affected = _dapperService.Execute(con, queryText, param, trans);
 
                     // use value processors to execute extra operations
                     foreach (var processor in valueProcessors)
@@ -1015,28 +1021,19 @@ namespace DataEditorPortal.Web.Services
                         processor.PostProcess(model);
                     }
 
-                    trans.Commit();
-
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
+                    _dapperService.Commit(trans);
 
                     // run after saved event
                     if (formLayout?.AfterSaved != null)
                     {
-                        AfterSaved(new EventActionModel()
-                        {
-                            EventName = "After Updating",
-                            EventSection = config.Name,
-                            EventConfig = formLayout.AfterSaved,
-                            Username = CurrentUsername,
-                            ConnectionString = config.DataSourceConnection.ConnectionString
-                        }, model);
+                        AfterSaved(formLayout.AfterSaved, config.Name, config.DataSourceConnection.ConnectionString, model);
                     }
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
+                    _dapperService.Rollback(trans);
 
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -1047,6 +1044,8 @@ namespace DataEditorPortal.Web.Services
 
         public bool DeleteGridData(string name, object[] ids)
         {
+            _dapperService.EventSection = $"{name} | DeleteGridData";
+
             var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
@@ -1083,7 +1082,7 @@ namespace DataEditorPortal.Web.Services
             {
                 con.ConnectionString = config.DataSourceConnection.ConnectionString;
                 con.Open();
-                var trans = con.BeginTransaction();
+                var trans = _dapperService.BeginTransaction(con);
 
                 try
                 {
@@ -1100,7 +1099,7 @@ namespace DataEditorPortal.Web.Services
                         }
                     }
 
-                    var affected = con.Execute(queryText, param, trans);
+                    var affected = _dapperService.Execute(con, queryText, param, trans);
 
                     // use value processors to execute extra operations
                     foreach (var processor in valueProcessors)
@@ -1108,28 +1107,19 @@ namespace DataEditorPortal.Web.Services
                         processor.AfterDeleted();
                     }
 
-                    trans.Commit();
-
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, name, queryText, param, $"{affected} rows affected.");
+                    _dapperService.Commit(trans);
 
                     // run after saved event
                     if (detailConfig.DeletingForm?.AfterSaved != null)
                     {
-                        AfterSaved(new EventActionModel()
-                        {
-                            EventName = "After Deleting",
-                            EventSection = config.Name,
-                            EventConfig = detailConfig.DeletingForm?.AfterSaved,
-                            Username = CurrentUsername,
-                            ConnectionString = config.DataSourceConnection.ConnectionString
-                        }, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
+                        AfterSaved(detailConfig.DeletingForm?.AfterSaved, config.Name, config.DataSourceConnection.ConnectionString, new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
                     }
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
+                    _dapperService.Rollback(trans);
 
-                    _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, name, queryText, param, ex.Message);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
@@ -1140,7 +1130,7 @@ namespace DataEditorPortal.Web.Services
 
         private void ProcessComputedValues(List<FormFieldConfig> formFields, IDictionary<string, object> model, IDbConnection con)
         {
-            var currentUser = _depDbContext.Users.FirstOrDefault(x => x.Username == CurrentUsername);
+            var currentUser = _depDbContext.Users.FirstOrDefault(x => x.Username == _currentUsername);
 
             foreach (var field in formFields)
             {
@@ -1154,13 +1144,11 @@ namespace DataEditorPortal.Web.Services
                             var query = _queryBuilder.ProcessQueryWithParamters(field.computedConfig.queryText, model);
                             try
                             {
-                                var value = con.ExecuteScalar(query.Item1, query.Item2, null, null, field.computedConfig.type);
+                                var value = _dapperService.ExecuteScalar(con, query.Item1, query.Item2, null, null, field.computedConfig.type);
                                 SetModelValue(model, field.key, value);
-                                _eventLogService.AddDbQueryLog(EventLogCategory.DB_SUCCESS, "Get Computed Value", query.Item1, query.Item2);
                             }
                             catch (Exception ex)
                             {
-                                _eventLogService.AddDbQueryLog(EventLogCategory.DB_ERROR, "Get Computed Value", query.Item1, query.Item2, ex.Message);
                                 _logger.LogError(ex, ex.Message);
                                 throw new DepException($"An Error has occurred when calculate computed value for field: {field.key}. Error: {ex.Message}");
                             }
@@ -1206,9 +1194,9 @@ namespace DataEditorPortal.Web.Services
                 model.Add(key, value);
         }
 
-        private void AfterSaved(EventActionModel actionConfig, IDictionary<string, object> model)
+        private void AfterSaved(FormEventConfig eventConfig, string name, string connectionString, IDictionary<string, object> model)
         {
-            var eventConfig = actionConfig.EventConfig;
+            _dapperService.EventSection = $"{name} | AfterSaved";
 
             if (eventConfig == null || string.IsNullOrEmpty(eventConfig.Script)) return;
 
@@ -1222,20 +1210,10 @@ namespace DataEditorPortal.Web.Services
 
                     using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                     {
-                        con.ConnectionString = actionConfig.ConnectionString;
+                        con.ConnectionString = connectionString;
 
-                        con.Execute(queryText, param, null, null, commandType);
+                        _dapperService.Execute(con, queryText, param, null, null, commandType);
                     }
-
-                    _eventLogService.AddEventLog(new EventLogModel()
-                    {
-                        Category = EventLogCategory.INFO,
-                        Section = actionConfig.EventSection,
-                        Action = actionConfig.EventName,
-                        Username = actionConfig.Username,
-                        Details = queryText,
-                        Params = param != null ? JsonSerializer.Serialize(param) : ""
-                    });
                 }
 
                 if (eventConfig.EventType == FormEventType.CommandLine)
@@ -1261,30 +1239,12 @@ namespace DataEditorPortal.Web.Services
                             }
                         }
                     }
-
-                    _eventLogService.AddEventLog(new EventLogModel()
-                    {
-                        Category = EventLogCategory.INFO,
-                        Section = actionConfig.EventSection,
-                        Action = actionConfig.EventName,
-                        Username = actionConfig.Username,
-                        Details = eventConfig.Script
-                    });
-
+                    _eventLogService.AddEventLog(EventLogCategory.INFO, _dapperService.EventSection, "Execute Command Line", eventConfig.Script);
                 }
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(new EventLogModel()
-                {
-                    Category = EventLogCategory.Error,
-                    Section = actionConfig.EventSection,
-                    Action = actionConfig.EventName,
-                    Username = actionConfig.Username,
-                    Details = JsonSerializer.Serialize(eventConfig),
-                    Params = JsonSerializer.Serialize(model),
-                    Result = ex.Message
-                });
+                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "", JsonSerializer.Serialize(eventConfig), JsonSerializer.Serialize(model), ex.Message);
                 _logger.LogError(ex, ex.Message);
             }
         }
@@ -1348,6 +1308,8 @@ namespace DataEditorPortal.Web.Services
         /// <returns>Values of IdColumn of Table1 that linked to table2Id</returns>
         public IEnumerable<object> GetLinkedDataIdsForList(string table1Name, string table2Id)
         {
+            _dapperService.EventSection = $"{table1Name} | GetLinkedDataIdsForList";
+
             var relationInfo = GetRelationInfo(table1Name);
 
             var queryText = relationInfo.Table2.Query_GetRelationDataById;
@@ -1360,7 +1322,7 @@ namespace DataEditorPortal.Web.Services
                 {
                     con.ConnectionString = relationInfo.ConnectionString;
                     con.Open();
-                    var datas = con.Query(queryText, param);
+                    var datas = _dapperService.Query(con, queryText, param);
 
                     table1Ids = datas.Select(data =>
                     {
@@ -1371,6 +1333,7 @@ namespace DataEditorPortal.Web.Services
             }
             catch (Exception ex)
             {
+                _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                 _logger.LogError(ex, ex.Message);
             }
 
@@ -1647,6 +1610,8 @@ namespace DataEditorPortal.Web.Services
 
         public IEnumerable<object> CheckDataExists(string name, object[] ids)
         {
+            _dapperService.EventSection = $"{name} | CheckDataExists";
+
             var config = GetUniversalGridConfiguration(name);
 
             // get query text for list data from grid config.
@@ -1667,12 +1632,13 @@ namespace DataEditorPortal.Web.Services
 
                 try
                 {
+                    var data = _dapperService.Query(con, queryText, param);
+
                     DataTable schema;
                     using (var dr = con.ExecuteReader(queryText, param))
                     {
                         schema = dr.GetSchemaTable();
                     }
-                    var data = con.Query(queryText, param);
                     result = data.Select(x =>
                     {
                         var row = (IDictionary<string, object>)x;
@@ -1681,6 +1647,7 @@ namespace DataEditorPortal.Web.Services
                 }
                 catch (Exception ex)
                 {
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, ex.StackTrace, null, ex.Message);
                     _logger.LogError(ex, ex.Message);
                 }
             }

@@ -15,7 +15,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     NAME = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SEARCH_PARAMS = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    USERID = table.Column<Guid>(type: "RAW(16)", nullable: true),
+                    USERID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UNIVERSAL_GRID_CONFIG_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>

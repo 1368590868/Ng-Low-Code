@@ -19,7 +19,7 @@ export class SystemLogDialogComponent {
     domReadOnly: true,
     language: 'sql',
     lineNumbers: 'off',
-    roundedSelection: true,
+    roundedSelection: false,
     minimap: { enabled: false },
     wordWrap: false,
     contextmenu: false,
@@ -52,9 +52,9 @@ export class SystemLogDialogComponent {
           'User Name ': data?.username,
           Details: this.removeExtraIndentation(data?.details),
           Params: data?.params,
-          Result: data?.result
+          Result: data?.result,
+          Connection: data?.connection
         };
-        console.log(this.viewData);
         this.viewData = Object.keys(this.viewData).map(key => {
           return {
             name: key,

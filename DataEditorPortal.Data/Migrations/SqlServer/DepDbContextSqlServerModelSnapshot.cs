@@ -351,6 +351,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("CATEGORY");
 
+                    b.Property<string>("Connection")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CONNECTION");
+
                     b.Property<string>("Details")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DETAILS");
@@ -436,7 +440,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnName("UNIVERSAL_GRID_CONFIG_ID");
 
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("RAW(16)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("USERID");
 
                     b.HasKey("Id");
