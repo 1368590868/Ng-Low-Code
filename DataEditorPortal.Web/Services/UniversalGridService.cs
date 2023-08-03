@@ -273,6 +273,8 @@ namespace DataEditorPortal.Web.Services
         #region Grid List data
         public GridData GetGridData(string name, GridParam param)
         {
+            _dapperService.EventSection = $"{name} | QueryGridData";
+
             var config = GetUniversalGridConfiguration(name);
 
             #region compose the query text
@@ -329,6 +331,18 @@ namespace DataEditorPortal.Web.Services
             queryText = _queryBuilder.UseSearches(queryText, searchRules);
 
             // convert grid filter to where clause
+            if (param.Filters != null)
+            {
+                param.Filters.ForEach(filter =>
+                {
+                    if (filter.field == Constants.LINK_DATA_FIELD_NAME && filter.value != null)
+                    {
+                        filter.field = dataSourceConfig.IdColumn;
+                        filter.matchMode = "in";
+                        filter.value = GetLinkedDataIdsForList(name, filter.value.ToString());
+                    }
+                });
+            }
             filtersApplied = ProcessFilterParam(param.Filters, filtersApplied);
             queryText = _queryBuilder.UseFilters(queryText, param.Filters);
 
