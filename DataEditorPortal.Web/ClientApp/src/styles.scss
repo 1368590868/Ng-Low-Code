@@ -234,3 +234,7 @@ formly-form {
 .fa-no-icon:before {
   content: '\f2799';
 }
+
+.p-datatable-loading-overlay {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+}
