@@ -62,27 +62,29 @@ namespace DataEditorPortal.Web.Services
         }
         public void Commit(IDbTransaction tran)
         {
+            var connectionStr = tran.Connection?.ConnectionString;
             try
             {
                 tran.Commit();
-                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Commit Transaction", null, null, null, tran.Connection.ConnectionString);
+                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Commit Transaction", null, null, null, connectionStr);
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Commit Transaction Failed", null, null, ex.Message, tran.Connection.ConnectionString);
+                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Commit Transaction Failed", null, null, ex.Message, connectionStr);
                 throw;
             }
         }
         public void Rollback(IDbTransaction tran)
         {
+            var connectionStr = tran.Connection?.ConnectionString;
             try
             {
                 tran.Rollback();
-                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Rollback Transaction", null, null, null, tran.Connection.ConnectionString);
+                _eventLogService.AddEventLog(EventLogCategory.DATABASE, EventSection, "Rollback Transaction", null, null, null, connectionStr);
             }
             catch (Exception ex)
             {
-                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Rollback Transaction Failed", null, null, ex.Message, tran.Connection.ConnectionString);
+                _eventLogService.AddEventLog(EventLogCategory.ERROR, EventSection, "Rollback Transaction Failed", null, null, ex.Message, connectionStr);
                 throw;
             }
         }
