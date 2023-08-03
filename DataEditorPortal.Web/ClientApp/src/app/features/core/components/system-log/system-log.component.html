@@ -6,6 +6,10 @@
       styleClass="p-datatable-striped"
       [value]="data"
       [rowHover]="true"
+      [tableStyle]="{ 'table-layout': 'fixed' }"
+      [resizableColumns]="true"
+      sortField="EVENT_TIME"
+      [sortOrder]="-1"
       [rows]="10"
       [showCurrentPageReport]="true"
       [lazy]="true"
@@ -28,7 +32,7 @@
             tooltipPosition="left"
             icon="pi pi-refresh text-lg"
             styleClass="p-button-rounded p-button-outlined mr-1"
-            (onClick)="onRefresh(table)"></p-button>
+            (onClick)="onRefresh()"></p-button>
         </div>
       </ng-template>
       <ng-template pTemplate="header">
@@ -52,13 +56,33 @@
             <p-sortIcon field="CATEGORY"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
-              type="text"
               field="CATEGORY"
+              matchMode="in"
               display="menu"
               [hideOnClear]="true"
+              [showMatchModes]="false"
               [showOperator]="false"
-              [showAddButton]="false"
-              [maxFractionDigits]="2"></p-columnFilter>
+              [showAddButton]="false">
+              <ng-template
+                pTemplate="filter"
+                let-value
+                let-filter="filterCallback">
+                <p-multiSelect
+                  [showToggleAll]="false"
+                  appendTo="body"
+                  placeholder="Any"
+                  [ngModel]="value"
+                  [options]="[
+                    { label: 'Database', value: 'Database' },
+                    { label: 'Page Request', value: 'Page Request' },
+                    { label: 'Error', value: 'Error' },
+                    { label: 'Exception', value: 'Exception' },
+                    { label: 'Information', value: 'Information' }
+                  ]"
+                  (onChange)="filter($event.value)">
+                </p-multiSelect>
+              </ng-template>
+            </p-columnFilter>
           </th>
           <th pSortableColumn="EVENT_SECTION">
             <span style="vertical-align: middle">Event Section</span>
@@ -140,7 +164,7 @@
     styleClass="p-paginator-bottom"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries  "
     [alwaysShow]="true"
-    (onPageChange)="onPageChange($event)"
+    (onPageChange)="onPageChange($event, table)"
     [rowsPerPageOptions]="rowsPerPageOptions"
     [showFirstLastIcon]="true"
     [showCurrentPageReport]="true"

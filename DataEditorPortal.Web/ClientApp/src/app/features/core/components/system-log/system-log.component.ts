@@ -8,6 +8,7 @@ import {
   SystemLogService
 } from 'src/app/shared';
 import { SystemLogDialogComponent } from './system-log-dialog/system-log-dialog.component';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-system-log',
@@ -34,20 +35,17 @@ export class SystemLogComponent implements OnInit {
     this.fetchData();
   }
 
-  onPageChange(event: PaginationEvent) {
+  onPageChange(event: PaginationEvent, tableRef: Table) {
     const { first, rows } = event;
     this.first = first;
     this.rows = rows;
     this.fetchData();
+
+    tableRef.resetScrollTop();
   }
 
-  onRefresh(table: any) {
-    this.filters = null;
-    this.sortMeta = null;
-    this.multiSortMeta = null;
+  onRefresh() {
     this.first = 0;
-
-    table.reset();
 
     this.fetchData();
   }
