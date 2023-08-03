@@ -99,6 +99,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [AdminAuthorizationFilter]
         [Route("username-exists")]
         public bool ExistName([FromQuery] string username, [FromQuery] Guid? id)
         {
@@ -106,6 +107,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [AdminAuthorizationFilter]
         [Route("email-exists")]
         public bool ExistEmail([FromQuery] string email, [FromQuery] Guid? id)
         {
@@ -113,6 +115,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [AdminAuthorizationFilter]
         [Route("detail/{userId}")]
         public dynamic GetUserDetail(Guid userId)
         {
@@ -126,6 +129,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorizationFilter]
         [Route("create")]
         public Guid Create([FromBody] User model)
         {
@@ -133,6 +137,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPut]
+        [AdminAuthorizationFilter]
         [Route("update/{userId}")]
         public Guid Update(Guid userId, [FromBody] User model)
         {
@@ -157,6 +162,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [AdminAuthorizationFilter]
         [Route("{userId}/permissions")]
         public List<PermissionNode> Permissions(Guid userId)
         {
@@ -180,6 +186,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorizationFilter]
         [Route("{userId}/permissions")]
         public bool UpdatePermissions(Guid userId, [FromBody] UserPermissions model)
         {
@@ -211,6 +218,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [AdminAuthorizationFilter]
         [Route("{userId}/roles")]
         public dynamic UserRoles(Guid userId)
         {
@@ -233,6 +241,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorizationFilter]
         [Route("{userId}/roles")]
         public bool UpdateUserRoles(Guid userId, [FromBody] UserPermissions model)
         {

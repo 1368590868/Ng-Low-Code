@@ -5,6 +5,7 @@ using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,8 @@ using System.Linq;
 
 namespace DataEditorPortal.Web.Controllers
 {
+    [Authorize]
+    [AdminAuthorizationFilter]
     [ApiController]
     [Route("api/site-group")]
     public class SiteGroupController : ControllerBase

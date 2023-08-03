@@ -5,6 +5,7 @@ using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,7 @@ using System.Linq;
 
 namespace DataEditorPortal.Web.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/event-log")]
     public class EventLogController : ControllerBase
@@ -94,6 +96,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorizationFilter]
         [Route("create")]
         public Guid Create(EventLog model)
         {
@@ -105,6 +108,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpDelete]
+        [AdminAuthorizationFilter]
         [Route("{id}/delete")]
         public bool Delete(Guid id)
         {
