@@ -18,8 +18,9 @@
   </ng-template>
   <ng-template pTemplate>
     <app-table
-      *ngIf="detailTableName && showDetail"
+      *ngIf="detailTableName"
       #detailTable
+      [style]="{ height: showDetail ? 'auto' : '0px' }"
       class="flex-grow-1"
       headerSize="compact"
       [gridName]="detailTableName"

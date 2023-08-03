@@ -2,7 +2,6 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { TableComponent } from '../table/table.component';
 import { Splitter } from 'primeng/splitter';
-import { filter, takeWhile, tap } from 'rxjs';
 
 @Component({
   selector: 'app-master-table',
@@ -31,30 +30,16 @@ export class MasterTableComponent {
     }
 
     const table1Id = event.data[this.masterTable.tableConfig.dataKey];
-    this.gridTableService
-      .getHighlightLinkedData(this.detailTableName, table1Id)
-      .pipe(
-        tap(ids => {
-          this.detailTable.loaded$
-            .pipe(
-              filter(x => x),
-              tap(() => {
-                // set table2 search criteria
-                this.detailTable.defaultFilter = [
-                  {
-                    field: this.detailTable.tableConfig.dataKey,
-                    matchMode: 'in',
-                    value: ids
-                  }
-                ];
-                this.detailTable.fetchData();
-              }),
-              takeWhile(x => !x)
-            )
-            .subscribe();
-        })
-      )
-      .subscribe();
+    setTimeout(() => {
+      this.detailTable.defaultFilter = [
+        {
+          field: 'LINK_DATA_FIELD',
+          matchMode: 'in',
+          value: table1Id
+        }
+      ];
+      this.detailTable.fetchData();
+    }, 100);
   }
 
   onMasterRowUnselect() {
