@@ -363,6 +363,12 @@ export class TableComponent implements OnInit, OnDestroy {
         const fieldProp = obj[prop];
         for (let i = 0; i < fieldProp.length; i++) {
           if (fieldProp[i].value != null) {
+            if (
+              Array.isArray(fieldProp[i].value) &&
+              fieldProp[i].value.length === 0
+            ) {
+              continue;
+            }
             fieldProp[i].field = prop;
             fetchParam.filters.push(fieldProp[i]);
           }
