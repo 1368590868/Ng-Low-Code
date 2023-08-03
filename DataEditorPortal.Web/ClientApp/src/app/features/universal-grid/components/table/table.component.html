@@ -228,7 +228,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage" let-columns>
-        <tr *ngIf="columns && columns.length > 0">
+        <tr *ngIf="columns && columns.length > 0" class="empty-message">
           <td class="text-lg" [attr.colspan]="columns.length + 2">
             {{
               this.firstLoadDone

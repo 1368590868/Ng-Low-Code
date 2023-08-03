@@ -20,6 +20,7 @@ import { DataFormatService } from './services/data-format.service';
 import { AutoFilterDirective } from './directive/auto-filter.directive';
 import { DropdownFixDirective } from './directive/dropdown-fix.directive';
 import { MonacoEditorDirective } from './directive/monaco-editor.directive';
+import { TableDirective } from './directive/table.directive';
 
 // public components
 import { AttachmentsComponent } from './components/attachments/attachments.component';
@@ -53,6 +54,7 @@ registerQuill();
     AutoFilterDirective,
     DropdownFixDirective,
     MonacoEditorDirective,
+    TableDirective,
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
@@ -72,6 +74,7 @@ registerQuill();
     AutoFilterDirective,
     DropdownFixDirective,
     MonacoEditorDirective,
+    TableDirective,
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
