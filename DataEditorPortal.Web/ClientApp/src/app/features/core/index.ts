@@ -28,6 +28,7 @@ import { EditorModule } from 'primeng/editor';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { MonacoEditorModule } from 'ngx-monaco-editor';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 import {
   HeaderComponent,
@@ -118,6 +119,7 @@ export const routes: Routes = [
     EditorModule,
     InputTextareaModule,
     ProgressBarModule,
+    MultiSelectModule,
     MonacoEditorModule.forRoot()
   ],
   exports: [
