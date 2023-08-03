@@ -2,6 +2,7 @@
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,6 +12,7 @@ using System.Linq;
 
 namespace DataEditorPortal.Web.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class LookupController : ControllerBase

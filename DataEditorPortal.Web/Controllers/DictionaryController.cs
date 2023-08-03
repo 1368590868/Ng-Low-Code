@@ -4,6 +4,7 @@ using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,8 @@ using System.Linq;
 
 namespace DataEditorPortal.Web.Controllers
 {
+    [Authorize]
+    [AdminAuthorizationFilter]
     [ApiController]
     [Route("api/[controller]")]
     public class DictionaryController : ControllerBase
@@ -43,9 +46,12 @@ namespace DataEditorPortal.Web.Controllers
             var dataSourceConfig = new DataSourceConfig()
             {
                 TableSchema = Constants.DEFAULT_SCHEMA,
-                TableName = "DATA_DICTIONARIES"
+                TableName = "DATA_DICTIONARIES",
+                IdColumn = "ID"
             };
             var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
+
+            var filtersApplied = _universalGridService.ProcessFilterParam(param.Filters, new List<FilterParam>());
             queryText = _queryBuilder.UseFilters(queryText, param.Filters);
             queryText = _queryBuilder.UseSearches(queryText);
 
@@ -60,8 +66,6 @@ namespace DataEditorPortal.Web.Controllers
             }
 
             var output = new GridData();
-
-            var filtersApplied = _universalGridService.ProcessFilterParam(param.Filters, new List<FilterParam>());
             var keyValues = filtersApplied.Select(x => new KeyValuePair<string, object>($"{x.field}_{x.index}", x.value));
             var queryParams = _queryBuilder.GenerateDynamicParameter(keyValues);
 

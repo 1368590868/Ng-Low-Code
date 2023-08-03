@@ -80,6 +80,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
     const { checked } = event;
     if (checked) {
       this.dataSource.forEach((item: any) => {
+        item.__LINKED__ = true;
         const repeat = this.innerValue.find(
           (x: any) => x.table2Id === item[this.table2IdColumn]
         );
@@ -89,6 +90,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
       });
     } else {
       this.dataSource.forEach((item: any) => {
+        item.__LINKED__ = false;
         const removeIds = this.innerValue.findIndex(x => {
           return x.table2Id === item[this.table2IdColumn];
         });
@@ -101,6 +103,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   onRowUnselect(event: any) {
     const { data } = event;
+    data.__LINKED__ = false;
     const removeIds = this.innerValue.findIndex(x => {
       return x.table2Id === data[this.table2IdColumn];
     });
@@ -111,6 +114,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   onRowSelect(event: any) {
     const { data } = event;
+    data.__LINKED__ = true;
     if (this.selectionMode === 'multiple')
       this.innerValue.push({ table2Id: data[this.table2IdColumn] });
     else this.innerValue = [{ table2Id: data[this.table2IdColumn] }];
