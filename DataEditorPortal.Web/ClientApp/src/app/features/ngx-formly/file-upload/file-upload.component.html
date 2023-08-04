@@ -41,7 +41,11 @@
       <td class="text-right">
         <button
           *ngIf="file.status === 'Deleted'"
-          [disabled]="(newAttachments | filter) >= this.fileLimit"
+          [disabled]="
+            this.fileLimit === 0
+              ? false
+              : (newAttachments | filter) >= this.fileLimit
+          "
           pButton
           pRipple
           icon="pi pi-refresh"
