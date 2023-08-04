@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { EditorComponent } from 'ngx-monaco-editor';
-import { SystemLogData } from 'src/app/shared';
-import { SystemLogService } from 'src/app/shared/services/system-log.service';
+import { SystemLogData, SystemLogService } from 'src/app/shared';
 
 @Component({
   selector: 'app-system-log-dialog',

@@ -11,7 +11,7 @@ import {
   PortalEditLinkComponent,
   PortalEditBasicSubComponent
 } from './components';
-import { PortalRouterLoadingGuard } from 'src/app/shared/guards/portal-router-loading.guard';
+import { PortalRouterLoadingGuard } from 'src/app/shared';
 
 const routes: Routes = [
   { path: '', redirectTo: 'list', pathMatch: 'full' },

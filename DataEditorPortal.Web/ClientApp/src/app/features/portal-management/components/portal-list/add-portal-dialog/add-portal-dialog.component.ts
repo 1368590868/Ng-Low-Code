@@ -7,11 +7,10 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { NotifyService } from 'src/app/shared';
+import { NotifyService, SiteGroupService } from 'src/app/shared';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { PortalItem } from '../../../models/portal-item';
 import { Subject, skip, takeUntil } from 'rxjs';
-import { SiteGroupService } from 'src/app/shared/services/site-group.service';
 
 @Component({
   selector: 'app-add-portal-dialog',

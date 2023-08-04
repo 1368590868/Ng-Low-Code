@@ -7,7 +7,7 @@ import {
   HttpResponse
 } from '@angular/common/http';
 import { catchError, finalize, of, tap, throwError } from 'rxjs';
-import { NotifyService } from '../utils/notify.service';
+import { NotifyService } from '../services/notify.service';
 import { ConfigDataService } from '../services/config-data.service';
 
 @Injectable()

@@ -2,11 +2,10 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { catchError, EMPTY, tap } from 'rxjs';
-import { SystemLogService } from 'src/app/shared';
+import { GlobalLoadingService, SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { ExportForm, ExportParam } from '../../models/export';
 import { UniversalGridService } from '../../services/universal-grid.service';
-import { GlobalLoadingService } from 'src/app/shared/services/global-loading.service';
 
 @Component({
   selector: 'app-export-excel-action',

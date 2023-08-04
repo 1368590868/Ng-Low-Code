@@ -8,11 +8,12 @@ import {
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { ConfirmationService } from 'primeng/api';
-import { ConfigDataService, NotifyService } from 'src/app/shared';
 import {
+  ConfigDataService,
   DbConnectionData,
-  DbConnectionService
-} from 'src/app/shared/services/db-connection.service ';
+  DbConnectionService,
+  NotifyService
+} from 'src/app/shared';
 
 @Component({
   selector: 'app-add-connection-dialog',

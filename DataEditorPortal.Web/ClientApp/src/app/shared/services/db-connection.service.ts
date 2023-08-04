@@ -1,16 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { ApiResponse } from '..';
-
-export interface DbConnectionData {
-  name: string;
-  serverName?: string;
-  authentication?: number;
-  username?: string;
-  password?: string;
-  dbName: string;
-}
+import { ApiResponse, DbConnectionData } from '..';
 
 @Injectable({
   providedIn: 'root'

@@ -3,11 +3,10 @@ import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { skip, tap } from 'rxjs';
-import { NotifyService } from 'src/app/shared';
+import { NotifyService, SiteGroupService } from 'src/app/shared';
 import { PortalItem, PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
-import { SiteGroupService } from 'src/app/shared/services/site-group.service';
 
 @Component({
   selector: 'app-portal-edit-basic',

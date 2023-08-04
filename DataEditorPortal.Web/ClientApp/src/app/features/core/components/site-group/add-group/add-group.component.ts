@@ -13,10 +13,12 @@ import {
 } from '@angular/forms';
 import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
-import { NotifyService } from 'src/app/shared';
-import { GroupDetail } from 'src/app/shared/models/site-group';
-import { GlobalLoadingService } from 'src/app/shared/services/global-loading.service';
-import { SiteGroupService } from 'src/app/shared/services/site-group.service';
+import {
+  GlobalLoadingService,
+  GroupDetail,
+  NotifyService,
+  SiteGroupService
+} from 'src/app/shared';
 
 @Component({
   selector: 'app-add-group',

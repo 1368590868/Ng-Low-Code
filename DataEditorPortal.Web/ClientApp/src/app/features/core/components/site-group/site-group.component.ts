@@ -5,11 +5,11 @@ import {
   NotifyService,
   PaginationEvent,
   SortMetaEvent,
-  GridParam
+  GridParam,
+  GroupData,
+  SiteGroupService
 } from 'src/app/shared';
-import { SiteGroupService } from 'src/app/shared/services/site-group.service';
 import { AddGroupComponent } from './add-group/add-group.component';
-import { GroupData } from 'src/app/shared/models/site-group';
 
 @Component({
   selector: 'app-site-group',

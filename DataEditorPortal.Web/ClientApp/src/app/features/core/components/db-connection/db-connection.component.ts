@@ -1,12 +1,14 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { MenuItem, ConfirmationService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { DictionaryData, NotifyService, PaginationEvent } from 'src/app/shared';
-import { AddConnectionDialogComponent } from './add-connection-dialog/add-connection-dialog.component';
 import {
   DbConnectionData,
-  DbConnectionService
-} from 'src/app/shared/services/db-connection.service ';
+  DbConnectionService,
+  DictionaryData,
+  NotifyService,
+  PaginationEvent
+} from 'src/app/shared';
+import { AddConnectionDialogComponent } from './add-connection-dialog/add-connection-dialog.component';
 
 @Component({
   selector: 'app-db-connection',
