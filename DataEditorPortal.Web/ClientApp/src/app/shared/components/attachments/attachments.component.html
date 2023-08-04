@@ -1,26 +1,25 @@
-<div class="inline-flex align-items-start flex-column overflow-hidden">
-  <ng-container *ngIf="showAll">
-    <table class="p-datatable-table attachment-table">
-      <tbody class="p-datatable-tbody">
-        <tr *ngFor="let file of fileList" style="background-color: #fff">
-          <td style="width: 30%">
-            <a
-              class="no-underline cursor-pointer text-primary flex flex-shrink-0 overflow-hidden text-overflow-ellipsis max-w-full"
-              (click)="onAttachmentClick(file)"
-              href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
-                fieldName
-              }}/{{ file.fileId }}/{{ file.fileName || '' }}"
-              target="_blank"
-              >{{ file.fileName }}</a
-            >
-          </td>
-          <td style="width: 70%">
-            {{ file.comments }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </ng-container>
+<ng-container *ngIf="showAll">
+  <div *ngFor="let file of fileList" class="flex attachment-row w-full">
+    <div
+      class="overflow-hidden"
+      [style]="{ flex: file.comments ? '0 0 40%' : '1' }">
+      <a
+        class="no-underline cursor-pointer text-primary max-w-full inline-block"
+        (click)="onAttachmentClick(file)"
+        href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
+          fieldName
+        }}/{{ file.fileId }}/{{ file.fileName || '' }}"
+        target="_blank"
+        >{{ file.fileName }}</a
+      >
+    </div>
+    <div class="ml-3">
+      {{ file.comments }}
+    </div>
+  </div>
+</ng-container>
+
+<ng-container class="inline-flex align-items-start flex-column overflow-hidden">
   <ng-container *ngIf="!showAll && fileList.length === 1">
     <a
       class="no-underline cursor-pointer text-primary overflow-hidden text-overflow-ellipsis max-w-full"
@@ -40,4 +39,4 @@
       {{ fileList.length }} attachments
     </span>
   </ng-container>
-</div>
+</ng-container>

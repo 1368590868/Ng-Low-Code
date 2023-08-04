@@ -1,7 +1,13 @@
-.attachment-table {
-  tr:last-child {
-    td {
-      border-bottom: 0;
-    }
+.attachment-row {
+  border-bottom: 1px solid var(--surface-c);
+  padding: 0.625rem 0;
+
+  &:last-child {
+    border-bottom: 0;
+    padding: 0.625rem 0 0 0;
+  }
+
+  a {
+    word-break: break-all;
   }
 }
