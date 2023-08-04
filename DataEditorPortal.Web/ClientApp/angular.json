@@ -49,7 +49,14 @@
               "node_modules/quill/dist/quill.snow.css"
             ],
             "scripts": ["node_modules/quill/dist/quill.min.js"],
-            "allowedCommonJsDependencies": ["qs", "quill", "pluralize"]
+            "allowedCommonJsDependencies": [
+              "qs",
+              "quill",
+              "pluralize",
+              "numeral",
+              "quill-blot-formatter",
+              "quill-toggle-fullscreen-button"
+            ]
           },
           "configurations": {
             "production": {
