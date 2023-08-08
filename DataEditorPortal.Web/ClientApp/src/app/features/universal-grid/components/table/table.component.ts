@@ -179,13 +179,13 @@ export class TableComponent implements OnInit, OnDestroy {
               this.searchModel = model;
               this.first = 0;
               this.rows = this.tableConfig.pageSize || 100;
+              this.selection = [];
+              this.clearHighlighted();
+              this.defaultFilter = [];
               this.fetchData();
             } else {
               this.resetAndClear();
             }
-          }),
-          tap(() => {
-            this.defaultFilter = [];
           }),
           takeUntil(this.destroy$)
         )
@@ -560,6 +560,12 @@ export class TableComponent implements OnInit, OnDestroy {
 
     this.setHighlightFilter();
     this.fetchData();
+    if (!this.showHighlightOnly) {
+      this.gridTableService
+        .getHighlightLinkedData(this.gridName, this.table2Id)
+        .pipe(tap(res => this.setHightlightRow(res)))
+        .subscribe();
+    }
   }
 
   setHighlightFilter() {
@@ -578,9 +584,9 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   setHightlightRow(linkedTable1Ids?: any[]) {
-    if (this.table2Id)
+    if (this.table2Id) {
       if (linkedTable1Ids) this.linkedTable1Ids = linkedTable1Ids;
-      else this.linkedTable1Ids = [];
+    } else this.linkedTable1Ids = [];
     // if (!this.showHighlightOnly) {
     this.records = this.records.map(data => {
       data['linked_highlighted'] = this.linkedTable1Ids.find(
