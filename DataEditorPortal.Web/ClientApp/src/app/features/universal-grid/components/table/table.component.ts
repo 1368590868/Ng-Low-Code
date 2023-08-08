@@ -354,11 +354,14 @@ export class TableComponent implements OnInit, OnDestroy {
           this.firstLoadDone = true;
         }),
         tap(res => {
-          this.showHighlightOnly
-            ? this.setHightlightRow(
-                res.data.map(data => data[this.tableConfig.dataKey])
-              )
-            : this.setHightlightRow();
+          if (this.table2Id) {
+            // if table2Id is set, need to reset hightlight row after data refresh
+            this.showHighlightOnly
+              ? this.setHightlightRow(
+                  res.data.map(data => data[this.tableConfig.dataKey])
+                )
+              : this.setHightlightRow(this.linkedTable1Ids);
+          }
         }),
         finalize(() => {
           this.loading = false;
@@ -521,11 +524,11 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   // linked features
-  table2Id?: any;
-  linkedTable1Ids: any[] = [];
+  table2Id: any | undefined;
+  linkedTable1Ids: any[] | undefined;
   clearHighlighted() {
     this.table2Id = undefined;
-    this.linkedTable1Ids = [];
+    this.linkedTable1Ids = undefined;
     this.records = this.records.map(data => {
       data['linked_highlighted'] = '';
       return data;
@@ -586,19 +589,19 @@ export class TableComponent implements OnInit, OnDestroy {
     }
   }
 
-  setHightlightRow(linkedTable1Ids?: any[]) {
-    if (this.table2Id) {
-      if (linkedTable1Ids) this.linkedTable1Ids = linkedTable1Ids;
-    } else this.linkedTable1Ids = [];
-    // if (!this.showHighlightOnly) {
-    this.records = this.records.map(data => {
-      data['linked_highlighted'] = this.linkedTable1Ids.find(
-        x => data[this.tableConfig.dataKey] === x
-      )
-        ? 'highlighted'
-        : '';
-      return data;
-    });
+  setHightlightRow(linkedTable1Ids: any[] | undefined) {
+    this.linkedTable1Ids = linkedTable1Ids;
+
+    if (this.linkedTable1Ids) {
+      this.records = this.records.map(data => {
+        data['linked_highlighted'] = this.linkedTable1Ids?.find(
+          x => data[this.tableConfig.dataKey] === x
+        )
+          ? 'highlighted'
+          : '';
+        return data;
+      });
+    }
   }
 
   // column state, order, width, visiblity
