@@ -34,6 +34,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DomHandler } from 'primeng/dom';
 import { UrlParamsService } from '../../services/url-params.service';
 import * as pluralize from 'pluralize';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-table',
@@ -49,6 +50,8 @@ export class TableComponent implements OnInit, OnDestroy {
   @Output() rowSelect = new EventEmitter<any>();
   @Output() rowUnselect = new EventEmitter<any>();
   @Output() resetData = new EventEmitter<any>();
+
+  isShowHighlight = false;
 
   destroy$ = new Subject();
 
@@ -107,16 +110,25 @@ export class TableComponent implements OnInit, OnDestroy {
   // default filter
   defaultFilter: GridFilterParam[] = [];
 
+  // Item Type
+  itemType = '';
+
   constructor(
     private gridTableService: GridTableService,
     private userService: UserService,
     private domSanitizer: DomSanitizer,
     private confirmationService: ConfirmationService,
     private urlParamsService: UrlParamsService,
-    private systemLogService: SystemLogService
+    private systemLogService: SystemLogService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    // get item type from route
+    this.route.data.pipe(takeUntil(this.destroy$)).subscribe(data => {
+      this.itemType = data['type'];
+    });
+
     // this.reset();
     this.stateKey = `universal-grid-state-${this.gridName}`;
 
@@ -171,6 +183,9 @@ export class TableComponent implements OnInit, OnDestroy {
             } else {
               this.resetAndClear();
             }
+          }),
+          tap(() => {
+            this.defaultFilter = [];
           }),
           takeUntil(this.destroy$)
         )
@@ -338,12 +353,42 @@ export class TableComponent implements OnInit, OnDestroy {
           }
           this.firstLoadDone = true;
         }),
-        tap(() => this.highlightLinkedData(this.table2Id)),
+        tap(() => {
+          if (!this.isShowHighlight) {
+            this.highlightLinkedData(this.table2Id);
+          } else {
+            if (this.table2Id) {
+              this.records = this.records.map(data => {
+                data['linked_highlighted'] = 'highlighted';
+                return data;
+              });
+            }
+          }
+        }),
         finalize(() => {
           this.loading = false;
         })
       )
       .subscribe();
+  }
+
+  onlyShowHighlight(isClick = false) {
+    if (isClick) this.isShowHighlight = !this.isShowHighlight;
+
+    if (this.isShowHighlight) {
+      if (this.table2Id) {
+        this.defaultFilter = [
+          {
+            field: 'LINK_DATA_FIELD',
+            matchMode: 'in',
+            value: this.table2Id
+          }
+        ];
+      }
+    } else {
+      this.defaultFilter = [];
+    }
+    this.fetchData();
   }
 
   getFetchParam() {
@@ -526,6 +571,14 @@ export class TableComponent implements OnInit, OnDestroy {
               )
                 ? 'highlighted'
                 : '';
+
+              //On highlight  filter
+              if (this.isShowHighlight) {
+                this.onlyShowHighlight();
+              } else {
+                this.defaultFilter = [];
+              }
+
               return data;
             });
           })

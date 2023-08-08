@@ -79,6 +79,18 @@
                 >{{ selectedRecords.length }} row(s) selected</strong
               >
             </div>
+
+            <p-button
+              *ngIf="itemType === 'linked'"
+              pTooltip="Reset the sorts and filters"
+              tooltipPosition="left"
+              [styleClass]="
+                isShowHighlight
+                  ? 'p-button-rounded mr-1'
+                  : 'p-button-rounded p-button-outlined mr-1'
+              "
+              icon="pi pi-filter text-lg"
+              (onClick)="onlyShowHighlight(true)"></p-button>
             <p-button
               pTooltip="Reset the sorts and filters"
               tooltipPosition="left"
