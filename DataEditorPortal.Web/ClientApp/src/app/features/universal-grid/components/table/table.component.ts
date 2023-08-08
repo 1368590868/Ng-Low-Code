@@ -51,7 +51,7 @@ export class TableComponent implements OnInit, OnDestroy {
   @Output() rowUnselect = new EventEmitter<any>();
   @Output() resetData = new EventEmitter<any>();
 
-  isShowHighlight = false;
+  showHighlightOnly = false;
 
   destroy$ = new Subject();
 
@@ -353,42 +353,18 @@ export class TableComponent implements OnInit, OnDestroy {
           }
           this.firstLoadDone = true;
         }),
-        tap(() => {
-          if (!this.isShowHighlight) {
-            this.highlightLinkedData(this.table2Id);
-          } else {
-            if (this.table2Id) {
-              this.records = this.records.map(data => {
-                data['linked_highlighted'] = 'highlighted';
-                return data;
-              });
-            }
-          }
+        tap(res => {
+          this.showHighlightOnly
+            ? this.setHightlightRow(
+                res.data.map(data => data[this.tableConfig.dataKey])
+              )
+            : this.setHightlightRow();
         }),
         finalize(() => {
           this.loading = false;
         })
       )
       .subscribe();
-  }
-
-  onlyShowHighlight(isClick = false) {
-    if (isClick) this.isShowHighlight = !this.isShowHighlight;
-
-    if (this.isShowHighlight) {
-      if (this.table2Id) {
-        this.defaultFilter = [
-          {
-            field: 'LINK_DATA_FIELD',
-            matchMode: 'in',
-            value: this.table2Id
-          }
-        ];
-      }
-    } else {
-      this.defaultFilter = [];
-    }
-    this.fetchData();
   }
 
   getFetchParam() {
@@ -543,8 +519,10 @@ export class TableComponent implements OnInit, OnDestroy {
 
   // linked features
   table2Id?: any;
+  linkedTable1Ids: any[] = [];
   clearHighlighted() {
     this.table2Id = undefined;
+    this.linkedTable1Ids = [];
     this.records = this.records.map(data => {
       data['linked_highlighted'] = '';
       return data;
@@ -561,30 +539,57 @@ export class TableComponent implements OnInit, OnDestroy {
       });
 
       this.selection = [];
-      this.gridTableService
-        .getHighlightLinkedData(this.gridName, table2Id)
-        .pipe(
-          tap(res => {
-            this.records = this.records.map(data => {
-              data['linked_highlighted'] = res.find(
-                x => data[this.tableConfig.dataKey] === x
-              )
-                ? 'highlighted'
-                : '';
 
-              //On highlight  filter
-              if (this.isShowHighlight) {
-                this.onlyShowHighlight();
-              } else {
-                this.defaultFilter = [];
-              }
-
-              return data;
-            });
-          })
-        )
-        .subscribe();
+      if (this.showHighlightOnly) {
+        // set filter by linked data and reload data
+        this.setHighlightFilter();
+        this.fetchData();
+      } else {
+        // reset default filter and load linked data only
+        this.defaultFilter = [];
+        this.gridTableService
+          .getHighlightLinkedData(this.gridName, table2Id)
+          .pipe(tap(res => this.setHightlightRow(res)))
+          .subscribe();
+      }
     }
+  }
+
+  onShowHighlightOnlyClick() {
+    this.showHighlightOnly = !this.showHighlightOnly;
+
+    this.setHighlightFilter();
+    this.fetchData();
+  }
+
+  setHighlightFilter() {
+    if (this.showHighlightOnly && this.table2Id) {
+      // set filter by linked data only when table2 has value
+      this.defaultFilter = [
+        {
+          field: 'LINK_DATA_FIELD',
+          matchMode: 'in',
+          value: this.table2Id
+        }
+      ];
+    } else {
+      this.defaultFilter = [];
+    }
+  }
+
+  setHightlightRow(linkedTable1Ids?: any[]) {
+    if (this.table2Id)
+      if (linkedTable1Ids) this.linkedTable1Ids = linkedTable1Ids;
+      else this.linkedTable1Ids = [];
+    // if (!this.showHighlightOnly) {
+    this.records = this.records.map(data => {
+      data['linked_highlighted'] = this.linkedTable1Ids.find(
+        x => data[this.tableConfig.dataKey] === x
+      )
+        ? 'highlighted'
+        : '';
+      return data;
+    });
   }
 
   // column state, order, width, visiblity

@@ -81,16 +81,16 @@
             </div>
 
             <p-button
-              *ngIf="itemType === 'linked'"
+              *ngIf="itemType === 'linked' && table2Id"
               pTooltip="View Linked Item(s) Only"
               tooltipPosition="left"
               [styleClass]="
-                isShowHighlight
+                showHighlightOnly
                   ? 'p-button-rounded mr-1'
                   : 'p-button-rounded p-button-outlined mr-1'
               "
-              icon="pi pi-filter text-lg"
-              (onClick)="onlyShowHighlight(true)"></p-button>
+              icon="pi pi-link text-lg"
+              (onClick)="onShowHighlightOnlyClick()"></p-button>
             <p-button
               pTooltip="Reset the sorts and filters"
               tooltipPosition="left"
