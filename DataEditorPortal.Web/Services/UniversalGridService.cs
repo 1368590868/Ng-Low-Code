@@ -339,7 +339,7 @@ namespace DataEditorPortal.Web.Services
                     {
                         filter.field = dataSourceConfig.IdColumn;
                         filter.matchMode = "in";
-                        filter.value = GetLinkedDataIdsForList(name, filter.value.ToString());
+                        filter.value = GetLinkedDataIdsForList(name, filter.value.ToString()).ToList();
                     }
                 });
             }

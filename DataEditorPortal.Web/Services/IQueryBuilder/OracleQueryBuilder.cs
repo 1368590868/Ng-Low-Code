@@ -72,6 +72,8 @@ namespace DataEditorPortal.Web.Services
                 {
                     if (jsonElement.EnumerateArray().ToList().Count > 0)
                         clause = $"{field} IN {parameter}";
+                    else
+                        clause = $"1=2";
                 }
                 else if (jsonElement.ValueKind == JsonValueKind.String)
                 {

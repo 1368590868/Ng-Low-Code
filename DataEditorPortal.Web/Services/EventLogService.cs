@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Services
@@ -88,7 +89,7 @@ namespace DataEditorPortal.Web.Services
                     EventTime = DateTime.UtcNow,
                     Username = CurrentUsername,
                     Details = details,
-                    Params = param != null ? JsonSerializer.Serialize(param, new JsonSerializerOptions() { WriteIndented = true }) : "",
+                    Params = param != null ? JsonSerializer.Serialize(param, new JsonSerializerOptions() { WriteIndented = true, Converters = { new ByteArrayToStringConverter() } }) : "",
                     Result = result,
                     Connection = connection != null ? Regex.Replace(connection, pattern, replacement, RegexOptions.IgnoreCase) : ""
                 });
@@ -97,6 +98,27 @@ namespace DataEditorPortal.Web.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
+            }
+        }
+
+        // in order to handle byte[] and byte[16] (RAW(16) GUID in oracle)
+        class ByteArrayToStringConverter : JsonConverter<byte[]>
+        {
+            public override byte[] Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                throw new NotSupportedException();
+            }
+
+            public override void Write(Utf8JsonWriter writer, byte[] value, JsonSerializerOptions options)
+            {
+                if (value.Length == 16)
+                {
+                    writer.WriteStringValue(Convert.ToHexString(value));
+                }
+                else
+                {
+                    writer.WriteStringValue("... FILE BYTES ...");
+                }
             }
         }
     }

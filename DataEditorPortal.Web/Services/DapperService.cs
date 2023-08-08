@@ -183,16 +183,12 @@ namespace DataEditorPortal.Web.Services
         {
             if (param is DynamicParameters dp)
             {
+                // param is dynamic parameters, convert it to key value pairs
                 Dictionary<string, object> keyValuePairs = new Dictionary<string, object>();
                 foreach (var key in dp.ParameterNames)
                 {
                     var value = ((SqlMapper.IParameterLookup)dp)[key];
-                    if (value != null && value.GetType() == typeof(byte[]))
-                    {
-                        keyValuePairs.Add(key, "... FILE BYTES ...");
-                    }
-                    else
-                        keyValuePairs.Add(key, value);
+                    keyValuePairs.Add(key, value);
                 }
                 return keyValuePairs;
             }
@@ -206,7 +202,10 @@ namespace DataEditorPortal.Web.Services
                 return keyValuePairList;
             }
             else
+            {
+                // param is dynamic object
                 return param;
+            }
         }
     }
 }
