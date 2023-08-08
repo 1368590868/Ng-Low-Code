@@ -459,6 +459,9 @@ export class TableComponent implements OnInit, OnDestroy {
     this.searchModel = undefined;
     this.first = 0;
     this.rows = this.tableConfig.pageSize || 100;
+    this.clearHighlighted();
+    this.defaultFilter = [];
+    this.showHighlightOnly = false;
     this.fetchDataParam = this.getFetchParam();
     this.records = [];
     this.totalRecords = 0;
