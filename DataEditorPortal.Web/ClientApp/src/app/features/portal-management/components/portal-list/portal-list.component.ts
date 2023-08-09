@@ -119,21 +119,6 @@ export class PortalListComponent implements OnInit {
           });
         }
       });
-      items.push({
-        label: 'Export',
-        icon: 'pi pi-fw pi-file-export',
-        command: () => this.export(row)
-      });
-      if (row['configCompleted'] && row['itemType'] !== 'linked') {
-        items.push({
-          label: 'Config Actions',
-          icon: 'pi pi-fw pi-th-large',
-          command: () => {
-            this.customActions.portalItemId = row['id'];
-            this.customActions.showDialog();
-          }
-        });
-      }
     } else if (row['type'] === 'System' || row['type'] === 'External') {
       items.push({
         label: 'Edit',
@@ -285,6 +270,33 @@ export class PortalListComponent implements OnInit {
       });
     }
 
+    // Portal Item Actions
+    if (row['type'] === 'Portal Item') {
+      items.push({
+        separator: true
+      });
+      items.push({
+        label: 'Export',
+        icon: 'pi pi-fw pi-file-export',
+        command: () => this.export(row)
+      });
+      items.push({
+        label: 'Copy',
+        icon: 'pi pi-fw pi-copy',
+        command: () => this.copy(row)
+      });
+      if (row['configCompleted'] && row['itemType'] !== 'linked') {
+        items.push({
+          label: 'Config Actions',
+          icon: 'pi pi-fw pi-th-large',
+          command: () => {
+            this.customActions.portalItemId = row['id'];
+            this.customActions.showDialog();
+          }
+        });
+      }
+    }
+
     const hasChildren = rowNode.children && rowNode.children.length > 0;
     if (
       row['type'] !== 'System' &&
@@ -365,6 +377,18 @@ export class PortalListComponent implements OnInit {
         })
       )
       .subscribe();
+  }
+
+  copy(row: PortalItemData) {
+    this.portalItemService.copyPortalItem(row['id']).subscribe(res => {
+      if (res && res.code === 200) {
+        this.notifyService.notifySuccess(
+          'Success',
+          'Copy Successfully Completed.'
+        );
+        this.getPortalList();
+      }
+    });
   }
 
   export(row: PortalItemData) {

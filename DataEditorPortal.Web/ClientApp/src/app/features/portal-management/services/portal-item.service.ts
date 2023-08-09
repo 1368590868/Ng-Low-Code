@@ -217,6 +217,12 @@ export class PortalItemService {
       .pipe(tap(() => this.refreshMenu()));
   }
 
+  copyPortalItem(id: string): Observable<ApiResponse<boolean>> {
+    return this.http
+      .post<ApiResponse<boolean>>(`${this._apiUrl}portal-item/${id}/copy`, null)
+      .pipe(tap(() => this.refreshMenu()));
+  }
+
   // datasource
   getDataSourceConnections(): Observable<DataSourceConnection[]> {
     return this.http
