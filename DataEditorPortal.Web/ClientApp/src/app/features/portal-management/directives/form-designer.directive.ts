@@ -300,8 +300,10 @@ export class FormDesignerDirective {
             {
               key: 'fileLimit',
               type: 'inputNumber',
-              defaultValue: 1,
+              defaultValue: 0,
               props: {
+                min: 0,
+                max: 99,
                 label: 'File Limit',
                 description: 'Maximum number of files that can be uploaded.',
                 placeholder: 'Maximum number of files that can be uploaded.'

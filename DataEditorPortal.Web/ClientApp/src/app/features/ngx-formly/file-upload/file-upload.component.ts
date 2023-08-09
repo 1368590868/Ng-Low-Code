@@ -237,7 +237,7 @@ export class FileUploadComponent implements ControlValueAccessor {
     [maxFileSize]="props.maxFileSize"
     [chooseLabel]="props.chooseLabel || 'Browse'"
     [multiple]="props.multiple"
-    [fileLimit]="props.fileLimit"
+    [fileLimit]="props.fileLimit ?? 0"
     [gridName]="props.gridName"
     [fieldName]="field.key"></app-file-upload>`,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -251,7 +251,7 @@ export class FormlyFieldFileUploadComponent
         maxFileSize: number;
         chooseLabel: string;
         multiple: boolean;
-        fileLimit: number;
+        fileLimit?: number;
         gridName: string;
         fieldName: any;
       }
