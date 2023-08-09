@@ -17,7 +17,7 @@ import { AddPortalDialogComponent } from './add-portal-dialog/add-portal-dialog.
   providers: [ConfirmationService]
 })
 export class PortalListComponent implements OnInit {
-  data!: PortalItem[];
+  data: PortalItem[] = [];
   addNewMenuModels: MenuItem[] = [
     {
       label: 'Create Folder',
@@ -320,7 +320,13 @@ export class PortalListComponent implements OnInit {
       .getPortalList()
       .pipe(
         tap(res => {
-          res.forEach(x => (x.expanded = false));
+          res.forEach(x => {
+            const exist = this.data.find(
+              m => m.data?.['id'] === x.data?.['id']
+            );
+            if (exist) x.expanded = exist.expanded;
+            else x.expanded = false;
+          });
           this.data = res;
         })
       )
