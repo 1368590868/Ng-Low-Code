@@ -17,6 +17,8 @@ namespace DataEditorPortal.Web.Common.MapperProfiles
                 .ForMember(d => d.Parent, opt => opt.Ignore()); ;
             CreateMap<UniversalGridConfiguration, UniversalGridConfiguration>()
                 .ForMember(d => d.DataSourceConnection, opt => opt.Ignore());
+            CreateMap<Lookup, Lookup>()
+                .ForMember(d => d.DataSourceConnection, opt => opt.Ignore());
         }
     }
 }

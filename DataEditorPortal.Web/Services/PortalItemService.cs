@@ -33,6 +33,8 @@ namespace DataEditorPortal.Web.Services
         bool ExistName(string name, Guid? id);
         Guid Create(PortalItemData model);
         Guid Update(Guid id, PortalItemData model);
+
+        bool Copy(Guid id);
         bool Delete(Guid id);
         List<DataSourceTable> GetDataSourceTables(string connectionName);
         List<DataSourceTableColumn> GetDataSourceTableColumns(string connectionName, string sqlText);
@@ -247,15 +249,25 @@ namespace DataEditorPortal.Web.Services
                     lookups.ForEach(l => _depDbContext.Lookups.Remove(l));
 
                     // remove permission
-                    var types = new List<string>();
-                    if (config.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
-                    if (config.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
-                    if (config.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
+                    var types = GetPermissionTypes(config);
 
                     // get old permissions
                     var oldPermissionNames = types.Select(t => $"{t}_{ config.Name.Replace("-", "_") }".ToUpper());
                     var permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
-                    permissions.ForEach(p => _depDbContext.SitePermissions.Remove(p));
+                    permissions.ForEach(p =>
+                    {
+                        _depDbContext.UserPermissions
+                           .Where(up => up.PermissionGrantId == p.Id)
+                           .ToList()
+                           .ForEach(up => _depDbContext.UserPermissions.Remove(up));
+
+                        _depDbContext.SiteRolePermissions
+                           .Where(srp => srp.SitePermissionId == p.Id)
+                           .ToList()
+                           .ForEach(srp => _depDbContext.SiteRolePermissions.Remove(srp));
+
+                        _depDbContext.SitePermissions.Remove(p);
+                    });
 
                     // remove saved searches
                     var searches = _depDbContext.SavedSearches.Where(x => x.UniversalGridConfigurationId == config.Id).ToList();
@@ -274,12 +286,173 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
+        public bool Copy(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.Include(x => x.SiteGroups).FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new DepException("Not Found", 404);
+            }
+
+            var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
+            var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+            var allNames = _depDbContext.SiteMenus.Select(m => new SiteMenu() { Name = m.Name, Label = m.Label }).ToList();
+
+            var siteMenuCopy = _mapper.Map<SiteMenu>(siteMenu);
+            siteMenuCopy.Id = Guid.NewGuid();
+            siteMenuCopy.Order = _depDbContext.SiteMenus
+                .Where(x => x.ParentId == siteMenuCopy.ParentId)
+                .OrderByDescending(x => x.Order)
+                .Select(x => x.Order)
+                .FirstOrDefault() + 1;
+
+            CopyInternal(siteMenu, siteMenuCopy, userId, allNames);
+
+            _depDbContext.SaveChanges();
+
+            return true;
+        }
+
+        public void CopyInternal(SiteMenu siteMenuSource, SiteMenu siteMenuCopy, Guid userId, List<SiteMenu> allNames)
+        {
+            if (siteMenuSource == null) return;
+
+            #region find unique label and name
+
+            var tempName = $"{siteMenuSource.Name}-copy";
+            var dup = 0;
+            while (allNames.Any(m => m.Name == tempName))
+            {
+                dup++;
+                tempName = $"{siteMenuSource.Name}-copy-{dup}";
+            }
+            var tempLabel = $"{siteMenuSource.Label} - Copy";
+            dup = 0;
+            while (allNames.Any(m => m.Label == tempLabel))
+            {
+                dup++;
+                tempLabel = $"{siteMenuSource.Label} - Copy {dup}";
+            }
+            allNames.Add(new SiteMenu() { Name = tempName, Label = tempLabel });
+
+            #endregion
+
+            #region clone site menu
+
+            siteMenuCopy.Name = tempName;
+            siteMenuCopy.Label = tempLabel;
+            _depDbContext.SiteMenus.Add(siteMenuCopy);
+
+            #endregion
+
+            #region clone grid config
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenuSource.Name);
+            if (config == null) throw new DepException("No Grid configration for this portal item.");
+
+            var configCopy = _mapper.Map<UniversalGridConfiguration>(config);
+            configCopy.Id = Guid.NewGuid();
+            configCopy.Name = tempName;
+            configCopy.CreatedBy = userId;
+            configCopy.CreatedDate = DateTime.UtcNow;
+            _depDbContext.UniversalGridConfigurations.Add(configCopy);
+
+            #region clone lookups
+
+            var lookups = _depDbContext.Lookups.Where(x => x.UniversalGridConfigurationId == config.Id).ToList();
+            foreach (var lookup in lookups)
+            {
+                var lookupCopy = _mapper.Map<Lookup>(lookup);
+                lookupCopy.Id = Guid.NewGuid();
+                lookupCopy.UniversalGridConfigurationId = configCopy.Id;
+
+                _depDbContext.Lookups.Add(lookupCopy);
+
+                configCopy.SearchConfig = configCopy.SearchConfig.Replace(lookup.Id.ToString(), lookupCopy.Id.ToString());
+                configCopy.DetailConfig = configCopy.DetailConfig.Replace(lookup.Id.ToString(), lookupCopy.Id.ToString());
+            }
+
+            #endregion
+
+            #region create and sync permissions
+
+            var types = GetPermissionTypes(config);
+
+            // get old permissions
+            var permissionNames = types.Select(t => $"{t}_{ config.Name.Replace("-", "_") }".ToUpper());
+            var permissions = _depDbContext.SitePermissions.Where(x => permissionNames.Contains(x.PermissionName)).ToList();
+
+            types.ForEach(t =>
+            {
+                var permissionCopy = new SitePermission() { Id = Guid.NewGuid() };
+                permissionCopy.Category = $"Portal Item: { siteMenuCopy.Label }";
+                permissionCopy.PermissionName = $"{t}_{ siteMenuCopy.Name.Replace("-", "_") }".ToUpper();
+                permissionCopy.PermissionDescription = $"{t} { siteMenuCopy.Label }";
+                _depDbContext.Add(permissionCopy);
+
+                // find the source permission and check if it is assigned to a user or role
+                // if yes, assign the cloned one to user or role
+                var permissionName = $"{t}_{ config.Name.Replace("-", "_") }".ToUpper();
+                var permission = permissions.FirstOrDefault(p => p.PermissionName == permissionName);
+                if (permission != null)
+                {
+                    _depDbContext.UserPermissions
+                       .Where(up => up.PermissionGrantId == permission.Id)
+                       .ToList()
+                       .ForEach(up =>
+                       {
+                           _depDbContext.UserPermissions.Add(new UserPermission()
+                           {
+                               GrantType = up.GrantType,
+                               UserId = up.UserId,
+                               CreatedBy = userId,
+                               CreatedDate = DateTime.UtcNow,
+                               PermissionGrantId = permissionCopy.Id
+                           });
+                       });
+
+                    _depDbContext.SiteRolePermissions
+                       .Where(srp => srp.SitePermissionId == permission.Id)
+                       .ToList()
+                       .ForEach(srp =>
+                       {
+                           _depDbContext.SiteRolePermissions.Add(new SiteRolePermission()
+                           {
+                               SiteRoleId = srp.SiteRoleId,
+                               CreatedBy = userId,
+                               CreatedDate = DateTime.UtcNow,
+                               SitePermissionId = permissionCopy.Id
+                           });
+                       });
+                }
+            });
+
+            #endregion
+
+
+            #endregion
+
+            // clone children
+            var childrenMenus = _depDbContext.SiteMenus.Where(x => x.ParentId == siteMenuSource.Id).OrderBy(x => x.Order).ToList();
+            childrenMenus.ForEach(m =>
+            {
+                var mCopy = _mapper.Map<SiteMenu>(m);
+                mCopy.Id = Guid.NewGuid();
+                mCopy.ParentId = siteMenuCopy.Id;
+
+                CopyInternal(m, mCopy, userId, allNames);
+
+                // update linked datasource
+                if (configCopy.ItemType == GridItemType.LINKED)
+                {
+                    configCopy.DataSourceConfig = configCopy.DataSourceConfig.Replace(m.Id.ToString(), mCopy.Id.ToString());
+                }
+            });
+        }
+
         private void CreateOrUpdatePermission(SiteMenu siteMenu, UniversalGridConfiguration config, string oldMenuName = null)
         {
-            var types = new List<string>();
-            if (config.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
-            if (config.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
-            if (config.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
+            var types = GetPermissionTypes(config);
 
             List<SitePermission> permissions = new List<SitePermission>();
             if (!string.IsNullOrEmpty(oldMenuName))
@@ -307,6 +480,16 @@ namespace DataEditorPortal.Web.Services
                 permission.PermissionName = $"{t}_{ siteMenu.Name.Replace("-", "_") }".ToUpper();
                 permission.PermissionDescription = $"{t} { siteMenu.Label }";
             });
+        }
+
+        private List<string> GetPermissionTypes(UniversalGridConfiguration config)
+        {
+            var types = new List<string>();
+            if (config.ItemType == GridItemType.SINGLE) types = new List<string> { "View", "Add", "Edit", "Delete", "Export" };
+            if (config.ItemType == GridItemType.LINKED_SINGLE) types = new List<string> { "Add", "Edit", "Delete", "Export" };
+            if (config.ItemType == GridItemType.LINKED) types = new List<string> { "View" };
+
+            return types;
         }
 
         public List<DataSourceTable> GetDataSourceTables(string name)
@@ -1005,7 +1188,7 @@ namespace DataEditorPortal.Web.Services
                         while (allNames.Any(n => n.Id != siteMenu.Id && n.Name == tempName))
                         {
                             dup++;
-                            tempName = $"{tempName}-{dup}";
+                            tempName = $"{GetCodeName(siteMenu.Name)}-{dup}";
                         }
                         allNames.Add(new { Id = siteMenu.Id, Name = tempName });
 
