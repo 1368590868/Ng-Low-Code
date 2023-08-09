@@ -19,6 +19,7 @@ namespace DataEditorPortal.Web.Common.MapperProfiles
                 .ForMember(d => d.DataSourceConnection, opt => opt.Ignore());
             CreateMap<Lookup, Lookup>()
                 .ForMember(d => d.DataSourceConnection, opt => opt.Ignore());
+            CreateMap<SavedSearch, SavedSearch>();
         }
     }
 }

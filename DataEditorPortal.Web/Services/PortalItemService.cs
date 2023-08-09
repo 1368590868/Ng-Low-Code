@@ -283,6 +283,9 @@ namespace DataEditorPortal.Web.Services
 
                 // remove siteMenu
                 _depDbContext.SiteMenus.Remove(siteMenu);
+
+                // remove cache
+                RemoveGridCache(siteMenu.Name);
             }
         }
 
@@ -309,6 +312,20 @@ namespace DataEditorPortal.Web.Services
             CopyInternal(siteMenu, siteMenuCopy, userId, allNames);
 
             _depDbContext.SaveChanges();
+
+            // copy custom icon file
+            if (siteMenu.Icon != null && siteMenu.Icon.StartsWith("icons/"))
+            {
+                var destIcon = siteMenu.Icon.Replace(siteMenu.Id.ToString(), siteMenuCopy.Id.ToString());
+
+                var sourceIconFile = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data", $"{siteMenu.Icon}");
+                var destIconFile = Path.Combine(_hostEnvironment.ContentRootPath, "App_Data", $"{destIcon}");
+
+                File.Copy(sourceIconFile, destIconFile);
+
+                siteMenuCopy.Icon = destIcon;
+                _depDbContext.SaveChanges();
+            }
 
             return true;
         }
@@ -341,11 +358,14 @@ namespace DataEditorPortal.Web.Services
 
             siteMenuCopy.Name = tempName;
             siteMenuCopy.Label = tempLabel;
+            siteMenuCopy.Status = PortalItemStatus.Draft;
             _depDbContext.SiteMenus.Add(siteMenuCopy);
 
             #endregion
 
             #region clone grid config
+
+            RemoveGridCache(tempName);
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenuSource.Name);
             if (config == null) throw new DepException("No Grid configration for this portal item.");
@@ -370,6 +390,19 @@ namespace DataEditorPortal.Web.Services
 
                 configCopy.SearchConfig = configCopy.SearchConfig.Replace(lookup.Id.ToString(), lookupCopy.Id.ToString());
                 configCopy.DetailConfig = configCopy.DetailConfig.Replace(lookup.Id.ToString(), lookupCopy.Id.ToString());
+            }
+
+            #endregion
+
+            #region clone saved searches
+
+            var savedSearches = _depDbContext.SavedSearches.Where(x => x.UniversalGridConfigurationId == config.Id).ToList();
+            foreach (var search in savedSearches)
+            {
+                var searchCopy = _mapper.Map<SavedSearch>(search);
+                searchCopy.Id = Guid.NewGuid();
+                searchCopy.UniversalGridConfigurationId = configCopy.Id;
+                _depDbContext.SavedSearches.Add(searchCopy);
             }
 
             #endregion
