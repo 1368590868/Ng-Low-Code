@@ -32,8 +32,9 @@ export class GlobalLoadingService {
     if (!this.isStart) return;
     if (this.callback) clearTimeout(this.callback);
     const index = this.requestArr.findIndex(x => x === timestep);
-    if (index === -1) return;
-    this.requestArr.splice(index, 1);
+    if (index > -1) {
+      this.requestArr.splice(index, 1);
+    }
 
     this.callback = setTimeout(() => {
       if (this.requestArr.length === 0) {
