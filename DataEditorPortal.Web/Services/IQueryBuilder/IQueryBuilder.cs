@@ -70,7 +70,7 @@ namespace DataEditorPortal.Web.Services
             {
                 if (!string.IsNullOrEmpty(item.value.ToString()))
                 {
-                    var criteriaStr = GenerateCriteriaClause(item);
+                    var criteriaStr = GenerateCriteriaClause(item, false);
                     if (!string.IsNullOrEmpty(criteriaStr))
                         filters.Add(criteriaStr);
                 }
@@ -79,7 +79,7 @@ namespace DataEditorPortal.Web.Services
             return string.Join(" AND ", filters);
         }
 
-        protected abstract string GenerateCriteriaClause(FilterParam item);
+        protected abstract string GenerateCriteriaClause(FilterParam item, bool useParam = true);
 
         protected virtual string GenerateOrderClause(List<SortParam> sortParams)
         {
@@ -173,10 +173,20 @@ namespace DataEditorPortal.Web.Services
         {
             if (filterParams == null) filterParams = new List<FilterParam>();
 
-            var where = GenerateWhereClause(filterParams);
+            List<string> filters = new List<string>();
 
-            return where.Any()
-                ? query.Replace("##FILTERS##", $"({string.Join(" AND ", where)})")
+            foreach (var item in filterParams)
+            {
+                if (!string.IsNullOrEmpty(item.value.ToString()))
+                {
+                    var criteriaStr = GenerateCriteriaClause(item);
+                    if (!string.IsNullOrEmpty(criteriaStr))
+                        filters.Add(criteriaStr);
+                }
+            }
+
+            return filters.Any()
+                ? query.Replace("##FILTERS##", $"({string.Join(" AND ", filters)})")
                 : query.Replace("##FILTERS##", "1=1");
         }
 
@@ -382,29 +392,14 @@ namespace DataEditorPortal.Web.Services
 
         public virtual string GenerateSqlTextForColumnFilterOption(DataSourceConfig config)
         {
-            if (!string.IsNullOrEmpty(config.QueryText))
-            {
-                var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => EscapeColumnName(x))) : "*";
+            var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => EscapeColumnName(x))) : "*";
 
-                var queryText = GenerateSqlTextForList(config);
-                queryText = UseSearches(queryText);
-                queryText = UseFilters(queryText);
-                queryText = RemoveOrderBy(queryText, out var _);
+            var queryText = GenerateSqlTextForList(config);
+            queryText = UseSearches(queryText);
+            queryText = UseFilters(queryText);
+            queryText = RemoveOrderBy(queryText, out var _);
 
-                return $@"SELECT DISTINCT {columns} FROM ({queryText}) A";
-            }
-            else
-            {
-                var source = string.IsNullOrEmpty(config.TableName) ? config.TableName : $"{config.TableSchema}.{config.TableName}";
-
-                var columns = config.Columns.Count > 0 ? string.Join(",", config.Columns.Select(x => EscapeColumnName(x))) : "*";
-
-                var where = config.Filters.Count > 0 ? string.Join(" AND ", GenerateWhereClause(config.Filters)) : "1=1";
-
-                var queryText = $@"SELECT DISTINCT {columns} FROM {source} WHERE {where}";
-
-                return queryText;
-            }
+            return $@"SELECT DISTINCT {columns} FROM ({queryText}) A";
         }
 
         public virtual string GenerateSqlTextForExist(DataSourceConfig config)

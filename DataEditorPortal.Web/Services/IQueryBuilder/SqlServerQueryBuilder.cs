@@ -15,15 +15,17 @@ namespace DataEditorPortal.Web.Services
 
         #region Ultilities
 
-        protected override string GenerateCriteriaClause(FilterParam item)
+        protected override string GenerateCriteriaClause(FilterParam item, bool useParam = true)
         {
             string field = EscapeColumnName(item.field);
-            string parameter = $"{ParameterPrefix}{ParameterName(item.field)}_{item.index}";
+            string parameterOrValue = $"{ParameterPrefix}{ParameterName(item.field)}_{item.index}";
 
             string clause = string.Empty;
             if (!string.IsNullOrEmpty(item.whereClause))
             {
-                clause = item.whereClause.Replace("##VALUE##", parameter);
+                if (!useParam) throw new NotSupportedException("Values for custom search rule are not supported to use string format.");
+
+                clause = item.whereClause.Replace("##VALUE##", parameterOrValue);
             }
             else
             {
@@ -31,34 +33,38 @@ namespace DataEditorPortal.Web.Services
 
                 if (jsonElement.ValueKind == JsonValueKind.True || jsonElement.ValueKind == JsonValueKind.False)
                 {
-                    clause = $"{field} = {parameter}";
+                    if (!useParam) parameterOrValue = jsonElement.GetBoolean() ? "1" : "0";
+
+                    clause = $"{field} = {parameterOrValue}";
                 }
                 else if (jsonElement.ValueKind == JsonValueKind.Number)
                 {
+                    if (!useParam) parameterOrValue = jsonElement.GetDecimal().ToString();
+
                     switch (item.matchMode)
                     {
                         case "gt":
-                            clause = $"{field} > {parameter}";
+                            clause = $"{field} > {parameterOrValue}";
                             break;
 
                         case "lt":
-                            clause = $"{field} < {parameter}";
+                            clause = $"{field} < {parameterOrValue}";
                             break;
 
                         case "gte":
-                            clause = $"{field} >= {parameter}";
+                            clause = $"{field} >= {parameterOrValue}";
                             break;
 
                         case "lte":
-                            clause = $"{field} <= {parameter}";
+                            clause = $"{field} <= {parameterOrValue}";
                             break;
 
                         case "equals":
-                            clause = $"{field} = {parameter}";
+                            clause = $"{field} = {parameterOrValue}";
                             break;
 
                         case "notEquals":
-                            clause = $"{field} <> {parameter}";
+                            clause = $"{field} <> {parameterOrValue}";
                             break;
 
                         default:
@@ -67,53 +73,65 @@ namespace DataEditorPortal.Web.Services
                 }
                 else if (jsonElement.ValueKind == JsonValueKind.Array)
                 {
+                    if (!useParam) throw new NotSupportedException("Values of Array are not supported to use string format.");
+
                     if (jsonElement.EnumerateArray().ToList().Count > 0)
-                        clause = $"{field} IN {parameter}";
+                        clause = $"{field} IN {parameterOrValue}";
                     else
                         clause = $"1=2";
                 }
                 else if (jsonElement.ValueKind == JsonValueKind.String)
                 {
+                    if (!useParam)
+                    {
+                        if (item.matchMode.StartsWith("date"))
+                        {
+                            parameterOrValue = $"'{_utcLocalConverter.Converter.ConvertToProvider.Invoke(jsonElement.GetDateTime()):yyyy/MM/dd HH:mm:ss}'";
+                        }
+                        else
+                            parameterOrValue = $"'{jsonElement.GetString().Replace("'", "''")}'";
+                    }
+
                     switch (item.matchMode)
                     {
                         case "startsWith":
-                            clause = $"{field} LIKE {parameter} + '%'";
+                            clause = $"{field} LIKE {parameterOrValue} + '%'";
                             break;
 
                         case "contains":
-                            clause = $"{field} LIKE '%' + {parameter} + '%'";
+                            clause = $"{field} LIKE '%' + {parameterOrValue} + '%'";
                             break;
 
                         case "notContains":
-                            clause = $"{field} NOT LIKE '%' + {parameter} + '%'";
+                            clause = $"{field} NOT LIKE '%' + {parameterOrValue} + '%'";
                             break;
 
                         case "endsWith":
-                            clause = $"{field} LIKE '%' + {parameter}";
+                            clause = $"{field} LIKE '%' + {parameterOrValue}";
                             break;
 
                         case "equals":
-                            clause = $"{field} = {parameter}";
+                            clause = $"{field} = {parameterOrValue}";
                             break;
 
                         case "notEquals":
-                            clause = $"{field} <> {parameter}";
+                            clause = $"{field} <> {parameterOrValue}";
                             break;
 
                         case "dateIs":
-                            clause = $"{field} >= {parameter} AND {field} < DATEADD(DAY, 1, {parameter})";
+                            clause = $"{field} >= {parameterOrValue} AND {field} < DATEADD(DAY, 1, {parameterOrValue})";
                             break;
 
                         case "dateIsNot":
-                            clause = $"{field} < {parameter} AND {field} >= DATEADD(DAY, 1, {parameter})";
+                            clause = $"{field} < {parameterOrValue} AND {field} >= DATEADD(DAY, 1, {parameterOrValue})";
                             break;
 
                         case "dateBefore":
-                            clause = $"{field} < {parameter}";
+                            clause = $"{field} < {parameterOrValue}";
                             break;
 
                         case "dateAfter":
-                            clause = $"{field} >= DATEADD(DAY, 1, {parameter})";
+                            clause = $"{field} >= DATEADD(DAY, 1, {parameterOrValue})";
                             break;
                         default:
                             break;
