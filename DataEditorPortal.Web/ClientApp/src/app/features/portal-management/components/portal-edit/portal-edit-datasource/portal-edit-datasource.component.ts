@@ -481,7 +481,6 @@ export class PortalEditDatasourceComponent
       const index = newFilter.indexOf(filter);
       newFilter.splice(index, 1, filter);
       this.filters = newFilter;
-      console.log(this.filters);
     }
   }
 
