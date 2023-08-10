@@ -144,6 +144,9 @@ export class PortalEditDatasourceComponent
         // set filters
         if (dsConfig.filters) {
           this.filters = dsConfig.filters.map<DataSourceFilterControls>(x => {
+            if (x.value && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}.*/.test(x.value)) {
+              (x as any).value = new Date(x.value);
+            }
             return {
               matchOptions: this.getFilterMatchModeOptions(x.filterType),
               filterType: x.filterType,
@@ -467,6 +470,9 @@ export class PortalEditDatasourceComponent
   ) {
     const column = this.dbTableColumns.find(x => x.columnName === value);
     if (column) {
+      if (column.filterType === 'boolean') {
+        filter.formControlValue.setValue(false);
+      }
       filter.matchOptions = this.getFilterMatchModeOptions(column.filterType);
       filter.filterType = column.filterType;
       filter.formControlMatchMode.setValue(filter.matchOptions[0].value);
@@ -475,6 +481,7 @@ export class PortalEditDatasourceComponent
       const index = newFilter.indexOf(filter);
       newFilter.splice(index, 1, filter);
       this.filters = newFilter;
+      console.log(this.filters);
     }
   }
 

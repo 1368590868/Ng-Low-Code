@@ -155,6 +155,7 @@
                 appendTo="body"
                 placeholder="Enter a value"></p-calendar>
               <p-inputSwitch
+                styleClass="block"
                 *ngIf="filter.filterType === 'boolean'"
                 [required]="true"
                 [formControl]="filter.formControlValue"></p-inputSwitch>
