@@ -1,16 +1,15 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GridTableService } from '../../services/grid-table.service';
 import { TableComponent } from '../table/table.component';
 import { Splitter } from 'primeng/splitter';
+import { Subject, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-master-table',
   templateUrl: './master-table.component.html',
   styleUrls: ['./master-table.component.scss']
 })
-export class MasterTableComponent {
-  // @Input() gridName!: string;
-
+export class MasterTableComponent implements OnInit, OnDestroy {
   @ViewChild(Splitter) splitterRef!: Splitter;
   @ViewChild('masterTable') masterTable!: TableComponent;
   @ViewChild('detailTable') detailTable!: TableComponent;
@@ -18,8 +17,25 @@ export class MasterTableComponent {
   @Input() detailTableName!: string;
 
   showDetail = false;
+  destroy$ = new Subject();
 
   constructor(private gridTableService: GridTableService) {}
+
+  ngOnInit(): void {
+    this.gridTableService.searchClicked$
+      .pipe(
+        tap(() => {
+          this.onMasterRowUnselect();
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(null);
+    this.destroy$.complete();
+  }
 
   onMasterRowSelect(event: any) {
     // open detail table
