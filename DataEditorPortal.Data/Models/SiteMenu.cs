@@ -43,6 +43,7 @@ namespace DataEditorPortal.Data.Models
         [Column("PARENT_ID")]
         public Guid? ParentId { get; set; }
 
+        [XmlIgnore]
         public virtual ICollection<SiteGroup> SiteGroups { get; set; }
     }
 }

@@ -173,6 +173,7 @@ namespace DataEditorPortal.Web.Controllers
             var query = from sp in _depDbContext.SitePermissions
                         join p in userPermissions on sp.Id equals p.PermissionGrantId into ups
                         from up in ups.DefaultIfEmpty()
+                        orderby sp.Category, sp.PermissionName
                         select new AppRolePermission()
                         {
                             Id = sp.Id,

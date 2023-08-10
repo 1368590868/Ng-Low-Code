@@ -526,6 +526,13 @@ namespace DataEditorPortal.Web.Controllers
             return _portalItemService.Delete(id);
         }
 
+        [HttpPost]
+        [Route("{id}/copy")]
+        public bool UpdatePortalItem(Guid id)
+        {
+            return _portalItemService.Copy(id);
+        }
+
         #endregion
 
         #region Datasource configuration

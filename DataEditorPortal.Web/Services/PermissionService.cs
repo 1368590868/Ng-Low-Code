@@ -91,6 +91,7 @@ namespace DataEditorPortal.Web.Services
                         Children = items.Any() ? items : null
                     };
                 })
+                .Where(x => x.Type != "Folder" || (x.Children != null && x.Children.Any()))
                 .ToList();
         }
 
