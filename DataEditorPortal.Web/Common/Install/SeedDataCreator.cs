@@ -388,14 +388,14 @@ namespace DataEditorPortal.Web.Common.Install
                 }),
 
                 ColumnsConfig = JsonSerializer.Serialize(new GridColConfig[] {
-                        new GridColConfig { type = "DataBaseField", field = "USERNAME", header = "User ID", width = 130, filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "NAME", header = "Name", width = 250, filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "EMAIL", header = "Email", width = 250, filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "PHONE", header = "Phone", width = 250, filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "AUTO_EMAIL", header = "Auto Email", width = 250, filterType = "boolean", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "VENDOR", header = "Vendor", width = 250, filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "EMPLOYER", header = "Employer", width = 250, filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "COMMENTS", header = "Comments", width = 250, filterType = "text", sortable = true }
+                        new GridColConfig { type = "DataBaseField", field = "USERNAME", header = "User ID", width = 130, filterType = "text", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "NAME", header = "Name", width = 250, filterType = "text", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "EMAIL", header = "Email", width = 250, filterType = "text", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "PHONE", header = "Phone", width = 250, filterType = "text", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "AUTO_EMAIL", header = "Auto Email", width = 250, filterType = "boolean", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "VENDOR", header = "Vendor", width = 250, filterType = "text", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "EMPLOYER", header = "Employer", width = 250, filterType = "text", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "COMMENTS", header = "Comments", width = 250, filterType = "text", sortable = true, filterable = true }
                     }),
 
                 SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
@@ -567,12 +567,12 @@ namespace DataEditorPortal.Web.Common.Install
                 }),
 
                 ColumnsConfig = JsonSerializer.Serialize(new GridColConfig[] {
-                        new GridColConfig { type = "DataBaseField", field = "NAME", header = "Name", width = 130, filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "FIRST_NAME", header = "First Name", width = 250, filterType = "text", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "CHECKED", header = "Checked", width = 250, filterType = "boolean", sortable = false },
-                        new GridColConfig { type = "DataBaseField", field = "NUMBER", header = "Number", width = 250, filterType = "numeric", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "TOTAL", header = "Total", width = 250, filterType = "numeric", sortable = true },
-                        new GridColConfig { type = "DataBaseField", field = "CREATE_DATE", header = "Create Date", width = 250, filterType = "date", sortable = true }
+                        new GridColConfig { type = "DataBaseField", field = "NAME", header = "Name", width = 130, filterType = "text", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "FIRST_NAME", header = "First Name", width = 250, filterType = "text", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "CHECKED", header = "Checked", width = 250, filterType = "boolean", sortable = false, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "NUMBER", header = "Number", width = 250, filterType = "numeric", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "TOTAL", header = "Total", width = 250, filterType = "numeric", sortable = true, filterable = true },
+                        new GridColConfig { type = "DataBaseField", field = "CREATE_DATE", header = "Create Date", width = 250, filterType = "date", sortable = true, filterable = true }
                     }),
 
                 SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
@@ -1107,24 +1107,24 @@ namespace DataEditorPortal.Web.Common.Install
                 }),
 
                 ColumnsConfig = JsonSerializer.Serialize(new GridColConfig[] {
-                    new GridColConfig { type = "DataBaseField", field = "NAME6", header = "NAME6", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "NAME3", header = "NAME3", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "NAME", header = "NAME", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "TYPE", header = "TYPE", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "STATUS1", header = "STATUS1", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "DATETIME1", header = "DATETIME1", width = 250, filterType = "date", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "CRITERIA", header = "CRITERIA", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "ASSESSEDBY", header = "ASSESSEDBY", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "DATETIME2", header = "DATETIME2", width = 250, filterType = "date", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "DATETIME3", header = "DATETIME3", width = 250, filterType = "date", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "DATETIME4", header = "DATETIME4", width = 250, filterType = "date", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "COMMENTS", header = "COMMENTS", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "STATUS", header = "STATUS", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "CREATIONUSER", header = "CREATIONUSER", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "LASTUSER", header = "LASTUSER", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "DATEMODIFIED", header = "DATEMODIFIED", width = 250, filterType = "date", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "DATECREATED", header = "DATECREATED", width = 250, filterType = "date", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "GLOBALID", header = "GLOBALID", width = 250, filterType = "text", sortable = true }
+                    new GridColConfig { type = "DataBaseField", field = "NAME6", header = "NAME6", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "NAME3", header = "NAME3", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "NAME", header = "NAME", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "TYPE", header = "TYPE", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "STATUS1", header = "STATUS1", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATETIME1", header = "DATETIME1", width = 250, filterType = "date", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "CRITERIA", header = "CRITERIA", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "ASSESSEDBY", header = "ASSESSEDBY", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATETIME2", header = "DATETIME2", width = 250, filterType = "date", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATETIME3", header = "DATETIME3", width = 250, filterType = "date", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATETIME4", header = "DATETIME4", width = 250, filterType = "date", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "COMMENTS", header = "COMMENTS", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "STATUS", header = "STATUS", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "CREATIONUSER", header = "CREATIONUSER", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "LASTUSER", header = "LASTUSER", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATEMODIFIED", header = "DATEMODIFIED", width = 250, filterType = "date", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATECREATED", header = "DATECREATED", width = 250, filterType = "date", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "GLOBALID", header = "GLOBALID", width = 250, filterType = "text", sortable = true, filterable = true }
                 }),
 
                 SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
@@ -1427,20 +1427,20 @@ namespace DataEditorPortal.Web.Common.Install
                 }),
 
                 ColumnsConfig = JsonSerializer.Serialize(new GridColConfig[] {
-                    new GridColConfig { type = "DataBaseField", field = "NAME6", header = "NAME6", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "NAME3", header = "NAME3", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "TYPE", header = "TYPE", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "STATUS1", header = "STATUS1", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "ASSIGNEDTO", header = "ASSIGNEDTO", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "DATETIME3", header = "DATETIME3", width = 250, filterType = "date", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "DATETIME4", header = "DATETIME4", width = 250, filterType = "date", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "COMMENTS", header = "COMMENTS", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "STATUS", header = "STATUS", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "CREATIONUSER", header = "CREATIONUSER", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "LASTUSER", header = "LASTUSER", width = 250, filterType = "text", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "DATEMODIFIED", header = "DATEMODIFIED", width = 250, filterType = "date", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "DATECREATED", header = "DATECREATED", width = 250, filterType = "date", sortable = true },
-                    new GridColConfig { type = "DataBaseField", field = "GLOBALID", header = "GLOBALID", width = 250, filterType = "text", sortable = true }
+                    new GridColConfig { type = "DataBaseField", field = "NAME6", header = "NAME6", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "NAME3", header = "NAME3", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "TYPE", header = "TYPE", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "STATUS1", header = "STATUS1", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "ASSIGNEDTO", header = "ASSIGNEDTO", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATETIME3", header = "DATETIME3", width = 250, filterType = "date", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATETIME4", header = "DATETIME4", width = 250, filterType = "date", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "COMMENTS", header = "COMMENTS", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "STATUS", header = "STATUS", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "CREATIONUSER", header = "CREATIONUSER", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "LASTUSER", header = "LASTUSER", width = 250, filterType = "text", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATEMODIFIED", header = "DATEMODIFIED", width = 250, filterType = "date", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "DATECREATED", header = "DATECREATED", width = 250, filterType = "date", sortable = true, filterable = true },
+                    new GridColConfig { type = "DataBaseField", field = "GLOBALID", header = "GLOBALID", width = 250, filterType = "text", sortable = true, filterable = true }
                 }),
 
                 SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {

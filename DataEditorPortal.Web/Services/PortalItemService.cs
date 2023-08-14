@@ -647,7 +647,7 @@ namespace DataEditorPortal.Web.Services
                 var columns = GetGridColumnsConfig(id).Where(x => x.type == "AttachmentField").ToList();
                 columns.ForEach(x => result.Add(new DataSourceTableColumn()
                 {
-                    FilterType = "attachments",
+                    FilterType = "attachmentField",
                     AllowDBNull = true,
                     ColumnName = x.field
                 }));
@@ -750,7 +750,8 @@ namespace DataEditorPortal.Web.Services
                     header = x.ColumnName,
                     width = 200,
                     filterType = x.FilterType,
-                    sortable = true
+                    sortable = true,
+                    filterable = true
                 }).ToList();
             }
         }

@@ -462,7 +462,7 @@ namespace DataEditorPortal.Web.Services
 
             var result = new List<object>();
             var columnConfig = columnsConfig.FirstOrDefault(x => x.field == column);
-            if (columnConfig != null && columnConfig.filterType == "enums")
+            if (columnConfig != null && columnConfig.enumFilterValue)
             {
                 dataSourceConfig.Columns = new List<string>() { columnConfig.field };
                 var query = _queryBuilder.GenerateSqlTextForColumnFilterOption(dataSourceConfig);
@@ -503,10 +503,10 @@ namespace DataEditorPortal.Web.Services
         public MemoryStream ExportExcel(string name, ExportParam param)
         {
             var columns = GetGridColumnsConfig(name)
-                .Where(x => x.type == "DataBaseField" || x.filterType == "attachments")
+                .Where(x => x.type == "DataBaseField" || x.type == "AttachmentField")
                 .ToList();
 
-            var attachmentCols = columns.Where(x => x.filterType == "attachments");
+            var attachmentCols = columns.Where(x => x.type == "AttachmentField");
 
             var result = GetGridData(name, param);
 
@@ -530,7 +530,7 @@ namespace DataEditorPortal.Web.Services
                 var columnIndex = 1;
                 foreach (var column in columns)
                 {
-                    if (column.filterType == "attachments")
+                    if (column.type == "AttachmentField")
                     {
                         var count = attatchmentColCounts[column.field];
 
@@ -1276,7 +1276,7 @@ namespace DataEditorPortal.Web.Services
                 if (string.IsNullOrEmpty(config.ColumnsConfig)) return new List<GridColConfig>();
 
                 var columnsConfig = JsonSerializer.Deserialize<List<GridColConfig>>(config.ColumnsConfig);
-                return columnsConfig.Where(x => x.type == "AttachmentField" && x.filterType == "attachments").Select(x =>
+                return columnsConfig.Where(x => x.type == "AttachmentField").Select(x =>
                 {
                     if (x.fileUploadConfig == null)
                     {

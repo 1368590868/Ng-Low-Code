@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace DataEditorPortal.Web.Services
 {
-    [FilterType("attachments")]
+    [FilterType("attachmentField")]
     public class AttachmentProcessor : ValueProcessorBase
     {
         private UploadedFileMeta _uploadeFiledMeta;
@@ -47,7 +47,7 @@ namespace DataEditorPortal.Web.Services
             var service = _serviceProvider.GetRequiredService<IUniversalGridService>();
             var attachmentCols = service.GetAttachmentCols(Config);
 
-            if (Field.filterType == "attachments")
+            if (Field.filterType == "attachmentField")
             {
                 if (model.ContainsKey(Field.key))
                 {

@@ -81,6 +81,8 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string filterType { get; set; }
 
         public bool sortable { get; set; }
+        public bool filterable { get; set; }
+        public bool enumFilterValue { get; set; }
         public bool hidden { get; set; }
 
         public string template { get; set; }

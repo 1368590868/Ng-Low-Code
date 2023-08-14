@@ -305,7 +305,7 @@ namespace DataEditorPortal.Web.Services
                 if (!formConfig.FormFields.Any(f => f.key == idColumn))
                     formConfig.FormFields.Insert(0, new FormFieldConfig() { key = idColumn, filterType = "text", props = JsonSerializer.Serialize(new { required = true }) });
             }
-            return formConfig.FormFields.Where(x => !x.excludeFromImport && x.filterType != "linkDataField" && x.filterType != "attachments").ToList();
+            return formConfig.FormFields.Where(x => !x.excludeFromImport && x.filterType != "linkDataField" && x.filterType != "attachmentField").ToList();
         }
 
         #endregion

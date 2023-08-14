@@ -1,6 +1,4 @@
-﻿using DataEditorPortal.Data.Common;
-using DataEditorPortal.Data.Contexts;
-using DataEditorPortal.Data.Models;
+﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using Microsoft.Extensions.Caching.Memory;
@@ -496,32 +494,6 @@ namespace DataEditorPortal.Web.Services.FieldImporter
         #endregion
 
         #region Common private methods
-
-        private void RemoveMemoryCache(string fieldKey)
-        {
-            _memoryCache.Remove($"import_data_required_{fieldKey}");
-            _memoryCache.Remove($"import_data_validation_{fieldKey}");
-            _memoryCache.Remove($"import_data_options_{fieldKey}");
-            _memoryCache.Remove($"import_data_fraction_{fieldKey}");
-        }
-
-        private List<FormFieldConfig> GetTemplateFields(UniversalGridConfiguration config, ImportType type)
-        {
-            GridFormLayout formConfig = null;
-            if (type == ImportType.Add)
-            {
-                formConfig = _universalGridService.GetAddingFormConfig(config);
-            }
-            else if (type == ImportType.Update)
-            {
-                formConfig = _universalGridService.GetUpdatingFormConfig(config);
-                var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
-                var idColumn = dataSourceConfig.IdColumn;
-                if (!formConfig.FormFields.Any(f => f.key == idColumn))
-                    formConfig.FormFields.Insert(0, new FormFieldConfig() { key = idColumn, filterType = "text", props = JsonSerializer.Serialize(new { required = true }) });
-            }
-            return formConfig.FormFields.Where(x => x.filterType != "linkDataField" && x.filterType != "attachments").ToList();
-        }
 
         private bool IsRequired(FormFieldConfig field)
         {
