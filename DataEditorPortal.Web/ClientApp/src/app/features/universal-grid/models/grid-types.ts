@@ -27,16 +27,17 @@ export interface GridConfig {
 }
 
 export interface GridColumn {
-  field?: string;
-  header?: string;
+  field: string;
+  header: string;
   width: number;
-  filterType?: string;
-  uiType?: string;
+  filterType: string;
   order?: number;
-  aggregate: boolean;
   template?: string;
   format?: string;
   filterOptions?: any[];
+  sortable: boolean;
+  filterable: boolean;
+  enumFilterValue?: boolean;
 }
 
 export interface GridSearchConfig {

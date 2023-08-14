@@ -18,7 +18,7 @@ export class ViewRecordActionComponent
   extends GridActionDirective
   implements OnInit
 {
-  viewData: ViewColumn[];
+  viewData: any[];
   loading = true;
   formatters?: any;
 
@@ -43,7 +43,7 @@ export class ViewRecordActionComponent
           .map(key => {
             const field = res.find(x => x.field === key);
             return {
-              key:field?.field,
+              key: field?.field,
               name: field?.header,
               value: this.selectedRecords[0][key],
               type: field?.type,

@@ -60,17 +60,18 @@ export interface DataSourceSortBy {
 }
 
 export interface GridColumn {
-  type?: string;
-  field?: string;
-  header?: string;
-  width?: number;
-  filterType?: string;
-  uiType?: string;
+  type: string;
+  field: string;
+  header: string;
+  width: number;
+  filterType: string;
   order?: number;
-  aggregate?: boolean;
-  selected?: boolean;
+  selected: boolean;
   template?: string;
   format?: string;
+  sortable: boolean;
+  filterable: boolean;
+  enumFilterValue?: boolean;
 }
 
 export interface GridSearchField {

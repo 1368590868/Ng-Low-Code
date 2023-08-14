@@ -12,40 +12,37 @@
     <tr>
       <td style="width: 30%">{{ viewData.name }}</td>
       <td>
-        <ng-container
-          *ngIf="!viewData.template"
-          [ngTemplateOutlet]="
-            viewData.filterType === 'date'
-              ? date
-              : viewData.filterType === 'numeric'
-              ? numeric
-              : viewData.filterType === 'boolean'
-              ? boolean
-              : viewData.filterType === 'attachments'
-              ? attachments
-              : normal
-          "></ng-container>
-        <ng-template #boolean>{{ viewData.value | boolean }}</ng-template>
-        <ng-template #date>{{
-          viewData.value
-            | date : (viewData.format === '' ? undefined : viewData.format)
-        }}</ng-template>
-        <ng-template #numeric>{{
-          viewData.value
-            | numeral : (viewData.format === '' ? undefined : viewData.format)
-        }}</ng-template>
-        <ng-template #attachments>
+        <!-- DataBaseField-->
+        <ng-container *ngIf="viewData.type === 'DataBaseField'">
+          <ng-container *ngIf="viewData.filterType === 'boolean'">{{
+            viewData.value | boolean
+          }}</ng-container>
+          <ng-container *ngIf="viewData.filterType === 'date'">{{
+            viewData.value
+              | date : (viewData.format === '' ? undefined : viewData.format)
+          }}</ng-container>
+          <ng-container *ngIf="viewData.filterType === 'numeric'">{{
+            viewData.value
+              | numeral : (viewData.format === '' ? undefined : viewData.format)
+          }}</ng-container>
+        </ng-container>
+
+        <!-- AttachmentField-->
+        <ng-container *ngIf="viewData.type === 'AttachmentField'">
           <app-attachments
             [data]="viewData.value"
             [gridName]="gridName"
             [fieldName]="viewData.key"
             [showAll]="true"></app-attachments>
-        </ng-template>
-        <ng-template #normal>{{ viewData.value }}</ng-template>
-        <span
-          *ngIf="viewData.template"
-          [innerHTML]="selectedRecords[0] | template : viewData.template">
-        </span>
+        </ng-container>
+
+        <!-- TemplateField-->
+        <ng-container *ngIf="viewData.type === 'TemplateField'">
+          <span
+            *ngIf="viewData.template"
+            [innerHTML]="selectedRecords[0] | template : viewData.template">
+          </span>
+        </ng-container>
       </td>
     </tr>
   </ng-template>

@@ -201,20 +201,46 @@ export class PortalEditColumnsComponent
       }
     },
     {
+      key: 'filterType',
+      type: 'select',
+      props: {
+        label: 'Field Type',
+        placeholder: 'Please Select',
+        disabled: true,
+        required: true,
+        showClear: false,
+        options: [
+          {
+            label: 'None',
+            value: 'none'
+          },
+          {
+            label: 'Text',
+            value: 'text'
+          },
+          {
+            label: 'Numeric',
+            value: 'numeric'
+          },
+          {
+            label: 'Boolean',
+            value: 'boolean'
+          },
+          {
+            label: 'Date',
+            value: 'date'
+          }
+        ]
+      },
+      hide: true
+    },
+    {
       key: 'header',
       type: 'input',
       props: {
         label: 'Column Header',
         required: true,
         placeholder: 'Column Header'
-      }
-    },
-    {
-      key: 'hidden',
-      defaultValue: false,
-      type: 'checkbox',
-      props: {
-        label: 'Hidden'
       }
     },
     {
@@ -256,44 +282,14 @@ export class PortalEditColumnsComponent
     {
       fieldGroup: [
         {
-          key: 'filterType',
-          type: 'select',
-          defaultValue: 'text',
+          key: 'format',
+          type: 'input',
           props: {
-            label: 'Filter Type',
-            placeholder: 'Please Select',
-            required: true,
-            showClear: false,
-            options: [
-              {
-                label: 'None',
-                value: 'none'
-              },
-              {
-                label: 'Text',
-                value: 'text'
-              },
-              {
-                label: 'Numeric',
-                value: 'numeric'
-              },
-              {
-                label: 'Boolean',
-                value: 'boolean'
-              },
-              {
-                label: 'Date',
-                value: 'date'
-              },
-              {
-                label: 'Enums',
-                value: 'enums'
-              },
-              {
-                label: 'Attachments',
-                value: 'attachments'
-              }
-            ]
+            label: 'Data Format'
+          },
+          expressions: {
+            hide: `['numeric','date'].indexOf(model.filterType) < 0`,
+            'props.description': `model.filterType === 'numeric' && 'Please enter value format. <br/> <a href="http://numeraljs.com/#format" target="_blank">See more</a>'`
           }
         },
         {
@@ -305,19 +301,42 @@ export class PortalEditColumnsComponent
           }
         },
         {
-          key: 'format',
-          type: 'input',
-          props: {
-            label: 'Data Format'
-          },
-          expressions: {
-            hide: `['numeric','date'].indexOf(field.parent.model.filterType) < 0`,
-            'props.description': `field.parent.model.filterType === 'numeric' && 'Please enter value format. <br/> <a href="http://numeraljs.com/#format" target="_blank">See more</a>'`
-          }
+          fieldGroupClassName: 'flex',
+          fieldGroup: [
+            {
+              className: 'w-6',
+              key: 'filterable',
+              type: 'checkbox',
+              defaultValue: true,
+              props: {
+                label: 'Filterable'
+              }
+            },
+            {
+              className: 'w-6',
+              key: 'enumFilterValue',
+              type: 'checkbox',
+              defaultValue: false,
+              props: {
+                label: 'List Filter Values'
+              },
+              expressions: {
+                hide: `!field.parent.model.filterable`
+              }
+            }
+          ]
         }
       ],
       expressions: {
         hide: `field.parent.model.type !== 'DataBaseField'`
+      }
+    },
+    {
+      key: 'hidden',
+      defaultValue: false,
+      type: 'checkbox',
+      props: {
+        label: 'Hidden'
       }
     }
   ];
@@ -381,7 +400,9 @@ export class PortalEditColumnsComponent
               filterType: x.filterType,
               header: x.columnName,
               width: 200,
-              sortable: true
+              sortable: true,
+              filterable: true,
+              selected: false
             };
           });
       });
@@ -482,7 +503,9 @@ export class PortalEditColumnsComponent
         filterType: 'none',
         header: `TEMPLATE_${index}`,
         width: 200,
-        selected: true
+        selected: true,
+        filterable: false,
+        sortable: false
       },
       ...this.targetColumns
     ];
@@ -498,10 +521,12 @@ export class PortalEditColumnsComponent
       {
         type: 'AttachmentField',
         field: `ATTACHMENT_${index}`,
-        filterType: 'attachments',
+        filterType: 'none',
         header: `ATTACHMENT_${index}`,
         width: 200,
-        selected: true
+        selected: true,
+        filterable: false,
+        sortable: false
       },
       ...this.targetColumns
     ];

@@ -58,7 +58,7 @@ export const FROM_DESIGNER_CONTROLS: {
   {
     label: 'File Upload',
     value: 'fileUpload',
-    filterType: 'attachments'
+    filterType: 'attachmentField'
   },
   {
     label: 'Link Data Editor',

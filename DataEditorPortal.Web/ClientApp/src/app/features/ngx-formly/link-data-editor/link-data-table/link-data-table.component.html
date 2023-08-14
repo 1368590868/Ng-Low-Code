@@ -61,38 +61,38 @@
       </td>
       <td
         *ngFor="let col of columns"
-        [title]="col.filterType !== 'attachments' ? data[col.field] || '' : ''"
+        [title]="col.type === 'DataBaseField' ? data[col.field] || '' : ''"
         [style.text-align]="'center'">
-        <ng-container
-          *ngIf="!col.template"
-          [ngTemplateOutlet]="
-            col.filterType === 'date'
-              ? date
-              : col.filterType === 'numeric'
-              ? numeric
-              : col.filterType === 'boolean'
-              ? boolean
-              : col.filterType === 'attachments'
-              ? attachments
-              : normal
-          "></ng-container>
-        <ng-template #boolean>{{ data[col.field] | boolean }}</ng-template>
-        <ng-template #date>{{
-          data[col.field] | date : (col.format === '' ? undefined : col.format)
-        }}</ng-template>
-        <ng-template #numeric>{{
-          data[col.field]
-            | numeral : (col.format === '' ? undefined : col.format)
-        }}</ng-template>
-        <ng-template #attachments
-          ><span
+        <!-- DataBaseField-->
+        <ng-container *ngIf="col.type === 'DataBaseField'">
+          <ng-container *ngIf="col.filterType === 'boolean'">{{
+            data[col.field] | boolean
+          }}</ng-container>
+          <ng-container *ngIf="col.filterType === 'date'">{{
+            data[col.field]
+              | date : (col.format === '' ? undefined : col.format)
+          }}</ng-container>
+          <ng-container *ngIf="col.filterType === 'numeric'">{{
+            data[col.field]
+              | numeral : (col.format === '' ? undefined : col.format)
+          }}</ng-container>
+        </ng-container>
+
+        <!-- AttachmentField-->
+        <ng-container *ngIf="col.type === 'AttachmentField'">
+          <span
             [innerHTML]="
               data[col.field] | attachments : table2Name : col.field
-            "></span
-        ></ng-template>
-        <ng-template #normal>{{ data[col.field] }}</ng-template>
-        <span *ngIf="col.template" [innerHTML]="data | template : col.template">
-        </span>
+            "></span>
+        </ng-container>
+
+        <!-- TemplateField-->
+        <ng-container *ngIf="col.type === 'TemplateField'">
+          <span
+            *ngIf="col.template"
+            [innerHTML]="data | template : col.template">
+          </span>
+        </ng-container>
       </td>
     </tr>
   </ng-template>

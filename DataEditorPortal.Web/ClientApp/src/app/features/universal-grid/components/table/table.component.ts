@@ -158,7 +158,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
       // load column filter options
       this.columns.forEach(col => {
-        if (col.field && col.filterType === 'enums') {
+        if (col.field && col.filterable && col.enumFilterValue) {
           this.gridTableService
             .getTableColumnFilterOptions(this.gridName, col.field)
             .subscribe(val => {

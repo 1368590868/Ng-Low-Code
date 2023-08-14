@@ -56,24 +56,29 @@
             *ngIf="column.header">
             <p-tag>{{ column.header }}</p-tag>
           </div>
-          <div class="w-6rem" *ngIf="column.type === 'DataBaseField'">
-            <p-tag severity="success">Filterable</p-tag>
-          </div>
-          <p-tag *ngIf="column.type === 'TemplateField'" severity="warning"
-            >Template Field</p-tag
-          >
-          <p-tag *ngIf="column.type === 'AttachmentField'" severity="warning"
-            >Attachment Field</p-tag
-          >
-          <div class="w-6rem" *ngIf="column.sortable">
-            <p-tag severity="success">Sortable</p-tag>
-          </div>
-          <p-button
-            *ngIf="column.type !== 'DataBaseField'"
-            icon="pi pi-trash"
-            class="remove-btn mr-0 ml-auto"
-            styleClass="p-button-text p-button-rounded"
-            (onClick)="onRemoveCustomColumn($event, column)"></p-button>
+
+          <ng-container *ngIf="column.type === 'DataBaseField'">
+            <div class="w-6rem" *ngIf="column.filterable">
+              <p-tag severity="success">Filterable</p-tag>
+            </div>
+            <div class="w-6rem" *ngIf="column.sortable">
+              <p-tag severity="success">Sortable</p-tag>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="column.type !== 'DataBaseField'">
+            <p-tag *ngIf="column.type === 'TemplateField'" severity="warning">
+              Template Field
+            </p-tag>
+            <p-tag *ngIf="column.type === 'AttachmentField'" severity="warning">
+              Attachment Field
+            </p-tag>
+            <p-button
+              icon="pi pi-trash"
+              class="remove-btn mr-0 ml-auto"
+              styleClass="p-button-text p-button-rounded"
+              (onClick)="onRemoveCustomColumn($event, column)"></p-button>
+          </ng-container>
         </div>
       </ng-template>
       <ng-template pTemplate="emptymessagetarget">
