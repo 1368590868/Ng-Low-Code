@@ -863,28 +863,28 @@ namespace DataEditorPortal.Web.Common.Install
                 {
                     Id = Guid.Parse("EF604385-873D-4229-9685-1D14BE1B484C"),
                     Name = "LINK NAME4 OPTIONS",
-                    QueryText = "SELECT DISTINCT NAME4 AS LABEL, NAME4 AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".DEMO_LINK_LOOKUP WHERE 1=1 {{AND NAME1 = ##NAME1##}} ORDER BY NAME4",
+                    QueryText = "SELECT DISTINCT NAME4 AS LABEL, NAME4 AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".DEMO_LINK_LOOKUP WHERE 1=1 {{AND NAME1 = ##CUSTOM_SEARCH_1##}} ORDER BY NAME4",
                     DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("44A5D080-876C-42B4-8243-739D2BCEA013"),
                     Name = "LINK NAME5 OPTIONS",
-                    QueryText = "SELECT DISTINCT NAME5 AS LABEL, NAME5 AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".DEMO_LINK_LOOKUP WHERE 1=1 {{AND NAME1 = ##NAME1##}} {{AND NAME4 = ##NAME4##}} ORDER BY NAME5",
+                    QueryText = "SELECT DISTINCT NAME5 AS LABEL, NAME5 AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".DEMO_LINK_LOOKUP WHERE 1=1 {{AND NAME1 = ##CUSTOM_SEARCH_1##}} {{AND NAME4 = ##CUSTOM_SEARCH_4##}} ORDER BY NAME5",
                     DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("4F584448-9877-4037-AF0D-1AD2B17AD9F1"),
                     Name = "LINK NAME6 OPTIONS",
-                    QueryText = "SELECT DISTINCT NAME6 AS LABEL, NAME6 AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".DEMO_LINK_LOOKUP WHERE 1=1 {{AND NAME1 = ##NAME1##}} {{AND NAME4 = ##NAME4##}} {{AND NAME5 = ##NAME5##}} ORDER BY NAME6",
+                    QueryText = "SELECT DISTINCT NAME6 AS LABEL, NAME6 AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".DEMO_LINK_LOOKUP WHERE 1=1 {{AND NAME1 = ##CUSTOM_SEARCH_1##}} {{AND NAME4 = ##CUSTOM_SEARCH_4##}} {{AND NAME5 = ##CUSTOM_SEARCH_5##}} ORDER BY NAME6",
                     DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 },
                 new Lookup()
                 {
                     Id = Guid.Parse("901B664B-B443-45C1-8F49-B585A845E321"),
                     Name = "LINK NAME3 OPTIONS",
-                    QueryText = "SELECT DISTINCT NAME3 AS LABEL, NAME3 AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".DEMO_LINK_LOOKUP WHERE 1=1 {{AND NAME1 = ##NAME1##}} {{AND NAME4 = ##NAME4##}} {{AND NAME5 = ##NAME5##}} {{AND NAME6 = ##NAME6##}} ORDER BY NAME3",
+                    QueryText = "SELECT DISTINCT NAME3 AS LABEL, NAME3 AS VALUE FROM " + Constants.DEFAULT_SCHEMA + ".DEMO_LINK_LOOKUP WHERE 1=1 {{AND NAME1 = ##CUSTOM_SEARCH_1##}} {{AND NAME4 = ##CUSTOM_SEARCH_4##}} {{AND NAME5 = ##CUSTOM_SEARCH_5##}} {{AND NAME6 = ##CUSTOM_SEARCH_6##}} ORDER BY NAME3",
                     DataSourceConnectionName = Constants.DEFAULT_CONNECTION_NAME
                 }
             };
@@ -976,7 +976,7 @@ namespace DataEditorPortal.Web.Common.Install
 
                 SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
                     new SearchFieldConfig {
-                        key = "NAME1",
+                        key = "CUSTOM_SEARCH_1",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -996,7 +996,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME4",
+                        key = "CUSTOM_SEARCH_4",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1004,7 +1004,7 @@ namespace DataEditorPortal.Web.Common.Install
                             placeholder = "Select Name4...",
                             optionsLookup = new {
                                 id = "EF604385-873D-4229-9685-1D14BE1B484C",
-                                deps = new object[]{ "NAME1" }
+                                deps = new object[]{ "CUSTOM_SEARCH_1" }
                             },
                         },
                         searchRule = new SearchFieldFilterRule
@@ -1019,7 +1019,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME5",
+                        key = "CUSTOM_SEARCH_5",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1027,7 +1027,7 @@ namespace DataEditorPortal.Web.Common.Install
                             placeholder = "Select Name5...",
                             optionsLookup = new {
                                 id = "44A5D080-876C-42B4-8243-739D2BCEA013",
-                                deps = new object[]{ "NAME1", "NAME4" }
+                                deps = new object[]{ "CUSTOM_SEARCH_1", "CUSTOM_SEARCH_4" }
                             }
                         },
                         searchRule = new SearchFieldFilterRule
@@ -1042,7 +1042,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME6",
+                        key = "CUSTOM_SEARCH_6",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1050,7 +1050,7 @@ namespace DataEditorPortal.Web.Common.Install
                             placeholder = "Select Name6...",
                             optionsLookup = new {
                                 id = "4F584448-9877-4037-AF0D-1AD2B17AD9F1",
-                                deps = new object[]{ "NAME1", "NAME4", "NAME5" }
+                                deps = new object[]{ "CUSTOM_SEARCH_1", "CUSTOM_SEARCH_4", "CUSTOM_SEARCH_5" }
                             }
                         },
                         searchRule = new SearchFieldFilterRule
@@ -1065,7 +1065,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME3",
+                        key = "CUSTOM_SEARCH_3",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1073,7 +1073,7 @@ namespace DataEditorPortal.Web.Common.Install
                             placeholder = "Select Name3...",
                             optionsLookup = new {
                                 id = "901B664B-B443-45C1-8F49-B585A845E321",
-                                deps = new object[]{ "NAME1", "NAME4", "NAME5", "NAME6" }
+                                deps = new object[]{ "CUSTOM_SEARCH_1", "CUSTOM_SEARCH_4", "CUSTOM_SEARCH_5", "CUSTOM_SEARCH_6" }
                             }
                         },
                         searchRule = new SearchFieldFilterRule
@@ -1129,7 +1129,7 @@ namespace DataEditorPortal.Web.Common.Install
 
                 SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
                     new SearchFieldConfig {
-                        key = "NAME1",
+                        key = "CUSTOM_SEARCH_1",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1143,7 +1143,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME4",
+                        key = "CUSTOM_SEARCH_4",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1157,7 +1157,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME5",
+                        key = "CUSTOM_SEARCH_5",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1171,7 +1171,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME6",
+                        key = "CUSTOM_SEARCH_6",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1185,7 +1185,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME3",
+                        key = "CUSTOM_SEARCH_3",
                         type = "select",
                         filterType = "text",
                         props = new {
