@@ -491,7 +491,13 @@ namespace DataEditorPortal.Web.Services
             }
 
             return result
-                .Select(x => new DropdownOptionsItem { Label = x, Value = x })
+                .Select(x =>
+                {
+                    if (x.GetType() == typeof(bool))
+                        return new DropdownOptionsItem { Label = ((bool)x) ? "Yes" : "No", Value = x };
+                    else
+                        return new DropdownOptionsItem { Label = x, Value = x };
+                })
                 .OrderBy(x => x.Label)
                 .ToList();
         }
