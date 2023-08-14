@@ -76,6 +76,9 @@
             data[col.field]
               | numeral : (col.format === '' ? undefined : col.format)
           }}</ng-container>
+          <ng-container *ngIf="col.filterType === 'text'">{{
+            data[col.field]
+          }}</ng-container>
         </ng-container>
 
         <!-- AttachmentField-->

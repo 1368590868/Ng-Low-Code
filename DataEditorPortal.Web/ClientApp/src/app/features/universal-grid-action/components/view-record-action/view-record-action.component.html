@@ -25,6 +25,9 @@
             viewData.value
               | numeral : (viewData.format === '' ? undefined : viewData.format)
           }}</ng-container>
+          <ng-container *ngIf="viewData.filterType === 'text'">{{
+            viewData.value
+          }}</ng-container>
         </ng-container>
 
         <!-- AttachmentField-->
