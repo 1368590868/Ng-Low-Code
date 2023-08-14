@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { GridColumn } from 'src/app/features/portal-management/models/portal-item';
 import { SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UniversalGridService } from '../../services/universal-grid.service';
 
-export interface ViewColumn extends GridColumn {
+export interface ViewColumn {
   name?: string;
   value?: string;
+  key: string;
+  type: string;
+  format?: string;
+  template?: string;
+  filterType: string;
 }
 
 @Component({
@@ -18,7 +22,7 @@ export class ViewRecordActionComponent
   extends GridActionDirective
   implements OnInit
 {
-  viewData: any[];
+  viewData: ViewColumn[];
   loading = true;
   formatters?: any;
 
