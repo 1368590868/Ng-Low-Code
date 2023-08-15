@@ -6,6 +6,10 @@
     .p-splitter-panel {
       transition: flex-basis var(--transition-duration);
     }
+
+    & > .p-splitter-panel-nested:first-child {
+      overflow: auto;
+    }
   }
   .search-area {
     padding: 0.5rem 0.25rem 0.25rem;
@@ -29,6 +33,11 @@
   }
 
   .hide-panel {
+    .split-area.p-splitter {
+      & > .p-splitter-panel-nested:first-child {
+        overflow: visible;
+      }
+    }
     .search-area {
       padding: 0.5rem 0rem 0.25rem;
     }

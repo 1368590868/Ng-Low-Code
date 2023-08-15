@@ -124,8 +124,8 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
   }
 
   onResizeEnd({ sizes }: { sizes: number[] }) {
-    if (sizes[0] < 20) {
-      this.splitterRef._panelSizes = this.panelSizesPrev;
+    if (sizes[0] < 15) {
+      this.splitterRef._panelSizes = [15, 85];
     }
     this.configDataService.sidebarCollapsed = false;
     this.splitterRef.saveState();
