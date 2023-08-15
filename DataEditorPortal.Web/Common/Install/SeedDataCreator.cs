@@ -1445,7 +1445,7 @@ namespace DataEditorPortal.Web.Common.Install
 
                 SearchConfig = JsonSerializer.Serialize(new SearchFieldConfig[] {
                     new SearchFieldConfig {
-                        key = "NAME1",
+                        key = "CUSTOM_SEARCH_1",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1459,7 +1459,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME4",
+                        key = "CUSTOM_SEARCH_4",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1473,7 +1473,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME5",
+                        key = "CUSTOM_SEARCH_5",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1487,7 +1487,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME6",
+                        key = "CUSTOM_SEARCH_6",
                         type = "select",
                         filterType = "text",
                         props = new {
@@ -1501,7 +1501,7 @@ namespace DataEditorPortal.Web.Common.Install
                         }
                     },
                     new SearchFieldConfig {
-                        key = "NAME3",
+                        key = "CUSTOM_SEARCH_3",
                         type = "select",
                         filterType = "text",
                         props = new {
