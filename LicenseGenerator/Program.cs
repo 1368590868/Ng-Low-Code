@@ -93,7 +93,7 @@ namespace LicenseGenerator
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
             {
                 rsa.FromXmlString(privateKey);
-                encryptedData = rsa.SignData(Encoding.ASCII.GetBytes(plaintext), new SHA1CryptoServiceProvider());
+                encryptedData = rsa.SignData(Encoding.ASCII.GetBytes(plaintext), SHA1.Create());
                 rsa.Dispose();
             }
             return Convert.ToBase64String(encryptedData);

@@ -51,7 +51,7 @@ namespace DataEditorPortal.Web.Common
 
             var signature = license.Substring(signatureStartIndex);
 
-            return rsa.VerifyData(Encoding.ASCII.GetBytes(data), new SHA1CryptoServiceProvider(), Convert.FromBase64String(signature));
+            return rsa.VerifyData(Encoding.ASCII.GetBytes(data), SHA1.Create(), Convert.FromBase64String(signature));
         }
 
         public bool IsExpired(string license)

@@ -26,6 +26,7 @@ using Oracle.ManagedDataAccess.Client;
 using Quartz;
 using System;
 using System.Data;
+using System.Text.Json.Serialization;
 
 namespace DataEditorPortal.Web
 {
@@ -163,7 +164,7 @@ namespace DataEditorPortal.Web
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new IsoDateTimeConverter());
-                options.JsonSerializerOptions.IgnoreNullValues = true;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 options.JsonSerializerOptions.WriteIndented = false;
             });
 
@@ -177,8 +178,6 @@ namespace DataEditorPortal.Web
 
             services.AddQuartz(q =>
             {
-                q.UseMicrosoftDependencyInjectionJobFactory();
-
                 q.ScheduleJob<ClearTempFileJob>(trigger => trigger
                     .WithIdentity("ClearTempFileJob")
                     .StartAt(DateBuilder.EvenMinuteDateAfterNow())
@@ -186,7 +185,7 @@ namespace DataEditorPortal.Web
                     .WithDailyTimeIntervalSchedule(x => x.StartingDailyAt(new TimeOfDay(0, 0)).InTimeZone(TimeZoneInfo.Utc).EndingDailyAfterCount(1))
                     .WithDescription("ClearTempFileJob"));
             });
-            services.AddQuartzServer(options => { options.WaitForJobsToComplete = true; });
+            services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

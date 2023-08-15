@@ -659,7 +659,7 @@ namespace Setup
                     return true;
                 }
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
                 MessageBox.Show("Please run with administrative privileges.");
                 return false;
