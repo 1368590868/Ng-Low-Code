@@ -615,7 +615,7 @@ namespace Setup
             foreach (DirectoryInfo subDirectory in subDirectories)
             {
                 string newDestinationFolder = Path.Combine(destinationDir.FullName, subDirectory.Name);
-                CopyFiles(subDirectory.FullName, newDestinationFolder, sw);
+                CopyFiles(subDirectory.FullName, newDestinationFolder, sw, filePattern);
             }
         }
 

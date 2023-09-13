@@ -115,7 +115,7 @@
             <Label x:Name="label5" Content="Appliation Alias:" HorizontalAlignment="Left" Margin="10,143,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
             <Label x:Name="label7" Content="Default Schema:" HorizontalAlignment="Left" Margin="10,171,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.335,0.584" Padding="0,0,0,0" Height="20"/>
 
-            <TextBox x:Name="textTargetFolder" Margin="103,87,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding SitePublishModel.TargetFolder, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Height="20" HorizontalAlignment="Left" Width="220" IsReadOnly="True" Style="{DynamicResource ValidatingControl}" Padding="3,1,3,0"/>
+            <TextBox x:Name="textTargetFolder" Margin="103,87,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Text="{Binding SitePublishModel.TargetFolder, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Height="20" HorizontalAlignment="Left" Width="220" IsReadOnly="True" Style="{DynamicResource ValidatingControl}" Padding="3,1,3,0"/>
             <Button x:Name="btnBrowse" Content="Browse" Margin="328,87,0,0" Height="20" VerticalAlignment="Top" Click="btnBrowse_Click" HorizontalAlignment="Left" Width="50"/>
 
             <ComboBox x:Name="cmbSiteName" Margin="103,115,0,0" VerticalAlignment="Top" IsTextSearchEnabled="False" SelectedIndex="0" Height="20" Width="220" HorizontalAlignment="Left" Padding="6,1,5,0"
