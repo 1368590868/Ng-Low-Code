@@ -39,7 +39,9 @@
           <th style="width: 2.5rem"></th>
           <th style="width: 15%" pSortableColumn="EVENT_TIME">
             <span style="vertical-align: middle">Event Time</span>
-            <p-sortIcon field="EVENT_TIME"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'EVENT_TIME'"
+              field="EVENT_TIME"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="date"
@@ -52,7 +54,9 @@
           </th>
           <th style="width: 15%" pSortableColumn="CATEGORY">
             <span style="vertical-align: middle">Category</span>
-            <p-sortIcon field="CATEGORY"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'CATEGORY'"
+              field="CATEGORY"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               field="CATEGORY"
@@ -85,7 +89,9 @@
           </th>
           <th pSortableColumn="EVENT_SECTION">
             <span style="vertical-align: middle">Event Section</span>
-            <p-sortIcon field="EVENT_SECTION"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'EVENT_SECTION'"
+              field="EVENT_SECTION"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -99,7 +105,9 @@
 
           <th pSortableColumn="EVENT_NAME">
             <span style="vertical-align: middle">Event Name</span>
-            <p-sortIcon field="EVENT_NAME"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'EVENT_NAME'"
+              field="EVENT_NAME"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -112,7 +120,9 @@
           </th>
           <th style="width: 15%" pSortableColumn="USERNAME">
             <span style="vertical-align: middle">User Name</span>
-            <p-sortIcon field="USERNAME"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'USERNAME'"
+              field="USERNAME"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"

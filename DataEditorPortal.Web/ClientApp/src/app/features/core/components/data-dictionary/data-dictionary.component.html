@@ -1,6 +1,7 @@
 <div class="layout-content flex flex-column p-card mt-3">
   <div class="flex-grow-1">
     <p-table
+      #table
       [loading]="loading"
       styleClass="p-datatable-striped"
       [value]="data"
@@ -34,7 +35,9 @@
         <tr>
           <th style="width: 20%" pSortableColumn="LABEL">
             <span style="vertical-align: middle">Label</span>
-            <p-sortIcon field="LABEL"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'LABEL'"
+              field="LABEL"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -47,7 +50,9 @@
           </th>
           <th style="width: 20%" pSortableColumn="VALUE">
             <span style="vertical-align: middle">Value</span>
-            <p-sortIcon field="VALUE"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'VALUE'"
+              field="VALUE"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -60,7 +65,9 @@
           </th>
           <th style="width: 20%" pSortableColumn="VALUE1">
             <span style="vertical-align: middle">Value1</span>
-            <p-sortIcon field="VALUE1"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'VALUE1'"
+              field="VALUE1"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -73,7 +80,9 @@
           </th>
           <th style="width: 20%" pSortableColumn="VALUE2">
             <span style="vertical-align: middle">Value2</span>
-            <p-sortIcon field="VALUE2"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'VALUE2'"
+              field="VALUE2"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -86,7 +95,9 @@
           </th>
           <th style="width: 18%" pSortableColumn="CATEGORY">
             <span style="vertical-align: middle">Category</span>
-            <p-sortIcon field="CATEGORY"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'CATEGORY'"
+              field="CATEGORY"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"

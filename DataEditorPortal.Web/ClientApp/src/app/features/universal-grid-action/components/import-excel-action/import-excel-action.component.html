@@ -22,6 +22,7 @@
   </div>
 
   <p-table
+    #table
     [value]="importFileList"
     [paginator]="importFileList.length > 0"
     [rows]="5"
@@ -31,7 +32,10 @@
     <ng-template pTemplate="header">
       <tr>
         <th pSortableColumn="name">
-          Name <p-sortIcon field="name"></p-sortIcon>
+          Name
+          <p-sortIcon
+            *ngIf="table.sortField === 'name'"
+            field="name"></p-sortIcon>
           <p-columnFilter
             style="vertical-align: middle"
             type="text"
@@ -43,7 +47,10 @@
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
         <th pSortableColumn="importType">
-          Import Type <p-sortIcon field="importType"></p-sortIcon>
+          Import Type
+          <p-sortIcon
+            *ngIf="table.sortField === 'importType'"
+            field="importType"></p-sortIcon>
           <p-columnFilter
             style="vertical-align: middle"
             type="text"
@@ -55,7 +62,9 @@
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
         <th pSortableColumn="createdByUser">
-          Created By<p-sortIcon field="createdByUser"></p-sortIcon>
+          Created By<p-sortIcon
+            *ngIf="table.sortField === 'createdByUser'"
+            field="createdByUser"></p-sortIcon>
           <p-columnFilter
             style="vertical-align: middle"
             type="text"
@@ -67,7 +76,10 @@
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
         <th pSortableColumn="createdDate">
-          Created Date <p-sortIcon field="createdDate"></p-sortIcon>
+          Created Date
+          <p-sortIcon
+            *ngIf="table.sortField === 'createdDate'"
+            field="createdDate"></p-sortIcon>
           <p-columnFilter
             style="vertical-align: middle"
             type="text"

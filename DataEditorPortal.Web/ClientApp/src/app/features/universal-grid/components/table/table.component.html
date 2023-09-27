@@ -129,7 +129,9 @@
             [style.text-align]="'center'"
             [pSortableColumnDisabled]="!col.sortable">
             <span style="vertical-align: middle">{{ col.header }}</span>
-            <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="col.sortable && col.field === dataTable.sortField"
+              [field]="col.field"></p-sortIcon>
             <p-columnFilter
               *ngIf="col.filterable && !col.enumFilterValue"
               style="vertical-align: middle"

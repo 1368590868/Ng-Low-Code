@@ -1,6 +1,7 @@
 <div class="layout-content flex flex-column p-card mt-3">
   <div class="flex-grow-1">
     <p-table
+      #table
       [loading]="loading"
       styleClass="p-datatable-striped"
       [value]="data"
@@ -33,7 +34,9 @@
         <tr>
           <th style="width: 20%" pSortableColumn="TITLE">
             <span style="vertical-align: middle">Title</span>
-            <p-sortIcon field="TITLE"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'TITLE'"
+              field="TITLE"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -46,7 +49,9 @@
           </th>
           <th style="width: 20%" pSortableColumn="NAME">
             <span style="vertical-align: middle">Name</span>
-            <p-sortIcon field="NAME"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'NAME'"
+              field="NAME"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -59,7 +64,9 @@
           </th>
           <th pSortableColumn="DESCRIPTION">
             <span style="vertical-align: middle">Description</span>
-            <p-sortIcon field="DESCRIPTION"></p-sortIcon>
+            <p-sortIcon
+              *ngIf="table.sortField === 'DESCRIPTION'"
+              field="DESCRIPTION"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
