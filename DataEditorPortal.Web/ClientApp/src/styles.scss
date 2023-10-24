@@ -139,6 +139,36 @@ formly-form {
   min-height: 6.5rem;
 }
 
+// override placeholder color start
+.p-multiselect .p-multiselect-label.p-placeholder {
+  color: var(--gray-400);
+}
+.p-treeselect .p-treeselect-label.p-placeholder {
+  color: var(--gray-400);
+}
+.p-cascadeselect .p-cascadeselect-label.p-placeholder {
+  color: var(--gray-400);
+}
+.p-dropdown .p-dropdown-label.p-placeholder {
+  color: var(--gray-400);
+}
+::-webkit-input-placeholder {
+  color: var(--gray-400);
+}
+
+:-moz-placeholder {
+  color: var(--gray-400);
+}
+
+::-moz-placeholder {
+  color: var(--gray-400);
+}
+
+:-ms-input-placeholder {
+  color: var(--gray-400);
+}
+// override placeholder color end
+
 .monaco-editor-wrapper {
   background-color: #eeeeee;
   border: 1px solid #ced4da;
