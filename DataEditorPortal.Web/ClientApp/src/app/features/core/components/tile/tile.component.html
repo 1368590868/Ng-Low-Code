@@ -5,7 +5,7 @@
     minHeight: menus.length > 0 ? 'calc(100% - 7rem)' : 'calc(100% - 4.25rem)'
   }">
   <div
-    class="w-10 flex align-content-start flex-wrap"
+    class="tile-wrap flex align-content-start flex-wrap"
     *ngIf="menus.length > 0; else emptyMessage">
     <ng-container *ngFor="let menu of menus">
       <div

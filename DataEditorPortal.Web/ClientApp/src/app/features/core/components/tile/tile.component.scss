@@ -1,3 +1,37 @@
+.tile-wrap {
+  width: 1440px;
+}
+
+@media screen and (min-width: 1600px) {
+  .tile-wrap {
+    width: 1440px;
+  }
+}
+
+@media screen and (max-width: 1440px) {
+  .tile-wrap {
+    width: 1260px;
+  }
+}
+
+@media screen and (max-width: 1260px) {
+  .tile-wrap {
+    width: 1080px;
+  }
+}
+
+@media screen and (max-width: 1080px) {
+  .tile-wrap {
+    width: 720px;
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .tile-wrap {
+    width: 540px;
+  }
+}
+
 .tile-block {
   height: 13rem;
   width: 13rem;
