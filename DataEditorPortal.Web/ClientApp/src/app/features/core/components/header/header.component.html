@@ -1,7 +1,14 @@
 <header class="header flex flex-nowarp justify-content-between">
   <div class="flex justify-content-center align-items-center">
     <div class="logo-wrapper flex justify-content-center align-items-center">
-      <img class="logo" [src]="configDataService.siteSettings.siteLogo" />
+      <img
+        *ngIf="configDataService.siteSettings.siteLogo"
+        class="logo"
+        [src]="configDataService.siteSettings.siteLogo" />
+      <i
+        *ngIf="!configDataService.siteSettings.siteLogo"
+        class="pi pi-image text-4xl"
+        style="color: var(--topbar-item-text-color)"></i>
     </div>
     <div class="title-desc text-xl font-bold mb-1">
       {{ this.siteName || configDataService.siteSettings.siteName }}
