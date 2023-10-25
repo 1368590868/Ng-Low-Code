@@ -295,6 +295,13 @@ export class AddPortalDialogComponent {
           }
         });
       }
+    } else {
+      this.fields.forEach(x => {
+        if (x.formControl?.invalid) {
+          x.formControl.markAsDirty();
+          x.formControl.updateValueAndValidity();
+        }
+      });
     }
   }
 }

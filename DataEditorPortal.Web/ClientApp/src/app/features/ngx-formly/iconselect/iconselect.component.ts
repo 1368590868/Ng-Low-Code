@@ -5,14 +5,16 @@ import {
   forwardRef,
   ChangeDetectorRef,
   Input,
-  Inject
+  Inject,
+  Injector
 } from '@angular/core';
 import { SelectItem } from 'primeng/api';
 import { Dropdown } from 'primeng/dropdown';
 import {
   ControlValueAccessor,
   FormControl,
-  NG_VALUE_ACCESSOR
+  NG_VALUE_ACCESSOR,
+  NgControl
 } from '@angular/forms';
 import { NotifyService } from 'src/app/shared';
 import { FileUpload } from 'primeng/fileupload';
@@ -311,6 +313,7 @@ export class IconSelectComponent implements ControlValueAccessor {
   public onChange!: (value: any) => void;
   public onTouch!: () => void;
   public disabled!: boolean;
+  public formNgControl!: NgControl;
   progress = 0;
   apiUrl = '';
 
@@ -330,13 +333,23 @@ export class IconSelectComponent implements ControlValueAccessor {
   constructor(
     private cdr: ChangeDetectorRef,
     private notifyService: NotifyService,
-    @Inject('API_URL') apiUrl: string
+    @Inject('API_URL') apiUrl: string,
+    @Inject(Injector) private injector: Injector
   ) {
     this.apiUrl = apiUrl;
     this.iconList = this.initIcon.map(icon => ({
       label: icon.replace('pi ', ''),
       value: icon
     }));
+  }
+
+  ngOnInit(): void {
+    this.setComponentControl();
+  }
+
+  private setComponentControl(): void {
+    const injectedControl = this.injector.get(NgControl);
+    this.formNgControl = injectedControl;
   }
 
   writeValue(value: any): void {

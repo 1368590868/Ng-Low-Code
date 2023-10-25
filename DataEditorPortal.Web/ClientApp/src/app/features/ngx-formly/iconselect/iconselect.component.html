@@ -2,6 +2,10 @@
   <div class="relative flex-grow-1">
     <p-dropdown
       #dropdown
+      [class]="{
+        'ng-invalid': formNgControl.invalid,
+        'ng-dirty': formNgControl.dirty
+      }"
       [style.display]="iconLogo ? 'none' : 'block'"
       [options]="iconList"
       [filter]="true"
@@ -32,7 +36,7 @@
         [class]="
           dropdown.value
             ? (dropdown?.value?.startsWith('pi') ? 'pi ' : '') + dropdown.value
-            : 'fa fa-no-icon'
+            : ''
         "></i>
     </div>
 
