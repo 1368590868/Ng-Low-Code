@@ -24,6 +24,7 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
         <span
           *ngIf="props.required && props.hideRequiredMarker !== true"
           aria-hidden="true"
+          class="text-red-500"
           >*</span
         >
         <i
