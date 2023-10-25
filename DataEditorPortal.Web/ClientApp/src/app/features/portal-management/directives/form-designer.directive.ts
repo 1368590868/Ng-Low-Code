@@ -91,6 +91,7 @@ export class FormDesignerDirective {
     {
       key: 'filterType',
       type: 'input',
+      props: { placeholder: 'Enter Filter Type' },
       hooks: {
         onInit: field => {
           field.formControl?.valueChanges
@@ -121,7 +122,8 @@ export class FormDesignerDirective {
       type: 'input',
       props: {
         label: 'Field Name',
-        disabled: true
+        disabled: true,
+        placeholder: 'Enter Field Name'
       }
     },
     {

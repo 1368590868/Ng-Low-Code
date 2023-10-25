@@ -197,7 +197,8 @@ export class PortalEditColumnsComponent
       type: 'input',
       props: {
         disabled: true,
-        label: 'Column Type'
+        label: 'Column Type',
+        placeholder: 'Column Type'
       }
     },
     {
@@ -285,7 +286,8 @@ export class PortalEditColumnsComponent
           key: 'format',
           type: 'input',
           props: {
-            label: 'Data Format'
+            label: 'Data Format',
+            placeholder: 'Data Format'
           },
           expressions: {
             hide: `['numeric','date'].indexOf(model.filterType) < 0`,
