@@ -45,7 +45,7 @@
 
   <!-- Link Tables  -->
   <div *ngIf="dsConfig?.dataSourceConnectionName !== null">
-    <p-divider styleClass="w-6 mt-4 font-semibold">Primary Table</p-divider>
+    <p-divider styleClass="w-6 mt-5 font-semibold">Primary Table</p-divider>
     <div class="w-6 mb-3 overflow-hidden">
       <ng-container
         *ngIf="
@@ -95,7 +95,7 @@
             </tr>
           </ng-template>
         </p-table>
-        <div class="flex flex-column mb-2 mt-3">
+        <div class="flex flex-column mb-3 mt-3">
           <label for="columnsForLinkedField" class="mb-1"
             >Select Columns for Link Data Editor</label
           >
@@ -124,7 +124,7 @@
         styleClass="p-button-text p-button-sm mt-1 mb-3"
         (onClick)="onAddPrimaryTable()"></p-button>
     </div>
-    <p-divider styleClass="w-6 mt-4 font-semibold">Secondary Table</p-divider>
+    <p-divider styleClass="w-6 mt-5 font-semibold">Secondary Table</p-divider>
     <div class="w-6 mb-3 overflow-hidden">
       <ng-container
         *ngIf="
@@ -176,7 +176,7 @@
             </tr>
           </ng-template>
         </p-table>
-        <div class="flex flex-column mb-2 mt-3">
+        <div class="flex flex-column mb-3 mt-3">
           <label for="columnsForLinkedField" class="mb-1"
             >Select Columns for Link Data Editor</label
           >
@@ -218,7 +218,7 @@
       secondaryTableConfig.details.length > 0 &&
       secondaryTableConfig.details[0].configCompleted
     ">
-    <p-divider styleClass="w-6 mt-4 font-semibold">Link Relation</p-divider>
+    <p-divider styleClass="w-6 mt-5 font-semibold">Link Relation</p-divider>
     <!-- Relation Button -->
     <div class="w-6 flex align-items-center my-3">
       <div class="flex align-items-center w-20rem">
