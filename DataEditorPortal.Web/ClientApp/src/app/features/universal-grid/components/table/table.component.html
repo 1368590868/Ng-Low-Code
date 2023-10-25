@@ -126,7 +126,7 @@
             [pSortableColumn]="col.field"
             [style.width]="col.width + 'px !important'"
             [style.max-width]="col.width + 'px !important'"
-            [style.text-align]="'center'"
+            [style.text-align]="col.align || 'center'"
             [pSortableColumnDisabled]="!col.sortable">
             <span style="vertical-align: middle">{{ col.header }}</span>
             <p-sortIcon
@@ -198,7 +198,7 @@
           <td
             *ngFor="let col of columns"
             [title]="col.type === 'DataBaseField' ? data[col.field] || '' : ''"
-            [style.text-align]="'center'">
+            [style.text-align]="col.align || 'center'">
             <!-- DataBaseField-->
             <ng-container *ngIf="col.type === 'DataBaseField'">
               <ng-container *ngIf="col.filterType === 'boolean'">{{

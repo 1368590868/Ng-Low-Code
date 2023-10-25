@@ -340,6 +340,21 @@ export class PortalEditColumnsComponent
       props: {
         label: 'Hidden'
       }
+    },
+    {
+      key: 'align',
+      defaultValue: 'center',
+      type: 'select',
+      props: {
+        label: 'Align mode',
+        required: true,
+        options: [
+          { label: 'Left', value: 'left' },
+          { label: 'Center', value: 'center' },
+          { label: 'Right', value: 'right' }
+        ],
+        placeholder: 'Please Select'
+      }
     }
   ];
 
