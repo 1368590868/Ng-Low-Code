@@ -28,6 +28,8 @@ export class ActionWrapperComponent implements OnInit {
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
   @Input() dialogStyle = { width: '31.25rem' };
+  @Input() contentStyleClass =
+    'border-top-1 surface-border pt-4 pb-0 flex flex-column';
   @Input() set visible(val: boolean) {
     if (val) this.display = 'block';
     else this.display = 'none';

@@ -126,6 +126,7 @@ const GRID_ACTION_CONFIG = [
       icon: 'pi pi-trash',
       buttonStyleClass: 'p-button-outlined p-button-danger',
       header: 'Delete Confirmation',
+      contentStyleClass: 'pb-0 flex flex-column',
       cancelText: 'No',
       okText: 'Yes'
     }
