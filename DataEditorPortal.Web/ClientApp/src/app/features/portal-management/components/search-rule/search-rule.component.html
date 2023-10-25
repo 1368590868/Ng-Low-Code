@@ -5,7 +5,8 @@
     pInputText
     [formControl]="formControlField"
     (blur)="onFormControlFieldBlur()"
-    [required]="true" />
+    [required]="true"
+    placeholder="Enter  Rule" />
   <p-dropdown
     *ngIf="!whereClause"
     [formControl]="formControlMatchMode"
