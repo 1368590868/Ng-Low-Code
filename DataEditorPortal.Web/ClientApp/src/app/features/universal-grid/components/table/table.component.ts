@@ -21,7 +21,7 @@ import {
   GridActionWrapperOption
 } from 'src/app/features/universal-grid-action';
 import { GridColumn, GridConfig, GridData } from '../../models/grid-types';
-import { Table } from 'primeng/table';
+import { Table, TableHeaderCheckbox } from 'primeng/table';
 import { ConfirmationService, TableState } from 'primeng/api';
 import {
   GridFilterParam,
@@ -57,6 +57,8 @@ export class TableComponent implements OnInit, OnDestroy {
 
   records: GridData[] = [];
   totalRecords = 0;
+
+  innerSelectedRecords: GridData[] = [];
 
   _selection: any;
   set selection(value: any) {
@@ -347,6 +349,9 @@ export class TableComponent implements OnInit, OnDestroy {
         tap(res => {
           this.records = res.data;
           this.totalRecords = res.total;
+          this.innerSelectedRecords = JSON.parse(
+            JSON.stringify(this.selectedRecords)
+          );
 
           if (this.urlParamsService.initParams && !this.firstLoadDone) {
             this.selection = JSON.parse(JSON.stringify(this.selection));
@@ -421,6 +426,21 @@ export class TableComponent implements OnInit, OnDestroy {
 
   onRowCheckBoxClick(event: MouseEvent) {
     event.stopPropagation();
+  }
+
+  onHeaderCheckbox(tableHeaderCheckboxRef: TableHeaderCheckbox) {
+    if (tableHeaderCheckboxRef.checked) {
+      this.selection = [
+        ...new Set([...this.records, ...this.innerSelectedRecords])
+      ];
+    } else {
+      this.innerSelectedRecords = this.innerSelectedRecords.filter(x => {
+        return !this.records.find(
+          y => y[this.tableConfig.dataKey] === x[this.tableConfig.dataKey]
+        );
+      });
+      this.selection = [...new Set(this.innerSelectedRecords)];
+    }
   }
 
   onRowSelect(event: any) {

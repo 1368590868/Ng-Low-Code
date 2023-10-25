@@ -116,7 +116,11 @@
       <ng-template pTemplate="header" let-columns>
         <tr>
           <th *ngIf="selectionMode === 'multiple'" class="selection">
-            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            <p-tableHeaderCheckbox
+              #tableHeaderCheckboxRef
+              (click)="
+                onHeaderCheckbox(tableHeaderCheckboxRef)
+              "></p-tableHeaderCheckbox>
           </th>
           <th class="action"></th>
           <th
