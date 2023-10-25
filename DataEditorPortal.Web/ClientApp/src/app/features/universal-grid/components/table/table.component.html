@@ -71,7 +71,7 @@
                 [gridName]="gridName"
                 (savedEvent)="refresh()"></ng-template>
             </div>
-            <div class="flex-none mr-2 ml-auto">
+            <div class="flex-none mr-2 ml-auto mt-1">
               <strong
                 *ngIf="
                   selectedRecords.length > 0 && selectionMode === 'multiple'
@@ -86,8 +86,8 @@
               tooltipPosition="left"
               [styleClass]="
                 showHighlightOnly
-                  ? 'p-button-rounded mr-1'
-                  : 'p-button-rounded p-button-outlined mr-1'
+                  ? 'p-button-rounded mr-1 w-2rem h-2rem mt-1'
+                  : 'p-button-rounded p-button-outlined mr-1 w-2rem h-2rem mt-1'
               "
               icon="pi pi-link text-lg"
               (onClick)="onShowHighlightOnlyClick()"></p-button>
@@ -95,19 +95,19 @@
               pTooltip="Reset the sorts and filters"
               tooltipPosition="left"
               icon="pi pi-refresh text-lg"
-              styleClass="p-button-rounded p-button-outlined mr-1"
+              styleClass="p-button-rounded p-button-outlined mr-1 w-2rem h-2rem mt-1"
               (onClick)="resetAndRefresh()"></p-button>
             <p-button
               pTooltip="Show/Hide columns"
               tooltipPosition="left"
               icon="pi pi-pause text-lg"
-              styleClass="p-button-rounded p-button-outlined mr-1"
+              styleClass="p-button-rounded p-button-outlined mr-1 w-2rem h-2rem mt-1"
               (onClick)="columnSelectorVisible = true"></p-button>
             <p-button
               pTooltip="Reset table back to original view"
               tooltipPosition="left"
               icon="pi pi-sync text-lg"
-              styleClass="p-button-rounded p-button-outlined"
+              styleClass="p-button-rounded p-button-outlined w-2rem h-2rem mt-1"
               (onClick)="confirmResetColumns($event)"></p-button>
           </div>
         </div>
