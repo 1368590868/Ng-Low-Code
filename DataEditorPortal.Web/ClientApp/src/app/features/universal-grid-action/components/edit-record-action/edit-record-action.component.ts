@@ -29,7 +29,7 @@ import {
 import { UniversalGridService } from '../../services/universal-grid.service';
 import * as qs from 'qs';
 import { GridTableService } from 'src/app/features/universal-grid/services/grid-table.service';
-
+import { isEqual, cloneDeep } from 'lodash-es';
 @Component({
   selector: 'app-edit-record-action',
   templateUrl: './edit-record-action.component.html',
@@ -49,6 +49,7 @@ export class EditRecordActionComponent
   model = {};
   fields!: FormlyFieldConfig[];
   dataKey?: string;
+  backModel: any;
 
   eventConfig?: FormEventConfig;
 
@@ -70,6 +71,10 @@ export class EditRecordActionComponent
   ) {
     super();
   }
+
+  override isFormUnmodified = () => {
+    return isEqual(this.model, this.backModel);
+  };
 
   ngOnInit(): void {
     if (!this.isAddForm) {
@@ -145,7 +150,8 @@ export class EditRecordActionComponent
           this.fields = fields;
 
           if (fields.length > 0) this.loadedEvent.emit();
-        })
+        }),
+        tap(() => (this.backModel = cloneDeep(this.model)))
       )
       .subscribe();
   }
@@ -260,7 +266,8 @@ export class EditRecordActionComponent
       .pipe(
         tap(result => {
           this.eventConfig = result;
-        })
+        }),
+        tap(() => (this.backModel = cloneDeep(this.model)))
       )
       .subscribe();
   }

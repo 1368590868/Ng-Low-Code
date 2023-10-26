@@ -46,6 +46,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { SidebarModule } from 'primeng/sidebar';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { DividerModule } from 'primeng/divider';
 
@@ -88,6 +89,7 @@ import { DividerModule } from 'primeng/divider';
     SidebarModule,
     CheckboxModule,
     ConfirmPopupModule,
+    ConfirmDialogModule,
     DividerModule
   ],
   providers: [

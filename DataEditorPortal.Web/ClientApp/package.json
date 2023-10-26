@@ -24,6 +24,8 @@
     "@angular/router": "^15.0.0",
     "@ngx-formly/core": "^6.0.0",
     "@ngx-formly/primeng": "^6.0.0",
+    "@types/lodash-es": "^4.17.10",
+    "lodash-es": "^4.17.21",
     "monaco-editor": "^0.36.0",
     "ngx-monaco-editor": "^12.0.0",
     "numeral": "^2.0.6",

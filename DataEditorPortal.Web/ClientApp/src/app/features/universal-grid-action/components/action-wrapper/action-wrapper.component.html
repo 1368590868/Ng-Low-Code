@@ -6,7 +6,8 @@
   [styleClass]="buttonStyleClass"></p-button>
 <p-dialog
   [header]="header"
-  [(visible)]="dialogVisible"
+  [visible]="dialogVisible"
+  (visibleChange)="onVisibleChange($event)"
   (onHide)="onHide()"
   [style]="dialogStyle"
   [modal]="dialogModal"

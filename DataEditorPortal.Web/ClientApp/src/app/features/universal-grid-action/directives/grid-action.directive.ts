@@ -14,4 +14,6 @@ export class GridActionDirective {
   @Output() savedEvent = new EventEmitter<void>();
   @Output() cancelEvent = new EventEmitter<void>();
   @Output() errorEvent = new EventEmitter<void>();
+
+  isFormUnmodified?: () => boolean;
 }

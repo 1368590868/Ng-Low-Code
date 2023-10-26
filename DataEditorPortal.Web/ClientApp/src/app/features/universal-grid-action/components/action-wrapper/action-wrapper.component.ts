@@ -13,6 +13,7 @@ import { UrlParamsService } from 'src/app/features/universal-grid/services/url-p
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { GridActionConfig } from '../../models/grid-config';
 import { GlobalLoadingService } from 'src/app/shared';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-action-wrapper',
@@ -54,7 +55,8 @@ export class ActionWrapperComponent implements OnInit {
 
   constructor(
     private urlParamsService: UrlParamsService,
-    public globalLoadingService: GlobalLoadingService
+    public globalLoadingService: GlobalLoadingService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -84,7 +86,7 @@ export class ActionWrapperComponent implements OnInit {
   }
 
   onCancel() {
-    this.dialogVisible = false;
+    this.closeDialog();
   }
 
   onOk() {
@@ -127,7 +129,7 @@ export class ActionWrapperComponent implements OnInit {
       this.savedEvent.emit();
     });
     actionRef.instance.cancelEvent.subscribe(() => {
-      this.dialogVisible = false;
+      this.closeDialog();
     });
     actionRef.instance.errorEvent.subscribe(() => {
       this.isLoading = false;
@@ -139,5 +141,32 @@ export class ActionWrapperComponent implements OnInit {
 
     // set actionRef to wrapper, for it to invoke
     this.componentRef = actionRef;
+  }
+
+  onVisibleChange(visible: boolean) {
+    this.closeDialog(visible);
+  }
+
+  closeDialog(visible = false) {
+    if (this.componentRef.instance.isFormUnmodified?.() === undefined) {
+      this.dialogVisible = visible;
+      return;
+    }
+
+    if (this.componentRef.instance.isFormUnmodified?.()) {
+      this.dialogVisible = false;
+    } else {
+      this.confirmationService.confirm({
+        key: 'confirm-dialog',
+        rejectButtonStyleClass: 'p-button-text',
+        acceptButtonStyleClass: 'ml-1',
+        header: ' ',
+        message: `You have unsaved changes in the form \n Are you sure you want to close the form?`,
+        icon: 'pi pi-exclamation-triangle',
+        accept: () => {
+          this.dialogVisible = false;
+        }
+      });
+    }
   }
 }
