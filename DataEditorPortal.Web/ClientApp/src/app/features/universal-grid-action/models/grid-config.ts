@@ -9,7 +9,9 @@ export interface GridActionWrapperOption {
   cancelText?: string;
   class?: string;
   buttonStyleClass?: string;
-  dialogStyle?: string;
+  dialogStyle?: object;
+  dialogContentStyleClass?: string;
+  dialogHideFooter?: boolean;
 }
 
 export interface GridActionOption {
@@ -24,7 +26,7 @@ export interface GridActionConfig {
   name: string;
   label?: string;
   isCustom?: boolean;
-  requireGridRowSelected: boolean | number;
+  requireGridRowSelected?: boolean | number;
   component: Type<GridActionDirective>;
   wrapper?: GridActionWrapperOption;
   props?: {

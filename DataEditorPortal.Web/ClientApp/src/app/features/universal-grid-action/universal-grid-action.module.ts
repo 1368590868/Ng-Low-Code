@@ -53,8 +53,9 @@ import {
 import { ImportExcelActionComponent } from './components/import-excel-action/import-excel-action.component';
 
 import { HasErrorPipe } from './components/import-excel-action/import-excel-action.component';
+import { GridActionConfig } from './models/grid-config';
 
-const GRID_ACTION_CONFIG = [
+const GRID_ACTION_CONFIG: GridActionConfig[] = [
   {
     name: 'add-record',
     component: EditRecordActionComponent,
@@ -114,7 +115,7 @@ const GRID_ACTION_CONFIG = [
       cancelText: 'Cancel',
       okText: 'Import',
       dialogStyle: { width: '90rem', height: '50.625rem' },
-      hideFooter: true
+      dialogHideFooter: true
     }
   },
   {
@@ -126,7 +127,7 @@ const GRID_ACTION_CONFIG = [
       icon: 'pi pi-trash',
       buttonStyleClass: 'p-button-outlined p-button-danger',
       header: 'Delete Confirmation',
-      contentStyleClass: 'pb-0 flex flex-column',
+      dialogContentStyleClass: 'pb-0 flex flex-column',
       cancelText: 'No',
       okText: 'Yes'
     }

@@ -10,11 +10,11 @@
   (onHide)="onHide()"
   [style]="dialogStyle"
   [modal]="true"
-  [contentStyleClass]="contentStyleClass"
+  [contentStyleClass]="dialogContentStyleClass"
   appendTo="body">
   <ng-container #container></ng-container>
   <app-global-loading></app-global-loading>
-  <ng-template pTemplate="footer" *ngIf="!hideFooter">
+  <ng-template pTemplate="footer" *ngIf="!dialogHideFooter">
     <p-button
       *ngIf="cancelText"
       icon="pi pi-times"
