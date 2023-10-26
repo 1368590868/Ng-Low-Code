@@ -12,6 +12,7 @@ export interface GridActionWrapperOption {
   dialogStyle?: object;
   dialogContentStyleClass?: string;
   dialogHideFooter?: boolean;
+  dialogModal?: boolean;
 }
 
 export interface GridActionOption {

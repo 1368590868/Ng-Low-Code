@@ -30,6 +30,7 @@ export class ActionWrapperComponent implements OnInit {
   @Input() dialogStyle = { width: '31.25rem' };
   @Input() dialogContentStyleClass =
     'border-top-1 surface-border pt-4 pb-0 flex flex-column';
+  @Input() dialogModal = true;
   @Input() set visible(val: boolean) {
     if (val) this.display = 'block';
     else this.display = 'none';
