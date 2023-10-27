@@ -2,31 +2,37 @@
   width: 1440px;
 }
 
-@media screen and (min-width: 1600px) {
+@media screen and (min-width: 2310px) {
   .tile-wrap {
-    width: 1440px;
+    width: 2100px;
   }
 }
 
-@media screen and (max-width: 1440px) {
+@media (2100px <= width <2300px) {
+  .tile-wrap {
+    width: 1680px;
+  }
+}
+
+@media screen and (max-width: 1580px) {
   .tile-wrap {
     width: 1260px;
   }
 }
 
-@media screen and (max-width: 1260px) {
+@media screen and (max-width: 1386px) {
   .tile-wrap {
     width: 1080px;
   }
 }
 
-@media screen and (max-width: 1080px) {
+@media screen and (max-width: 1188px) {
   .tile-wrap {
     width: 720px;
   }
 }
 
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 792px) {
   .tile-wrap {
     width: 540px;
   }
