@@ -2,6 +2,7 @@
   <div class="relative flex-grow-1">
     <p-dropdown
       #dropdown
+      [style]="{ '--icon-padding': !dropdown.value ? '0.5rem' : '3rem' }"
       [class]="{
         'ng-invalid': formNgControl.invalid,
         'ng-dirty': formNgControl.dirty
