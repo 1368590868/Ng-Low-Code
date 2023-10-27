@@ -148,7 +148,7 @@ export class ActionWrapperComponent implements OnInit {
   }
 
   closeDialog(visible = false) {
-    if (this.componentRef.instance.isFormUnmodified?.() === undefined) {
+    if (this.componentRef.instance.isFormUnmodified === undefined) {
       this.dialogVisible = visible;
       return;
     }
