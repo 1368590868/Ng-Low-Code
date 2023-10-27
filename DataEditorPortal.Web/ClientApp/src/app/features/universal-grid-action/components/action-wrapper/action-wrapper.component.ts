@@ -160,7 +160,7 @@ export class ActionWrapperComponent implements OnInit {
         key: 'confirm-dialog',
         rejectButtonStyleClass: 'p-button-text',
         acceptButtonStyleClass: 'ml-1',
-        header: ' ',
+        header: 'Close Form',
         message: `You have unsaved changes in the form \n Are you sure you want to close the form?`,
         icon: 'pi pi-exclamation-triangle',
         accept: () => {
