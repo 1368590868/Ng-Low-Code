@@ -49,7 +49,7 @@ export class EditRecordActionComponent
   model = {};
   fields!: FormlyFieldConfig[];
   dataKey?: string;
-  backModel: any;
+  backModel = {};
 
   eventConfig?: FormEventConfig;
 
@@ -151,7 +151,9 @@ export class EditRecordActionComponent
 
           if (fields.length > 0) this.loadedEvent.emit();
         }),
-        tap(() => (this.backModel = cloneDeep(this.model)))
+        tap(() => {
+          this.setBackupModel();
+        })
       )
       .subscribe();
   }
@@ -245,6 +247,10 @@ export class EditRecordActionComponent
           x.props['gridName'] = this.gridName;
         }
       });
+
+    setTimeout(() => {
+      this.setBackupModel();
+    });
   }
   private configFieldExpressions(fields: FormlyFieldConfig[]) {
     // set expressions
@@ -267,9 +273,16 @@ export class EditRecordActionComponent
         tap(result => {
           this.eventConfig = result;
         }),
-        tap(() => (this.backModel = cloneDeep(this.model)))
+        tap(() => {
+          this.setBackupModel();
+        })
       )
       .subscribe();
+  }
+
+  setBackupModel() {
+    if (Object.keys(this.model).length !== 0)
+      this.backModel = cloneDeep(this.model);
   }
 
   submitSave(model: EditFormData) {
