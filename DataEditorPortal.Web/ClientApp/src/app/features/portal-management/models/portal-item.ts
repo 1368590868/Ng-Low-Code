@@ -74,6 +74,12 @@ export interface GridColumn {
   enumFilterValue?: boolean;
 }
 
+export interface GridSearchConfig {
+  searchFields: GridSearchField[];
+  useExistingSearch: boolean;
+  existingSearchName: string;
+}
+
 export interface GridSearchField {
   key: string;
   type: string;

@@ -28,6 +28,19 @@
       (modelChange)="modelChange($event)"
       class="p-fluid"></formly-form>
 
+    <div *ngIf="existingSearchOptions.length > 0">
+      <p-divider></p-divider>
+      <label>Search On</label>
+      <p-dropdown
+        styleClass="w-full mb-3"
+        [options]="existingSearchOptions"
+        [showClear]="true"
+        (onClear)="onClear()"
+        [formControl]="formControlExistingSearch"
+        appendTo="body"
+        placeholder="Existing Search Config"></p-dropdown>
+    </div>
+
     <div class="flex justify-content-end">
       <p-button styleClass="p-button-outlined mr-2" (onClick)="onClear()">
         Clear

@@ -4,7 +4,29 @@
     Select the fields that you want to used in search panel.
   </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
-  <div class="w-full pt-2 flex">
+
+  <div class="flex align-items-center">
+    <div class="flex align-items-center py-2 mr-4">
+      <p-inputSwitch
+        class="mr-2"
+        [(ngModel)]="useExistingSearch"></p-inputSwitch>
+      Use Existing Search
+    </div>
+    <div class="flex align-items-center" *ngIf="useExistingSearch">
+      <p-dropdown
+        styleClass="w-15rem"
+        appendTo="body"
+        [showClear]="true"
+        placeholder="Please Select"
+        [(ngModel)]="existingSearchName"
+        [options]="existingSearchOptions"></p-dropdown>
+      <i
+        class="pi pi-question-circle ml-3 text-lg"
+        pTooltip="Select one existing portal item search configuration."></i>
+    </div>
+  </div>
+
+  <div class="w-full pt-2 flex" *ngIf="!useExistingSearch">
     <p-pickList
       #pickList
       class="flex-grow-1 mr-3"
@@ -81,6 +103,7 @@
       </div>
     </div>
   </div>
+
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
       <p-button
@@ -109,3 +132,8 @@
     </div>
   </ng-template>
 </p-card>
+<p-confirmDialog
+  header="Confirmation"
+  icon="pi pi-exclamation-triangle"
+  rejectButtonStyleClass="p-button-text"
+  [style]="{ maxWidth: '40rem' }"></p-confirmDialog>

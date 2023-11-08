@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { PrimeNGConfig } from 'primeng/api';
-import { map, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 import { ApiResponse, ConfigDataService, NotifyService } from 'src/app/shared';
 import {
   DataSourceConfig,
@@ -16,7 +16,8 @@ import {
   LinkedDataSourceConfig,
   LinkedSingleConfig,
   PortalItem,
-  PortalItemData
+  PortalItemData,
+  GridSearchConfig
 } from '../models/portal-item';
 
 @Injectable({
@@ -341,15 +342,54 @@ export class PortalItemService {
       .pipe(tap(() => this.refreshMenu()));
   }
 
-  getGridSearchConfig(): Observable<GridSearchField[]> {
+  getGridSearchConfig(): Observable<GridSearchConfig> {
     return this.http
-      .get<ApiResponse<GridSearchField[]>>(
+      .get<ApiResponse<GridSearchConfig>>(
         `${this._apiUrl}portal-item/${this.itemId}/grid-search`
       )
-      .pipe(map(x => x.data || []));
+      .pipe(
+        map(
+          x =>
+            x.data || {
+              searchFields: [],
+              useExistingSearch: false,
+              existingSearchName: ''
+            }
+        )
+      );
   }
 
-  saveGridSearchConfig(data: GridSearchField[]) {
+  getPortalItemOptions(): Observable<{ label: string; value: string }[]> {
+    return this.http
+      .get<ApiResponse<{ label: string; value: string }[]>>(
+        `${this._apiUrl}portal-item/${this.itemId}/grid-search`
+      )
+      .pipe(
+        map(x => x.data || []),
+        map(() => [
+          { label: 'Demo Item', value: 'demo-item' },
+          { label: 'Test Table', value: 'test-value' }
+        ])
+      );
+  }
+
+  getExistingSearchOptions(
+    gridName: string
+  ): Observable<{ label: string; value: string }[]> {
+    return this.http
+      .get<ApiResponse<{ label: string; value: string }[]>>(
+        `${this._apiUrl}portal-item/${this.itemId}/grid-search`
+      )
+      .pipe(
+        map(x => x.data || []),
+        map(() => [
+          { label: 'Demo Item Copy', value: '/demo-item-copy' },
+          { label: 'Test Table', value: '/folder-3/test-table1-123123' }
+        ])
+      );
+  }
+
+  saveGridSearchConfig(data: GridSearchConfig) {
     return this.http
       .post<ApiResponse<boolean>>(
         `${this._apiUrl}portal-item/${this.itemId}/grid-search`,

@@ -1,4 +1,10 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
@@ -11,6 +17,9 @@ import {
 import { GridTableService } from '../../services/grid-table.service';
 import { UrlParamsService } from '../../services/url-params.service';
 import { SearchService } from '../../services/search.service';
+import { Router } from '@angular/router';
+import * as qs from 'qs';
+import { PortalItemService } from 'src/app/features/portal-management/services/portal-item.service';
 
 @Component({
   selector: 'app-search',
@@ -30,12 +39,15 @@ export class SearchComponent implements OnInit, OnDestroy {
   } = {};
   fields!: FormlyFieldConfig[];
 
+  existingSearchOptions: { label: string; value: string }[] = [];
+
   isLoading = false;
   visible = false;
   dialogStyle = { width: '35rem' };
   showStar = false;
 
   formControlSearchHistory = new FormControl();
+  formControlExistingSearch = new FormControl();
   formControlDialogSearchHistory = new FormControl();
   formControlDialogName = new FormControl();
   dialogHistoryOptions: {
@@ -64,7 +76,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     private systemLogService: SystemLogService,
     private urlParamsService: UrlParamsService,
     private searchService: SearchService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private portalItemService: PortalItemService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -108,6 +122,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
       this.fields = fields;
       const searchParams = this.urlParamsService.getSearchInitParams();
+      this.initExistingSearch();
       if (searchParams && searchParams.action === 'search') {
         if (searchParams?.payload) {
           this.model = { ...this.model, ...searchParams?.payload };
@@ -136,6 +151,13 @@ export class SearchComponent implements OnInit, OnDestroy {
       }
     });
 
+    // get existing search options
+    this.portalItemService
+      .getExistingSearchOptions(this.gridName)
+      .subscribe(res => {
+        this.existingSearchOptions = res;
+      });
+
     this.formControlSearchHistory.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(value => {
@@ -144,6 +166,23 @@ export class SearchComponent implements OnInit, OnDestroy {
           this.onSubmit(this.model);
         }
       });
+
+    this.formControlExistingSearch.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => {
+        if (value) {
+          this.searchService.setSearchForm(this.model);
+          this.router.navigate([value]);
+        }
+      });
+  }
+
+  initExistingSearch() {
+    if (this.searchService.searchForm) {
+      this.model = { ...this.model, ...this.searchService.searchForm };
+
+      this.searchService.clearSearchForm();
+    }
   }
 
   ngOnDestroy(): void {

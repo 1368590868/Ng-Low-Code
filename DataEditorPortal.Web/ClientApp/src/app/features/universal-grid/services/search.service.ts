@@ -8,8 +8,17 @@ import { ApiResponse } from 'src/app/shared';
 })
 export class SearchService {
   public _apiUrl: string;
+  public searchForm: any;
   constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string) {
     this._apiUrl = apiUrl;
+  }
+
+  setSearchForm(form: any) {
+    this.searchForm = form;
+  }
+
+  clearSearchForm() {
+    this.searchForm = null;
   }
 
   getSearchHistory(gridName: string) {
