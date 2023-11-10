@@ -165,6 +165,10 @@ export class ActionWrapperComponent implements OnInit {
         icon: 'pi pi-exclamation-triangle',
         accept: () => {
           this.dialogVisible = false;
+          this.confirmationService.close();
+        },
+        reject: () => {
+          this.confirmationService.close();
         }
       });
     }
