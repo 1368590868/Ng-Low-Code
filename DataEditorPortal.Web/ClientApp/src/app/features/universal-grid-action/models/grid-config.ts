@@ -27,7 +27,7 @@ export interface GridActionConfig {
   name: string;
   label?: string;
   isCustom?: boolean;
-  requireGridRowSelected?: boolean | number;
+  requireGridRowSelected?: boolean | number | string;
   component: Type<GridActionDirective>;
   wrapper?: GridActionWrapperOption;
   props?: {

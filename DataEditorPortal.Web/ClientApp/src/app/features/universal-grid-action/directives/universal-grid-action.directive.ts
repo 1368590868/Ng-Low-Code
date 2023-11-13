@@ -131,12 +131,32 @@ export class UniversalGridActionDirective
 
   setActionWrapperVisible(wrapper: ComponentRef<ActionWrapperComponent>) {
     const actionCfg = wrapper.instance.actionConfig;
-    wrapper.instance.visible =
-      (actionCfg.requireGridRowSelected === true &&
-        this.selectedRecords.length > 0) ||
-      actionCfg.requireGridRowSelected === this.selectedRecords.length ||
-      actionCfg.requireGridRowSelected === undefined ||
-      actionCfg.requireGridRowSelected === false;
+
+    const isActionVisible = (): boolean => {
+      if (typeof actionCfg.requireGridRowSelected === 'string') {
+        const operator = actionCfg.requireGridRowSelected.split(' ')[0];
+        const value = actionCfg.requireGridRowSelected.split(' ')[1];
+        if (operator === '>') {
+          return this.selectedRecords.length > Number(value);
+        } else if (operator === '<') {
+          return this.selectedRecords.length < Number(value);
+        } else if (operator === '=') {
+          return this.selectedRecords.length === Number(value);
+        } else {
+          return false;
+        }
+      } else {
+        return (
+          (actionCfg.requireGridRowSelected === true &&
+            this.selectedRecords.length > 0) ||
+          actionCfg.requireGridRowSelected === this.selectedRecords.length ||
+          actionCfg.requireGridRowSelected === undefined ||
+          actionCfg.requireGridRowSelected === false
+        );
+      }
+    };
+
+    wrapper.instance.visible = isActionVisible();
   }
 
   syncActionProps(wrapper: ComponentRef<ActionWrapperComponent>, prop: string) {

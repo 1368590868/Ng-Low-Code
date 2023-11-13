@@ -54,6 +54,7 @@ import { ImportExcelActionComponent } from './components/import-excel-action/imp
 
 import { HasErrorPipe } from './components/import-excel-action/import-excel-action.component';
 import { GridActionConfig } from './models/grid-config';
+import { EditMultipleRecordActionComponent } from './components/edit-multiple-record-action/edit-multiple-record-action.component';
 
 const GRID_ACTION_CONFIG: GridActionConfig[] = [
   {
@@ -68,6 +69,19 @@ const GRID_ACTION_CONFIG: GridActionConfig[] = [
     },
     props: {
       isAddForm: true
+    }
+  },
+  {
+    name: 'edit-multiple-record',
+    requireGridRowSelected: '> 1',
+    component: EditMultipleRecordActionComponent,
+    wrapper: {
+      label: 'Edit Multiple',
+      icon: 'pi pi-file-edit',
+      buttonStyleClass: 'p-button-outlined',
+      header: 'Update multiple data details',
+      dialogStyle: { width: '50rem' },
+      okText: 'Update'
     }
   },
   {
@@ -237,7 +251,8 @@ const EVENT_ACTION_CONFIG = [
     UserPermissionActionComponent,
     ImportExcelActionComponent,
     HasErrorPipe,
-    ImportStatusComponent
+    ImportStatusComponent,
+    EditMultipleRecordActionComponent
   ],
   imports: [
     CommonModule,

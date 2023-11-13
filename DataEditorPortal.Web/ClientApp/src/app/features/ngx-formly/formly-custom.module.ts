@@ -15,6 +15,7 @@ import { DateValidatorModule } from './datevalidator';
 import { UniversalRegexpModule } from './universalregexp';
 import { FormlyFileUploadModule } from './file-upload/file-upload.modules';
 import { FormlyFormFieldModule } from './form-field/form-field.module';
+import { FormlyFormFieldMultipleModule } from './form-field-multiple/form-field-multiple.module';
 import { FormlyLinkDataEditorModule } from './link-data-editor';
 import { FormlyLocationEditorModule } from './location-editor/location-editor.modules';
 
@@ -36,6 +37,7 @@ import { FormlyLocationEditorModule } from './location-editor/location-editor.mo
     UniversalRegexpModule,
     FormlyFileUploadModule,
     FormlyFormFieldModule,
+    FormlyFormFieldMultipleModule,
     FormlyLinkDataEditorModule,
     FormlyLocationEditorModule
   ],

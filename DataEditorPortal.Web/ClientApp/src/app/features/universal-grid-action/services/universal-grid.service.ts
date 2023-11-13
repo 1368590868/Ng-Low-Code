@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { ApiResponse, NotifyService } from 'src/app/shared';
 import { GridColumn } from '../../portal-management/models/portal-item';
 import { EditFormData, EditFormField, FormEventConfig } from '../models/edit';
@@ -52,6 +52,30 @@ export class UniversalGridService {
       .pipe(map(res => res.data || {}));
   }
 
+  getMultipleDetailData(
+    name: string,
+    ids: string[]
+  ): Observable<{ data: EditFormData; state: string[] }> {
+    // return this.http
+    //   .post<ApiResponse<EditFormData>>(
+    //     `${this._apiUrl}universal-grid/${name}/data`,
+    //     { ids }
+    //   )
+    //   .pipe(map(res => res.data || {}));
+    return of({
+      data: {
+        ID: '40848483-b4c4-41e7-ae4e-018e523cce62',
+        NAME: null,
+        FIRST_NAME: 'Robert',
+        NUMBER: 15,
+        VENDOR: 'Amet',
+        EMPLOYOR: 'Ipsum',
+        DIVISION: 'Amet'
+      },
+      state: ['FIRST_NAME', 'EMPLOYOR', 'VENDOR', 'NUMBER', 'DIVISION']
+    });
+  }
+
   addGridData(
     name: string,
     data: EditFormData
@@ -71,6 +95,19 @@ export class UniversalGridService {
       `${this._apiUrl}universal-grid/${name}/data/${id}/update`,
       data
     );
+  }
+
+  updateMultipleGridData(
+    name: string,
+    ids: string[],
+    data: EditFormData
+  ): Observable<ApiResponse<boolean>> {
+    // return this.http.post<ApiResponse<boolean>>(
+    //   `${this._apiUrl}universal-grid/${name}/data`,
+    //   { ids, data }
+    // );
+    console.log('savedata', data);
+    return of({ code: 200, data: true });
   }
 
   deleteGridData(

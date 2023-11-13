@@ -303,6 +303,7 @@ export class TableComponent implements OnInit, OnDestroy {
         });
       }
     }
+
     if (this.allowDelete) {
       if (this.tableConfig.customDeleteFormName) {
         actions.push({ name: this.tableConfig.customDeleteFormName });
@@ -317,6 +318,12 @@ export class TableComponent implements OnInit, OnDestroy {
     this.tableConfig.customActions?.forEach(x => {
       actions.push(x);
     });
+
+    if (this.allowEdit) {
+      actions.push({
+        name: 'edit-multiple-record'
+      });
+    }
 
     this.tableActions = [...actions];
   }
