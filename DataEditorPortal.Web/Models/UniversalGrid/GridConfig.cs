@@ -88,6 +88,8 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public string template { get; set; }
         public string format { get; set; }
 
+        public string align { get; set; }
+
         public FileUploadConfig fileUploadConfig { get; set; }
     }
 
