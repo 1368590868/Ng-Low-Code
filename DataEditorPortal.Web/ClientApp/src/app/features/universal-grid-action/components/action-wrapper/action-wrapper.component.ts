@@ -1,19 +1,19 @@
 import {
   Component,
-  Input,
-  ViewChild,
-  ViewContainerRef,
   ComponentRef,
-  Output,
   EventEmitter,
+  HostBinding,
+  Input,
   OnInit,
-  HostBinding
+  Output,
+  ViewChild,
+  ViewContainerRef
 } from '@angular/core';
+import { ConfirmationService } from 'primeng/api';
 import { UrlParamsService } from 'src/app/features/universal-grid/services/url-params.service';
+import { LoadingComponent } from 'src/app/shared/components/loading/loading.component';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { GridActionConfig } from '../../models/grid-config';
-import { GlobalLoadingService } from 'src/app/shared';
-import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-action-wrapper',
@@ -45,17 +45,18 @@ export class ActionWrapperComponent implements OnInit {
 
   @ViewChild('container', { read: ViewContainerRef, static: true })
   viewContainerRef!: ViewContainerRef;
+  @ViewChild(LoadingComponent) loadingRef!: LoadingComponent;
 
   componentRef!: ComponentRef<GridActionDirective>;
   dialogVisible = false;
-  isLoading = false;
+  isSaving = false;
   buttonDisabled = true;
+  loaded = false;
 
   initParams?: any;
 
   constructor(
     private urlParamsService: UrlParamsService,
-    public globalLoadingService: GlobalLoadingService,
     private confirmationService: ConfirmationService
   ) {}
 
@@ -73,10 +74,12 @@ export class ActionWrapperComponent implements OnInit {
   }
 
   showDialog() {
-    this.isLoading = false;
-    this.dialogVisible = true;
-    this.globalLoadingService.start();
-    this.renderAction();
+    this.loaded = false;
+    if (!this.dialogVisible) {
+      this.dialogVisible = true;
+      this.loadingRef.start();
+      this.renderAction();
+    }
   }
 
   onHide() {
@@ -90,7 +93,7 @@ export class ActionWrapperComponent implements OnInit {
   }
 
   onOk() {
-    this.isLoading = true;
+    this.isSaving = true;
     if (this.hasEventHandler('onSave'))
       (this.componentRef.instance as any).onSave();
     else {
@@ -132,11 +135,11 @@ export class ActionWrapperComponent implements OnInit {
       this.closeDialog();
     });
     actionRef.instance.errorEvent.subscribe(() => {
-      this.isLoading = false;
+      this.isSaving = false;
     });
     actionRef.instance.loadedEvent.subscribe(() => {
-      this.isLoading = false;
       this.buttonDisabled = false;
+      this.loaded = true;
     });
 
     // set actionRef to wrapper, for it to invoke

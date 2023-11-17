@@ -6,19 +6,14 @@ import {
   ViewChild
 } from '@angular/core';
 import {
-  NgForm,
-  FormGroup,
   AbstractControl,
-  FormControl
+  FormControl,
+  FormGroup,
+  NgForm
 } from '@angular/forms';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
-import {
-  GlobalLoadingService,
-  GroupDetail,
-  NotifyService,
-  SiteGroupService
-} from 'src/app/shared';
+import { GroupDetail, NotifyService, SiteGroupService } from 'src/app/shared';
 
 @Component({
   selector: 'app-add-group',
@@ -53,8 +48,7 @@ export class AddGroupComponent {
 
   constructor(
     private siteGroupService: SiteGroupService,
-    private notifyService: NotifyService,
-    private globalLoadingService: GlobalLoadingService
+    private notifyService: NotifyService
   ) {}
   showDialog() {
     this.isLoading = false;
@@ -62,7 +56,6 @@ export class AddGroupComponent {
     this.buttonDisabled = false;
 
     if (this.id) {
-      this.globalLoadingService.start();
       this.getDetail();
     } else {
       this.getFields();

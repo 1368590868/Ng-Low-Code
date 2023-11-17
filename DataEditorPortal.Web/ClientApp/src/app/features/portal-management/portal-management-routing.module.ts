@@ -1,17 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PortalListComponent } from './components/portal-list/portal-list.component';
 import {
-  PortalEditComponent,
   PortalEditBasicComponent,
-  PortalEditDatasourceComponent,
+  PortalEditBasicSubComponent,
   PortalEditColumnsComponent,
-  PortalEditSearchComponent,
+  PortalEditComponent,
+  PortalEditDatasourceComponent,
   PortalEditFormComponent,
   PortalEditLinkComponent,
-  PortalEditBasicSubComponent
+  PortalEditSearchComponent
 } from './components';
-import { PortalRouterLoadingGuard } from 'src/app/shared';
+import { PortalListComponent } from './components/portal-list/portal-list.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'list', pathMatch: 'full' },
@@ -21,7 +20,6 @@ const routes: Routes = [
     path: 'edit-single/:id',
     component: PortalEditComponent,
     data: { type: 'single' },
-    canActivateChild: [PortalRouterLoadingGuard],
     children: [
       { path: 'basic', component: PortalEditBasicComponent },
       { path: 'datasource', component: PortalEditDatasourceComponent },
@@ -41,7 +39,6 @@ const routes: Routes = [
     path: 'edit-linked/:id',
     component: PortalEditComponent,
     data: { type: 'linked' },
-    canActivateChild: [PortalRouterLoadingGuard],
     children: [
       { path: 'basic', component: PortalEditBasicComponent },
       { path: 'datasource', component: PortalEditLinkComponent },
@@ -65,7 +62,6 @@ const routes: Routes = [
     path: 'edit-linked/:parentId/datasource/edit/:id',
     component: PortalEditComponent,
     data: { type: 'linked-single' },
-    canActivateChild: [PortalRouterLoadingGuard],
     children: [
       { path: 'basic', component: PortalEditBasicSubComponent },
       { path: 'datasource', component: PortalEditDatasourceComponent },

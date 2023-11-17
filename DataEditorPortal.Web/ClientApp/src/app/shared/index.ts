@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { FormlyModule } from '@ngx-formly/core';
 
@@ -9,26 +9,27 @@ import { FormlyModule } from '@ngx-formly/core';
 import { MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
-import { globalLoadingInterceptor } from './interceptor/global-loading.interceptor';
+import { RequestLogInterceptor } from './interceptor/request-log.interceptor';
+import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
 
-import { BooleanTextPipe } from './pipes/boolean-text.pipe';
 import { AttachmentsPipe } from './pipes/attachments.pipe';
-import { TemplatePipe } from './pipes/template.pipe';
+import { BooleanTextPipe } from './pipes/boolean-text.pipe';
 import { NumeralPipe } from './pipes/numeral.pipe';
+import { TemplatePipe } from './pipes/template.pipe';
 
 import { AutoFilterDirective } from './directive/auto-filter.directive';
 import { DropdownFixDirective } from './directive/dropdown-fix.directive';
 import { MonacoEditorDirective } from './directive/monaco-editor.directive';
-import { TableDirective } from './directive/table.directive';
 import { PermissionDirective } from './directive/permission.directive';
+import { TableDirective } from './directive/table.directive';
 
 // public components
 import { AttachmentsComponent } from './components/attachments/attachments.component';
-import { GlobalLoadingComponent } from './components/global-loading/global-loading.component';
-import { registerNumeral, registerQuill } from './utils';
+import { LoadingComponent } from './components/loading/loading.component';
+import { DialogFocusDirective } from './directive/dialog-focus.directive';
 import { ConfigDataService, DataFormatService } from './services';
+import { registerNumeral, registerQuill } from './utils';
 
 export * from './guards';
 export * from './models';
@@ -43,13 +44,14 @@ registerQuill();
     AutoFilterDirective,
     DropdownFixDirective,
     MonacoEditorDirective,
+    DialogFocusDirective,
     TableDirective,
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
     NumeralPipe,
     AttachmentsComponent,
-    GlobalLoadingComponent
+    LoadingComponent
   ],
   imports: [
     CommonModule,
@@ -63,18 +65,19 @@ registerQuill();
     AutoFilterDirective,
     DropdownFixDirective,
     MonacoEditorDirective,
+    DialogFocusDirective,
     TableDirective,
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
     NumeralPipe,
     AttachmentsComponent,
-    GlobalLoadingComponent
+    LoadingComponent
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: globalLoadingInterceptor,
+      useClass: RequestLogInterceptor,
       multi: true
     },
     {

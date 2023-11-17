@@ -14,7 +14,7 @@
   [contentStyleClass]="dialogContentStyleClass"
   appendTo="body">
   <ng-container #container></ng-container>
-  <app-global-loading></app-global-loading>
+  <app-loading mode="once"></app-loading>
   <ng-template pTemplate="footer" *ngIf="!dialogHideFooter">
     <p-button
       *ngIf="cancelText"
@@ -28,6 +28,6 @@
       (onClick)="onOk()"
       [label]="okText"
       [disabled]="buttonDisabled"
-      [loading]="isLoading"></p-button>
+      [loading]="isSaving"></p-button>
   </ng-template>
 </p-dialog>

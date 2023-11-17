@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { catchError, EMPTY, tap } from 'rxjs';
-import { GlobalLoadingService, SystemLogService } from 'src/app/shared';
+import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { EMPTY, catchError, tap } from 'rxjs';
+import { SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { ExportForm, ExportParam } from '../../models/export';
 import { UniversalGridService } from '../../services/universal-grid.service';
@@ -35,8 +35,7 @@ export class ExportExcelActionComponent
 
   constructor(
     private gridService: UniversalGridService,
-    private systemLogService: SystemLogService,
-    private globalLoadingService: GlobalLoadingService
+    private systemLogService: SystemLogService
   ) {
     super();
   }
@@ -66,7 +65,6 @@ export class ExportExcelActionComponent
       )}`
     };
 
-    this.globalLoadingService.end();
     this.loadedEvent.emit();
   }
 

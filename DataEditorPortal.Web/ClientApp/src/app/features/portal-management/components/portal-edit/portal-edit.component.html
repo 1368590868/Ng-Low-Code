@@ -6,7 +6,7 @@
     <p-steps [readonly]="!configCompleted" [model]="steps"></p-steps>
   </div>
   <div class="relative loading-wrap">
-    <app-global-loading></app-global-loading>
+    <app-loading></app-loading>
     <router-outlet
       *ngIf="activatedIndex >= 0"
       (activate)="onActivate($event)"

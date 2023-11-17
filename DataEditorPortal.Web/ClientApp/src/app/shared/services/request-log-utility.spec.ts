@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { GlobalLoadingService } from './global-loading.service';
+import { RequestLogUtility } from './request-log-utility';
 
-describe('FormLoadingService', () => {
-  let service: GlobalLoadingService;
+describe('RequestLogUtility', () => {
+  let service: RequestLogUtility;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(GlobalLoadingService);
+    service = TestBed.inject(RequestLogUtility);
   });
 
   it('should be created', () => {
