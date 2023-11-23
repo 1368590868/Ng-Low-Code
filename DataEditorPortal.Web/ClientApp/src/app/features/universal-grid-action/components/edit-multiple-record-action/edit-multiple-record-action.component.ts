@@ -2,24 +2,22 @@ import { DatePipe } from '@angular/common';
 import {
   Component,
   Inject,
-  Injector,
   Input,
   OnInit,
   Type,
   ViewChild
 } from '@angular/core';
-import { FormGroup, NgForm, Validators } from '@angular/forms';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { isEqual, cloneDeep } from 'lodash-es';
+import { FormGroup, NgForm } from '@angular/forms';
+import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { cloneDeep, isEqual } from 'lodash-es';
 import { Subject, forkJoin, tap } from 'rxjs';
-import { GridTableService } from 'src/app/features/universal-grid/services/grid-table.service';
 import {
-  NotifyService,
   NgxFormlyService,
+  NotifyService,
   SystemLogService
 } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
-import { FormEventConfig, EditFormData } from '../../models/edit';
+import { EditFormData, FormEventConfig } from '../../models/edit';
 import { EventActionHandlerService } from '../../services/event-action-handler.service';
 import { UniversalGridService } from '../../services/universal-grid.service';
 
@@ -39,15 +37,10 @@ export class EditMultipleRecordActionComponent
 
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  model = {};
+  model: EditFormData = {};
   fields!: FormlyFieldConfig[];
   dataKeys: string[] = [];
   backModel = {};
-  fieldsCopy!: FormlyFieldConfig[];
-  resultCopy!: {
-    data: EditFormData;
-    state: string[];
-  };
 
   eventConfig?: FormEventConfig;
 
@@ -76,21 +69,20 @@ export class EditMultipleRecordActionComponent
     if (!this.isAddForm) {
       this.dataKeys = this.selectedRecords.map((x: any) => x[this.recordKey]);
       forkJoin([
-        this.gridService.getMultipleDetailData(this.gridName, this.dataKeys),
+        this.gridService.batchGet(this.gridName, this.dataKeys),
         this.gridService.getSearchConfig(this.gridName)
       ])
         .pipe(
           tap(([result, searchConfig]) => {
             Object.keys(result).forEach(key => {
-              if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}.*/.test(result.data[key])) {
-                result.data[key] = new Date(result.data[key]);
+              if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}.*/.test(result[key])) {
+                result[key] = new Date(result[key]);
               }
             });
             this.onLoadUrlParams();
             this.searchConfig(searchConfig);
-            this.resultCopy = result;
 
-            this.model = result.data;
+            this.model = result;
           }),
           tap(() => this.getFormConfig()),
           tap(() => this.getEventConfig())
@@ -128,7 +120,6 @@ export class EditMultipleRecordActionComponent
       .pipe(
         tap(result => {
           const fields = result as FormlyFieldConfig[];
-          this.fieldsCopy = cloneDeep(result);
           this.configFieldDefaultValue(fields);
           this.configFieldLookup(fields);
           this.configFieldValidator(fields);
@@ -238,17 +229,11 @@ export class EditMultipleRecordActionComponent
 
     // use multiple edit wrapper
     fields.forEach((x: any) => {
-      if (x.props) {
-        x.wrappers = ['form-field-multiple'];
+      x.wrappers = ['form-field-multiple'];
 
-        x.props['fieldsCopy'] = this.fieldsCopy;
+      if ((x.key as string) in this.model) {
+        if (x.props) x.props['isSameValue'] = true;
       }
-
-      this.resultCopy.state.forEach(key => {
-        if (x.key === key) {
-          if (x.props) x.props['isSameValue'] = true;
-        }
-      });
     });
 
     setTimeout(() => {
@@ -295,20 +280,15 @@ export class EditMultipleRecordActionComponent
       params: JSON.stringify(model)
     });
 
-    const state = this.fields
-      .map(f => {
-        if (f.props && !f.props['isSameValue']) {
-          return f.key;
-        }
-        return null;
-      })
-      .filter(x => x);
+    const data: EditFormData = {};
+    this.fields.forEach(f => {
+      if (f.props && f.props['isSameValue'] && f.key) {
+        data[f.key as string] = this.model[f.key as string];
+      }
+    });
 
     this.gridService
-      .updateMultipleGridData(this.gridName, this.dataKeys, {
-        data: this.model,
-        state
-      })
+      .batchUpdate(this.gridName, this.dataKeys, data)
       .subscribe(res => {
         if (res.code === 200 && res.data) {
           this.notifyService.notifySuccess(
