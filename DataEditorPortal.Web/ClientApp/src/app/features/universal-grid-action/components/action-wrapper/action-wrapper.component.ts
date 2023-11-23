@@ -10,6 +10,7 @@ import {
   ViewContainerRef
 } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
+import { Dialog } from 'primeng/dialog';
 import { UrlParamsService } from 'src/app/features/universal-grid/services/url-params.service';
 import { LoadingComponent } from 'src/app/shared/components/loading/loading.component';
 import { GridActionDirective } from '../../directives/grid-action.directive';
@@ -46,6 +47,7 @@ export class ActionWrapperComponent implements OnInit {
   @ViewChild('container', { read: ViewContainerRef, static: true })
   viewContainerRef!: ViewContainerRef;
   @ViewChild(LoadingComponent) loadingRef!: LoadingComponent;
+  @ViewChild(Dialog) dialogRef!: Dialog;
 
   componentRef!: ComponentRef<GridActionDirective>;
   dialogVisible = false;
@@ -79,6 +81,8 @@ export class ActionWrapperComponent implements OnInit {
       this.dialogVisible = true;
       this.loadingRef.start();
       this.renderAction();
+    } else {
+      this.dialogRef.moveOnTop();
     }
   }
 
