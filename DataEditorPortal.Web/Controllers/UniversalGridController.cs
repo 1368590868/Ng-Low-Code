@@ -93,6 +93,15 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPost]
+        [Route("{name}/data/batch-get")]
+        public IDictionary<string, object> BatchGet(string name, [FromBody] BatchGetInput input)
+        {
+            if (input == null || input.Ids == null || input.Ids.Length == 0) throw new ArgumentNullException("input.Ids");
+
+            return _universalGridService.BatchGet(name, input.Ids);
+        }
+
+        [HttpPost]
         [Route("{name}/data/{type}/validate/{id?}")]
         public bool ValidateData(string name, string type, string id, [FromBody] Dictionary<string, object> model)
         {
@@ -111,6 +120,16 @@ namespace DataEditorPortal.Web.Controllers
         public bool UpdateData(string name, string id, [FromBody] Dictionary<string, object> model)
         {
             return _universalGridService.UpdateGridData(name, id, model);
+        }
+
+        [HttpPost]
+        [Route("{name}/data/batch-update")]
+        public bool BatchUpdate(string name, [FromBody] BatchUpdateInput model)
+        {
+            if (model == null || model.Ids == null || model.Ids.Length == 0) throw new ArgumentNullException("model.Ids");
+            if (model == null || model.Data == null || model.Data.Keys.Count == 0) throw new ArgumentNullException("model.Data");
+
+            return _universalGridService.BatchUpdate(name, model.Ids, model.Data);
         }
 
         [HttpDelete]

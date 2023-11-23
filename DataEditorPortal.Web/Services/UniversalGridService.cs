@@ -38,8 +38,10 @@ namespace DataEditorPortal.Web.Services
         MemoryStream ExportExcel(string name, ExportParam param);
 
         IDictionary<string, object> GetGridDataDetail(string name, string id);
+        IDictionary<string, object> BatchGet(string name, string[] ids);
         bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model);
         bool UpdateGridData(string name, string id, IDictionary<string, object> model);
+        bool BatchUpdate(string name, string[] ids, IDictionary<string, object> model);
         bool AddGridData(string name, IDictionary<string, object> model);
         bool DeleteGridData(string name, object[] ids);
 
@@ -787,6 +789,91 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
+        public IDictionary<string, object> BatchGet(string name, string[] ids)
+        {
+            _dapperService.EventSection = $"{name} | GetGridDataDetail - Batch";
+
+            var config = GetUniversalGridConfiguration(name);
+            var formLayout = GetUpdatingFormConfig(config);
+            var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            var queryText = _queryBuilder.GenerateSqlTextForDetail(dataSourceConfig, true);
+
+            // join attachments 
+            var attachmentCols = GetAttachmentCols(config);
+            if (attachmentCols.Any())
+                queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
+
+            IDictionary<string, object> details = new Dictionary<string, object>();
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
+            {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+                // always provide Id column parameter
+                var param = _queryBuilder.GenerateDynamicParameter(new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
+
+                try
+                {
+                    con.Open();
+                    var data = _dapperService.Query(con, queryText, param).ToList();
+
+                    DataTable schema;
+                    using (var dr = con.ExecuteReader(queryText, param))
+                    {
+                        schema = dr.GetSchemaTable();
+                    }
+
+                    var models = new List<IDictionary<string, object>>();
+                    data.ForEach(item =>
+                    {
+                        // get all fileds data in a row
+                        var row = (IDictionary<string, object>)item;
+                        foreach (var key in row.Keys)
+                        {
+                            var index = row.Keys.ToList().IndexOf(key);
+                            row[key] = _queryBuilder.TransformValue(row[key], schema.Rows[index]);
+                        }
+
+                        // process every row to form model
+                        var result = row.AsList().ToDictionary(x => x.Key, x => x.Value);
+                        foreach (var field in formLayout.FormFields)
+                        {
+                            var processor = factory.CreateValueProcessor(field, config, con);
+                            if (processor != null)
+                            {
+                                processor.FetchValue(result);
+                            }
+                        }
+
+                        models.Add(result);
+                    });
+
+                    // diff form data
+                    foreach (var field in formLayout.FormFields)
+                    {
+                        var same = false;
+                        var comparer = factory.CreateValueComparer(field, config);
+                        if (comparer != null)
+                            same = models.Distinct(comparer).Count() == 1;
+                        else
+                            same = models.Select(d => d[field.key]).Distinct().Count() == 1;
+
+                        if (same)
+                            details[field.key] = models[0][field.key];
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
+                    _logger.LogError(ex, ex.Message);
+                    throw new DepException("An Error in the query has occurred: " + ex.Message);
+                }
+
+                return details;
+            }
+        }
+
         public bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model)
         {
             _dapperService.EventSection = $"{name} | ValidateGridData";
@@ -1143,6 +1230,185 @@ namespace DataEditorPortal.Web.Services
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
+            }
+
+            return true;
+        }
+
+        public bool BatchUpdate(string name, string[] ids, IDictionary<string, object> model)
+        {
+            _dapperService.EventSection = $"{name} | BatchUpdate";
+
+            var config = GetUniversalGridConfiguration(name);
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+
+            // get detail config
+            var formLayout = GetUpdatingFormConfig(config);
+            var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+
+            #region Get all data models
+
+            var queryText = _queryBuilder.GenerateSqlTextForDetail(dataSourceConfig, true);
+
+            // join attachments 
+            var attachmentCols = GetAttachmentCols(config);
+            if (attachmentCols.Any())
+                queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
+
+            var models = new List<IDictionary<string, object>>();
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
+            {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
+                var param = _queryBuilder.GenerateDynamicParameter(new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
+
+                var data = _dapperService.Query(con, queryText, param).ToList();
+
+                DataTable schema;
+                using (var dr = con.ExecuteReader(queryText, param))
+                {
+                    schema = dr.GetSchemaTable();
+                }
+
+                models = new List<IDictionary<string, object>>();
+                data.ForEach(item =>
+                {
+                    // get all fileds data in a row
+                    var row = (IDictionary<string, object>)item;
+                    foreach (var key in row.Keys)
+                    {
+                        var index = row.Keys.ToList().IndexOf(key);
+                        row[key] = _queryBuilder.TransformValue(row[key], schema.Rows[index]);
+                    }
+
+                    // process every row to form model
+                    var result = row.AsList().ToDictionary(x => x.Key, x => x.Value);
+                    foreach (var field in formLayout.FormFields)
+                    {
+                        var processor = factory.CreateValueProcessor(field, config, con);
+                        if (processor != null)
+                        {
+                            processor.FetchValue(result);
+                        }
+                    }
+
+                    models.Add(result);
+                });
+            }
+
+            #endregion
+
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
+            {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+                con.Open();
+
+                #region prepair values and paramsters
+
+                // drop the keyvalue which not in formfield defination
+                model = model.ToList()
+                    .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
+                    .ToDictionary(x => x.Key, x => x.Value);
+
+                // apply new values,
+                // modelToUpdate should already have IdColumn, as it comes form SqlTextForList
+                foreach (var modelToUpdate in models)
+                {
+                    foreach (var kv1 in model)
+                        modelToUpdate[kv1.Key] = kv1.Value;
+
+                    // add id parameter
+                    //if (modelToUpdate.ContainsKey(dataSourceConfig.IdColumn))
+                    //    modelToUpdate[dataSourceConfig.IdColumn] = kv.Key;
+                    //else
+                    //    modelToUpdate.Add(dataSourceConfig.IdColumn, kv.Key);
+
+                    // calculate the computed field values
+                    ProcessComputedValues(formLayout.FormFields, modelToUpdate, con);
+                }
+
+                #endregion
+
+                // start transaction
+                var trans = _dapperService.BeginTransaction(con);
+
+                #region Run update for each record
+
+                var errorMsg = string.Empty;
+                foreach (var modelToUpdate in models)
+                {
+                    // use value processor to convert values in model
+                    var valueProcessors = new List<ValueProcessorBase>();
+                    foreach (var field in formLayout.FormFields)
+                    {
+                        var processor = factory.CreateValueProcessor(field, config, con, trans);
+                        if (processor != null)
+                        {
+                            valueProcessors.Add(processor);
+                            processor.PreProcess(modelToUpdate);
+                        }
+                    }
+
+                    // generate the query text
+                    queryText = _queryBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
+                    {
+                        TableSchema = dataSourceConfig.TableSchema,
+                        TableName = dataSourceConfig.TableName,
+                        IdColumn = dataSourceConfig.IdColumn,
+                        Columns = modelToUpdate.Keys.ToList(),
+                        QueryText = formLayout.QueryText
+                    });
+                    var param = _queryBuilder.GenerateDynamicParameter(modelToUpdate.AsEnumerable());
+
+                    try
+                    {
+                        var affected = _dapperService.Execute(con, queryText, param, trans);
+
+                        // use value processors to execute extra operations
+                        foreach (var processor in valueProcessors)
+                        {
+                            processor.PostProcess(modelToUpdate);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
+                        _logger.LogError(ex, ex.Message);
+                        errorMsg = ex.Message;
+                    }
+                }
+
+                // throw errors 
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    _dapperService.Rollback(trans);
+                    throw new DepException("An Error in the query has occurred: " + errorMsg);
+                }
+
+                #endregion
+
+                try
+                {
+                    // Commit all the changes in transaction
+                    _dapperService.Commit(trans);
+                }
+                catch (Exception ex)
+                {
+                    _dapperService.Rollback(trans);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
+                    _logger.LogError(ex, ex.Message);
+                    throw new DepException("An Error in the query has occurred: " + errorMsg);
+                }
+
+                // run after saved event?
+                //foreach (var m in models)
+                //{
+                //    if (formLayout?.AfterSaved != null)
+                //    {
+                //        AfterSaved(formLayout.AfterSaved, config.Name, config.DataSourceConnection.ConnectionString, m);
+                //    }
+                //}
             }
 
             return true;
