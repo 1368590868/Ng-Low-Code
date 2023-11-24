@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { PrimeNGConfig } from 'primeng/api';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { ApiResponse, ConfigDataService, NotifyService } from 'src/app/shared';
 import {
   DataSourceConfig,
@@ -11,13 +11,12 @@ import {
   GirdDetailConfig,
   GridColumn,
   GridCustomAction,
-  GridSearchField,
+  GridSearchConfig,
   ImportPortal,
   LinkedDataSourceConfig,
   LinkedSingleConfig,
   PortalItem,
-  PortalItemData,
-  GridSearchConfig
+  PortalItemData
 } from '../models/portal-item';
 
 @Injectable({
@@ -353,7 +352,7 @@ export class PortalItemService {
             x.data || {
               searchFields: [],
               useExistingSearch: false,
-              existingSearchName: ''
+              existingSearchId: ''
             }
         )
       );
@@ -362,15 +361,9 @@ export class PortalItemService {
   getPortalItemOptions(): Observable<{ label: string; value: string }[]> {
     return this.http
       .get<ApiResponse<{ label: string; value: string }[]>>(
-        `${this._apiUrl}portal-item/${this.itemId}/grid-search`
+        `${this._apiUrl}portal-item/${this.itemId}/grid-search/existing-config`
       )
-      .pipe(
-        map(x => x.data || []),
-        map(() => [
-          { label: 'Demo Item', value: 'demo-item' },
-          { label: 'Test Table', value: 'test-value' }
-        ])
-      );
+      .pipe(map(x => x.data || []));
   }
 
   getExistingSearchOptions(
@@ -378,14 +371,14 @@ export class PortalItemService {
   ): Observable<{ label: string; value: string }[]> {
     return this.http
       .get<ApiResponse<{ label: string; value: string }[]>>(
-        `${this._apiUrl}portal-item/${this.itemId}/grid-search`
+        `${this._apiUrl}universal-grid/${gridName}/grids-with-same-config`
       )
       .pipe(
-        map(x => x.data || []),
-        map(() => [
-          { label: 'Demo Item Copy', value: '/demo-item-copy' },
-          { label: 'Test Table', value: '/folder-3/test-table1-123123' }
-        ])
+        map(x => x.data || [])
+        // map(() => [
+        //   { label: 'Demo Item Copy', value: '/demo-item-copy' },
+        //   { label: 'Test Table', value: '/folder-3/test-table1-123123' }
+        // ])
       );
   }
 

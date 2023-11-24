@@ -77,7 +77,7 @@ export interface GridColumn {
 export interface GridSearchConfig {
   searchFields: GridSearchField[];
   useExistingSearch: boolean;
-  existingSearchName: string;
+  existingSearchId: string;
 }
 
 export interface GridSearchField {

@@ -7,10 +7,12 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFormOptions } from '@ngx-formly/core';
+import { cloneDeep, isEqual } from 'lodash-es';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
 import { forkJoin, of, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import {
   DataSourceTableColumn,
   GridFormField,
@@ -19,8 +21,6 @@ import {
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { FormDesignerViewComponent } from '../../form-designer/form-designer-view.component';
-import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
-import { cloneDeep, isEqual } from 'lodash-es';
 @Component({
   selector: 'app-portal-edit-search',
   templateUrl: './portal-edit-search.component.html',
@@ -48,12 +48,12 @@ export class PortalEditSearchComponent
 
   useExistingSearch = false;
   existingSearchOptions: { label: string; value: string }[] = [];
-  existingSearchName = '';
+  existingSearchId = '';
 
   originalConfig: GridSearchConfig = {
     useExistingSearch: false,
     searchFields: [],
-    existingSearchName: ''
+    existingSearchId: ''
   };
 
   addCustomSearchModels: MenuItem[] = [
@@ -115,6 +115,8 @@ export class PortalEditSearchComponent
       ]).subscribe(res => {
         this.isLoading = false;
         this.existingSearchOptions = res[2];
+        this.useExistingSearch = res[0].useExistingSearch;
+        this.existingSearchId = res[0].existingSearchId;
         this.targetColumns = res[0].searchFields
           .filter(
             c =>
@@ -133,7 +135,7 @@ export class PortalEditSearchComponent
         this.originalConfig = {
           useExistingSearch: res[0].useExistingSearch,
           searchFields: cloneDeep(this.targetColumns),
-          existingSearchName: res[0].existingSearchName
+          existingSearchId: res[0].existingSearchId
         };
 
         this.sourceColumns = res[1]
@@ -194,7 +196,7 @@ export class PortalEditSearchComponent
   }
 
   valid() {
-    if (this.useExistingSearch && !this.existingSearchName) {
+    if (this.useExistingSearch && !this.existingSearchId) {
       this.notifyService.notifyWarning(
         'Warning',
         'Please select existing search.'
@@ -222,7 +224,7 @@ export class PortalEditSearchComponent
         .saveGridSearchConfig({
           searchFields: this.targetColumns,
           useExistingSearch: this.useExistingSearch,
-          existingSearchName: this.existingSearchName
+          existingSearchId: this.existingSearchId
         })
         .pipe(
           tap(res => {
@@ -250,7 +252,7 @@ export class PortalEditSearchComponent
 
   dataSourceChanged(): boolean {
     if (this.useExistingSearch) {
-      if (this.originalConfig.existingSearchName !== this.existingSearchName) {
+      if (this.originalConfig.existingSearchId !== this.existingSearchId) {
         return true;
       }
     } else {
@@ -267,7 +269,7 @@ export class PortalEditSearchComponent
     if (
       this.dataSourceChanged() &&
       this.originalConfig.searchFields.length === 0 &&
-      !this.originalConfig.existingSearchName &&
+      !this.originalConfig.existingSearchId &&
       !this.originalConfig.useExistingSearch
     ) {
       this.confirmationService.confirm({
