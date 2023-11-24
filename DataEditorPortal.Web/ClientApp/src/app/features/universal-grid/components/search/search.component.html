@@ -30,11 +30,10 @@
 
     <div *ngIf="existingSearchOptions.length > 0">
       <p-divider></p-divider>
-      <label>Search On</label>
+      <label class="line-height-3">Search On</label>
       <p-dropdown
         styleClass="w-full mb-3"
         [options]="existingSearchOptions"
-        [showClear]="true"
         (onClear)="onClear()"
         [formControl]="formControlExistingSearch"
         appendTo="body"

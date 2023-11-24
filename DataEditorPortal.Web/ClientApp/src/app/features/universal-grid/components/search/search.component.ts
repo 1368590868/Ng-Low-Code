@@ -166,6 +166,14 @@ export class SearchComponent implements OnInit, OnDestroy {
           this.router.navigate([value]);
         }
       });
+
+    this.setDefaultSearchOn();
+  }
+
+  setDefaultSearchOn() {
+    this.formControlExistingSearch.setValue(this.router.url.substring(1), {
+      emitEvent: false
+    });
   }
 
   initExistingSearch() {
