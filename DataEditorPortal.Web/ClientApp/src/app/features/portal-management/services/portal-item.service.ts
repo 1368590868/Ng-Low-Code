@@ -366,22 +366,6 @@ export class PortalItemService {
       .pipe(map(x => x.data || []));
   }
 
-  getExistingSearchOptions(
-    gridName: string
-  ): Observable<{ label: string; value: string }[]> {
-    return this.http
-      .get<ApiResponse<{ label: string; value: string }[]>>(
-        `${this._apiUrl}universal-grid/${gridName}/grids-with-same-config`
-      )
-      .pipe(
-        map(x => x.data || [])
-        // map(() => [
-        //   { label: 'Demo Item Copy', value: '/demo-item-copy' },
-        //   { label: 'Test Table', value: '/folder-3/test-table1-123123' }
-        // ])
-      );
-  }
-
   saveGridSearchConfig(data: GridSearchConfig) {
     return this.http
       .post<ApiResponse<boolean>>(

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { map, Observable, Subject } from 'rxjs';
+import { Observable, Subject, map } from 'rxjs';
 import { ApiResponse, GridParam, SearchParam } from 'src/app/shared';
 import {
   GridColumn,
@@ -87,5 +87,15 @@ export class GridTableService {
         `${this._apiUrl}universal-grid/${name}/config/search`
       )
       .pipe(map(res => res.data || []));
+  }
+
+  getExistingSearchOptions(
+    gridName: string
+  ): Observable<{ label: string; value: string }[]> {
+    return this.http
+      .get<ApiResponse<{ label: string; value: string }[]>>(
+        `${this._apiUrl}universal-grid/${gridName}/grids-with-same-config`
+      )
+      .pipe(map(x => x.data || []));
   }
 }

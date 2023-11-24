@@ -104,7 +104,6 @@ export class PortalEditSearchComponent
   }
 
   ngOnInit(): void {
-    console.log(this.itemId, '11111111111111111');
     if (this.itemId) {
       forkJoin([
         this.portalItemService.getGridSearchConfig(),

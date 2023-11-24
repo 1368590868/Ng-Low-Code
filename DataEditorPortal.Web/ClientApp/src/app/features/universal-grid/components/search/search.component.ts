@@ -1,11 +1,6 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  Input,
-  OnDestroy,
-  OnInit
-} from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
 import {
@@ -15,11 +10,8 @@ import {
   SystemLogService
 } from 'src/app/shared';
 import { GridTableService } from '../../services/grid-table.service';
-import { UrlParamsService } from '../../services/url-params.service';
 import { SearchService } from '../../services/search.service';
-import { Router } from '@angular/router';
-import * as qs from 'qs';
-import { PortalItemService } from 'src/app/features/portal-management/services/portal-item.service';
+import { UrlParamsService } from '../../services/url-params.service';
 
 @Component({
   selector: 'app-search',
@@ -77,7 +69,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     private urlParamsService: UrlParamsService,
     private searchService: SearchService,
     private notifyService: NotifyService,
-    private portalItemService: PortalItemService,
     private router: Router
   ) {}
 
@@ -152,7 +143,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     });
 
     // get existing search options
-    this.portalItemService
+    this.gridTableService
       .getExistingSearchOptions(this.gridName)
       .subscribe(res => {
         this.existingSearchOptions = res;
