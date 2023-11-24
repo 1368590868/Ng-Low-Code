@@ -24,6 +24,10 @@ namespace DataEditorPortal.Data.Models
         public string DataSourceConfig { get; set; }
         [Column("COLUMNS_CONFIG")]
         public string ColumnsConfig { get; set; }
+        [Column("USE_EXISTING_SEARCH")]
+        public bool UseExistingSearch { get; set; }
+        [Column("EXISTING_SEARCH_NAME")]
+        public string ExistingSearchName { get; set; }
         [Column("SEARCH_CONFIG")]
         public string SearchConfig { get; set; }
         [Column("DETAIL_CONFIG")]

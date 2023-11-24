@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,6 +20,7 @@ namespace DataEditorPortal.Data.Models
         [Column("NUMBER")]
         public int Number { get; set; }
         [Column("TOTAL")]
+        [Precision(18, 2)]
         public decimal Total { get; set; }
         [Column("VENDOR")]
         public string Vendor { get; set; }
