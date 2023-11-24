@@ -29,6 +29,7 @@ namespace DataEditorPortal.Web.Services
         List<GridColConfig> GetGridColumnsConfig(string name);
         List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column);
         List<SearchFieldConfig> GetGridSearchConfig(string name);
+        List<DropdownOptionsItem> GetGridWithSameSearchConfig(string name);
         List<FormFieldConfig> GetGridFormConfig(string name, string type);
         GridFormLayout GetFormEventConfig(string name, string type);
 
@@ -74,6 +75,7 @@ namespace DataEditorPortal.Web.Services
         private readonly IAttachmentService _attachmentService;
         private readonly IMemoryCache _memoryCache;
         private readonly IDapperService _dapperService;
+        private readonly IUserService _userService;
 
         private string _currentUsername;
         public string CurrentUsername
@@ -96,7 +98,8 @@ namespace DataEditorPortal.Web.Services
             IEventLogService eventLogService,
             IAttachmentService attachmentService,
             IMemoryCache memoryCache,
-            IDapperService dapperService)
+            IDapperService dapperService,
+            IUserService userService)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
@@ -108,6 +111,7 @@ namespace DataEditorPortal.Web.Services
             _attachmentService = attachmentService;
             _memoryCache = memoryCache;
             _dapperService = dapperService;
+            _userService = userService;
 
             if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
                 CurrentUsername = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
@@ -192,6 +196,74 @@ namespace DataEditorPortal.Web.Services
             var result = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
 
             //result.ForEach(x => x.searchRule = null);
+
+            return result;
+        }
+
+        public List<DropdownOptionsItem> GetGridWithSameSearchConfig(string name)
+        {
+            var config = GetUniversalGridConfiguration(name);
+
+            var topestId = config.Id;
+            if (config.UseExistingSearch && !string.IsNullOrEmpty(config.ExistingSearchName))
+            {
+                // find the topest item id
+                var nameWithoutStartSlash = config.ExistingSearchName.TrimStart('/');
+                var slashIndex = nameWithoutStartSlash.IndexOf("/");
+                Guid.TryParse(slashIndex > 0 ? nameWithoutStartSlash.Substring(0, slashIndex) : nameWithoutStartSlash, out topestId);
+            }
+
+            var result = new List<DropdownOptionsItem>();
+            var menusQuery = from m in _depDbContext.SiteMenus select m;
+            var menus = (
+                from m in menusQuery
+                join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name
+                where
+                    // basic criteria
+                    m.Type == "Portal Item" && u.ConfigCompleted && u.SearchConfig != null
+                    // exclude itself
+                    && u.Id != config.Id
+                    // include the topest search item and all items use it
+                    && (u.Id == topestId || u.ExistingSearchName.Contains(topestId.ToString()))
+                select m
+            ).ToList();
+
+            if (menus.Count > 0)
+            {
+                // has grids use same search config
+                // filter by permissions
+                var isAdmin = _userService.IsAdmin(_currentUsername);
+                var userPermissions = _userService.GetUserPermissions().Keys.ToList();
+                menus = menus
+                    .Where(
+                        m => isAdmin || (m.Status == PortalItemStatus.Published && userPermissions.Contains($"VIEW_{m.Name.Replace("-", "_")}".ToUpper()))
+                    )
+                    .ToList();
+
+                // set menu router link
+                var nameLists = menusQuery.Select(m => new { m.Name, m.ParentId, m.Id });
+                menus.ForEach(m =>
+                {
+                    var parentId = m.ParentId;
+                    var path = m.Name;
+                    while (parentId.HasValue)
+                    {
+                        var temp = nameLists.FirstOrDefault(n => n.Id == parentId);
+                        if (temp != null)
+                        {
+                            path = $"{temp.Name}/{path}";
+                            parentId = temp.ParentId;
+                        }
+                    }
+                    m.Name = path;
+                });
+
+                // convert to dropdown items
+                result = menus
+                    .Select(m => new DropdownOptionsItem() { Label = m.Label, Value = m.Name })
+                    .OrderBy(m => m.Label)
+                    .ToList();
+            }
 
             return result;
         }

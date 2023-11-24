@@ -65,6 +65,13 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [Route("{name}/grids-with-same-config")]
+        public List<DropdownOptionsItem> GetGridWithSameSearchConfig(string name)
+        {
+            return _universalGridService.GetGridWithSameSearchConfig(name);
+        }
+
+        [HttpGet]
         [Route("{name}/config/form")]
         public List<FormFieldConfig> GridFormConfig(string name, [FromQuery] string type)
         {

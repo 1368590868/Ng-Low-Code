@@ -43,8 +43,9 @@ namespace DataEditorPortal.Web.Services
         bool SaveDataSourceConfig(Guid id, DataSourceConfig model);
         List<GridColConfig> GetGridColumnsConfig(Guid id);
         bool SaveGridColumnsConfig(Guid id, List<GridColConfig> model);
-        List<SearchFieldConfig> GetGridSearchConfig(Guid id);
-        bool SaveGridSearchConfig(Guid id, List<SearchFieldConfig> model);
+        SearchConfig GetGridSearchConfig(Guid id);
+        bool SaveGridSearchConfig(Guid id, SearchConfig model);
+        List<DropdownOptionsItem> GetExistingSearchItems(Guid id);
         DetailConfig GetGridFormConfig(Guid id);
         bool SaveGridFormConfig(Guid id, DetailConfig model);
         List<CustomAction> GetCustomActions(Guid id);
@@ -229,7 +230,7 @@ namespace DataEditorPortal.Web.Services
                 // remove icon file, ignore error
                 try
                 {
-                    File.Delete(Path.Combine(_hostEnvironment.ContentRootPath, "App_Data", $"{ siteMenu.Icon}"));
+                    File.Delete(Path.Combine(_hostEnvironment.ContentRootPath, "App_Data", $"{siteMenu.Icon}"));
                 }
                 catch { };
             }
@@ -252,7 +253,7 @@ namespace DataEditorPortal.Web.Services
                     var types = GetPermissionTypes(config);
 
                     // get old permissions
-                    var oldPermissionNames = types.Select(t => $"{t}_{ config.Name.Replace("-", "_") }".ToUpper());
+                    var oldPermissionNames = types.Select(t => $"{t}_{config.Name.Replace("-", "_")}".ToUpper());
                     var permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
                     permissions.ForEach(p =>
                     {
@@ -412,20 +413,20 @@ namespace DataEditorPortal.Web.Services
             var types = GetPermissionTypes(config);
 
             // get old permissions
-            var permissionNames = types.Select(t => $"{t}_{ config.Name.Replace("-", "_") }".ToUpper());
+            var permissionNames = types.Select(t => $"{t}_{config.Name.Replace("-", "_")}".ToUpper());
             var permissions = _depDbContext.SitePermissions.Where(x => permissionNames.Contains(x.PermissionName)).ToList();
 
             types.ForEach(t =>
             {
                 var permissionCopy = new SitePermission() { Id = Guid.NewGuid() };
-                permissionCopy.Category = $"Portal Item: { siteMenuCopy.Label }";
-                permissionCopy.PermissionName = $"{t}_{ siteMenuCopy.Name.Replace("-", "_") }".ToUpper();
-                permissionCopy.PermissionDescription = $"{t} { siteMenuCopy.Label }";
+                permissionCopy.Category = $"Portal Item: {siteMenuCopy.Label}";
+                permissionCopy.PermissionName = $"{t}_{siteMenuCopy.Name.Replace("-", "_")}".ToUpper();
+                permissionCopy.PermissionDescription = $"{t} {siteMenuCopy.Label}";
                 _depDbContext.Add(permissionCopy);
 
                 // find the source permission and check if it is assigned to a user or role
                 // if yes, assign the cloned one to user or role
-                var permissionName = $"{t}_{ config.Name.Replace("-", "_") }".ToUpper();
+                var permissionName = $"{t}_{config.Name.Replace("-", "_")}".ToUpper();
                 var permission = permissions.FirstOrDefault(p => p.PermissionName == permissionName);
                 if (permission != null)
                 {
@@ -491,7 +492,7 @@ namespace DataEditorPortal.Web.Services
             if (!string.IsNullOrEmpty(oldMenuName))
             {
                 // get old permissions
-                var oldPermissionNames = types.Select(t => $"{t}_{ oldMenuName.Replace("-", "_") }".ToUpper());
+                var oldPermissionNames = types.Select(t => $"{t}_{oldMenuName.Replace("-", "_")}".ToUpper());
                 permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
             }
 
@@ -500,7 +501,7 @@ namespace DataEditorPortal.Web.Services
                 SitePermission permission = null;
                 if (!string.IsNullOrEmpty(oldMenuName))
                 {
-                    var oldName = $"{t}_{ oldMenuName.Replace("-", "_") }".ToUpper();
+                    var oldName = $"{t}_{oldMenuName.Replace("-", "_")}".ToUpper();
                     permission = permissions.FirstOrDefault(p => p.PermissionName == oldName);
                 }
 
@@ -509,9 +510,9 @@ namespace DataEditorPortal.Web.Services
                     permission = new SitePermission() { Id = Guid.NewGuid() };
                     _depDbContext.Add(permission);
                 }
-                permission.Category = $"Portal Item: { siteMenu.Label }";
-                permission.PermissionName = $"{t}_{ siteMenu.Name.Replace("-", "_") }".ToUpper();
-                permission.PermissionDescription = $"{t} { siteMenu.Label }";
+                permission.Category = $"Portal Item: {siteMenu.Label}";
+                permission.PermissionName = $"{t}_{siteMenu.Name.Replace("-", "_")}".ToUpper();
+                permission.PermissionDescription = $"{t} {siteMenu.Label}";
             });
         }
 
@@ -777,7 +778,7 @@ namespace DataEditorPortal.Web.Services
             return true;
         }
 
-        public List<SearchFieldConfig> GetGridSearchConfig(Guid id)
+        public SearchConfig GetGridSearchConfig(Guid id)
         {
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
@@ -787,18 +788,28 @@ namespace DataEditorPortal.Web.Services
 
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            var result = new SearchConfig();
+            if (config.UseExistingSearch && !string.IsNullOrEmpty(config.ExistingSearchName))
+            {
+                var idStr = config.ExistingSearchName.Substring(config.ExistingSearchName.LastIndexOf("/") + 1);
+                Guid searchId = Guid.Empty;
+                if (Guid.TryParse(idStr, out searchId))
+                {
+                    result.UseExistingSearch = true;
+                    result.ExistingSearchId = searchId;
+                }
+            }
 
             if (!string.IsNullOrEmpty(config.SearchConfig))
             {
-                return JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
+                result.SearchFields = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
             }
-            else
-            {
-                return new List<SearchFieldConfig>();
-            }
+
+            return result;
         }
 
-        public bool SaveGridSearchConfig(Guid id, List<SearchFieldConfig> model)
+        public bool SaveGridSearchConfig(Guid id, SearchConfig model)
         {
             var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
             if (siteMenu == null)
@@ -809,7 +820,48 @@ namespace DataEditorPortal.Web.Services
             var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
             if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
 
-            config.SearchConfig = JsonSerializer.Serialize(model);
+            if (model.UseExistingSearch && model.ExistingSearchId.HasValue)
+            {
+                var searchItem = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Id == model.ExistingSearchId);
+                if (searchItem == null) throw new Exception("Grid configuration does not exists with Id: " + model.ExistingSearchId);
+                var newSearchName = $"{searchItem.ExistingSearchName}/{searchItem.Id}"; // the format of the search name is /{id1}/{id2}/...
+
+                // update all items that use current as existing searchW
+                var items = _depDbContext.UniversalGridConfigurations
+                    .Where(u => u.UseExistingSearch && u.ExistingSearchName.Contains(config.Id.ToString()))
+                    .ToList();
+                items.ForEach(item =>
+                {
+                    if (!string.IsNullOrEmpty(config.ExistingSearchName))
+                        item.ExistingSearchName = item.ExistingSearchName.Replace(config.ExistingSearchName, newSearchName);
+                    else
+                        item.ExistingSearchName = $"{newSearchName}{item.ExistingSearchName}";
+                    item.SearchConfig = searchItem.SearchConfig;
+                });
+
+                config.SearchConfig = searchItem.SearchConfig;
+                config.UseExistingSearch = true;
+                config.ExistingSearchName = newSearchName;
+            }
+            else
+            {
+                var searchFieldsStr = JsonSerializer.Serialize(model.SearchFields);
+
+                // update all items that use current as existing search
+                var items = _depDbContext.UniversalGridConfigurations
+                    .Where(u => u.UseExistingSearch && u.ExistingSearchName.Contains(config.Id.ToString()))
+                    .ToList();
+                items.ForEach(item =>
+                {
+                    item.ExistingSearchName = item.ExistingSearchName.Replace(config.ExistingSearchName, "");
+                    item.SearchConfig = searchFieldsStr;
+                });
+
+                config.SearchConfig = searchFieldsStr;
+                config.UseExistingSearch = false;
+                config.ExistingSearchName = "";
+            }
+
             siteMenu.Status = Data.Common.PortalItemStatus.Draft;
 
             // save search to primary table and secondary table if current table is linked
@@ -844,6 +896,39 @@ namespace DataEditorPortal.Web.Services
             RemoveGridCache(config.Name);
 
             return true;
+        }
+
+        public List<DropdownOptionsItem> GetExistingSearchItems(Guid id)
+        {
+            var siteMenu = _depDbContext.SiteMenus.FirstOrDefault(x => x.Id == id);
+            if (siteMenu == null)
+            {
+                throw new DepException("Not Found", 404);
+            }
+
+            var config = _depDbContext.UniversalGridConfigurations.FirstOrDefault(x => x.Name == siteMenu.Name);
+            if (config == null) throw new Exception("Grid configuration does not exists with name: " + siteMenu.Name);
+
+            var menus = (
+                    from m in _depDbContext.SiteMenus
+                    join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name
+                    where m.Type == "Portal Item" && u.ConfigCompleted
+                        && u.Id != config.Id && u.SearchConfig != null
+                        && (u.ExistingSearchName == null || !u.ExistingSearchName.Contains(config.Id.ToString()))
+                    select new
+                    {
+                        m.Label,
+                        m.Name,
+                        u.Id,
+                    }
+                ).ToList();
+
+            var options = menus
+                .OrderBy(m => m.Label)
+                .Select(m => new DropdownOptionsItem() { Label = m.Label, Value = m.Id })
+                .ToList();
+
+            return options;
         }
 
         public DetailConfig GetGridFormConfig(Guid id)

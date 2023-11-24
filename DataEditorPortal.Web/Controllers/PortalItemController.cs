@@ -2,6 +2,7 @@
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
 using DataEditorPortal.Web.Common;
+using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.PortalItem;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
@@ -246,7 +247,7 @@ namespace DataEditorPortal.Web.Controllers
             if (!string.IsNullOrEmpty(oldMenuName))
             {
                 // get old permissions
-                var oldPermissionNames = types.Select(t => $"{t}_{ oldMenuName.Replace("-", "_") }".ToUpper());
+                var oldPermissionNames = types.Select(t => $"{t}_{oldMenuName.Replace("-", "_")}".ToUpper());
                 permissions = _depDbContext.SitePermissions.Where(x => oldPermissionNames.Contains(x.PermissionName)).ToList();
             }
 
@@ -255,7 +256,7 @@ namespace DataEditorPortal.Web.Controllers
                 SitePermission permission = null;
                 if (!string.IsNullOrEmpty(oldMenuName))
                 {
-                    var oldName = $"{t}_{ oldMenuName.Replace("-", "_") }".ToUpper();
+                    var oldName = $"{t}_{oldMenuName.Replace("-", "_")}".ToUpper();
                     permission = permissions.FirstOrDefault(p => p.PermissionName == oldName);
                 }
 
@@ -264,9 +265,9 @@ namespace DataEditorPortal.Web.Controllers
                     permission = new SitePermission() { Id = Guid.NewGuid() };
                     _depDbContext.Add(permission);
                 }
-                permission.Category = $"External Link: { siteMenu.Label }";
-                permission.PermissionName = $"{t}_{ siteMenu.Name.Replace("-", "_") }".ToUpper();
-                permission.PermissionDescription = $"{t} { siteMenu.Label }";
+                permission.Category = $"External Link: {siteMenu.Label}";
+                permission.PermissionName = $"{t}_{siteMenu.Name.Replace("-", "_")}".ToUpper();
+                permission.PermissionDescription = $"{t} {siteMenu.Label}";
             });
         }
 
@@ -293,7 +294,7 @@ namespace DataEditorPortal.Web.Controllers
                 // remove icon file, ignore error
                 try
                 {
-                    System.IO.File.Delete(Path.Combine(_hostEnvironment.ContentRootPath, "App_Data", $"{ siteMenu.Icon}"));
+                    System.IO.File.Delete(Path.Combine(_hostEnvironment.ContentRootPath, "App_Data", $"{siteMenu.Icon}"));
                 }
                 catch { };
             }
@@ -852,14 +853,21 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{id}/grid-search")]
-        public List<SearchFieldConfig> GetGridSearchConfig(Guid id)
+        public SearchConfig GetGridSearchConfig(Guid id)
         {
             return _portalItemService.GetGridSearchConfig(id);
         }
 
+        [HttpGet]
+        [Route("{id}/grid-search/existing-config")]
+        public List<DropdownOptionsItem> GetExistingSearchItems(Guid id)
+        {
+            return _portalItemService.GetExistingSearchItems(id);
+        }
+
         [HttpPost]
         [Route("{id}/grid-search")]
-        public bool SaveGridSearchConfig(Guid id, List<SearchFieldConfig> model)
+        public bool SaveGridSearchConfig(Guid id, SearchConfig model)
         {
             return _portalItemService.SaveGridSearchConfig(id, model);
         }
