@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Observable, map, of } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiResponse, NotifyService } from 'src/app/shared';
 import { GridColumn } from '../../portal-management/models/portal-item';
 import { GridSearchConfig } from '../../universal-grid/models/grid-types';
@@ -59,18 +59,6 @@ export class UniversalGridService {
         { ids }
       )
       .pipe(map(res => res.data || {}));
-    // return of({
-    //   data: {
-    //     ID: '40848483-b4c4-41e7-ae4e-018e523cce62',
-    //     NAME: null,
-    //     FIRST_NAME: 'Robert',
-    //     NUMBER: 15,
-    //     VENDOR: 'Amet',
-    //     EMPLOYOR: 'Ipsum',
-    //     DIVISION: 'Amet'
-    //   },
-    //   state: ['FIRST_NAME', 'EMPLOYOR', 'VENDOR', 'NUMBER', 'DIVISION']
-    // });
   }
 
   addGridData(
@@ -103,8 +91,6 @@ export class UniversalGridService {
       `${this._apiUrl}universal-grid/${name}/data/batch-update`,
       { ids, data }
     );
-    console.log('savedata', data);
-    return of({ code: 200, data: true });
   }
 
   deleteGridData(
