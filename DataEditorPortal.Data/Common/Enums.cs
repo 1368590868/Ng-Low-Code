@@ -27,7 +27,7 @@
         Failed
     }
 
-    public enum ImportType
+    public enum ActionType
     {
         Add,
         Update

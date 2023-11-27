@@ -10,7 +10,7 @@ namespace DataEditorPortal.Web.Models.ImportData
 
         public string Name { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public ImportType ImportType { get; set; }
+        public ActionType ImportType { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public DataImportResult Status { get; set; }

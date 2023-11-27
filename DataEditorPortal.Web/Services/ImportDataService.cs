@@ -20,10 +20,10 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IImportDataServcie
     {
-        Stream GenerateImportTemplate(string name, ImportType type);
-        IEnumerable<IDictionary<string, object>> GetSourceData(string name, ImportType type, UploadedFileModel uploadedFile, bool removeFile = false);
-        IList<FormFieldConfig> ValidateImportedData(string name, ImportType type, IEnumerable<IDictionary<string, object>> sourceObjs);
-        IEnumerable<IDictionary<string, object>> GetTransformedSourceData(string name, ImportType type, UploadedFileModel uploadedFile);
+        Stream GenerateImportTemplate(string name, ActionType type);
+        IEnumerable<IDictionary<string, object>> GetSourceData(string name, ActionType type, UploadedFileModel uploadedFile, bool removeFile = false);
+        IList<FormFieldConfig> ValidateImportedData(string name, ActionType type, IEnumerable<IDictionary<string, object>> sourceObjs);
+        IEnumerable<IDictionary<string, object>> GetTransformedSourceData(string name, ActionType type, UploadedFileModel uploadedFile);
     }
 
     public class ImportDataService : IImportDataServcie
@@ -50,7 +50,7 @@ namespace DataEditorPortal.Web.Services
 
         #region Get data from excel
 
-        public IEnumerable<IDictionary<string, object>> GetSourceData(string name, ImportType type, UploadedFileModel uploadedFile, bool removeFile = false)
+        public IEnumerable<IDictionary<string, object>> GetSourceData(string name, ActionType type, UploadedFileModel uploadedFile, bool removeFile = false)
         {
             var config = _universalGridService.GetUniversalGridConfiguration(name);
             var fields = GetTemplateFields(config, type);
@@ -120,7 +120,7 @@ namespace DataEditorPortal.Web.Services
                 ));
         }
 
-        public IEnumerable<IDictionary<string, object>> GetTransformedSourceData(string name, ImportType type, UploadedFileModel uploadedFile)
+        public IEnumerable<IDictionary<string, object>> GetTransformedSourceData(string name, ActionType type, UploadedFileModel uploadedFile)
         {
             var sourceObjs = GetSourceData(name, type, uploadedFile, true);
 
@@ -148,7 +148,7 @@ namespace DataEditorPortal.Web.Services
 
         #endregion
 
-        public Stream GenerateImportTemplate(string name, ImportType type)
+        public Stream GenerateImportTemplate(string name, ActionType type)
         {
             var config = _universalGridService.GetUniversalGridConfiguration(name);
 
@@ -193,7 +193,7 @@ namespace DataEditorPortal.Web.Services
             return stream;
         }
 
-        public IList<FormFieldConfig> ValidateImportedData(string name, ImportType type, IEnumerable<IDictionary<string, object>> sourceObjs)
+        public IList<FormFieldConfig> ValidateImportedData(string name, ActionType type, IEnumerable<IDictionary<string, object>> sourceObjs)
         {
             if (sourceObjs == null) throw new ArgumentNullException("sourceObjs");
             if (!sourceObjs.Any()) throw new DepException("No records in template for importing.");
@@ -264,11 +264,11 @@ namespace DataEditorPortal.Web.Services
                     foreach (var obj in batch)
                     {
                         var exists = result.Any(x => string.Compare(x.ToString(), obj[idColumn].ToString(), true) == 0);
-                        if (type == ImportType.Add && exists)
+                        if (type == ActionType.Add && exists)
                         {
                             obj["__status__"] = ReviewImportStatus.AlreadyExists;
                         }
-                        if (type == ImportType.Update && !exists)
+                        if (type == ActionType.Update && !exists)
                         {
                             obj["__status__"] = ReviewImportStatus.NotExists;
                         }
@@ -290,14 +290,14 @@ namespace DataEditorPortal.Web.Services
             _memoryCache.Remove($"import_data_locationField_{fieldKey}");
         }
 
-        private List<FormFieldConfig> GetTemplateFields(UniversalGridConfiguration config, ImportType type)
+        private List<FormFieldConfig> GetTemplateFields(UniversalGridConfiguration config, ActionType type)
         {
             GridFormLayout formConfig = null;
-            if (type == ImportType.Add)
+            if (type == ActionType.Add)
             {
                 formConfig = _universalGridService.GetAddingFormConfig(config);
             }
-            else if (type == ImportType.Update)
+            else if (type == ActionType.Update)
             {
                 formConfig = _universalGridService.GetUpdatingFormConfig(config);
                 var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);

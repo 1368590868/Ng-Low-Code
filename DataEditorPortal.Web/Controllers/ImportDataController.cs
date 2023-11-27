@@ -103,7 +103,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("{gridName}/{type}/upload-excel-template")]
-        public dynamic UploadExcelTemplate(string gridName, ImportType type, [FromBody] UploadedFileModel uploadedFile)
+        public dynamic UploadExcelTemplate(string gridName, ActionType type, [FromBody] UploadedFileModel uploadedFile)
         {
             var sourceObjs = _importDataServcie.GetSourceData(gridName, type, uploadedFile);
 
@@ -123,7 +123,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpPost]
         [Route("{gridName}/{type}/confirm-import")]
-        public void ConfirmImport(string gridName, ImportType type, [FromBody] UploadedFileModel uploadedFile)
+        public void ConfirmImport(string gridName, ActionType type, [FromBody] UploadedFileModel uploadedFile)
         {
             var username = AppUser.ParseUsername(User.Identity.Name).Username;
             var currentUserId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
@@ -152,7 +152,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{gridName}/{type}/download-template")]
-        public IActionResult DownloadTemplate(string gridName, ImportType type)
+        public IActionResult DownloadTemplate(string gridName, ActionType type)
         {
             var fs = _importDataServcie.GenerateImportTemplate(gridName, type);
 

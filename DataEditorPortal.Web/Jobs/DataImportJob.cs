@@ -38,7 +38,7 @@ namespace DataEditorPortal.Web.Jobs
             JobDataMap dataMap = context.MergedJobDataMap;
 
             var gridName = dataMap.GetString("gridName");
-            var importType = (ImportType)dataMap.Get("importType");
+            var importType = (ActionType)dataMap.Get("importType");
             var uploadedFile = dataMap.Get("templateFile") as UploadedFileModel;
             var createdById = dataMap.GetGuid("createdById");
             var createdByName = dataMap.GetString("createdByName");
@@ -75,8 +75,8 @@ namespace DataEditorPortal.Web.Jobs
                     // start to import, using grid service to add or update
                     foreach (var obj in sourceObjs)
                     {
-                        if (importType == ImportType.Add) _universalGridService.AddGridData(gridName, obj);
-                        if (importType == ImportType.Update) _universalGridService.UpdateGridData(gridName, obj[idColumn].ToString(), obj);
+                        if (importType == ActionType.Add) _universalGridService.AddGridData(gridName, obj);
+                        if (importType == ActionType.Update) _universalGridService.UpdateGridData(gridName, obj[idColumn].ToString(), obj);
 
                         countImported++;
 
