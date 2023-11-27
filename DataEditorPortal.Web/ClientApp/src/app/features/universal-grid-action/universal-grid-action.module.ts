@@ -1,60 +1,59 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 
 // primeNG components
-import { AnimateModule } from 'primeng/animate';
-import { ToastModule } from 'primeng/toast';
-import { MenubarModule } from 'primeng/menubar';
-import { AvatarModule } from 'primeng/avatar';
-import { SplitterModule } from 'primeng/splitter';
-import { DropdownModule } from 'primeng/dropdown';
-import { TableModule } from 'primeng/table';
-import { CalendarModule } from 'primeng/calendar';
-import { SliderModule } from 'primeng/slider';
-import { DialogModule } from 'primeng/dialog';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { ContextMenuModule } from 'primeng/contextmenu';
-import { InputTextModule } from 'primeng/inputtext';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { SplitButtonModule } from 'primeng/splitbutton';
-import { RippleModule } from 'primeng/ripple';
-import { ButtonModule } from 'primeng/button';
-import { SkeletonModule } from 'primeng/skeleton';
 import { AccordionModule } from 'primeng/accordion';
-import { DividerModule } from 'primeng/divider';
+import { AnimateModule } from 'primeng/animate';
+import { AvatarModule } from 'primeng/avatar';
+import { ButtonModule } from 'primeng/button';
+import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
-import { TreeModule } from 'primeng/tree';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { DialogModule } from 'primeng/dialog';
+import { DividerModule } from 'primeng/divider';
+import { DropdownModule } from 'primeng/dropdown';
 import { FileUploadModule } from 'primeng/fileupload';
+import { InputTextModule } from 'primeng/inputtext';
+import { MenubarModule } from 'primeng/menubar';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { RippleModule } from 'primeng/ripple';
+import { SkeletonModule } from 'primeng/skeleton';
+import { SliderModule } from 'primeng/slider';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { SplitterModule } from 'primeng/splitter';
+import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
+import { TreeModule } from 'primeng/tree';
 
-import { GridActionDirective } from './directives/grid-action.directive';
-import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
-import { EditRecordActionComponent } from './components/edit-record-action/edit-record-action.component';
+import { SharedModule } from 'src/app/shared';
 import { ActionWrapperComponent } from './components/action-wrapper/action-wrapper.component';
-import { ViewRecordActionComponent } from './components/view-record-action/view-record-action.component';
+import { EditRecordActionComponent } from './components/edit-record-action/edit-record-action.component';
 import { ExportExcelActionComponent } from './components/export-excel-action/export-excel-action.component';
+import { ImportExcelActionComponent } from './components/import-excel-action/import-excel-action.component';
+import { ImportStatusComponent } from './components/import-excel-action/import-status.component';
+import { ManageRoleActionComponent } from './components/manage-role-action/manage-role.component-action';
 import { RemoveActionComponent } from './components/remove-action/remove-action.component';
 import { UserManagerActionComponent } from './components/user-manager-action/user-manager-action.component';
-import { ManageRoleActionComponent } from './components/manage-role-action/manage-role.component-action';
-import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
 import { UserPermissionActionComponent } from './components/user-permission-action/user-permission-action.component';
-import { ImportStatusComponent } from './components/import-excel-action/import-status.component';
-import { SharedModule } from 'src/app/shared';
+import { UserRoleActionComponent } from './components/user-role-action/user-role-action.component';
+import { ViewRecordActionComponent } from './components/view-record-action/view-record-action.component';
+import { GridActionDirective } from './directives/grid-action.directive';
+import { UniversalGridActionDirective } from './directives/universal-grid-action.directive';
 import {
-  OnValidateDemoActionHandler,
+  AsyncQueryTextActionHandler,
   OnAfterSavedDemoActionHandler,
-  AsyncQueryTextActionHandler
+  OnValidateDemoActionHandler
 } from './services/event-action-handler.service';
-import { ImportExcelActionComponent } from './components/import-excel-action/import-excel-action.component';
 
+import { EditMultipleRecordActionComponent } from './components/edit-multiple-record-action/edit-multiple-record-action.component';
 import { HasErrorPipe } from './components/import-excel-action/import-excel-action.component';
 import { GridActionConfig } from './models/grid-config';
-import { EditMultipleRecordActionComponent } from './components/edit-multiple-record-action/edit-multiple-record-action.component';
 
 const GRID_ACTION_CONFIG: GridActionConfig[] = [
   {
@@ -73,6 +72,8 @@ const GRID_ACTION_CONFIG: GridActionConfig[] = [
   },
   {
     name: 'edit-multiple-record',
+    label: 'Edit Multiple',
+    isCustom: true,
     requireGridRowSelected: '> 1',
     component: EditMultipleRecordActionComponent,
     wrapper: {

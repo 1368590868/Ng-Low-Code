@@ -7,12 +7,17 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { GridTableService } from '../../services/grid-table.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
+import * as pluralize from 'pluralize';
+import { ConfirmationService, TableState } from 'primeng/api';
+import { DomHandler } from 'primeng/dom';
+import { Table, TableHeaderCheckbox } from 'primeng/table';
 import {
   BehaviorSubject,
+  Subject,
   finalize,
   forkJoin,
-  Subject,
   takeUntil,
   tap
 } from 'rxjs';
@@ -20,9 +25,6 @@ import {
   GridActionOption,
   GridActionWrapperOption
 } from 'src/app/features/universal-grid-action';
-import { GridColumn, GridConfig, GridData } from '../../models/grid-types';
-import { Table, TableHeaderCheckbox } from 'primeng/table';
-import { ConfirmationService, TableState } from 'primeng/api';
 import {
   GridFilterParam,
   GridParam,
@@ -30,11 +32,9 @@ import {
   SystemLogService,
   UserService
 } from 'src/app/shared';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { DomHandler } from 'primeng/dom';
+import { GridColumn, GridConfig, GridData } from '../../models/grid-types';
+import { GridTableService } from '../../services/grid-table.service';
 import { UrlParamsService } from '../../services/url-params.service';
-import * as pluralize from 'pluralize';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-table',
@@ -316,14 +316,11 @@ export class TableComponent implements OnInit, OnDestroy {
     }
 
     this.tableConfig.customActions?.forEach(x => {
+      if (!this.allowEdit && x.name === 'edit-multiple-record') {
+        return;
+      }
       actions.push(x);
     });
-
-    if (this.allowEdit) {
-      actions.push({
-        name: 'edit-multiple-record'
-      });
-    }
 
     this.tableActions = [...actions];
   }

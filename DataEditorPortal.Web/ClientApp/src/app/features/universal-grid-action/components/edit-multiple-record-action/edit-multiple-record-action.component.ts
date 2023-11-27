@@ -274,17 +274,17 @@ export class EditMultipleRecordActionComponent
   }
 
   submitSave(model: EditFormData) {
-    this.systemLogService.addSiteVisitLog({
-      action: 'Update',
-      section: this.gridName,
-      params: JSON.stringify(model)
-    });
-
     const data: EditFormData = {};
     this.fields.forEach(f => {
       if (f.props && f.props['isSameValue'] && f.key) {
         data[f.key as string] = this.model[f.key as string];
       }
+    });
+
+    this.systemLogService.addSiteVisitLog({
+      action: 'Update',
+      section: this.gridName,
+      params: JSON.stringify({ data, ids: this.dataKeys })
     });
 
     this.gridService
