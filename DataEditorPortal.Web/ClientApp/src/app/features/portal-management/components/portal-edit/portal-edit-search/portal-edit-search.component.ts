@@ -250,6 +250,14 @@ export class PortalEditSearchComponent
   }
 
   dataSourceChanged(): boolean {
+    // Add Mode dont need to check
+    if (
+      !this.originalConfig.useExistingSearch &&
+      this.originalConfig.searchFields.length === 0
+    ) {
+      return false;
+    }
+
     if (this.useExistingSearch) {
       if (this.originalConfig.existingSearchId !== this.existingSearchId) {
         return true;
