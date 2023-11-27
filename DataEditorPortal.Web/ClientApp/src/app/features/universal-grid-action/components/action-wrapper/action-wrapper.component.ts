@@ -133,6 +133,7 @@ export class ActionWrapperComponent implements OnInit {
     // bind action events
     actionRef.instance.savedEvent.subscribe(() => {
       this.dialogVisible = false;
+      this.isSaving = false;
       this.savedEvent.emit();
     });
     actionRef.instance.cancelEvent.subscribe(() => {
