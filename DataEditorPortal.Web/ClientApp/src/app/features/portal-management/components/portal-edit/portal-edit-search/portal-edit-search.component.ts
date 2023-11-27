@@ -273,12 +273,7 @@ export class PortalEditSearchComponent
 
   saveConfigOrTips() {
     // searchFields and useExistingSearch to initialize data, it is add else edit
-    if (
-      this.dataSourceChanged() &&
-      this.originalConfig.searchFields.length === 0 &&
-      !this.originalConfig.existingSearchId &&
-      !this.originalConfig.useExistingSearch
-    ) {
+    if (this.dataSourceChanged()) {
       this.confirmationService.confirm({
         message:
           'You are going to change the <b>Search configuration</b>.<br><br>' +
@@ -287,7 +282,9 @@ export class PortalEditSearchComponent
           'Are you sure that you want to perform this action?',
         accept: () => this.saveGridSearchConfig()
       });
-    } else this.saveGridSearchConfig();
+    } else {
+      this.saveGridSearchConfig();
+    }
   }
 
   onSaveAndNext() {
