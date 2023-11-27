@@ -1138,6 +1138,55 @@ namespace DataEditorPortal.Web.Services
 
             // get detail config
             var formLayout = GetUpdatingFormConfig(config);
+            var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+
+            #region Get model
+
+            var queryText = _queryBuilder.GenerateSqlTextForDetail(dataSourceConfig, false);
+
+            // join attachments 
+            var attachmentCols = GetAttachmentCols(config);
+            if (attachmentCols.Any())
+                queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
+
+            var modelToUpdate = new Dictionary<string, object>();
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
+            {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
+                var param = _queryBuilder.GenerateDynamicParameter(new Dictionary<string, object>() { { dataSourceConfig.IdColumn, id } });
+
+                var data = _dapperService.QueryFirst(con, queryText, param);
+
+                DataTable schema;
+                using (var dr = con.ExecuteReader(queryText, param))
+                {
+                    schema = dr.GetSchemaTable();
+                }
+
+                // get all fileds data in a row
+                var row = (IDictionary<string, object>)data;
+                foreach (var key in row.Keys)
+                {
+                    var index = row.Keys.ToList().IndexOf(key);
+                    row[key] = _queryBuilder.TransformValue(row[key], schema.Rows[index]);
+                }
+
+                // process every row to form model
+                var result = row.AsList().ToDictionary(x => x.Key, x => x.Value);
+                foreach (var field in formLayout.FormFields)
+                {
+                    var processor = factory.CreateValueProcessor(field, config, con);
+                    if (processor != null)
+                    {
+                        processor.FetchValue(result);
+                    }
+                }
+
+                modelToUpdate = result;
+            }
+
+            #endregion
 
             using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
             {
@@ -1150,20 +1199,23 @@ namespace DataEditorPortal.Web.Services
                     .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
                     .ToDictionary(x => x.Key, x => x.Value);
 
+                // apply new values
+                foreach (var kv1 in model)
+                    modelToUpdate[kv1.Key] = kv1.Value;
+
                 // add id parameter
-                if (model.ContainsKey(dataSourceConfig.IdColumn))
-                    model[dataSourceConfig.IdColumn] = id;
+                if (modelToUpdate.ContainsKey(dataSourceConfig.IdColumn))
+                    modelToUpdate[dataSourceConfig.IdColumn] = id;
                 else
-                    model.Add(dataSourceConfig.IdColumn, id);
+                    modelToUpdate.Add(dataSourceConfig.IdColumn, id);
 
                 // calculate the computed field values
-                ProcessComputedValues(formLayout.FormFields, model, con);
+                ProcessComputedValues(formLayout.FormFields, modelToUpdate, con);
 
                 // excute command
                 var trans = _dapperService.BeginTransaction(con);
 
                 // use value processor to convert values in model
-                var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
                 var valueProcessors = new List<ValueProcessorBase>();
                 foreach (var field in formLayout.FormFields)
                 {
@@ -1171,20 +1223,20 @@ namespace DataEditorPortal.Web.Services
                     if (processor != null)
                     {
                         valueProcessors.Add(processor);
-                        processor.PreProcess(model);
+                        processor.PreProcess(modelToUpdate);
                     }
                 }
 
                 // generate the query text
-                var queryText = _queryBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
+                queryText = _queryBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
                 {
                     TableSchema = dataSourceConfig.TableSchema,
                     TableName = dataSourceConfig.TableName,
                     IdColumn = dataSourceConfig.IdColumn,
-                    Columns = model.Keys.ToList(),
+                    Columns = modelToUpdate.Keys.ToList(),
                     QueryText = formLayout.QueryText
                 });
-                var param = _queryBuilder.GenerateDynamicParameter(model.AsEnumerable());
+                var param = _queryBuilder.GenerateDynamicParameter(modelToUpdate.AsEnumerable());
 
                 #endregion
 
@@ -1195,7 +1247,7 @@ namespace DataEditorPortal.Web.Services
                     // use value processors to execute extra operations
                     foreach (var processor in valueProcessors)
                     {
-                        processor.PostProcess(model);
+                        processor.PostProcess(modelToUpdate);
                     }
 
                     _dapperService.Commit(trans);
@@ -1203,7 +1255,7 @@ namespace DataEditorPortal.Web.Services
                     // run after saved event
                     if (formLayout?.AfterSaved != null)
                     {
-                        AfterSaved(formLayout.AfterSaved, config.Name, config.DataSourceConnection.ConnectionString, model);
+                        AfterSaved(formLayout.AfterSaved, config.Name, config.DataSourceConnection.ConnectionString, modelToUpdate);
                     }
                 }
                 catch (Exception ex)
@@ -1387,12 +1439,6 @@ namespace DataEditorPortal.Web.Services
                 {
                     foreach (var kv1 in model)
                         modelToUpdate[kv1.Key] = kv1.Value;
-
-                    // add id parameter
-                    //if (modelToUpdate.ContainsKey(dataSourceConfig.IdColumn))
-                    //    modelToUpdate[dataSourceConfig.IdColumn] = kv.Key;
-                    //else
-                    //    modelToUpdate.Add(dataSourceConfig.IdColumn, kv.Key);
 
                     // calculate the computed field values
                     ProcessComputedValues(formLayout.FormFields, modelToUpdate, con);
