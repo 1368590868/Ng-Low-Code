@@ -221,8 +221,6 @@ namespace DataEditorPortal.Web.Services
                 where
                     // basic criteria
                     m.Type == "Portal Item" && u.ConfigCompleted && u.SearchConfig != null
-                    // exclude itself
-                    && u.Id != config.Id
                     // include the topest search item and all items use it
                     && (u.Id == topestId || u.ExistingSearchName.Contains(topestId.ToString()))
                 select m

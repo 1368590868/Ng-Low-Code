@@ -853,7 +853,9 @@ namespace DataEditorPortal.Web.Services
                     .ToList();
                 items.ForEach(item =>
                 {
-                    item.ExistingSearchName = item.ExistingSearchName.Replace(config.ExistingSearchName, "");
+                    if (!string.IsNullOrEmpty(config.ExistingSearchName))
+                        item.ExistingSearchName = item.ExistingSearchName.Replace(config.ExistingSearchName, "");
+
                     item.SearchConfig = searchFieldsStr;
                 });
 
