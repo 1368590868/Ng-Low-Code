@@ -102,7 +102,7 @@ const GRID_ACTION_CONFIG: GridActionConfig[] = [
     wrapper: {
       header: 'View data details',
       cancelText: '',
-      dialogStyle: { width: '50rem' },
+      dialogStyle: { width: '65rem' },
       dialogModal: false
     }
   },

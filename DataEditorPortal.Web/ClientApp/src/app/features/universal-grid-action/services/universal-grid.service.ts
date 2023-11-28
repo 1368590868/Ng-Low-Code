@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { ApiResponse, NotifyService } from 'src/app/shared';
 import { GridColumn } from '../../portal-management/models/portal-item';
 import { GridSearchConfig } from '../../universal-grid/models/grid-types';
+import { UpdateHistory } from '../components/view-record-action/view-record-action.component';
 import { EditFormData, EditFormField, FormEventConfig } from '../models/edit';
 import { ExportParam } from '../models/export';
 
@@ -115,6 +116,17 @@ export class UniversalGridService {
     return this.http
       .get<ApiResponse<GridColumn[]>>(
         `${this._apiUrl}universal-grid/${name}/config/columns`
+      )
+      .pipe(map(res => res.data || []));
+  }
+
+  getUpdateHistoriesData(
+    name: string,
+    id: string
+  ): Observable<UpdateHistory[]> {
+    return this.http
+      .get<ApiResponse<UpdateHistory[]>>(
+        `${this._apiUrl}universal-grid/${name}/data/${id}/update-histories`
       )
       .pipe(map(res => res.data || []));
   }

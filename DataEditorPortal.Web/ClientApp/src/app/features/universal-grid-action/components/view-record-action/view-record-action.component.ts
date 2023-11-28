@@ -13,6 +13,18 @@ export interface ViewColumn {
   filterType: string;
 }
 
+export interface UpdateHistory {
+  id: string;
+  createDate: string;
+  username: string;
+  gridConfigurationId: string;
+  dataId: string;
+  field: string;
+  originalValue: string;
+  newValue: string;
+  actionType: number;
+}
+
 @Component({
   selector: 'app-view-record-action',
   templateUrl: './view-record-action.component.html',
@@ -25,6 +37,7 @@ export class ViewRecordActionComponent
   viewData: ViewColumn[];
   loading = true;
   formatters?: any;
+  updateHistories: UpdateHistory[] = [];
 
   constructor(
     private universalGridService: UniversalGridService,
@@ -74,5 +87,14 @@ export class ViewRecordActionComponent
         this.loadedEvent.emit();
       }
     });
+
+    this.universalGridService
+      .getUpdateHistoriesData(
+        this.gridName,
+        this.selectedRecords[0][this.recordKey]
+      )
+      .subscribe(res => {
+        this.updateHistories = res;
+      });
   }
 }

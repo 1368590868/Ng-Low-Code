@@ -60,3 +60,58 @@
     </p>
   </div>
 </ng-template>
+<ng-container *ngIf="updateHistories.length > 0">
+  <p-divider styleClass="mt-4 font-bold">Update Histories</p-divider>
+  <p-table
+    [value]="updateHistories"
+    sortField="createDate"
+    sortMode="single"
+    [scrollable]="true"
+    scrollHeight="350px"
+    tableStyle="tableLayout: fiexd"
+    rowGroupMode="subheader"
+    groupRowsBy="createDate">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Field</th>
+        <th>Original Value</th>
+        <th>New Value</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="groupheader" let-history>
+      <tr pRowGroupHeader style="background: #fcfcfc">
+        <td colspan="3">
+          <span
+            >{{ history.createDate | date : 'M/d/yyyy h:mm a' }} -
+            {{ history.actionType === 0 ? 'ADD' : 'UPDATE' }} - by
+            {{ history.username }}</span
+          >
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-history let-rowIndex="rowIndex">
+      <tr>
+        <td>
+          <span>{{ history.field }}</span>
+        </td>
+        <td>
+          <div
+            class="w-20rem overflow-hidden white-space-nowrap text-overflow-ellipsis"
+            [pTooltip]="history.originalValue"
+            tooltipPosition="top">
+            {{ history.originalValue }}
+          </div>
+        </td>
+        <td>
+          <div
+            class="w-20rem overflow-hidden white-space-nowrap text-overflow-ellipsis"
+            [pTooltip]="history.newValue"
+            tooltipPosition="top">
+            {{ history.newValue }}
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</ng-container>
