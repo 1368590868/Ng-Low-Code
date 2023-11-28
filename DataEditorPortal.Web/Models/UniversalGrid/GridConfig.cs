@@ -56,6 +56,13 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         CurrentUserName, CurrentUserId, CurrentUserGuid, CurrentUserEmail, CurrentDateTime
     }
 
+    public class SearchConfig
+    {
+        public bool UseExistingSearch { get; set; }
+        public Guid? ExistingSearchId { get; set; }
+        public List<SearchFieldConfig> SearchFields { get; set; } = new List<SearchFieldConfig>();
+    }
+
     public class SearchFieldConfig : FormFieldConfig
     {
         // search rule
@@ -87,6 +94,8 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
 
         public string template { get; set; }
         public string format { get; set; }
+
+        public string align { get; set; }
 
         public FileUploadConfig fileUploadConfig { get; set; }
     }

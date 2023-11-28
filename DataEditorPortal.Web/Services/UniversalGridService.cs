@@ -29,6 +29,7 @@ namespace DataEditorPortal.Web.Services
         List<GridColConfig> GetGridColumnsConfig(string name);
         List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column);
         List<SearchFieldConfig> GetGridSearchConfig(string name);
+        List<DropdownOptionsItem> GetGridWithSameSearchConfig(string name);
         List<FormFieldConfig> GetGridFormConfig(string name, string type);
         GridFormLayout GetFormEventConfig(string name, string type);
 
@@ -38,8 +39,10 @@ namespace DataEditorPortal.Web.Services
         MemoryStream ExportExcel(string name, ExportParam param);
 
         IDictionary<string, object> GetGridDataDetail(string name, string id);
+        IDictionary<string, object> BatchGet(string name, string[] ids);
         bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model);
         bool UpdateGridData(string name, string id, IDictionary<string, object> model);
+        bool BatchUpdate(string name, string[] ids, IDictionary<string, object> model);
         bool AddGridData(string name, IDictionary<string, object> model);
         bool DeleteGridData(string name, object[] ids);
 
@@ -72,6 +75,7 @@ namespace DataEditorPortal.Web.Services
         private readonly IAttachmentService _attachmentService;
         private readonly IMemoryCache _memoryCache;
         private readonly IDapperService _dapperService;
+        private readonly IUserService _userService;
 
         private string _currentUsername;
         public string CurrentUsername
@@ -94,7 +98,8 @@ namespace DataEditorPortal.Web.Services
             IEventLogService eventLogService,
             IAttachmentService attachmentService,
             IMemoryCache memoryCache,
-            IDapperService dapperService)
+            IDapperService dapperService,
+            IUserService userService)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
@@ -106,6 +111,7 @@ namespace DataEditorPortal.Web.Services
             _attachmentService = attachmentService;
             _memoryCache = memoryCache;
             _dapperService = dapperService;
+            _userService = userService;
 
             if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
                 CurrentUsername = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
@@ -190,6 +196,72 @@ namespace DataEditorPortal.Web.Services
             var result = JsonSerializer.Deserialize<List<SearchFieldConfig>>(config.SearchConfig);
 
             //result.ForEach(x => x.searchRule = null);
+
+            return result;
+        }
+
+        public List<DropdownOptionsItem> GetGridWithSameSearchConfig(string name)
+        {
+            var config = GetUniversalGridConfiguration(name);
+
+            var topestId = config.Id;
+            if (config.UseExistingSearch && !string.IsNullOrEmpty(config.ExistingSearchName))
+            {
+                // find the topest item id
+                var nameWithoutStartSlash = config.ExistingSearchName.TrimStart('/');
+                var slashIndex = nameWithoutStartSlash.IndexOf("/");
+                Guid.TryParse(slashIndex > 0 ? nameWithoutStartSlash.Substring(0, slashIndex) : nameWithoutStartSlash, out topestId);
+            }
+
+            var result = new List<DropdownOptionsItem>();
+            var menusQuery = from m in _depDbContext.SiteMenus select m;
+            var menus = (
+                from m in menusQuery
+                join u in _depDbContext.UniversalGridConfigurations on m.Name equals u.Name
+                where
+                    // basic criteria
+                    m.Type == "Portal Item" && u.ConfigCompleted && u.SearchConfig != null
+                    // include the topest search item and all items use it
+                    && (u.Id == topestId || u.ExistingSearchName.Contains(topestId.ToString()))
+                select m
+            ).ToList();
+
+            if (menus.Count > 0)
+            {
+                // has grids use same search config
+                // filter by permissions
+                var isAdmin = _userService.IsAdmin(_currentUsername);
+                var userPermissions = _userService.GetUserPermissions().Keys.ToList();
+                menus = menus
+                    .Where(
+                        m => isAdmin || (m.Status == PortalItemStatus.Published && userPermissions.Contains($"VIEW_{m.Name.Replace("-", "_")}".ToUpper()))
+                    )
+                    .ToList();
+
+                // set menu router link
+                var nameLists = menusQuery.Select(m => new { m.Name, m.ParentId, m.Id });
+                menus.ForEach(m =>
+                {
+                    var parentId = m.ParentId;
+                    var path = m.Name;
+                    while (parentId.HasValue)
+                    {
+                        var temp = nameLists.FirstOrDefault(n => n.Id == parentId);
+                        if (temp != null)
+                        {
+                            path = $"{temp.Name}/{path}";
+                            parentId = temp.ParentId;
+                        }
+                    }
+                    m.Name = path;
+                });
+
+                // convert to dropdown items
+                result = menus
+                    .Select(m => new DropdownOptionsItem() { Label = m.Label, Value = m.Name })
+                    .OrderBy(m => m.Label)
+                    .ToList();
+            }
 
             return result;
         }
@@ -787,6 +859,91 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
+        public IDictionary<string, object> BatchGet(string name, string[] ids)
+        {
+            _dapperService.EventSection = $"{name} | GetGridDataDetail - Batch";
+
+            var config = GetUniversalGridConfiguration(name);
+            var formLayout = GetUpdatingFormConfig(config);
+            var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+            var queryText = _queryBuilder.GenerateSqlTextForDetail(dataSourceConfig, true);
+
+            // join attachments 
+            var attachmentCols = GetAttachmentCols(config);
+            if (attachmentCols.Any())
+                queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
+
+            IDictionary<string, object> details = new Dictionary<string, object>();
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
+            {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+                // always provide Id column parameter
+                var param = _queryBuilder.GenerateDynamicParameter(new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
+
+                try
+                {
+                    con.Open();
+                    var data = _dapperService.Query(con, queryText, param).ToList();
+
+                    DataTable schema;
+                    using (var dr = con.ExecuteReader(queryText, param))
+                    {
+                        schema = dr.GetSchemaTable();
+                    }
+
+                    var models = new List<IDictionary<string, object>>();
+                    data.ForEach(item =>
+                    {
+                        // get all fileds data in a row
+                        var row = (IDictionary<string, object>)item;
+                        foreach (var key in row.Keys)
+                        {
+                            var index = row.Keys.ToList().IndexOf(key);
+                            row[key] = _queryBuilder.TransformValue(row[key], schema.Rows[index]);
+                        }
+
+                        // process every row to form model
+                        var result = row.AsList().ToDictionary(x => x.Key, x => x.Value);
+                        foreach (var field in formLayout.FormFields)
+                        {
+                            var processor = factory.CreateValueProcessor(field, config, con);
+                            if (processor != null)
+                            {
+                                processor.FetchValue(result);
+                            }
+                        }
+
+                        models.Add(result);
+                    });
+
+                    // diff form data
+                    foreach (var field in formLayout.FormFields)
+                    {
+                        var same = false;
+                        var comparer = factory.CreateValueComparer(field, config);
+                        if (comparer != null)
+                            same = models.Distinct(comparer).Count() == 1;
+                        else
+                            same = models.Select(d => d[field.key]).Distinct().Count() == 1;
+
+                        if (same)
+                            details[field.key] = models[0][field.key];
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
+                    _logger.LogError(ex, ex.Message);
+                    throw new DepException("An Error in the query has occurred: " + ex.Message);
+                }
+
+                return details;
+            }
+        }
+
         public bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model)
         {
             _dapperService.EventSection = $"{name} | ValidateGridData";
@@ -1143,6 +1300,185 @@ namespace DataEditorPortal.Web.Services
                     _logger.LogError(ex, ex.Message);
                     throw new DepException("An Error in the query has occurred: " + ex.Message);
                 }
+            }
+
+            return true;
+        }
+
+        public bool BatchUpdate(string name, string[] ids, IDictionary<string, object> model)
+        {
+            _dapperService.EventSection = $"{name} | BatchUpdate";
+
+            var config = GetUniversalGridConfiguration(name);
+            // get query text for list data from grid config.
+            var dataSourceConfig = JsonSerializer.Deserialize<DataSourceConfig>(config.DataSourceConfig);
+
+            // get detail config
+            var formLayout = GetUpdatingFormConfig(config);
+            var factory = _serviceProvider.GetRequiredService<IValueProcessorFactory>();
+
+            #region Get all data models
+
+            var queryText = _queryBuilder.GenerateSqlTextForDetail(dataSourceConfig, true);
+
+            // join attachments 
+            var attachmentCols = GetAttachmentCols(config);
+            if (attachmentCols.Any())
+                queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
+
+            var models = new List<IDictionary<string, object>>();
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
+            {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+
+                var param = _queryBuilder.GenerateDynamicParameter(new Dictionary<string, object>() { { dataSourceConfig.IdColumn, ids } });
+
+                var data = _dapperService.Query(con, queryText, param).ToList();
+
+                DataTable schema;
+                using (var dr = con.ExecuteReader(queryText, param))
+                {
+                    schema = dr.GetSchemaTable();
+                }
+
+                models = new List<IDictionary<string, object>>();
+                data.ForEach(item =>
+                {
+                    // get all fileds data in a row
+                    var row = (IDictionary<string, object>)item;
+                    foreach (var key in row.Keys)
+                    {
+                        var index = row.Keys.ToList().IndexOf(key);
+                        row[key] = _queryBuilder.TransformValue(row[key], schema.Rows[index]);
+                    }
+
+                    // process every row to form model
+                    var result = row.AsList().ToDictionary(x => x.Key, x => x.Value);
+                    foreach (var field in formLayout.FormFields)
+                    {
+                        var processor = factory.CreateValueProcessor(field, config, con);
+                        if (processor != null)
+                        {
+                            processor.FetchValue(result);
+                        }
+                    }
+
+                    models.Add(result);
+                });
+            }
+
+            #endregion
+
+            using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
+            {
+                con.ConnectionString = config.DataSourceConnection.ConnectionString;
+                con.Open();
+
+                #region prepair values and paramsters
+
+                // drop the keyvalue which not in formfield defination
+                model = model.ToList()
+                    .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
+                    .ToDictionary(x => x.Key, x => x.Value);
+
+                // apply new values,
+                // modelToUpdate should already have IdColumn, as it comes form SqlTextForList
+                foreach (var modelToUpdate in models)
+                {
+                    foreach (var kv1 in model)
+                        modelToUpdate[kv1.Key] = kv1.Value;
+
+                    // add id parameter
+                    //if (modelToUpdate.ContainsKey(dataSourceConfig.IdColumn))
+                    //    modelToUpdate[dataSourceConfig.IdColumn] = kv.Key;
+                    //else
+                    //    modelToUpdate.Add(dataSourceConfig.IdColumn, kv.Key);
+
+                    // calculate the computed field values
+                    ProcessComputedValues(formLayout.FormFields, modelToUpdate, con);
+                }
+
+                #endregion
+
+                // start transaction
+                var trans = _dapperService.BeginTransaction(con);
+
+                #region Run update for each record
+
+                var errorMsg = string.Empty;
+                foreach (var modelToUpdate in models)
+                {
+                    // use value processor to convert values in model
+                    var valueProcessors = new List<ValueProcessorBase>();
+                    foreach (var field in formLayout.FormFields)
+                    {
+                        var processor = factory.CreateValueProcessor(field, config, con, trans);
+                        if (processor != null)
+                        {
+                            valueProcessors.Add(processor);
+                            processor.PreProcess(modelToUpdate);
+                        }
+                    }
+
+                    // generate the query text
+                    queryText = _queryBuilder.GenerateSqlTextForUpdate(new DataSourceConfig()
+                    {
+                        TableSchema = dataSourceConfig.TableSchema,
+                        TableName = dataSourceConfig.TableName,
+                        IdColumn = dataSourceConfig.IdColumn,
+                        Columns = modelToUpdate.Keys.ToList(),
+                        QueryText = formLayout.QueryText
+                    });
+                    var param = _queryBuilder.GenerateDynamicParameter(modelToUpdate.AsEnumerable());
+
+                    try
+                    {
+                        var affected = _dapperService.Execute(con, queryText, param, trans);
+
+                        // use value processors to execute extra operations
+                        foreach (var processor in valueProcessors)
+                        {
+                            processor.PostProcess(modelToUpdate);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
+                        _logger.LogError(ex, ex.Message);
+                        errorMsg = ex.Message;
+                    }
+                }
+
+                // throw errors 
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    _dapperService.Rollback(trans);
+                    throw new DepException("An Error in the query has occurred: " + errorMsg);
+                }
+
+                #endregion
+
+                try
+                {
+                    // Commit all the changes in transaction
+                    _dapperService.Commit(trans);
+                }
+                catch (Exception ex)
+                {
+                    _dapperService.Rollback(trans);
+                    _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, null, $"{ex.Message}");
+                    _logger.LogError(ex, ex.Message);
+                    throw new DepException("An Error in the query has occurred: " + errorMsg);
+                }
+
+                // run after saved event?
+                //foreach (var m in models)
+                //{
+                //    if (formLayout?.AfterSaved != null)
+                //    {
+                //        AfterSaved(formLayout.AfterSaved, config.Name, config.DataSourceConnection.ConnectionString, m);
+                //    }
+                //}
             }
 
             return true;

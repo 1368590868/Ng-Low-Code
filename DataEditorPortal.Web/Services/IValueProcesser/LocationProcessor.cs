@@ -116,4 +116,80 @@ namespace DataEditorPortal.Web.Services
             return;
         }
     }
+
+    [FilterType("locationField")]
+    public class LocationComparer : ValueComparerBase
+    {
+        private IEnumerable<string> _keys;
+
+        public override bool Equals(IDictionary<string, object> x, IDictionary<string, object> y)
+        {
+            if (ReferenceEquals(x, y))
+                return true;
+
+            if (x == null || y == null)
+                return false;
+
+            GetKeys();
+
+            foreach (var key in _keys)
+            {
+                if (!x.ContainsKey(key) || !y.ContainsKey(key))
+                    return false;
+
+                var valueX = x[key];
+                var valueY = y[key];
+
+                if (valueX == null && valueY == null)
+                    continue;
+
+                if (valueX == null || !valueX.Equals(valueY))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode(IDictionary<string, object> obj)
+        {
+            if (obj == null)
+                return 0;
+
+            GetKeys();
+
+            int hashCode = 17;
+
+            foreach (var key in _keys)
+            {
+                if (obj.ContainsKey(key))
+                {
+                    hashCode = hashCode * 23 + key.GetHashCode();
+                    hashCode = hashCode * 23 + (obj[key]?.GetHashCode() ?? 0);
+                }
+            }
+
+            return hashCode;
+        }
+
+        private void GetKeys()
+        {
+            if (_keys == null)
+            {
+                using (JsonDocument doc = JsonDocument.Parse(Field.props.ToString()))
+                {
+                    var props = doc.RootElement.EnumerateObject();
+
+                    var mappingProp = props.FirstOrDefault(x => x.Name == "mappingColumns").Value;
+                    if (mappingProp.ValueKind == JsonValueKind.Object)
+                    {
+                        // only get the mappings that already configed.
+                        var mappings = mappingProp.EnumerateObject().Where(m => m.Value.GetString() != null);
+                        _keys = mappings.Select(m => m.Value.GetString());
+                    }
+                }
+            }
+
+            if (_keys == null) throw new Exception("Configration error for location field.");
+        }
+    }
 }

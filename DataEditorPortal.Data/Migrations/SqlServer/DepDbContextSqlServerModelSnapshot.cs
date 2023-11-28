@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+#nullable disable
+
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
@@ -16,9 +18,109 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema(Common.Constants.DEFAULT_SCHEMA)
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.17")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "6.0.21")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.DataDictionary", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ID");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CATEGORY");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("LABEL");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("VALUE");
+
+                    b.Property<string>("Value1")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("VALUE1");
+
+                    b.Property<string>("Value2")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("VALUE2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DATA_DICTIONARIES", Common.Constants.DEFAULT_SCHEMA);
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.DataImportHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ID");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CREATED_BY");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CREATED_DATE");
+
+                    b.Property<Guid>("GridConfigurationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("GRID_COINFG_ID");
+
+                    b.Property<int>("ImportType")
+                        .HasColumnType("int")
+                        .HasColumnName("IMPORT_TYPE");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("NAME");
+
+                    b.Property<string>("Result")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("RESULT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("STATUS");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("GridConfigurationId");
+
+                    b.ToTable("DATA_IMPORT_HISTORIES", Common.Constants.DEFAULT_SCHEMA);
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.DataSourceConnection", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("NAME");
+
+                    b.Property<string>("ConnectionString")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CONNECTION_STRING");
+
+                    b.Property<string>("IncludeSchemas")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("INCLUDE_SCHEMAS");
+
+                    b.Property<string>("TableNameRule")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("TABLE_NAME_RULE");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("DATA_SOURCE_CONNECTIONS", Common.Constants.DEFAULT_SCHEMA);
+                });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_LOOKUP", b =>
                 {
@@ -45,15 +147,16 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("LOOKUPID");
 
-                    b.ToTable("DEMO_LINK_LOOKUP");
+                    b.ToTable("DEMO_LINK_LOOKUP", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_PRIMARY", b =>
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OBJECTID"), 1L, 1);
 
                     b.Property<string>("ASSESSEDBY")
                         .HasColumnType("nvarchar(max)");
@@ -114,15 +217,16 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("DEMO_LINK_PRIMARY");
+                    b.ToTable("DEMO_LINK_PRIMARY", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_RELATION", b =>
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OBJECTID"), 1L, 1);
 
                     b.Property<int>("LEFTID")
                         .HasColumnType("int");
@@ -132,15 +236,16 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("DEMO_LINK_RELATION");
+                    b.ToTable("DEMO_LINK_RELATION", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_SECONDARY", b =>
                 {
                     b.Property<int>("OBJECTID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OBJECTID"), 1L, 1);
 
                     b.Property<string>("ASSIGNEDTO")
                         .HasColumnType("nvarchar(max)");
@@ -189,106 +294,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("DEMO_LINK_SECONDARY");
-                });
-
-            modelBuilder.Entity("DataEditorPortal.Data.Models.DataDictionary", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ID");
-
-                    b.Property<string>("Category")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("CATEGORY");
-
-                    b.Property<string>("Label")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("LABEL");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("VALUE");
-
-                    b.Property<string>("Value1")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("VALUE1");
-
-                    b.Property<string>("Value2")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("VALUE2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DATA_DICTIONARIES");
-                });
-
-            modelBuilder.Entity("DataEditorPortal.Data.Models.DataImportHistory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ID");
-
-                    b.Property<Guid>("CreatedById")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("CREATED_BY");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("CREATED_DATE");
-
-                    b.Property<Guid>("GridConfigurationId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("GRID_COINFG_ID");
-
-                    b.Property<int>("ImportType")
-                        .HasColumnType("int")
-                        .HasColumnName("IMPORT_TYPE");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("NAME");
-
-                    b.Property<string>("Result")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("RESULT");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int")
-                        .HasColumnName("STATUS");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("GridConfigurationId");
-
-                    b.ToTable("DATA_IMPORT_HISTORIES");
-                });
-
-            modelBuilder.Entity("DataEditorPortal.Data.Models.DataSourceConnection", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("NAME");
-
-                    b.Property<string>("ConnectionString")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("CONNECTION_STRING");
-
-                    b.Property<string>("IncludeSchemas")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("INCLUDE_SCHEMAS");
-
-                    b.Property<string>("TableNameRule")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("TABLE_NAME_RULE");
-
-                    b.HasKey("Name");
-
-                    b.ToTable("DATA_SOURCE_CONNECTIONS");
+                    b.ToTable("DEMO_LINK_SECONDARY", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DemoTable", b =>
@@ -328,6 +334,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnName("NUMBER");
 
                     b.Property<decimal>("Total")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("TOTAL");
 
@@ -337,7 +344,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("DEMO_TABLE");
+                    b.ToTable("DEMO_TABLE", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.EventLog", b =>
@@ -385,7 +392,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("EVENT_LOGS");
+                    b.ToTable("EVENT_LOGS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.Lookup", b =>
@@ -417,7 +424,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("UniversalGridConfigurationId");
 
-                    b.ToTable("LOOKUPS");
+                    b.ToTable("LOOKUPS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SavedSearch", b =>
@@ -445,7 +452,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SAVED_SEARCHES");
+                    b.ToTable("SAVED_SEARCHES", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteContent", b =>
@@ -469,7 +476,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SITE_CONTENTS");
+                    b.ToTable("SITE_CONTENTS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteGroup", b =>
@@ -493,7 +500,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SITE_GROUPS");
+                    b.ToTable("SITE_GROUPS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteMenu", b =>
@@ -559,7 +566,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("SITE_MENUS");
+                    b.ToTable("SITE_MENUS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SitePermission", b =>
@@ -583,7 +590,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SITE_PERMISSIONS");
+                    b.ToTable("SITE_PERMISSIONS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteRole", b =>
@@ -603,7 +610,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SITE_ROLES");
+                    b.ToTable("SITE_ROLES", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteRolePermission", b =>
@@ -635,7 +642,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("SiteRoleId");
 
-                    b.ToTable("SITE_ROLE_PERMISSIONS");
+                    b.ToTable("SITE_ROLE_PERMISSIONS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteSetting", b =>
@@ -663,7 +670,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SITE_SETTINGS");
+                    b.ToTable("SITE_SETTINGS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.UniversalGridConfiguration", b =>
@@ -709,6 +716,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DETAIL_CONFIG");
 
+                    b.Property<string>("ExistingSearchName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("EXISTING_SEARCH_NAME");
+
                     b.Property<string>("ItemType")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("ITEM_TYPE");
@@ -721,11 +732,15 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("SEARCH_CONFIG");
 
+                    b.Property<bool>("UseExistingSearch")
+                        .HasColumnType("bit")
+                        .HasColumnName("USE_EXISTING_SEARCH");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DataSourceConnectionName");
 
-                    b.ToTable("UNIVERSAL_GRID_CONFIGURATIONS");
+                    b.ToTable("UNIVERSAL_GRID_CONFIGURATIONS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.UploadedFile", b =>
@@ -764,7 +779,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("UPLOADED_FILE");
+                    b.ToTable("UPLOADED_FILE", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.User", b =>
@@ -802,10 +817,9 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("USER_ID")
-                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
-                        .HasAnnotation("SqlServer:IdentitySeed", 1)
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnName("USER_ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
 
                     b.Property<string>("UserType")
                         .HasColumnType("nvarchar(max)")
@@ -821,7 +835,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("USERS");
+                    b.ToTable("USERS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.UserPermission", b =>
@@ -855,7 +869,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("USER_PERMISSIONS");
+                    b.ToTable("USER_PERMISSIONS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("SiteGroupSiteMenu", b =>
@@ -872,7 +886,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("SiteMenusId");
 
-                    b.ToTable("SITE_GROUP_SITE_MENU");
+                    b.ToTable("SITE_GROUP_SITE_MENU", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DataImportHistory", b =>
