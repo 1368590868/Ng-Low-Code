@@ -1,13 +1,17 @@
 ﻿using DataEditorPortal.Data.Common;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
 using DataEditorPortal.Web.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -17,19 +21,16 @@ namespace DataEditorPortal.Web.Jobs
     {
         private readonly ILogger<DataImportJob> _logger;
         private readonly DepDbContext _depDbContext;
-        private readonly IUniversalGridService _universalGridService;
-        private readonly IImportDataServcie _importDataServcie;
+        private readonly IServiceProvider _serviceProvider;
 
         public DataImportJob(
             ILogger<DataImportJob> logger,
             DepDbContext depDbContext,
-            IUniversalGridService universalGridService,
-            IImportDataServcie importDataServcie)
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
             _depDbContext = depDbContext;
-            _universalGridService = universalGridService;
-            _importDataServcie = importDataServcie;
+            _serviceProvider = serviceProvider;
         }
 
         public Task Execute(IJobExecutionContext context)
@@ -66,21 +67,31 @@ namespace DataEditorPortal.Web.Jobs
             var countImported = 0;
             try
             {
-                var sourceObjs = _importDataServcie.GetTransformedSourceData(gridName, importType, uploadedFile);
-                var totalCount = (double)sourceObjs.Count();
-                if (sourceObjs != null)
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    _universalGridService.CurrentUsername = createdByName;
+                    var claims = new List<Claim> { new Claim(ClaimTypes.Name, createdByName) };
+                    var identity = new ClaimsIdentity(claims, "custom", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+                    var principal = new ClaimsPrincipal(identity);
+                    var currentUserAccessor = scope.ServiceProvider.GetRequiredService<ICurrentUserAccessor>();
+                    currentUserAccessor.SetCurrentUser(principal);
 
-                    // start to import, using grid service to add or update
-                    foreach (var obj in sourceObjs)
+                    var _universalGridService = scope.ServiceProvider.GetRequiredService<IUniversalGridService>();
+                    var _importDataServcie = scope.ServiceProvider.GetRequiredService<IImportDataServcie>();
+
+                    var sourceObjs = _importDataServcie.GetTransformedSourceData(gridName, importType, uploadedFile);
+                    var totalCount = (double)sourceObjs.Count();
+                    if (sourceObjs != null)
                     {
-                        if (importType == ActionType.Add) _universalGridService.AddGridData(gridName, obj);
-                        if (importType == ActionType.Update) _universalGridService.UpdateGridData(gridName, obj[idColumn].ToString(), obj);
+                        // start to import, using grid service to add or update
+                        foreach (var obj in sourceObjs)
+                        {
+                            if (importType == ActionType.Add) _universalGridService.AddGridData(gridName, obj);
+                            if (importType == ActionType.Update) _universalGridService.UpdateGridData(gridName, obj[idColumn].ToString(), obj);
 
-                        countImported++;
+                            countImported++;
 
-                        context.JobDetail.JobDataMap["progress"] = countImported / totalCount * 100;
+                            context.JobDetail.JobDataMap["progress"] = countImported / totalCount * 100;
+                        }
                     }
                 }
 

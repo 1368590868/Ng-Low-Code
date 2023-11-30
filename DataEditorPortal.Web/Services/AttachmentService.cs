@@ -4,7 +4,6 @@ using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.UniversalGrid;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -29,8 +28,8 @@ namespace DataEditorPortal.Web.Services
         private readonly IHostEnvironment _hostEnvironment;
         private readonly IQueryBuilder _queryBuilder;
         private readonly DepDbContext _depDbContext;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDapperService _dapperService;
+        private readonly ICurrentUserAccessor _currentUserAccessor;
 
         private FileUploadConfig DEFAULT_CONFIG = new FileUploadConfig()
         {
@@ -50,32 +49,23 @@ namespace DataEditorPortal.Web.Services
         };
 
         private string _currentUsername;
-        public string CurrentUsername
-        {
-            set
-            {
-                _currentUsername = value;
-                _dapperService.CurrentUsername = value;
-            }
-        }
 
         public AttachmentService(
             IHostEnvironment hostEnvironment,
             IServiceProvider serviceProvider,
             IQueryBuilder queryBuilder,
             DepDbContext depDbContext,
-            IHttpContextAccessor httpContextAccessor,
-            IDapperService dapperService)
+            IDapperService dapperService,
+            ICurrentUserAccessor currentUserAccessor)
         {
             _hostEnvironment = hostEnvironment;
             _serviceProvider = serviceProvider;
             _queryBuilder = queryBuilder;
             _depDbContext = depDbContext;
-            _httpContextAccessor = httpContextAccessor;
             _dapperService = dapperService;
 
-            if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
-                CurrentUsername = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
+            _currentUserAccessor = currentUserAccessor;
+            _currentUsername = AppUser.ParseUsername(_currentUserAccessor.CurrentUser.Identity.Name).Username;
         }
 
         public FileUploadConfig GetDefaultConfig()

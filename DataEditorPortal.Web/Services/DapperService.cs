@@ -1,7 +1,5 @@
 ﻿using Dapper;
-using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Web.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -11,7 +9,6 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IDapperService
     {
-        string CurrentUsername { set; }
         string EventSection { get; set; }
         IDbTransaction BeginTransaction(IDbConnection con);
         void Commit(IDbTransaction tran);
@@ -25,34 +22,16 @@ namespace DataEditorPortal.Web.Services
 
     public class DapperService : IDapperService
     {
-        private IHttpContextAccessor _httpContextAccessor;
-        private readonly DepDbContext _depDbContext;
         private readonly ILogger<DapperService> _logger;
         private readonly IEventLogService _eventLogService;
 
-        private string _currentUsername;
-        public string CurrentUsername
-        {
-            set
-            {
-                _currentUsername = value;
-                _eventLogService.CurrentUsername = value;
-            }
-        }
         public string EventSection { get; set; }
 
         public DapperService(
-            IHttpContextAccessor httpContextAccessor,
-            DepDbContext depDbContext,
             ILogger<DapperService> logger, IEventLogService eventLogService)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _depDbContext = depDbContext;
             _logger = logger;
             _eventLogService = eventLogService;
-
-            if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
-                CurrentUsername = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
         }
 
         public IDbTransaction BeginTransaction(IDbConnection con)

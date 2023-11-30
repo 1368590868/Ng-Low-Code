@@ -320,19 +320,19 @@ namespace DataEditorPortal.Web.Services.FieldImporter
                     switch (validator)
                     {
                         case "beforetoday":
-                            DateTime.TryParse(value.ToString(), out dtVal);
+                            dtVal = TransformDate(value);
                             if (dtVal >= DateTime.Now.Date) errorMsg.Add("The value should be before today.");
                             break;
                         case "aftertoday":
-                            DateTime.TryParse(value.ToString(), out dtVal);
+                            dtVal = TransformDate(value);
                             if (dtVal <= DateTime.Now.Date) errorMsg.Add("The value should be after today.");
                             break;
                         case "beforeistoday":
-                            DateTime.TryParse(value.ToString(), out dtVal);
+                            dtVal = TransformDate(value);
                             if (dtVal > DateTime.Now.Date) errorMsg.Add("The value should be before or is today.");
                             break;
                         case "afteristoday":
-                            DateTime.TryParse(value.ToString(), out dtVal);
+                            dtVal = TransformDate(value);
                             if (dtVal < DateTime.Now.Date) errorMsg.Add("The value should be after or is today.");
                             break;
                         case "email":

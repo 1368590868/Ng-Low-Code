@@ -24,7 +24,6 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IUniversalGridService
     {
-        string CurrentUsername { set; }
         GridConfig GetGridConfig(string name);
         List<GridColConfig> GetGridColumnsConfig(string name);
         List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column);
@@ -77,17 +76,9 @@ namespace DataEditorPortal.Web.Services
         private readonly IMemoryCache _memoryCache;
         private readonly IDapperService _dapperService;
         private readonly IUserService _userService;
+        private readonly ICurrentUserAccessor _currentUserAccessor;
 
         private string _currentUsername;
-        public string CurrentUsername
-        {
-            set
-            {
-                _currentUsername = value;
-                _dapperService.CurrentUsername = value;
-                _eventLogService.CurrentUsername = value;
-            }
-        }
 
         public UniversalGridService(
             IServiceProvider serviceProvider,
@@ -100,7 +91,8 @@ namespace DataEditorPortal.Web.Services
             IAttachmentService attachmentService,
             IMemoryCache memoryCache,
             IDapperService dapperService,
-            IUserService userService)
+            IUserService userService,
+            ICurrentUserAccessor currentUserAccessor)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
@@ -113,9 +105,9 @@ namespace DataEditorPortal.Web.Services
             _memoryCache = memoryCache;
             _dapperService = dapperService;
             _userService = userService;
+            _currentUserAccessor = currentUserAccessor;
 
-            if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
-                CurrentUsername = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
+            _currentUsername = AppUser.ParseUsername(_currentUserAccessor.CurrentUser.Identity.Name).Username;
         }
 
         #region Grid cofnig, columns config, search config and detail form config

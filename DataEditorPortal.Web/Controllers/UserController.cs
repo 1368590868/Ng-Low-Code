@@ -107,7 +107,6 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
-        [AdminAuthorizationFilter]
         [Route("email-exists")]
         public bool ExistEmail([FromQuery] string email, [FromQuery] Guid? id)
         {
@@ -115,7 +114,6 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
-        [AdminAuthorizationFilter]
         [Route("detail/{userId}")]
         public dynamic GetUserDetail(Guid userId)
         {
@@ -123,6 +121,14 @@ namespace DataEditorPortal.Web.Controllers
             if (dep_user == null)
             {
                 throw new DepException("Not Found", 404);
+            }
+            else
+            {
+                var username = AppUser.ParseUsername(HttpContext.User.Identity.Name).Username;
+                if (dep_user.Username != username && !_userService.IsAdmin(dep_user.Username))
+                {
+                    throw new DepException("Not Found", 404);
+                }
             }
 
             return dep_user;
@@ -137,7 +143,6 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpPut]
-        [AdminAuthorizationFilter]
         [Route("update/{userId}")]
         public Guid Update(Guid userId, [FromBody] User model)
         {
@@ -145,6 +150,14 @@ namespace DataEditorPortal.Web.Controllers
             if (dep_user == null)
             {
                 throw new DepException("Not Found", 404);
+            }
+            else
+            {
+                var username = AppUser.ParseUsername(HttpContext.User.Identity.Name).Username;
+                if (dep_user.Username != username && !_userService.IsAdmin(dep_user.Username))
+                {
+                    throw new DepException("Not Found", 404);
+                }
             }
 
             dep_user.Username = model.Username;

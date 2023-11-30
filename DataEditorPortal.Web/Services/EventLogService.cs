@@ -1,7 +1,7 @@
 ﻿using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text.Json;
@@ -12,30 +12,28 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IEventLogService
     {
-        string CurrentUsername { get; set; }
         void AddPageRequestLog(EventLogModel model);
         void AddEventLog(string category, string section, string name, string details = null, object param = null, string result = "", string connection = "");
     }
 
     public class EventLogService : IEventLogService
     {
-        private IHttpContextAccessor _httpContextAccessor;
         private readonly DepDbContext _depDbContext;
         private readonly ILogger<EventLogService> _logger;
+        private readonly ICurrentUserAccessor _currentUserAccessor;
 
-        public string CurrentUsername { get; set; }
+        private string _currentUsername;
 
         public EventLogService(
-            IHttpContextAccessor httpContextAccessor,
             DepDbContext depDbContext,
-            ILogger<EventLogService> logger)
+            ILogger<EventLogService> logger,
+            ICurrentUserAccessor currentUserAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
             _depDbContext = depDbContext;
             _logger = logger;
 
-            if (_httpContextAccessor.HttpContext != null && _httpContextAccessor.HttpContext.User != null)
-                CurrentUsername = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
+            _currentUserAccessor = currentUserAccessor;
+            _currentUsername = AppUser.ParseUsername(_currentUserAccessor.CurrentUser.Identity.Name).Username;
         }
 
         public void AddPageRequestLog(EventLogModel model)
@@ -48,7 +46,7 @@ namespace DataEditorPortal.Web.Services
                     EventSection = model.Section.ToUpper(),
                     EventName = model.Action,
                     EventTime = DateTime.UtcNow,
-                    Username = CurrentUsername,
+                    Username = _currentUsername,
                     Details = model.Details,
                     Params = FormatJson(model.Params)
                 });
@@ -87,7 +85,7 @@ namespace DataEditorPortal.Web.Services
                     EventSection = section.ToUpper(),
                     EventName = name,
                     EventTime = DateTime.UtcNow,
-                    Username = CurrentUsername,
+                    Username = _currentUsername,
                     Details = details,
                     Params = param != null ? JsonSerializer.Serialize(param, new JsonSerializerOptions() { WriteIndented = true, Converters = { new ByteArrayToStringConverter() } }) : "",
                     Result = result,
