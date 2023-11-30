@@ -33,6 +33,7 @@ namespace DataEditorPortal.Data.Contexts
         public virtual DbSet<UniversalGridConfiguration> UniversalGridConfigurations { get; set; }
         public virtual DbSet<DataImportHistory> DataImportHistories { get; set; }
         public virtual DbSet<SavedSearch> SavedSearches { get; set; }
+        public virtual DbSet<DataUpdateHistory> DataUpdateHistories { get; set; }
 
         public virtual DbSet<DemoTable> DemoTables { get; set; }
         public virtual DbSet<DEMO_LINK_PRIMARY> DEMO_LINK_PRIMARY { get; set; }

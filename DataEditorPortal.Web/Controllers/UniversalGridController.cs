@@ -99,6 +99,13 @@ namespace DataEditorPortal.Web.Controllers
             return _universalGridService.GetGridDataDetail(name, id);
         }
 
+        [HttpGet]
+        [Route("{name}/data/{id}/update-histories")]
+        public List<DataUpdateHistory> GetDataUpdateHistories(string name, string id)
+        {
+            return _universalGridService.GetDataUpdateHistories(name, id);
+        }
+
         [HttpPost]
         [Route("{name}/data/batch-get")]
         public IDictionary<string, object> BatchGet(string name, [FromBody] BatchGetInput input)

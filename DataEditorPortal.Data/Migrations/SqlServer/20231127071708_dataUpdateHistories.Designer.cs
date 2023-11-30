@@ -4,6 +4,7 @@ using DataEditorPortal.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    partial class DepDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20231127071708_dataUpdateHistories")]
+    partial class dataUpdateHistories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema(Common.Constants.DEFAULT_SCHEMA)
+                .HasDefaultSchema("DATA_EDITOR_PORTAL")
                 .HasAnnotation("ProductVersion", "6.0.21")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -52,7 +54,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("DATA_DICTIONARIES", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("DATA_DICTIONARIES", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DataImportHistory", b =>
@@ -96,7 +98,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("GridConfigurationId");
 
-                    b.ToTable("DATA_IMPORT_HISTORIES", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("DATA_IMPORT_HISTORIES", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DataSourceConnection", b =>
@@ -119,7 +121,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Name");
 
-                    b.ToTable("DATA_SOURCE_CONNECTIONS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("DATA_SOURCE_CONNECTIONS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DataUpdateHistory", b =>
@@ -163,7 +165,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("DATA_UPDATE_HISTORIES", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("DATA_UPDATE_HISTORIES", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_LOOKUP", b =>
@@ -191,7 +193,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("LOOKUPID");
 
-                    b.ToTable("DEMO_LINK_LOOKUP", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("DEMO_LINK_LOOKUP", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_PRIMARY", b =>
@@ -261,7 +263,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("DEMO_LINK_PRIMARY", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("DEMO_LINK_PRIMARY", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_RELATION", b =>
@@ -280,7 +282,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("DEMO_LINK_RELATION", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("DEMO_LINK_RELATION", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_SECONDARY", b =>
@@ -338,7 +340,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("OBJECTID");
 
-                    b.ToTable("DEMO_LINK_SECONDARY", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("DEMO_LINK_SECONDARY", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DemoTable", b =>
@@ -388,7 +390,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("DEMO_TABLE", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("DEMO_TABLE", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.EventLog", b =>
@@ -436,7 +438,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("EVENT_LOGS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("EVENT_LOGS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.Lookup", b =>
@@ -468,7 +470,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("UniversalGridConfigurationId");
 
-                    b.ToTable("LOOKUPS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("LOOKUPS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SavedSearch", b =>
@@ -496,7 +498,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SAVED_SEARCHES", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("SAVED_SEARCHES", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteContent", b =>
@@ -520,7 +522,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SITE_CONTENTS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("SITE_CONTENTS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteGroup", b =>
@@ -544,7 +546,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SITE_GROUPS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("SITE_GROUPS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteMenu", b =>
@@ -610,7 +612,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("SITE_MENUS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("SITE_MENUS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SitePermission", b =>
@@ -634,7 +636,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SITE_PERMISSIONS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("SITE_PERMISSIONS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteRole", b =>
@@ -654,7 +656,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SITE_ROLES", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("SITE_ROLES", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteRolePermission", b =>
@@ -686,7 +688,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("SiteRoleId");
 
-                    b.ToTable("SITE_ROLE_PERMISSIONS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("SITE_ROLE_PERMISSIONS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.SiteSetting", b =>
@@ -714,7 +716,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("SITE_SETTINGS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("SITE_SETTINGS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.UniversalGridConfiguration", b =>
@@ -784,7 +786,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("DataSourceConnectionName");
 
-                    b.ToTable("UNIVERSAL_GRID_CONFIGURATIONS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("UNIVERSAL_GRID_CONFIGURATIONS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.UploadedFile", b =>
@@ -823,7 +825,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("UPLOADED_FILE", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("UPLOADED_FILE", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.User", b =>
@@ -879,7 +881,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.ToTable("USERS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("USERS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.UserPermission", b =>
@@ -913,7 +915,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("USER_PERMISSIONS", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("USER_PERMISSIONS", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("SiteGroupSiteMenu", b =>
@@ -930,7 +932,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
 
                     b.HasIndex("SiteMenusId");
 
-                    b.ToTable("SITE_GROUP_SITE_MENU", Common.Constants.DEFAULT_SCHEMA);
+                    b.ToTable("SITE_GROUP_SITE_MENU", "DATA_EDITOR_PORTAL");
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DataImportHistory", b =>

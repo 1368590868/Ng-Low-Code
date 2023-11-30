@@ -40,6 +40,7 @@ namespace DataEditorPortal.Web.Services
 
         IDictionary<string, object> GetGridDataDetail(string name, string id);
         IDictionary<string, object> BatchGet(string name, string[] ids);
+        List<DataUpdateHistory> GetDataUpdateHistories(string name, string id);
         bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model);
         bool UpdateGridData(string name, string id, IDictionary<string, object> model);
         bool BatchUpdate(string name, string[] ids, IDictionary<string, object> model);
@@ -944,6 +945,17 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
+        public List<DataUpdateHistory> GetDataUpdateHistories(string name, string id)
+        {
+            var config = GetUniversalGridConfiguration(name);
+            var configId = config.Id.ToString();
+
+            return _depDbContext.DataUpdateHistories
+                .Where(h => h.GridConfigurationId == configId && h.DataId == id)
+                .OrderByDescending(h => h.CreateDate)
+                .ToList();
+        }
+
         public bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model)
         {
             _dapperService.EventSection = $"{name} | ValidateGridData";
@@ -1199,9 +1211,29 @@ namespace DataEditorPortal.Web.Services
                     .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
                     .ToDictionary(x => x.Key, x => x.Value);
 
-                // apply new values
+                // apply new values, create data update histories
+                var updateHistories = new List<DataUpdateHistory>();
+                var updateTime = DateTime.UtcNow;
                 foreach (var kv1 in model)
-                    modelToUpdate[kv1.Key] = kv1.Value;
+                {
+                    var originalValue = modelToUpdate[kv1.Key];
+                    var newValue = kv1.Value;
+                    if (!IsValueEqual(originalValue, newValue))
+                    {
+                        modelToUpdate[kv1.Key] = newValue;
+                        updateHistories.Add(new DataUpdateHistory()
+                        {
+                            Username = _currentUsername,
+                            CreateDate = updateTime,
+                            GridConfigurationId = config.Id.ToString(),
+                            DataId = id,
+                            Field = kv1.Key,
+                            OriginalValue = originalValue != null ? originalValue.ToString() : "",
+                            NewValue = newValue != null ? newValue.ToString() : "",
+                            ActionType = ActionType.Update
+                        });
+                    }
+                }
 
                 // add id parameter
                 if (modelToUpdate.ContainsKey(dataSourceConfig.IdColumn))
@@ -1251,6 +1283,10 @@ namespace DataEditorPortal.Web.Services
                     }
 
                     _dapperService.Commit(trans);
+
+                    // save data update histories
+                    _depDbContext.AddRange(updateHistories);
+                    _depDbContext.SaveChanges();
 
                     // run after saved event
                     if (formLayout?.AfterSaved != null)
@@ -1435,10 +1471,30 @@ namespace DataEditorPortal.Web.Services
 
                 // apply new values,
                 // modelToUpdate should already have IdColumn, as it comes form SqlTextForList
+                var updateHistories = new List<DataUpdateHistory>();
+                var updateTime = DateTime.UtcNow;
                 foreach (var modelToUpdate in models)
                 {
                     foreach (var kv1 in model)
-                        modelToUpdate[kv1.Key] = kv1.Value;
+                    {
+                        var originalValue = _queryBuilder.GetJsonElementValue(modelToUpdate[kv1.Key]);
+                        var newValue = _queryBuilder.GetJsonElementValue(kv1.Value);
+                        if (!IsValueEqual(originalValue, newValue))
+                        {
+                            modelToUpdate[kv1.Key] = newValue;
+                            updateHistories.Add(new DataUpdateHistory()
+                            {
+                                Username = _currentUsername,
+                                CreateDate = updateTime,
+                                GridConfigurationId = config.Id.ToString(),
+                                DataId = modelToUpdate[dataSourceConfig.IdColumn].ToString(),
+                                Field = kv1.Key,
+                                OriginalValue = originalValue != null ? originalValue.ToString() : "",
+                                NewValue = newValue != null ? newValue.ToString() : "",
+                                ActionType = ActionType.Update
+                            });
+                        }
+                    }
 
                     // calculate the computed field values
                     ProcessComputedValues(formLayout.FormFields, modelToUpdate, con);
@@ -1508,6 +1564,10 @@ namespace DataEditorPortal.Web.Services
                 {
                     // Commit all the changes in transaction
                     _dapperService.Commit(trans);
+
+                    // save data update histories
+                    _depDbContext.AddRange(updateHistories);
+                    _depDbContext.SaveChanges();
                 }
                 catch (Exception ex)
                 {
@@ -1649,6 +1709,31 @@ namespace DataEditorPortal.Web.Services
                 _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, JsonSerializer.Serialize(eventConfig), ex.Message);
                 _logger.LogError(ex, ex.Message);
             }
+        }
+
+        private bool IsValueEqual(object v1, object v2)
+        {
+            var x = _queryBuilder.GetJsonElementValue(v1);
+            var y = _queryBuilder.GetJsonElementValue(v2);
+
+            if (ReferenceEquals(x, y))
+                return true;
+
+            if (x == null && y == null)
+                return true;
+
+            if (x != null && y != null)
+            {
+                Type typeX = x.GetType();
+                Type typeY = y.GetType();
+
+                if (typeX != typeY)
+                    return false;
+
+                return x.Equals(y);
+            }
+
+            return false;
         }
 
         #endregion
