@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataEditorPortal.Data.Contexts;
 using DataEditorPortal.Data.Models;
+using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -28,19 +29,22 @@ namespace DataEditorPortal.Web.Services
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMemoryCache _memoryCache;
+        private readonly ICurrentUserAccessor _currentUserAccessor;
 
         public UserService(
             DepDbContext depDbContext,
             ILogger<UserService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            ICurrentUserAccessor currentUserAccessor)
         {
             _depDbContext = depDbContext;
             _logger = logger;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _memoryCache = memoryCache;
+            _currentUserAccessor = currentUserAccessor;
         }
 
         public List<MenuItem> GetUserMenus(string username, string groupName)
@@ -89,7 +93,7 @@ namespace DataEditorPortal.Web.Services
                     {
                         return m.Status == Data.Common.PortalItemStatus.Published
                             && m.ParentId == null
-                            && (m.Type == "Folder" || userPermissions.Contains($"VIEW_{ m.Name.Replace("-", "_") }".ToUpper()));
+                            && (m.Type == "Folder" || userPermissions.Contains($"VIEW_{m.Name.Replace("-", "_")}".ToUpper()));
                     }
                 })
                 .Select(m =>
@@ -132,7 +136,7 @@ namespace DataEditorPortal.Web.Services
                         {
                             return m.Status == Data.Common.PortalItemStatus.Published
                                 && m.ParentId == parentId
-                                && userPermissions.Contains($"VIEW_{ m.Name.Replace("-", "_") }".ToUpper());
+                                && userPermissions.Contains($"VIEW_{m.Name.Replace("-", "_")}".ToUpper());
                         }
                     })
                     .Select(m =>
@@ -166,8 +170,7 @@ namespace DataEditorPortal.Web.Services
         {
             var result = new Dictionary<string, bool>();
 
-            var user = _httpContextAccessor.HttpContext.User;
-            var username = AppUser.ParseUsername(user.Identity.Name).Username;
+            var username = _currentUserAccessor.CurrentUser.Username();
             var userEntity = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
             var userId = userEntity != null ? userEntity.Id : Guid.Empty;
 
@@ -245,7 +248,7 @@ namespace DataEditorPortal.Web.Services
 
         public Guid CreateUser(User model, List<string> roleNames = null)
         {
-            var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
+            var username = _currentUserAccessor.CurrentUser.Username();
             var user = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
 
             var dep_user = new User();

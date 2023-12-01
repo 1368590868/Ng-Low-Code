@@ -107,7 +107,7 @@ namespace DataEditorPortal.Web.Services
             _userService = userService;
             _currentUserAccessor = currentUserAccessor;
 
-            _currentUsername = AppUser.ParseUsername(_currentUserAccessor.CurrentUser.Identity.Name).Username;
+            _currentUsername = _currentUserAccessor.CurrentUser.Username();
         }
 
         #region Grid cofnig, columns config, search config and detail form config

@@ -21,15 +21,18 @@ namespace DataEditorPortal.Web.Controllers
         private readonly ILogger<RoleController> _logger;
         private readonly DepDbContext _depDbContext;
         private readonly IPermissionService _permissionService;
+        private readonly ICurrentUserAccessor _currentUserAccessor;
 
         public RoleController(
             ILogger<RoleController> logger,
             DepDbContext depDbContext,
-            IPermissionService permissionService)
+            IPermissionService permissionService,
+            ICurrentUserAccessor currentUserAccessor)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _permissionService = permissionService;
+            _currentUserAccessor = currentUserAccessor;
         }
 
         [HttpGet]
@@ -43,8 +46,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("create")]
         public Guid Create([FromBody] AppRole role)
         {
-            var username = AppUser.ParseUsername(User.Identity.Name).Username;
-            var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+            var userId = _currentUserAccessor.CurrentUser.UserId();
 
             var siteRole = new SiteRole()
             {
@@ -78,8 +80,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{roleId}/update")]
         public Guid Update(Guid roleId, [FromBody] AppRole role)
         {
-            var username = AppUser.ParseUsername(User.Identity.Name).Username;
-            var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+            var userId = _currentUserAccessor.CurrentUser.UserId();
 
             var siteRole = _depDbContext.SiteRoles.FirstOrDefault(r => r.Id == roleId);
             siteRole.RoleName = role.RoleName;

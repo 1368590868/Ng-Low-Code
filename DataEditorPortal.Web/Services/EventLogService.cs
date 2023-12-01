@@ -33,7 +33,7 @@ namespace DataEditorPortal.Web.Services
             _logger = logger;
 
             _currentUserAccessor = currentUserAccessor;
-            _currentUsername = AppUser.ParseUsername(_currentUserAccessor.CurrentUser.Identity.Name).Username;
+            _currentUsername = _currentUserAccessor.CurrentUser.Username();
         }
 
         public void AddPageRequestLog(EventLogModel model)

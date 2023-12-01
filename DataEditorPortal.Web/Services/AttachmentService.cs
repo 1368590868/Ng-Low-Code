@@ -65,7 +65,7 @@ namespace DataEditorPortal.Web.Services
             _dapperService = dapperService;
 
             _currentUserAccessor = currentUserAccessor;
-            _currentUsername = AppUser.ParseUsername(_currentUserAccessor.CurrentUser.Identity.Name).Username;
+            _currentUsername = _currentUserAccessor.CurrentUser.Username();
         }
 
         public FileUploadConfig GetDefaultConfig()

@@ -8,6 +8,8 @@ using DataEditorPortal.Web.Common.ResponseAutoWrapper;
 using DataEditorPortal.Web.Jobs;
 using DataEditorPortal.Web.Services;
 using DataEditorPortal.Web.Services.FieldImporter;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +24,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Web;
 using Oracle.ManagedDataAccess.Client;
 using Quartz;
 using System;
@@ -112,6 +115,8 @@ namespace DataEditorPortal.Web
             });
             services.AddSingleton<IUtcLocalConverter, UtcLocalConverter>();
 
+            services.AddTransient<IClaimsTransformation, DepUserClaimsTransformation>();
+            services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
             services.AddScoped<IUniversalGridService, UniversalGridService>();
             services.AddScoped<IPortalItemService, PortalItemService>();
             services.AddScoped<IUserService, UserService>();
@@ -142,7 +147,15 @@ namespace DataEditorPortal.Web
                 });
             });
 
-            services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
+            var authentication = Configuration.GetValue<string>("Authentication");
+            if (authentication == "Windows")
+            {
+                services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
+            }
+            else if (authentication == "AzureAd")
+            {
+                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddMicrosoftIdentityWebApi(Configuration);
+            }
 
             services.AddAutoMapper(typeof(Startup));
             services.AddResponseAutoWrapper(options =>

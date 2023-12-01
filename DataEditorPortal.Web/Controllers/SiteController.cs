@@ -135,7 +135,7 @@ namespace DataEditorPortal.Web.Controllers
         [NoLicenseCheck]
         public List<MenuItem> GetMenus([FromQuery] string siteGroupName)
         {
-            var user = AppUser.FromWindowsIdentity(User?.Identity);
+            var user = AppUser.FromClaimsPrincipal(User);
             return _userService.GetUserMenus(user.Username, siteGroupName);
         }
 

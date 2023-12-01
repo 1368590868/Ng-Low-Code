@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DataEditorPortal.Web.Models;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 
@@ -60,4 +62,27 @@ namespace DataEditorPortal.Web.Common
         }
     }
 
+    public static class CurrentUserExtensions
+    {
+        public static string Username(this ClaimsPrincipal claimsPrincipal)
+        {
+            return AppUser.FromClaimsPrincipal(claimsPrincipal).Username;
+        }
+
+        public static string DisplayName(this ClaimsPrincipal claimsPrincipal)
+        {
+            return claimsPrincipal.FindFirstValue(DepClaimConstants.DisplayName);
+        }
+
+        public static Guid UserId(this ClaimsPrincipal claimsPrincipal)
+        {
+            var userClaim = claimsPrincipal.FindFirst(DepClaimConstants.UserId);
+            if (userClaim != null)
+            {
+                return Guid.Parse(userClaim.Value);
+            }
+
+            return Guid.Empty;
+        }
+    }
 }

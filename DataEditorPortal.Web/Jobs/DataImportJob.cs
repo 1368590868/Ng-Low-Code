@@ -69,7 +69,10 @@ namespace DataEditorPortal.Web.Jobs
             {
                 using (var scope = _serviceProvider.CreateScope())
                 {
-                    var claims = new List<Claim> { new Claim(ClaimTypes.Name, createdByName) };
+                    var claims = new List<Claim> {
+                        new Claim(DepClaimConstants.DisplayName, createdByName),
+                        new Claim(DepClaimConstants.UserId, createdById.ToString())
+                    };
                     var identity = new ClaimsIdentity(claims, "custom", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
                     var principal = new ClaimsPrincipal(identity);
                     var currentUserAccessor = scope.ServiceProvider.GetRequiredService<ICurrentUserAccessor>();

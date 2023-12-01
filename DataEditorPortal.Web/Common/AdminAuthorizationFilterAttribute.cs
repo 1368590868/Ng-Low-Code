@@ -22,7 +22,7 @@ namespace DataEditorPortal.Web.Common
 
             public void OnAuthorization(AuthorizationFilterContext context)
             {
-                var user = AppUser.FromWindowsIdentity(context.HttpContext.User?.Identity);
+                var user = AppUser.FromClaimsPrincipal(context.HttpContext.User);
                 var isAdmin = _userService.IsAdmin(user.Username);
 
                 if (!isAdmin)

@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Microsoft.Identity.Web;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
+using System.Security.Claims;
 
 namespace DataEditorPortal.Web.Models
 {
@@ -9,7 +10,6 @@ namespace DataEditorPortal.Web.Models
     public class AppUser
     {
         public Guid Id { get; set; }
-        public string IdentityName => Domain + "\\" + Username;
         public string Username { get; set; }
         public string Domain { get; set; }
         public bool Authenticated { get; set; }
@@ -27,51 +27,42 @@ namespace DataEditorPortal.Web.Models
 
         public Dictionary<string, bool> Permissions { get; set; } = new Dictionary<string, bool>();
 
-        public static AppUser ParseUsername(string user)
+        public static AppUser FromClaimsPrincipal(ClaimsPrincipal user)
         {
             AppUser appUser = new AppUser();
-            if (!string.IsNullOrEmpty(user))
-            {
-                var parts = user.Split('\\', StringSplitOptions.RemoveEmptyEntries).ToList();
-                if (parts.Count > 1)
-                {
-                    appUser.Domain = parts.First();
-                    appUser.Username = parts.Last();
-                }
-                else
-                {
-                    appUser.Username = parts.Last();
-                }
-            }
-            return appUser;
-        }
-
-        public static AppUser FromWindowsIdentity(IIdentity identity)
-        {
-            AppUser appUser = new AppUser();
-            if (identity == null)
+            if (user == null || user.Identity == null)
             {
                 return appUser;
             }
 
-            appUser.Authenticated = identity.IsAuthenticated;
+            appUser.Authenticated = user.Identity.IsAuthenticated;
 
-            string identityName = identity.Name;
-            if (!string.IsNullOrEmpty(identityName))
+            var oid = user.GetObjectId();
+            if (oid != null)
             {
-                var parts = identityName.Split('\\', StringSplitOptions.RemoveEmptyEntries).ToList();
-                if (parts.Count > 1)
+                // azure ad
+                appUser.Username = Guid.Parse(oid).ToString();
+                appUser.DisplayName = user.GetDisplayName();
+                appUser.Domain = user.GetDomainHint();
+            }
+            else
+            {
+                string identityName = user.Identity.Name;
+                if (!string.IsNullOrEmpty(identityName))
                 {
-                    appUser.Domain = parts.First();
-                    appUser.Username = parts.Last();
-                }
-                else
-                {
-                    appUser.Username = parts.Last();
+                    var parts = identityName.Split('\\', StringSplitOptions.RemoveEmptyEntries).ToList();
+                    if (parts.Count > 1)
+                    {
+                        appUser.Domain = parts.First();
+                        appUser.Username = parts.Last();
+                    }
+                    else
+                    {
+                        appUser.Username = parts.Last();
+                    }
+                    appUser.DisplayName = appUser.Username;
                 }
             }
-
-            //Query for display name and emails
 
             return appUser;
         }

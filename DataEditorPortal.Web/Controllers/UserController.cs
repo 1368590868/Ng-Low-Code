@@ -24,17 +24,20 @@ namespace DataEditorPortal.Web.Controllers
         private readonly DepDbContext _depDbContext;
         private readonly IUserService _userService;
         private readonly IPermissionService _permissionService;
+        private readonly ICurrentUserAccessor _currentUserAccessor;
 
         public UserController(
             ILogger<UserController> logger,
             DepDbContext depDbContext,
             IUserService userService,
-            IPermissionService permissionService)
+            IPermissionService permissionService,
+            ICurrentUserAccessor currentUserAccessor)
         {
             _logger = logger;
             _depDbContext = depDbContext;
             _userService = userService;
             _permissionService = permissionService;
+            _currentUserAccessor = currentUserAccessor;
         }
 
         [HttpGet]
@@ -42,7 +45,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("getLoggedInUser")]
         public AppUser GetLoggedInUser([FromQuery] string url)
         {
-            var user = AppUser.FromWindowsIdentity(User?.Identity);
+            var user = AppUser.FromClaimsPrincipal(User);
 
             var dep_user = _depDbContext.Users.Where(x => x.Username == user.Username).FirstOrDefault();
             if (dep_user == null)
@@ -55,11 +58,11 @@ namespace DataEditorPortal.Web.Controllers
                 // check site has admin
                 if (_userService.HasAdmin())
                 {
-                    _userService.CreateUser(dep_user);
+                    dep_user.Id = _userService.CreateUser(dep_user);
                 }
                 else
                 {
-                    _userService.CreateUser(dep_user, new List<string>() { "Administrators" });
+                    dep_user.Id = _userService.CreateUser(dep_user, new List<string>() { "Administrators" });
                 }
             }
 
@@ -124,7 +127,7 @@ namespace DataEditorPortal.Web.Controllers
             }
             else
             {
-                var username = AppUser.ParseUsername(HttpContext.User.Identity.Name).Username;
+                var username = _currentUserAccessor.CurrentUser.Username();
                 if (dep_user.Username != username && !_userService.IsAdmin(dep_user.Username))
                 {
                     throw new DepException("Not Found", 404);
@@ -153,7 +156,7 @@ namespace DataEditorPortal.Web.Controllers
             }
             else
             {
-                var username = AppUser.ParseUsername(HttpContext.User.Identity.Name).Username;
+                var username = _currentUserAccessor.CurrentUser.Username();
                 if (dep_user.Username != username && !_userService.IsAdmin(dep_user.Username))
                 {
                     throw new DepException("Not Found", 404);
@@ -204,8 +207,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{userId}/permissions")]
         public bool UpdatePermissions(Guid userId, [FromBody] UserPermissions model)
         {
-            var username = AppUser.ParseUsername(User.Identity.Name).Username;
-            var currentUserId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+            var currentUserId = _currentUserAccessor.CurrentUser.UserId();
 
             _depDbContext.UserPermissions
                 .Where(p => p.UserId == userId)
@@ -259,8 +261,7 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{userId}/roles")]
         public bool UpdateUserRoles(Guid userId, [FromBody] UserPermissions model)
         {
-            var username = AppUser.ParseUsername(User.Identity.Name).Username;
-            var currentUserId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+            var currentUserId = _currentUserAccessor.CurrentUser.UserId();
 
             _depDbContext.UserPermissions
                 .Where(p => p.UserId == userId)

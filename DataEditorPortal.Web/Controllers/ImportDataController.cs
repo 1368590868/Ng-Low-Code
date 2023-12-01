@@ -31,6 +31,7 @@ namespace DataEditorPortal.Web.Controllers
         private readonly IImportDataServcie _importDataServcie;
         private readonly IMapper _mapper;
         private readonly ISchedulerFactory _schedulerFactory;
+        private readonly ICurrentUserAccessor _currentUserAccessor;
 
         public ImportDataController(
             ILogger<ImportDataController> logger,
@@ -38,7 +39,8 @@ namespace DataEditorPortal.Web.Controllers
             IUniversalGridService universalGridService,
             IImportDataServcie importDataServcie,
             IMapper mapper,
-            ISchedulerFactory schedulerFactory)
+            ISchedulerFactory schedulerFactory,
+            ICurrentUserAccessor currentUserAccessor)
         {
             _logger = logger;
             _depDbContext = depDbContext;
@@ -46,6 +48,7 @@ namespace DataEditorPortal.Web.Controllers
             _importDataServcie = importDataServcie;
             _mapper = mapper;
             _schedulerFactory = schedulerFactory;
+            _currentUserAccessor = currentUserAccessor;
         }
 
         [HttpGet]
@@ -125,15 +128,15 @@ namespace DataEditorPortal.Web.Controllers
         [Route("{gridName}/{type}/confirm-import")]
         public void ConfirmImport(string gridName, ActionType type, [FromBody] UploadedFileModel uploadedFile)
         {
-            var username = AppUser.ParseUsername(User.Identity.Name).Username;
-            var currentUserId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+            var displayName = _currentUserAccessor.CurrentUser.DisplayName();
+            var userId = _currentUserAccessor.CurrentUser.UserId();
 
             var jobDataMap = new JobDataMap();
             jobDataMap.Add("gridName", gridName);
             jobDataMap.Add("importType", type);
             jobDataMap.Add("templateFile", uploadedFile);
-            jobDataMap.Add("createdById", currentUserId);
-            jobDataMap.Add("createdByName", username);
+            jobDataMap.Add("createdById", userId);
+            jobDataMap.Add("createdByName", displayName);
 
             var jobName = Guid.NewGuid().ToString();
             var job = JobBuilder.Create<DataImportJob>()

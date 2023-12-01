@@ -7,7 +7,6 @@ using DataEditorPortal.Web.Common;
 using DataEditorPortal.Web.Models;
 using DataEditorPortal.Web.Models.PortalItem;
 using DataEditorPortal.Web.Models.UniversalGrid;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,9 +63,9 @@ namespace DataEditorPortal.Web.Services
         private readonly IQueryBuilder _queryBuilder;
         private readonly ILogger<PortalItemService> _logger;
         private readonly IMapper _mapper;
-        private IHttpContextAccessor _httpContextAccessor;
         private readonly IMemoryCache _memoryCache;
         private readonly IHostEnvironment _hostEnvironment;
+        private readonly ICurrentUserAccessor _currentUserAccessor;
 
         public PortalItemService(
             IServiceProvider serviceProvider,
@@ -74,18 +73,18 @@ namespace DataEditorPortal.Web.Services
             IQueryBuilder queryBuilder,
             ILogger<PortalItemService> logger,
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
             IMemoryCache memoryCache,
-            IHostEnvironment hostEnvironment)
+            IHostEnvironment hostEnvironment,
+            ICurrentUserAccessor currentUserAccessor)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
             _queryBuilder = queryBuilder;
             _logger = logger;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
             _memoryCache = memoryCache;
             _hostEnvironment = hostEnvironment;
+            _currentUserAccessor = currentUserAccessor;
         }
 
         public bool ExistName(string name, Guid? id)
@@ -129,8 +128,7 @@ namespace DataEditorPortal.Web.Services
                 model.Name = GetCodeName(model.Label);
             if (ExistName(model.Name, null)) throw new DepException("Portal Name does already exist.");
 
-            var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
-            var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+            var userId = _currentUserAccessor.CurrentUser.UserId();
 
             model.Order = _depDbContext.SiteMenus
                 .Where(x => x.ParentId == model.ParentId)
@@ -298,8 +296,7 @@ namespace DataEditorPortal.Web.Services
                 throw new DepException("Not Found", 404);
             }
 
-            var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
-            var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+            var userId = _currentUserAccessor.CurrentUser.UserId();
             var allNames = _depDbContext.SiteMenus.Select(m => new SiteMenu() { Name = m.Name, Label = m.Label }).ToList();
 
             var siteMenuCopy = _mapper.Map<SiteMenu>(siteMenu);
@@ -1297,8 +1294,7 @@ namespace DataEditorPortal.Web.Services
                     if (parentSiteMenu == null) parentSiteMenu = siteMenus[0];
 
                     // cache userid and allNames
-                    var username = AppUser.ParseUsername(_httpContextAccessor.HttpContext.User.Identity.Name).Username;
-                    var userId = _depDbContext.Users.FirstOrDefault(x => x.Username == username).Id;
+                    var userId = _currentUserAccessor.CurrentUser.UserId();
                     var allNames = _depDbContext.SiteMenus.Select(m => new { m.Id, m.Name }).ToList();
 
                     foreach (var siteMenu in siteMenus)
