@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MsalService } from '@azure/msal-angular';
 import { PrimeNGConfig } from 'primeng/api';
 
 @Component({
@@ -9,7 +10,13 @@ import { PrimeNGConfig } from 'primeng/api';
 export class AppComponent implements OnInit {
   title = 'data-editor-portal';
 
-  constructor(private primengConfig: PrimeNGConfig) {}
+  constructor(
+    private primengConfig: PrimeNGConfig,
+    private authService: MsalService
+  ) {
+    this.authService.handleRedirectObservable().subscribe();
+  }
+
   ngOnInit(): void {
     this.primengConfig.ripple = false;
   }
