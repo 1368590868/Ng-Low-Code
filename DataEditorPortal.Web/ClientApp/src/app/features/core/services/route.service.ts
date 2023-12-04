@@ -1,22 +1,22 @@
-import { Component, Inject, Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Route, Router, Routes } from '@angular/router';
 import { tap, withLatestFrom } from 'rxjs';
 import {
-  SiteMenu,
+  AdminPermissionGuard,
   ConfigDataService,
-  AuthRouterGuard,
-  AdminPermissionGuard
+  SiteMenu
 } from 'src/app/shared';
-import { GroupLayoutComponent } from '../layout/group-layout.component';
+import { AUTH_GUARD_TOKEN } from '../../http-config/http-config.module';
 import {
-  SiteSettingsComponent,
   DataDictionaryComponent,
   DbConnectionComponent,
+  SiteGroupComponent,
+  SiteSettingsComponent,
   SystemLogComponent,
-  TileComponent,
-  SiteGroupComponent
+  TileComponent
 } from '../components';
 import { FolderLayoutComponent } from '../layout/folder-layout.component';
+import { GroupLayoutComponent } from '../layout/group-layout.component';
 
 @Injectable({
   providedIn: 'root'
@@ -136,7 +136,7 @@ export class RouteService {
             m => m.UniversalGridModule
           ),
         data: { type: menu.itemType, name: menu.name },
-        canActivate: [AuthRouterGuard]
+        canActivate: [AUTH_GUARD_TOKEN]
       };
     } else if (menu.type === 'Folder') {
       return {
@@ -182,7 +182,7 @@ export class RouteService {
         default:
           break;
       }
-      if (menu.requireAuth) route.canActivate?.push(AuthRouterGuard);
+      if (menu.requireAuth) route.canActivate?.push(AUTH_GUARD_TOKEN);
       if (menu.requireAuth) route.canActivate?.push(AdminPermissionGuard);
       return route;
     }

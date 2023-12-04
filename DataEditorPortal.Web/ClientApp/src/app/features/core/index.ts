@@ -1,63 +1,66 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 
 import { FormlyModule } from '@ngx-formly/core';
 
 // primeNG components
-import { ToastModule } from 'primeng/toast';
-import { ButtonModule } from 'primeng/button';
-import { MenubarModule } from 'primeng/menubar';
-import { AvatarModule } from 'primeng/avatar';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { DividerModule } from 'primeng/divider';
-import { CardModule } from 'primeng/card';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TableModule } from 'primeng/table';
-import { SkeletonModule } from 'primeng/skeleton';
-import { MenuModule } from 'primeng/menu';
-import { PaginatorModule } from 'primeng/paginator';
-import { TabViewModule } from 'primeng/tabview';
-import { EditorModule } from 'primeng/editor';
-import { InputTextareaModule } from 'primeng/inputtextarea';
-import { ProgressBarModule } from 'primeng/progressbar';
 import { MonacoEditorModule } from 'ngx-monaco-editor';
+import { AvatarModule } from 'primeng/avatar';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { DividerModule } from 'primeng/divider';
+import { EditorModule } from 'primeng/editor';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { MenuModule } from 'primeng/menu';
+import { MenubarModule } from 'primeng/menubar';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { PaginatorModule } from 'primeng/paginator';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SkeletonModule } from 'primeng/skeleton';
+import { TableModule } from 'primeng/table';
+import { TabViewModule } from 'primeng/tabview';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 
 import {
-  HeaderComponent,
-  NavMenuComponent,
   AboutComponent,
-  ContactComponent,
-  TileComponent,
-  LoginComponent,
-  ErrorPageComponent,
-  SiteSettingsComponent,
-  PersonalDialogComponent,
-  DataDictionaryComponent,
-  AddDictionaryDialogComponent,
   AddConnectionDialogComponent,
+  AddDictionaryDialogComponent,
+  AddGroupComponent,
+  ContactComponent,
+  DataDictionaryComponent,
+  DbConnectionComponent,
+  ErrorPageComponent,
+  HeaderComponent,
+  LoginComponent,
+  NavMenuComponent,
+  PersonalDialogComponent,
+  SiteGroupComponent,
+  SiteSettingsComponent,
   SystemLogComponent,
   SystemLogDialogComponent,
-  DbConnectionComponent,
-  SiteGroupComponent,
-  AddGroupComponent
+  TileComponent
 } from './components';
-import { GroupLayoutComponent } from './layout/group-layout.component';
 import { FolderLayoutComponent } from './layout/folder-layout.component';
+import { GroupLayoutComponent } from './layout/group-layout.component';
 
-import { AuthRouterGuard, SharedModule } from 'src/app/shared';
+import { SharedModule } from 'src/app/shared';
+import {
+  AUTH_GUARD_TOKEN,
+  HttpConfigModule
+} from '../http-config/http-config.module';
 
 export * from './components';
 
 export const routes: Routes = [
-  { path: '', component: TileComponent, canActivate: [AuthRouterGuard] },
+  { path: '', component: TileComponent, canActivate: [AUTH_GUARD_TOKEN] },
   {
     path: 'about',
     component: AboutComponent
@@ -67,7 +70,7 @@ export const routes: Routes = [
     component: ContactComponent
   },
   { path: 'login', component: LoginComponent },
-  { path: '**', component: ErrorPageComponent, canActivate: [AuthRouterGuard] }
+  { path: '**', component: ErrorPageComponent, canActivate: [AUTH_GUARD_TOKEN] }
 ];
 
 @NgModule({
@@ -100,6 +103,7 @@ export const routes: Routes = [
     ReactiveFormsModule,
     FormlyModule,
     SharedModule,
+    HttpConfigModule.forRoot('windows'),
     ButtonModule,
     ToastModule,
     MenubarModule,

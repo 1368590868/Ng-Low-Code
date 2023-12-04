@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -8,10 +8,6 @@ import { FormlyModule } from '@ngx-formly/core';
 // primeNG components
 import { MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
-
-import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
-import { RequestLogInterceptor } from './interceptor/request-log.interceptor';
-import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
 
 import { AttachmentsPipe } from './pipes/attachments.pipe';
 import { BooleanTextPipe } from './pipes/boolean-text.pipe';
@@ -74,25 +70,7 @@ registerQuill();
     AttachmentsComponent,
     LoadingComponent
   ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestLogInterceptor,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: HttpErrorInterceptor,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: WinAuthInterceptor,
-      multi: true
-    },
-    MessageService,
-    DataFormatService
-  ]
+  providers: [MessageService, DataFormatService]
 })
 export class SharedModule {
   constructor(private configDataService: ConfigDataService) {
