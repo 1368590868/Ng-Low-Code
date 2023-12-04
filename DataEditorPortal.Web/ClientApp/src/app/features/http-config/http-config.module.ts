@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthRouterGuard, UserService } from 'src/app/shared';
@@ -14,7 +14,7 @@ interface AuthGuard {
 export const AUTH_GUARD_TOKEN = new InjectionToken<AuthGuard>('AUTH_GUARD');
 @NgModule({
   declarations: [],
-  imports: [CommonModule]
+  imports: [CommonModule, HttpClientModule]
 })
 export class HttpConfigModule {
   static forRoot(type: string): ModuleWithProviders<HttpConfigModule> {
