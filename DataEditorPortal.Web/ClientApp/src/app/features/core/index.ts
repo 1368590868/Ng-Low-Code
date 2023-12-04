@@ -52,10 +52,7 @@ import { FolderLayoutComponent } from './layout/folder-layout.component';
 import { GroupLayoutComponent } from './layout/group-layout.component';
 
 import { SharedModule } from 'src/app/shared';
-import {
-  AUTH_GUARD_TOKEN,
-  HttpConfigModule
-} from '../http-config/http-config.module';
+import { AUTH_GUARD_TOKEN } from '../http-config/http-config.module';
 
 export * from './components';
 
@@ -103,7 +100,6 @@ export const routes: Routes = [
     ReactiveFormsModule,
     FormlyModule,
     SharedModule,
-    HttpConfigModule.forRoot('windows'),
     ButtonModule,
     ToastModule,
     MenubarModule,

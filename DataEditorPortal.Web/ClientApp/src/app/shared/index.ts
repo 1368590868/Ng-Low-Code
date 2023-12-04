@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -49,13 +48,7 @@ registerQuill();
     AttachmentsComponent,
     LoadingComponent
   ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    HttpClientModule,
-    FormlyModule,
-    TooltipModule
-  ],
+  imports: [CommonModule, FormsModule, FormlyModule, TooltipModule],
   exports: [
     PermissionDirective,
     AutoFilterDirective,
