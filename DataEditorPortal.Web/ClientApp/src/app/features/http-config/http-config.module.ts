@@ -9,11 +9,10 @@ import {
   MsalService
 } from '@azure/msal-angular';
 import {
-  BrowserCacheLocation,
-  InteractionType,
-  LogLevel,
-  PublicClientApplication
-} from '@azure/msal-browser';
+  IPublicClientApplication,
+  MsalGuardConfiguration,
+  MsalInterceptorConfiguration
+} from './azuread-config';
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
 import { RequestLogInterceptor } from './interceptor/request-log.interceptor';
 import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
@@ -32,60 +31,9 @@ export const LOGIN_ENV = new InjectionToken<string>('windows');
     CommonModule,
     HttpClientModule,
     MsalModule.forRoot(
-      new PublicClientApplication({
-        auth: {
-          clientId: '59befac2-4643-476c-a946-c7f31c80b37f',
-          redirectUri: '/',
-          postLogoutRedirectUri: window.location.origin + '/'
-        },
-        cache: {
-          cacheLocation: BrowserCacheLocation.LocalStorage,
-          storeAuthStateInCookie: true
-        },
-        system: {
-          loggerOptions: {
-            logLevel: LogLevel.Verbose,
-            loggerCallback: (level, message, containsPii) => {
-              if (containsPii) {
-                return;
-              }
-              switch (level) {
-                case LogLevel.Error:
-                  console.error(message);
-                  return;
-                case LogLevel.Info:
-                  console.info(message);
-                  return;
-                case LogLevel.Verbose:
-                  console.log(message);
-                  return;
-                case LogLevel.Warning:
-                  console.warn(message);
-                  return;
-              }
-            },
-            piiLoggingEnabled: false
-          }
-        }
-      }),
-      {
-        interactionType: InteractionType.Redirect
-      },
-      {
-        interactionType: InteractionType.Redirect,
-        protectedResourceMap: new Map([
-          ['https://10.10.120.246:44316/api/site/settings', null],
-          ['https://10.10.120.246:44316/api/site/env', null],
-          [
-            'https://10.10.120.246:44316/api/User/GetLoggedInUser',
-            ['api://59befac2-4643-476c-a946-c7f31c80b37f/user.full']
-          ],
-          [
-            'https://10.10.120.246:44316/api/site/menus',
-            ['api://59befac2-4643-476c-a946-c7f31c80b37f/user.full']
-          ]
-        ])
-      }
+      IPublicClientApplication,
+      MsalGuardConfiguration,
+      MsalInterceptorConfiguration
     )
   ]
 })
@@ -114,6 +62,16 @@ export class HttpConfigModule {
             {
               provide: LOGIN_ENV,
               useValue: 'Windows'
+            },
+            {
+              provide: LOGIN_GUARD,
+              useFactory: () => {
+                return {
+                  canActivate(): boolean {
+                    return true;
+                  }
+                };
+              }
             }
           ]
         };
