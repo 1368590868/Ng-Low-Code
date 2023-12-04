@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
-import { Router } from '@angular/router';
 import {
   MsalBroadcastService,
   MsalGuard,
@@ -15,16 +14,18 @@ import {
   LogLevel,
   PublicClientApplication
 } from '@azure/msal-browser';
-import { AuthRouterGuard, UserService } from 'src/app/shared';
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
 import { RequestLogInterceptor } from './interceptor/request-log.interceptor';
 import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
 
-interface AuthGuard {
+interface LoginGuard {
   canActivate(): boolean;
 }
 
-export const AUTH_GUARD_TOKEN = new InjectionToken<AuthGuard>('AUTH_GUARD');
+export type AuthType = 'AzureAd' | 'Windows';
+
+export const LOGIN_GUARD = new InjectionToken<LoginGuard>('');
+export const LOGIN_ENV = new InjectionToken<string>('windows');
 @NgModule({
   declarations: [],
   imports: [
@@ -89,19 +90,12 @@ export const AUTH_GUARD_TOKEN = new InjectionToken<AuthGuard>('AUTH_GUARD');
   ]
 })
 export class HttpConfigModule {
-  static forRoot(
-    type: 'AzureAd' | 'Windows'
-  ): ModuleWithProviders<HttpConfigModule> {
+  static forRoot(type: AuthType): ModuleWithProviders<HttpConfigModule> {
     switch (type) {
       case 'Windows': {
         return {
           ngModule: HttpConfigModule,
           providers: [
-            {
-              provide: AUTH_GUARD_TOKEN,
-              useClass: AuthRouterGuard,
-              deps: [UserService, Router]
-            },
             {
               provide: HTTP_INTERCEPTORS,
               useClass: WinAuthInterceptor,
@@ -116,6 +110,10 @@ export class HttpConfigModule {
               provide: HTTP_INTERCEPTORS,
               useClass: HttpErrorInterceptor,
               multi: true
+            },
+            {
+              provide: LOGIN_ENV,
+              useValue: 'Windows'
             }
           ]
         };
@@ -125,11 +123,6 @@ export class HttpConfigModule {
         return {
           ngModule: HttpConfigModule,
           providers: [
-            {
-              provide: AUTH_GUARD_TOKEN,
-              useClass: AuthRouterGuard,
-              deps: [UserService, Router]
-            },
             {
               provide: HTTP_INTERCEPTORS,
               useClass: MsalInterceptor,
@@ -144,6 +137,14 @@ export class HttpConfigModule {
               provide: HTTP_INTERCEPTORS,
               useClass: HttpErrorInterceptor,
               multi: true
+            },
+            {
+              provide: LOGIN_GUARD,
+              useClass: MsalGuard
+            },
+            {
+              provide: LOGIN_ENV,
+              useValue: 'AzureAd'
             },
             MsalService,
             MsalGuard,

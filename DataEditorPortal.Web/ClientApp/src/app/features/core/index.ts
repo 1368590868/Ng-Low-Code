@@ -50,13 +50,13 @@ import {
 import { FolderLayoutComponent } from './layout/folder-layout.component';
 import { GroupLayoutComponent } from './layout/group-layout.component';
 
-import { SharedModule } from 'src/app/shared';
-import { AUTH_GUARD_TOKEN } from '../http-config/http-config.module';
+import { AuthRouterGuard, SharedModule } from 'src/app/shared';
+import { LOGIN_GUARD } from '../http-config/http-config.module';
 
 export * from './components';
 
 export const routes: Routes = [
-  { path: '', component: TileComponent, canActivate: [AUTH_GUARD_TOKEN] },
+  { path: '', component: TileComponent, canActivate: [AuthRouterGuard] },
   {
     path: 'about',
     component: AboutComponent
@@ -65,8 +65,12 @@ export const routes: Routes = [
     path: 'contact',
     component: ContactComponent
   },
-  { path: 'login', component: LoginComponent },
-  { path: '**', component: ErrorPageComponent, canActivate: [AUTH_GUARD_TOKEN] }
+  {
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [LOGIN_GUARD]
+  },
+  { path: '**', component: ErrorPageComponent, canActivate: [AuthRouterGuard] }
 ];
 
 @NgModule({

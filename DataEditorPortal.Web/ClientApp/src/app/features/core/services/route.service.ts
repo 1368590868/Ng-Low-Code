@@ -3,10 +3,10 @@ import { Route, Router, Routes } from '@angular/router';
 import { tap, withLatestFrom } from 'rxjs';
 import {
   AdminPermissionGuard,
+  AuthRouterGuard,
   ConfigDataService,
   SiteMenu
 } from 'src/app/shared';
-import { AUTH_GUARD_TOKEN } from '../../http-config/http-config.module';
 import {
   DataDictionaryComponent,
   DbConnectionComponent,
@@ -136,7 +136,7 @@ export class RouteService {
             m => m.UniversalGridModule
           ),
         data: { type: menu.itemType, name: menu.name },
-        canActivate: [AUTH_GUARD_TOKEN]
+        canActivate: [AuthRouterGuard]
       };
     } else if (menu.type === 'Folder') {
       return {
@@ -182,7 +182,7 @@ export class RouteService {
         default:
           break;
       }
-      if (menu.requireAuth) route.canActivate?.push(AUTH_GUARD_TOKEN);
+      if (menu.requireAuth) route.canActivate?.push(AuthRouterGuard);
       if (menu.requireAuth) route.canActivate?.push(AdminPermissionGuard);
       return route;
     }

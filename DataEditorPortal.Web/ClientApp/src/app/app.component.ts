@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, Optional } from '@angular/core';
 import { MsalService } from '@azure/msal-angular';
 import { PrimeNGConfig } from 'primeng/api';
+import { AuthType, LOGIN_ENV } from './features/http-config/http-config.module';
 
 @Component({
   selector: 'app-root',
@@ -12,9 +13,12 @@ export class AppComponent implements OnInit {
 
   constructor(
     private primengConfig: PrimeNGConfig,
-    private authService: MsalService
+    @Optional() private authService: MsalService,
+    @Inject(LOGIN_ENV) private authConfig: AuthType
   ) {
-    this.authService.handleRedirectObservable().subscribe();
+    if (this.authConfig === 'AzureAd' && this.authService) {
+      this.authService.handleRedirectObservable().subscribe();
+    }
   }
 
   ngOnInit(): void {
