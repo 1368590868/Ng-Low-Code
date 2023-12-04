@@ -1,14 +1,13 @@
-import { Injectable } from '@angular/core';
 import {
-  HttpRequest,
+  HttpErrorResponse,
   HttpHandler,
   HttpInterceptor,
-  HttpErrorResponse,
+  HttpRequest,
   HttpResponse
 } from '@angular/common/http';
-import { catchError, finalize, of, tap, throwError } from 'rxjs';
-import { NotifyService } from '../services/notify.service';
-import { ConfigDataService } from '../services/config-data.service';
+import { Injectable } from '@angular/core';
+import { catchError, of, throwError } from 'rxjs';
+import { ConfigDataService, NotifyService } from 'src/app/shared';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {

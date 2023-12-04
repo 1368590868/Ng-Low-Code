@@ -3,9 +3,9 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthRouterGuard, UserService } from 'src/app/shared';
-import { HttpErrorInterceptor } from 'src/app/shared/interceptor/http-error.interceptor';
-import { RequestLogInterceptor } from 'src/app/shared/interceptor/request-log.interceptor';
-import { WinAuthInterceptor } from 'src/app/shared/interceptor/win-auth.interceptor';
+import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
+import { RequestLogInterceptor } from './interceptor/request-log.interceptor';
+import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
 
 interface AuthGuard {
   canActivate(): boolean;

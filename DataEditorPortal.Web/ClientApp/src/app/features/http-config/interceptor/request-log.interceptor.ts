@@ -5,7 +5,7 @@ import {
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { finalize } from 'rxjs';
-import { RequestLogUtility } from '../services/request-log-utility';
+import { RequestLogUtility } from 'src/app/shared';
 
 @Injectable()
 export class RequestLogInterceptor implements HttpInterceptor {
