@@ -38,10 +38,17 @@ namespace DataEditorPortal.Web.Common
                 {
                     var user = _memoryCache.GetOrCreate($"user_{username}", entry =>
                     {
-                        entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
                         var user = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
-                        if (user != null) { return user; }
-                        return null;
+                        if (user != null)
+                        {
+                            entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
+                            return user;
+                        }
+                        else
+                        {
+                            entry.SetAbsoluteExpiration(TimeSpan.FromTicks(1));
+                            return null;
+                        }
                     });
 
                     // Add the user ID as a new claim

@@ -79,7 +79,8 @@ namespace DataEditorPortal.Web.Common
             var userClaim = claimsPrincipal.FindFirst(DepClaimConstants.UserId);
             if (userClaim != null)
             {
-                return Guid.Parse(userClaim.Value);
+                Guid.TryParse(userClaim.Value, out Guid guid);
+                return guid;
             }
 
             return Guid.Empty;
