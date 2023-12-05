@@ -219,7 +219,7 @@ namespace DataEditorPortal.Web.Services
                 select m
             ).ToList();
 
-            if (menus.Count > 0)
+            if (menus.Count > 1)
             {
                 // has grids use same search config
                 // filter by permissions
