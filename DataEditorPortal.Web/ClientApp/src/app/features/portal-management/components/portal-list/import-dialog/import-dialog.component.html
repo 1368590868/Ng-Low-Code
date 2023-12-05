@@ -74,7 +74,7 @@
         [scrollable]="true">
         <ng-template pTemplate="header">
           <tr>
-            <th [style.width]="'2.875rem !important'">
+            <th [style.width]="'3rem !important'">
               <!-- <p-tableHeaderCheckbox></p-tableHeaderCheckbox> -->
             </th>
             <th [style.width]="'13rem !important'">Type</th>
@@ -82,9 +82,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-infoList>
-          <tr
-            [pSelectableRow]="infoList"
-            [pSelectableRowDisabled]="disableRow(infoList)">
+          <tr [pHighlightRow]="infoList">
             <td>
               <p-tableCheckbox
                 [disabled]="disableRow(infoList)"

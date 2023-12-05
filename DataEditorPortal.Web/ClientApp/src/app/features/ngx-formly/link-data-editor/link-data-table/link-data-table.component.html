@@ -26,7 +26,10 @@
   [sortField]="'linked'">
   <ng-template pTemplate="header" let-columns>
     <tr>
-      <th style="width: 4.6rem; max-width: 4.6rem" pSortableColumn="linked">
+      <th
+        style="width: 4.6rem; max-width: 4.6rem"
+        pSortableColumn="linked"
+        pFrozenColumn>
         <div
           class="flex align-items-center"
           *ngIf="selectionMode === 'multiple'">
@@ -52,8 +55,8 @@
   </ng-template>
 
   <ng-template pTemplate="body" let-data let-columns="columns">
-    <tr [pSelectableRow]="data">
-      <td>
+    <tr [pHighlightRow]="data">
+      <td pFrozenColumn>
         <p-tableCheckbox
           *ngIf="selectionMode === 'multiple'"
           [value]="data"
@@ -115,7 +118,7 @@
 <p-table [value]="[1, 2]" *ngIf="table1Name === ''">
   <ng-template pTemplate="header">
     <tr>
-      <th style="width: 2.875rem">
+      <th style="width: 3rem">
         <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
       </th>
       <th>Column 1</th>

@@ -16,25 +16,40 @@ export class LinkedTableComponent {
 
   constructor(private gridTableService: GridTableService) {}
 
+  selectedPrimaryRow: any;
   onPrimaryRowSelect(event: any) {
-    // mark linked data highlighted
-    this.primaryTable.clearHighlighted();
-    this.secondaryTable.highlightLinkedData(
-      event.data[this.primaryTable.tableConfig.dataKey]
-    );
+    this.selectedSecondaryRow = undefined;
+    const dataId = event.data[this.primaryTable.tableConfig.dataKey];
+    if (this.selectedPrimaryRow !== dataId) {
+      this.selectedPrimaryRow = dataId;
+      // mark linked data highlighted
+      this.primaryTable.clearHighlighted();
+      this.secondaryTable.highlightLinkedData(dataId);
+    } else {
+      this.onPrimaryRowClear();
+    }
   }
-  onPrimaryRowUnselect() {
+  onPrimaryRowClear() {
+    this.selectedPrimaryRow = undefined;
     this.secondaryTable.clearHighlighted();
   }
 
-  onSecondaryRowSelect(event: any) {
-    // mark linked data highlighted
-    this.secondaryTable.clearHighlighted();
-    this.primaryTable.highlightLinkedData(
-      event.data[this.secondaryTable.tableConfig.dataKey]
-    );
+  selectedSecondaryRow: any;
+  onSecondaryRowClick(event: any) {
+    this.selectedPrimaryRow = undefined;
+    const dataId = event.data[this.secondaryTable.tableConfig.dataKey];
+
+    if (this.selectedSecondaryRow != dataId) {
+      this.selectedSecondaryRow = dataId;
+      // mark linked data highlighted
+      this.secondaryTable.clearHighlighted();
+      this.primaryTable.highlightLinkedData(dataId);
+    } else {
+      this.onSecondaryRowClear();
+    }
   }
-  onSecondaryRowUnselect() {
+  onSecondaryRowClear() {
+    this.selectedSecondaryRow = undefined;
     this.primaryTable.clearHighlighted();
   }
 }

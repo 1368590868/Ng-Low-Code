@@ -1,8 +1,8 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { GridTableService } from '../../services/grid-table.service';
-import { TableComponent } from '../table/table.component';
 import { Splitter } from 'primeng/splitter';
 import { Subject, takeUntil, tap } from 'rxjs';
+import { GridTableService } from '../../services/grid-table.service';
+import { TableComponent } from '../table/table.component';
 
 @Component({
   selector: 'app-master-table',
@@ -25,7 +25,7 @@ export class MasterTableComponent implements OnInit, OnDestroy {
     this.gridTableService.searchClicked$
       .pipe(
         tap(() => {
-          this.onMasterRowUnselect();
+          this.onMasterRowClear();
         }),
         takeUntil(this.destroy$)
       )
@@ -37,28 +37,35 @@ export class MasterTableComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onMasterRowSelect(event: any) {
-    // open detail table
-    if (!this.showDetail) {
-      this.splitterRef.panelSizes = [50, 50];
-      this.splitterRef.gutterSize = 4;
-      this.showDetail = true;
-    }
-
+  selectedMasterRow: any;
+  onMasterRowClick(event: any) {
     const table1Id = event.data[this.masterTable.tableConfig.dataKey];
-    setTimeout(() => {
-      this.detailTable.defaultFilter = [
-        {
-          field: 'LINK_DATA_FIELD',
-          matchMode: 'in',
-          value: table1Id
-        }
-      ];
-      this.detailTable.fetchData();
-    }, 100);
+    if (this.selectedMasterRow != table1Id) {
+      this.selectedMasterRow = table1Id;
+      // open detail table
+      if (!this.showDetail) {
+        this.splitterRef.panelSizes = [50, 50];
+        this.splitterRef.gutterSize = 4;
+        this.showDetail = true;
+      }
+
+      setTimeout(() => {
+        this.detailTable.defaultFilter = [
+          {
+            field: 'LINK_DATA_FIELD',
+            matchMode: 'in',
+            value: table1Id
+          }
+        ];
+        this.detailTable.fetchData();
+      }, 100);
+    } else {
+      this.onMasterRowClear();
+    }
   }
 
-  onMasterRowUnselect() {
+  onMasterRowClear() {
+    this.selectedMasterRow = undefined;
     this.showDetail = false;
     this.splitterRef.gutterSize = 0;
     this.splitterRef.panelSizes = [99.9, 0.1];

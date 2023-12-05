@@ -12,9 +12,8 @@
       headerSize="compact"
       [gridName]="masterTableName"
       selectionMode="single"
-      (rowSelect)="onMasterRowSelect($event)"
-      (rowUnselect)="onMasterRowUnselect()"
-      (resetData)="onMasterRowUnselect()"></app-table>
+      (rowClick)="onMasterRowClick($event)"
+      (resetData)="onMasterRowClear()"></app-table>
   </ng-template>
   <ng-template pTemplate>
     <app-table
