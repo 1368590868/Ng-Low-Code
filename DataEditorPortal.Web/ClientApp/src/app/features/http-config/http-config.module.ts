@@ -1,7 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
 import {
+  InjectionToken,
+  Injector,
+  ModuleWithProviders,
+  NgModule
+} from '@angular/core';
+import {
+  MSAL_GUARD_CONFIG,
+  MSAL_INSTANCE,
+  MSAL_INTERCEPTOR_CONFIG,
   MsalBroadcastService,
   MsalGuard,
   MsalInterceptor,
@@ -11,7 +19,7 @@ import {
 import {
   IPublicClientApplication,
   MsalGuardConfiguration,
-  MsalInterceptorConfiguration
+  MsalInterceptorConfiguration as MsalInterceptorCFactory
 } from './azuread-config';
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
 import { RequestLogInterceptor } from './interceptor/request-log.interceptor';
@@ -27,15 +35,7 @@ export const LOGIN_GUARD = new InjectionToken<LoginGuard>('');
 export const LOGIN_ENV = new InjectionToken<string>('windows');
 @NgModule({
   declarations: [],
-  imports: [
-    CommonModule,
-    HttpClientModule,
-    MsalModule.forRoot(
-      IPublicClientApplication,
-      MsalGuardConfiguration,
-      MsalInterceptorConfiguration
-    )
-  ]
+  imports: [CommonModule, HttpClientModule, MsalModule]
 })
 export class HttpConfigModule {
   static forRoot(type: AuthType): ModuleWithProviders<HttpConfigModule> {
@@ -103,6 +103,29 @@ export class HttpConfigModule {
             {
               provide: LOGIN_ENV,
               useValue: 'AzureAd'
+            },
+            {
+              provide: MSAL_INSTANCE,
+              useFactory: (injector: Injector) => {
+                const clientId = injector.get('AZURE_AD').clientId;
+                return IPublicClientApplication(clientId);
+              },
+              deps: [Injector]
+            },
+            {
+              provide: MSAL_GUARD_CONFIG,
+              useFactory: () => {
+                return MsalGuardConfiguration;
+              }
+            },
+            {
+              provide: MSAL_INTERCEPTOR_CONFIG,
+              useFactory: (injector: Injector) => {
+                const apiUrl = injector.get('API_URL');
+                const clientId = injector.get('AZURE_AD').clientId;
+                return MsalInterceptorCFactory(apiUrl, clientId);
+              },
+              deps: [Injector]
             },
             MsalService,
             MsalGuard,

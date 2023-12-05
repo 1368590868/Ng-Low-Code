@@ -28,7 +28,7 @@ import { FormlyCustomTypeModule } from './features/ngx-formly/formly-custom.modu
       ]
     }),
     FormlyCustomTypeModule,
-    HttpConfigModule.forRoot('Windows')
+    HttpConfigModule.forRoot('AzureAd')
   ],
   bootstrap: [AppComponent]
 })

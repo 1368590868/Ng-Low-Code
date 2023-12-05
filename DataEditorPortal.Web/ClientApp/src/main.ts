@@ -13,21 +13,37 @@ const providers: StaticProvider[] = [
 
 if (environment.production) {
   enableProdMode();
-  providers.push({
-    provide: 'API_URL',
-    useFactory: () => {
-      return `${getBaseUrl()}api/`;
+  providers.push(
+    {
+      provide: 'API_URL',
+      useFactory: () => {
+        return `${getBaseUrl()}api/`;
+      },
+      deps: []
     },
-    deps: []
-  });
+    {
+      provide: 'AZURE_AD',
+      useFactory: () => {
+        return environment.azureAd;
+      }
+    }
+  );
 } else {
-  providers.push({
-    provide: 'API_URL',
-    useFactory: () => {
-      return `${environment.apiHost}api/`;
+  providers.push(
+    {
+      provide: 'API_URL',
+      useFactory: () => {
+        return `${environment.apiHost}api/`;
+      },
+      deps: []
     },
-    deps: []
-  });
+    {
+      provide: 'AZURE_AD',
+      useFactory: () => {
+        return environment.azureAd;
+      }
+    }
+  );
 }
 
 platformBrowserDynamic(providers)
