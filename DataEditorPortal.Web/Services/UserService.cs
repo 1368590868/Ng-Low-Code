@@ -136,7 +136,7 @@ namespace DataEditorPortal.Web.Services
                         {
                             return m.Status == Data.Common.PortalItemStatus.Published
                                 && m.ParentId == parentId
-                                && userPermissions.Contains($"VIEW_{m.Name.Replace("-", "_")}".ToUpper());
+                                && (m.Type == "Folder" || userPermissions.Contains($"VIEW_{m.Name.Replace("-", "_")}".ToUpper()));
                         }
                     })
                     .Select(m =>
