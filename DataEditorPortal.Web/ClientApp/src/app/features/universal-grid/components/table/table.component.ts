@@ -50,6 +50,7 @@ export class TableComponent implements OnInit, OnDestroy {
   @Output() rowSelect = new EventEmitter<any>();
   @Output() rowUnselect = new EventEmitter<any>();
   @Output() resetData = new EventEmitter<any>();
+  @Output() rowClick = new EventEmitter<any>();
 
   showHighlightOnly = false;
 
@@ -452,6 +453,9 @@ export class TableComponent implements OnInit, OnDestroy {
   }
   onRowUnselect(event: any) {
     this.rowUnselect.emit(event);
+  }
+  onRowClick(event: MouseEvent, data: any) {
+    this.rowClick.emit({ event, data });
   }
 
   refresh() {

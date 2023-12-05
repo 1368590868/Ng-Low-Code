@@ -1,4 +1,3 @@
-import { NgModule } from '@angular/core';
 import {
   CommonModule,
   CurrencyPipe,
@@ -6,49 +5,50 @@ import {
   DecimalPipe,
   PercentPipe
 } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 // formly
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 
-import { UniversalGridRoutingModule } from './universal-grid-routing.module';
-import { SplitAreaComponent } from './pages/split-area/split-area.component';
-import { SearchComponent } from './components/search/search.component';
-import { TableComponent } from './components/table/table.component';
 import { LinkedTableComponent } from './components/linked-table/linked-table.component';
 import { MasterTableComponent } from './components/master-table/master-table.component';
+import { SearchComponent } from './components/search/search.component';
+import { TableComponent } from './components/table/table.component';
 import { LinkedOrMasterComponent } from './pages/linked-or-master';
+import { SplitAreaComponent } from './pages/split-area/split-area.component';
+import { UniversalGridRoutingModule } from './universal-grid-routing.module';
 
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
-import { GridTableService } from './services/grid-table.service';
 import { SharedModule } from 'src/app/shared';
+import { GridTableService } from './services/grid-table.service';
 
 // primeNG components
 import { AnimateModule } from 'primeng/animate';
-import { ToastModule } from 'primeng/toast';
-import { MenubarModule } from 'primeng/menubar';
-import { AvatarModule } from 'primeng/avatar';
-import { SplitterModule } from 'primeng/splitter';
-import { DropdownModule } from 'primeng/dropdown';
-import { TableModule } from 'primeng/table';
-import { CalendarModule } from 'primeng/calendar';
-import { SliderModule } from 'primeng/slider';
-import { DialogModule } from 'primeng/dialog';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { ContextMenuModule } from 'primeng/contextmenu';
-import { InputTextModule } from 'primeng/inputtext';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { SplitButtonModule } from 'primeng/splitbutton';
-import { RippleModule } from 'primeng/ripple';
-import { ButtonModule } from 'primeng/button';
-import { PaginatorModule } from 'primeng/paginator';
-import { SidebarModule } from 'primeng/sidebar';
-import { CheckboxModule } from 'primeng/checkbox';
-import { ConfirmPopupModule } from 'primeng/confirmpopup';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { AvatarModule } from 'primeng/avatar';
+import { ButtonModule } from 'primeng/button';
+import { CalendarModule } from 'primeng/calendar';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputTextModule } from 'primeng/inputtext';
+import { MenubarModule } from 'primeng/menubar';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { PaginatorModule } from 'primeng/paginator';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { RippleModule } from 'primeng/ripple';
+import { SidebarModule } from 'primeng/sidebar';
+import { SliderModule } from 'primeng/slider';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { SplitterModule } from 'primeng/splitter';
+import { TableModule } from 'primeng/table';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
   declarations: [

@@ -116,14 +116,17 @@
 
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th *ngIf="selectionMode === 'multiple'" class="selection">
+          <th
+            *ngIf="selectionMode === 'multiple'"
+            class="selection"
+            pFrozenColumn>
             <p-tableHeaderCheckbox
               #tableHeaderCheckboxRef
               (click)="
                 onHeaderCheckbox(tableHeaderCheckboxRef)
               "></p-tableHeaderCheckbox>
           </th>
-          <th class="action"></th>
+          <th class="action" pFrozenColumn></th>
           <th
             *ngFor="let col of columns"
             pReorderableColumn
@@ -179,14 +182,16 @@
       <ng-template pTemplate="body" let-data let-columns="columns">
         <tr
           *ngIf="columns && columns.length > 0"
-          [pSelectableRow]="data"
-          [class]="data['linked_highlighted']">
-          <td *ngIf="selectionMode === 'multiple'">
+          class="selection"
+          [pHighlightRow]="data"
+          (click)="onRowClick($event, data)"
+          [class.highlighted]="!!data['linked_highlighted']">
+          <td *ngIf="selectionMode === 'multiple'" pFrozenColumn>
             <p-tableCheckbox
               [value]="data"
               (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
           </td>
-          <td>
+          <td pFrozenColumn>
             <div class="row-actions flex">
               <ng-template
                 class="flex"

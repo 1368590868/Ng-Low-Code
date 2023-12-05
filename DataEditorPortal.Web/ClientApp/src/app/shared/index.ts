@@ -23,6 +23,7 @@ import { TableDirective } from './directive/table.directive';
 import { AttachmentsComponent } from './components/attachments/attachments.component';
 import { LoadingComponent } from './components/loading/loading.component';
 import { DialogFocusDirective } from './directive/dialog-focus.directive';
+import { PTableHighlightRowDirective } from './directive/p-highlight-row.directive';
 import { ConfigDataService, DataFormatService } from './services';
 import { registerNumeral, registerQuill } from './utils';
 
@@ -40,6 +41,7 @@ registerQuill();
     DropdownFixDirective,
     MonacoEditorDirective,
     DialogFocusDirective,
+    PTableHighlightRowDirective,
     TableDirective,
     BooleanTextPipe,
     AttachmentsPipe,
@@ -55,6 +57,7 @@ registerQuill();
     DropdownFixDirective,
     MonacoEditorDirective,
     DialogFocusDirective,
+    PTableHighlightRowDirective,
     TableDirective,
     BooleanTextPipe,
     AttachmentsPipe,
