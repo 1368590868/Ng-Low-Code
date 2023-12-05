@@ -20,7 +20,7 @@ export const IPublicClientFactory = (injector: Injector) => {
     },
     system: {
       loggerOptions: {
-        logLevel: LogLevel.Verbose,
+        logLevel: LogLevel.Error,
         loggerCallback: (level, message, containsPii) => {
           if (containsPii) {
             return;
