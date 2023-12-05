@@ -7,7 +7,7 @@ import {
 } from '@azure/msal-browser';
 
 export const IPublicClientFactory = (injector: Injector) => {
-  const clientId = injector.get('AZURE_AD').clientId;
+  const clientId = injector.get('MSAL_INSTANCE_CONFIG').clientId;
   return new PublicClientApplication({
     auth: {
       clientId,
@@ -52,7 +52,7 @@ export const MsalGuardConfiguration: any = {
 
 export const MsalInterceptorCFactory: any = (injector: Injector) => {
   const apiUrl = injector.get('API_URL');
-  const clientId = injector.get('AZURE_AD').clientId;
+  const clientId = injector.get('MSAL_INSTANCE_CONFIG').clientId;
 
   return {
     interactionType: InteractionType.Redirect,

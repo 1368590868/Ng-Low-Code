@@ -22,7 +22,7 @@ if (environment.production) {
       deps: []
     },
     {
-      provide: 'AZURE_AD',
+      provide: 'MSAL_INSTANCE_CONFIG',
       useFactory: () => {
         return (window as any).MSAL_INSTANCE_CONFIG;
       }
@@ -38,7 +38,7 @@ if (environment.production) {
       deps: []
     },
     {
-      provide: 'AZURE_AD',
+      provide: 'MSAL_INSTANCE_CONFIG',
       useFactory: () => {
         return environment.MSAL_INSTANCE_CONFIG;
       }
