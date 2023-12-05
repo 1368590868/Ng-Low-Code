@@ -1,9 +1,10 @@
 import { Component, Inject, OnInit, Pipe, PipeTransform } from '@angular/core';
-import { GridActionDirective } from '../../directives/grid-action.directive';
-import { ImportActionService } from '../../services/import-action.service';
+import { tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
-import { ImportStatusComponent } from './import-status.component';
+import { GridActionDirective } from '../../directives/grid-action.directive';
 import { InfoData } from '../../models/import';
+import { ImportActionService } from '../../services/import-action.service';
+import { ImportStatusComponent } from './import-status.component';
 
 @Pipe({
   name: 'hasError'
@@ -80,16 +81,20 @@ export class ImportExcelActionComponent
   }
 
   onDownloadTemplate() {
-    const url = `${this.apiUrl}import-data/${
-      this.gridName
-    }/${this.stepType.toLowerCase()}/download-template`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.target = '_black';
-    const fileName = this.stepType;
-    a.download = fileName;
-    a.click();
-    a.remove();
+    this.importExcelService
+      .getImportTemplate(this.gridName, this.stepType.toLowerCase())
+      .pipe(
+        tap(res => {
+          const url = window.URL.createObjectURL(res);
+          const a = document.createElement('a');
+          a.href = url;
+          const fileName = this.gridName + '-template';
+          a.download = fileName + '.xlsx';
+          a.click();
+          a.remove();
+        })
+      )
+      .subscribe();
   }
 
   onSelect(event: any) {

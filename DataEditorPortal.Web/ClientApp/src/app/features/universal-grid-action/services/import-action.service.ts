@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { map } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiResponse } from 'src/app/shared';
-import { ImportHistories, InfoList, LoadState } from '../models/import';
+import { ImportHistories, LoadState } from '../models/import';
 
 @Injectable()
 export class ImportActionService {
@@ -17,6 +17,14 @@ export class ImportActionService {
         `${this.apiUrl}import-data/${gridName}/histories`
       )
       .pipe(map(res => res.data ?? []));
+  }
+
+  getImportTemplate(gridName: string, type: string): Observable<Blob> {
+    return this.http.post(
+      `${this.apiUrl}import-data/${gridName}/${type}/download-template`,
+      null,
+      { responseType: 'blob' }
+    );
   }
 
   getUploadTemplate(file: any, gridName: string, type: string) {
