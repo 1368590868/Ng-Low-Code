@@ -1,3 +1,4 @@
+import { Injector } from '@angular/core';
 import {
   BrowserCacheLocation,
   InteractionType,
@@ -5,7 +6,8 @@ import {
   PublicClientApplication
 } from '@azure/msal-browser';
 
-export const IPublicClientApplication = (clientId: string) => {
+export const IPublicClientFactory = (injector: Injector) => {
+  const clientId = injector.get('AZURE_AD').clientId;
   return new PublicClientApplication({
     auth: {
       clientId,
@@ -48,18 +50,10 @@ export const MsalGuardConfiguration: any = {
   interactionType: InteractionType.Redirect
 };
 
-export const MsalInterceptorConfiguration: any = (
-  apiUrl: string,
-  clientId: string
-) => {
-  console.log(window.location.origin);
-  let newApiUrl = '';
-  if (apiUrl.length < 5) {
-    newApiUrl = window.location.origin;
-  } else {
-    newApiUrl = apiUrl.replace('api/', '');
-  }
-  console.log(newApiUrl);
+export const MsalInterceptorCFactory: any = (injector: Injector) => {
+  const apiUrl = injector.get('API_URL');
+  const clientId = injector.get('AZURE_AD').clientId;
+
   return {
     interactionType: InteractionType.Redirect,
     protectedResourceMap: new Map([

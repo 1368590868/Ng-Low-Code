@@ -16,14 +16,14 @@ import {
   MsalModule,
   MsalService
 } from '@azure/msal-angular';
-import {
-  IPublicClientApplication,
-  MsalGuardConfiguration,
-  MsalInterceptorConfiguration as MsalInterceptorCFactory
-} from './azuread-config';
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
 import { RequestLogInterceptor } from './interceptor/request-log.interceptor';
 import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
+import {
+  IPublicClientFactory,
+  MsalGuardConfiguration,
+  MsalInterceptorCFactory
+} from './msal-config';
 
 interface LoginGuard {
   canActivate(): boolean;
@@ -106,10 +106,7 @@ export class HttpConfigModule {
             },
             {
               provide: MSAL_INSTANCE,
-              useFactory: (injector: Injector) => {
-                const clientId = injector.get('AZURE_AD').clientId;
-                return IPublicClientApplication(clientId);
-              },
+              useFactory: IPublicClientFactory,
               deps: [Injector]
             },
             {
@@ -120,11 +117,7 @@ export class HttpConfigModule {
             },
             {
               provide: MSAL_INTERCEPTOR_CONFIG,
-              useFactory: (injector: Injector) => {
-                const apiUrl = injector.get('API_URL');
-                const clientId = injector.get('AZURE_AD').clientId;
-                return MsalInterceptorCFactory(apiUrl, clientId);
-              },
+              useFactory: MsalInterceptorCFactory,
               deps: [Injector]
             },
             MsalService,

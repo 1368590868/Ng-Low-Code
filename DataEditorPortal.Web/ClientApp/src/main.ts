@@ -24,7 +24,7 @@ if (environment.production) {
     {
       provide: 'AZURE_AD',
       useFactory: () => {
-        return environment.azureAd;
+        return (window as any).MSAL_INSTANCE_CONFIG;
       }
     }
   );
@@ -40,7 +40,7 @@ if (environment.production) {
     {
       provide: 'AZURE_AD',
       useFactory: () => {
-        return environment.azureAd;
+        return environment.MSAL_INSTANCE_CONFIG;
       }
     }
   );
