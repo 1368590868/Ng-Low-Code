@@ -95,6 +95,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("download-temp-file/{fileId}/{fileName}")]
         public ActionResult DownloadTempFile(string fileId, string fileName)
         {
@@ -120,6 +121,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("download-file/{gridName}/{fieldName}/{fileId}/{fileName}")]
         public ActionResult DownloadFile(string gridName, string fieldName, string fileId)
         {
@@ -150,6 +152,7 @@ namespace DataEditorPortal.Web.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("icons/{fileName}")]
         public ActionResult GetIcon(string fileName)
         {
