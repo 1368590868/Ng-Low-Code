@@ -148,7 +148,7 @@ namespace DataEditorPortal.Web
                 });
             });
 
-            var authentication = Configuration.GetValue<string>("Authentication");
+            var authentication = Configuration.GetValue<string>("Authentication", "Windows");
             if (authentication == "Windows")
             {
                 services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
