@@ -54,7 +54,7 @@ namespace DataEditorPortal.Web.Services.FieldImporter
                             worksheet.Cells[1, columnIndex].Value = labelProp.GetString();
 
                         var desProp = props.FirstOrDefault(x => x.Name == $"{key}Description").Value;
-                        if (desProp.ValueKind == JsonValueKind.String)
+                        if (desProp.ValueKind == JsonValueKind.String && !string.IsNullOrEmpty(desProp.GetString()))
                             worksheet.Cells[1, columnIndex].AddComment(desProp.GetString());
 
                         if (key == "from" || key == "to") SetStringColumn(new FormFieldConfig() { key = key }, worksheet, columnIndex);

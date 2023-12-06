@@ -50,14 +50,14 @@ namespace DataEditorPortal.Web.Controllers
             return _universalGridService.GetGridColumnsConfig(name);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("{name}/config/column/filter-options")]
-        public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, [FromQuery] string column)
+        public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, [FromQuery] string column, [FromBody] GridParam param)
         {
             if (string.IsNullOrEmpty(column))
                 throw new DepException("Column can not be empty.");
 
-            return _universalGridService.GetGridColumnFilterOptions(name, column);
+            return _universalGridService.GetGridColumnFilterOptions(name, column, param);
         }
 
         [HttpGet]
@@ -104,7 +104,7 @@ namespace DataEditorPortal.Web.Controllers
 
         [HttpGet]
         [Route("{name}/data/{id}/update-histories")]
-        public List<DataUpdateHistory> GetDataUpdateHistories(string name, string id)
+        public List<DataUpdateHistoryModel> GetDataUpdateHistories(string name, string id)
         {
             return _universalGridService.GetDataUpdateHistories(name, id);
         }

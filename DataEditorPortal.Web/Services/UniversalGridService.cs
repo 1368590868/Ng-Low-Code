@@ -26,7 +26,6 @@ namespace DataEditorPortal.Web.Services
     {
         GridConfig GetGridConfig(string name);
         List<GridColConfig> GetGridColumnsConfig(string name);
-        List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column);
         List<SearchFieldConfig> GetGridSearchConfig(string name);
         List<DropdownOptionsItem> GetGridWithSameSearchConfig(string name);
         List<FormFieldConfig> GetGridFormConfig(string name, string type);
@@ -36,10 +35,11 @@ namespace DataEditorPortal.Web.Services
         List<FilterParam> ProcessFilterParam(List<FilterParam> filters, List<FilterParam> filtersApplied);
         GridData QueryGridData(IDbConnection con, string queryText, object queryParams, string gridName, bool writeLog = false);
         MemoryStream ExportExcel(string name, ExportParam param);
+        List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column, GridParam param);
 
         IDictionary<string, object> GetGridDataDetail(string name, string id);
         IDictionary<string, object> BatchGet(string name, string[] ids);
-        List<DataUpdateHistory> GetDataUpdateHistories(string name, string id);
+        List<DataUpdateHistoryModel> GetDataUpdateHistories(string name, string id);
         bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model);
         bool UpdateGridData(string name, string id, IDictionary<string, object> model);
         bool BatchUpdate(string name, string[] ids, IDictionary<string, object> model);
@@ -77,6 +77,7 @@ namespace DataEditorPortal.Web.Services
         private readonly IDapperService _dapperService;
         private readonly IUserService _userService;
         private readonly ICurrentUserAccessor _currentUserAccessor;
+        private readonly IDataUpdateHistoryService _dataUpdateHistoryService;
 
         private string _currentUsername;
 
@@ -92,7 +93,8 @@ namespace DataEditorPortal.Web.Services
             IMemoryCache memoryCache,
             IDapperService dapperService,
             IUserService userService,
-            ICurrentUserAccessor currentUserAccessor)
+            ICurrentUserAccessor currentUserAccessor,
+            IDataUpdateHistoryService dataUpdateHistoryService)
         {
             _serviceProvider = serviceProvider;
             _depDbContext = depDbContext;
@@ -106,6 +108,7 @@ namespace DataEditorPortal.Web.Services
             _dapperService = dapperService;
             _userService = userService;
             _currentUserAccessor = currentUserAccessor;
+            _dataUpdateHistoryService = dataUpdateHistoryService;
 
             _currentUsername = _currentUserAccessor.CurrentUser.Username();
         }
@@ -516,7 +519,7 @@ namespace DataEditorPortal.Web.Services
             return output;
         }
 
-        public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column)
+        public List<DropdownOptionsItem> GetGridColumnFilterOptions(string name, string column, GridParam param)
         {
             _dapperService.EventSection = $"{name} | GetGridColumnFilterOptions";
 
@@ -529,8 +532,98 @@ namespace DataEditorPortal.Web.Services
             var columnConfig = columnsConfig.FirstOrDefault(x => x.field == column);
             if (columnConfig != null && columnConfig.enumFilterValue)
             {
+                #region compose the query text
+
                 dataSourceConfig.Columns = new List<string>() { columnConfig.field };
-                var query = _queryBuilder.GenerateSqlTextForColumnFilterOption(dataSourceConfig);
+
+                // get query text for list data from grid config.
+                var filtersApplied = ProcessFilterParam(dataSourceConfig.Filters, new List<FilterParam>());
+                var queryText = _queryBuilder.GenerateSqlTextForList(dataSourceConfig);
+
+                if (param != null)
+                {
+
+                    // convert search criteria to where clause
+                    var searchConfigStr = !string.IsNullOrEmpty(config.SearchConfig) ? config.SearchConfig : "[]";
+                    var searchConfig = JsonSerializer.Deserialize<List<SearchFieldConfig>>(searchConfigStr);
+                    var searchRules = new List<FilterParam>();
+                    if (param.Searches != null)
+                    {
+                        searchRules = param.Searches
+                            .Where(x => x.Value != null)
+                            .Select(x =>
+                            {
+                                FilterParam param = null;
+
+                                var fieldConfig = searchConfig.FirstOrDefault(s => s.key == x.Key);
+                                if (fieldConfig != null && fieldConfig.searchRule != null)
+                                {
+                                    param = new FilterParam
+                                    {
+                                        field = fieldConfig.searchRule.field,
+                                        matchMode = fieldConfig.searchRule.matchMode,
+                                        value = x.Value,
+                                        whereClause = fieldConfig.searchRule.whereClause
+                                    };
+                                }
+                                return param;
+                            })
+                            .Where(x => x != null)
+                            .ToList();
+                    }
+                    filtersApplied = ProcessFilterParam(searchRules, filtersApplied);
+                    queryText = _queryBuilder.UseSearches(queryText, searchRules);
+
+                    // convert grid filter to where clause
+                    if (param.Filters != null)
+                    {
+                        param.Filters.ForEach(filter =>
+                        {
+                            if (filter.field == Constants.LINK_DATA_FIELD_NAME && filter.value != null)
+                            {
+                                filter.field = dataSourceConfig.IdColumn;
+                                filter.matchMode = "in";
+                                filter.value = GetLinkedDataIdsForList(name, filter.value.ToString()).ToList();
+                            }
+                        });
+                    }
+                    filtersApplied = ProcessFilterParam(param.Filters, filtersApplied);
+                    queryText = _queryBuilder.UseFilters(queryText, param.Filters);
+                }
+                // join attachments 
+                //var attachmentCols = GetAttachmentCols(config);
+                //if (attachmentCols.Any())
+                //    queryText = _queryBuilder.JoinAttachments(queryText, attachmentCols);
+
+                // set default sorts
+                //if (!param.Sorts.Any())
+                //{
+                //    param.Sorts = dataSourceConfig.SortBy;
+                //    if (!param.Sorts.Any())
+                //        param.Sorts = new List<SortParam>() { new SortParam { field = dataSourceConfig.IdColumn, order = 1 } };
+                //}
+
+                //if (param.IndexCount > 0)
+                //{
+                //    // use pagination
+                //    queryText = _queryBuilder.UsePagination(queryText, param.StartIndex, param.IndexCount, param.Sorts);
+                //}
+                //else
+                //{
+                //    // replace the order by clause by input Sorts in queryText
+                //    queryText = _queryBuilder.UseOrderBy(queryText, param.Sorts);
+                //}
+
+                #endregion
+
+                var keyValues = filtersApplied.Select(x => new KeyValuePair<string, object>($"{x.field}_{x.index}", x.value));
+                var queryParams = _queryBuilder.GenerateDynamicParameter(keyValues);
+
+                var query = _queryBuilder.GenerateSqlTextForColumnFilterOption(new DataSourceConfig()
+                {
+                    Columns = new List<string>() { columnConfig.field },
+                    QueryText = queryText
+                });
 
                 using (var con = _serviceProvider.GetRequiredService<IDbConnection>())
                 {
@@ -538,7 +631,7 @@ namespace DataEditorPortal.Web.Services
 
                     try
                     {
-                        result = _dapperService.Query(con, query)
+                        result = _dapperService.Query(con, query, queryParams)
                             .Select(x => ((IDictionary<string, object>)x)[columnConfig.field])
                             .Where(x => x != null && x != DBNull.Value)
                             .ToList();
@@ -937,15 +1030,12 @@ namespace DataEditorPortal.Web.Services
             }
         }
 
-        public List<DataUpdateHistory> GetDataUpdateHistories(string name, string id)
+        public List<DataUpdateHistoryModel> GetDataUpdateHistories(string name, string id)
         {
             var config = GetUniversalGridConfiguration(name);
             var configId = config.Id.ToString();
 
-            return _depDbContext.DataUpdateHistories
-                .Where(h => h.GridConfigurationId == configId && h.DataId == id)
-                .OrderByDescending(h => h.CreateDate)
-                .ToList();
+            return _dataUpdateHistoryService.GetDataUpdateHistories(configId, id);
         }
 
         public bool OnValidateGridData(string name, string type, string id, IDictionary<string, object> model)
@@ -1204,28 +1294,12 @@ namespace DataEditorPortal.Web.Services
                     .ToDictionary(x => x.Key, x => x.Value);
 
                 // apply new values, create data update histories
-                var updateHistories = new List<DataUpdateHistory>();
-                var updateTime = DateTime.UtcNow;
-                foreach (var kv1 in model)
+                var updateHistories = _dataUpdateHistoryService.CompareAndApply(model, modelToUpdate);
+                updateHistories.ForEach(item =>
                 {
-                    var originalValue = modelToUpdate[kv1.Key];
-                    var newValue = kv1.Value;
-                    if (!IsValueEqual(originalValue, newValue))
-                    {
-                        modelToUpdate[kv1.Key] = newValue;
-                        updateHistories.Add(new DataUpdateHistory()
-                        {
-                            Username = _currentUsername,
-                            CreateDate = updateTime,
-                            GridConfigurationId = config.Id.ToString(),
-                            DataId = id,
-                            Field = kv1.Key,
-                            OriginalValue = originalValue != null ? originalValue.ToString() : "",
-                            NewValue = newValue != null ? newValue.ToString() : "",
-                            ActionType = ActionType.Update
-                        });
-                    }
-                }
+                    item.GridConfigurationId = config.Id.ToString();
+                    item.DataId = id;
+                });
 
                 // add id parameter
                 if (modelToUpdate.ContainsKey(dataSourceConfig.IdColumn))
@@ -1464,29 +1538,15 @@ namespace DataEditorPortal.Web.Services
                 // apply new values,
                 // modelToUpdate should already have IdColumn, as it comes form SqlTextForList
                 var updateHistories = new List<DataUpdateHistory>();
-                var updateTime = DateTime.UtcNow;
                 foreach (var modelToUpdate in models)
                 {
-                    foreach (var kv1 in model)
+                    var histories = _dataUpdateHistoryService.CompareAndApply(model, modelToUpdate);
+                    histories.ForEach(item =>
                     {
-                        var originalValue = _queryBuilder.GetJsonElementValue(modelToUpdate[kv1.Key]);
-                        var newValue = _queryBuilder.GetJsonElementValue(kv1.Value);
-                        if (!IsValueEqual(originalValue, newValue))
-                        {
-                            modelToUpdate[kv1.Key] = newValue;
-                            updateHistories.Add(new DataUpdateHistory()
-                            {
-                                Username = _currentUsername,
-                                CreateDate = updateTime,
-                                GridConfigurationId = config.Id.ToString(),
-                                DataId = modelToUpdate[dataSourceConfig.IdColumn].ToString(),
-                                Field = kv1.Key,
-                                OriginalValue = originalValue != null ? originalValue.ToString() : "",
-                                NewValue = newValue != null ? newValue.ToString() : "",
-                                ActionType = ActionType.Update
-                            });
-                        }
-                    }
+                        item.GridConfigurationId = config.Id.ToString();
+                        item.DataId = modelToUpdate[dataSourceConfig.IdColumn].ToString();
+                    });
+                    updateHistories.AddRange(histories);
 
                     // calculate the computed field values
                     ProcessComputedValues(formLayout.FormFields, modelToUpdate, con);
@@ -1701,31 +1761,6 @@ namespace DataEditorPortal.Web.Services
                 _eventLogService.AddEventLog(EventLogCategory.EXCEPTION, _dapperService.EventSection, "System Error", ex.StackTrace, JsonSerializer.Serialize(eventConfig), ex.Message);
                 _logger.LogError(ex, ex.Message);
             }
-        }
-
-        private bool IsValueEqual(object v1, object v2)
-        {
-            var x = _queryBuilder.GetJsonElementValue(v1);
-            var y = _queryBuilder.GetJsonElementValue(v2);
-
-            if (ReferenceEquals(x, y))
-                return true;
-
-            if (x == null && y == null)
-                return true;
-
-            if (x != null && y != null)
-            {
-                Type typeX = x.GetType();
-                Type typeY = y.GetType();
-
-                if (typeX != typeY)
-                    return false;
-
-                return x.Equals(y);
-            }
-
-            return false;
         }
 
         #endregion

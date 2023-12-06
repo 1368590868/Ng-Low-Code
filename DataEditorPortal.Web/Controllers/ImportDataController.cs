@@ -153,7 +153,7 @@ namespace DataEditorPortal.Web.Controllers
             scheduler.ScheduleJob(job, trigger);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("{gridName}/{type}/download-template")]
         public IActionResult DownloadTemplate(string gridName, ActionType type)
         {

@@ -27,6 +27,9 @@ namespace DataEditorPortal.Data.Models
         [Column("NEW_VALUE")]
         public string NewValue { get; set; }
 
+        [Column("VALUE_TYPE")]
+        public string ValueType { get; set; }
+
         [Column("ACTION_TYPE")]
         public ActionType ActionType { get; set; }
     }

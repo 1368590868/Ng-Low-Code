@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataEditorPortal.Data.Migrations.SqlServer
 {
     [DbContext(typeof(DepDbContextSqlServer))]
-    [Migration("20231124013134_existingSearch")]
-    partial class existingSearch
+    [Migration("20231206023931_dataUpdateHistories1")]
+    partial class dataUpdateHistories1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -122,6 +122,54 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.HasKey("Name");
 
                     b.ToTable("DATA_SOURCE_CONNECTIONS", Common.Constants.DEFAULT_SCHEMA);
+                });
+
+            modelBuilder.Entity("DataEditorPortal.Data.Models.DataUpdateHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ID");
+
+                    b.Property<int>("ActionType")
+                        .HasColumnType("int")
+                        .HasColumnName("ACTION_TYPE");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CREATE_DATE");
+
+                    b.Property<string>("DataId")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("DATA_ID");
+
+                    b.Property<string>("Field")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("FIELD");
+
+                    b.Property<string>("GridConfigurationId")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("GRID_CONFIG_ID");
+
+                    b.Property<string>("NewValue")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("NEW_VALUE");
+
+                    b.Property<string>("OriginalValue")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ORIGINAL_VALUE");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("USERNAME");
+
+                    b.Property<string>("ValueType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("VALUE_TYPE");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DATA_UPDATE_HISTORIES", Common.Constants.DEFAULT_SCHEMA);
                 });
 
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_LOOKUP", b =>
@@ -336,6 +384,7 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnName("NUMBER");
 
                     b.Property<decimal>("Total")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("TOTAL");
 

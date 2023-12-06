@@ -137,10 +137,6 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("datetime2")
                         .HasColumnName("CREATE_DATE");
 
-                    b.Property<string>("GridConfigurationId")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("GRID_CONFIG_ID");
-
                     b.Property<string>("DataId")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DATA_ID");
@@ -148,6 +144,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("Field")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("FIELD");
+
+                    b.Property<string>("GridConfigurationId")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("GRID_CONFIG_ID");
 
                     b.Property<string>("NewValue")
                         .HasColumnType("nvarchar(max)")
@@ -160,6 +160,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                     b.Property<string>("Username")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("USERNAME");
+
+                    b.Property<string>("ValueType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("VALUE_TYPE");
 
                     b.HasKey("Id");
 

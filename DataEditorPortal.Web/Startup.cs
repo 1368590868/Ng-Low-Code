@@ -127,6 +127,7 @@ namespace DataEditorPortal.Web
             services.AddScoped<IImportDataServcie, ImportDataService>();
             services.AddScoped<ILookupService, LookupService>();
             services.AddScoped<IDapperService, DapperService>();
+            services.AddScoped<IDataUpdateHistoryService, DataUpdateHistoryService>();
 
             services.AddValueProcessors();
             services.AddFieldImporters();
