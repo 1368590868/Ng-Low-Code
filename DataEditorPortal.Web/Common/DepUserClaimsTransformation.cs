@@ -27,13 +27,9 @@ namespace DataEditorPortal.Web.Common
 
         public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
         {
-            // Check if the principal has already been transformed
-            var alreadyTransformed = principal.FindFirst(DepClaimConstants.UserId);
-
-            if (alreadyTransformed == null)
+            if (!principal.HasClaim(c => c.Type == DepClaimConstants.UserId))
             {
                 var username = AppUser.FromClaimsPrincipal(principal).Username;
-
                 if (username != null)
                 {
                     var user = _memoryCache.GetOrCreate($"user_{username}", entry =>
@@ -50,18 +46,50 @@ namespace DataEditorPortal.Web.Common
                             return null;
                         }
                     });
-
-                    // Add the user ID as a new claim
-                    var userId = user?.Id;
-                    var userIdClaim = new Claim(DepClaimConstants.UserId, userId == null ? "" : userId.ToString());
-                    ((ClaimsIdentity)principal.Identity).AddClaim(userIdClaim);
-
-                    // Add the user displayName as a new claim
-                    var displayName = user?.Name;
-                    var displayNameClaim = new Claim(DepClaimConstants.DisplayName, displayName == null ? "" : displayName.ToString());
-                    ((ClaimsIdentity)principal.Identity).AddClaim(displayNameClaim);
+                    if (user != null)
+                    {
+                        var identity = new ClaimsIdentity(username);
+                        identity.AddClaim(new Claim(DepClaimConstants.UserId, user.Id.ToString()));
+                        identity.AddClaim(new Claim(DepClaimConstants.DisplayName, user.Name.ToString()));
+                        principal.AddIdentity(identity);
+                    }
                 }
             }
+            //// Check if the principal has already been transformed
+            //var alreadyTransformed = principal.FindFirstValue(DepClaimConstants.UserId);
+
+            //if (alreadyTransformed == null)
+            //{
+            //    var username = AppUser.FromClaimsPrincipal(principal).Username;
+
+            //    if (username != null)
+            //    {
+            //        var user = _memoryCache.GetOrCreate($"user_{username}", entry =>
+            //        {
+            //            var user = _depDbContext.Users.FirstOrDefault(x => x.Username == username);
+            //            if (user != null)
+            //            {
+            //                entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
+            //                return user;
+            //            }
+            //            else
+            //            {
+            //                entry.SetAbsoluteExpiration(TimeSpan.FromTicks(1));
+            //                return null;
+            //            }
+            //        });
+
+            //        // Add the user ID as a new claim
+            //        var userId = user?.Id;
+            //        var userIdClaim = new Claim(DepClaimConstants.UserId, userId == null ? "" : userId.ToString());
+            //        ((ClaimsIdentity)principal.Identity).AddClaim(userIdClaim);
+
+            //        // Add the user displayName as a new claim
+            //        var displayName = user?.Name;
+            //        var displayNameClaim = new Claim(DepClaimConstants.DisplayName, displayName == null ? "" : displayName.ToString());
+            //        ((ClaimsIdentity)principal.Identity).AddClaim(displayNameClaim);
+            //    }
+            //}
 
             return Task.FromResult(principal);
         }
