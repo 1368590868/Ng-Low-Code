@@ -59,7 +59,7 @@ namespace DataEditorPortal.Web.Services
         public override void FetchValue(IDictionary<string, object> model)
         {
             var data = GetLinkDataModelForForm(Config.Name, model)
-                .Select(x => new { Table2Id = x.Table2Id })
+                .Select(x => new { table2Id = x.Table2Id })
                 .ToList();
 
             model.Add(Constants.LINK_DATA_FIELD_NAME, data);
@@ -99,7 +99,10 @@ namespace DataEditorPortal.Web.Services
                 if (model[Constants.LINK_DATA_FIELD_NAME] != null)
                 {
                     var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                    var jsonElement = (JsonElement)model[Constants.LINK_DATA_FIELD_NAME];
+                    JsonElement jsonElement;
+                    if (model[Constants.LINK_DATA_FIELD_NAME] is JsonElement) jsonElement = (JsonElement)model[Constants.LINK_DATA_FIELD_NAME];
+                    else jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(model[Constants.LINK_DATA_FIELD_NAME]));
+
                     if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
                     {
                         var valueStr = jsonElement.ToString();
@@ -310,6 +313,49 @@ namespace DataEditorPortal.Web.Services
             }
 
             return relationData;
+        }
+    }
+
+    [FilterType("linkDataField")]
+    public class LinkDataComparer : ValueComparerBase
+    {
+        public override bool Equals(object v1, object v2)
+        {
+            if (ReferenceEquals(v1, v2))
+                return true;
+
+            if (v1 == null || v2 == null)
+                return true;
+
+            //value of link data should be IEnumerable<IDictionary<string, object>>, otherwise throw exception
+            var x = ((IEnumerable<object>)v1).Cast<IDictionary<string, object>>();
+            var y = ((IEnumerable<object>)v2).Cast<IDictionary<string, object>>();
+
+            if (x.Count() != y.Count()) return false;
+
+            var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DictionaryKeyPolicy = JsonNamingPolicy.CamelCase };
+            return JsonSerializer.Serialize(x, jsonOptions) == JsonSerializer.Serialize(y, jsonOptions);
+        }
+
+        public override int GetHashCode(object val)
+        {
+            if (val == null)
+                return 0;
+
+            var obj = ((IEnumerable<object>)val).Cast<IDictionary<string, object>>();
+
+            int hashCode = 17;
+            foreach (var v in obj)
+            {
+                hashCode = hashCode * 23 + v.GetHashCode();
+            }
+
+            return hashCode;
+        }
+
+        public override string GetValueString(object val)
+        {
+            return val == null ? "" : JsonSerializer.Serialize(val);
         }
     }
 }

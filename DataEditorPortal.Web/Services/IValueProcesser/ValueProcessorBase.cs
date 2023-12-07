@@ -19,13 +19,15 @@ namespace DataEditorPortal.Web.Services
         public abstract void AfterDeleted();
     }
 
-    public abstract class ValueComparerBase : IEqualityComparer<IDictionary<string, object>>
+    public abstract class ValueComparerBase : IEqualityComparer<object>
     {
         public UniversalGridConfiguration Config;
         public FormFieldConfig Field;
 
-        public abstract new bool Equals(IDictionary<string, object> x, IDictionary<string, object> y);
-        public abstract int GetHashCode(IDictionary<string, object> obj);
+        public abstract new bool Equals(object x, object y);
+        public abstract int GetHashCode(object obj);
+
+        public abstract string GetValueString(object obj);
     }
 
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct, AllowMultiple = false)]

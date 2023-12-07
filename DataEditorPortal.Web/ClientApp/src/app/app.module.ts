@@ -23,9 +23,7 @@ import { FormlyCustomTypeModule } from './features/ngx-formly/formly-custom.modu
     CoreModule,
     ToastModule,
     FormlyModule.forRoot({
-      validationMessages: [
-        { name: 'required', message: 'This field is required.' }
-      ]
+      validationMessages: [{ name: 'required', message: 'This field is required.' }]
     }),
     FormlyCustomTypeModule,
     HttpConfigModule.forRoot('Windows')

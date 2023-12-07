@@ -1294,7 +1294,7 @@ namespace DataEditorPortal.Web.Services
                     .ToDictionary(x => x.Key, x => x.Value);
 
                 // apply new values, create data update histories
-                var updateHistories = _dataUpdateHistoryService.CompareAndApply(model, modelToUpdate);
+                var updateHistories = _dataUpdateHistoryService.CompareAndApply(model, modelToUpdate, formLayout.FormFields);
                 updateHistories.ForEach(item =>
                 {
                     item.GridConfigurationId = config.Id.ToString();
@@ -1540,7 +1540,7 @@ namespace DataEditorPortal.Web.Services
                 var updateHistories = new List<DataUpdateHistory>();
                 foreach (var modelToUpdate in models)
                 {
-                    var histories = _dataUpdateHistoryService.CompareAndApply(model, modelToUpdate);
+                    var histories = _dataUpdateHistoryService.CompareAndApply(model, modelToUpdate, formLayout.FormFields);
                     histories.ForEach(item =>
                     {
                         item.GridConfigurationId = config.Id.ToString();

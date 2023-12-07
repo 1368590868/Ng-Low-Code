@@ -7,12 +7,13 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace DataEditorPortal.Web.Services
 {
     public interface IDataUpdateHistoryService
     {
-        List<DataUpdateHistory> CompareAndApply(IDictionary<string, object> model, IDictionary<string, object> modelToUpdate);
+        List<DataUpdateHistory> CompareAndApply(IDictionary<string, object> model, IDictionary<string, object> modelToUpdate, List<FormFieldConfig> fields);
         List<DataUpdateHistoryModel> GetDataUpdateHistories(string configId, string id);
     }
 
@@ -24,46 +25,77 @@ namespace DataEditorPortal.Web.Services
         private readonly IQueryBuilder _queryBuilder;
         private readonly IUtcLocalConverter _utcLocalConverter;
         private readonly string dateFormat = "yyyy-MM-dd HH:mm:ss";
+        private readonly IValueProcessorFactory _valueProcessorFactory;
+
         public DataUpdateHistoryService(
             DepDbContext depDbContext,
             ILogger<DataUpdateHistoryService> logger,
             ICurrentUserAccessor currentUserAccessor,
             IQueryBuilder queryBuilder,
-            IUtcLocalConverter utcLocalConverter)
+            IUtcLocalConverter utcLocalConverter,
+            IValueProcessorFactory valueProcessorFactory)
         {
             _depDbContext = depDbContext;
             _logger = logger;
             _currentUserAccessor = currentUserAccessor;
             _queryBuilder = queryBuilder;
             _utcLocalConverter = utcLocalConverter;
+            _valueProcessorFactory = valueProcessorFactory;
         }
 
-        public List<DataUpdateHistory> CompareAndApply(IDictionary<string, object> model, IDictionary<string, object> modelToUpdate)
+        public List<DataUpdateHistory> CompareAndApply(IDictionary<string, object> model, IDictionary<string, object> modelToUpdate, List<FormFieldConfig> fields)
         {
             var updateHistories = new List<DataUpdateHistory>();
             var updateTime = DateTime.UtcNow;
-            foreach (var kv1 in model)
-            {
-                // original value should query from db, it should be correct type already. 
-                // new value should from frontend, it should be JsonElement
-                // no matter where the value come from,
-                // invoke GetJsonElementValue() to get the correct value with type that can be write to db
-                var originalValue = _queryBuilder.GetJsonElementValue(modelToUpdate[kv1.Key]);
-                var newValue = _queryBuilder.GetJsonElementValue(kv1.Value);
 
-                if (!IsValueEqual(originalValue, newValue))
+            foreach (FormFieldConfig field in fields)
+            {
+                if (model.ContainsKey(field.key))
                 {
-                    modelToUpdate[kv1.Key] = newValue;
-                    updateHistories.Add(new DataUpdateHistory()
+                    // original value should query from db, it should be correct type already. 
+                    // new value should from frontend, it should be JsonElement
+                    // no matter where the value come from,
+                    // invoke GetJsonElementValue() to get the correct value with type that can be write to db
+                    var originalValue = _queryBuilder.GetJsonElementValue(modelToUpdate[field.key]);
+                    var newValue = _queryBuilder.GetJsonElementValue(model[field.key]);
+
+                    var comparer = _valueProcessorFactory.CreateValueComparer(field, null);
+                    if (comparer != null)
                     {
-                        Username = _currentUserAccessor.CurrentUser.Username(),
-                        CreateDate = updateTime,
-                        Field = kv1.Key,
-                        OriginalValue = ConvertValueToString(originalValue),
-                        NewValue = ConvertValueToString(newValue),
-                        ValueType = GetValueTypeString(originalValue, newValue),
-                        ActionType = ActionType.Update
-                    });
+                        if (!comparer.Equals(originalValue, newValue))
+                        {
+                            modelToUpdate[field.key] = newValue;
+                            // generate data update history, store json
+                            updateHistories.Add(new DataUpdateHistory()
+                            {
+                                Username = _currentUserAccessor.CurrentUser.Username(),
+                                CreateDate = updateTime,
+                                Field = field.key,
+                                OriginalValue = comparer.GetValueString(originalValue),
+                                NewValue = comparer.GetValueString(newValue),
+                                ValueType = typeof(string).ToString(),
+                                ActionType = ActionType.Update
+                            });
+                        }
+                    }
+                    else
+                    {
+                        if (!IsValueEqual(originalValue, newValue))
+                        {
+                            modelToUpdate[field.key] = newValue;
+                            // generate data update history, store json
+                            updateHistories.Add(new DataUpdateHistory()
+                            {
+                                Username = _currentUserAccessor.CurrentUser.Username(),
+                                CreateDate = updateTime,
+                                Field = field.key,
+                                OriginalValue = ConvertValueToString(originalValue),
+                                NewValue = ConvertValueToString(newValue),
+                                ValueType = GetValueTypeString(originalValue, newValue),
+                                ActionType = ActionType.Update
+                            });
+                        }
+                    }
                 }
             }
 
@@ -104,16 +136,13 @@ namespace DataEditorPortal.Web.Services
         private string ConvertValueToString(object value)
         {
             if (value == null) return "";
+
             var type = value.GetType();
-            if (type == typeof(DateTime))
-            {
-                return ((DateTime)value).ToString(dateFormat);
-            }
-            if (type == typeof(byte[]))
-            {
-                return Convert.ToBase64String((byte[])value);
-            }
-            return value.ToString();
+            if (type == typeof(DateTime)) { return ((DateTime)value).ToString(dateFormat); }
+            if (type == typeof(byte[])) { return Convert.ToBase64String((byte[])value); }
+            if (type == typeof(string)) { return value.ToString(); }
+
+            return JsonSerializer.Serialize(value);
         }
 
         private object ConvertStringToValue(string valueStr, string typeStr)
@@ -121,6 +150,7 @@ namespace DataEditorPortal.Web.Services
             if (string.IsNullOrEmpty(typeStr)) { return valueStr; }
 
             var type = Type.GetType(typeStr);
+            if (type == null) { return valueStr; };
             if (type == typeof(decimal)) return decimal.Parse(valueStr);
             if (type == typeof(DateTime))
             {
@@ -133,8 +163,9 @@ namespace DataEditorPortal.Web.Services
             }
             if (type == typeof(byte[])) { return Convert.FromBase64String(typeStr); }
             if (type == typeof(bool)) { return valueStr == "1"; }
+            if (type == typeof(string)) { return valueStr; }
 
-            return valueStr;
+            return JsonSerializer.Deserialize(valueStr, type);
         }
 
         /// <summary>
@@ -172,6 +203,11 @@ namespace DataEditorPortal.Web.Services
 
                 if (typeX != typeY)
                     return false;
+
+                if (typeX == typeof(DateTime))
+                {
+                    return ((DateTime)x).ToString(dateFormat) == ((DateTime)y).ToString(dateFormat);
+                }
 
                 return x.Equals(y);
             }

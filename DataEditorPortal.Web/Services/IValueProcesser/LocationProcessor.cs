@@ -122,13 +122,17 @@ namespace DataEditorPortal.Web.Services
     {
         private IEnumerable<string> _keys;
 
-        public override bool Equals(IDictionary<string, object> x, IDictionary<string, object> y)
+        public override bool Equals(object v1, object v2)
         {
-            if (ReferenceEquals(x, y))
+            if (ReferenceEquals(v1, v2))
                 return true;
 
-            if (x == null || y == null)
-                return false;
+            if (v1 == null || v2 == null)
+                return true;
+
+            // value of location should be IDictionary, otherwise throw exception
+            var x = (IDictionary<string, object>)v1;
+            var y = (IDictionary<string, object>)v2;
 
             GetKeys();
 
@@ -143,17 +147,29 @@ namespace DataEditorPortal.Web.Services
                 if (valueX == null && valueY == null)
                     continue;
 
-                if (valueX == null || !valueX.Equals(valueY))
+                if (valueX == null || valueY == null)
                     return false;
+
+                if (key == "fromMeasure" || key == "toMeasure")
+                {
+                    if (!decimal.Equals(Convert.ToDecimal(valueX), Convert.ToDecimal(valueY))) return false;
+                }
+                else
+                {
+                    if (!valueX.Equals(valueY)) return false;
+                }
             }
 
             return true;
         }
 
-        public override int GetHashCode(IDictionary<string, object> obj)
+        public override int GetHashCode(object val)
         {
-            if (obj == null)
+            if (val == null)
                 return 0;
+
+            // value of location should be IDictionary, otherwise throw exception
+            var obj = (IDictionary<string, object>)val;
 
             GetKeys();
 
@@ -163,8 +179,19 @@ namespace DataEditorPortal.Web.Services
             {
                 if (obj.ContainsKey(key))
                 {
-                    hashCode = hashCode * 23 + key.GetHashCode();
-                    hashCode = hashCode * 23 + (obj[key]?.GetHashCode() ?? 0);
+                    var keyCode = key.GetHashCode();
+                    var valueCode = 0;
+                    if (obj.ContainsKey(key) && obj[key] != null)
+                    {
+                        if (key == "fromMeature" || key == "toMeature")
+                        {
+                            valueCode = Convert.ToDecimal(obj[key]).GetHashCode();
+                        }
+                        else
+                            valueCode = obj[key].GetHashCode();
+                    }
+
+                    hashCode = hashCode * 23 + keyCode + valueCode;
                 }
             }
 
@@ -183,13 +210,31 @@ namespace DataEditorPortal.Web.Services
                     if (mappingProp.ValueKind == JsonValueKind.Object)
                     {
                         // only get the mappings that already configed.
-                        var mappings = mappingProp.EnumerateObject().Where(m => m.Value.GetString() != null);
-                        _keys = mappings.Select(m => m.Value.GetString());
+                        var mappings = mappingProp.EnumerateObject().Where(m => m.Name != null);
+                        _keys = mappings.Select(m => m.Name).ToList();
                     }
                 }
             }
 
             if (_keys == null) throw new Exception("Configration error for location field.");
+        }
+
+        public override string GetValueString(object val)
+        {
+            // value of location should be IDictionary, otherwise throw exception
+            var obj = (IDictionary<string, object>)val;
+
+            GetKeys();
+
+            foreach (var key in _keys)
+            {
+                if (!obj.ContainsKey(key))
+                {
+                    obj.Remove(key);
+                }
+            }
+
+            return JsonSerializer.Serialize(obj);
         }
     }
 }
