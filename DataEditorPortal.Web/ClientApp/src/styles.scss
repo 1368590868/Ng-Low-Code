@@ -71,8 +71,7 @@ body {
   position: relative;
   overflow: hidden;
   height: 100%;
-  box-shadow: 0 0px 2px -1px rgb(0 0 0 / 20%), 0 0px 2px 0 rgb(0 0 0 / 14%),
-    0 0px 3px 0 rgb(0 0 0 / 12%);
+  box-shadow: 0 0px 2px -1px rgb(0 0 0 / 20%), 0 0px 2px 0 rgb(0 0 0 / 14%), 0 0px 3px 0 rgb(0 0 0 / 12%);
 }
 
 /* ngx formly style */
@@ -133,6 +132,13 @@ formly-form {
 .p-inputwrapper-filled .p-multiselect.p-multiselect-chip .p-multiselect-label {
   display: flex;
   flex-wrap: wrap;
+  .p-multiselect-token {
+    max-width: 100%;
+    .p-multiselect-token-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
 
 .p-inputtextarea {

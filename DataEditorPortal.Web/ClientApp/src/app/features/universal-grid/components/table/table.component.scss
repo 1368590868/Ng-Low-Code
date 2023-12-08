@@ -94,3 +94,9 @@
     }
   }
 }
+
+::ng-deep {
+  .p-column-filter-overlay-menu {
+    max-width: 25rem;
+  }
+}
