@@ -92,10 +92,10 @@ export class DialogFocusDirective implements OnDestroy {
     document
       .querySelectorAll<HTMLElement>('.dialog-focusable .p-dialog')
       .forEach(el => array.push(el));
-    // if (array.length <= 1) return;
+    if (array.length <= 1) return;
 
-    let offsetTop = this.dialog.container.offsetTop;
-    let offsetLeft = this.dialog.container.offsetLeft;
+    let offsetTop = array[0].offsetTop;
+    let offsetLeft = array[0].offsetLeft;
     // eslint-disable-next-line no-constant-condition
     while (true) {
       if (
