@@ -253,7 +253,7 @@ export class EditMultipleRecordActionComponent extends GridActionDirective imple
     const data: EditFormData = {};
     this.fields.forEach(f => {
       if (f.props && f.props['isSameValue'] && f.key) {
-        data[f.key as string] = this.model[f.key as string];
+        if (this.model[f.key as string] !== undefined) data[f.key as string] = this.model[f.key as string];
       }
     });
 
