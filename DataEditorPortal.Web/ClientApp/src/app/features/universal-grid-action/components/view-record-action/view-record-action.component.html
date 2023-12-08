@@ -1,7 +1,4 @@
-<p-table
-  *ngIf="!loading; else elseBlock"
-  [value]="viewData"
-  styleClass="p-datatable-striped">
+<p-table *ngIf="!loading; else elseBlock" [value]="viewDataList" styleClass="p-datatable-striped">
   <ng-template pTemplate="header">
     <tr>
       <th>Name</th>
@@ -14,20 +11,14 @@
       <td>
         <!-- DataBaseField-->
         <ng-container *ngIf="viewData.type === 'DataBaseField'">
-          <ng-container *ngIf="viewData.filterType === 'boolean'">{{
-            viewData.value | boolean
-          }}</ng-container>
+          <ng-container *ngIf="viewData.filterType === 'boolean'">{{ viewData.value | boolean }}</ng-container>
           <ng-container *ngIf="viewData.filterType === 'date'">{{
-            viewData.value
-              | date : (viewData.format === '' ? undefined : viewData.format)
+            viewData.value | date : (viewData.format === '' ? undefined : viewData.format)
           }}</ng-container>
           <ng-container *ngIf="viewData.filterType === 'numeric'">{{
-            viewData.value
-              | numeral : (viewData.format === '' ? undefined : viewData.format)
+            viewData.value | numeral : (viewData.format === '' ? undefined : viewData.format)
           }}</ng-container>
-          <ng-container *ngIf="viewData.filterType === 'text'">{{
-            viewData.value
-          }}</ng-container>
+          <ng-container *ngIf="viewData.filterType === 'text'">{{ viewData.value }}</ng-container>
         </ng-container>
 
         <!-- AttachmentField-->
@@ -41,10 +32,7 @@
 
         <!-- TemplateField-->
         <ng-container *ngIf="viewData.type === 'TemplateField'">
-          <span
-            *ngIf="viewData.template"
-            [innerHTML]="selectedRecords[0] | template : viewData.template">
-          </span>
+          <span *ngIf="viewData.template" [innerHTML]="selectedRecords[0] | template : viewData.template"> </span>
         </ng-container>
       </td>
     </tr>
@@ -66,6 +54,7 @@
     [value]="updateHistories"
     sortField="createDate"
     sortMode="single"
+    [sortOrder]="-1"
     [scrollable]="true"
     scrollHeight="350px"
     tableStyle="tableLayout: fiexd"
@@ -82,9 +71,8 @@
       <tr pRowGroupHeader style="background: #fcfcfc">
         <td colspan="3">
           <span
-            >{{ history.createDate | date : 'M/d/yyyy h:mm a' }} -
-            {{ history.actionType === 0 ? 'ADD' : 'UPDATE' }} - by
-            {{ history.username }}</span
+            >{{ history.createDate | date : 'M/d/yyyy h:mm a' }} - {{ history.actionType === 0 ? 'ADD' : 'UPDATE' }} -
+            by {{ history.username }}</span
           >
         </td>
       </tr>
@@ -95,20 +83,78 @@
         <td>
           <span>{{ history.field }}</span>
         </td>
-        <td>
+        <td class="w-20rem">
           <div
-            class="w-20rem overflow-hidden white-space-nowrap text-overflow-ellipsis"
-            [pTooltip]="history.originalValue"
+            style="max-width: 20rem"
+            class="inline-block overflow-hidden white-space-nowrap text-overflow-ellipsis"
+            [pTooltip]="
+              history.filterType === 'boolean'
+                ? (history.originalValue | boolean)
+                : history.filterType === 'date'
+                ? (history.originalValue | date)
+                : history.filterType === 'numeric'
+                ? (history.originalValue | numeral)
+                : history.originalValue
+            "
             tooltipPosition="top">
-            {{ history.originalValue }}
+            <ng-container *ngIf="history.type === 'DataBaseField'">
+              <ng-container *ngIf="history.filterType === 'boolean'">{{
+                history.originalValue | boolean
+              }}</ng-container>
+              <ng-container *ngIf="history.filterType === 'date'">{{
+                history.originalValue | date : (history.format === '' ? undefined : history.format)
+              }}</ng-container>
+              <ng-container *ngIf="history.filterType === 'numeric'">{{
+                history.originalValue | numeral : (history.format === '' ? undefined : history.format)
+              }}</ng-container>
+              <ng-container *ngIf="history.filterType === 'text'">{{ history.originalValue }}</ng-container>
+            </ng-container>
+            <ng-container *ngIf="history.type === 'AttachmentField'">
+              <app-attachments
+                [data]="history.originalValue"
+                [gridName]="gridName"
+                [fieldName]="history.field"
+                [showAll]="true"></app-attachments>
+            </ng-container>
+            <ng-container *ngIf="history.type === 'LocationAndLinked'">
+              {{ history.originalValue }}
+            </ng-container>
           </div>
         </td>
-        <td>
+        <td class="w-20rem">
           <div
-            class="w-20rem overflow-hidden white-space-nowrap text-overflow-ellipsis"
-            [pTooltip]="history.newValue"
+            style="max-width: 20rem"
+            class="inline-block overflow-hidden white-space-nowrap text-overflow-ellipsis"
+            [pTooltip]="
+              history.filterType === 'boolean'
+                ? (history.newValue | boolean)
+                : history.filterType === 'date'
+                ? (history.newValue | date)
+                : history.filterType === 'numeric'
+                ? (history.newValue | numeral)
+                : history.newValue
+            "
             tooltipPosition="top">
-            {{ history.newValue }}
+            <ng-container *ngIf="history.type === 'DataBaseField'">
+              <ng-container *ngIf="history.filterType === 'boolean'">{{ history.newValue | boolean }}</ng-container>
+              <ng-container *ngIf="history.filterType === 'date'">{{
+                history.newValue | date : (history.format === '' ? undefined : history.format)
+              }}</ng-container>
+              <ng-container *ngIf="history.filterType === 'numeric'">{{
+                history.newValue | numeral : (history.format === '' ? undefined : history.format)
+              }}</ng-container>
+              <ng-container *ngIf="history.filterType === 'text'">{{ history.newValue }}</ng-container>
+            </ng-container>
+            <ng-container *ngIf="history.type === 'AttachmentField'">
+              <app-attachments
+                [data]="history.newValue"
+                [gridName]="gridName"
+                [fieldName]="history.field"
+                [showAll]="true"></app-attachments>
+            </ng-container>
+            <ng-container *ngIf="history.type === 'LocationAndLinked'">
+              {{ history.newValue }}
+            </ng-container>
           </div>
         </td>
       </tr>

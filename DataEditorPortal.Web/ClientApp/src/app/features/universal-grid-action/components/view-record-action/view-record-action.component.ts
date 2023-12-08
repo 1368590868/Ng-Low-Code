@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { forkJoin, tap } from 'rxjs';
 import { SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { UniversalGridService } from '../../services/universal-grid.service';
@@ -13,7 +14,7 @@ export interface ViewColumn {
   filterType: string;
 }
 
-export interface UpdateHistory {
+export interface UpdateHistory extends ViewColumn {
   id: string;
   createDate: string;
   username: string;
@@ -30,21 +31,15 @@ export interface UpdateHistory {
   templateUrl: './view-record-action.component.html',
   styleUrls: ['./view-record-action.component.scss']
 })
-export class ViewRecordActionComponent
-  extends GridActionDirective
-  implements OnInit
-{
-  viewData: ViewColumn[];
+export class ViewRecordActionComponent extends GridActionDirective implements OnInit {
+  viewDataList: ViewColumn[];
   loading = true;
   formatters?: any;
   updateHistories: UpdateHistory[] = [];
 
-  constructor(
-    private universalGridService: UniversalGridService,
-    private systemLogService: SystemLogService
-  ) {
+  constructor(private universalGridService: UniversalGridService, private systemLogService: SystemLogService) {
     super();
-    this.viewData = [];
+    this.viewDataList = [];
   }
 
   ngOnInit(): void {
@@ -53,48 +48,57 @@ export class ViewRecordActionComponent
       section: this.gridName,
       params: JSON.stringify(this.selectedRecords[0])
     });
-    this.universalGridService.getTableColumns(this.gridName).subscribe(res => {
-      if (this.selectedRecords[0] !== undefined) {
-        const key = Object.keys(this.selectedRecords[0])
-          .filter(key => key != 'RowNumber')
-          .map(key => {
-            const field = res.find(x => x.field === key);
-            return {
-              key: field?.field,
-              name: field?.header,
-              value: this.selectedRecords[0][key],
-              type: field?.type,
-              format: field?.format,
-              template: field?.template,
-              filterType: field?.filterType
-            };
-          })
-          .filter(x => x.name !== undefined);
-        // sort by res
-        const result = res.map(x => {
-          return {
-            key: x.field,
-            name: x.header,
-            value: key.find(y => y.name === x.header)?.value,
-            type: x.type,
-            format: x.format,
-            template: x.template,
-            filterType: x.filterType
-          };
-        });
-        this.viewData = result;
-        this.loading = false;
-        this.loadedEvent.emit();
-      }
-    });
 
-    this.universalGridService
-      .getUpdateHistoriesData(
-        this.gridName,
-        this.selectedRecords[0][this.recordKey]
+    forkJoin([
+      this.universalGridService.getTableColumns(this.gridName),
+      this.universalGridService.getUpdateHistoriesData(this.gridName, this.selectedRecords[0][this.recordKey])
+    ])
+      .pipe(
+        tap(([columns, histories]) => {
+          if (this.selectedRecords[0] !== undefined) {
+            const key = Object.keys(this.selectedRecords[0])
+              .filter(key => key != 'RowNumber')
+              .map(key => {
+                const field = columns.find(x => x.field === key);
+                return {
+                  key: field?.field,
+                  name: field?.header,
+                  value: this.selectedRecords[0][key],
+                  type: field?.type,
+                  format: field?.format,
+                  template: field?.template,
+                  filterType: field?.filterType
+                };
+              })
+              .filter(x => x.name !== undefined);
+            // sort by res
+            const result = columns.map(x => {
+              return {
+                key: x.field,
+                name: x.header,
+                value: key.find(y => y.name === x.header)?.value,
+                type: x.type,
+                format: x.format,
+                template: x.template,
+                filterType: x.filterType
+              };
+            });
+            this.viewDataList = result;
+            this.loading = false;
+            this.loadedEvent.emit();
+          }
+
+          this.updateHistories = histories.map(x => {
+            const viewdata = this.viewDataList.find(y => y.key === x.field);
+            return {
+              ...x,
+              filterType: viewdata?.filterType || 'text',
+              format: viewdata?.format,
+              type: viewdata?.type || 'LocationAndLinked'
+            };
+          });
+        })
       )
-      .subscribe(res => {
-        this.updateHistories = res;
-      });
+      .subscribe();
   }
 }
