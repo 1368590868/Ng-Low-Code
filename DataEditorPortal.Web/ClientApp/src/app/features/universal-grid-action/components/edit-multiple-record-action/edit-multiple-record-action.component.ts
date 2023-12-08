@@ -1,21 +1,10 @@
 import { DatePipe } from '@angular/common';
-import {
-  Component,
-  Inject,
-  Input,
-  OnInit,
-  Type,
-  ViewChild
-} from '@angular/core';
+import { Component, Inject, Input, OnInit, Type, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { cloneDeep, isEqual } from 'lodash-es';
 import { Subject, forkJoin, tap } from 'rxjs';
-import {
-  NgxFormlyService,
-  NotifyService,
-  SystemLogService
-} from 'src/app/shared';
+import { NgxFormlyService, NotifyService, SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { EditFormData, FormEventConfig } from '../../models/edit';
 import { EventActionHandlerService } from '../../services/event-action-handler.service';
@@ -27,10 +16,7 @@ import { UniversalGridService } from '../../services/universal-grid.service';
   styleUrls: ['./edit-multiple-record-action.component.scss'],
   providers: [DatePipe]
 })
-export class EditMultipleRecordActionComponent
-  extends GridActionDirective
-  implements OnInit
-{
+export class EditMultipleRecordActionComponent extends GridActionDirective implements OnInit {
   @Input() isAddForm = false;
   @Input() layout: 'vertical' | 'horizontal' = 'horizontal';
   destroy$ = new Subject<void>();
@@ -164,10 +150,7 @@ export class EditMultipleRecordActionComponent
     // set default value
     fields
       .filter(
-        f =>
-          (f.type === 'input' || f.type === 'textarea') &&
-          f.defaultValue &&
-          typeof f.defaultValue === 'string'
+        f => (f.type === 'input' || f.type === 'textarea') && f.defaultValue && typeof f.defaultValue === 'string'
       )
       .forEach(f => {
         const matches = [
@@ -177,14 +160,8 @@ export class EditMultipleRecordActionComponent
         ];
         let value = f.defaultValue;
         matches.forEach(match => {
-          let searchVal = this.fetchDataParam?.searches
-            ? this.fetchDataParam?.searches[match[1]]
-            : '';
-          if (searchVal && searchVal.getDate)
-            searchVal = this.datePipe.transform(
-              searchVal,
-              match[3] ?? 'yyyyMMdd'
-            );
+          let searchVal = this.fetchDataParam?.searches ? this.fetchDataParam?.searches[match[1]] : '';
+          if (searchVal && searchVal.getDate) searchVal = this.datePipe.transform(searchVal, match[3] ?? 'yyyyMMdd');
           value = value.replace(match[0], searchVal ?? '');
         });
         f.defaultValue = value;
@@ -269,8 +246,7 @@ export class EditMultipleRecordActionComponent
   }
 
   setBackupModel() {
-    if (Object.keys(this.model).length !== 0)
-      this.backModel = cloneDeep(this.model);
+    if (Object.keys(this.model).length !== 0) this.backModel = cloneDeep(this.model);
   }
 
   submitSave(model: EditFormData) {
@@ -281,26 +257,27 @@ export class EditMultipleRecordActionComponent
       }
     });
 
+    if (Reflect.ownKeys(data).length === 0) {
+      this.notifyService.notifyWarning('Warning', 'Please select at least one field to update.');
+      this.errorEvent.emit();
+      return;
+    }
+
     this.systemLogService.addSiteVisitLog({
       action: 'Update',
       section: this.gridName,
       params: JSON.stringify({ data, ids: this.dataKeys })
     });
 
-    this.gridService
-      .batchUpdate(this.gridName, this.dataKeys, data)
-      .subscribe(res => {
-        if (res.code === 200 && res.data) {
-          this.notifyService.notifySuccess(
-            'Success',
-            'Save Successfully Completed.'
-          );
+    this.gridService.batchUpdate(this.gridName, this.dataKeys, data).subscribe(res => {
+      if (res.code === 200 && res.data) {
+        this.notifyService.notifySuccess('Success', 'Save Successfully Completed.');
 
-          this.savedEvent.emit();
-        } else {
-          this.errorEvent.emit();
-        }
-      });
+        this.savedEvent.emit();
+      } else {
+        this.errorEvent.emit();
+      }
+    });
   }
 
   onFormSubmit(model: EditFormData) {
