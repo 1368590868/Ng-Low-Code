@@ -30,8 +30,7 @@ export class ActionWrapperComponent implements OnInit {
   @Input() okText = 'Ok';
   @Input() cancelText = 'Cancel';
   @Input() dialogStyle = { width: '31.25rem' };
-  @Input() dialogContentStyleClass =
-    'border-top-1 surface-border pt-4 pb-0 flex flex-column';
+  @Input() dialogContentStyleClass = 'border-top-1 surface-border pt-4 pb-0 flex flex-column';
   @Input() dialogModal = true;
   @Input() set visible(val: boolean) {
     if (val) this.display = 'block';
@@ -57,17 +56,11 @@ export class ActionWrapperComponent implements OnInit {
 
   initParams?: any;
 
-  constructor(
-    private urlParamsService: UrlParamsService,
-    private confirmationService: ConfirmationService
-  ) {}
+  constructor(private urlParamsService: UrlParamsService, private confirmationService: ConfirmationService) {}
 
   ngOnInit(): void {
     this.initParams = this.urlParamsService.initParams;
-    if (
-      this.initParams &&
-      this.initParams.name === this.actionConfig?.props?.['gridName']
-    ) {
+    if (this.initParams && this.initParams.name === this.actionConfig?.props?.['gridName']) {
       if (this.initParams.action === this.actionConfig?.name) {
         this.showDialog();
         this.urlParamsService.clearInitParams();
@@ -87,8 +80,7 @@ export class ActionWrapperComponent implements OnInit {
   }
 
   onHide() {
-    if (this.hasEventHandler('onCancel'))
-      (this.componentRef.instance as any).onCancel();
+    if (this.hasEventHandler('onCancel')) (this.componentRef.instance as any).onCancel();
     this.viewContainerRef.clear();
   }
 
@@ -98,27 +90,21 @@ export class ActionWrapperComponent implements OnInit {
 
   onOk() {
     this.isSaving = true;
-    if (this.hasEventHandler('onSave'))
-      (this.componentRef.instance as any).onSave();
+    if (this.hasEventHandler('onSave')) (this.componentRef.instance as any).onSave();
     else {
       this.dialogVisible = false;
+      this.isSaving = false;
     }
   }
 
   hasEventHandler(event: string) {
-    return (
-      event in this.componentRef.instance &&
-      typeof (this.componentRef.instance as any)[event] === 'function'
-    );
+    return event in this.componentRef.instance && typeof (this.componentRef.instance as any)[event] === 'function';
   }
 
   renderAction() {
     this.viewContainerRef.clear();
 
-    const actionRef =
-      this.viewContainerRef.createComponent<GridActionDirective>(
-        this.actionConfig.component
-      );
+    const actionRef = this.viewContainerRef.createComponent<GridActionDirective>(this.actionConfig.component);
 
     // assign action data;
     if (this.actionConfig.props) {
