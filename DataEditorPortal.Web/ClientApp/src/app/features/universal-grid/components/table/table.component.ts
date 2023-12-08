@@ -76,6 +76,9 @@ export class TableComponent implements OnInit, OnDestroy {
 
   searchModel?: SearchParam;
   fetchDataParam?: GridParam;
+  fetchDataParam$ = new BehaviorSubject<GridParam | undefined>(
+    this.fetchDataParam
+  );
   filters?: any;
   sortMeta?: any;
   multiSortMeta?: any;
@@ -159,16 +162,6 @@ export class TableComponent implements OnInit, OnDestroy {
       this.columnsConfigCached = JSON.parse(JSON.stringify(result[1]));
       this.restoreColumns();
 
-      // load column filter options
-      this.columns.forEach(col => {
-        if (col.field && col.filterable && col.enumFilterValue) {
-          this.gridTableService
-            .getTableColumnFilterOptions(this.gridName, col.field)
-            .subscribe(val => {
-              col.filterOptions = val;
-            });
-        }
-      });
       this.initUrlParams();
       this.loading = false;
       this.loaded$.next(true);
@@ -425,6 +418,8 @@ export class TableComponent implements OnInit, OnDestroy {
     // set pagination
     fetchParam.startIndex = this.first ?? 0;
     fetchParam.indexCount = this.rows;
+
+    this.fetchDataParam$.next(fetchParam);
 
     return fetchParam;
   }

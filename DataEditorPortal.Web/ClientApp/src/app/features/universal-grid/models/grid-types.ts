@@ -1,3 +1,4 @@
+import { GridParam } from 'src/app/shared';
 import { GridActionOption } from '../../universal-grid-action/universal-grid-action.module';
 
 export interface GridResult {
@@ -34,10 +35,12 @@ export interface GridColumn {
   order?: number;
   template?: string;
   format?: string;
-  filterOptions?: any[];
   sortable: boolean;
   filterable: boolean;
   enumFilterValue?: boolean;
+
+  _filterOptions?: any[];
+  _filterDepParam?: GridParam;
 }
 
 export interface GridSearchConfig {

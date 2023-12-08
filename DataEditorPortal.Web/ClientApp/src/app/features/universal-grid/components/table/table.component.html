@@ -145,6 +145,7 @@
               style="vertical-align: middle"
               [type]="col.filterType"
               [field]="col.field"
+              [column]="col"
               display="menu"
               [hideOnClear]="true"
               [showOperator]="false"
@@ -155,6 +156,7 @@
               *ngIf="col.filterable && col.enumFilterValue"
               style="vertical-align: middle"
               [field]="col.field"
+              [column]="col"
               matchMode="in"
               display="menu"
               [hideOnClear]="true"
@@ -170,7 +172,7 @@
                   appendTo="body"
                   placeholder="Any"
                   [ngModel]="value"
-                  [options]="col.filterOptions || []"
+                  [options]="col._filterOptions || []"
                   (onChange)="filter($event.value)">
                 </p-multiSelect>
               </ng-template>

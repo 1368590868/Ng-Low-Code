@@ -64,10 +64,15 @@ export class GridTableService {
       .pipe(map(res => res.data || []));
   }
 
-  getTableColumnFilterOptions(name: string, column: string): Observable<any[]> {
+  getTableColumnFilterOptions(
+    name: string,
+    column: string,
+    tableParams: GridParam | undefined
+  ): Observable<any[]> {
     return this.http
-      .get<ApiResponse<any[]>>(
-        `${this._apiUrl}universal-grid/${name}/config/column/filter-options?column=${column}`
+      .post<ApiResponse<any[]>>(
+        `${this._apiUrl}universal-grid/${name}/config/column/filter-options?column=${column}`,
+        tableParams || {}
       )
       .pipe(map(res => res.data || []));
   }
