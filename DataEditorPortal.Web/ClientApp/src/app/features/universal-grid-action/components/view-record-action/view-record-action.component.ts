@@ -90,6 +90,7 @@ export class ViewRecordActionComponent extends GridActionDirective implements On
 
           this.updateHistories = histories.map(x => {
             const viewdata = this.viewDataList.find(y => y.key === x.field);
+
             return {
               ...x,
               filterType: viewdata?.filterType || 'text',
@@ -97,6 +98,20 @@ export class ViewRecordActionComponent extends GridActionDirective implements On
               type: viewdata?.type || 'LocationAndLinked'
             };
           });
+
+          this.updateHistories = this.viewDataList
+            .map(x => {
+              const history = histories.find(y => y.field === x.key);
+              if (history)
+                return {
+                  ...history,
+                  filterType: x?.filterType || 'text',
+                  format: x?.format,
+                  type: x?.type || 'LocationAndLinked'
+                };
+              else return null;
+            })
+            .filter(x => x) as UpdateHistory[];
         })
       )
       .subscribe();
