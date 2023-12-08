@@ -325,7 +325,7 @@ namespace DataEditorPortal.Web.Services
                 return true;
 
             if (v1 == null || v2 == null)
-                return true;
+                return false;
 
             //value of link data should be IEnumerable<IDictionary<string, object>>, otherwise throw exception
             var x = ((IEnumerable<object>)v1).Cast<IDictionary<string, object>>();

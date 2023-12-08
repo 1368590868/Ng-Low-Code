@@ -13,7 +13,7 @@ namespace DataEditorPortal.Web.Services
 {
     public interface IDataUpdateHistoryService
     {
-        List<DataUpdateHistory> CompareAndApply(IDictionary<string, object> model, IDictionary<string, object> modelToUpdate, List<FormFieldConfig> fields);
+        List<DataUpdateHistory> CompareAndApply(IEnumerable<FormFieldConfig> fields, IDictionary<string, object> model, IDictionary<string, object> modelToUpdate);
         List<DataUpdateHistoryModel> GetDataUpdateHistories(string configId, string id);
     }
 
@@ -43,7 +43,7 @@ namespace DataEditorPortal.Web.Services
             _valueProcessorFactory = valueProcessorFactory;
         }
 
-        public List<DataUpdateHistory> CompareAndApply(IDictionary<string, object> model, IDictionary<string, object> modelToUpdate, List<FormFieldConfig> fields)
+        public List<DataUpdateHistory> CompareAndApply(IEnumerable<FormFieldConfig> fields, IDictionary<string, object> model, IDictionary<string, object> modelToUpdate)
         {
             var updateHistories = new List<DataUpdateHistory>();
             var updateTime = DateTime.UtcNow;
@@ -194,7 +194,7 @@ namespace DataEditorPortal.Web.Services
                 return true;
 
             if (x == null && y == null)
-                return true;
+                return false;
 
             if (x != null && y != null)
             {

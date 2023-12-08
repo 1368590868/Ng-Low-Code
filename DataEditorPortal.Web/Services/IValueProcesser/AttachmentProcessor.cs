@@ -132,7 +132,7 @@ namespace DataEditorPortal.Web.Services
                 return true;
 
             if (v1 == null || v2 == null)
-                return true;
+                return false;
 
             return v1.Equals(v2);
         }

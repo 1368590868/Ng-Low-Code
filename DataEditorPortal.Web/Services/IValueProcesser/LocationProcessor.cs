@@ -128,7 +128,7 @@ namespace DataEditorPortal.Web.Services
                 return true;
 
             if (v1 == null || v2 == null)
-                return true;
+                return false;
 
             // value of location should be IDictionary, otherwise throw exception
             var x = (IDictionary<string, object>)v1;
@@ -183,7 +183,7 @@ namespace DataEditorPortal.Web.Services
                     var valueCode = 0;
                     if (obj.ContainsKey(key) && obj[key] != null)
                     {
-                        if (key == "fromMeature" || key == "toMeature")
+                        if (key == "fromMeasure" || key == "toMeasure")
                         {
                             valueCode = Convert.ToDecimal(obj[key]).GetHashCode();
                         }
