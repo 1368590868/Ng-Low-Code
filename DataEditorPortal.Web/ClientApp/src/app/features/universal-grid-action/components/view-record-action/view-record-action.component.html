@@ -1,6 +1,6 @@
 <p-table *ngIf="!loading; else elseBlock" [value]="viewDataList">
   <ng-template pTemplate="header">
-    <tr>
+    <tr class="line-height-4">
       <th>Name</th>
       <th>Value</th>
     </tr>
@@ -61,14 +61,14 @@
     rowGroupMode="subheader"
     groupRowsBy="createDate">
     <ng-template pTemplate="header">
-      <tr>
+      <tr class="line-height-4">
         <th>Field</th>
         <th>Original Value</th>
         <th>New Value</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="groupheader" let-history>
-      <tr pRowGroupHeader style="background: #fcfcfc">
+      <tr pRowGroupHeader class="font-semibold">
         <td colspan="3">
           <span
             >{{ history.createDate | date : 'M/d/yyyy h:mm a' }} - {{ history.actionType === 0 ? 'ADD' : 'UPDATE' }} -
@@ -80,7 +80,7 @@
 
     <ng-template pTemplate="body" let-history let-rowIndex="rowIndex">
       <tr>
-        <td>
+        <td class="pl-4">
           <span>{{ history.field }}</span>
         </td>
         <td class="w-20rem">
