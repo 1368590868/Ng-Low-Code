@@ -88,30 +88,20 @@ export class ViewRecordActionComponent extends GridActionDirective implements On
             this.loadedEvent.emit();
           }
 
-          this.updateHistories = histories.map(x => {
-            const viewdata = this.viewDataList.find(y => y.key === x.field);
-
-            return {
-              ...x,
-              filterType: viewdata?.filterType || 'text',
-              format: viewdata?.format,
-              type: viewdata?.type || 'LocationAndLinked'
-            };
-          });
-
           this.updateHistories = this.viewDataList
             .map(x => {
               const history = histories.find(y => y.field === x.key);
               if (history)
                 return {
                   ...history,
-                  filterType: x?.filterType || 'text',
+                  filterType: x?.filterType,
                   format: x?.format,
-                  type: x?.type || 'LocationAndLinked'
+                  type: x?.type
                 };
               else return null;
             })
-            .filter(x => x) as UpdateHistory[];
+            .filter(x => x)
+            .filter(x => x!.type !== 'AttachmentField') as UpdateHistory[];
         })
       )
       .subscribe();
