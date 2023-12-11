@@ -25,6 +25,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
+using Microsoft.SqlServer.Types;
 using Oracle.ManagedDataAccess.Client;
 using Quartz;
 using System;
@@ -178,6 +179,9 @@ namespace DataEditorPortal.Web
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new IsoDateTimeConverter());
+                options.JsonSerializerOptions.Converters.Add(new SqlGeometryConverter());
+                options.JsonSerializerOptions.Converters.Add(new SqlGeographyConverter());
+                options.JsonSerializerOptions.Converters.Add(new SqlHierarchyIdConverter());
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 options.JsonSerializerOptions.WriteIndented = false;
             });
@@ -200,6 +204,8 @@ namespace DataEditorPortal.Web
                     .WithDescription("ClearTempFileJob"));
             });
             services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });
+
+            MicrosoftSqlServerTypesAssemblyResolver.Resolve();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
