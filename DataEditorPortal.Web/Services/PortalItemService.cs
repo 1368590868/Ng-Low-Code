@@ -605,6 +605,7 @@ namespace DataEditorPortal.Web.Services
                         var schema = dr.GetSchemaTable();
                         foreach (DataRow row in schema.Rows)
                         {
+                            if (row["DataType"] == DBNull.Value) continue;
                             result.Add(new DataSourceTableColumn()
                             {
                                 AllowDBNull = (bool)row["AllowDBNull"],

@@ -239,7 +239,9 @@ namespace DataEditorPortal.Web.Services
             }
             else if (jsonElement.ValueKind == JsonValueKind.Object)
             {
-                return jsonElement.EnumerateObject().Select(m => GetJsonElementValue(m.Value)).ToList();
+                var dic = new Dictionary<string, object>();
+                jsonElement.EnumerateObject().ToList().ForEach(m => dic.Add(m.Name, GetJsonElementValue(m.Value)));
+                return dic;
             }
             else if (jsonElement.ValueKind == JsonValueKind.Number) return jsonElement.GetDecimal();
             else if (jsonElement.ValueKind == JsonValueKind.True) return 1;

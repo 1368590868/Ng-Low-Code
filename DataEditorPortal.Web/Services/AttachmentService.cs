@@ -119,7 +119,7 @@ namespace DataEditorPortal.Web.Services
                     #endregion
 
                     // FILE ID and DATA ID
-                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("ID"), uploadedFile.FileId));
+                    value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("ID"), Guid.NewGuid().ToString()));
                     var referenceDataKey = config.GetMappedColumn("REFERENCE_DATA_KEY");
                     value.Add(new KeyValuePair<string, object>(config.GetMappedColumn("FOREIGN_KEY"), model[referenceDataKey]));
 
@@ -181,13 +181,15 @@ namespace DataEditorPortal.Web.Services
             if (updateParameters.Any())
                 _dapperService.Execute(con, updateScript, updateParameters, trans);
 
-            try
-            {
-                // if the file is not deleted successfully, we have scheduler job to clear it.
-                tempFiles.ForEach(x => File.Delete(x));
-            }
-            catch
-            { }
+            // 2023-12-07, in order to support edit multiple, we cannot delete the temp file
+            // leave it to scheduler job
+            //try
+            //{
+            //    // if the file is not deleted successfully, we have scheduler job to clear it.
+            //    tempFiles.ForEach(x => File.Delete(x));
+            //}
+            //catch
+            //{ }
         }
 
         public dynamic GetFileStream(string fileId, FileUploadConfig config)

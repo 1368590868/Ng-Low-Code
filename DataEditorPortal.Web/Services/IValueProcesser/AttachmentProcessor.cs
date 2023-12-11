@@ -54,7 +54,9 @@ namespace DataEditorPortal.Web.Services
                     if (model[Field.key] != null)
                     {
                         var jsonOptions = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                        var jsonElement = (JsonElement)model[Field.key];
+                        JsonElement jsonElement;
+                        if (model[Field.key] is JsonElement) jsonElement = (JsonElement)model[Field.key];
+                        else jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(model[Field.key]));
                         if (jsonElement.ValueKind == JsonValueKind.Array || jsonElement.ValueKind == JsonValueKind.String)
                         {
                             _uploadeFiledMeta = new UploadedFileMeta()
@@ -118,6 +120,34 @@ namespace DataEditorPortal.Web.Services
                 new List<KeyValuePair<string, object>>() { new KeyValuePair<string, object>(dsConfig.IdColumn, model[dsConfig.IdColumn]) }
             );
             return _dapperService.QueryFirst(Conn, queryText, param, Trans) as IDictionary<string, object>;
+        }
+    }
+
+    [FilterType("attachmentField")]
+    public class AttachmentComparer : ValueComparerBase
+    {
+        public override bool Equals(object v1, object v2)
+        {
+            if (ReferenceEquals(v1, v2))
+                return true;
+
+            if (v1 == null || v2 == null)
+                return false;
+
+            return v1.Equals(v2);
+        }
+
+        public override int GetHashCode(object val)
+        {
+            if (val == null)
+                return 0;
+
+            return val.GetHashCode();
+        }
+
+        public override string GetValueString(object val)
+        {
+            return val == null ? "" : val.ToString();
         }
     }
 }
