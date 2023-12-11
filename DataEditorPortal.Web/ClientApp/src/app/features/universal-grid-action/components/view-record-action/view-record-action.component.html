@@ -1,4 +1,4 @@
-<p-table *ngIf="!loading; else elseBlock" [value]="viewDataList" styleClass="p-datatable-striped">
+<p-table *ngIf="!loading; else elseBlock" [value]="viewDataList">
   <ng-template pTemplate="header">
     <tr>
       <th>Name</th>
@@ -109,16 +109,6 @@
               }}</ng-container>
               <ng-container *ngIf="history.filterType === 'text'">{{ history.originalValue }}</ng-container>
             </ng-container>
-            <ng-container *ngIf="history.type === 'AttachmentField'">
-              <app-attachments
-                [data]="history.originalValue"
-                [gridName]="gridName"
-                [fieldName]="history.field"
-                [showAll]="true"></app-attachments>
-            </ng-container>
-            <ng-container *ngIf="history.type === 'LocationAndLinked'">
-              {{ history.originalValue }}
-            </ng-container>
           </div>
         </td>
         <td class="w-20rem">
@@ -144,16 +134,6 @@
                 history.newValue | numeral : (history.format === '' ? undefined : history.format)
               }}</ng-container>
               <ng-container *ngIf="history.filterType === 'text'">{{ history.newValue }}</ng-container>
-            </ng-container>
-            <ng-container *ngIf="history.type === 'AttachmentField'">
-              <app-attachments
-                [data]="history.newValue"
-                [gridName]="gridName"
-                [fieldName]="history.field"
-                [showAll]="true"></app-attachments>
-            </ng-container>
-            <ng-container *ngIf="history.type === 'LocationAndLinked'">
-              {{ history.newValue }}
             </ng-container>
           </div>
         </td>
