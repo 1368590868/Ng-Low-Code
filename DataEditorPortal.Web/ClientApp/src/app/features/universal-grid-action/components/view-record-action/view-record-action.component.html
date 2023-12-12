@@ -48,96 +48,99 @@
     </p>
   </div>
 </ng-template>
-<ng-container *ngIf="updateHistories.length > 0">
-  <p-divider styleClass="mt-4 font-bold">Update Histories</p-divider>
-  <p-table
-    [value]="updateHistories"
-    sortField="createDate"
-    sortMode="single"
-    [sortOrder]="-1"
-    [scrollable]="true"
-    scrollHeight="350px"
-    tableStyle="tableLayout: fiexd"
-    rowGroupMode="subheader"
-    groupRowsBy="createDate">
-    <ng-template pTemplate="header">
-      <tr class="line-height-4">
-        <th>Field</th>
-        <th>Original Value</th>
-        <th>New Value</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="groupheader" let-history>
-      <tr pRowGroupHeader class="font-semibold">
-        <td colspan="3">
-          <span
-            >{{ history.createDate | date : 'M/d/yyyy h:mm a' }} - {{ history.actionType === 0 ? 'ADD' : 'UPDATE' }} -
-            by {{ history.username }}</span
-          >
-        </td>
-      </tr>
-    </ng-template>
 
-    <ng-template pTemplate="body" let-history let-rowIndex="rowIndex">
-      <tr>
-        <td class="pl-4">
-          <span>{{ history.field }}</span>
-        </td>
-        <td class="w-20rem">
-          <div
-            style="max-width: 20rem"
-            class="inline-block overflow-hidden white-space-nowrap text-overflow-ellipsis"
-            [pTooltip]="
-              history.filterType === 'boolean'
-                ? (history.originalValue | boolean)
-                : history.filterType === 'date'
-                ? (history.originalValue | date)
-                : history.filterType === 'numeric'
-                ? (history.originalValue | numeral)
-                : history.originalValue
-            "
-            tooltipPosition="top">
-            <ng-container *ngIf="history.type === 'DataBaseField'">
-              <ng-container *ngIf="history.filterType === 'boolean'">{{
-                history.originalValue | boolean
-              }}</ng-container>
-              <ng-container *ngIf="history.filterType === 'date'">{{
-                history.originalValue | date : (history.format === '' ? undefined : history.format)
-              }}</ng-container>
-              <ng-container *ngIf="history.filterType === 'numeric'">{{
-                history.originalValue | numeral : (history.format === '' ? undefined : history.format)
-              }}</ng-container>
-              <ng-container *ngIf="history.filterType === 'text'">{{ history.originalValue }}</ng-container>
-            </ng-container>
-          </div>
-        </td>
-        <td class="w-20rem">
-          <div
-            style="max-width: 20rem"
-            class="inline-block overflow-hidden white-space-nowrap text-overflow-ellipsis"
-            [pTooltip]="
-              history.filterType === 'boolean'
-                ? (history.newValue | boolean)
-                : history.filterType === 'date'
-                ? (history.newValue | date)
-                : history.filterType === 'numeric'
-                ? (history.newValue | numeral)
-                : history.newValue
-            "
-            tooltipPosition="top">
-            <ng-container *ngIf="history.type === 'DataBaseField'">
-              <ng-container *ngIf="history.filterType === 'boolean'">{{ history.newValue | boolean }}</ng-container>
-              <ng-container *ngIf="history.filterType === 'date'">{{
-                history.newValue | date : (history.format === '' ? undefined : history.format)
-              }}</ng-container>
-              <ng-container *ngIf="history.filterType === 'numeric'">{{
-                history.newValue | numeral : (history.format === '' ? undefined : history.format)
-              }}</ng-container>
-              <ng-container *ngIf="history.filterType === 'text'">{{ history.newValue }}</ng-container>
-            </ng-container>
-          </div>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+<ng-container *ngIf="updateHistories.length > 0">
+  <p-divider styleClass="mt-5">
+    <p-button
+      label="Show Histories"
+      [icon]="showHistory ? 'pi pi-minus' : 'pi pi-plus'"
+      styleClass="p-button-text p-button-sm"
+      (onClick)="showHistory = !showHistory"></p-button>
+  </p-divider>
+  <ng-container *ngIf="showHistory">
+    <p-table
+      [value]="updateHistories"
+      sortField="createDate"
+      sortMode="single"
+      [sortOrder]="-1"
+      [scrollable]="true"
+      scrollHeight="350px"
+      tableStyle="tableLayout: fiexd"
+      rowGroupMode="subheader"
+      groupRowsBy="createDate">
+      <ng-template pTemplate="header">
+        <tr class="line-height-4">
+          <th>Field</th>
+          <th>Original Value</th>
+          <th>New Value</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="groupheader" let-history>
+        <tr pRowGroupHeader class="font-semibold">
+          <td colspan="3">
+            <span
+              >{{ history.createDate | date : 'M/d/yyyy h:mm a' }} - {{ history.actionType === 0 ? 'ADD' : 'UPDATE' }} -
+              by {{ history.username }}</span
+            >
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-history let-rowIndex="rowIndex">
+        <tr>
+          <td class="pl-4">
+            <span>{{ history.field }}</span>
+          </td>
+          <td class="w-20rem">
+            <div
+              style="max-width: 20rem"
+              class="inline-block overflow-hidden white-space-nowrap text-overflow-ellipsis"
+              [pTooltip]="
+                history.filterType === 'boolean'
+                  ? (history.originalValue | boolean)
+                  : history.filterType === 'date'
+                  ? (history.originalValue | date)
+                  : history.filterType === 'numeric'
+                  ? (history.originalValue | numeral)
+                  : history.originalValue
+              "
+              tooltipPosition="top">
+              <ng-container>
+                <ng-container *ngIf="history.filterType === 'boolean'">{{
+                  history.originalValue | boolean
+                }}</ng-container>
+                <ng-container *ngIf="history.filterType === 'date'">{{ history.originalValue | date }}</ng-container>
+                <ng-container *ngIf="history.filterType === 'numeric'">{{
+                  history.originalValue | numeral
+                }}</ng-container>
+                <ng-container *ngIf="history.filterType === 'text'">{{ history.originalValue }}</ng-container>
+              </ng-container>
+            </div>
+          </td>
+          <td class="w-20rem">
+            <div
+              style="max-width: 20rem"
+              class="inline-block overflow-hidden white-space-nowrap text-overflow-ellipsis"
+              [pTooltip]="
+                history.filterType === 'boolean'
+                  ? (history.newValue | boolean)
+                  : history.filterType === 'date'
+                  ? (history.newValue | date)
+                  : history.filterType === 'numeric'
+                  ? (history.newValue | numeral)
+                  : history.newValue
+              "
+              tooltipPosition="top">
+              <ng-container>
+                <ng-container *ngIf="history.filterType === 'boolean'">{{ history.newValue | boolean }}</ng-container>
+                <ng-container *ngIf="history.filterType === 'date'">{{ history.newValue | date }}</ng-container>
+                <ng-container *ngIf="history.filterType === 'numeric'">{{ history.newValue | numeral }}</ng-container>
+                <ng-container *ngIf="history.filterType === 'text'">{{ history.newValue }}</ng-container>
+              </ng-container>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </ng-container>
 </ng-container>

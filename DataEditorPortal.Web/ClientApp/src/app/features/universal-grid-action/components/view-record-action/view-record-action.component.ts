@@ -14,7 +14,7 @@ export interface ViewColumn {
   filterType: string;
 }
 
-export interface UpdateHistory extends ViewColumn {
+export interface UpdateHistory {
   id: string;
   createDate: string;
   username: string;
@@ -24,6 +24,10 @@ export interface UpdateHistory extends ViewColumn {
   originalValue: string;
   newValue: string;
   actionType: number;
+  fieldConfig: {
+    type: string;
+    filterType: string;
+  };
 }
 
 @Component({
@@ -36,6 +40,7 @@ export class ViewRecordActionComponent extends GridActionDirective implements On
   loading = true;
   formatters?: any;
   updateHistories: UpdateHistory[] = [];
+  showHistory = false;
 
   constructor(private universalGridService: UniversalGridService, private systemLogService: SystemLogService) {
     super();
@@ -87,21 +92,14 @@ export class ViewRecordActionComponent extends GridActionDirective implements On
             this.loading = false;
             this.loadedEvent.emit();
           }
-
-          this.updateHistories = this.viewDataList
-            .map(x => {
-              const history = histories.find(y => y.field === x.key);
-              if (history)
-                return {
-                  ...history,
-                  filterType: x?.filterType,
-                  format: x?.format,
-                  type: x?.type
-                };
-              else return null;
+          this.updateHistories = histories
+            .map(h => {
+              return {
+                ...h,
+                filterType: h.fieldConfig.filterType
+              };
             })
-            .filter(x => x)
-            .filter(x => x!.type !== 'AttachmentField') as UpdateHistory[];
+            .filter(x => !['attachmentField', 'linkDataField', 'locationField'].includes(x.filterType));
         })
       )
       .subscribe();
