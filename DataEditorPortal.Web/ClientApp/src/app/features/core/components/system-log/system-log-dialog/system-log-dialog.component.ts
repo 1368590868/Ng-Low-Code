@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { EditorComponent } from 'ngx-monaco-editor';
+import { EditorComponent } from 'ngx-monaco-editor-v2';
 import { SystemLogData, SystemLogService } from 'src/app/shared';
 
 @Component({

@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
-import { MonacoEditorModule } from 'ngx-monaco-editor';
-import { FormlyFieldMonacoEditorComponent } from './monaco-editor.type';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { SharedModule } from 'src/app/shared';
+import { FormlyFieldMonacoEditorComponent } from './monaco-editor.type';
 
 @NgModule({
   declarations: [FormlyFieldMonacoEditorComponent],

@@ -6,7 +6,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormlyModule } from '@ngx-formly/core';
 
 // primeNG components
-import { MonacoEditorModule } from 'ngx-monaco-editor';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';

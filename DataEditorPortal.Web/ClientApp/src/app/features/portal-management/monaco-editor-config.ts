@@ -1,4 +1,4 @@
-import { NgxMonacoEditorConfig } from 'ngx-monaco-editor';
+import { NgxMonacoEditorConfig } from 'ngx-monaco-editor-v2';
 
 export const MonacoEditorConfig: NgxMonacoEditorConfig = {
   defaultOptions: {

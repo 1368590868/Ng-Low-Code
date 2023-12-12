@@ -1,17 +1,15 @@
 import {
   Directive,
-  Output,
-  EventEmitter,
-  Input,
   Host,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
   Optional,
   Self,
-  OnInit,
-  OnChanges,
-  SimpleChanges,
-  OnDestroy
+  SimpleChanges
 } from '@angular/core';
-import { EditorComponent } from 'ngx-monaco-editor';
+import { EditorComponent } from 'ngx-monaco-editor-v2';
 import { Subscription } from 'rxjs';
 
 @Directive({

@@ -1,87 +1,86 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // formly
 import { FormlyModule } from '@ngx-formly/core';
 
 // primeNG components
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { AnimateModule } from 'primeng/animate';
-import { ToastModule } from 'primeng/toast';
-import { DropdownModule } from 'primeng/dropdown';
-import { TableModule } from 'primeng/table';
-import { CalendarModule } from 'primeng/calendar';
-import { DialogModule } from 'primeng/dialog';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { InputTextModule } from 'primeng/inputtext';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { SplitButtonModule } from 'primeng/splitbutton';
 import { ButtonModule } from 'primeng/button';
+import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
-import { TreeTableModule } from 'primeng/treetable';
-import { TagModule } from 'primeng/tag';
-import { MenuModule } from 'primeng/menu';
-import { SkeletonModule } from 'primeng/skeleton';
+import { ChipModule } from 'primeng/chip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { DialogModule } from 'primeng/dialog';
+import { DividerModule } from 'primeng/divider';
+import { DropdownModule } from 'primeng/dropdown';
+import { FileUploadModule } from 'primeng/fileupload';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 import { KeyFilterModule } from 'primeng/keyfilter';
-import { StepsModule } from 'primeng/steps';
+import { MenuModule } from 'primeng/menu';
+import { MessageModule } from 'primeng/message';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { OrderListModule } from 'primeng/orderlist';
 import { PickListModule } from 'primeng/picklist';
-import { TooltipModule } from 'primeng/tooltip';
-import { DividerModule } from 'primeng/divider';
-import { InputSwitchModule } from 'primeng/inputswitch';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { InputTextareaModule } from 'primeng/inputtextarea';
-import { ContextMenuModule } from 'primeng/contextmenu';
-import { MessageModule } from 'primeng/message';
-import { MonacoEditorModule } from 'ngx-monaco-editor';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TabViewModule } from 'primeng/tabview';
-import { FileUploadModule } from 'primeng/fileupload';
-import { ChipModule } from 'primeng/chip';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { SkeletonModule } from 'primeng/skeleton';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { StepsModule } from 'primeng/steps';
+import { TableModule } from 'primeng/table';
+import { TabViewModule } from 'primeng/tabview';
+import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
+import { TreeTableModule } from 'primeng/treetable';
 
-import { PortalManagementRoutingModule } from './portal-management-routing.module';
 import { UniversalGridActionModule } from 'src/app/features/universal-grid-action';
 import { SharedModule } from 'src/app/shared';
 import { CoreModule } from '../core';
 import {
-  PortalListComponent,
   AddPortalDialogComponent,
-  PortalEditComponent,
-  PortalEditBasicComponent,
-  PortalEditDatasourceComponent,
-  PortalEditColumnsComponent,
-  PortalEditSearchComponent,
-  PortalEditFormComponent,
-  SvgDragComponent,
-  FormlyFieldOptionsEditorComponent,
-  OptionDialogComponent,
-  CustomActionsComponent,
-  FormlyFieldSearchRuleEditorComponent,
-  SearchRuleComponent,
-  FormlyFieldValidatorEditorComponent,
-  FormDesignerViewComponent,
-  FormDesignerConfigComponent,
-  SearchDesignerConfigComponent,
-  ValidatorEditorComponent,
-  ComputedValueEditorComponent,
-  FormlyFieldComputedValueEditorComponent,
-  FormLayoutComponent,
   AdvancedQueryDialogComponent,
-  FormLayoutDeleteComponent,
+  ComputedValueEditorComponent,
+  CustomActionsComponent,
   EventConfigComponent,
-  PortalEditLinkComponent,
-  PortalEditBasicSubComponent,
   FileUploadConfigurationComponent,
+  FormDesignerConfigComponent,
+  FormDesignerViewComponent,
+  FormLayoutComponent,
+  FormLayoutDeleteComponent,
+  FormlyFieldComputedValueEditorComponent,
   FormlyFieldFileUploadConfigurationComponent,
+  FormlyFieldLocationConfigurationComponent,
+  FormlyFieldOptionsEditorComponent,
+  FormlyFieldSearchRuleEditorComponent,
+  FormlyFieldValidatorEditorComponent,
   LocationConfigurationComponent,
-  FormlyFieldLocationConfigurationComponent
+  OptionDialogComponent,
+  PortalEditBasicComponent,
+  PortalEditBasicSubComponent,
+  PortalEditColumnsComponent,
+  PortalEditComponent,
+  PortalEditDatasourceComponent,
+  PortalEditFormComponent,
+  PortalEditLinkComponent,
+  PortalEditSearchComponent,
+  PortalListComponent,
+  SearchDesignerConfigComponent,
+  SearchRuleComponent,
+  SvgDragComponent,
+  ValidatorEditorComponent
 } from './components';
-import { FROM_DESIGNER_CONTROLS } from './directives/form-designer.directive';
-import { MonacoEditorConfig } from './monaco-editor-config';
-import { PortalEditStepDirective } from './directives/portal-edit-step.directive';
 import { ImportDialogComponent } from './components/portal-list/import-dialog/import-dialog.component';
+import { FROM_DESIGNER_CONTROLS } from './directives/form-designer.directive';
+import { PortalEditStepDirective } from './directives/portal-edit-step.directive';
+import { MonacoEditorConfig } from './monaco-editor-config';
+import { PortalManagementRoutingModule } from './portal-management-routing.module';
 
 @NgModule({
   declarations: [
