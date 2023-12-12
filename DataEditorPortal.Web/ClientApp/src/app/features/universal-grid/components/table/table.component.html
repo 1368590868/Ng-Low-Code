@@ -35,9 +35,7 @@
       (onColResize)="onColResize($event)"
       (onColReorder)="onColReorder($event)">
       <ng-template pTemplate="caption">
-        <div
-          class="flex"
-          [class]="headerSize === 'normal' ? 'flex-column' : ''">
+        <div class="flex" [class]="headerSize === 'normal' ? 'flex-column' : ''">
           <div [class]="headerSize === 'normal' ? 'mt-2 mb-3' : 'my-2 mr-4'">
             <h3>
               {{ tableConfig.caption }}
@@ -49,9 +47,7 @@
                 ><i class="pi text-lg pi-external-link cursor-pointer"></i
               ></a>
             </h3>
-            <p
-              *ngIf="tableConfig.description && headerSize === 'normal'"
-              class="my-1 p-card-subtitle">
+            <p *ngIf="tableConfig.description && headerSize === 'normal'" class="my-1 p-card-subtitle">
               {{ tableConfig.description }}
             </p>
           </div>
@@ -73,10 +69,7 @@
                 (savedEvent)="refresh()"></ng-template>
             </div>
             <div class="flex-none mr-2 ml-auto mt-1">
-              <strong
-                *ngIf="
-                  selectedRecords.length > 0 && selectionMode === 'multiple'
-                "
+              <strong *ngIf="selectedRecords.length > 0 && selectionMode === 'multiple'"
                 >{{ selectedRecords.length }} row(s) selected</strong
               >
             </div>
@@ -116,15 +109,10 @@
 
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th
-            *ngIf="selectionMode === 'multiple'"
-            class="selection"
-            pFrozenColumn>
+          <th *ngIf="selectionMode === 'multiple'" class="selection" pFrozenColumn>
             <p-tableHeaderCheckbox
               #tableHeaderCheckboxRef
-              (click)="
-                onHeaderCheckbox(tableHeaderCheckboxRef)
-              "></p-tableHeaderCheckbox>
+              (click)="onHeaderCheckbox(tableHeaderCheckboxRef)"></p-tableHeaderCheckbox>
           </th>
           <th class="action" pFrozenColumn></th>
           <th
@@ -137,9 +125,7 @@
             [style.text-align]="col.align || 'center'"
             [pSortableColumnDisabled]="!col.sortable">
             <span style="vertical-align: middle">{{ col.header }}</span>
-            <p-sortIcon
-              *ngIf="col.sortable && col.field === dataTable.sortField"
-              [field]="col.field"></p-sortIcon>
+            <p-sortIcon *ngIf="col.sortable && col.field === dataTable.sortField" [field]="col.field"></p-sortIcon>
             <p-columnFilter
               *ngIf="col.filterable && !col.enumFilterValue"
               style="vertical-align: middle"
@@ -163,18 +149,30 @@
               [showMatchModes]="false"
               [showOperator]="false"
               [showAddButton]="false">
-              <ng-template
-                pTemplate="filter"
-                let-value
-                let-filter="filterCallback">
-                <p-multiSelect
-                  [showToggleAll]="false"
-                  display="chip"
-                  placeholder="Any"
-                  [ngModel]="value"
-                  [options]="col._filterOptions || []"
-                  (onChange)="filter($event.value)">
-                </p-multiSelect>
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <ng-container *ngIf="(col._filterOptions || []).length > 4">
+                  <p-multiSelect
+                    [showToggleAll]="false"
+                    display="chip"
+                    placeholder="Any"
+                    [ngModel]="value"
+                    [options]="col._filterOptions || []"
+                    (onChange)="filter($event.value)">
+                  </p-multiSelect>
+                </ng-container>
+                <ng-container *ngIf="(col._filterOptions || []).length <= 4">
+                  <div class="flex align-items-center column-gap-4 row-gap-2 flex-wrap">
+                    <div class="flex align-items-center gap-1" *ngFor="let option of col._filterOptions || []">
+                      <p-checkbox
+                        [inputId]="col.field + option.value"
+                        [ngModel]="value"
+                        [value]="option.value"
+                        (ngModelChange)="filter($event)"
+                        [name]="col.filed"></p-checkbox>
+                      <label [for]="col.field + option.value">{{ option.label }}</label>
+                    </div>
+                  </div>
+                </ng-container>
               </ng-template>
             </p-columnFilter>
           </th>
@@ -189,9 +187,7 @@
           (click)="onRowClick($event, data)"
           [class.highlighted]="!!data['linked_highlighted']">
           <td *ngIf="selectionMode === 'multiple'" pFrozenColumn>
-            <p-tableCheckbox
-              [value]="data"
-              (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
+            <p-tableCheckbox [value]="data" (click)="onRowCheckBoxClick($event)"></p-tableCheckbox>
           </td>
           <td pFrozenColumn>
             <div class="row-actions flex">
@@ -213,36 +209,24 @@
             [style.text-align]="col.align || 'center'">
             <!-- DataBaseField-->
             <ng-container *ngIf="col.type === 'DataBaseField'">
-              <ng-container *ngIf="col.filterType === 'boolean'">{{
-                data[col.field] | boolean
-              }}</ng-container>
+              <ng-container *ngIf="col.filterType === 'boolean'">{{ data[col.field] | boolean }}</ng-container>
               <ng-container *ngIf="col.filterType === 'date'">{{
-                data[col.field]
-                  | date : (col.format === '' ? undefined : col.format)
+                data[col.field] | date : (col.format === '' ? undefined : col.format)
               }}</ng-container>
               <ng-container *ngIf="col.filterType === 'numeric'">{{
-                data[col.field]
-                  | numeral : (col.format === '' ? undefined : col.format)
+                data[col.field] | numeral : (col.format === '' ? undefined : col.format)
               }}</ng-container>
-              <ng-container *ngIf="col.filterType === 'text'">{{
-                data[col.field]
-              }}</ng-container>
+              <ng-container *ngIf="col.filterType === 'text'">{{ data[col.field] }}</ng-container>
             </ng-container>
 
             <!-- AttachmentField-->
             <ng-container *ngIf="col.type === 'AttachmentField'">
-              <app-attachments
-                [data]="data[col.field]"
-                [gridName]="gridName"
-                [fieldName]="col.field"></app-attachments>
+              <app-attachments [data]="data[col.field]" [gridName]="gridName" [fieldName]="col.field"></app-attachments>
             </ng-container>
 
             <!-- TemplateField-->
             <ng-container *ngIf="col.type === 'TemplateField'">
-              <span
-                *ngIf="col.template"
-                [innerHTML]="data | template : col.template">
-              </span>
+              <span *ngIf="col.template" [innerHTML]="data | template : col.template"> </span>
             </ng-container>
           </td>
         </tr>
@@ -250,11 +234,7 @@
       <ng-template pTemplate="emptymessage" let-columns>
         <tr *ngIf="columns && columns.length > 0" class="empty-message">
           <td class="text-lg" [attr.colspan]="columns.length + 2">
-            {{
-              this.firstLoadDone
-                ? 'No data were found for your search.'
-                : 'Fill in Search Inputs to get your data.'
-            }}
+            {{ this.firstLoadDone ? 'No data were found for your search.' : 'Fill in Search Inputs to get your data.' }}
           </td>
         </tr>
       </ng-template>
@@ -276,13 +256,7 @@
     dropdownAppendTo="body"></p-paginator>
 </div>
 
-<p-sidebar
-  *ngIf="visible"
-  [(visible)]="visible"
-  position="right"
-  [baseZIndex]="10000"
-  [modal]="false"
-  class="sidebar">
+<p-sidebar *ngIf="visible" [(visible)]="visible" position="right" [baseZIndex]="10000" [modal]="false" class="sidebar">
   <iframe [src]="helpUrl" class="w-full h-full" frameborder="0"></iframe>
 </p-sidebar>
 
