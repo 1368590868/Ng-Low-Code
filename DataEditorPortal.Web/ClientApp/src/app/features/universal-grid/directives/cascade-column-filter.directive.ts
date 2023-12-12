@@ -59,8 +59,8 @@ export class PTableCascadeColumnFilterDirective implements OnInit, OnDestroy {
             // append current param value to options, in case of Mutiple select shows empty
             const currentFilter = this.columnFilter.fieldConstraints[0].value;
             if (currentFilter && currentFilter.length > 0) {
-              const added = currentFilter.filter((o: any) => val.filter(v => v === o).length === 0);
-              val.unshift(...added);
+              const added = currentFilter.filter((o: any) => val.filter(v => v.value === o).length === 0);
+              val.unshift(...added.map((x: any) => ({ label: x, value: x })));
             }
           }
           this.column._filterOptions = val;
