@@ -1,12 +1,4 @@
-import {
-  Directive,
-  Host,
-  Input,
-  OnDestroy,
-  OnInit,
-  Optional,
-  Self
-} from '@angular/core';
+import { Directive, Host, Input, OnDestroy, OnInit, Optional, Self } from '@angular/core';
 import { ColumnFilter } from 'primeng/table';
 import { Subject, filter, map, switchMap, takeUntil, tap } from 'rxjs';
 import { GridParam } from 'src/app/shared';
@@ -59,22 +51,16 @@ export class PTableCascadeColumnFilterDirective implements OnInit, OnDestroy {
         filter(() => !!this.column.enumFilterValue),
         // get options from backend
         switchMap(params => {
-          return this.gridTableService.getTableColumnFilterOptions(
-            this.appTable.gridName,
-            this.field,
-            params
-          );
+          return this.gridTableService.getTableColumnFilterOptions(this.appTable.gridName, this.field, params);
         }),
         // update filter options
         tap(val => {
-          if (
-            this.columnFilter &&
-            this.columnFilter.fieldConstraints.length === 1
-          ) {
+          if (this.columnFilter && this.columnFilter.fieldConstraints.length === 1) {
             // append current param value to options, in case of Mutiple select shows empty
-            const val = this.columnFilter.fieldConstraints[0].value;
-            if (val && val.length > 0) {
-              val.unshift(...val.map((v: any) => ({ label: v, value: v })));
+            const currentFilter = this.columnFilter.fieldConstraints[0].value;
+            if (currentFilter && currentFilter.length > 0) {
+              const added = currentFilter.filter((o: any) => val.filter(v => v === o).length === 0);
+              val.unshift(...added);
             }
           }
           this.column._filterOptions = val;
@@ -97,11 +83,7 @@ export class PTableCascadeColumnFilterDirective implements OnInit, OnDestroy {
     }
     const changed = filtersPrev.filter(f1 => {
       const f2 = filtersCurr.find(f2 => f1.field === f2.field);
-      return (
-        f2 &&
-        (f1.matchMode != f2.matchMode ||
-          JSON.stringify(f1.value) != JSON.stringify(f2.value))
-      );
+      return f2 && (f1.matchMode != f2.matchMode || JSON.stringify(f1.value) != JSON.stringify(f2.value));
     });
     if (changed.length > 0 && !!changed.find(f => f.field !== this.field)) {
       // there is filter changed and not itself
@@ -115,9 +97,7 @@ export class PTableCascadeColumnFilterDirective implements OnInit, OnDestroy {
       const fieldsDoesnotDependWithCurrentField = added
         .filter(f => f.field !== this.field) // except the filed itself
         .filter(f => {
-          const fieldAdded = this.appTable.columns.find(
-            c => c.field === f.field
-          );
+          const fieldAdded = this.appTable.columns.find(c => c.field === f.field);
           if (fieldAdded) {
             const deps = fieldAdded._filterDepParam;
             const depsFilters = deps?.filters || [];
