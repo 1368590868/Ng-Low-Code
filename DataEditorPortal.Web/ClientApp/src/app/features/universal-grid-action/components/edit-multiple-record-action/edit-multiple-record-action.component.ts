@@ -53,7 +53,7 @@ export class EditMultipleRecordActionComponent extends GridActionDirective imple
 
   ngOnInit(): void {
     if (!this.isAddForm) {
-      this.dataKeys = this.selectedRecords.map((x: any) => x[this.recordKey]);
+      this.dataKeys = this.selectedRecords.map((x: any) => x[this.recordKey] + '');
       forkJoin([
         this.gridService.batchGet(this.gridName, this.dataKeys),
         this.gridService.getSearchConfig(this.gridName)
