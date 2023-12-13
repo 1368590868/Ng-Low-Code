@@ -579,6 +579,8 @@ export class TableComponent implements OnInit, OnDestroy {
       this.columnsOrderState = state.columnOrder;
       this.columnsWidthState = state.columnWidths.split(',');
     }
+    // The first load set the default value
+    this.table.setResizeTableWidth(1 + 'px');
   }
 
   restoreColumns() {
@@ -616,7 +618,6 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   setTableWidth(visibleCols: GridColumn[]) {
-    this.table.setResizeTableWidth(1 + 'px');
     // get the width of selection colmun and action column
     const tableHead = DomHandler.findSingle(this.table.containerViewChild.nativeElement, '.p-datatable-thead');
     const headers = DomHandler.find(tableHead, 'tr > th.selection, tr > th.action');
