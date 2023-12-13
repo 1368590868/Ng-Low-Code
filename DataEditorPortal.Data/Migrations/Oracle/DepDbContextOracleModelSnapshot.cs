@@ -122,6 +122,58 @@ namespace DataEditorPortal.Data.Migrations.Oracle
                     b.ToTable("DATA_SOURCE_CONNECTIONS", Common.Constants.DEFAULT_SCHEMA);
                 });
 
+            modelBuilder.Entity("DataEditorPortal.Data.Models.DataUpdateHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("RAW(16)")
+                        .HasColumnName("ID");
+
+                    b.Property<int>("ActionType")
+                        .HasColumnType("NUMBER(10)")
+                        .HasColumnName("ACTION_TYPE");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TIMESTAMP(7)")
+                        .HasColumnName("CREATE_DATE");
+
+                    b.Property<string>("DataId")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("DATA_ID");
+
+                    b.Property<string>("Field")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("FIELD");
+
+                    b.Property<string>("FieldConfig")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("FIELD_CONFIG");
+
+                    b.Property<string>("GridConfigurationId")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("GRID_CONFIG_ID");
+
+                    b.Property<string>("NewValue")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("NEW_VALUE");
+
+                    b.Property<string>("OriginalValue")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("ORIGINAL_VALUE");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("USERNAME");
+
+                    b.Property<string>("ValueType")
+                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasColumnName("VALUE_TYPE");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DATA_UPDATE_HISTORIES", Common.Constants.DEFAULT_SCHEMA);
+                });
+
             modelBuilder.Entity("DataEditorPortal.Data.Models.DEMO_LINK_LOOKUP", b =>
                 {
                     b.Property<string>("LOOKUPID")
