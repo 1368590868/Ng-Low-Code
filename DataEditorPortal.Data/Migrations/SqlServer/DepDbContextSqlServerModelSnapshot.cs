@@ -145,6 +145,10 @@ namespace DataEditorPortal.Data.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("FIELD");
 
+                    b.Property<string>("FieldConfig")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("FIELD_CONFIG");
+
                     b.Property<string>("GridConfigurationId")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("GRID_CONFIG_ID");

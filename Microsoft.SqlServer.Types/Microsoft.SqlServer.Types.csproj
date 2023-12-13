@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>dep.sqltypes.fix.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
+    <FileVersion>10.0.0.0</FileVersion>
+    <AssemblyVersion>10.0.0.0</AssemblyVersion>
+    <InformationalVersion>10.0.0.0</InformationalVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.4" />
+  </ItemGroup>
+  
+</Project>

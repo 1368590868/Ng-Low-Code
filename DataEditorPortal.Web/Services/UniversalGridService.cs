@@ -1301,6 +1301,11 @@ namespace DataEditorPortal.Web.Services
                     item.DataId = id;
                 });
 
+                // filter modelToUpdate, drop the keyvalue which not in formfield defination
+                modelToUpdate = modelToUpdate.ToList()
+                    .Where(kv => formLayout.FormFields.Any(f => kv.Key == f.key))
+                    .ToDictionary(x => x.Key, x => x.Value);
+
                 // add id parameter
                 if (modelToUpdate.ContainsKey(dataSourceConfig.IdColumn))
                     modelToUpdate[dataSourceConfig.IdColumn] = id;
@@ -1547,6 +1552,13 @@ namespace DataEditorPortal.Web.Services
                         item.DataId = modelToUpdate[dataSourceConfig.IdColumn].ToString();
                     });
                     updateHistories.AddRange(histories);
+
+                    // filter modelToUpdate, drop the keyvalue which not in formfield defination
+                    foreach (var key in modelToUpdate.Keys)
+                    {
+                        if (key != dataSourceConfig.IdColumn && formLayout.FormFields.All(f => f.key != key))
+                            modelToUpdate.Remove(key);
+                    }
 
                     // calculate the computed field values
                     ProcessComputedValues(formLayout.FormFields, modelToUpdate, con);
