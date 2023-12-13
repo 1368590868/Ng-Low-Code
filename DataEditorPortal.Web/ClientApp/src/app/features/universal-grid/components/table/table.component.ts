@@ -1,37 +1,13 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  ViewChild
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import * as pluralize from 'pluralize';
 import { ConfirmationService, TableState } from 'primeng/api';
 import { DomHandler } from 'primeng/dom';
 import { Table, TableHeaderCheckbox } from 'primeng/table';
-import {
-  BehaviorSubject,
-  Subject,
-  finalize,
-  forkJoin,
-  takeUntil,
-  tap
-} from 'rxjs';
-import {
-  GridActionOption,
-  GridActionWrapperOption
-} from 'src/app/features/universal-grid-action';
-import {
-  GridFilterParam,
-  GridParam,
-  SearchParam,
-  SystemLogService,
-  UserService
-} from 'src/app/shared';
+import { BehaviorSubject, Subject, finalize, forkJoin, takeUntil, tap } from 'rxjs';
+import { GridActionOption, GridActionWrapperOption } from 'src/app/features/universal-grid-action';
+import { GridFilterParam, GridParam, SearchParam, SystemLogService, UserService } from 'src/app/shared';
 import { GridColumn, GridConfig, GridData } from '../../models/grid-types';
 import { GridTableService } from '../../services/grid-table.service';
 import { UrlParamsService } from '../../services/url-params.service';
@@ -76,9 +52,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   searchModel?: SearchParam;
   fetchDataParam?: GridParam;
-  fetchDataParam$ = new BehaviorSubject<GridParam | undefined>(
-    this.fetchDataParam
-  );
+  fetchDataParam$ = new BehaviorSubject<GridParam | undefined>(this.fetchDataParam);
   filters?: any;
   sortMeta?: any;
   multiSortMeta?: any;
@@ -190,18 +164,11 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   initUrlParams() {
-    this.urlParamsService.getInitParams(
-      this.gridName,
-      this.tableConfig.dataKey
-    );
+    this.urlParamsService.getInitParams(this.gridName, this.tableConfig.dataKey);
     if (this.urlParamsService.initParams) {
-      this.filters = this.urlParamsService.getIdFilter(
-        this.tableConfig.dataKey
-      );
+      this.filters = this.urlParamsService.getIdFilter(this.tableConfig.dataKey);
 
-      this.selection = this.urlParamsService.getTableSelection(
-        this.tableConfig.dataKey
-      );
+      this.selection = this.urlParamsService.getTableSelection(this.tableConfig.dataKey);
 
       this.onFilter({ filters: this.filters });
     }
@@ -213,11 +180,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   getPermission(name: string) {
-    return (
-      this.userService.USER.permissions?.[
-        name + this.gridName.toUpperCase().replace(/-/g, '_')
-      ] ?? false
-    );
+    return this.userService.USER.permissions?.[name + this.gridName.toUpperCase().replace(/-/g, '_')] ?? false;
   }
 
   openHelpUrl(url: string) {
@@ -227,13 +190,9 @@ export class TableComponent implements OnInit, OnDestroy {
 
   setAllows() {
     const isAdmin = this.userService.USER.isAdmin;
-    this.allowAdd =
-      this.tableConfig.allowAdding && (isAdmin || this.getPermission('ADD_'));
-    this.allowEdit =
-      this.tableConfig.allowEditing && (isAdmin || this.getPermission('EDIT_'));
-    this.allowDelete =
-      this.tableConfig.allowDeleting &&
-      (isAdmin || this.getPermission('DELETE_'));
+    this.allowAdd = this.tableConfig.allowAdding && (isAdmin || this.getPermission('ADD_'));
+    this.allowEdit = this.tableConfig.allowEditing && (isAdmin || this.getPermission('EDIT_'));
+    this.allowDelete = this.tableConfig.allowDeleting && (isAdmin || this.getPermission('DELETE_'));
     this.allowExport = isAdmin || this.getPermission('EXPORT_');
   }
 
@@ -289,9 +248,7 @@ export class TableComponent implements OnInit, OnDestroy {
         actions.push({
           name: 'add-record',
           wrapper: {
-            header: `Create ${pluralize.singular(
-              this.tableConfig.caption || ''
-            )}`,
+            header: `Create ${pluralize.singular(this.tableConfig.caption || '')}`,
             label: `Add ${pluralize.singular(this.tableConfig.caption || '')}`
           }
         });
@@ -347,9 +304,7 @@ export class TableComponent implements OnInit, OnDestroy {
         tap(res => {
           this.records = res.data;
           this.totalRecords = res.total;
-          this.innerSelectedRecords = JSON.parse(
-            JSON.stringify(this.selectedRecords)
-          );
+          this.innerSelectedRecords = JSON.parse(JSON.stringify(this.selectedRecords));
 
           if (this.urlParamsService.initParams && !this.firstLoadDone) {
             this.selection = JSON.parse(JSON.stringify(this.selection));
@@ -360,9 +315,7 @@ export class TableComponent implements OnInit, OnDestroy {
           if (this.table2Id) {
             // if table2Id is set, need to reset hightlight row after data refresh
             this.showHighlightOnly
-              ? this.setHightlightRow(
-                  res.data.map(data => data[this.tableConfig.dataKey])
-                )
+              ? this.setHightlightRow(res.data.map(data => data[this.tableConfig.dataKey]))
               : this.setHightlightRow(this.linkedTable1Ids);
           }
         }),
@@ -390,10 +343,7 @@ export class TableComponent implements OnInit, OnDestroy {
         const fieldProp = obj[prop];
         for (let i = 0; i < fieldProp.length; i++) {
           if (fieldProp[i].value != null) {
-            if (
-              Array.isArray(fieldProp[i].value) &&
-              fieldProp[i].value.length === 0
-            ) {
+            if (Array.isArray(fieldProp[i].value) && fieldProp[i].value.length === 0) {
               continue;
             }
             fieldProp[i].field = prop;
@@ -430,14 +380,10 @@ export class TableComponent implements OnInit, OnDestroy {
 
   onHeaderCheckbox(tableHeaderCheckboxRef: TableHeaderCheckbox) {
     if (tableHeaderCheckboxRef.checked) {
-      this.selection = [
-        ...new Set([...this.records, ...this.innerSelectedRecords])
-      ];
+      this.selection = [...new Set([...this.records, ...this.innerSelectedRecords])];
     } else {
       this.innerSelectedRecords = this.innerSelectedRecords.filter(x => {
-        return !this.records.find(
-          y => y[this.tableConfig.dataKey] === x[this.tableConfig.dataKey]
-        );
+        return !this.records.find(y => y[this.tableConfig.dataKey] === x[this.tableConfig.dataKey]);
       });
       this.selection = [...new Set(this.innerSelectedRecords)];
     }
@@ -524,8 +470,7 @@ export class TableComponent implements OnInit, OnDestroy {
   onColReorder($event: any) {
     const { dragIndex, dropIndex, columns } = $event;
     const dragCol = columns[dropIndex];
-    const dropCol =
-      dragIndex > dropIndex ? columns[dropIndex + 1] : columns[dropIndex - 1];
+    const dropCol = dragIndex > dropIndex ? columns[dropIndex + 1] : columns[dropIndex - 1];
 
     const from = this.columnsConfig.findIndex(x => x.field === dragCol.field);
     const to = this.columnsConfig.findIndex(x => x.field === dropCol.field);
@@ -617,9 +562,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
     if (this.linkedTable1Ids) {
       this.records = this.records.map(data => {
-        data['linked_highlighted'] = this.linkedTable1Ids?.find(
-          x => data[this.tableConfig.dataKey] === x
-        )
+        data['linked_highlighted'] = this.linkedTable1Ids?.find(x => data[this.tableConfig.dataKey] === x)
           ? 'highlighted'
           : '';
         return data;
@@ -643,10 +586,7 @@ export class TableComponent implements OnInit, OnDestroy {
     this.columnsOrderState.forEach((key, index) => {
       const col = this.columnsConfig.find(x => x.field === key);
       if (col) {
-        const savedWidth =
-          index + 2 < this.columnsWidthState.length
-            ? this.columnsWidthState[index + 2]
-            : 0;
+        const savedWidth = index + 2 < this.columnsWidthState.length ? this.columnsWidthState[index + 2] : 0;
         if (savedWidth) col.width = savedWidth * 1; // restore column width
         reorderedColumns.push(col);
       }
@@ -676,15 +616,11 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   setTableWidth(visibleCols: GridColumn[]) {
+    this.table.setResizeTableWidth(1 + 'px');
     // get the width of selection colmun and action column
-    const tableHead = DomHandler.findSingle(
-      this.table.containerViewChild.nativeElement,
-      '.p-datatable-thead'
-    );
-    const headers = DomHandler.find(
-      tableHead,
-      'tr > th.selection, tr > th.action'
-    );
+    const tableHead = DomHandler.findSingle(this.table.containerViewChild.nativeElement, '.p-datatable-thead');
+    const headers = DomHandler.find(tableHead, 'tr > th.selection, tr > th.action');
+
     let width = 0;
     headers.forEach(header => (width += DomHandler.getOuterWidth(header) * 1));
     // reset table width
@@ -722,8 +658,7 @@ export class TableComponent implements OnInit, OnDestroy {
   confirmResetColumns(event: any) {
     this.confirmationService.confirm({
       target: event.target,
-      message:
-        'Are you sure that you want to reset your table back to original view?',
+      message: 'Are you sure that you want to reset your table back to original view?',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.resetToDefaultColumns();

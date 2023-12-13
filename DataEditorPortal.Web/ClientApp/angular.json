@@ -31,12 +31,12 @@
               {
                 "glob": "**/vs/{base/**,editor/**,language/**,loader.js}",
                 "input": "node_modules/monaco-editor/min",
-                "output": "/assets/monaco-editor/min"
+                "output": "/assets/monaco/min"
               },
               {
                 "glob": "**/vs/basic-languages/{sql,javascript,bat}/**",
                 "input": "node_modules/monaco-editor/min",
-                "output": "/assets/monaco-editor/min"
+                "output": "/assets/monaco/min"
               }
             ],
             "styles": [
