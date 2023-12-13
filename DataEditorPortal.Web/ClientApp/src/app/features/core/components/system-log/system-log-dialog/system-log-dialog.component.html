@@ -9,6 +9,7 @@
     *ngIf="!loading; else elseBlock"
     [value]="viewData"
     [rowHover]="true"
+    [tableStyle]="{ 'table-layout': 'fixed' }"
     styleClass="p-datatable-striped">
     <ng-template pTemplate="header">
       <tr>
@@ -19,17 +20,13 @@
     <ng-template pTemplate="body" let-viewData>
       <tr *ngIf="viewData.value">
         <td>{{ viewData.name }}</td>
-        <td>
+        <td style="word-break: break-all">
           <ng-container>
             <ng-container *ngIf="viewData.name === 'Event time'">
               {{ viewData.value | date : 'M/d/yyyy h:mm a' }}
             </ng-container>
             <ng-container
-              *ngIf="
-                viewData.name !== 'Event time' &&
-                viewData.name !== 'Details' &&
-                viewData.name !== 'Params'
-              ">
+              *ngIf="viewData.name !== 'Event time' && viewData.name !== 'Details' && viewData.name !== 'Params'">
               {{ viewData.value }}
             </ng-container>
             <ng-container *ngIf="viewData.name === 'Details'">

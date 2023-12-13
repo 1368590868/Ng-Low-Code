@@ -26,7 +26,7 @@ export class SystemLogDialogComponent {
     folding: false,
     lineDecorationsWidth: 0,
     lineNumbersMinChars: 0,
-    automaticLayout: false,
+    automaticLayout: true,
     scrollBeyondLastLine: false,
     scrollbar: {
       verticalScrollbarSize: 2,
@@ -106,9 +106,7 @@ export class SystemLogDialogComponent {
   }
 
   onMonacoInit(editor: any, ngxEditor: EditorComponent) {
-    editor.onDidContentSizeChange(
-      this.updateHeight(editor, ngxEditor._editorContainer.nativeElement)
-    );
+    editor.onDidContentSizeChange(this.updateHeight(editor, ngxEditor._editorContainer.nativeElement));
   }
 
   updateHeight(editor: any, container: any) {
