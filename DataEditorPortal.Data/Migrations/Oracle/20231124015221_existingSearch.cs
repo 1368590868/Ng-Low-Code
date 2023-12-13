@@ -10,14 +10,14 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.AddColumn<string>(
                 name: "EXISTING_SEARCH_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS",
                 type: "NVARCHAR2(2000)",
                 nullable: true);
 
             migrationBuilder.AddColumn<bool>(
                 name: "USE_EXISTING_SEARCH",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS",
                 type: "NUMBER(1)",
                 nullable: false,
@@ -28,12 +28,12 @@ namespace DataEditorPortal.Data.Migrations.Oracle
         {
             migrationBuilder.DropColumn(
                 name: "EXISTING_SEARCH_NAME",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS");
 
             migrationBuilder.DropColumn(
                 name: "USE_EXISTING_SEARCH",
-                schema: "DATA_EDITOR_PORTAL",
+                schema: Common.Constants.DEFAULT_SCHEMA,
                 table: "UNIVERSAL_GRID_CONFIGURATIONS");
         }
     }
