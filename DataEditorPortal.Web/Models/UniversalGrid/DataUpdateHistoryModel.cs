@@ -13,5 +13,7 @@ namespace DataEditorPortal.Web.Models.UniversalGrid
         public object OriginalValue { get; set; }
         public object NewValue { get; set; }
         public ActionType ActionType { get; set; }
+
+        public object FieldConfig { get; set; }
     }
 }

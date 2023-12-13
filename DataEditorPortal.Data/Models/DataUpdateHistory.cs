@@ -32,5 +32,8 @@ namespace DataEditorPortal.Data.Models
 
         [Column("ACTION_TYPE")]
         public ActionType ActionType { get; set; }
+
+        [Column("FIELD_CONFIG")]
+        public string FieldConfig { get; set; }
     }
 }

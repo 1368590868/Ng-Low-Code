@@ -74,7 +74,8 @@ namespace DataEditorPortal.Web.Services
                                 OriginalValue = comparer.GetValueString(originalValue),
                                 NewValue = comparer.GetValueString(newValue),
                                 ValueType = typeof(string).ToString(),
-                                ActionType = ActionType.Update
+                                ActionType = ActionType.Update,
+                                FieldConfig = JsonSerializer.Serialize(new { field.type, field.filterType })
                             });
                         }
                     }
@@ -92,7 +93,8 @@ namespace DataEditorPortal.Web.Services
                                 OriginalValue = ConvertValueToString(originalValue),
                                 NewValue = ConvertValueToString(newValue),
                                 ValueType = GetValueTypeString(originalValue, newValue),
-                                ActionType = ActionType.Update
+                                ActionType = ActionType.Update,
+                                FieldConfig = JsonSerializer.Serialize(new { field.type, field.filterType })
                             });
                         }
                     }
@@ -121,7 +123,8 @@ namespace DataEditorPortal.Web.Services
                     Field = item.Field,
                     OriginalValue = ConvertStringToValue(item.OriginalValue, item.ValueType),
                     NewValue = ConvertStringToValue(item.NewValue, item.ValueType),
-                    ActionType = item.ActionType
+                    ActionType = item.ActionType,
+                    FieldConfig = JsonSerializer.Deserialize<Dictionary<string, object>>(item.FieldConfig)
                 };
                 result.Add(model);
             }
