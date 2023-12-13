@@ -2,7 +2,7 @@
   <div class="relative flex-grow-1">
     <p-dropdown
       #dropdown
-      [style]="{ '--icon-padding': !dropdown.value ? '0.5rem' : '3rem' }"
+      [style]="{ '--icon-padding': !formControl.value ? '0.5rem' : '3rem' }"
       [class]="{
         'ng-invalid': formNgControl.invalid,
         'ng-dirty': formNgControl.dirty
@@ -30,26 +30,14 @@
         </div>
       </ng-template>
     </p-dropdown>
-    <div
-      *ngIf="!iconLogo"
-      class="absolute w-3rem h-full top-0 flex justify-content-center align-items-center">
-      <i
-        [class]="
-          dropdown.value
-            ? (dropdown?.value?.startsWith('pi') ? 'pi ' : '') + dropdown.value
-            : ''
-        "></i>
+    <div *ngIf="!iconLogo" class="absolute w-3rem h-full top-0 flex justify-content-center align-items-center">
+      <i [class]="dropdown.value ? (dropdown?.value?.startsWith('pi') ? 'pi ' : '') + dropdown.value : ''"></i>
     </div>
 
     <div *ngIf="iconLogo" class="flex justify-content-start align-items-center">
-      <p-avatar
-        [image]="iconLogo"
-        styleClass="overflow-hidden mr-3 block border-1 border-400"></p-avatar>
+      <p-avatar [image]="iconLogo" styleClass="overflow-hidden mr-3 block border-1 border-400"></p-avatar>
 
-      <p-button
-        (onClick)="removePic()"
-        label="Remove"
-        styleClass="p-button-outlined p-button-secondary">
+      <p-button (onClick)="removePic()" label="Remove" styleClass="p-button-outlined p-button-secondary">
         <!-- <span class="p-button-icon p-button-icon-left pi pi-trash"></span> -->
       </p-button>
     </div>
