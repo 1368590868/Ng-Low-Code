@@ -20,7 +20,6 @@ namespace DataEditorPortal.Web.Services
         string UseSearches(string query, List<FilterParam> filterParams = null);
         string GetFilterType(DataRow schema);
         string ParameterName(string name);
-        object GetJsonElementValue(object value);
         object TransformValue(object value, DataRow schema);
         object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues);
         string ReplaceQueryParamters(string queryText);
@@ -47,7 +46,7 @@ namespace DataEditorPortal.Web.Services
         string GetSqlTextForDatabaseSource(DataSourceConfig config);
 
         // for lookup
-        (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, IDictionary<string, object> model);
+        (string, object) ProcessQueryWithParamters(string queryText, IDictionary<string, object> model);
     }
 
     public abstract class QueryBuilder
@@ -225,43 +224,6 @@ namespace DataEditorPortal.Web.Services
             return "text";
         }
 
-        public virtual object GetJsonElementValue(object value)
-        {
-            if (value is byte[]) return value;
-
-            JsonElement jsonElement;
-            if (value is JsonElement) jsonElement = (JsonElement)value;
-            else jsonElement = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(value));
-
-            if (jsonElement.ValueKind == JsonValueKind.Array)
-            {
-                return jsonElement.EnumerateArray().Select(m => GetJsonElementValue(m)).ToList();
-            }
-            else if (jsonElement.ValueKind == JsonValueKind.Object)
-            {
-                var dic = new Dictionary<string, object>();
-                jsonElement.EnumerateObject().ToList().ForEach(m => dic.Add(m.Name, GetJsonElementValue(m.Value)));
-                return dic;
-            }
-            else if (jsonElement.ValueKind == JsonValueKind.Number) return jsonElement.GetDecimal();
-            else if (jsonElement.ValueKind == JsonValueKind.True) return 1;
-            else if (jsonElement.ValueKind == JsonValueKind.False) return 0;
-            else if (jsonElement.ValueKind == JsonValueKind.String)
-            {
-                if (Regex.IsMatch(jsonElement.GetString(), @"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$"))
-                {
-                    var formats = new string[] { "yyyy-MM-ddTHH:mm:ss.FFFFFFFK", "", "" };
-                    DateTime date;
-                    if (DateTime.TryParseExact(jsonElement.GetString(), formats, null, System.Globalization.DateTimeStyles.None, out date))
-                    {
-                        return _utcLocalConverter.Converter.ConvertToProvider.Invoke(date);
-                    }
-                }
-                return jsonElement.GetString();
-            }
-            else return null;
-        }
-
         protected abstract string EscapeColumnName(string columnName);
 
         public virtual string ParameterName(string name)
@@ -288,7 +250,7 @@ namespace DataEditorPortal.Web.Services
             var dict = new Dictionary<string, object>();
             foreach (var item in keyValues)
             {
-                dict.Add(ParameterName(item.Key), GetJsonElementValue(item.Value));
+                dict.Add(ParameterName(item.Key), JsonElementConverter.GetValue(item.Value, _utcLocalConverter));
             }
 
             dynamic param = dict.Aggregate(
@@ -532,7 +494,7 @@ namespace DataEditorPortal.Web.Services
 
         #endregion
 
-        public (string, List<KeyValuePair<string, object>>) ProcessQueryWithParamters(string queryText, IDictionary<string, object> model)
+        public (string, object) ProcessQueryWithParamters(string queryText, IDictionary<string, object> model)
         {
             var fieldRegex = new Regex(@"\#\#([a-zA-Z]{1}[a-zA-Z0-9_]+?)\#\#");
             var regex = new Regex(@"\{\{(.+?)\}\}");
@@ -553,7 +515,7 @@ namespace DataEditorPortal.Web.Services
 
                 object value = null;
                 if (model.ContainsKey(key))
-                    value = GetJsonElementValue(model[key]);
+                    value = JsonElementConverter.GetValue(model[key]);
 
                 if (value == null)
                 {
@@ -577,7 +539,7 @@ namespace DataEditorPortal.Web.Services
                     }
                     else
                     {
-                        keyValuePairs.Add(new KeyValuePair<string, object>(ParameterName(key), value));
+                        keyValuePairs.Add(new KeyValuePair<string, object>(key, value));
 
                         var criteria = match.Groups[1].Value.Replace(fieldMatch.Value, $"{ParameterPrefix}{ParameterName(key)}");
                         queryText = queryText.Replace(match.Value, criteria);
@@ -594,26 +556,26 @@ namespace DataEditorPortal.Web.Services
 
                 object value = null;
                 if (model.ContainsKey(key))
-                    value = GetJsonElementValue(model[key]);
+                    value = JsonElementConverter.GetValue(model[key]);
 
                 if (new Regex(@$"IN {match.Value.ToUpper()}").IsMatch(queryText.ToUpper()))
                 {
                     // check the operator, if it is "IN", value should be IEnumerable<object>
                     // If not, we need to default the value to empty array.
                     if (value != null && value is IEnumerable<object>)
-                        keyValuePairs.Add(new KeyValuePair<string, object>(ParameterName(key), value));
+                        keyValuePairs.Add(new KeyValuePair<string, object>(key, value));
                     else
-                        keyValuePairs.Add(new KeyValuePair<string, object>(ParameterName(key), new object[] { }));
+                        keyValuePairs.Add(new KeyValuePair<string, object>(key, new object[] { }));
                 }
                 else
                 {
-                    if (value != null) keyValuePairs.Add(new KeyValuePair<string, object>(ParameterName(key), value));
-                    else keyValuePairs.Add(new KeyValuePair<string, object>(ParameterName(key), null));
+                    if (value != null) keyValuePairs.Add(new KeyValuePair<string, object>(key, value));
+                    else keyValuePairs.Add(new KeyValuePair<string, object>(key, null));
                 }
                 queryText = queryText.Replace(match.Value, $"{ParameterPrefix}{ParameterName(key)}");
             }
 
-            return (queryText, keyValuePairs);
+            return (queryText, GenerateDynamicParameter(keyValuePairs));
         }
 
         public string ReplaceQueryParamters(string queryText)

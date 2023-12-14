@@ -292,9 +292,21 @@ namespace DataEditorPortal.Web.Services
                 {
                     var datas = _dapperService.Query(Conn, queryText, param, Trans);
 
+                    DataTable schema;
+                    using (var dr = Conn.ExecuteReader(queryText, param))
+                    {
+                        schema = dr.GetSchemaTable();
+                    }
+
                     relationData = datas.Select(data =>
                     {
                         var item = (IDictionary<string, object>)data;
+
+                        foreach (var key in item.Keys)
+                        {
+                            var index = item.Keys.ToList().IndexOf(key);
+                            item[key] = _queryBuilder.TransformValue(item[key], schema.Rows[index]);
+                        }
 
                         return new RelationDataModel()
                         {

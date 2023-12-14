@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace DataEditorPortal.Web.Common
+namespace DataEditorPortal.Web.Common.Json
 {
     /// <summary>
     /// Converts a <see cref="DateTime"/> to and from the ISO 8601 date format (e.g. <c>"2008-04-12T12:53Z"</c>).
@@ -34,7 +34,7 @@ namespace DataEditorPortal.Web.Common
         public string DateTimeFormat
         {
             get => _dateTimeFormat ?? string.Empty;
-            set => _dateTimeFormat = (string.IsNullOrEmpty(value)) ? null : value;
+            set => _dateTimeFormat = string.IsNullOrEmpty(value) ? null : value;
         }
 
         /// <summary>

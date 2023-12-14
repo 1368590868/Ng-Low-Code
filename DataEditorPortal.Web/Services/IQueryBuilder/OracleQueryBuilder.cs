@@ -4,6 +4,7 @@ using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -212,20 +213,53 @@ namespace DataEditorPortal.Web.Services
                 return string.Format("\"{0}\"", columnName);
         }
 
-        public override object GetJsonElementValue(object value)
+        public override object GenerateDynamicParameter(IEnumerable<KeyValuePair<string, object>> keyValues)
         {
-            var result = base.GetJsonElementValue(value);
+            var dict = new Dictionary<string, object>();
 
-            if (result != null && result.GetType() == typeof(string))
+            Func<object, object> valueConverter = null;
+            valueConverter = (object value) =>
             {
-                Guid guid;
-                if (new Regex("^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$").IsMatch(result.ToString()) && Guid.TryParse(result.ToString(), out guid))
+                if (value != null)
                 {
-                    return guid.ToByteArray();
+                    if (value.GetType().IsAssignableTo(typeof(IEnumerable<object>)))
+                    {
+                        return ((IEnumerable<object>)value).Select(x => valueConverter(x));
+                    }
+                    if (value.GetType().IsAssignableTo(typeof(IDictionary<string, object>)))
+                    {
+                        var dic = new Dictionary<string, object>();
+                        ((IDictionary<string, object>)value).ToList().ForEach(m => dic.Add(m.Key, valueConverter(m.Value)));
+                        return dic;
+                    }
+                    if (value.GetType() == typeof(bool))
+                    {
+                        return (bool)value ? 1 : 0;
+                    }
+                    if (value.GetType() == typeof(string))
+                    {
+                        Guid guid;
+                        if (new Regex("^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$").IsMatch(value.ToString()) && Guid.TryParse(value.ToString(), out guid))
+                        {
+                            return guid.ToByteArray();
+                        }
+                    }
                 }
+                return value;
+            };
+
+            foreach (var item in keyValues)
+            {
+                var value = JsonElementConverter.GetValue(item.Value, _utcLocalConverter);
+                dict.Add(ParameterName(item.Key), valueConverter(value));
             }
 
-            return result;
+            dynamic param = dict.Aggregate(
+                new ExpandoObject() as IDictionary<string, object>,
+                (a, p) => { a.Add(p); return a; }
+            );
+
+            return (object)param;
         }
 
         #endregion
@@ -283,7 +317,7 @@ namespace DataEditorPortal.Web.Services
                                         '""status"":""' || {statusSegment} || '""' ||
                                     '}}'
                                     , ','
-                                ) WITHIN GROUP (ORDER BY { EscapeColumnName(config.GetMappedColumn("FILE_NAME"))})
+                                ) WITHIN GROUP (ORDER BY {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))})
                                 , CHR(0)
                             ) || 
                         ']' AS ATTACHMENTS

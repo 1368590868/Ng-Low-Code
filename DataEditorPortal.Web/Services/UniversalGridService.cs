@@ -1848,11 +1848,23 @@ namespace DataEditorPortal.Web.Services
                 {
                     con.ConnectionString = relationInfo.ConnectionString;
                     con.Open();
+
                     var datas = _dapperService.Query(con, queryText, param);
+                    DataTable schema;
+                    using (var dr = con.ExecuteReader(queryText, param))
+                    {
+                        schema = dr.GetSchemaTable();
+                    }
 
                     table1Ids = datas.Select(data =>
                     {
                         var item = (IDictionary<string, object>)data;
+                        foreach (var key in item.Keys)
+                        {
+                            var index = item.Keys.ToList().IndexOf(key);
+                            item[key] = _queryBuilder.TransformValue(item[key], schema.Rows[index]);
+                        }
+
                         return item[$"T2_{relationInfo.Table1.IdColumn}"];
                     });
                 }

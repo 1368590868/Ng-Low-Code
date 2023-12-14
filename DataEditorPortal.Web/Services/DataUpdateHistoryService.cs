@@ -22,7 +22,6 @@ namespace DataEditorPortal.Web.Services
         private readonly DepDbContext _depDbContext;
         private readonly ILogger<DataUpdateHistoryService> _logger;
         private readonly ICurrentUserAccessor _currentUserAccessor;
-        private readonly IQueryBuilder _queryBuilder;
         private readonly IUtcLocalConverter _utcLocalConverter;
         private readonly string dateFormat = "yyyy-MM-dd HH:mm:ss";
         private readonly IValueProcessorFactory _valueProcessorFactory;
@@ -38,7 +37,6 @@ namespace DataEditorPortal.Web.Services
             _depDbContext = depDbContext;
             _logger = logger;
             _currentUserAccessor = currentUserAccessor;
-            _queryBuilder = queryBuilder;
             _utcLocalConverter = utcLocalConverter;
             _valueProcessorFactory = valueProcessorFactory;
         }
@@ -55,9 +53,9 @@ namespace DataEditorPortal.Web.Services
                     // original value should query from db, it should be correct type already. 
                     // new value should from frontend, it should be JsonElement
                     // no matter where the value come from,
-                    // invoke GetJsonElementValue() to get the correct value with type that can be write to db
-                    var originalValue = _queryBuilder.GetJsonElementValue(modelToUpdate[field.key]);
-                    var newValue = _queryBuilder.GetJsonElementValue(model[field.key]);
+                    // invoke JsonElementConverter.GetValue() to get the correct value with type that can be write to db
+                    var originalValue = JsonElementConverter.GetValue(modelToUpdate[field.key], _utcLocalConverter);
+                    var newValue = JsonElementConverter.GetValue(model[field.key], _utcLocalConverter);
 
                     var comparer = _valueProcessorFactory.CreateValueComparer(field, null);
                     if (comparer != null)
@@ -165,7 +163,7 @@ namespace DataEditorPortal.Web.Services
                 }
             }
             if (type == typeof(byte[])) { return Convert.FromBase64String(typeStr); }
-            if (type == typeof(bool)) { return valueStr == "1"; }
+            if (type == typeof(bool)) { return Convert.ToBoolean(valueStr); }
             if (type == typeof(string)) { return valueStr; }
 
             return JsonSerializer.Deserialize(valueStr, type);

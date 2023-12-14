@@ -1,10 +1,9 @@
-﻿
-using Microsoft.SqlServer.Types;
+﻿using Microsoft.SqlServer.Types;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace DataEditorPortal.Web.Common
+namespace DataEditorPortal.Web.Common.Json
 {
     public class SqlGeometryConverter : JsonConverter<SqlGeometry>
     {
