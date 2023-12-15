@@ -1,7 +1,5 @@
 .nav-menu {
-  --menuitem-text-color: #515c66;
-
-  box-shadow: 2px 0 4px -1px #0003, 4px 0 5px #00000024, 1px 0 10px #0000001f;
+  box-shadow: 2px 0 4px -1px rgba(0, 0, 0, 0.2), 4px 0 5px rgba(0, 0, 0, 0.14), 1px 0 10px rgba(0, 0, 0, 0.12);
   position: sticky;
   top: 4rem;
   z-index: 1000;
@@ -23,13 +21,9 @@
 
       .p-menuitem-text,
       .p-submenu-icon {
-        color: var(--menuitem-text-color);
         font-size: 0.875rem;
         line-height: 1.5rem;
         white-space: nowrap;
-      }
-      .p-menuitem-icon {
-        color: var(--menuitem-text-color);
       }
     }
     .p-submenu-list {
@@ -44,7 +38,7 @@
 
     .p-menuitem-link-active,
     .active-parent-menu > a {
-      background-color: #eef2ff !important;
+      background-color: var(--highlight-bg);
       .p-menuitem-text,
       .p-submenu-icon,
       .p-menuitem-icon {
