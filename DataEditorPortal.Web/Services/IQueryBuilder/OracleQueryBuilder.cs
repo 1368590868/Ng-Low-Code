@@ -7,7 +7,6 @@ using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace DataEditorPortal.Web.Services
 {
@@ -174,35 +173,35 @@ namespace DataEditorPortal.Web.Services
                 return Convert.ToInt16(value) == 1;
 
             if (dbType == OracleDbType.Raw && (int)schema["ColumnSize"] == 16)
-                return new Guid((byte[])value);
+                return Convert.ToHexString((byte[])value);
 
             if (type == typeof(TimeSpan))
                 return ((TimeSpan)value).TotalSeconds / 3600;
 
-            if (type == typeof(string) && value.ToString().Length == 32)
-            {
-                Guid temp;
-                if (TryParseHexToGuid((string)value, out temp))
-                {
-                    return temp.ToString();
-                }
-            }
+            //if (type == typeof(string) && value.ToString().Length == 32)
+            //{
+            //    Guid temp;
+            //    if (TryParseHexToGuid((string)value, out temp))
+            //    {
+            //        return temp.ToString();
+            //    }
+            //}
             return base.TransformValue(value, schema);
         }
 
-        private bool TryParseHexToGuid(string text, out Guid guid)
-        {
-            try
-            {
-                byte[] bytes = Convert.FromHexString(text);
-                guid = new Guid(bytes);
-                return true;
-            }
-            catch (Exception) { }
+        //private bool TryParseHexToGuid(string text, out Guid guid)
+        //{
+        //    try
+        //    {
+        //        byte[] bytes = Convert.FromHexString(text);
+        //        guid = new Guid(bytes);
+        //        return true;
+        //    }
+        //    catch (Exception) { }
 
-            guid = Guid.Empty;
-            return false;
-        }
+        //    guid = Guid.Empty;
+        //    return false;
+        //}
 
         protected override string EscapeColumnName(string columnName)
         {
@@ -236,14 +235,14 @@ namespace DataEditorPortal.Web.Services
                     {
                         return (bool)value ? 1 : 0;
                     }
-                    if (value.GetType() == typeof(string))
-                    {
-                        Guid guid;
-                        if (new Regex("^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$").IsMatch(value.ToString()) && Guid.TryParse(value.ToString(), out guid))
-                        {
-                            return guid.ToByteArray();
-                        }
-                    }
+                    //if (value.GetType() == typeof(string))
+                    //{
+                    //    Guid guid;
+                    //    if (new Regex("^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$").IsMatch(value.ToString()) && Guid.TryParse(value.ToString(), out guid))
+                    //    {
+                    //        return guid.ToByteArray();
+                    //    }
+                    //}
                 }
                 return value;
             };
