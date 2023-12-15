@@ -175,10 +175,12 @@ namespace DataEditorPortal.Web
 
             services.AddControllersWithViews(configure =>
             {
+                configure.ModelBinderProviders.Insert(0, new HexStringGuidBinderProvider());
                 configure.Filters.Add<LicenseActionFilter>();
             })
             .AddJsonOptions(options =>
             {
+                //options.JsonSerializerOptions.Converters.Add(new GuidConverter());
                 options.JsonSerializerOptions.Converters.Add(new IsoDateTimeConverter());
                 options.JsonSerializerOptions.Converters.Add(new SqlGeometryConverter());
                 options.JsonSerializerOptions.Converters.Add(new SqlGeographyConverter());
