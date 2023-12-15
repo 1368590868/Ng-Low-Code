@@ -4,19 +4,14 @@
   [style]="{
     minHeight: menus.length > 0 ? 'calc(100% - 7rem)' : 'calc(100% - 4.25rem)'
   }">
-  <div
-    class="tile-wrap flex align-content-start flex-wrap"
-    *ngIf="menus.length > 0; else emptyMessage">
+  <div class="tile-wrap flex align-content-start flex-wrap" *ngIf="menus.length > 0; else emptyMessage">
     <ng-container *ngFor="let menu of menus">
       <div
         *ngIf="menu.routerLink"
         class="tile-block bg-white m-3 p-2 flex flex-column align-items-center cursor-pointer shadow-2"
         [routerLink]="menu?.routerLink"
         [pTooltip]="menu.description || ''">
-        <i
-          [class]="menu.icon"
-          [style]="menu.iconStyle"
-          class="text-7xl text-primary my-5"></i>
+        <i [class]="menu.icon" [style]="menu.iconStyle" class="text-7xl text-primary my-5"></i>
         <div class="font-semibold text-xl text-center" [title]="menu.label">
           {{ menu?.label }}
         </div>
@@ -27,10 +22,7 @@
         target="_blank"
         class="tile-block bg-white m-3 p-2 flex flex-column align-items-center cursor-pointer shadow-2"
         [pTooltip]="menu.description || ''">
-        <i
-          [class]="menu.icon"
-          [style]="menu.iconStyle"
-          class="text-7xl text-cyan-500 my-5"></i>
+        <i [class]="menu.icon" [style]="menu.iconStyle" class="text-7xl text-cyan-500 my-5"></i>
         <div class="font-semibold text-xl text-center" [title]="menu.label">
           {{ menu?.label }}
         </div>
@@ -38,14 +30,9 @@
     </ng-container>
   </div>
   <ng-template #emptyMessage>
-    <div
-      *ngIf="!loading"
-      class="flex flex-column justify-content-center align-items-center">
+    <div class="flex flex-column justify-content-center align-items-center">
       <!-- <h3 class="text-8xl">No Pages</h3> -->
-      <span class="text-5xl text-center"
-        >You don't have any pages to access. <br />Please contact
-        administrator.</span
-      >
+      <span class="text-5xl text-center">You don't have any pages to access. <br />Please contact administrator.</span>
     </div>
   </ng-template>
 </div>

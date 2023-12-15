@@ -1,5 +1,5 @@
-import { ApplicationRef, Component, Inject, OnDestroy } from '@angular/core';
-import { Observable, Subject, map, takeUntil } from 'rxjs';
+import { Component, Inject, OnDestroy } from '@angular/core';
+import { Observable, Subject, map } from 'rxjs';
 import { ConfigDataService, SiteMenu } from 'src/app/shared';
 
 @Component({
@@ -8,7 +8,6 @@ import { ConfigDataService, SiteMenu } from 'src/app/shared';
   styleUrls: ['./tile.component.scss']
 })
 export class TileComponent implements OnDestroy {
-  loading = true;
   destroy$ = new Subject();
 
   menus$?: Observable<SiteMenu[]>;
@@ -40,14 +39,7 @@ export class TileComponent implements OnDestroy {
       });
   }
 
-  constructor(
-    private configDataService: ConfigDataService,
-    @Inject('API_URL') private apiUrl: string,
-    public app: ApplicationRef
-  ) {
-    app.isStable.pipe(takeUntil(this.destroy$)).subscribe(x => {
-      if (x) this.loading = false;
-    });
+  constructor(private configDataService: ConfigDataService, @Inject('API_URL') private apiUrl: string) {
     this.menus$ = this.configDataService.menusInGroup$.pipe(
       map(menus => {
         return this.flattenMenus(menus);
