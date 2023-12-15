@@ -151,6 +151,7 @@ export class TableComponent implements OnInit, OnDestroy {
               this.rows = this.tableConfig.pageSize || 100;
               this.selection = [];
               this.clearHighlighted();
+              this.showHighlightOnly = false;
               this.defaultFilter = [];
               this.fetchData();
             } else {
@@ -504,6 +505,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   highlightLinkedData(table2Id: string) {
+    (this.table as any).highlightRowId = undefined;
     this.table2Id = table2Id;
     if (table2Id) {
       this.systemLogService.addSiteVisitLog({

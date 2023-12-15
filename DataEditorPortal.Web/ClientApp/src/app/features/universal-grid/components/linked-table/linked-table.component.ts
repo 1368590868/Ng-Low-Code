@@ -18,6 +18,8 @@ export class LinkedTableComponent {
 
   selectedPrimaryRow: any;
   onPrimaryRowSelect(event: any) {
+    if (this.primaryTable.showHighlightOnly) return;
+
     this.selectedSecondaryRow = undefined;
     const dataId = event.data[this.primaryTable.tableConfig.dataKey];
     if (this.selectedPrimaryRow !== dataId) {
@@ -25,8 +27,6 @@ export class LinkedTableComponent {
       // mark linked data highlighted
       this.primaryTable.clearHighlighted();
       this.secondaryTable.highlightLinkedData(dataId);
-    } else {
-      this.onPrimaryRowClear();
     }
   }
   onPrimaryRowClear() {
@@ -36,6 +36,8 @@ export class LinkedTableComponent {
 
   selectedSecondaryRow: any;
   onSecondaryRowClick(event: any) {
+    if (this.secondaryTable.showHighlightOnly) return;
+
     this.selectedPrimaryRow = undefined;
     const dataId = event.data[this.secondaryTable.tableConfig.dataKey];
 
@@ -44,8 +46,6 @@ export class LinkedTableComponent {
       // mark linked data highlighted
       this.secondaryTable.clearHighlighted();
       this.primaryTable.highlightLinkedData(dataId);
-    } else {
-      this.onSecondaryRowClear();
     }
   }
   onSecondaryRowClear() {
