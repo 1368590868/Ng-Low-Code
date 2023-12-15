@@ -128,7 +128,7 @@ namespace DataEditorPortal.Web.Controllers
             else
             {
                 var username = _currentUserAccessor.CurrentUser.Username();
-                if (dep_user.Username != username && !_userService.IsAdmin(dep_user.Username))
+                if (dep_user.Username != username && !_userService.IsAdmin(username))
                 {
                     throw new DepException("Not Found", 404);
                 }
@@ -157,7 +157,7 @@ namespace DataEditorPortal.Web.Controllers
             else
             {
                 var username = _currentUserAccessor.CurrentUser.Username();
-                if (dep_user.Username != username && !_userService.IsAdmin(dep_user.Username))
+                if (dep_user.Username != username && !_userService.IsAdmin(username))
                 {
                     throw new DepException("Not Found", 404);
                 }

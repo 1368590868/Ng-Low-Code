@@ -180,7 +180,7 @@ namespace DataEditorPortal.Web
             })
             .AddJsonOptions(options =>
             {
-                //options.JsonSerializerOptions.Converters.Add(new GuidConverter());
+                options.JsonSerializerOptions.Converters.Add(new HexStringGuidConverter());
                 options.JsonSerializerOptions.Converters.Add(new IsoDateTimeConverter());
                 options.JsonSerializerOptions.Converters.Add(new SqlGeometryConverter());
                 options.JsonSerializerOptions.Converters.Add(new SqlGeographyConverter());

@@ -15,7 +15,7 @@ namespace DataEditorPortal.Web.Common
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.Metadata.ModelType == typeof(Guid))
+            if (context.Metadata.ModelType == typeof(Guid) || context.Metadata.ModelType == typeof(Guid?))
             {
                 return new BinderTypeModelBinder(typeof(HexStringGuidModelBinder));
             }
@@ -57,6 +57,13 @@ namespace DataEditorPortal.Web.Common
                 }
             }
 
+            if (!Guid.TryParse(valueAsString, out var result))
+            {
+                bindingContext.ModelState.TryAddModelError(bindingContext.ModelName, "Invalid GUID format.");
+                return Task.CompletedTask;
+            }
+
+            bindingContext.Result = ModelBindingResult.Success(result);
             return Task.CompletedTask;
         }
 
