@@ -203,9 +203,9 @@ namespace DataEditorPortal.Web.Services
                                 (SELECT 
                                     ',{{' +
                                         '""fileId"":""' + {EscapeColumnName(config.GetMappedColumn("ID"))} + '"",' +
-                                        '""fileName"":""' + {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))} + '"",' +
-                                        '""contentType"":""' + {contentTypeSegment} + '"",' +
-                                        '""comments"":""' + {commentsSegment} + '"",' +
+                                        '""fileName"":""' + STRING_ESCAPE({EscapeColumnName(config.GetMappedColumn("FILE_NAME"))}, 'json') + '"",' +
+                                        '""contentType"":""' + STRING_ESCAPE({contentTypeSegment}, 'json') + '"",' +
+                                        '""comments"":""' + STRING_ESCAPE({commentsSegment}, 'json') + '"",' +
                                         '""status"":""' + {statusSegment} + '""' +
                                     '}}' 
                                 FROM {config.TableSchema}.{config.TableName} WHERE {EscapeColumnName(foreignKey)} = A.{EscapeColumnName(foreignKey)} FOR XML PATH (''))

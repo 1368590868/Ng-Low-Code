@@ -305,21 +305,17 @@ namespace DataEditorPortal.Web.Services
                 LEFT JOIN (
                     SELECT 
                         {EscapeColumnName(foreignKey)},
-                        '[' || 
-                            REPLACE(
-                                LISTAGG(
-                                    '{{' || 
-                                        '""fileId"":""' || {EscapeColumnName(config.GetMappedColumn("ID"))} || '"",' || 
-                                        '""fileName"":""' || {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))} || '"",' || 
-                                        '""contentType"":""' || {contentTypeSegment} || '"",' || 
-                                        '""comments"":""' || {commentsSegment} || '"",' || 
-                                        '""status"":""' || {statusSegment} || '""' ||
-                                    '}}'
-                                    , ','
-                                ) WITHIN GROUP (ORDER BY {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))})
-                                , CHR(0)
-                            ) || 
-                        ']' AS ATTACHMENTS
+                        JSON_ARRAYAGG(
+	                        JSON_OBJECT(
+		                        KEY 'fileId' VALUE {EscapeColumnName(config.GetMappedColumn("ID"))},
+		                        KEY 'fileName' VALUE {EscapeColumnName(config.GetMappedColumn("FILE_NAME"))},
+		                        KEY 'contentType' VALUE {contentTypeSegment},
+		                        KEY 'comments' VALUE {commentsSegment},
+		                        KEY 'status' VALUE {statusSegment}
+		                        RETURNING CLOB
+	                        ) 
+	                        RETURNING CLOB
+                        ) AS ATTACHMENTS
                     FROM {config.TableSchema}.{config.TableName}
                     GROUP BY {EscapeColumnName(foreignKey)}
                 ) {col.field}_ATTACHMENTS ON ALL_DATA.{EscapeColumnName(referenceDataKey)} = {col.field}_ATTACHMENTS.{EscapeColumnName(foreignKey)}
