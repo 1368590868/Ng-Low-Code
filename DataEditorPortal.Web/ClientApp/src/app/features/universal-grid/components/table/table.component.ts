@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Optional, Output, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import * as pluralize from 'pluralize';
@@ -11,6 +11,7 @@ import { GridFilterParam, GridParam, SearchParam, SystemLogService, UserService 
 import { GridColumn, GridConfig, GridData } from '../../models/grid-types';
 import { GridTableService } from '../../services/grid-table.service';
 import { UrlParamsService } from '../../services/url-params.service';
+import { LinkedTableComponent } from '../linked-table/linked-table.component';
 
 @Component({
   selector: 'app-table',
@@ -100,8 +101,11 @@ export class TableComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private urlParamsService: UrlParamsService,
     private systemLogService: SystemLogService,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    @Optional() private linkedTable: LinkedTableComponent
+  ) {
+    this.allowHighlightOnly = !!this.linkedTable;
+  }
 
   ngOnInit() {
     // get item type from route
@@ -493,6 +497,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   // linked features
+  allowHighlightOnly = false;
   table2Id: any | undefined;
   linkedTable1Ids: any[] | undefined;
   clearHighlighted() {
