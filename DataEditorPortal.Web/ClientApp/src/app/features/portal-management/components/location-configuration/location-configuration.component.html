@@ -1,10 +1,6 @@
 <div class="flex align-items-center justify-content-between">
   <div class="flex">
-    <p-message
-      *ngIf="!innerValue"
-      class="cursor-pointer"
-      severity="warn"
-      text="Not Configured"></p-message>
+    <p-message *ngIf="!innerValue" class="cursor-pointer" severity="warn" text="Not Configured"></p-message>
     <p-message
       *ngIf="innerValue"
       class="cursor-pointer"
@@ -14,17 +10,14 @@
 
     <p-button
       *ngIf="innerValue"
-      styleClass="p-button-text p-button-rounded remove-btn"
+      [outlined]="true"
+      [rounded]="true"
+      styleClass="remove-btn"
       icon="pi pi-times-circle"
       (onClick)="removeConfig()"></p-button>
   </div>
 
-  <p-button
-    *ngIf="!innerValue"
-    styleClass="p-button-outlined"
-    (onClick)="showDialog()"
-    >Configure</p-button
-  >
+  <p-button *ngIf="!innerValue" [outlined]="true" (onClick)="showDialog()">Configure</p-button>
 </div>
 <p-dialog
   [(visible)]="visible"
@@ -56,11 +49,7 @@
     <div class="flex align-items-center mb-3 -mx-3">
       <div class="flex flex-column px-3 w-6 flex-1">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="locationType === 2 ? 'Measure' : ' From Measure'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="locationType === 2 ? 'Measure' : ' From Measure'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -98,11 +87,7 @@
     <div class="flex align-items-center mb-3 -mx-3" *ngIf="locationType !== 2">
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="'To Measure'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="'To Measure'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -119,11 +104,7 @@
     </div>
   </div>
   <ng-template pTemplate="footer">
-    <p-button
-      icon="pi pi-times"
-      label="Cancel"
-      styleClass="p-button-text"
-      (onClick)="visible = false"></p-button>
+    <p-button icon="pi pi-times" label="Cancel" [text]="true" (onClick)="visible = false"></p-button>
     <p-button icon="pi pi-check" label="Ok" (onClick)="onSave()"></p-button>
   </ng-template>
 </p-dialog>

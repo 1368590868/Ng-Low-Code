@@ -80,30 +80,34 @@
               [pTooltip]="'View Linked Item(s) Only'"
               tooltipPosition="left"
               [style.cursor]="!table2Id ? 'not-allowed' : 'pointer'"
-              [styleClass]="
-                showHighlightOnly
-                  ? 'p-button-rounded mr-1 w-2rem h-2rem mt-1'
-                  : 'p-button-rounded p-button-outlined mr-1 w-2rem h-2rem mt-1'
-              "
+              [rounded]="true"
+              [outlined]="!showHighlightOnly"
+              [styleClass]="'mr-1 w-2rem h-2rem mt-1'"
               icon="pi pi-link text-lg"
               (onClick)="onShowHighlightOnlyClick()"></p-button>
             <p-button
               pTooltip="Reset the sorts and filters"
               tooltipPosition="left"
               icon="pi pi-refresh text-lg"
-              styleClass="p-button-rounded p-button-outlined mr-1 w-2rem h-2rem mt-1"
+              [outlined]="true"
+              [rounded]="true"
+              styleClass="mr-1 w-2rem h-2rem mt-1"
               (onClick)="resetAndRefresh()"></p-button>
             <p-button
               pTooltip="Show/Hide columns"
               tooltipPosition="left"
               icon="pi pi-pause text-lg"
-              styleClass="p-button-rounded p-button-outlined mr-1 w-2rem h-2rem mt-1"
+              [outlined]="true"
+              [rounded]="true"
+              styleClass="mr-1 w-2rem h-2rem mt-1"
               (onClick)="columnSelectorVisible = true"></p-button>
             <p-button
               pTooltip="Reset table back to original view"
               tooltipPosition="left"
               icon="pi pi-sync text-lg"
-              styleClass="p-button-rounded p-button-outlined w-2rem h-2rem mt-1"
+              [outlined]="true"
+              [rounded]="true"
+              styleClass="mr-1 w-2rem h-2rem mt-1"
               (onClick)="confirmResetColumns($event)"></p-button>
           </div>
         </div>

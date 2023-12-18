@@ -5,17 +5,12 @@
     <p-divider styleClass="mt-0"></p-divider>
     <div class="w-full pb-1" style="margin-top: -1rem">
       <p-tabView>
-        <p-tabPanel
-          header="Settings for Site"
-          *ngIf="!configDataService.licenseExpired">
+        <p-tabPanel header="Settings for Site" *ngIf="!configDataService.licenseExpired">
           <div class="w-6 mb-3 mt-3">
             <p class="mb-2">Site Logo</p>
             <div class="flex align-items-start justify-content-between mb-3">
               <div class="flex align-items-center">
-                <img
-                  *ngIf="this.siteLogo"
-                  [src]="this.siteLogo"
-                  [style]="{ maxHeight: '3.5rem' }" />
+                <img *ngIf="this.siteLogo" [src]="this.siteLogo" [style]="{ maxHeight: '3.5rem' }" />
                 <!-- Upload Button -->
                 <p-button
                   tabindex="0"
@@ -23,7 +18,7 @@
                   label="Upload"
                   icon="pi pi-plus"
                   class="ml-auto relative padding-0"
-                  styleClass="p-button-outlined">
+                  [outlined]="true">
                   <input
                     #file
                     (change)="picChange($event)"
@@ -36,16 +31,15 @@
 
                 <!-- Remove Button -->
                 <ng-template #removeButton>
-                  <button
-                    (click)="removePic()"
-                    pButton
-                    pRipple
-                    type="button"
+                  <p-button
+                    (onClick)="removePic()"
                     label="Remove"
-                    class="p-button-text p-button-danger p-button-sm ml-3">
-                    <span
-                      class="p-button-icon p-button-icon-left pi pi-trash"></span>
-                  </button>
+                    [text]="true"
+                    size="small"
+                    severity="danger"
+                    icon="pi pi-trash"
+                    class="ml-3">
+                  </p-button>
                 </ng-template>
 
                 <!-- Tips -->
@@ -73,9 +67,7 @@
               (onClick)="onSave()"></p-button>
           </div>
         </p-tabPanel>
-        <p-tabPanel
-          header="Content for About"
-          *ngIf="!configDataService.licenseExpired">
+        <p-tabPanel header="Content for About" *ngIf="!configDataService.licenseExpired">
           <div class="w-full mb-4 mt-3">
             <!-- <p class="mb-2">Site About</p> -->
             <div>
@@ -93,9 +85,7 @@
               (onClick)="onSaveAbout()"></p-button>
           </div>
         </p-tabPanel>
-        <p-tabPanel
-          header="Content for Contact"
-          *ngIf="!configDataService.licenseExpired">
+        <p-tabPanel header="Content for Contact" *ngIf="!configDataService.licenseExpired">
           <div class="w-full mb-4 mt-3">
             <!-- <p class="mb-2">Site Contact</p> -->
             <div>
@@ -155,23 +145,11 @@
   <div class="w-full mb-3">
     <p class="mb-2">Site License</p>
     <div>
-      <textarea
-        class="w-full"
-        pInputTextarea
-        rows="10"
-        [required]="true"
-        [formControl]="formControlLicense"></textarea>
+      <textarea class="w-full" pInputTextarea rows="10" [required]="true" [formControl]="formControlLicense"></textarea>
     </div>
   </div>
   <ng-template pTemplate="footer">
-    <p-button
-      icon="pi pi-times"
-      (onClick)="onCancel()"
-      label="Cancel"
-      styleClass="p-button-text"></p-button>
-    <p-button
-      icon="pi pi-check"
-      (onClick)="onSaveLicense()"
-      label="Save License"></p-button>
+    <p-button icon="pi pi-times" (onClick)="onCancel()" label="Cancel" [text]="true"></p-button>
+    <p-button icon="pi pi-check" (onClick)="onSaveLicense()" label="Save License"></p-button>
   </ng-template>
 </p-dialog>

@@ -24,13 +24,13 @@
       dataKey="id">
       <ng-template pTemplate="caption">
         <div class="flex align-items-center justify-content-between my-2">
-          <h3 class="flex align-items-center" style="height: 2.33rem">
-            System Event Logs
-          </h3>
+          <h3 class="flex align-items-center" style="height: 2.33rem">System Event Logs</h3>
           <p-button
             tooltipPosition="left"
             icon="pi pi-refresh text-lg"
-            styleClass="p-button-rounded p-button-outlined mr-1"
+            [outlined]="true"
+            [rounded]="true"
+            styleClass="mr-1"
             (onClick)="onRefresh()"></p-button>
         </div>
       </ng-template>
@@ -39,9 +39,7 @@
           <th style="width: 2.5rem"></th>
           <th style="width: 15%" pSortableColumn="EVENT_TIME">
             <span style="vertical-align: middle">Event Time</span>
-            <p-sortIcon
-              *ngIf="table.sortField === 'EVENT_TIME'"
-              field="EVENT_TIME"></p-sortIcon>
+            <p-sortIcon *ngIf="table.sortField === 'EVENT_TIME'" field="EVENT_TIME"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="date"
@@ -54,9 +52,7 @@
           </th>
           <th style="width: 15%" pSortableColumn="CATEGORY">
             <span style="vertical-align: middle">Category</span>
-            <p-sortIcon
-              *ngIf="table.sortField === 'CATEGORY'"
-              field="CATEGORY"></p-sortIcon>
+            <p-sortIcon *ngIf="table.sortField === 'CATEGORY'" field="CATEGORY"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               field="CATEGORY"
@@ -66,10 +62,7 @@
               [showMatchModes]="false"
               [showOperator]="false"
               [showAddButton]="false">
-              <ng-template
-                pTemplate="filter"
-                let-value
-                let-filter="filterCallback">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                 <p-multiSelect
                   [showToggleAll]="false"
                   appendTo="body"
@@ -89,9 +82,7 @@
           </th>
           <th pSortableColumn="EVENT_SECTION">
             <span style="vertical-align: middle">Event Section</span>
-            <p-sortIcon
-              *ngIf="table.sortField === 'EVENT_SECTION'"
-              field="EVENT_SECTION"></p-sortIcon>
+            <p-sortIcon *ngIf="table.sortField === 'EVENT_SECTION'" field="EVENT_SECTION"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -105,9 +96,7 @@
 
           <th pSortableColumn="EVENT_NAME">
             <span style="vertical-align: middle">Event Name</span>
-            <p-sortIcon
-              *ngIf="table.sortField === 'EVENT_NAME'"
-              field="EVENT_NAME"></p-sortIcon>
+            <p-sortIcon *ngIf="table.sortField === 'EVENT_NAME'" field="EVENT_NAME"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -120,9 +109,7 @@
           </th>
           <th style="width: 15%" pSortableColumn="USERNAME">
             <span style="vertical-align: middle">User Name</span>
-            <p-sortIcon
-              *ngIf="table.sortField === 'USERNAME'"
-              field="USERNAME"></p-sortIcon>
+            <p-sortIcon *ngIf="table.sortField === 'USERNAME'" field="USERNAME"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -138,9 +125,7 @@
       <ng-template pTemplate="body" let-rowData>
         <tr
           [style]="{
-            background: ['Error', 'Exception'].includes(rowData.CATEGORY)
-              ? 'var(--red-50)'
-              : null
+            background: ['Error', 'Exception'].includes(rowData.CATEGORY) ? 'var(--red-50)' : null
           }">
           <td>
             <div class="row-actions flex">
@@ -149,7 +134,9 @@
                 label=""
                 icon="pi pi-info-circle"
                 class="flex"
-                styleClass="p-button-lg p-button-rounded p-button-text "></p-button>
+                [rounded]="true"
+                [text]="true"
+                size="large"></p-button>
             </div>
           </td>
           <td>

@@ -6,28 +6,13 @@
   (onHide)="onHide()"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0"
   appendTo="body">
-  <form
-    [formGroup]="form"
-    (ngSubmit)="onFormSubmit(model)"
-    #editForm="ngForm"
-    class="user-form">
-    <formly-form
-      [model]="model"
-      [fields]="fields"
-      [options]="options"
-      [form]="form"
-      class="p-fluid">
-      <button type="submit" class="btn btn-primary submit-button border">
-        Submit
-      </button>
+  <form [formGroup]="form" (ngSubmit)="onFormSubmit(model)" #editForm="ngForm" class="user-form">
+    <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form" class="p-fluid">
+      <button type="submit" class="btn btn-primary submit-button border">Submit</button>
     </formly-form>
   </form>
   <ng-template pTemplate="footer">
-    <p-button
-      icon="pi pi-times"
-      (onClick)="onCancel()"
-      label="Cancel"
-      styleClass="p-button-text"></p-button>
+    <p-button icon="pi pi-times" (onClick)="onCancel()" label="Cancel" [text]="true"></p-button>
     <p-button icon="pi pi-check" (onClick)="onOk()" label="Update"></p-button>
   </ng-template>
 </p-dialog>

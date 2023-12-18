@@ -23,21 +23,14 @@
       <ng-template pTemplate="caption">
         <div class="flex align-items-center my-2">
           <h3 class="">Data Dictionary</h3>
-          <p-button
-            icon="pi pi-plus"
-            class="ml-auto"
-            styleClass="p-button-outlined"
-            label="New"
-            (onClick)="onNewOpen()"></p-button>
+          <p-button icon="pi pi-plus" class="ml-auto" [outlined]="true" label="New" (onClick)="onNewOpen()"></p-button>
         </div>
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
           <th style="width: 20%" pSortableColumn="LABEL">
             <span style="vertical-align: middle">Label</span>
-            <p-sortIcon
-              *ngIf="table.sortField === 'LABEL'"
-              field="LABEL"></p-sortIcon>
+            <p-sortIcon *ngIf="table.sortField === 'LABEL'" field="LABEL"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -50,9 +43,7 @@
           </th>
           <th style="width: 20%" pSortableColumn="VALUE">
             <span style="vertical-align: middle">Value</span>
-            <p-sortIcon
-              *ngIf="table.sortField === 'VALUE'"
-              field="VALUE"></p-sortIcon>
+            <p-sortIcon *ngIf="table.sortField === 'VALUE'" field="VALUE"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -65,9 +56,7 @@
           </th>
           <th style="width: 20%" pSortableColumn="VALUE1">
             <span style="vertical-align: middle">Value1</span>
-            <p-sortIcon
-              *ngIf="table.sortField === 'VALUE1'"
-              field="VALUE1"></p-sortIcon>
+            <p-sortIcon *ngIf="table.sortField === 'VALUE1'" field="VALUE1"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -80,9 +69,7 @@
           </th>
           <th style="width: 20%" pSortableColumn="VALUE2">
             <span style="vertical-align: middle">Value2</span>
-            <p-sortIcon
-              *ngIf="table.sortField === 'VALUE2'"
-              field="VALUE2"></p-sortIcon>
+            <p-sortIcon *ngIf="table.sortField === 'VALUE2'" field="VALUE2"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -95,9 +82,7 @@
           </th>
           <th style="width: 18%" pSortableColumn="CATEGORY">
             <span style="vertical-align: middle">Category</span>
-            <p-sortIcon
-              *ngIf="table.sortField === 'CATEGORY'"
-              field="CATEGORY"></p-sortIcon>
+            <p-sortIcon *ngIf="table.sortField === 'CATEGORY'" field="CATEGORY"></p-sortIcon>
             <p-columnFilter
               style="vertical-align: middle"
               type="text"
@@ -127,12 +112,11 @@
               [model]="contextMenuItems"
               appendTo="body"
               [style]="{ width: 'auto' }"></p-menu>
-            <button
-              type="button"
-              pButton
+            <p-button
               icon="pi pi-ellipsis-v"
-              class="p-button-rounded p-button-text"
-              (click)="onShowMenu(menu, $event, rowData)"></button>
+              [rounded]="true"
+              [text]="true"
+              (onClick)="onShowMenu(menu, $event, rowData)"></p-button>
           </td>
         </tr>
       </ng-template>
@@ -153,11 +137,9 @@
     [showPageLinks]="true"></p-paginator>
 </div>
 
-<app-add-dictionary-dialog
-  #addDialog
-  (saved)="onDiaglogSaved()"></app-add-dictionary-dialog>
+<app-add-dictionary-dialog #addDialog (saved)="onDiaglogSaved()"></app-add-dictionary-dialog>
 
 <p-confirmDialog
   [style]="{ width: '40rem' }"
   [baseZIndex]="10000"
-  rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+  rejectButtonStyleClass="p-button-text mr-2"></p-confirmDialog>

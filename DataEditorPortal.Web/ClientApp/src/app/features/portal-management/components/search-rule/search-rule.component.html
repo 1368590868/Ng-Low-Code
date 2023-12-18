@@ -16,20 +16,20 @@
     placeholder="Please Select"
     [options]="_options"></p-dropdown>
   <div *ngIf="whereClause" (click)="showDialog()" style="cursor: pointer">
-    <p-message
-      severity="info"
-      text="Use Query Text"
-      styleClass="mr-1"></p-message>
+    <p-message severity="info" text="Use Query Text" styleClass="mr-1"></p-message>
   </div>
   <p-button
     *ngIf="whereClause"
-    styleClass="p-button-text p-button-rounded remove-btn"
+    [text]="true"
+    [rounded]="true"
+    styleClass="remove-btn"
     icon="pi pi-times-circle"
     (onClick)="whereClause = undefined"></p-button>
   <p-button
     class="ml-auto"
     title="Advanced Configuration"
-    styleClass="p-button-text p-button-rounded"
+    [text]="true"
+    [rounded]="true"
     icon="pi pi-ellipsis-v"
     (onClick)="showDialog()"></p-button>
 </div>
@@ -61,11 +61,7 @@
     </div>
   </div>
   <ng-template pTemplate="footer">
-    <p-button
-      icon="pi pi-times"
-      (onClick)="onCancel()"
-      label="Cancel"
-      styleClass="p-button-text"></p-button>
+    <p-button icon="pi pi-times" (onClick)="onCancel()" label="Cancel" [text]="true"></p-button>
     <p-button icon="pi pi-check" (onClick)="onOk()" label="Ok"></p-button>
   </ng-template>
 </p-dialog>

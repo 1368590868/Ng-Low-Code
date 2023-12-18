@@ -54,7 +54,8 @@
     <p-button
       label="Show Histories"
       [icon]="showHistory ? 'pi pi-minus' : 'pi pi-plus'"
-      styleClass="p-button-text p-button-sm"
+      [text]="true"
+      size="small"
       (onClick)="showHistory = !showHistory"></p-button>
   </p-divider>
   <ng-container *ngIf="showHistory">
@@ -65,7 +66,7 @@
       [sortOrder]="-1"
       [scrollable]="true"
       scrollHeight="350px"
-      [tableStyle]="{tableLayout: 'fixed'}"
+      [tableStyle]="{ tableLayout: 'fixed' }"
       rowGroupMode="subheader"
       groupRowsBy="createDate">
       <ng-template pTemplate="header">

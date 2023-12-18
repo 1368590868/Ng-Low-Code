@@ -1,8 +1,6 @@
 <p-card styleClass="">
   <ng-template pTemplate="title"> Grid Columns </ng-template>
-  <ng-template pTemplate="subtitle">
-    Select the fields that you want to display in grid.
-  </ng-template>
+  <ng-template pTemplate="subtitle"> Select the fields that you want to display in grid. </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
   <div class="w-full pt-2 flex">
     <p-pickList
@@ -27,8 +25,7 @@
       sourceFilterPlaceholder="Search by name"
       targetFilterPlaceholder="Search by name">
       <ng-template pTemplate="targetHeader">
-        <div
-          class="p-picklist-title flex align-items-center justify-content-between">
+        <div class="p-picklist-title flex align-items-center justify-content-between">
           <span>Column Fields</span>
           <p-menu
             #addNewMenu
@@ -39,21 +36,18 @@
             [style]="{ width: 'auto', minWidth: '12.5833rem' }"></p-menu>
           <p-button
             label="Add Custom Column"
-            styleClass="p-button-sm p-button-text"
+            [text]="true"
+            size="small"
             (onClick)="addNewMenu.toggle($event)"></p-button>
         </div>
       </ng-template>
       <ng-template let-column pTemplate="item">
         <div *ngIf="!column.selected" class="">[{{ column.field }}]</div>
         <div *ngIf="column.selected" class="flex align-items-center">
-          <div
-            [title]="column.field"
-            class="w-15rem mr-3 overflow-hidden text-overflow-ellipsis">
+          <div [title]="column.field" class="w-15rem mr-3 overflow-hidden text-overflow-ellipsis">
             [{{ column.field }}]
           </div>
-          <div
-            class="w-20rem mr-3 overflow-hidden text-overflow-ellipsis"
-            *ngIf="column.header">
+          <div class="w-20rem mr-3 overflow-hidden text-overflow-ellipsis" *ngIf="column.header">
             <p-tag>{{ column.header }}</p-tag>
           </div>
 
@@ -67,16 +61,13 @@
           </ng-container>
 
           <ng-container *ngIf="column.type !== 'DataBaseField'">
-            <p-tag *ngIf="column.type === 'TemplateField'" severity="warning">
-              Template Field
-            </p-tag>
-            <p-tag *ngIf="column.type === 'AttachmentField'" severity="warning">
-              Attachment Field
-            </p-tag>
+            <p-tag *ngIf="column.type === 'TemplateField'" severity="warning"> Template Field </p-tag>
+            <p-tag *ngIf="column.type === 'AttachmentField'" severity="warning"> Attachment Field </p-tag>
             <p-button
               icon="pi pi-trash"
               class="remove-btn mr-0 ml-auto"
-              styleClass="p-button-text p-button-rounded"
+              [text]="true"
+              [rounded]="true"
               (onClick)="onRemoveCustomColumn($event, column)"></p-button>
           </ng-container>
         </div>
@@ -92,10 +83,7 @@
         <div class="p-picklist-title">Configuration Form</div>
       </div>
       <div class="p-picklist-list flex-grow-1">
-        <form
-          *ngIf="this.model && this.model.field; else emptyMessage"
-          [formGroup]="form"
-          #configForm="ngForm">
+        <form *ngIf="this.model && this.model.field; else emptyMessage" [formGroup]="form" #configForm="ngForm">
           <formly-form
             [form]="form"
             [fields]="fields"
@@ -104,9 +92,7 @@
             class="p-fluid"></formly-form>
         </form>
         <ng-template #emptyMessage>
-          <div class="pt-4">
-            Please select one row in <b>Column Fields</b> panel to configure.
-          </div>
+          <div class="pt-4">Please select one row in <b>Column Fields</b> panel to configure.</div>
         </ng-template>
       </div>
     </div>
@@ -117,14 +103,14 @@
         label="Back"
         icon="pi pi-angle-left"
         [disabled]="isLoading || isSaving"
-        styleClass="p-button-outlined"
+        [outlined]="true"
         (onClick)="onBack()"></p-button>
       <p-button
         label="Save Draft & Exit"
         icon="pi pi-save"
         class="ml-auto"
         [disabled]="isLoading || isSaving"
-        styleClass="p-button-outlined"
+        [outlined]="true"
         (onClick)="onSaveAndExit()"
         [loading]="isSaving && isSavingAndExit"></p-button>
       <p-button

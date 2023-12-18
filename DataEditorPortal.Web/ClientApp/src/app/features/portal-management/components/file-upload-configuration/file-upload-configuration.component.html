@@ -6,23 +6,17 @@
       severity="info"
       text="Use existing table"
       (click)="showDialog()"></p-message>
-    <p-message
-      *ngIf="!dsConfig.fieldMapping"
-      severity="info"
-      text="Use default table"></p-message>
+    <p-message *ngIf="!dsConfig.fieldMapping" severity="info" text="Use default table"></p-message>
     <p-button
       *ngIf="dsConfig.fieldMapping"
-      styleClass="p-button-text p-button-rounded remove-btn"
+      [text]="true"
+      [rounded]="true"
+      styleClass="remove-btn"
       icon="pi pi-times-circle"
       (onClick)="removeConfig()"></p-button>
   </div>
 
-  <p-button
-    *ngIf="!dsConfig.fieldMapping"
-    styleClass="p-button-outlined"
-    (onClick)="showDialog()"
-    >Configure</p-button
-  >
+  <p-button *ngIf="!dsConfig.fieldMapping" [outlined]="true" (onClick)="showDialog()">Configure</p-button>
 </div>
 <p-dialog
   [(visible)]="visible"
@@ -147,11 +141,7 @@
     <div class="flex align-items-center mb-2 -mx-3">
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="'FILE_NAME'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="'FILE_NAME'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -191,11 +181,7 @@
     <div class="flex align-items-center mb-2 -mx-3" *ngIf="isStorageTypeBinary">
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="'FILE_BYTES'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="'FILE_BYTES'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -211,16 +197,10 @@
           appendTo="body"></p-dropdown>
       </div>
     </div>
-    <div
-      class="flex align-items-center mb-2 -mx-3"
-      *ngIf="!isStorageTypeBinary">
+    <div class="flex align-items-center mb-2 -mx-3" *ngIf="!isStorageTypeBinary">
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="'FILE_PATH'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="'FILE_PATH'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -241,11 +221,7 @@
     <div class="flex align-items-center mb-2 -mx-3">
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="'COMMENTS'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="'COMMENTS'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -266,11 +242,7 @@
     <div class="flex align-items-center mb-2 -mx-3">
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="'CONTENT_TYPE'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="'CONTENT_TYPE'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -291,11 +263,7 @@
     <div class="flex align-items-center mb-2 -mx-3">
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="'CREATED BY'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="'CREATED BY'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -316,11 +284,7 @@
     <div class="flex align-items-center mb-2 -mx-3">
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="'CREATED DATE'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="'CREATED DATE'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -341,11 +305,7 @@
     <div class="flex align-items-center mb-2 -mx-3">
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="'MODIFIED BY'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="'MODIFIED BY'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -366,11 +326,7 @@
     <div class="flex align-items-center mb-2 -mx-3">
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="" class="mb-1"></label>
-        <input
-          type="text"
-          pInputText
-          [ngModel]="'MODIFIED DATE'"
-          [disabled]="true" />
+        <input type="text" pInputText [ngModel]="'MODIFIED DATE'" [disabled]="true" />
       </div>
       <div class="flex flex-column flex-1 px-3 w-6">
         <label for="tableName" class="mb-1"></label>
@@ -389,15 +345,7 @@
     </div>
   </div>
   <ng-template pTemplate="footer">
-    <p-button
-      icon="pi pi-times"
-      (onClick)="onCancel()"
-      label="Cancel"
-      styleClass="p-button-text"></p-button>
-    <p-button
-      icon="pi pi-check"
-      (onClick)="onOk()"
-      label="Ok"
-      [loading]="isLoading"></p-button>
+    <p-button icon="pi pi-times" (onClick)="onCancel()" label="Cancel" [text]="true"></p-button>
+    <p-button icon="pi pi-check" (onClick)="onOk()" label="Ok" [loading]="isLoading"></p-button>
   </ng-template>
 </p-dialog>

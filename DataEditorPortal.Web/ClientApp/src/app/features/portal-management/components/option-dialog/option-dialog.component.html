@@ -1,10 +1,5 @@
 <div class="flex align-items-center justify-content-between">
-  <p-button
-    styleClass="p-button-outlined"
-    (onClick)="showDialog()"
-    [disabled]="disabled"
-    >Configure</p-button
-  >
+  <p-button [outlined]="true" (onClick)="showDialog()" [disabled]="disabled">Configure</p-button>
   <p-message
     *ngIf="optionsLookup || (options && options.length > 0)"
     severity="info"
@@ -21,18 +16,13 @@
   <ng-template pTemplate="header">
     <span class="p-dialog-title"
       >{{ dialogTitle }} Editor
-      <a (click)="changeMode()" *ngIf="!onlyAdvanced">{{
-        !isAdvanced ? 'Advance Mode' : 'Simple Mode'
-      }}</a></span
+      <a (click)="changeMode()" *ngIf="!onlyAdvanced">{{ !isAdvanced ? 'Advance Mode' : 'Simple Mode' }}</a></span
     >
     <div class="flex align-items-center"></div>
   </ng-template>
   <div #container class="dialog-content">
     <div class="flex flex-column" style="min-height: 10rem">
-      <ng-container
-        [ngTemplateOutlet]="
-          !isAdvanced ? simpleRef : advancedRef
-        "></ng-container>
+      <ng-container [ngTemplateOutlet]="!isAdvanced ? simpleRef : advancedRef"></ng-container>
       <ng-template #simpleRef>
         <p-orderList
           appendTo="body"
@@ -54,7 +44,8 @@
               <div>
                 <p-button
                   icon="pi pi-trash"
-                  styleClass="p-button-rounded p-button-text"
+                  [rounded]="true"
+                  [text]="true"
                   (onClick)="onRemoveFilter(option)"></p-button>
               </div>
             </div>
@@ -70,7 +61,8 @@
           label="Add"
           icon="pi pi-plus"
           class="mt-1 mb-3"
-          styleClass="p-button-text p-button-sm"
+          [text]="true"
+          size="small"
           (onClick)="onAdd()"></p-button>
       </ng-template>
       <ng-template #advancedRef>
@@ -95,11 +87,7 @@
             </div>
             <div class="flex flex-column flex-grow-1 px-3 w-6">
               <label class="line-height-3">Name</label>
-              <input
-                [formControl]="formControlName"
-                [required]="true"
-                pInputText
-                placeholder="Enter a name" />
+              <input [formControl]="formControlName" [required]="true" pInputText placeholder="Enter a name" />
             </div>
           </div>
           <div class="flex flex-column">
@@ -125,11 +113,7 @@
     </div>
   </div>
   <ng-template pTemplate="footer">
-    <p-button
-      icon="pi pi-times"
-      (onClick)="onCancel()"
-      label="Cancel"
-      styleClass="p-button-text"></p-button>
+    <p-button icon="pi pi-times" (onClick)="onCancel()" label="Cancel" [text]="true"></p-button>
     <p-button
       icon="pi pi-check"
       (onClick)="onOk()"

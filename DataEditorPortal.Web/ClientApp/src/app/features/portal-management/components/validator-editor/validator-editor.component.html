@@ -12,12 +12,8 @@
       display="chip"
       [options]="selectOptions">
       <ng-template let-value pTemplate="selectedItems">
-        <div
-          *ngFor="let item of value; let i = index"
-          class="p-multiselect-token">
-          <span class="p-multiselect-token-label">{{
-            select.findLabelByValue(item)
-          }}</span>
+        <div *ngFor="let item of value; let i = index" class="p-multiselect-token">
+          <span class="p-multiselect-token-label">{{ select.findLabelByValue(item) }}</span>
           <span
             *ngIf="!select.disabled"
             class="p-multiselect-token-icon pi pi-times-circle"
@@ -26,25 +22,20 @@
         <ng-container *ngIf="hasAdvanceData">
           <div class="p-multiselect-token">
             <span class="p-multiselect-token-label">Advanced</span>
-            <span
-              class="p-multiselect-token-icon pi pi-times-circle"
-              (click)="removeAdvance()"></span>
+            <span class="p-multiselect-token-icon pi pi-times-circle" (click)="removeAdvance()"></span>
           </div>
         </ng-container>
-        <ng-container
-          #empty
-          *ngIf="(!value || value.length === 0) && !hasAdvanceData"
-          >{{
-            select.placeholder || select.defaultLabel || 'empty'
-          }}</ng-container
-        >
+        <ng-container #empty *ngIf="(!value || value.length === 0) && !hasAdvanceData">{{
+          select.placeholder || select.defaultLabel || 'empty'
+        }}</ng-container>
       </ng-template>
     </p-multiSelect>
 
     <p-button
       class="ml-auto"
       title="Advanced Configuration"
-      styleClass="p-button-text p-button-rounded"
+      [text]="true"
+      [rounded]="true"
       icon="pi pi-ellipsis-v"
       (onClick)="showDialog()"></p-button>
   </div>
@@ -57,9 +48,7 @@
     contentStyleClass="border-top-1 surface-border pt-4 pb-0">
     <div #container class="dialog-content">
       <div class="mb-3">
-        <label class="line-height-2 mb-1 flex align-items-center"
-          >Javascript Expression
-        </label>
+        <label class="line-height-2 mb-1 flex align-items-center">Javascript Expression </label>
         <ngx-monaco-editor
           *ngIf="visible"
           formControlName="expressionFormControl"
@@ -70,19 +59,10 @@
           [options]="{ language: 'javascript' }"></ngx-monaco-editor>
       </div>
       <label class="line-height-3 flex align-items-center">Message </label>
-      <input
-        class="w-full mb-2"
-        rows="5"
-        pInputText
-        formControlName="messageFormControl"
-        placeholder="Enter a value" />
+      <input class="w-full mb-2" rows="5" pInputText formControlName="messageFormControl" placeholder="Enter a value" />
     </div>
     <ng-template pTemplate="footer">
-      <p-button
-        icon="pi pi-times"
-        (onClick)="onCancel()"
-        label="Cancel"
-        styleClass="p-button-text"></p-button>
+      <p-button icon="pi pi-times" (onClick)="onCancel()" label="Cancel" [text]="true"></p-button>
       <p-button icon="pi pi-check" (onClick)="onOk()" label="Ok"></p-button>
     </ng-template>
   </p-dialog>

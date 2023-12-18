@@ -1,15 +1,9 @@
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger
-} from '@angular/animations';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Observable, combineLatest, filter, map } from 'rxjs';
-import { ConfigDataService, UserService, SiteMenu } from 'src/app/shared';
+import { ConfigDataService, SiteMenu, UserService } from 'src/app/shared';
 
 @Component({
   selector: 'app-nav-menu',
@@ -66,7 +60,7 @@ export class NavMenuComponent implements OnInit {
 
     if (menu.status !== 1) {
       menu.badge = 'Draft';
-      menu.badgeStyleClass = 'p-badge p-badge-warning';
+      menu.badgeStyleClass = 'p-badge p-badge-warning border-round ml-2';
     }
 
     if (menu.icon && /^icons\/.*/.test(menu.icon)) {

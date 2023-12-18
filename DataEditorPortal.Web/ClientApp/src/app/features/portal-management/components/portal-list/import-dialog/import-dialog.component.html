@@ -1,11 +1,7 @@
 <p-dialog
   [header]="header"
   [(visible)]="visible"
-  [style]="
-    step === 1
-      ? { width: '40rem', minHeight: '25rem' }
-      : { width: '50rem', height: '35rem' }
-  "
+  [style]="step === 1 ? { width: '40rem', minHeight: '25rem' } : { width: '50rem', height: '35rem' }"
   [modal]="true"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0"
   appendTo="body">
@@ -13,9 +9,7 @@
     <!-- Select File -->
     <div *ngIf="step === 1">
       <div class="mb-4">
-        <label class="line-height-3 flex align-items-center"
-          >Select folder of the import</label
-        >
+        <label class="line-height-3 flex align-items-center">Select folder of the import</label>
         <p-dropdown
           styleClass="w-full"
           [options]="options"
@@ -53,15 +47,16 @@
         <p-button
           *ngIf="file?.fileName"
           icon="pi pi-file"
-          styleClass="p-button-link flex-nowrap"
+          [link]="true"
+          styleClass="flex-nowrap"
           [label]="fileLabel"></p-button>
       </div>
     </div>
 
     <div *ngIf="step === 2" class="preview-data flex flex-column overflow-auto">
       <p class="mb-3">
-        Please select the objects to import. Existing objects are marked with a
-        warning and will be overwritten if checked.
+        Please select the objects to import. Existing objects are marked with a warning and will be overwritten if
+        checked.
       </p>
       <p-table
         class="data-table overflow-auto"
@@ -108,12 +103,7 @@
   <ng-template pTemplate="footer">
     <div class="flex justify-content-between">
       <div>
-        <p-button
-          *ngIf="step !== 1"
-          icon="pi pi-angle-left"
-          (onClick)="onBack()"
-          label="Back"
-          styleClass="p-button-text"></p-button>
+        <p-button *ngIf="step !== 1" icon="pi pi-angle-left" (onClick)="onBack()" label="Back" [text]="true"></p-button>
       </div>
       <div>
         <p-button
@@ -121,7 +111,7 @@
           icon="pi pi-times"
           (onClick)="onCancel()"
           [label]="cancelText"
-          styleClass="p-button-text"></p-button>
+          [text]="true"></p-button>
         <p-button
           [iconPos]="step === 2 ? 'left' : 'right'"
           [icon]="'pi ' + (step === 2 ? 'pi-check' : 'pi-angle-right')"

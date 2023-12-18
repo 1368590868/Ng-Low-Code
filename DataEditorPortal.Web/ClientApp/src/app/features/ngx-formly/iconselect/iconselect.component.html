@@ -37,9 +37,7 @@
     <div *ngIf="iconLogo" class="flex justify-content-start align-items-center">
       <p-avatar [image]="iconLogo" styleClass="overflow-hidden mr-3 block border-1 border-400"></p-avatar>
 
-      <p-button (onClick)="removePic()" label="Remove" styleClass="p-button-outlined p-button-secondary">
-        <!-- <span class="p-button-icon p-button-icon-left pi pi-trash"></span> -->
-      </p-button>
+      <p-button (onClick)="removePic()" label="Remove" [outlined]="true" severity="secondary"> </p-button>
     </div>
   </div>
 

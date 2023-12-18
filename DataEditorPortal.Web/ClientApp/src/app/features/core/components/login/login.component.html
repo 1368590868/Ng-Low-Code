@@ -1,14 +1,11 @@
-<div
-  class="layout-content login-warp w-9 flex justify-content-center align-items-center">
+<div class="layout-content login-warp w-9 flex justify-content-center align-items-center">
   <div *ngIf="hasLoginError">
     <div class="h-full text-center">
       <h3 class="text-5xl">Failed to login..</h3>
       <p-button styleClass=" mt-6" (onClick)="reload()">Retry</p-button>
     </div>
   </div>
-  <div
-    *ngIf="isLoading"
-    class="login-error flex flex-column-reverse justify-content-center align-items-center">
+  <div *ngIf="isLoading" class="login-error flex flex-column-reverse justify-content-center align-items-center">
     <span class="text-3xl">Signing in..</span>
     <p-progressSpinner></p-progressSpinner>
   </div>

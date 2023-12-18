@@ -7,7 +7,7 @@
     <tr>
       <th style="width: 38.5%">Name</th>
       <th>Comment</th>
-      <th style="width: 3rem"></th>
+      <th style="width: 3.5rem"></th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-file>
@@ -40,27 +40,22 @@
         </ng-template>
       </td>
       <td class="text-right">
-        <button
+        <p-button
           *ngIf="file.status === 'Deleted'"
-          [disabled]="
-            this.fileLimit === 0
-              ? false
-              : (newAttachments | filter) >= this.fileLimit
-          "
-          pButton
-          pRipple
+          [disabled]="this.fileLimit === 0 ? false : (newAttachments | filter) >= this.fileLimit"
           icon="pi pi-refresh"
-          type="button"
-          class="p-button-text p-button-sm p-button-rounded"
-          (click)="tempAttachmentRestore(file)"></button>
-        <button
+          [text]="true"
+          size="small"
+          [rounded]="true"
+          (onClick)="tempAttachmentRestore(file)"></p-button>
+        <p-button
           *ngIf="file.status !== 'Deleted'"
-          pButton
-          pRipple
           icon="pi pi-trash"
-          type="button"
-          class="p-button-text p-button-danger p-button-sm p-button-rounded"
-          (click)="tempAttachmentDelete(file)"></button>
+          [text]="true"
+          size="small"
+          [rounded]="true"
+          severity="danger"
+          (onClick)="tempAttachmentDelete(file)"></p-button>
       </td>
     </tr>
   </ng-template>

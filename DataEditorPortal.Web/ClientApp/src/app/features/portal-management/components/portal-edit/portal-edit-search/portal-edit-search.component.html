@@ -1,15 +1,11 @@
 <p-card styleClass="">
   <ng-template pTemplate="title"> Search Configuration </ng-template>
-  <ng-template pTemplate="subtitle">
-    Select the fields that you want to used in search panel.
-  </ng-template>
+  <ng-template pTemplate="subtitle"> Select the fields that you want to used in search panel. </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
 
   <div class="flex align-items-center">
     <div class="flex align-items-center py-2 mr-4">
-      <p-inputSwitch
-        class="mr-2"
-        [(ngModel)]="useExistingSearch"></p-inputSwitch>
+      <p-inputSwitch class="mr-2" [(ngModel)]="useExistingSearch"></p-inputSwitch>
       Use Existing Search
     </div>
     <div class="flex align-items-center" *ngIf="useExistingSearch">
@@ -50,8 +46,7 @@
       (onMoveAllToSource)="onMoveToSource($event)"
       (onTargetSelect)="onTargetSelect($event)">
       <ng-template pTemplate="targetHeader">
-        <div
-          class="p-picklist-title flex align-items-center justify-content-between">
+        <div class="p-picklist-title flex align-items-center justify-content-between">
           <span>Search Fields</span>
           <p-menu
             #addNewMenu
@@ -62,20 +57,20 @@
             [style]="{ width: 'auto', minWidth: '12.5833rem' }"></p-menu>
           <p-button
             label="Add Custom Field"
-            styleClass="p-button-sm p-button-text"
+            [text]="true"
+            size="small"
             (onClick)="addNewMenu.toggle($event)"></p-button>
         </div>
       </ng-template>
       <ng-template let-column pTemplate="item">
         <div *ngIf="!column.selected" class="">[{{ column.key }}]</div>
-        <app-form-designer-view
-          *ngIf="column.selected"
-          [config]="column"></app-form-designer-view>
+        <app-form-designer-view *ngIf="column.selected" [config]="column"></app-form-designer-view>
         <p-button
           *ngIf="column.key.indexOf('CUSTOM_SEARCH_') === 0"
           icon="pi pi-trash"
           class="remove-btn"
-          styleClass="p-button-text p-button-rounded"
+          [text]="true"
+          [rounded]="true"
           (onClick)="onRemoveCustomColumn($event, column)"></p-button>
       </ng-template>
       <ng-template pTemplate="emptymessagetarget">
@@ -96,9 +91,7 @@
             (configChange)="configChange($event)"></app-search-designer-config>
         </div>
         <ng-template #emptyMessage>
-          <div class="pt-4">
-            Please select one row in <b>Search Fields</b> panel to configure.
-          </div>
+          <div class="pt-4">Please select one row in <b>Search Fields</b> panel to configure.</div>
         </ng-template>
       </div>
     </div>
@@ -110,21 +103,21 @@
         label="Back"
         icon="pi pi-angle-left"
         [disabled]="isLoading || isSaving"
-        styleClass="p-button-outlined"
+        [outlined]="true"
         (onClick)="onBack()"></p-button>
       <p-button
         label="Save Draft & Exit"
         icon="pi pi-save"
         class="ml-auto"
         [disabled]="isLoading || isSaving"
-        styleClass="p-button-outlined"
+        [outlined]="true"
         (onClick)="onSaveAndExit()"
         [loading]="isSaving && isSavingAndExit"></p-button>
       <p-button
         [label]="isLastStep ? 'Save & Publish' : 'Save & Next'"
         [icon]="isLastStep ? 'pi pi-check' : 'pi pi-angle-right'"
         iconPos="right"
-        [styleClass]="isLastStep ? 'p-button-success' : ''"
+        [severity]="isLastStep ? 'success' : ''"
         [style]="{ 'margin-left': '.5em' }"
         [disabled]="isLoading || isSaving"
         (onClick)="onSaveAndNext()"
@@ -135,5 +128,5 @@
 <p-confirmDialog
   header="Confirmation"
   icon="pi pi-exclamation-triangle"
-  rejectButtonStyleClass="p-button-text"
+  rejectButtonStyleClass="p-button-text mr-2"
   [style]="{ maxWidth: '40rem' }"></p-confirmDialog>

@@ -13,26 +13,18 @@
       [@fadeInOutButton]="!configDataService.sidebarCollapsed ? 'show' : 'hide'"
       icon="pi pi-arrow-left"
       class="expand-btn"
-      styleClass="p-button-rounded"
+      [rounded]="true"
       (onClick)="onToggle()">
     </p-button>
     <div class="search-area w-full">
-      <app-search
-        @fadeInOut
-        *ngIf="!configDataService.sidebarCollapsed && gridName"
-        [gridName]="gridName"></app-search>
+      <app-search @fadeInOut *ngIf="!configDataService.sidebarCollapsed && gridName" [gridName]="gridName"></app-search>
     </div>
   </ng-template>
   <ng-template pTemplate>
     <div class="table-area w-full">
-      <app-table
-        @fadeInOut
-        *ngIf="itemType === 'single' && gridName"
-        [gridName]="gridName"></app-table>
+      <app-table @fadeInOut *ngIf="itemType === 'single' && gridName" [gridName]="gridName"></app-table>
       <ng-container *ngIf="itemType === 'linked' && gridName">
-        <app-linked-or-master
-          @fadeInOut
-          [gridName]="gridName"></app-linked-or-master>
+        <app-linked-or-master @fadeInOut [gridName]="gridName"></app-linked-or-master>
       </ng-container>
     </div>
   </ng-template>

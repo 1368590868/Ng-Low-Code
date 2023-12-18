@@ -7,12 +7,7 @@
   contentStyleClass="border-top-1 surface-border pt-4 pb-0">
   <div #container class="dialog-content">
     <div class="flex flex-column mb-2" style="min-height: 10rem">
-      <p-orderList
-        appendTo="body"
-        class="option-list"
-        [value]="optionArr"
-        [stripedRows]="true"
-        [dragdrop]="true">
+      <p-orderList appendTo="body" class="option-list" [value]="optionArr" [stripedRows]="true" [dragdrop]="true">
         <ng-template let-option pTemplate="item">
           <div class="flex align-items-center justify-content-between">
             <div class="mr-3">
@@ -25,10 +20,7 @@
                 appendTo="body"></p-dropdown>
             </div>
             <div>
-              <p-button
-                icon="pi pi-trash"
-                styleClass="p-button-rounded p-button-text"
-                (onClick)="onRemoveFilter(option)"></p-button>
+              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" (onClick)="onRemoveFilter(option)"></p-button>
             </div>
           </div>
         </ng-template>
@@ -41,20 +33,11 @@
         </ng-template>
       </p-orderList>
 
-      <p-button
-        label="Add"
-        icon="pi pi-plus"
-        class="mt-1"
-        styleClass="p-button-text p-button-sm"
-        (onClick)="onAdd()"></p-button>
+      <p-button label="Add" icon="pi pi-plus" class="mt-1" [text]="true" size="small" (onClick)="onAdd()"></p-button>
     </div>
   </div>
   <ng-template pTemplate="footer">
-    <p-button
-      icon="pi pi-times"
-      (onClick)="onCancel()"
-      label="Cancel"
-      styleClass="p-button-text"></p-button>
+    <p-button icon="pi pi-times" (onClick)="onCancel()" label="Cancel" [text]="true"></p-button>
     <p-button
       icon="pi pi-check"
       (onClick)="onOk()"

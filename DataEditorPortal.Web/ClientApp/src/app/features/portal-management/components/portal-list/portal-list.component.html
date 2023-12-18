@@ -19,14 +19,10 @@
             <p-button
               class="mr-2"
               icon="pi pi-file-import"
-              styleClass="p-button-outlined"
+              [outlined]="true"
               label="Import"
               (click)="importDialog.showDialog()"></p-button>
-            <p-button
-              icon="pi pi-plus"
-              styleClass="p-button-outlined"
-              label="New"
-              (click)="addNewMenu.toggle($event)"></p-button>
+            <p-button icon="pi pi-plus" [outlined]="true" label="New" (click)="addNewMenu.toggle($event)"></p-button>
           </div>
         </div>
       </ng-template>
@@ -90,9 +86,7 @@
             <ng-container *ngIf="!rowData?.parentId">
               <div class="flex align-items-center flex-wrap">
                 <div *ngFor="let item of rowData.siteGroups; let i = index">
-                  <p-chip
-                    styleClass="my-1 mr-2 font-medium border-round"
-                    [label]="item.title"></p-chip>
+                  <p-chip styleClass="my-1 mr-2 font-medium border-round" [label]="item.title"></p-chip>
                 </div>
               </div>
             </ng-container>
@@ -100,26 +94,15 @@
           <td>{{ rowData.description }}</td>
           <td style="width: 12rem">
             <div class="flex align-items-center">
-              <p-tag
-                *ngIf="rowData.status === 0"
-                icon="pi pi-file-edit"
-                severity="warning"
-                value="Draft"></p-tag>
-              <p-tag
-                *ngIf="rowData.status === 1"
-                icon="pi pi-check"
-                severity="success"
-                value="Published"></p-tag>
+              <p-tag *ngIf="rowData.status === 0" icon="pi pi-file-edit" severity="warning" value="Draft"></p-tag>
+              <p-tag *ngIf="rowData.status === 1" icon="pi pi-check" severity="success" value="Published"></p-tag>
               <p-tag
                 *ngIf="rowData.status === 2"
                 icon="pi pi-minus-circle"
                 severity="warning"
                 value="Unpublished"></p-tag>
               <i
-                *ngIf="
-                  rowData.type === 'Portal Item' &&
-                  rowData.configCompleted === false
-                "
+                *ngIf="rowData.type === 'Portal Item' && rowData.configCompleted === false"
                 class="pi pi-exclamation-circle ml-3 text-lg"
                 style="color: var(--yellow-600)"
                 pTooltip="You have't completed all configurations"></i>
@@ -132,35 +115,26 @@
               [model]="contextMenuItems"
               appendTo="body"
               [style]="{ width: 'auto' }"></p-menu>
-            <button
-              type="button"
-              pButton
+            <p-button
               icon="pi pi-ellipsis-v"
-              class="p-button-rounded p-button-text"
-              (click)="onShowMenu(menu, $event, rowNode.node)"></button>
+              [rounded]="true"
+              [text]="true"
+              (oncClick)="onShowMenu(menu, $event, rowNode.node)"></p-button>
           </td>
         </tr>
       </ng-template>
     </p-treeTable>
-    <p-contextMenu
-      #cm
-      appendTo="body"
-      [model]="contextMenuItems"
-      styleClass="w-auto"></p-contextMenu>
+    <p-contextMenu #cm appendTo="body" [model]="contextMenuItems" styleClass="w-auto"></p-contextMenu>
   </div>
 </div>
 
-<app-add-portal-dialog
-  #addDialog
-  (saved)="onDiaglogSaved()"></app-add-portal-dialog>
+<app-add-portal-dialog #addDialog (saved)="onDiaglogSaved()"></app-add-portal-dialog>
 
-<app-import-dialog
-  #importDialog
-  (saved)="onImportDialogSaved()"></app-import-dialog>
+<app-import-dialog #importDialog (saved)="onImportDialogSaved()"></app-import-dialog>
 
 <app-custom-actions #customActions></app-custom-actions>
 <p-confirmDialog
   header="Confirmation"
   icon="pi pi-exclamation-triangle"
-  rejectButtonStyleClass="p-button-text"
+  rejectButtonStyleClass="p-button-text mr-2"
   [style]="{ maxWidth: '40rem' }"></p-confirmDialog>

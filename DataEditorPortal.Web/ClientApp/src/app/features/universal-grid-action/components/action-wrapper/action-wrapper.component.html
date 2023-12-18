@@ -1,9 +1,4 @@
-<p-button
-  (onClick)="showDialog()"
-  [icon]="icon"
-  [label]="label"
-  [class]="class"
-  [styleClass]="buttonStyleClass"></p-button>
+<button pButton (click)="showDialog()" [icon]="icon" [label]="label" [class]="class + ' ' + buttonStyleClass"></button>
 <p-dialog
   focusable
   [header]="header"
@@ -23,7 +18,7 @@
       (onClick)="onCancel()"
       [label]="cancelText"
       [disabled]="buttonDisabled"
-      styleClass="p-button-text"></p-button>
+      [text]="true"></p-button>
     <p-button
       icon="pi pi-check"
       (onClick)="onOk()"

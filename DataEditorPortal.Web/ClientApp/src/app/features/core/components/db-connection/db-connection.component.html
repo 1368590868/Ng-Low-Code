@@ -19,12 +19,7 @@
       <ng-template pTemplate="caption">
         <div class="flex align-items-center my-2">
           <h3 class="">DataSource Connections</h3>
-          <p-button
-            icon="pi pi-plus"
-            class="ml-auto"
-            styleClass="p-button-outlined"
-            label="New"
-            (onClick)="onNewOpen()"></p-button>
+          <p-button icon="pi pi-plus" class="ml-auto" [outlined]="true" label="New" (onClick)="onNewOpen()"></p-button>
         </div>
       </ng-template>
       <ng-template pTemplate="header">
@@ -55,12 +50,11 @@
               [model]="contextMenuItems"
               appendTo="body"
               [style]="{ width: 'auto' }"></p-menu>
-            <button
-              type="button"
-              pButton
+            <p-button
               icon="pi pi-ellipsis-v"
-              class="p-button-rounded p-button-text"
-              (click)="onShowMenu(menu, $event, rowData)"></button>
+              [rounded]="true"
+              [text]="true"
+              (onClick)="onShowMenu(menu, $event, rowData)"></p-button>
           </td>
         </tr>
       </ng-template>
@@ -81,11 +75,9 @@
     [showPageLinks]="true"></p-paginator>
 </div>
 
-<app-add-connection-dialog
-  #addDialog
-  (saved)="onDialogSaved()"></app-add-connection-dialog>
+<app-add-connection-dialog #addDialog (saved)="onDialogSaved()"></app-add-connection-dialog>
 
 <p-confirmDialog
   [style]="{ width: '40rem' }"
   [baseZIndex]="10000"
-  rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+  rejectButtonStyleClass="p-button-text mr-2"></p-confirmDialog>

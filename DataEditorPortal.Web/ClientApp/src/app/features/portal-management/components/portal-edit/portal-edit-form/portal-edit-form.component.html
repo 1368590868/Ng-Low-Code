@@ -1,10 +1,6 @@
 <p-card styleClass="">
-  <ng-template pTemplate="title">
-    Add / Edit / Delete Configuration
-  </ng-template>
-  <ng-template pTemplate="subtitle">
-    Customize the Add / Edit / Delete Form or select custom Form.
-  </ng-template>
+  <ng-template pTemplate="title"> Add / Edit / Delete Configuration </ng-template>
+  <ng-template pTemplate="subtitle"> Customize the Add / Edit / Delete Form or select custom Form. </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
   <div class="w-full pb-1" style="margin-top: -1rem">
     <p-tabView>
@@ -47,21 +43,21 @@
         label="Back"
         icon="pi pi-angle-left"
         [disabled]="isLoading || isSaving"
-        styleClass="p-button-outlined"
+        [outlined]="true"
         (onClick)="onBack()"></p-button>
       <p-button
         label="Save Draft & Exit"
         icon="pi pi-save"
         class="ml-auto"
         [disabled]="isLoading || isSaving"
-        styleClass="p-button-outlined"
+        [outlined]="true"
         (onClick)="onSaveAndExit()"
         [loading]="isSaving && isSavingAndExit"></p-button>
       <p-button
         [label]="isLastStep ? 'Save & Publish' : 'Save & Next'"
         [icon]="isLastStep ? 'pi pi-check' : 'pi pi-angle-right'"
         [iconPos]="isLastStep ? 'left' : 'right'"
-        [styleClass]="isLastStep ? 'p-button-success' : ''"
+        [severity]="isLastStep ? 'success' : ''"
         [style]="{ 'margin-left': '.5em' }"
         [disabled]="isLoading || isSaving"
         (onClick)="onSaveAndNext()"

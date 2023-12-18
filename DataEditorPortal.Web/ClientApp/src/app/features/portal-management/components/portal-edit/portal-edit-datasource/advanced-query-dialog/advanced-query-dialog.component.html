@@ -32,15 +32,7 @@
     </div>
   </div>
   <ng-template pTemplate="footer">
-    <p-button
-      icon="pi pi-times"
-      (onClick)="onAdvanceDialogCancel()"
-      label="Cancel"
-      styleClass="p-button-text"></p-button>
-    <p-button
-      icon="pi pi-check"
-      [loading]="loading"
-      (onClick)="onAdvanceDialogOk()"
-      label="Ok"></p-button>
+    <p-button icon="pi pi-times" (onClick)="onAdvanceDialogCancel()" label="Cancel" [text]="true"></p-button>
+    <p-button icon="pi pi-check" [loading]="loading" (onClick)="onAdvanceDialogOk()" label="Ok"></p-button>
   </ng-template>
 </p-dialog>

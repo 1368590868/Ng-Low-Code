@@ -1,8 +1,6 @@
 <p-card styleClass="">
   <ng-template pTemplate="title"> Data Source </ng-template>
-  <ng-template pTemplate="subtitle">
-    Setup data source for this portal item.
-  </ng-template>
+  <ng-template pTemplate="subtitle"> Setup data source for this portal item. </ng-template>
   <p-divider styleClass="mt-0"></p-divider>
   <div class="w-6 pt-3">
     <div class="flex flex-column mb-3">
@@ -27,15 +25,14 @@
           *ngIf="!dbConnectionDisabled"
           class="ml-1"
           pTooltip="Create new Connection"
-          styleClass="p-button-text p-button-rounded"
+          [text]="true"
+          [rounded]="true"
           icon="pi pi-ellipsis-v"
           [disabled]="dbConnectionDisabled"
           (onClick)="addDialog.showDialog()"></p-button>
       </div>
 
-      <app-add-connection-dialog
-        #addDialog
-        (saved)="connectionSaved($event)"></app-add-connection-dialog>
+      <app-add-connection-dialog #addDialog (saved)="connectionSaved($event)"></app-add-connection-dialog>
     </div>
     <div class="flex flex-column mb-3">
       <ng-container *ngIf="!datasourceConfig.queryText">
@@ -56,7 +53,8 @@
             [disabled]="!datasourceConfig.dataSourceConnectionName"
             class="ml-1"
             pTooltip="Create new Query"
-            styleClass="p-button-text p-button-rounded"
+            [text]="true"
+            [rounded]="true"
             icon="pi pi-ellipsis-v"
             (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button>
         </div>
@@ -76,7 +74,9 @@
               }"></ngx-monaco-editor>
           </div>
           <p-button
-            styleClass="p-button-text p-button-rounded ml-2"
+            [text]="true"
+            [rounded]="true"
+            styleClass="ml-2"
             icon="pi pi-times-circle"
             (onClick)="removeAdvancedQuery()"></p-button>
         </div>
@@ -161,10 +161,7 @@
                 [formControl]="filter.formControlValue"></p-inputSwitch>
             </div>
             <div>
-              <p-button
-                icon="pi pi-trash"
-                styleClass="p-button-rounded p-button-text"
-                (onClick)="onRemoveFilter(filter)"></p-button>
+              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" (onClick)="onRemoveFilter(filter)"></p-button>
             </div>
           </div>
         </ng-template>
@@ -173,7 +170,8 @@
         label="Add"
         icon="pi pi-plus"
         class="mt-1"
-        styleClass="p-button-text p-button-sm"
+        [text]="true"
+        size="small"
         (onClick)="onAddFilter()"></p-button>
     </div>
     <p-divider styleClass="mb-0">Order By</p-divider>
@@ -201,7 +199,8 @@
             <div>
               <p-button
                 icon="pi pi-trash"
-                styleClass="p-button-rounded p-button-text"
+                [text]="true"
+                [rounded]="true"
                 (onClick)="onRemoveSortColumn(sortBy)"></p-button>
             </div>
           </div>
@@ -211,7 +210,8 @@
         label="Add"
         icon="pi pi-plus"
         class="mt-1"
-        styleClass="p-button-text p-button-sm"
+        [text]="true"
+        size="small"
         (onClick)="onAddSortColumn()"></p-button>
     </div>
   </div>
@@ -221,14 +221,14 @@
         label="Back"
         icon="pi pi-angle-left"
         [disabled]="isLoading || isSaving"
-        styleClass="p-button-outlined"
+        [outlined]="true"
         (onClick)="onBack()"></p-button>
       <p-button
         label="Save Draft & Exit"
         icon="pi pi-save"
         class="ml-auto"
         [disabled]="isLoading || isSaving"
-        styleClass="p-button-outlined"
+        [outlined]="true"
         (onClick)="onSaveAndExit()"
         [loading]="isSaving && isSavingAndExit"></p-button>
       <p-button
@@ -246,5 +246,5 @@
 <p-confirmDialog
   header="Confirmation"
   icon="pi pi-exclamation-triangle"
-  rejectButtonStyleClass="p-button-text"
+  rejectButtonStyleClass="p-button-text mr-2"
   [style]="{ maxWidth: '40rem' }"></p-confirmDialog>
