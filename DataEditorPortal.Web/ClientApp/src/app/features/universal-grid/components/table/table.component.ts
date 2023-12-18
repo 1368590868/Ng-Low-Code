@@ -22,7 +22,7 @@ import { LinkedTableComponent } from '../linked-table/linked-table.component';
 export class TableComponent implements OnInit, OnDestroy {
   @Input() headerSize: 'compact' | 'normal' = 'normal';
   @Input() gridName!: string;
-  @Input() selectionMode = 'multiple';
+  @Input() selectionMode: 'single' | 'multiple' | undefined | null = 'multiple';
   @Input() connectToSearch = true;
   @Output() rowSelect = new EventEmitter<any>();
   @Output() rowUnselect = new EventEmitter<any>();
@@ -626,7 +626,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   setTableWidth(visibleCols: GridColumn[]) {
     // get the width of selection colmun and action column
-    const tableHead = DomHandler.findSingle(this.table.containerViewChild.nativeElement, '.p-datatable-thead');
+    const tableHead = DomHandler.findSingle(this.table.containerViewChild?.nativeElement, '.p-datatable-thead');
     const headers = DomHandler.find(tableHead, 'tr > th.selection, tr > th.action');
 
     let width = 0;

@@ -7,9 +7,9 @@ import {
   Optional,
   Self
 } from '@angular/core';
+import { DomHandler } from 'primeng/dom';
 import { Dropdown } from 'primeng/dropdown';
 import { Subject, takeUntil } from 'rxjs';
-import { DomHandler } from 'primeng/dom';
 
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
@@ -28,6 +28,7 @@ export class DropdownFixDirective implements OnInit, OnDestroy {
           if (this.options && this.options.length) {
             // Set virtualScroll, scroll to selected item
             if (this.dropdown.virtualScroll) {
+              if (!this.dropdown.scroller) return;
               if (this.dropdown.scroller.first === 0) {
                 // check if the dropdown scroller doesn't scroll, if first === 0, we need to scroll again
                 const selectedIndex = this.dropdown.selectedOption
@@ -35,7 +36,7 @@ export class DropdownFixDirective implements OnInit, OnDestroy {
                       this.dropdown.getOptionValue(
                         this.dropdown.selectedOption
                       ),
-                      this.dropdown.optionsToDisplay
+                      this.dropdown.optionsToDisplay || []
                     )
                   : -1;
                 if (selectedIndex !== -1) {

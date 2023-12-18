@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Type } from '@angular/core';
 import {
   FieldType,
   FieldTypeConfig,
@@ -15,7 +15,7 @@ interface DatepickerProps extends FormlyFieldProps {
   showButtonBar: boolean;
   showOtherMonths: boolean;
   selectOtherMonths: boolean;
-  selectionMode?: string;
+  selectionMode: 'single' | 'multiple' | 'range' | undefined;
   numberOfMonths: number;
   inline: boolean;
   readonlyInput: boolean;

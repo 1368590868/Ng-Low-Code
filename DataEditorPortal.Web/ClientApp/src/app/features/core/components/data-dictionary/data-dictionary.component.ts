@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MenuItem, ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
+import { PaginatorState } from 'primeng/paginator';
 import {
-  DictionaryData,
-  NotifyService,
   DataDictionaryService,
-  PaginationEvent,
-  SortMetaEvent,
-  GridParam
+  DictionaryData,
+  GridParam,
+  NotifyService,
+  SortMetaEvent
 } from 'src/app/shared';
 import { AddDictionaryDialogComponent } from './add-dictionary-dialog/add-dictionary-dialog.component';
 
@@ -51,10 +51,10 @@ export class DataDictionaryComponent implements OnInit {
     this.fetchData();
   }
 
-  onPageChange(event: PaginationEvent) {
+  onPageChange(event: PaginatorState) {
     const { first, rows } = event;
-    this.first = first;
-    this.rows = rows;
+    this.first = first ?? 0;
+    this.rows = rows ?? 50;
     this.fetchData();
   }
 

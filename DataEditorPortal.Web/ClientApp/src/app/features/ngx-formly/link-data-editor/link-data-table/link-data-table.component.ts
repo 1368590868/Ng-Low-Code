@@ -6,11 +6,11 @@ import {
   OnInit,
   forwardRef
 } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { GridParam, SystemLogService } from 'src/app/shared';
 import { ColumnsConfig } from '../link-data-editor.type';
 import { LinkDataTableService } from '../service/link-data-table.service';
-import { forkJoin } from 'rxjs';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { GridParam, SystemLogService } from 'src/app/shared';
 
 @Component({
   selector: 'app-link-data-table',
@@ -38,7 +38,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   table2IdColumn = '';
   table2Name = '';
 
-  selectionMode = 'multiple';
+  selectionMode:'single' | 'multiple' | undefined | null = 'multiple';
   selection: any = [];
   onChange?: any;
   onTouch?: any;

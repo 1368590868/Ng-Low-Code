@@ -55,7 +55,7 @@ export class PTableCascadeColumnFilterDirective implements OnInit, OnDestroy {
         }),
         // update filter options
         tap(val => {
-          if (this.columnFilter && this.columnFilter.fieldConstraints.length === 1) {
+          if (this.columnFilter && this.columnFilter.fieldConstraints && this.columnFilter.fieldConstraints.length === 1) {
             // append current param value to options, in case of Mutiple select shows empty
             const currentFilter = this.columnFilter.fieldConstraints[0].value;
             if (currentFilter && currentFilter.length > 0) {

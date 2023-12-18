@@ -22,6 +22,7 @@ export class TableDirective implements AfterViewChecked {
 
   ngAfterViewChecked(): void {
     if (!this.hasClientHeight && this.table.virtualScroll) {
+      if(!this.table.containerViewChild) return;
       const rows = this.table.containerViewChild.nativeElement.querySelectorAll(
         '.p-datatable .p-datatable-tbody > tr:not(.empty-message)'
       );

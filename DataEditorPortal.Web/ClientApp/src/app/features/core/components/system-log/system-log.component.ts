@@ -1,14 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { PaginatorState } from 'primeng/paginator';
+import { Table } from 'primeng/table';
 import { tap } from 'rxjs';
 import {
   GridParam,
-  PaginationEvent,
   SortMetaEvent,
   SystemLogData,
   SystemLogService
 } from 'src/app/shared';
 import { SystemLogDialogComponent } from './system-log-dialog/system-log-dialog.component';
-import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-system-log',
@@ -35,10 +35,10 @@ export class SystemLogComponent implements OnInit {
     this.fetchData();
   }
 
-  onPageChange(event: PaginationEvent, tableRef: Table) {
+  onPageChange(event: PaginatorState, tableRef: Table) {
     const { first, rows } = event;
-    this.first = first;
-    this.rows = rows;
+    this.first = first ?? 0;
+    this.rows = rows ?? 50;
     this.fetchData();
 
     tableRef.resetScrollTop();

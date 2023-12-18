@@ -4,7 +4,7 @@ import { FieldWrapper } from '@ngx-formly/core';
 @Component({
   selector: 'app-formly-wrapper-divider',
   template: `
-    <p-divider align="left" [type]="to.type || 'solid'">
+    <p-divider align="left" [type]="'solid'">
       {{ to.label }}
     </p-divider>
   `

@@ -41,6 +41,8 @@ export class DialogFocusDirective implements OnDestroy {
               this.dialog.container,
               'click',
               () => {
+                if (!this.dialog.wrapper) return;
+
                 let zIndex = this.dialog.wrapper.style.zIndex;
 
                 // select the dialog array that needs to be updated
@@ -88,6 +90,8 @@ export class DialogFocusDirective implements OnDestroy {
   }
 
   setDialogPosition() {
+    if(!this.dialog.container) return;
+
     const array: HTMLElement[] = [];
     document
       .querySelectorAll<HTMLElement>('.dialog-focusable .p-dialog')

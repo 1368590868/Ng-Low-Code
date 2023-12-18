@@ -2,7 +2,8 @@
   [value]="permissions"
   scrollHeight="350px"
   selectionMode="checkbox"
-  [(selection)]="permissionSelect">
+  [selection]="permissionSelect"
+  (selectionChange)="selectionChange($event)">
   <ng-template
     *ngFor="let type of ['Folder', 'Portal Item', 'default']"
     let-node

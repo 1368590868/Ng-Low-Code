@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MenuItem, ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
+import { PaginatorState } from 'primeng/paginator';
 import {
-  NotifyService,
-  PaginationEvent,
-  SortMetaEvent,
   GridParam,
   GroupData,
-  SiteGroupService
+  NotifyService,
+  SiteGroupService,
+  SortMetaEvent
 } from 'src/app/shared';
 import { AddGroupComponent } from './add-group/add-group.component';
 
@@ -51,10 +51,10 @@ export class SiteGroupComponent implements OnInit {
     this.fetchData();
   }
 
-  onPageChange(event: PaginationEvent) {
+  onPageChange(event: PaginatorState) {
     const { first, rows } = event;
-    this.first = first;
-    this.rows = rows;
+    this.first = first ?? 0;
+    this.rows = rows ?? 50;
     this.fetchData();
   }
 

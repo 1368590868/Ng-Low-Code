@@ -199,6 +199,10 @@ export class ManageRoleActionComponent extends GridActionDirective {
     }
   }
 
+  selectionChange($event: any) {
+    this.permissionSelect = $event;
+  }
+
   onFormSubmit(model: ManageRoleForm) {
     const permissionSelect = this.permissionSelect
       .filter((x: any) => !x.type)

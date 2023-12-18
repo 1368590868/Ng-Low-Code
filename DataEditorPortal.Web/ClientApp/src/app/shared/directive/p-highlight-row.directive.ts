@@ -9,6 +9,7 @@ export class PTableHighlightRowDirective {
   constructor(public dt: Table) {}
 
   get selected(): boolean | undefined {
+    if(!this.dt.dataKey) return;
     return (this.dt as any).highlightRowId === this.data[this.dt.dataKey];
   }
 
@@ -26,6 +27,7 @@ export class PTableHighlightRowDirective {
 
   @HostListener('click', ['$event'])
   onClick() {
+    if (!this.dt.dataKey) return;
     (this.dt as any).highlightRowId = this.data[this.dt.dataKey];
   }
 }

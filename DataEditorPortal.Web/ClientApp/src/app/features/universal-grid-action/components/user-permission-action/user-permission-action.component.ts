@@ -85,6 +85,10 @@ export class UserPermissionActionComponent
     this.getPermissionsList(this.selectedRecords[0][this.recordKey]);
   }
 
+  selectionChange($event:any) {
+    this.permissionSelect = $event;
+  }
+
   onSave(): void {
     const permissionSelect = this.permissionSelect
       .filter((x: any) => !x.type)
