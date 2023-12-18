@@ -4,19 +4,21 @@
       <p-button
         icon="pi pi-file-import"
         (onClick)="onNewImport('Add')"
-        styleClass="p-button-outlined"
+        [outlined]="true"
         label="New Batch Add"></p-button>
       <p-button
         class="ml-3"
         icon="pi pi-file-edit"
         (onClick)="onNewImport('Update')"
-        styleClass="p-button-outlined"
+        [outlined]="true"
         label="New Batch Update"></p-button>
     </div>
     <div>
       <p-button
         icon="pi pi-refresh text-lg"
-        styleClass="p-button-rounded p-button-outlined mr-1"
+        [rounded]="true"
+        [outlined]="true"
+        styleClass="mr-1"
         (onClick)="refresh()"></p-button>
     </div>
   </div>
@@ -33,9 +35,7 @@
       <tr>
         <th pSortableColumn="name">
           Name
-          <p-sortIcon
-            *ngIf="table.sortField === 'name'"
-            field="name"></p-sortIcon>
+          <p-sortIcon *ngIf="table.sortField === 'name'" field="name"></p-sortIcon>
           <p-columnFilter
             style="vertical-align: middle"
             type="text"
@@ -48,9 +48,7 @@
         </th>
         <th pSortableColumn="importType">
           Import Type
-          <p-sortIcon
-            *ngIf="table.sortField === 'importType'"
-            field="importType"></p-sortIcon>
+          <p-sortIcon *ngIf="table.sortField === 'importType'" field="importType"></p-sortIcon>
           <p-columnFilter
             style="vertical-align: middle"
             type="text"
@@ -62,9 +60,7 @@
             [maxFractionDigits]="4"></p-columnFilter>
         </th>
         <th pSortableColumn="createdByUser">
-          Created By<p-sortIcon
-            *ngIf="table.sortField === 'createdByUser'"
-            field="createdByUser"></p-sortIcon>
+          Created By<p-sortIcon *ngIf="table.sortField === 'createdByUser'" field="createdByUser"></p-sortIcon>
           <p-columnFilter
             style="vertical-align: middle"
             type="text"
@@ -77,9 +73,7 @@
         </th>
         <th pSortableColumn="createdDate">
           Created Date
-          <p-sortIcon
-            *ngIf="table.sortField === 'createdDate'"
-            field="createdDate"></p-sortIcon>
+          <p-sortIcon *ngIf="table.sortField === 'createdDate'" field="createdDate"></p-sortIcon>
           <p-columnFilter
             style="vertical-align: middle"
             type="text"
@@ -103,18 +97,13 @@
         <td>{{ fileList.createdByUser }}</td>
         <td>{{ fileList.createdDate | date : 'M/d/yyyy h:mm a' }}</td>
         <td>
-          <app-import-status
-            [rowData]="fileList"
-            [gridName]="gridName"
-            [file]="file"></app-import-status>
+          <app-import-status [rowData]="fileList" [gridName]="gridName" [file]="file"></app-import-status>
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage" let-columns>
       <tr class="h-10rem empty-message">
-        <td class="text-lg text-center" [attr.colspan]="6">
-          No records found.
-        </td>
+        <td class="text-lg text-center" [attr.colspan]="6">No records found.</td>
       </tr>
     </ng-template>
   </p-table>
@@ -125,14 +114,11 @@
 </div> -->
 
 <div *ngIf="step === 2" class="overflow-auto pt-4">
-  <p class="mb-3 w-6">
-    To use the Excel Data Import feature, you will need the following:
-  </p>
+  <p class="mb-3 w-6">To use the Excel Data Import feature, you will need the following:</p>
   <div class="mb-3 w-6">
     <ul class="pl-3">
       <li>
-        To get started quickly, download the template provided, open it in Excel
-        (or equivalent) and edit the file.
+        To get started quickly, download the template provided, open it in Excel (or equivalent) and edit the file.
       </li>
     </ul>
   </div>
@@ -142,25 +128,20 @@
     <p-button
       icon="pi pi-file"
       (onClick)="onDownloadTemplate()"
-      styleClass="p-button-link"
+      [link]="true"
       label="Download template for Batch {{ stepType }}"></p-button>
   </div>
 
   <div class="mb-4 w-6">
     <ul class="pl-3">
+      <li class="mb-3">When you have completely filled in details, please save the file and upload it.</li>
       <li class="mb-3">
-        When you have completely filled in details, please save the file and
-        upload it.
+        Once you click "Next", The system will start reading the data from the Excel file and verfiy it, Depending on
+        the size of the file and the complexity of the data, this process may take some time.
       </li>
       <li class="mb-3">
-        Once you click "Next", The system will start reading the data from the
-        Excel file and verfiy it, Depending on the size of the file and the
-        complexity of the data, this process may take some time.
-      </li>
-      <li class="mb-3">
-        Review the data and fix any validation errors. Once fixed, you need to
-        repeat the import process with necessary adjustments to rectify any
-        errors.
+        Review the data and fix any validation errors. Once fixed, you need to repeat the import process with necessary
+        adjustments to rectify any errors.
       </li>
     </ul>
   </div>
@@ -188,24 +169,20 @@
       [value]="progress"
       class="w-15rem ml-2"
       styleClass="h-full"></p-progressBar>
-    <p-button
-      *ngIf="file?.fileName"
-      icon="pi pi-file"
-      styleClass="p-button-link"
-      [label]="file?.fileName"></p-button>
+    <p-button *ngIf="file?.fileName" icon="pi pi-file" [link]="true" [label]="file?.fileName"></p-button>
   </div>
 </div>
 
 <div *ngIf="step === 3" class="flex flex-column overflow-auto p-1">
   <p class="mb-3">
-    Review the data and fix any validation errors. Once fixed, you need to
-    repeat the import process with necessary adjustments to rectify any errors.
+    Review the data and fix any validation errors. Once fixed, you need to repeat the import process with necessary
+    adjustments to rectify any errors.
   </p>
   <div class="flex align-items-center mb-3" *ngIf="statusList.length > 1">
     <p-button
       *ngIf="innerInfoList && innerInfoList.length > 0"
       (onClick)="onShowInfo(-1)"
-      [styleClass]="clickFilterButton === -1 ? '' : 'p-button-outlined'"
+      [outlined]="clickFilterButton === -1 ? false : true"
       [badgeClass]="clickFilterButton === -1 ? '' : 'bg-primary'"
       [badge]="innerInfoList.length.toString()"
       label="All"></p-button>
@@ -213,14 +190,9 @@
       class="ml-1"
       *ngFor="let data of statusList"
       (onClick)="onShowInfo(data['__status__'])"
-      styleClass="p-button-outlined"
-      [styleClass]="
-        clickFilterButton === data['__status__'] ? '' : 'p-button-outlined'
-      "
+      [outlined]="clickFilterButton === data['__status__'] ? false : true"
       [badge]="data.data.length"
-      [badgeClass]="
-        clickFilterButton === data['__status__'] ? '' : 'bg-primary'
-      "
+      [badgeClass]="clickFilterButton === data['__status__'] ? '' : 'bg-primary'"
       label="{{
         data['__status__'] === 0
           ? 'Ready To Import'
@@ -249,10 +221,7 @@
         <tr>
           <th [style.min-width]="'12rem !important'">Status</th>
           <ng-container *ngFor="let col of columns">
-            <th
-              *ngIf="col.key !== '__status__'"
-              [pSortableColumn]="col.key"
-              [style.min-width]="'12rem !important'">
+            <th *ngIf="col.key !== '__status__'" [pSortableColumn]="col.key" [style.min-width]="'12rem !important'">
               <span style="vertical-align: middle">{{ col.header }}</span>
               <p-sortIcon [field]="col.key"></p-sortIcon>
               <p-columnFilter
@@ -272,24 +241,21 @@
       <ng-template pTemplate="body" let-infoList let-columns="columns">
         <tr>
           <td>
-            <p-tag
-              [severity]="infoList['__status__'] === 0 ? 'success' : 'warning'"
-              >{{
-                infoList['__status__'] === 0
-                  ? 'Ready To Import'
-                  : infoList['__status__'] === 1
-                  ? 'Duplicate'
-                  : infoList['__status__'] === 2
-                  ? 'Missing Fields'
-                  : infoList['__status__'] === 3
-                  ? 'Validation Error'
-                  : infoList['__status__'] === 4
-                  ? 'Already Exists'
-                  : infoList['__status__'] === 5
-                  ? 'Not Exists'
-                  : 'Unknown Error'
-              }}</p-tag
-            >
+            <p-tag [severity]="infoList['__status__'] === 0 ? 'success' : 'warning'">{{
+              infoList['__status__'] === 0
+                ? 'Ready To Import'
+                : infoList['__status__'] === 1
+                ? 'Duplicate'
+                : infoList['__status__'] === 2
+                ? 'Missing Fields'
+                : infoList['__status__'] === 3
+                ? 'Validation Error'
+                : infoList['__status__'] === 4
+                ? 'Already Exists'
+                : infoList['__status__'] === 5
+                ? 'Not Exists'
+                : 'Unknown Error'
+            }}</p-tag>
           </td>
           <ng-container *ngFor="let col of columns">
             <td *ngIf="col.key !== '__status__'">
@@ -310,22 +276,12 @@
   </div>
 </div>
 
-<div
-  class="dialog-footer flex justify-content-between mt-auto"
-  *ngIf="step !== 1">
+<div class="dialog-footer flex justify-content-between mt-auto" *ngIf="step !== 1">
   <div class="ml-1">
-    <p-button
-      icon="pi pi-angle-left"
-      (onClick)="onBack()"
-      label="Back"
-      styleClass="p-button-text"></p-button>
+    <p-button icon="pi pi-angle-left" (onClick)="onBack()" label="Back" [text]="true"></p-button>
   </div>
   <div>
-    <p-button
-      icon="pi pi-times"
-      (onClick)="onCancel()"
-      label="Cancel"
-      styleClass="p-button-text"></p-button>
+    <p-button icon="pi pi-times" (onClick)="onCancel()" label="Cancel" [text]="true"></p-button>
     <p-button
       [disabled]="validDisabled(currentStep) || isLoading"
       [iconPos]="okLabel !== 'Next' ? 'left' : 'right'"
