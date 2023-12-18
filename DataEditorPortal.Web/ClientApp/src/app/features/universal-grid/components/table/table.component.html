@@ -75,9 +75,9 @@
             </div>
 
             <p-button
-              *ngIf="itemType === 'linked'"
+              *ngIf="itemType === 'linked' && allowHighlightOnly"
               [disabled]="!table2Id"
-              [pTooltip]="table2Id ? 'View Linked Item(s) Only' : 'Select a row data to activate'"
+              [pTooltip]="'View Linked Item(s) Only'"
               tooltipPosition="left"
               [style.cursor]="!table2Id ? 'not-allowed' : 'pointer'"
               [styleClass]="
