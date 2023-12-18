@@ -1,18 +1,12 @@
 import { Injectable } from '@angular/core';
-import {
-  ActivatedRouteSnapshot,
-  CanActivate,
-  Router,
-  RouterStateSnapshot,
-  UrlTree
-} from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { UserService } from '..';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AdminPermissionGuard implements CanActivate {
+export class AdminPermissionGuard  {
   constructor(private userService: UserService, private router: Router) {}
   canActivate(
     route: ActivatedRouteSnapshot,
