@@ -3,12 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
-import {
-  NgxFormlyService,
-  NotifyService,
-  SearchParam,
-  SystemLogService
-} from 'src/app/shared';
+import { NgxFormlyService, NotifyService, SearchParam, SystemLogService } from 'src/app/shared';
 import { GridTableService } from '../../services/grid-table.service';
 import { SearchService } from '../../services/search.service';
 import { UrlParamsService } from '../../services/url-params.service';
@@ -29,7 +24,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   model: {
     [name: string]: any;
   } = {};
-  fields!: FormlyFieldConfig[];
+  fields?: FormlyFieldConfig[];
+  fieldsCopy?: FormlyFieldConfig[];
 
   existingSearchOptions: { label: string; value: string }[] = [];
 
@@ -77,41 +73,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.gridTableService.getSearchConfig(this.gridName).subscribe(result => {
       // this.options.resetModel?.();
       this.model = {};
+      this.fieldsCopy = JSON.parse(JSON.stringify(result));
 
-      // fetch lookups
-      const fields = result as FormlyFieldConfig[];
-      fields
-        .filter(
-          // advanced setting: options from lookup
-          x =>
-            typeof x.type === 'string' &&
-            ['select', 'multiSelect'].indexOf(x.type) >= 0 &&
-            x.props &&
-            x.props['optionsLookup']
-        )
-        .forEach(f => {
-          if (f.props) {
-            f.props.placeholder = 'Please Select';
-            if (!f.props.options) f.props.options = [];
+      this.fields = this.configFields(result as FormlyFieldConfig[]);
 
-            if (Array.isArray(f.props['optionsLookup'])) {
-              f.props.options = f.props['optionsLookup'];
-            } else {
-              this.ngxFormlyService.initFieldLookup(f, this.destroy$);
-            }
-          }
-        });
-
-      // set triStateCheckbox
-      fields
-        .filter(x => x.type == 'checkbox')
-        .forEach(f => {
-          f.type = 'triStateCheckbox';
-          f.defaultValue = null;
-          if (f.props) f.props['hideLabel'] = true;
-        });
-
-      this.fields = fields;
       const searchParams = this.urlParamsService.getSearchInitParams();
       this.initExistingSearch();
       if (searchParams && searchParams.action === 'search') {
@@ -134,40 +99,74 @@ export class SearchComponent implements OnInit, OnDestroy {
           value: x.searches,
           id: x.id
         }));
-        this.dialogHistoryOptions = [
-          ...this.dialogHistoryOptions,
-          ...newOptions
-        ];
+        this.dialogHistoryOptions = [...this.dialogHistoryOptions, ...newOptions];
         this.searchHistoryOptions = [...newOptions];
       }
     });
 
     // get existing search options
-    this.gridTableService
-      .getExistingSearchOptions(this.gridName)
-      .subscribe(res => {
-        this.existingSearchOptions = res;
-      });
+    this.gridTableService.getExistingSearchOptions(this.gridName).subscribe(res => {
+      this.existingSearchOptions = res;
+    });
 
-    this.formControlSearchHistory.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(value => {
-        if (value && Object.keys(value).length > 0) {
-          this.model = { ...this.model, ...value };
+    this.formControlSearchHistory.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
+      if (value && Object.keys(value).length > 0) {
+        const temp = this.configFields(this.fieldsCopy);
+        this.fields = undefined;
+        this.model = { ...this.model, ...value };
+        setTimeout(() => {
+          this.fields = temp;
           this.onSubmit(this.model);
-        }
-      });
+        }, 0);
+      }
+    });
 
-    this.formControlExistingSearch.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(value => {
-        if (value) {
-          this.searchService.setSearchForm(this.model);
-          this.router.navigate([value]);
-        }
-      });
+    this.formControlExistingSearch.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
+      if (value) {
+        this.searchService.setSearchForm(this.model);
+        this.router.navigate([value]);
+      }
+    });
 
     this.setDefaultSearchOn();
+  }
+
+  configFields(fields: FormlyFieldConfig[] | undefined) {
+    if (!fields) return fields;
+
+    // fetch lookups
+    fields
+      .filter(
+        // advanced setting: options from lookup
+        x =>
+          typeof x.type === 'string' &&
+          ['select', 'multiSelect'].indexOf(x.type) >= 0 &&
+          x.props &&
+          x.props['optionsLookup']
+      )
+      .forEach(f => {
+        if (f.props) {
+          f.props.placeholder = 'Please Select';
+          if (!f.props.options) f.props.options = [];
+
+          if (Array.isArray(f.props['optionsLookup'])) {
+            f.props.options = f.props['optionsLookup'];
+          } else {
+            this.ngxFormlyService.initFieldLookup(f, this.destroy$);
+          }
+        }
+      });
+
+    // set triStateCheckbox
+    fields
+      .filter(x => x.type == 'checkbox')
+      .forEach(f => {
+        f.type = 'triStateCheckbox';
+        f.defaultValue = null;
+        if (f.props) f.props['hideLabel'] = true;
+      });
+
+    return fields;
   }
 
   setDefaultSearchOn() {
@@ -223,57 +222,39 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   onOk() {
-    if (
-      this.formControlDialogSearchHistory.valid &&
-      this.formControlDialogName.valid
-    ) {
+    if (this.formControlDialogSearchHistory.valid && this.formControlDialogName.valid) {
       const name = this.formControlDialogName.value;
       if (Object.keys(this.formControlDialogSearchHistory.value).length === 0) {
         // Create
 
-        this.searchService
-          .addSearchHistory(this.gridName, name, this.model)
-          .subscribe(res => {
-            if (res.code === 200) {
-              this.notifyService.notifySuccess(
-                'Success',
-                'Create successfully'
-              );
-              this.visible = false;
-              this.searchHistoryOptions.push({
-                label: name,
-                value: this.model
-              });
-              this.dialogHistoryOptions.push({
-                label: name,
-                value: this.model
-              });
-            }
-          });
+        this.searchService.addSearchHistory(this.gridName, name, this.model).subscribe(res => {
+          if (res.code === 200) {
+            this.notifyService.notifySuccess('Success', 'Create successfully');
+            this.visible = false;
+            this.searchHistoryOptions.push({
+              label: name,
+              value: this.model
+            });
+            this.dialogHistoryOptions.push({
+              label: name,
+              value: this.model
+            });
+          }
+        });
       } else {
         // Update
         const selectedOption = this.dialogHistoryOptions.find(
           option => option.value === this.formControlDialogSearchHistory.value
         );
         this.searchService
-          .updateSearcHistory(
-            this.gridName,
-            selectedOption?.id || '',
-            name,
-            this.model
-          )
+          .updateSearcHistory(this.gridName, selectedOption?.id || '', name, this.model)
           .subscribe(res => {
             if (res.code === 200) {
-              this.notifyService.notifySuccess(
-                'Success',
-                'Create successfully'
-              );
+              this.notifyService.notifySuccess('Success', 'Create successfully');
               this.visible = false;
 
               this.searchHistoryOptions.forEach(option => {
-                if (
-                  option.value === this.formControlDialogSearchHistory.value
-                ) {
+                if (option.value === this.formControlDialogSearchHistory.value) {
                   option.label = name;
                   option.value = this.model;
                 }

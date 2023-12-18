@@ -1,11 +1,7 @@
 <div class="p-card pt-3 pb-1">
   <div class="flex mb-4 px-3 align-items-center">
     <h3>Search Inputs</h3>
-    <i
-      *ngIf="showStar"
-      title="Save Current Search"
-      class="pi pi-star ml-3 cursor-pointer"
-      (click)="showDialog()"></i>
+    <i *ngIf="showStar" title="Save Current Search" class="pi pi-star ml-3 cursor-pointer" (click)="showDialog()"></i>
   </div>
 
   <div class="px-3" *ngIf="searchHistoryOptions.length > 0">
@@ -19,7 +15,7 @@
       placeholder="Saved Searches"></p-dropdown>
     <p-divider styleClass="mb-2"></p-divider>
   </div>
-  <form [formGroup]="form" (ngSubmit)="onSubmit(model)" class="px-3 pb-3">
+  <form *ngIf="fields" [formGroup]="form" (ngSubmit)="onSubmit(model)" class="px-3 pb-3">
     <formly-form
       [form]="form"
       [fields]="fields"
@@ -41,9 +37,7 @@
     </div>
 
     <div class="flex justify-content-end">
-      <p-button styleClass="p-button-outlined mr-2" (onClick)="onClear()">
-        Clear
-      </p-button>
+      <p-button styleClass="p-button-outlined mr-2" (onClick)="onClear()"> Clear </p-button>
       <p-button type="submit">Submit</p-button>
     </div>
   </form>
@@ -58,9 +52,7 @@
   appendTo="body">
   <div #container class="dialog-content">
     <div class="mb-3">
-      <label class="line-height-3 flex align-items-center"
-        >New Search Name</label
-      >
+      <label class="line-height-3 flex align-items-center">New Search Name</label>
       <input
         type="text"
         class="w-full"
@@ -70,9 +62,7 @@
         placeholder="Enter Name" />
     </div>
     <div class="mb-3">
-      <label class="line-height-3 flex align-items-center"
-        >Replace Existing Saved Search</label
-      >
+      <label class="line-height-3 flex align-items-center">Replace Existing Saved Search</label>
       <p-dropdown
         styleClass="w-full"
         [required]="true"
@@ -83,11 +73,7 @@
     </div>
   </div>
   <ng-template pTemplate="footer">
-    <p-button
-      icon="pi pi-times"
-      (onClick)="onCancel()"
-      label="Cancel"
-      styleClass="p-button-text"></p-button>
+    <p-button icon="pi pi-times" (onClick)="onCancel()" label="Cancel" styleClass="p-button-text"></p-button>
     <p-button
       icon="pi pi-check"
       (onClick)="onOk()"
