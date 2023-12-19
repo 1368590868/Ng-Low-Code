@@ -141,9 +141,12 @@ export class PortalListComponent implements OnInit {
         command: () => {
           // new portal item
           this.portalItemService.parentFolder = row['id'];
-          this.router.navigate([`../add-single`], {
-            relativeTo: this.activatedRoute
-          });
+
+          setTimeout(() => {
+            this.router.navigate([`../add-single`], {
+              relativeTo: this.activatedRoute
+            });
+          }, 0);
         }
       });
 
@@ -153,9 +156,11 @@ export class PortalListComponent implements OnInit {
         command: () => {
           // new portal item
           this.portalItemService.parentFolder = row['id'];
-          this.router.navigate([`../add-linked`], {
-            relativeTo: this.activatedRoute
-          });
+          setTimeout(() => {
+            this.router.navigate([`../add-linked`], {
+              relativeTo: this.activatedRoute
+            });
+          }, 0);
         }
       });
 
