@@ -6,7 +6,6 @@
       class="flex-grow-1"
       headerSize="compact"
       [gridName]="primaryTableName"
-      selectionMode="single"
       (rowClick)="onPrimaryRowSelect($event)"
       (resetData)="onPrimaryRowClear()"></app-table>
   </ng-template>
@@ -17,7 +16,6 @@
       class="flex-grow-1"
       headerSize="compact"
       [gridName]="secondaryTableName"
-      selectionMode="single"
       (rowClick)="onSecondaryRowClick($event)"
       (resetData)="onSecondaryRowClear()"></app-table>
   </ng-template>

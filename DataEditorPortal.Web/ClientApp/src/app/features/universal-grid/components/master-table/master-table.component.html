@@ -1,9 +1,4 @@
-<p-splitter
-  #splitter
-  layout="vertical"
-  class="h-full"
-  [panelSizes]="[99.9, 0.1]"
-  [gutterSize]="0">
+<p-splitter #splitter layout="vertical" class="h-full" [panelSizes]="[99.9, 0.1]" [gutterSize]="0">
   <ng-template pTemplate>
     <app-table
       *ngIf="masterTableName"
@@ -11,7 +6,6 @@
       class="flex-grow-1"
       headerSize="compact"
       [gridName]="masterTableName"
-      selectionMode="single"
       (rowClick)="onMasterRowClick($event)"
       (resetData)="onMasterRowClear()"></app-table>
   </ng-template>
@@ -23,7 +17,6 @@
       class="flex-grow-1"
       headerSize="compact"
       [gridName]="detailTableName"
-      [connectToSearch]="false"
-      selectionMode="single"></app-table>
+      [connectToSearch]="false"></app-table>
   </ng-template>
 </p-splitter>
