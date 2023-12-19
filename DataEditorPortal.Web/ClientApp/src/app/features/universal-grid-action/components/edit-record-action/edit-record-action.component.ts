@@ -6,12 +6,12 @@ import { cloneDeep, isEqual } from 'lodash-es';
 import { Subject, forkJoin, tap } from 'rxjs';
 import { LinkedTableComponent } from 'src/app/features/universal-grid/components/linked-table/linked-table.component';
 import { MasterTableComponent } from 'src/app/features/universal-grid/components/master-table/master-table.component';
-import { GridTableService } from 'src/app/features/universal-grid/services/grid-table.service';
 import { NgxFormlyService, NotifyService, SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { EditFormData, FormEventConfig, FormEventMeta } from '../../models/edit';
 import { AsyncQueryTextActionHandler, EventActionHandlerService } from '../../services/event-action-handler.service';
 import { UniversalGridService } from '../../services/universal-grid.service';
+
 @Component({
   selector: 'app-edit-record-action',
   templateUrl: './edit-record-action.component.html',
@@ -42,7 +42,6 @@ export class EditRecordActionComponent extends GridActionDirective implements On
     private systemLogService: SystemLogService,
     private datePipe: DatePipe,
     private injector: Injector,
-    private gridTableService: GridTableService,
     @Inject('EVENT_ACTION_CONFIG')
     private EVENT_ACTION_CONFIG: {
       name: string;
