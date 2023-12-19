@@ -1,4 +1,5 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, Input, OnDestroy, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { GridTableService } from '../../services/grid-table.service';
 import { TableComponent } from '../table/table.component';
 
@@ -7,17 +8,65 @@ import { TableComponent } from '../table/table.component';
   templateUrl: './linked-table.component.html',
   styleUrls: ['./linked-table.component.scss']
 })
-export class LinkedTableComponent {
+export class LinkedTableComponent implements AfterViewChecked, OnDestroy {
   @ViewChild('primaryTable') primaryTable!: TableComponent;
   @ViewChild('secondaryTable') secondaryTable!: TableComponent;
   @Input() primaryTableName!: string;
   @Input() secondaryTableName!: string;
   useAsMasterDetailView = false;
+  convertTableLinkSelect: any = {};
+
+  subPrimarySelectionChange: Subscription | undefined;
+  subSecondarySelectionChange: Subscription | undefined;
 
   constructor(private gridTableService: GridTableService) {}
 
-  selectedPrimaryRow: any;
+  ngAfterViewChecked(): void {
+    if (this.primaryTable && !this.subPrimarySelectionChange) {
+      this.subPrimarySelectionChange = this.primaryTable.table.selectionChange.subscribe((event: any) => {
+        this.onPrimaryRowSelect(event || []);
+      });
+    }
+
+    if (this.secondaryTable && !this.subSecondarySelectionChange) {
+      this.subSecondarySelectionChange = this.secondaryTable.table.selectionChange.subscribe((event: any) => {
+        this.onSecondaryRowSelect(event || []);
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.subPrimarySelectionChange) {
+      this.subPrimarySelectionChange.unsubscribe();
+    }
+
+    if (this.subSecondarySelectionChange) {
+      this.subSecondarySelectionChange.unsubscribe();
+    }
+  }
+
   onPrimaryRowSelect(event: any) {
+    const kevs = event.map((item: any) => {
+      return {
+        key: item[this.primaryTable.tableConfig.dataKey]
+      };
+    });
+
+    this.convertTableLinkSelect[this.secondaryTableName] = kevs;
+  }
+
+  onSecondaryRowSelect(event: any) {
+    const kevs = event.map((item: any) => {
+      return {
+        key: item[this.secondaryTable.tableConfig.dataKey]
+      };
+    });
+
+    this.convertTableLinkSelect[this.primaryTableName] = kevs;
+  }
+
+  selectedPrimaryRow: any;
+  onPrimaryRowClick(event: any) {
     if (this.primaryTable.showHighlightOnly) return;
 
     this.selectedSecondaryRow = undefined;
@@ -40,7 +89,6 @@ export class LinkedTableComponent {
 
     this.selectedPrimaryRow = undefined;
     const dataId = event.data[this.secondaryTable.tableConfig.dataKey];
-
     if (this.selectedSecondaryRow != dataId) {
       this.selectedSecondaryRow = dataId;
       // mark linked data highlighted

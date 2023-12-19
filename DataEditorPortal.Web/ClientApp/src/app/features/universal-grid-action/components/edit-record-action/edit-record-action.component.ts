@@ -1,45 +1,24 @@
 import { DatePipe } from '@angular/common';
-import {
-  Component,
-  Inject,
-  Injector,
-  Input,
-  OnInit,
-  Type,
-  ViewChild
-} from '@angular/core';
+import { Component, Inject, Injector, Input, OnInit, Type, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { Subject, forkJoin, tap } from 'rxjs';
-import {
-  NgxFormlyService,
-  NotifyService,
-  SystemLogService
-} from 'src/app/shared';
-import { GridActionDirective } from '../../directives/grid-action.directive';
-import {
-  EditFormData,
-  FormEventConfig,
-  FormEventMeta
-} from '../../models/edit';
-import {
-  AsyncQueryTextActionHandler,
-  EventActionHandlerService
-} from '../../services/event-action-handler.service';
-import { UniversalGridService } from '../../services/universal-grid.service';
-import * as qs from 'qs';
+import { cloneDeep, isEqual } from 'lodash-es';
+import { Subject, forkJoin, takeUntil, tap } from 'rxjs';
+import { LinkedTableComponent } from 'src/app/features/universal-grid/components/linked-table/linked-table.component';
 import { GridTableService } from 'src/app/features/universal-grid/services/grid-table.service';
-import { isEqual, cloneDeep } from 'lodash-es';
+import { NgxFormlyService, NotifyService, SystemLogService } from 'src/app/shared';
+import { GridActionDirective } from '../../directives/grid-action.directive';
+import { EditFormData, FormEventConfig, FormEventMeta } from '../../models/edit';
+import { AsyncQueryTextActionHandler, EventActionHandlerService } from '../../services/event-action-handler.service';
+import { UniversalGridService } from '../../services/universal-grid.service';
 @Component({
   selector: 'app-edit-record-action',
   templateUrl: './edit-record-action.component.html',
   styleUrls: ['./edit-record-action.component.scss'],
   providers: [DatePipe]
 })
-export class EditRecordActionComponent
-  extends GridActionDirective
-  implements OnInit
-{
+export class EditRecordActionComponent extends GridActionDirective implements OnInit {
   @Input() isAddForm = false;
   @Input() layout: 'vertical' | 'horizontal' = 'horizontal';
   destroy$ = new Subject<void>();
@@ -67,7 +46,9 @@ export class EditRecordActionComponent
     private EVENT_ACTION_CONFIG: {
       name: string;
       handler: Type<EventActionHandlerService>;
-    }[]
+    }[],
+    private route: ActivatedRoute,
+    private linkedTableComponent: LinkedTableComponent
   ) {
     super();
   }
@@ -107,10 +88,28 @@ export class EditRecordActionComponent
             this.searchConfig(searchConfig);
           }),
           tap(() => this.getFormConfig()),
-          tap(() => this.getEventConfig())
+          tap(() => this.getEventConfig()),
+          tap(() => this.linkedConfig())
         )
         .subscribe();
     }
+  }
+
+  linkedConfig() {
+    // get item type from route
+    this.route.data.pipe(takeUntil(this.destroy$)).subscribe(data => {
+      if (data['type'] === 'linked') {
+        const linkedArr = this.linkedTableComponent.convertTableLinkSelect[this.gridName];
+
+        if (!linkedArr) return;
+        const linkedId = (linkedArr || []).map((data: { [x: string]: any }) => {
+          return {
+            table2Id: data['key']
+          };
+        });
+        this.model = { ...this.model, LINK_DATA_FIELD: linkedId };
+      }
+    });
   }
 
   searchConfig(searchConfig: any) {
@@ -185,10 +184,7 @@ export class EditRecordActionComponent
     // set default value
     fields
       .filter(
-        f =>
-          (f.type === 'input' || f.type === 'textarea') &&
-          f.defaultValue &&
-          typeof f.defaultValue === 'string'
+        f => (f.type === 'input' || f.type === 'textarea') && f.defaultValue && typeof f.defaultValue === 'string'
       )
       .forEach(f => {
         const matches = [
@@ -198,14 +194,8 @@ export class EditRecordActionComponent
         ];
         let value = f.defaultValue;
         matches.forEach(match => {
-          let searchVal = this.fetchDataParam?.searches
-            ? this.fetchDataParam?.searches[match[1]]
-            : '';
-          if (searchVal && searchVal.getDate)
-            searchVal = this.datePipe.transform(
-              searchVal,
-              match[3] ?? 'yyyyMMdd'
-            );
+          let searchVal = this.fetchDataParam?.searches ? this.fetchDataParam?.searches[match[1]] : '';
+          if (searchVal && searchVal.getDate) searchVal = this.datePipe.transform(searchVal, match[3] ?? 'yyyyMMdd');
           value = value.replace(match[0], searchVal ?? '');
         });
         f.defaultValue = value;
@@ -281,8 +271,7 @@ export class EditRecordActionComponent
   }
 
   setBackupModel() {
-    if (Object.keys(this.model).length !== 0)
-      this.backModel = cloneDeep(this.model);
+    if (Object.keys(this.model).length !== 0) this.backModel = cloneDeep(this.model);
   }
 
   submitSave(model: EditFormData) {
@@ -295,15 +284,10 @@ export class EditRecordActionComponent
 
       this.gridService.addGridData(this.gridName, model).subscribe(res => {
         if (res.code === 200 && res.data) {
-          this.notifyService.notifySuccess(
-            'Success',
-            'Save Successfully Completed.'
-          );
+          this.notifyService.notifySuccess('Success', 'Save Successfully Completed.');
 
           // run after saved event if configured.
-          const handler = this.getEventActionHandler(
-            this.eventConfig?.afterSaved
-          );
+          const handler = this.getEventActionHandler(this.eventConfig?.afterSaved);
           if (handler) handler.excuteAction().subscribe();
 
           this.savedEvent.emit();
@@ -317,34 +301,25 @@ export class EditRecordActionComponent
         section: this.gridName,
         params: JSON.stringify(model)
       });
-      this.gridService
-        .updateGridData(this.gridName, this.dataKey as string, this.model)
-        .subscribe(res => {
-          if (res.code === 200 && res.data) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Save Successfully Completed.'
-            );
+      this.gridService.updateGridData(this.gridName, this.dataKey as string, this.model).subscribe(res => {
+        if (res.code === 200 && res.data) {
+          this.notifyService.notifySuccess('Success', 'Save Successfully Completed.');
 
-            // run after saved event if configured.
-            const handler = this.getEventActionHandler(
-              this.eventConfig?.afterSaved
-            );
-            if (handler) handler.excuteAction().subscribe();
+          // run after saved event if configured.
+          const handler = this.getEventActionHandler(this.eventConfig?.afterSaved);
+          if (handler) handler.excuteAction().subscribe();
 
-            this.savedEvent.emit();
-          } else {
-            this.errorEvent.emit();
-          }
-        });
+          this.savedEvent.emit();
+        } else {
+          this.errorEvent.emit();
+        }
+      });
     }
   }
 
   getEventActionHandler(eventConfig?: FormEventMeta) {
     if (eventConfig && eventConfig.eventType === 'Javascript') {
-      const action = this.EVENT_ACTION_CONFIG.find(
-        x => x.name === eventConfig.script
-      );
+      const action = this.EVENT_ACTION_CONFIG.find(x => x.name === eventConfig.script);
       if (action) return this.injector.get(action?.handler);
     }
     if (
