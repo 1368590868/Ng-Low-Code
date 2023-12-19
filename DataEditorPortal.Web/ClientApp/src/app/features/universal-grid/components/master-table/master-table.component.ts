@@ -1,7 +1,8 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Splitter } from 'primeng/splitter';
-import { Subject, takeUntil, tap } from 'rxjs';
+import { Subject, Subscription, takeUntil, tap } from 'rxjs';
 import { GridTableService } from '../../services/grid-table.service';
+import { SelectionsType } from '../linked-table/linked-table.component';
 import { TableComponent } from '../table/table.component';
 
 @Component({
@@ -16,8 +17,13 @@ export class MasterTableComponent implements OnInit, OnDestroy {
   @Input() masterTableName!: string;
   @Input() detailTableName!: string;
 
+  selections: SelectionsType = {};
+
   showDetail = false;
   destroy$ = new Subject();
+
+  subMasterSelectionChange: Subscription | undefined;
+  subdetailSelectionChange: Subscription | undefined;
 
   constructor(private gridTableService: GridTableService) {}
 
@@ -32,9 +38,40 @@ export class MasterTableComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
+  ngAfterViewChecked(): void {
+    if (this.masterTable && !this.subMasterSelectionChange) {
+      this.subMasterSelectionChange = this.masterTable.table.selectionChange.subscribe((event: any) => {
+        this.onMasterRowSelect(event || []);
+      });
+    }
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next(null);
     this.destroy$.complete();
+
+    if (this.subMasterSelectionChange) {
+      this.subMasterSelectionChange.unsubscribe();
+    }
+
+    if (this.subdetailSelectionChange) {
+      this.subdetailSelectionChange.unsubscribe();
+    }
+  }
+
+  onMasterRowSelect(event = []) {
+    if (event.length > 1) {
+      this.selections[this.detailTableName] = [];
+      return;
+    }
+
+    const kevs = event.map(item => {
+      return {
+        key: item[this.masterTable.tableConfig.dataKey]
+      };
+    });
+
+    this.selections[this.detailTableName] = kevs;
   }
 
   selectedMasterRow: any;
