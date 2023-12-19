@@ -12,10 +12,7 @@ import { UniversalGridService } from '../../services/universal-grid.service';
   templateUrl: './export-excel-action.component.html',
   styleUrls: ['./export-excel-action.component.scss']
 })
-export class ExportExcelActionComponent
-  extends GridActionDirective
-  implements OnInit
-{
+export class ExportExcelActionComponent extends GridActionDirective implements OnInit {
   @ViewChild('exportForm') exportForm!: NgForm;
 
   form = new FormGroup({});
@@ -33,10 +30,7 @@ export class ExportExcelActionComponent
     }
   ];
 
-  constructor(
-    private gridService: UniversalGridService,
-    private systemLogService: SystemLogService
-  ) {
+  constructor(private gridService: UniversalGridService, private systemLogService: SystemLogService) {
     super();
   }
 
@@ -60,9 +54,7 @@ export class ExportExcelActionComponent
 
     this.model = {
       ...this.model,
-      fileName: `Export-${this.gridName}-${new Date().toLocaleDateString(
-        'en-US'
-      )}`
+      fileName: `Export-${this.gridName}-${new Date().toLocaleDateString('en-US')}`
     };
 
     this.loadedEvent.emit();
@@ -104,7 +96,7 @@ export class ExportExcelActionComponent
             a.download = fileName;
             a.click();
             a.remove();
-            this.savedEvent.emit();
+            // this.savedEvent.emit();
           })
         )
         .subscribe();
