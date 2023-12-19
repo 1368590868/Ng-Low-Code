@@ -69,8 +69,9 @@
               <a
                 class="ml-3 text-primary"
                 *ngIf="rowData.routerLink && rowData.type !== 'Folder'"
-                [routerLink]="rowData.routerLink"
-                ><i class="pi pi-link cursor-pointer"></i
+                [href]="rowData.routerLink"
+                target="_blank"
+                ><i class="pi pi-external-link cursor-pointer"></i
               ></a>
 
               <a
@@ -78,7 +79,7 @@
                 *ngIf="rowData.type === 'External' && rowData.link"
                 [href]="rowData.link"
                 target="_blank"
-                ><i class="pi pi-link cursor-pointer"></i
+                ><i class="pi pi-external-link cursor-pointer"></i
               ></a>
             </div>
           </td>

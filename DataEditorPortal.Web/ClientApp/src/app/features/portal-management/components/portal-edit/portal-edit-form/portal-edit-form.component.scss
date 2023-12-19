@@ -1,0 +1,14 @@
+:host {
+  ::ng-deep {
+    .p-tabview-nav-container {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      background-color: #fff;
+    }
+    .p-tabview-panels {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+}

@@ -1,11 +1,16 @@
-<div class="layout-content py-3 px-3">
-  <div class="p-card p-4 mb-3 shadow-1">
-    <h2 class="mb-4" *ngIf="itemCaption">
-      {{ itemCaption }}
-    </h2>
-    <p-steps [readonly]="!configCompleted" [model]="steps"></p-steps>
+<div class="layout-content">
+  <div class="p-3 pb-0 flex-shrink-0 h-auto">
+    <div class="p-card p-4">
+      <h2 class="mb-4" *ngIf="itemCaption">
+        {{ itemCaption }}
+        <a *ngIf="itemLink" [href]="itemLink" target="_blank" pTooltip="Preview in new window">
+          <p-button [text]="true" styleClass="p-1" size="small" icon="pi pi-external-link"></p-button>
+        </a>
+      </h2>
+      <p-steps [readonly]="!configCompleted" [model]="steps"></p-steps>
+    </div>
   </div>
-  <div class="relative loading-wrap">
+  <div class="relative loading-wrap p-3">
     <app-loading></app-loading>
     <router-outlet
       *ngIf="activatedIndex >= 0"

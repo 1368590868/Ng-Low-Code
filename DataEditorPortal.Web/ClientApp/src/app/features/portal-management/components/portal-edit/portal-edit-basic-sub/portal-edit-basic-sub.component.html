@@ -1,17 +1,19 @@
 <p-card styleClass="">
   <ng-template pTemplate="title"> Basic Infomation for Sub Table</ng-template>
   <ng-template pTemplate="subtitle"> Set basic information for sub table. </ng-template>
-  <p-divider styleClass="mt-0"></p-divider>
-  <div class="w-6 pt-3">
-    <form [formGroup]="form" #editForm="ngForm" (ngSubmit)="onFormSubmit(model)">
-      <formly-form [form]="form" [fields]="fields" [model]="model" [options]="options" class="p-fluid"></formly-form>
-      <div *ngIf="!fields || fields.length <= 0" class="flex flex-wrap" style="margin: 0 -0.5rem">
-        <p *ngFor="let e of [].constructor(5)" class="w-6 px-2 mb-3">
-          <p-skeleton width="5rem" styleClass="mb-1"></p-skeleton>
-          <p-skeleton height="2.83rem"></p-skeleton>
-        </p>
-      </div>
-    </form>
+  <p-divider styleClass="mt-0 sticky top-0 z-5"></p-divider>
+  <div class="scrollable-content">
+    <div class="w-6 pt-3">
+      <form [formGroup]="form" #editForm="ngForm" (ngSubmit)="onFormSubmit(model)">
+        <formly-form [form]="form" [fields]="fields" [model]="model" [options]="options" class="p-fluid"></formly-form>
+        <div *ngIf="!fields || fields.length <= 0" class="flex flex-wrap" style="margin: 0 -0.5rem">
+          <p *ngFor="let e of [].constructor(5)" class="w-6 px-2 mb-3">
+            <p-skeleton width="5rem" styleClass="mb-1"></p-skeleton>
+            <p-skeleton height="2.83rem"></p-skeleton>
+          </p>
+        </div>
+      </form>
+    </div>
   </div>
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">

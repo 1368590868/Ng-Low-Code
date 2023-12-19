@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap, Data } from '@angular/router';
+import { ActivatedRoute, Data, ParamMap, Router, Routes } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { switchMap, of, Subject, takeUntil, tap, take } from 'rxjs';
+import { Subject, of, switchMap, take, takeUntil, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
-import { PortalItemService } from '../../services/portal-item.service';
 import { PortalEditStepDirective } from '../../directives/portal-edit-step.directive';
+import { PortalItemService } from '../../services/portal-item.service';
 
 @Component({
   selector: 'app-portal-edit',
@@ -52,6 +52,27 @@ export class PortalEditComponent implements OnInit, OnDestroy {
   }
   get dataSourceConnectionName() {
     return this.portalItemService.dataSourceConnectionName;
+  }
+
+  get itemLink() {
+    const fn = (routes: Routes | undefined) => {
+      if (!routes) return undefined;
+      let path: string | undefined;
+      for (let i = 0; i < routes.length; i++) {
+        if (routes[i].data?.['id'] === this.itemId) {
+          path = routes[i].path;
+          break;
+        } else if (routes[i].children) {
+          const temp = fn(routes[i].children);
+          if (temp) {
+            path = `${routes[i].path}/${temp}`;
+            break;
+          }
+        }
+      }
+      return path;
+    };
+    return fn(this.router.config);
   }
 
   constructor(

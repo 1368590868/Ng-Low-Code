@@ -118,7 +118,7 @@ export class RouteService {
         path: menu.name,
         loadChildren: () =>
           import('src/app/features/universal-grid/universal-grid.module').then(m => m.UniversalGridModule),
-        data: { type: menu.itemType, name: menu.name },
+        data: { type: menu.itemType, name: menu.name, id: menu.id },
         canActivate: [AuthRouterGuard]
       };
     } else if (menu.type === 'Folder') {

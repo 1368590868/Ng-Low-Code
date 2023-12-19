@@ -1,98 +1,100 @@
 <p-card styleClass="">
   <ng-template pTemplate="title"> Search Configuration </ng-template>
   <ng-template pTemplate="subtitle"> Select the fields that you want to used in search panel. </ng-template>
-  <p-divider styleClass="mt-0"></p-divider>
 
-  <div class="flex align-items-center">
-    <div class="flex align-items-center py-2 mr-4">
-      <p-inputSwitch class="mr-2" [(ngModel)]="useExistingSearch"></p-inputSwitch>
-      Use Existing Search
-    </div>
-    <div class="flex align-items-center" *ngIf="useExistingSearch">
-      <p-dropdown
-        styleClass="w-15rem"
-        appendTo="body"
-        [showClear]="true"
-        placeholder="Please Select"
-        [(ngModel)]="existingSearchId"
-        [options]="existingSearchOptions"></p-dropdown>
-      <i
-        class="pi pi-question-circle ml-3 text-lg"
-        pTooltip="Select one existing portal item search configuration."></i>
-    </div>
-  </div>
-
-  <div class="w-full pt-2 flex" *ngIf="!useExistingSearch">
-    <p-pickList
-      #pickList
-      class="flex-grow-1 mr-3"
-      [class.isLinkedItem]="isLinkedItem"
-      [source]="sourceColumns"
-      [target]="targetColumns"
-      sourceHeader="Available Fields"
-      targetHeader="Search Fields"
-      [dragdrop]="true"
-      [responsive]="true"
-      [sourceStyle]="{ height: 'calc(100vh - 40.275rem)' }"
-      [targetStyle]="{ height: 'calc(100vh - 35.8916rem)' }"
-      sourceFilterPlaceholder="Search by name"
-      filterBy="key"
-      [showTargetFilter]="false"
-      [showSourceControls]="false"
-      [showTargetControls]="false"
-      (onMoveToTarget)="onMoveToTarget($event)"
-      (onMoveToSource)="onMoveToSource($event)"
-      (onMoveAllToTarget)="onMoveToTarget($event)"
-      (onMoveAllToSource)="onMoveToSource($event)"
-      (onTargetSelect)="onTargetSelect($event)">
-      <ng-template pTemplate="targetHeader">
-        <div class="p-picklist-title flex align-items-center justify-content-between">
-          <span>Search Fields</span>
-          <p-menu
-            #addNewMenu
-            [popup]="true"
-            [model]="addCustomSearchModels"
-            appendTo="body"
-            styleClass="mt-2"
-            [style]="{ width: 'auto', minWidth: '12.5833rem' }"></p-menu>
-          <p-button
-            label="Add Custom Field"
-            [text]="true"
-            size="small"
-            (onClick)="addNewMenu.toggle($event)"></p-button>
-        </div>
-      </ng-template>
-      <ng-template let-column pTemplate="item">
-        <div *ngIf="!column.selected" class="">[{{ column.key }}]</div>
-        <app-form-designer-view *ngIf="column.selected" [config]="column"></app-form-designer-view>
-        <p-button
-          *ngIf="column.key.indexOf('CUSTOM_SEARCH_') === 0"
-          icon="pi pi-trash"
-          class="remove-btn"
-          [text]="true"
-          [rounded]="true"
-          (onClick)="onRemoveCustomColumn($event, column)"></p-button>
-      </ng-template>
-      <ng-template pTemplate="emptymessagetarget">
-        <div class="w-full relative" *ngIf="!isLoading">
-          <app-svg-drag></app-svg-drag>
-        </div>
-      </ng-template>
-    </p-pickList>
-    <div class="config-form p-picklist">
-      <div class="p-picklist-header">
-        <div class="p-picklist-title">Configuration Form</div>
+  <p-divider styleClass="mt-0 sticky top-0 z-5"></p-divider>
+  <div class="scrollable-content">
+    <div class="flex align-items-center">
+      <div class="flex align-items-center py-2 mr-4">
+        <p-inputSwitch class="mr-2" [(ngModel)]="useExistingSearch"></p-inputSwitch>
+        Use Existing Search
       </div>
-      <div class="p-picklist-list flex-grow-1">
-        <div *ngIf="this.model && this.model.key; else emptyMessage">
-          <app-search-designer-config
-            [useTwoSearchRule]="isLinkedItem"
-            [config]="model"
-            (configChange)="configChange($event)"></app-search-designer-config>
-        </div>
-        <ng-template #emptyMessage>
-          <div class="pt-4">Please select one row in <b>Search Fields</b> panel to configure.</div>
+      <div class="flex align-items-center" *ngIf="useExistingSearch">
+        <p-dropdown
+          styleClass="w-15rem"
+          appendTo="body"
+          [showClear]="true"
+          placeholder="Please Select"
+          [(ngModel)]="existingSearchId"
+          [options]="existingSearchOptions"></p-dropdown>
+        <i
+          class="pi pi-question-circle ml-3 text-lg"
+          pTooltip="Select one existing portal item search configuration."></i>
+      </div>
+    </div>
+
+    <div class="w-full pt-2 flex" *ngIf="!useExistingSearch">
+      <p-pickList
+        #pickList
+        class="flex-grow-1 mr-3"
+        [class.isLinkedItem]="isLinkedItem"
+        [source]="sourceColumns"
+        [target]="targetColumns"
+        sourceHeader="Available Fields"
+        targetHeader="Search Fields"
+        [dragdrop]="true"
+        [responsive]="true"
+        [sourceStyle]="{ height: 'calc(100vh - 40.275rem)' }"
+        [targetStyle]="{ height: 'calc(100vh - 35.8916rem)' }"
+        sourceFilterPlaceholder="Search by name"
+        filterBy="key"
+        [showTargetFilter]="false"
+        [showSourceControls]="false"
+        [showTargetControls]="false"
+        (onMoveToTarget)="onMoveToTarget($event)"
+        (onMoveToSource)="onMoveToSource($event)"
+        (onMoveAllToTarget)="onMoveToTarget($event)"
+        (onMoveAllToSource)="onMoveToSource($event)"
+        (onTargetSelect)="onTargetSelect($event)">
+        <ng-template pTemplate="targetHeader">
+          <div class="p-picklist-title flex align-items-center justify-content-between">
+            <span>Search Fields</span>
+            <p-menu
+              #addNewMenu
+              [popup]="true"
+              [model]="addCustomSearchModels"
+              appendTo="body"
+              styleClass="mt-2"
+              [style]="{ width: 'auto', minWidth: '12.5833rem' }"></p-menu>
+            <p-button
+              label="Add Custom Field"
+              [text]="true"
+              size="small"
+              (onClick)="addNewMenu.toggle($event)"></p-button>
+          </div>
         </ng-template>
+        <ng-template let-column pTemplate="item">
+          <div *ngIf="!column.selected" class="">[{{ column.key }}]</div>
+          <app-form-designer-view *ngIf="column.selected" [config]="column"></app-form-designer-view>
+          <p-button
+            *ngIf="column.key.indexOf('CUSTOM_SEARCH_') === 0"
+            icon="pi pi-trash"
+            class="remove-btn"
+            [text]="true"
+            [rounded]="true"
+            (onClick)="onRemoveCustomColumn($event, column)"></p-button>
+        </ng-template>
+        <ng-template pTemplate="emptymessagetarget">
+          <div class="w-full relative" *ngIf="!isLoading">
+            <app-svg-drag></app-svg-drag>
+          </div>
+        </ng-template>
+      </p-pickList>
+      <div class="config-form p-picklist">
+        <div class="p-picklist-header">
+          <div class="p-picklist-title">Configuration Form</div>
+        </div>
+        <div class="p-picklist-list flex-grow-1">
+          <div *ngIf="this.model && this.model.key; else emptyMessage">
+            <app-search-designer-config
+              [useTwoSearchRule]="isLinkedItem"
+              [config]="model"
+              (configChange)="configChange($event)"></app-search-designer-config>
+          </div>
+          <ng-template #emptyMessage>
+            <div class="pt-4">Please select one row in <b>Search Fields</b> panel to configure.</div>
+          </ng-template>
+        </div>
       </div>
     </div>
   </div>

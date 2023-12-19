@@ -1,40 +1,42 @@
 <p-card styleClass="">
   <ng-template pTemplate="title"> Add / Edit / Delete Configuration </ng-template>
   <ng-template pTemplate="subtitle"> Customize the Add / Edit / Delete Form or select custom Form. </ng-template>
-  <p-divider styleClass="mt-0"></p-divider>
-  <div class="w-full pb-1" style="margin-top: -1rem">
-    <p-tabView>
-      <p-tabPanel header="Settings for Adding">
-        <app-form-layout
-          #addLayout
-          type="ADD"
-          [queryTextRequired]="dataSourceIsQueryText"
-          [config]="addingFormConfig"
-          [dbColumns]="dbColumns"></app-form-layout>
-      </p-tabPanel>
-      <p-tabPanel header="Settings for Editing">
-        <app-form-layout
-          #updateLayout
-          type="UPDATE"
-          [queryTextRequired]="dataSourceIsQueryText"
-          [config]="updatingFormConfig"
-          [dbColumns]="dbColumns"></app-form-layout>
-      </p-tabPanel>
-      <!-- <p-tabPanel header="Settings for Viewing">
+  <p-divider styleClass="mt-0 sticky top-0 z-5"></p-divider>
+  <div class="scrollable-content">
+    <div class="w-full pb-1" style="margin-top: -1rem">
+      <p-tabView>
+        <p-tabPanel header="Settings for Adding">
+          <app-form-layout
+            #addLayout
+            type="ADD"
+            [queryTextRequired]="dataSourceIsQueryText"
+            [config]="addingFormConfig"
+            [dbColumns]="dbColumns"></app-form-layout>
+        </p-tabPanel>
+        <p-tabPanel header="Settings for Editing">
+          <app-form-layout
+            #updateLayout
+            type="UPDATE"
+            [queryTextRequired]="dataSourceIsQueryText"
+            [config]="updatingFormConfig"
+            [dbColumns]="dbColumns"></app-form-layout>
+        </p-tabPanel>
+        <!-- <p-tabPanel header="Settings for Viewing">
         <app-form-layout
           #updateLayout
           type="UPDATE"
           [config]="updatingFormConfig"
           [dbColumns]="dbColumns"></app-form-layout>
       </p-tabPanel> -->
-      <p-tabPanel header="Settings for Deleting">
-        <app-form-layout-delete
-          #deleteLayout
-          type="Delete"
-          [queryTextRequired]="dataSourceIsQueryText"
-          [config]="deleteFormConfig"></app-form-layout-delete>
-      </p-tabPanel>
-    </p-tabView>
+        <p-tabPanel header="Settings for Deleting">
+          <app-form-layout-delete
+            #deleteLayout
+            type="Delete"
+            [queryTextRequired]="dataSourceIsQueryText"
+            [config]="deleteFormConfig"></app-form-layout-delete>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
   </div>
 
   <ng-template pTemplate="footer">

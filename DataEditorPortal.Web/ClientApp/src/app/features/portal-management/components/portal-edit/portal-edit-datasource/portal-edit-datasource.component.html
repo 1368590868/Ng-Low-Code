@@ -1,218 +1,224 @@
 <p-card styleClass="">
   <ng-template pTemplate="title"> Data Source </ng-template>
   <ng-template pTemplate="subtitle"> Setup data source for this portal item. </ng-template>
-  <p-divider styleClass="mt-0"></p-divider>
-  <div class="w-6 pt-3">
-    <div class="flex flex-column mb-3">
-      <label for="" class="mb-1"
-        >Database Connection
-        <i
-          *ngIf="dbConnectionDisabled"
-          class="pi pi-question-circle ml-2 text-lg"
-          [escape]="false"
-          pTooltip="To process data within the same transaction, this option is restricted to using the same database connection as the <b> Data Source</b>. If there are no available database tables, please consider changing the connection in <b>Data Source</b> or granting the tables to the current database connection."></i>
-      </label>
-      <div class="flex align-items-center">
-        <p-dropdown
-          [required]="true"
-          [options]="dbConnections"
-          (onChange)="onConnectionChange($event)"
-          [formControl]="formControlConnection"
-          placeholder="Please Select"
-          [style]="{ minWidth: '20rem' }"
-          appendTo="body"></p-dropdown>
-        <p-button
-          *ngIf="!dbConnectionDisabled"
-          class="ml-1"
-          pTooltip="Create new Connection"
-          [text]="true"
-          [rounded]="true"
-          icon="pi pi-ellipsis-v"
-          [disabled]="dbConnectionDisabled"
-          (onClick)="addDialog.showDialog()"></p-button>
-      </div>
-
-      <app-add-connection-dialog #addDialog (saved)="connectionSaved($event)"></app-add-connection-dialog>
-    </div>
-    <div class="flex flex-column mb-3">
-      <ng-container *ngIf="!datasourceConfig.queryText">
-        <label for="tableName" class="mb-1">Database Table</label>
-
+  <p-divider styleClass="mt-0 sticky top-0 z-5"></p-divider>
+  <div class="scrollable-content">
+    <div class="w-6 pt-3">
+      <div class="flex flex-column mb-3">
+        <label for="" class="mb-1"
+          >Database Connection
+          <i
+            *ngIf="dbConnectionDisabled"
+            class="pi pi-question-circle ml-2 text-lg"
+            [escape]="false"
+            pTooltip="To process data within the same transaction, this option is restricted to using the same database connection as the <b> Data Source</b>. If there are no available database tables, please consider changing the connection in <b>Data Source</b> or granting the tables to the current database connection."></i>
+        </label>
         <div class="flex align-items-center">
           <p-dropdown
-            #dbTableDropdown
-            *ngIf="!datasourceConfig.queryText"
             [required]="true"
-            [options]="dbTables"
-            (onChange)="onTableNameChange($event)"
-            [formControl]="formControlDbTable"
+            [options]="dbConnections"
+            (onChange)="onConnectionChange($event)"
+            [formControl]="formControlConnection"
             placeholder="Please Select"
-            [style]="{ minWidth: '41.5rem' }"
+            [style]="{ minWidth: '20rem' }"
             appendTo="body"></p-dropdown>
           <p-button
-            [disabled]="!datasourceConfig.dataSourceConnectionName"
+            *ngIf="!dbConnectionDisabled"
             class="ml-1"
-            pTooltip="Create new Query"
+            pTooltip="Create new Connection"
             [text]="true"
             [rounded]="true"
             icon="pi pi-ellipsis-v"
-            (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button>
+            [disabled]="dbConnectionDisabled"
+            (onClick)="addDialog.showDialog()"></p-button>
         </div>
-      </ng-container>
-      <ng-container *ngIf="datasourceConfig.queryText">
-        <label class="line-height-3">Database Query</label>
-        <div class="flex align-items-center">
-          <div (click)="advancedQueryDialog.showAdvanceDialog()">
-            <ngx-monaco-editor
-              [ngModel]="datasourceConfig.queryText"
+
+        <app-add-connection-dialog #addDialog (saved)="connectionSaved($event)"></app-add-connection-dialog>
+      </div>
+      <div class="flex flex-column mb-3">
+        <ng-container *ngIf="!datasourceConfig.queryText">
+          <label for="tableName" class="mb-1">Database Table</label>
+
+          <div class="flex align-items-center">
+            <p-dropdown
+              #dbTableDropdown
+              *ngIf="!datasourceConfig.queryText"
+              [required]="true"
+              [options]="dbTables"
+              (onChange)="onTableNameChange($event)"
+              [formControl]="formControlDbTable"
+              placeholder="Please Select"
               [style]="{ minWidth: '41.5rem' }"
-              class="pt-2 pl-2 border-round monaco-editor-wrapper display-only overflow-hidden"
-              [options]="{
-                folding: false,
-                readOnly: true,
-                domReadOnly: true
-              }"></ngx-monaco-editor>
+              appendTo="body"></p-dropdown>
+            <p-button
+              [disabled]="!datasourceConfig.dataSourceConnectionName"
+              class="ml-1"
+              pTooltip="Create new Query"
+              [text]="true"
+              [rounded]="true"
+              icon="pi pi-ellipsis-v"
+              (onClick)="advancedQueryDialog.showAdvanceDialog()"></p-button>
           </div>
-          <p-button
-            [text]="true"
-            [rounded]="true"
-            styleClass="ml-2"
-            icon="pi pi-times-circle"
-            (onClick)="removeAdvancedQuery()"></p-button>
+        </ng-container>
+        <ng-container *ngIf="datasourceConfig.queryText">
+          <label class="line-height-3">Database Query</label>
+          <div class="flex align-items-center">
+            <div (click)="advancedQueryDialog.showAdvanceDialog()">
+              <ngx-monaco-editor
+                [ngModel]="datasourceConfig.queryText"
+                [style]="{ minWidth: '41.5rem' }"
+                class="pt-2 pl-2 border-round monaco-editor-wrapper display-only overflow-hidden"
+                [options]="{
+                  folding: false,
+                  readOnly: true,
+                  domReadOnly: true
+                }"></ngx-monaco-editor>
+            </div>
+            <p-button
+              [text]="true"
+              [rounded]="true"
+              styleClass="ml-2"
+              icon="pi pi-times-circle"
+              (onClick)="removeAdvancedQuery()"></p-button>
+          </div>
+        </ng-container>
+        <app-advanced-query-dialog
+          #advancedQueryDialog
+          [connectionName]="datasourceConfig.dataSourceConnectionName"
+          [queryText]="datasourceConfig.queryText"
+          (queryChange)="queryChange($event)"></app-advanced-query-dialog>
+      </div>
+      <div class="flex align-items-center">
+        <div class="flex flex-column mb-2 mr-4">
+          <label for="idColumn" class="mb-1">Id Column</label>
+          <div class="flex align-items-center">
+            <p-dropdown
+              [required]="true"
+              [formControl]="formControlIdColumn"
+              [options]="dbTableColumns"
+              placeholder="Please Select"
+              [style]="{ minWidth: '20rem' }"
+              optionLabel="columnName"
+              optionValue="columnName"
+              appendTo="body"></p-dropdown>
+          </div>
         </div>
-      </ng-container>
-      <app-advanced-query-dialog
-        #advancedQueryDialog
-        [connectionName]="datasourceConfig.dataSourceConnectionName"
-        [queryText]="datasourceConfig.queryText"
-        (queryChange)="queryChange($event)"></app-advanced-query-dialog>
-    </div>
-    <div class="flex align-items-center">
-      <div class="flex flex-column mb-2 mr-4">
-        <label for="idColumn" class="mb-1">Id Column</label>
-        <div class="flex align-items-center">
-          <p-dropdown
-            [required]="true"
-            [formControl]="formControlIdColumn"
-            [options]="dbTableColumns"
-            placeholder="Please Select"
+        <div class="flex flex-column mb-2">
+          <label for="" class="mb-1">Page Size</label>
+          <p-inputNumber
+            [(ngModel)]="pageSize"
             [style]="{ minWidth: '20rem' }"
-            optionLabel="columnName"
-            optionValue="columnName"
-            appendTo="body"></p-dropdown>
+            [showButtons]="true"
+            [allowEmpty]="false"
+            [maxFractionDigits]="0"
+            [max]="1000"
+            [min]="10"></p-inputNumber>
         </div>
       </div>
+      <p-divider styleClass="mb-0">Where</p-divider>
       <div class="flex flex-column mb-2">
-        <label for="" class="mb-1">Page Size</label>
-        <p-inputNumber
-          [(ngModel)]="pageSize"
-          [style]="{ minWidth: '20rem' }"
-          [showButtons]="true"
-          [allowEmpty]="false"
-          [maxFractionDigits]="0"
-          [max]="1000"
-          [min]="10"></p-inputNumber>
+        <!-- <label class="mb-1">Filters</label> -->
+        <p-orderList [value]="filters" [stripedRows]="true">
+          <ng-template let-filter pTemplate="item">
+            <div class="flex align-items-center">
+              <div class="mr-3">
+                <p-dropdown
+                  [formControl]="filter.formControlField"
+                  [options]="dbTableColumns"
+                  optionLabel="columnName"
+                  optionValue="columnName"
+                  (onChange)="onFilterColumnChange($event, filter)"
+                  appendTo="body"></p-dropdown>
+              </div>
+              <div class="mr-3">
+                <p-dropdown
+                  [formControl]="filter.formControlMatchMode"
+                  [options]="filter.matchOptions"
+                  appendTo="body"></p-dropdown>
+              </div>
+              <div class="mr-3" style="width: 15rem">
+                <input
+                  *ngIf="filter.filterType === 'text'"
+                  [required]="true"
+                  [formControl]="filter.formControlValue"
+                  pInputText
+                  placeholder="Enter a value" />
+                <p-inputNumber
+                  *ngIf="filter.filterType === 'numeric'"
+                  [required]="true"
+                  [formControl]="filter.formControlValue"
+                  [showButtons]="true"
+                  placeholder="Enter a value"></p-inputNumber>
+                <p-calendar
+                  *ngIf="filter.filterType === 'date'"
+                  [required]="true"
+                  [formControl]="filter.formControlValue"
+                  appendTo="body"
+                  placeholder="Enter a value"></p-calendar>
+                <p-inputSwitch
+                  styleClass="block"
+                  *ngIf="filter.filterType === 'boolean'"
+                  [required]="true"
+                  [formControl]="filter.formControlValue"></p-inputSwitch>
+              </div>
+              <div>
+                <p-button
+                  icon="pi pi-trash"
+                  [text]="true"
+                  [rounded]="true"
+                  (onClick)="onRemoveFilter(filter)"></p-button>
+              </div>
+            </div>
+          </ng-template>
+        </p-orderList>
+        <p-button
+          label="Add"
+          icon="pi pi-plus"
+          class="mt-1"
+          [text]="true"
+          size="small"
+          (onClick)="onAddFilter()"></p-button>
       </div>
-    </div>
-    <p-divider styleClass="mb-0">Where</p-divider>
-    <div class="flex flex-column mb-2">
-      <!-- <label class="mb-1">Filters</label> -->
-      <p-orderList [value]="filters" [stripedRows]="true">
-        <ng-template let-filter pTemplate="item">
-          <div class="flex align-items-center">
-            <div class="mr-3">
-              <p-dropdown
-                [formControl]="filter.formControlField"
-                [options]="dbTableColumns"
-                optionLabel="columnName"
-                optionValue="columnName"
-                (onChange)="onFilterColumnChange($event, filter)"
-                appendTo="body"></p-dropdown>
+      <p-divider styleClass="mb-0">Order By</p-divider>
+      <div class="flex flex-column mb-2">
+        <!-- <label class="mb-1">Sort By</label> -->
+        <p-orderList [value]="sortBy" [stripedRows]="true" [dragdrop]="true">
+          <ng-template let-sortBy pTemplate="item">
+            <div class="flex align-items-center">
+              <div class="mr-3">
+                <p-dropdown
+                  [(ngModel)]="sortBy.field"
+                  [options]="dbTableColumns"
+                  optionLabel="columnName"
+                  optionValue="columnName"
+                  appendTo="body"
+                  placeholder="Select Id Column"></p-dropdown>
+              </div>
+              <div class="mr-3">
+                <p-dropdown
+                  [(ngModel)]="sortBy.order"
+                  [options]="dbOrderOptions"
+                  appendTo="body"
+                  placeholder="Order"></p-dropdown>
+              </div>
+              <div>
+                <p-button
+                  icon="pi pi-trash"
+                  [text]="true"
+                  [rounded]="true"
+                  (onClick)="onRemoveSortColumn(sortBy)"></p-button>
+              </div>
             </div>
-            <div class="mr-3">
-              <p-dropdown
-                [formControl]="filter.formControlMatchMode"
-                [options]="filter.matchOptions"
-                appendTo="body"></p-dropdown>
-            </div>
-            <div class="mr-3" style="width: 15rem">
-              <input
-                *ngIf="filter.filterType === 'text'"
-                [required]="true"
-                [formControl]="filter.formControlValue"
-                pInputText
-                placeholder="Enter a value" />
-              <p-inputNumber
-                *ngIf="filter.filterType === 'numeric'"
-                [required]="true"
-                [formControl]="filter.formControlValue"
-                [showButtons]="true"
-                placeholder="Enter a value"></p-inputNumber>
-              <p-calendar
-                *ngIf="filter.filterType === 'date'"
-                [required]="true"
-                [formControl]="filter.formControlValue"
-                appendTo="body"
-                placeholder="Enter a value"></p-calendar>
-              <p-inputSwitch
-                styleClass="block"
-                *ngIf="filter.filterType === 'boolean'"
-                [required]="true"
-                [formControl]="filter.formControlValue"></p-inputSwitch>
-            </div>
-            <div>
-              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" (onClick)="onRemoveFilter(filter)"></p-button>
-            </div>
-          </div>
-        </ng-template>
-      </p-orderList>
-      <p-button
-        label="Add"
-        icon="pi pi-plus"
-        class="mt-1"
-        [text]="true"
-        size="small"
-        (onClick)="onAddFilter()"></p-button>
-    </div>
-    <p-divider styleClass="mb-0">Order By</p-divider>
-    <div class="flex flex-column mb-2">
-      <!-- <label class="mb-1">Sort By</label> -->
-      <p-orderList [value]="sortBy" [stripedRows]="true" [dragdrop]="true">
-        <ng-template let-sortBy pTemplate="item">
-          <div class="flex align-items-center">
-            <div class="mr-3">
-              <p-dropdown
-                [(ngModel)]="sortBy.field"
-                [options]="dbTableColumns"
-                optionLabel="columnName"
-                optionValue="columnName"
-                appendTo="body"
-                placeholder="Select Id Column"></p-dropdown>
-            </div>
-            <div class="mr-3">
-              <p-dropdown
-                [(ngModel)]="sortBy.order"
-                [options]="dbOrderOptions"
-                appendTo="body"
-                placeholder="Order"></p-dropdown>
-            </div>
-            <div>
-              <p-button
-                icon="pi pi-trash"
-                [text]="true"
-                [rounded]="true"
-                (onClick)="onRemoveSortColumn(sortBy)"></p-button>
-            </div>
-          </div>
-        </ng-template>
-      </p-orderList>
-      <p-button
-        label="Add"
-        icon="pi pi-plus"
-        class="mt-1"
-        [text]="true"
-        size="small"
-        (onClick)="onAddSortColumn()"></p-button>
+          </ng-template>
+        </p-orderList>
+        <p-button
+          label="Add"
+          icon="pi pi-plus"
+          class="mt-1"
+          [text]="true"
+          size="small"
+          (onClick)="onAddSortColumn()"></p-button>
+      </div>
     </div>
   </div>
   <ng-template pTemplate="footer">
