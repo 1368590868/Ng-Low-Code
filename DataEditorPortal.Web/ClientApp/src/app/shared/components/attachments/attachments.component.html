@@ -1,14 +1,12 @@
 <ng-container *ngIf="showAll">
   <div *ngFor="let file of fileList" class="flex attachment-row w-full">
-    <div
-      class="overflow-hidden"
-      [style]="{ flex: file.comments ? '0 0 40%' : '1' }">
+    <div class="overflow-hidden" [style]="{ flex: file.comments ? '0 0 40%' : '1' }">
       <a
         class="no-underline cursor-pointer text-primary max-w-full inline-block"
         (click)="onAttachmentClick(file)"
-        href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
-          fieldName
-        }}/{{ file.fileId }}/{{ file.fileName || '' }}"
+        href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{ fieldName }}/{{ file.fileId }}/{{
+          file.fileName || ''
+        }}"
         target="_blank"
         >{{ file.fileName }}</a
       >
@@ -25,9 +23,9 @@
       class="no-underline cursor-pointer text-primary overflow-hidden text-overflow-ellipsis max-w-full"
       *ngFor="let file of fileList"
       (click)="onAttachmentClick(file)"
-      href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{
-        fieldName
-      }}/{{ file.fileId }}/{{ file.fileName || '' }}"
+      href="{{ apiUrl }}attachment/download-file/{{ gridName }}/{{ fieldName }}/{{ file.fileId }}/{{
+        file.fileName || ''
+      }}"
       pTooltip="{{ file.comments || '' }}"
       tooltipPosition="bottom"
       target="_blank"
@@ -35,8 +33,6 @@
     >
   </ng-container>
   <ng-container *ngIf="!showAll && fileList.length > 1">
-    <span [pTooltip]="tooltipList" [escape]="false" tooltipPosition="bottom">
-      {{ fileList.length }} attachments
-    </span>
+    <span [pTooltip]="tooltipList" [escape]="false" tooltipPosition="bottom"> {{ fileList.length }} attachments </span>
   </ng-container>
 </ng-container>
