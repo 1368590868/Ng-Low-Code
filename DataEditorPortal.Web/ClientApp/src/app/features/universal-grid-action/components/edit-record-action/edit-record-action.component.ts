@@ -1,11 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, Inject, Injector, Input, OnInit, Optional, Type, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { cloneDeep, isEqual } from 'lodash-es';
-import { Subject, forkJoin, takeUntil, tap } from 'rxjs';
+import { Subject, forkJoin, tap } from 'rxjs';
 import { LinkedTableComponent } from 'src/app/features/universal-grid/components/linked-table/linked-table.component';
+import { MasterTableComponent } from 'src/app/features/universal-grid/components/master-table/master-table.component';
 import { GridTableService } from 'src/app/features/universal-grid/services/grid-table.service';
 import { NgxFormlyService, NotifyService, SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
@@ -33,6 +33,7 @@ export class EditRecordActionComponent extends GridActionDirective implements On
   eventConfig?: FormEventConfig;
 
   @ViewChild('editForm') editForm!: NgForm;
+  tableWrapperComponent?: LinkedTableComponent | MasterTableComponent;
 
   constructor(
     private gridService: UniversalGridService,
@@ -47,10 +48,11 @@ export class EditRecordActionComponent extends GridActionDirective implements On
       name: string;
       handler: Type<EventActionHandlerService>;
     }[],
-    private route: ActivatedRoute,
-    @Optional() private tableWrapperComponent: LinkedTableComponent
+    @Optional() private linkedTableComponent: LinkedTableComponent,
+    @Optional() private masterTableComponent: MasterTableComponent
   ) {
     super();
+    this.tableWrapperComponent = this.linkedTableComponent ?? this.masterTableComponent;
   }
 
   override isFormUnmodified = () => {
@@ -96,20 +98,17 @@ export class EditRecordActionComponent extends GridActionDirective implements On
   }
 
   linkedConfig() {
-    // get item type from route
-    this.route.data.pipe(takeUntil(this.destroy$)).subscribe(data => {
-      if (data['type'] === 'linked') {
-        const linkedArr = this.tableWrapperComponent.selections[this.gridName];
+    if (this.tableWrapperComponent) {
+      const linkedArr = this.tableWrapperComponent.selections[this.gridName];
 
-        if (!linkedArr) return;
-        const linkedId = (linkedArr || []).map(data => {
-          return {
-            table2Id: data['key']
-          };
-        });
-        this.model = { ...this.model, LINK_DATA_FIELD: linkedId };
-      }
-    });
+      if (!linkedArr) return;
+      const linkedId = (linkedArr || []).map(data => {
+        return {
+          table2Id: data.key
+        };
+      });
+      this.model = { ...this.model, LINK_DATA_FIELD: linkedId };
+    }
   }
 
   searchConfig(searchConfig: any) {

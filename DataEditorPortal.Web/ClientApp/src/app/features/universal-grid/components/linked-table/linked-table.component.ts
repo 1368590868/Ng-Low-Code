@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { GridTableService } from '../../services/grid-table.service';
 import { TableComponent } from '../table/table.component';
 export interface SelectionsType {
-  [key: string]: { [key: string]: any }[];
+  [key: string]: { key: string }[];
 }
 
 @Component({
