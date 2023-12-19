@@ -1,9 +1,11 @@
 import { DatePipe } from '@angular/common';
-import { Component, Inject, Injector, Input, OnInit, Type, ViewChild } from '@angular/core';
+import { Component, Inject, Injector, Input, OnInit, Optional, Type, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { cloneDeep, isEqual } from 'lodash-es';
-import { Subject, forkJoin, tap } from 'rxjs';
+import { Subject, forkJoin, takeUntil, tap } from 'rxjs';
+import { LinkedTableComponent } from 'src/app/features/universal-grid/components/linked-table/linked-table.component';
 import { GridTableService } from 'src/app/features/universal-grid/services/grid-table.service';
 import { NgxFormlyService, NotifyService, SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
@@ -44,7 +46,9 @@ export class EditRecordActionComponent extends GridActionDirective implements On
     private EVENT_ACTION_CONFIG: {
       name: string;
       handler: Type<EventActionHandlerService>;
-    }[]
+    }[],
+    private route: ActivatedRoute,
+    @Optional() private tableWrapperComponent: LinkedTableComponent
   ) {
     super();
   }
@@ -84,10 +88,28 @@ export class EditRecordActionComponent extends GridActionDirective implements On
             this.searchConfig(searchConfig);
           }),
           tap(() => this.getFormConfig()),
-          tap(() => this.getEventConfig())
+          tap(() => this.getEventConfig()),
+          tap(() => this.linkedConfig())
         )
         .subscribe();
     }
+  }
+
+  linkedConfig() {
+    // get item type from route
+    this.route.data.pipe(takeUntil(this.destroy$)).subscribe(data => {
+      if (data['type'] === 'linked') {
+        const linkedArr = this.tableWrapperComponent.selections[this.gridName];
+
+        if (!linkedArr) return;
+        const linkedId = (linkedArr || []).map(data => {
+          return {
+            table2Id: data['key']
+          };
+        });
+        this.model = { ...this.model, LINK_DATA_FIELD: linkedId };
+      }
+    });
   }
 
   searchConfig(searchConfig: any) {
