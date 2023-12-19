@@ -1,10 +1,6 @@
 import { Type } from '@angular/core';
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import {
-  ControlValueAccessor,
-  FormControl,
-  NG_VALUE_ACCESSOR
-} from '@angular/forms';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EventActionHandlerService } from 'src/app/features/universal-grid-action/services/event-action-handler.service';
 
 @Component({
@@ -73,9 +69,7 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
 
   ngOnInit(): void {
     if (this.labelName === 'On Validate') {
-      this.typeOptions = this.typeOptions.filter(
-        x => x.value !== 'CommandLine'
-      );
+      this.typeOptions = this.typeOptions.filter(x => x.value !== 'CommandLine');
     }
 
     this.formControlType.valueChanges.subscribe(val => {
@@ -86,9 +80,7 @@ export class EventConfigComponent implements ControlValueAccessor, OnInit {
       } else if (val !== 'Javascript') {
         this.language = 'sql';
         this.helperMessage =
-          'Enter the query text . <br />' +
-          'E.g. <br /><br />' +
-          'SELECT Max(AMOUNT) FROM DEMO_TABLE';
+          'Enter the query text . <br />' + 'E.g. <br /><br />' + 'SELECT Max(AMOUNT) FROM DEMO_TABLE';
         this.formControlText.setValue(this.scriptText);
       }
 

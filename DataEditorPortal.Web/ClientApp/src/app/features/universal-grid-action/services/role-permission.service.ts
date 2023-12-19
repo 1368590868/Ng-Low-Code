@@ -3,11 +3,7 @@ import { Inject, Injectable } from '@angular/core';
 import { TreeNode } from 'primeng/api';
 import { map, Observable } from 'rxjs';
 import { ApiResponse } from 'src/app/shared';
-import {
-  updateRole,
-  ManageRoleForm,
-  RoleItem
-} from '../models/role-permisstion';
+import { updateRole, ManageRoleForm, RoleItem } from '../models/role-permisstion';
 
 @Injectable({
   providedIn: 'root'
@@ -20,9 +16,7 @@ export class RolePermissionService {
   }
 
   getRoleList() {
-    return this.http
-      .get<ApiResponse<RoleItem[]>>(`${this._apiUrl}role/list`)
-      .pipe(map(res => res.data || []));
+    return this.http.get<ApiResponse<RoleItem[]>>(`${this._apiUrl}role/list`).pipe(map(res => res.data || []));
   }
 
   getRolePermissions(roleId: string) {
@@ -38,16 +32,10 @@ export class RolePermissionService {
   }
 
   updateRole(data: ManageRoleForm) {
-    return this.http.post<ApiResponse<updateRole[]>>(
-      `${this._apiUrl}role/${data.roleId}/update`,
-      data
-    );
+    return this.http.post<ApiResponse<updateRole[]>>(`${this._apiUrl}role/${data.roleId}/update`, data);
   }
 
   createRole(data: ManageRoleForm) {
-    return this.http.put<ApiResponse<updateRole[]>>(
-      `${this._apiUrl}role/create`,
-      data
-    );
+    return this.http.put<ApiResponse<updateRole[]>>(`${this._apiUrl}role/create`, data);
   }
 }

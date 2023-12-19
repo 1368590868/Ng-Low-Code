@@ -2,13 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { PaginatorState } from 'primeng/paginator';
-import {
-  GridParam,
-  GroupData,
-  NotifyService,
-  SiteGroupService,
-  SortMetaEvent
-} from 'src/app/shared';
+import { GridParam, GroupData, NotifyService, SiteGroupService, SortMetaEvent } from 'src/app/shared';
 import { AddGroupComponent } from './add-group/add-group.component';
 
 @Component({
@@ -128,10 +122,7 @@ export class SiteGroupComponent implements OnInit {
       accept: () => {
         this.siteGroupService.deleteGroup(rowData.ID || '').subscribe(res => {
           if (res.code === 200) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Record deleted successfully'
-            );
+            this.notifyService.notifySuccess('Success', 'Record deleted successfully');
             this.fetchData();
           }
         });
@@ -160,10 +151,7 @@ export class SiteGroupComponent implements OnInit {
         const fieldProp = obj[prop];
         for (let i = 0; i < fieldProp.length; i++) {
           if (fieldProp[i].value != null) {
-            if (
-              Array.isArray(fieldProp[i].value) &&
-              fieldProp[i].value.length === 0
-            ) {
+            if (Array.isArray(fieldProp[i].value) && fieldProp[i].value.length === 0) {
               continue;
             }
             fieldProp[i].field = prop;

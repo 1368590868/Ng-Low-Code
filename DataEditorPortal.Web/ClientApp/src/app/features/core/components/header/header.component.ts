@@ -15,10 +15,7 @@ export class HeaderComponent implements OnInit {
   public visible = false;
   siteName?: string;
 
-  constructor(
-    public configDataService: ConfigDataService,
-    public userService: UserService
-  ) {
+  constructor(public configDataService: ConfigDataService, public userService: UserService) {
     this.items = [
       {
         label: 'Home',

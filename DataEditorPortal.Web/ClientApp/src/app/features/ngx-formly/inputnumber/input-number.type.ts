@@ -1,9 +1,5 @@
 import { Component, ChangeDetectionStrategy, Type } from '@angular/core';
-import {
-  FieldType,
-  FieldTypeConfig,
-  FormlyFieldConfig
-} from '@ngx-formly/core';
+import { FieldType, FieldTypeConfig, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyFieldProps } from '@ngx-formly/primeng/form-field';
 
 interface InputNumberProps extends FormlyFieldProps {
@@ -16,8 +12,7 @@ interface InputNumberProps extends FormlyFieldProps {
   maxFractionDigits?: number;
 }
 
-export interface FormlySelectFieldConfig
-  extends FormlyFieldConfig<InputNumberProps> {
+export interface FormlySelectFieldConfig extends FormlyFieldConfig<InputNumberProps> {
   type: 'inputNumber' | Type<FormlyFieldInputNumberComponent>;
 }
 
@@ -39,6 +34,4 @@ export interface FormlySelectFieldConfig
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldInputNumberComponent extends FieldType<
-  FieldTypeConfig<InputNumberProps>
-> {}
+export class FormlyFieldInputNumberComponent extends FieldType<FieldTypeConfig<InputNumberProps>> {}

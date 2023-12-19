@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import {
   ControlValueAccessor,
   FormBuilder,
@@ -27,9 +22,7 @@ import { NotifyService } from 'src/app/shared';
     }
   ]
 })
-export class ComputedValueEditorComponent
-  implements ControlValueAccessor, OnInit
-{
+export class ComputedValueEditorComponent implements ControlValueAccessor, OnInit {
   formBuilder = new FormBuilder();
   form!: FormGroup;
   visible = false;
@@ -133,10 +126,7 @@ export class ComputedValueEditorComponent
       this.visible = false;
       this.onSendData();
     } else {
-      this.notifyService.notifyWarning(
-        '',
-        'Query Type or Query Text is required.'
-      );
+      this.notifyService.notifyWarning('', 'Query Type or Query Text is required.');
       queryTextFormControl?.markAsDirty();
       typeFormControl?.markAsDirty();
     }
@@ -184,9 +174,7 @@ export class ComputedValueEditorComponent
     <app-computed-value-editor
       [formControl]="formControl"
       [formlyAttributes]="field"
-      (onChange)="
-        props.change && props.change(field, $event)
-      "></app-computed-value-editor>
+      (onChange)="props.change && props.change(field, $event)"></app-computed-value-editor>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

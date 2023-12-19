@@ -15,10 +15,7 @@ export class LinkDataTableService {
 
   getTableConfig(name: string): Observable<TableConfig> {
     return this.http
-      .post<ApiResponse<TableConfig>>(
-        `${this._apiUrl}universal-grid/${name}/linked-table-editor/table-config`,
-        null
-      )
+      .post<ApiResponse<TableConfig>>(`${this._apiUrl}universal-grid/${name}/linked-table-editor/table-config`, null)
       .pipe(
         map(
           res =>
@@ -33,10 +30,7 @@ export class LinkDataTableService {
 
   getTableData(name: string, tableParams: any): Observable<any[]> {
     return this.http
-      .post<ApiResponse<any>>(
-        `${this._apiUrl}universal-grid/${name}/linked-table-editor/table-data`,
-        tableParams
-      )
+      .post<ApiResponse<any>>(`${this._apiUrl}universal-grid/${name}/linked-table-editor/table-data`, tableParams)
       .pipe(map(res => res.data?.data || []));
   }
 }

@@ -1,15 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import {
-  distinctUntilChanged,
-  map,
-  Observable,
-  tap,
-  debounceTime,
-  Subject,
-  takeUntil
-} from 'rxjs';
+import { distinctUntilChanged, map, Observable, tap, debounceTime, Subject, takeUntil } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 import { evalExpression, evalStringExpression } from '../utils';
 
@@ -24,10 +16,7 @@ export class NgxFormlyService {
 
   private getLookup(id: string, data?: any): Observable<any[]> {
     return this.http
-      .post<ApiResponse<any[]>>(
-        `${this._apiUrl}lookup/${id}/options`,
-        data || {}
-      )
+      .post<ApiResponse<any[]>>(`${this._apiUrl}lookup/${id}/options`, data || {})
       .pipe(map(res => res.data || []));
   }
 
@@ -60,11 +49,8 @@ export class NgxFormlyService {
                 const control = field.formControl as FormControl;
                 if (control.value) {
                   const data = control.value || [];
-                  const filteredData = data.filter(
-                    (x: any) => !!result.find(o => o.value === x)
-                  );
-                  if (filteredData.length < data.length)
-                    field.formControl.setValue(filteredData);
+                  const filteredData = data.filter((x: any) => !!result.find(o => o.value === x));
+                  if (filteredData.length < data.length) field.formControl.setValue(filteredData);
                 }
               }
               field.options.detectChanges(field);
@@ -95,15 +81,9 @@ export class NgxFormlyService {
           // subscribe depends on fields value changes.
           const subject = new Subject<any>();
           const observable = subject as Observable<any>;
-          observable
-            .pipe(
-              debounceTime(100),
-              distinctUntilChanged(),
-              takeUntil(destroy$)
-            )
-            .subscribe(({ f, model }) => {
-              this.initFieldOptions(f, model);
-            });
+          observable.pipe(debounceTime(100), distinctUntilChanged(), takeUntil(destroy$)).subscribe(({ f, model }) => {
+            this.initFieldOptions(f, model);
+          });
 
           $deps.forEach((key: string) => {
             if (f.key === key) return;
@@ -137,37 +117,28 @@ export class NgxFormlyService {
     if (Array.isArray(field.validatorConfig)) {
       const validators: any = { validation: [] };
       let $deps: string[] = [];
-      field.validatorConfig.forEach(
-        (x: string | { expression: string; message: string }) => {
-          if (typeof x === 'string')
-            validators.validation.push(x); // pre-defined simple validators
-          else if (x.expression && x.message) {
-            // custom validators using javascript expression
-            // add custom validation to validators
-            validators.customValidation = {
-              expression: (control: AbstractControl, field: any, msg: any) => {
-                const form = control.root as FormGroup;
-                const model = { ...form.value };
-                model[field.key] = control.value;
-                return evalExpression(
-                  evalStringExpression(x.expression, ['$form', '$model']),
-                  control,
-                  [form, model]
-                );
-              },
-              message: x.message
-            };
+      field.validatorConfig.forEach((x: string | { expression: string; message: string }) => {
+        if (typeof x === 'string') validators.validation.push(x); // pre-defined simple validators
+        else if (x.expression && x.message) {
+          // custom validators using javascript expression
+          // add custom validation to validators
+          validators.customValidation = {
+            expression: (control: AbstractControl, field: any, msg: any) => {
+              const form = control.root as FormGroup;
+              const model = { ...form.value };
+              model[field.key] = control.value;
+              return evalExpression(evalStringExpression(x.expression, ['$form', '$model']), control, [form, model]);
+            },
+            message: x.message
+          };
 
-            // regex to match the dependencies fields
-            $deps = [
-              ...x.expression.matchAll(/\$model[.]{1}([a-zA-Z_]\w*){1}/g)
-            ]
-              .map(match => match[1]) // get the field name
-              .filter((value, index, array) => array.indexOf(value) === index) // distinct
-              .filter(value => value !== field.key); // exclude current field itself
-          }
+          // regex to match the dependencies fields
+          $deps = [...x.expression.matchAll(/\$model[.]{1}([a-zA-Z_]\w*){1}/g)]
+            .map(match => match[1]) // get the field name
+            .filter((value, index, array) => array.indexOf(value) === index) // distinct
+            .filter(value => value !== field.key); // exclude current field itself
         }
-      );
+      });
       field.validators = validators;
       field.validatorConfig = undefined;
 
@@ -177,11 +148,9 @@ export class NgxFormlyService {
           $deps.forEach(key => {
             const $dep = f.parent.get(key);
             if ($dep) {
-              $dep.formControl.valueChanges
-                .pipe(takeUntil(destory$))
-                .subscribe(() => {
-                  setTimeout(() => f?.formControl?.updateValueAndValidity());
-                });
+              $dep.formControl.valueChanges.pipe(takeUntil(destory$)).subscribe(() => {
+                setTimeout(() => f?.formControl?.updateValueAndValidity());
+              });
             }
           });
         };

@@ -22,10 +22,7 @@ import { ConfirmationService } from 'primeng/api';
   styleUrls: ['./portal-edit-link.component.scss'],
   providers: [ConfirmationService]
 })
-export class PortalEditLinkComponent
-  extends PortalEditStepDirective
-  implements OnInit
-{
+export class PortalEditLinkComponent extends PortalEditStepDirective implements OnInit {
   @ViewChild('customActions') customActions!: CustomActionsComponent;
   @ViewChildren('validationRef') validationRef!: NgModel[];
   isLoading = true;
@@ -100,118 +97,88 @@ export class PortalEditLinkComponent
         this.dsConfig.tableSchema = '';
       }
     });
-    this.formControlIdColumn.valueChanges.subscribe(
-      value => (this.dsConfig.idColumn = value)
-    );
+    this.formControlIdColumn.valueChanges.subscribe(value => (this.dsConfig.idColumn = value));
     this.formControlConnection.valueChanges.subscribe(value => {
       this.dsConfig.dataSourceConnectionName = value;
     });
 
     this.portalItemService.saveCurrentStep('datasource');
-    this.portalItemService
-      .getLinkedDatasource(this.itemId as string)
-      .subscribe(res => {
-        if (res.code === 200) {
-          const { data } = res;
-          this.dataSourceConfig = data || {};
-          this.isLoading = false;
-          this.isOneToMany = data?.linkTable?.isOneToMany ?? false;
-          this.formControlUseAsMasterDetailView.setValue(
-            this.dataSourceConfig.useAsMasterDetailView
-          );
+    this.portalItemService.getLinkedDatasource(this.itemId as string).subscribe(res => {
+      if (res.code === 200) {
+        const { data } = res;
+        this.dataSourceConfig = data || {};
+        this.isLoading = false;
+        this.isOneToMany = data?.linkTable?.isOneToMany ?? false;
+        this.formControlUseAsMasterDetailView.setValue(this.dataSourceConfig.useAsMasterDetailView);
 
-          this.primarySelected =
-            this.dataSourceConfig.primaryTable?.columnsForLinkedField || [];
-          this.secondarySelected =
-            this.dataSourceConfig.secondaryTable?.columnsForLinkedField || [];
-          this.formControlPrimaryMap.setValue(
-            this.dataSourceConfig.linkTable?.primaryForeignKey
-          );
-          this.formControlSecondaryMap.setValue(
-            this.dataSourceConfig.linkTable?.secondaryForeignKey
-          );
+        this.primarySelected = this.dataSourceConfig.primaryTable?.columnsForLinkedField || [];
+        this.secondarySelected = this.dataSourceConfig.secondaryTable?.columnsForLinkedField || [];
+        this.formControlPrimaryMap.setValue(this.dataSourceConfig.linkTable?.primaryForeignKey);
+        this.formControlSecondaryMap.setValue(this.dataSourceConfig.linkTable?.secondaryForeignKey);
 
-          this.showQuery = !!data?.linkTable?.queryInsert;
+        this.showQuery = !!data?.linkTable?.queryInsert;
 
-          this.formControlQueryText.setValue(data?.linkTable?.queryInsert);
+        this.formControlQueryText.setValue(data?.linkTable?.queryInsert);
 
-          if (data?.primaryTable?.id != null) {
-            this.portalItemService
-              .getLinkedSingleTableConfig(data.primaryTable.id)
-              .subscribe(item => {
-                this.primaryTableConfig = item;
-                const filteredData = this.primarySelected.filter(
-                  x => !!item.gridColumns.find(y => y.value === x)
-                );
-                if (filteredData.length < this.primarySelected.length) {
-                  this.primarySelected = filteredData;
-                }
-
-                this.formControlPrimaryReference.setValue(
-                  this.dataSourceConfig.linkTable?.primaryReferenceKey ??
-                    item?.idColumn
-                );
-
-                this.formControlPrimaryOneToMany.setValue(
-                  this.dataSourceConfig.linkTable?.primaryReferenceKey ??
-                    item?.idColumn
-                );
-              });
-          }
-
-          if (data?.secondaryTable?.id != null) {
-            this.portalItemService
-              .getLinkedSingleTableConfig(data.secondaryTable.id)
-              .subscribe(item => {
-                this.secondaryTableConfig = item;
-                const filteredData = this.secondarySelected.filter(
-                  x => !!item.gridColumns.find(y => y.value === x)
-                );
-                if (filteredData.length < this.secondarySelected.length) {
-                  this.secondarySelected = filteredData;
-                }
-
-                this.formControlSecondaryReference.setValue(
-                  this.dataSourceConfig.linkTable?.secondaryReferenceKey ??
-                    item?.idColumn
-                );
-                this.formControlSecondaryOneToMany.setValue(
-                  this.dataSourceConfig.linkTable?.secondaryReferenceKey ??
-                    item?.idColumn
-                );
-              });
-          }
-
-          if (data?.linkTable) {
-            this.dsConfig = data.linkTable;
-            this.orginalConfig = { ...data.linkTable };
-          }
-
-          // load database tables
-          this.portalItemService.getDataSourceConnections().subscribe(res => {
-            this.isLoading = false;
-            const connections: DataSourceConnection[] = res;
-            if (connections.length === 0) return;
-            this.dbConnections = connections.map(x => {
-              return { label: x.name, value: x.name || '' };
-            });
-            // check if current selected connections exists, if not exist, use the first
-            if (
-              !connections.find(
-                x => x.name === this.dsConfig?.dataSourceConnectionName
-              )
-            ) {
-              this.formControlConnection.setValue(connections[0].name);
-            } else {
-              this.formControlConnection.setValue(
-                this.dsConfig?.dataSourceConnectionName
-              );
+        if (data?.primaryTable?.id != null) {
+          this.portalItemService.getLinkedSingleTableConfig(data.primaryTable.id).subscribe(item => {
+            this.primaryTableConfig = item;
+            const filteredData = this.primarySelected.filter(x => !!item.gridColumns.find(y => y.value === x));
+            if (filteredData.length < this.primarySelected.length) {
+              this.primarySelected = filteredData;
             }
 
-            this.getDbTables();
+            this.formControlPrimaryReference.setValue(
+              this.dataSourceConfig.linkTable?.primaryReferenceKey ?? item?.idColumn
+            );
+
+            this.formControlPrimaryOneToMany.setValue(
+              this.dataSourceConfig.linkTable?.primaryReferenceKey ?? item?.idColumn
+            );
           });
         }
-      });
+
+        if (data?.secondaryTable?.id != null) {
+          this.portalItemService.getLinkedSingleTableConfig(data.secondaryTable.id).subscribe(item => {
+            this.secondaryTableConfig = item;
+            const filteredData = this.secondarySelected.filter(x => !!item.gridColumns.find(y => y.value === x));
+            if (filteredData.length < this.secondarySelected.length) {
+              this.secondarySelected = filteredData;
+            }
+
+            this.formControlSecondaryReference.setValue(
+              this.dataSourceConfig.linkTable?.secondaryReferenceKey ?? item?.idColumn
+            );
+            this.formControlSecondaryOneToMany.setValue(
+              this.dataSourceConfig.linkTable?.secondaryReferenceKey ?? item?.idColumn
+            );
+          });
+        }
+
+        if (data?.linkTable) {
+          this.dsConfig = data.linkTable;
+          this.orginalConfig = { ...data.linkTable };
+        }
+
+        // load database tables
+        this.portalItemService.getDataSourceConnections().subscribe(res => {
+          this.isLoading = false;
+          const connections: DataSourceConnection[] = res;
+          if (connections.length === 0) return;
+          this.dbConnections = connections.map(x => {
+            return { label: x.name, value: x.name || '' };
+          });
+          // check if current selected connections exists, if not exist, use the first
+          if (!connections.find(x => x.name === this.dsConfig?.dataSourceConnectionName)) {
+            this.formControlConnection.setValue(connections[0].name);
+          } else {
+            this.formControlConnection.setValue(this.dsConfig?.dataSourceConnectionName);
+          }
+
+          this.getDbTables();
+        });
+      }
+    });
   }
 
   onRadioChange(event: boolean) {
@@ -254,10 +221,7 @@ export class PortalEditLinkComponent
 
   onAddSecondaryTable() {
     if (this.dataSourceConfig.primaryTable == null) {
-      this.notifyService.notifyWarning(
-        'Warning',
-        'Please select primary table first.'
-      );
+      this.notifyService.notifyWarning('Warning', 'Please select primary table first.');
     } else {
       this.onSave().subscribe(res => {
         if (res.code === 200) {
@@ -271,10 +235,7 @@ export class PortalEditLinkComponent
 
   valid() {
     if (this.isOneToMany) {
-      if (
-        !this.formControlPrimaryOneToMany.value ||
-        !this.formControlSecondaryOneToMany.value
-      ) {
+      if (!this.formControlPrimaryOneToMany.value || !this.formControlSecondaryOneToMany.value) {
         this.formControlPrimaryOneToMany.markAsDirty();
         this.formControlSecondaryOneToMany.markAsDirty();
         return false;
@@ -330,11 +291,7 @@ export class PortalEditLinkComponent
   }
 
   dataSourceChanged() {
-    return (
-      this.orginalConfig &&
-      this.dsConfig.dataSourceConnectionName !=
-        this.orginalConfig.dataSourceConnectionName
-    );
+    return this.orginalConfig && this.dsConfig.dataSourceConnectionName != this.orginalConfig.dataSourceConnectionName;
   }
 
   onSaveAndExit() {
@@ -441,28 +398,26 @@ export class PortalEditLinkComponent
   }
 
   getDbTables() {
-    this.portalItemService
-      .getDataSourceTables(this.formControlConnection.value)
-      .subscribe(res => {
-        const tables: DataSourceTable[] = res;
+    this.portalItemService.getDataSourceTables(this.formControlConnection.value).subscribe(res => {
+      const tables: DataSourceTable[] = res;
 
-        // create label and value for dropdown
-        tables.forEach(x => {
-          x.label = `${x.tableSchema}.${x.tableName}`;
-          x.value = `${x.tableSchema}.${x.tableName}`;
-        });
-        this.dbTables = tables;
-
-        if (!this.dsConfig.queryText) {
-          const selectedDbTable = `${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`;
-          // check if current selected dbTable exists, if not exist, use the first
-          if (tables.find(x => x.value === selectedDbTable)) {
-            this.formControlDbTable.setValue(selectedDbTable);
-          }
-        }
-
-        this.getDbTableColumns();
+      // create label and value for dropdown
+      tables.forEach(x => {
+        x.label = `${x.tableSchema}.${x.tableName}`;
+        x.value = `${x.tableSchema}.${x.tableName}`;
       });
+      this.dbTables = tables;
+
+      if (!this.dsConfig.queryText) {
+        const selectedDbTable = `${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`;
+        // check if current selected dbTable exists, if not exist, use the first
+        if (tables.find(x => x.value === selectedDbTable)) {
+          this.formControlDbTable.setValue(selectedDbTable);
+        }
+      }
+
+      this.getDbTableColumns();
+    });
   }
 
   /* db connection dialog */
@@ -482,10 +437,7 @@ export class PortalEditLinkComponent
 
   setColumns(res: DataSourceTableColumn[]) {
     this.dbTableColumns = res;
-    if (
-      !this.dsConfig.idColumn ||
-      !res.find(x => x.columnName === this.dsConfig.idColumn)
-    ) {
+    if (!this.dsConfig.idColumn || !res.find(x => x.columnName === this.dsConfig.idColumn)) {
       this.formControlIdColumn.setValue(res[0].columnName);
     } else {
       this.formControlIdColumn.setValue(this.dsConfig.idColumn);
@@ -508,31 +460,20 @@ export class PortalEditLinkComponent
       this.formControlIdColumn.updateValueAndValidity();
     }
 
-    return (
-      this.formControlConnection.valid &&
-      this.formControlDbTable.valid &&
-      this.formControlIdColumn.valid
-    );
+    return this.formControlConnection.valid && this.formControlDbTable.valid && this.formControlIdColumn.valid;
   }
 
   getDbTableColumns() {
     if (this.dsConfig.queryText) {
       this.portalItemService
-        .getDataSourceTableColumnsByQuery(
-          this.formControlConnection.value,
-          this.dsConfig.queryText
-        )
+        .getDataSourceTableColumnsByQuery(this.formControlConnection.value, this.dsConfig.queryText)
         .subscribe(res => this.setColumns(res.data || []));
     } else {
       const selectedDbTable = this.formControlDbTable.value;
       if (!selectedDbTable) return;
       const [tableSchema, tableName] = selectedDbTable.split('.');
       this.portalItemService
-        .getDataSourceTableColumns(
-          this.formControlConnection.value,
-          tableSchema,
-          tableName
-        )
+        .getDataSourceTableColumns(this.formControlConnection.value, tableSchema, tableName)
         .subscribe(res => this.setColumns(res));
     }
   }

@@ -36,16 +36,13 @@ export class AsyncQueryTextActionHandler extends EventActionHandlerService {
   override excuteAction(params?: EventActionParam) {
     return this.http
       .post<ApiResponse<boolean>>(
-        `${this._apiUrl}universal-grid/${params?.name}/data/${
-          params?.type
-        }/validate/${params?.id ?? ''}`,
+        `${this._apiUrl}universal-grid/${params?.name}/data/${params?.type}/validate/${params?.id ?? ''}`,
         params?.data
       )
       .pipe(
         map(res => res.data || false),
         tap(res => {
-          if (!res && params?.errorMsg)
-            this.notifyService.notifyWarning('', params?.errorMsg);
+          if (!res && params?.errorMsg) this.notifyService.notifyWarning('', params?.errorMsg);
         })
       );
   }
@@ -60,10 +57,7 @@ export class OnValidateDemoActionHandler extends EventActionHandlerService {
       }),
       delay(1000),
       tap(() => {
-        this.notifyService.notifyInfo(
-          'On Validate',
-          'Validation excuted successfully'
-        );
+        this.notifyService.notifyInfo('On Validate', 'Validation excuted successfully');
       })
     );
   }
@@ -75,10 +69,7 @@ export class OnAfterSavedDemoActionHandler extends EventActionHandlerService {
     return of(false).pipe(
       delay(2000),
       tap(() => {
-        this.notifyService.notifyInfo(
-          'On After Saved',
-          'Action excuted successfully'
-        );
+        this.notifyService.notifyInfo('On After Saved', 'Action excuted successfully');
       })
     );
   }

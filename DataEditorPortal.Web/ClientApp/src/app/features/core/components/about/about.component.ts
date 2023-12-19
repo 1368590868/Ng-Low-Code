@@ -10,10 +10,7 @@ import { ConfigDataService } from 'src/app/shared';
 })
 export class AboutComponent implements OnInit {
   public content$!: Observable<SafeHtml>;
-  constructor(
-    private configDataService: ConfigDataService,
-    private domSanitizer: DomSanitizer
-  ) {}
+  constructor(private configDataService: ConfigDataService, private domSanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
     this.content$ = this.configDataService.siteGroup$.pipe(

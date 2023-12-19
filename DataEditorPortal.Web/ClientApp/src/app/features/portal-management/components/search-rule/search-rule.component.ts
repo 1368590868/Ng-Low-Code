@@ -1,14 +1,5 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit
-} from '@angular/core';
-import {
-  ControlValueAccessor,
-  FormControl,
-  NG_VALUE_ACCESSOR
-} from '@angular/forms';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { distinctUntilChanged, startWith } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
@@ -83,8 +74,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
     if (val) {
       this.field = val.field;
       this.formControlField.setValue(val.field);
-      if (val.matchMode)
-        this.formControlMatchMode.setValue(val.matchMode, { emitEvent: false });
+      if (val.matchMode) this.formControlMatchMode.setValue(val.matchMode, { emitEvent: false });
       this._whereClause = val.whereClause;
     }
     // this.onChange?.(val);
@@ -106,22 +96,18 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   constructor(private notifyService: NotifyService) {}
 
   ngOnInit(): void {
-    this.formControlMatchMode.valueChanges
-      .pipe(distinctUntilChanged())
-      .subscribe(val => {
-        this.onChange?.({
-          field: this.formControlField.value,
-          matchMode: val
-        });
+    this.formControlMatchMode.valueChanges.pipe(distinctUntilChanged()).subscribe(val => {
+      this.onChange?.({
+        field: this.formControlField.value,
+        matchMode: val
       });
-    this.formControlField.valueChanges
-      .pipe(distinctUntilChanged())
-      .subscribe(val => {
-        this.onChange?.({
-          field: val,
-          matchMode: this.formControlMatchMode.value
-        });
+    });
+    this.formControlField.valueChanges.pipe(distinctUntilChanged()).subscribe(val => {
+      this.onChange?.({
+        field: val,
+        matchMode: this.formControlMatchMode.value
       });
+    });
   }
   onFormControlFieldBlur() {
     const val = this.formControlField.value;
@@ -160,9 +146,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
       [formControl]="formControl"
       [formlyAttributes]="field"
       [options]="props.options"
-      (onChange)="
-        props.change && props.change(field, $event)
-      "></app-search-rule>
+      (onChange)="props.change && props.change(field, $event)"></app-search-rule>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

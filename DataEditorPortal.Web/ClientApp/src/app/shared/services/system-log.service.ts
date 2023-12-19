@@ -13,16 +13,11 @@ export class SystemLogService {
   }
 
   getTableData(tableParams: GridParam) {
-    return this.http.post<ApiResponse<GridResult<SystemLogViewInfo>>>(
-      `${this._apiUrl}event-log/list`,
-      tableParams
-    );
+    return this.http.post<ApiResponse<GridResult<SystemLogViewInfo>>>(`${this._apiUrl}event-log/list`, tableParams);
   }
 
   getRowData(id: string) {
-    return this.http.get<ApiResponse<SystemLogViewInfo>>(
-      `${this._apiUrl}event-log/${id}`
-    );
+    return this.http.get<ApiResponse<SystemLogViewInfo>>(`${this._apiUrl}event-log/${id}`);
   }
 
   addSiteVisitLog(data: { action: string; section: string; params: string }) {

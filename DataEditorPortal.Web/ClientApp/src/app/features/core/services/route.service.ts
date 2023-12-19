@@ -1,12 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { Route, Router, Routes } from '@angular/router';
 import { tap, withLatestFrom } from 'rxjs';
-import {
-  AdminPermissionGuard,
-  AuthRouterGuard,
-  ConfigDataService,
-  SiteMenu
-} from 'src/app/shared';
+import { AdminPermissionGuard, AuthRouterGuard, ConfigDataService, SiteMenu } from 'src/app/shared';
 import {
   DataDictionaryComponent,
   DbConnectionComponent,
@@ -38,11 +33,7 @@ export class RouteService {
   }
 
   resetRoutesConfig(menus: SiteMenu[], siteGroupName: string | undefined) {
-    this.updateRoute(
-      { path: '', children: this.router.config },
-      { name: '', items: menus },
-      true
-    );
+    this.updateRoute({ path: '', children: this.router.config }, { name: '', items: menus }, true);
 
     // update home and static pages to site group
     if (siteGroupName) {
@@ -52,9 +43,7 @@ export class RouteService {
       }
       const groupRoute = this.router.config.find(r => r.path === siteGroupName);
       if (groupRoute) {
-        this.staticRoutes
-          .filter(r => r.path !== '')
-          .forEach(r => groupRoute.children?.push(r));
+        this.staticRoutes.filter(r => r.path !== '').forEach(r => groupRoute.children?.push(r));
       }
     }
   }
@@ -106,11 +95,7 @@ export class RouteService {
   }
 
   routeCorrect: (route: Route) => boolean = r =>
-    !!(
-      r &&
-      r.path &&
-      (r.children || r.component || r.loadChildren || r.loadComponent)
-    );
+    !!(r && r.path && (r.children || r.component || r.loadChildren || r.loadComponent));
 
   buildPortalItemRoutes(menus: SiteMenu[]) {
     return menus
@@ -132,9 +117,7 @@ export class RouteService {
       return {
         path: menu.name,
         loadChildren: () =>
-          import('src/app/features/universal-grid/universal-grid.module').then(
-            m => m.UniversalGridModule
-          ),
+          import('src/app/features/universal-grid/universal-grid.module').then(m => m.UniversalGridModule),
         data: { type: menu.itemType, name: menu.name },
         canActivate: [AuthRouterGuard]
       };
@@ -153,16 +136,12 @@ export class RouteService {
           break;
         case 'UniversalGridModule':
           route.loadChildren = () =>
-            import(
-              'src/app/features/universal-grid/universal-grid.module'
-            ).then(m => m.UniversalGridModule);
+            import('src/app/features/universal-grid/universal-grid.module').then(m => m.UniversalGridModule);
           route.data = { type: menu.itemType, name: menu.name };
           break;
         case 'PortalManagementModule':
           route.loadChildren = () =>
-            import(
-              'src/app/features/portal-management/portal-management.module'
-            ).then(m => m.PortalManagementModule);
+            import('src/app/features/portal-management/portal-management.module').then(m => m.PortalManagementModule);
           break;
         case 'DbConnectionComponent':
           route.component = DbConnectionComponent;

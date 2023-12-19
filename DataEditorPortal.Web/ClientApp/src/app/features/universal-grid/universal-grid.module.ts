@@ -1,10 +1,4 @@
-import {
-  CommonModule,
-  CurrencyPipe,
-  DatePipe,
-  DecimalPipe,
-  PercentPipe
-} from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -94,13 +88,6 @@ import { ToastModule } from 'primeng/toast';
     ConfirmDialogModule,
     DividerModule
   ],
-  providers: [
-    GridTableService,
-    DatePipe,
-    DecimalPipe,
-    CurrencyPipe,
-    PercentPipe,
-    ConfirmationService
-  ]
+  providers: [GridTableService, DatePipe, DecimalPipe, CurrencyPipe, PercentPipe, ConfirmationService]
 })
 export class UniversalGridModule {}

@@ -10,8 +10,7 @@ describe('HttpErrorInterceptor', () => {
   );
 
   it('should be created', () => {
-    const interceptor: HttpErrorInterceptor =
-      TestBed.inject(HttpErrorInterceptor);
+    const interceptor: HttpErrorInterceptor = TestBed.inject(HttpErrorInterceptor);
     expect(interceptor).toBeTruthy();
   });
 });

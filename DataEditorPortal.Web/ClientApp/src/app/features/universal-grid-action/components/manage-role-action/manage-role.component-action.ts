@@ -4,11 +4,7 @@ import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { TreeNode } from 'primeng/api';
 import { NotifyService, SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
-import {
-  ManageRoleForm,
-  RoleItem,
-  RolePermissions
-} from '../../models/role-permisstion';
+import { ManageRoleForm, RoleItem, RolePermissions } from '../../models/role-permisstion';
 import { RolePermissionService } from '../../services/role-permission.service';
 
 @Component({
@@ -37,9 +33,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
               this.roleId = this.model.roleId || '';
               this.permissionSelect = [];
 
-              this.getRolePermissionsList(
-                this.roleId === '<new_role>' ? undefined : this.roleId
-              );
+              this.getRolePermissionsList(this.roleId === '<new_role>' ? undefined : this.roleId);
 
               const role = this.roleList.find(x => this.roleId == x.id);
               if (role) {
@@ -135,8 +129,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
     this.form.setValue({
       roleId: role.id,
       roleName: this.roleName,
-      roleDescription:
-        role.id === '<new_role>' ? '' : role?.roleDescription ?? ''
+      roleDescription: role.id === '<new_role>' ? '' : role?.roleDescription ?? ''
     });
   }
 
@@ -215,8 +208,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
         };
       });
     if (this.form.valid) {
-      const apiName =
-        this.model.roleId === '<new_role>' ? 'createRole' : 'updateRole';
+      const apiName = this.model.roleId === '<new_role>' ? 'createRole' : 'updateRole';
       this.systemLogService.addSiteVisitLog({
         action: this.model.roleId === '<new_role>' ? 'Add Role' : 'Update Role',
         section: this.rolePermissionService.section,
@@ -230,10 +222,7 @@ export class ManageRoleActionComponent extends GridActionDirective {
         permissions: permissionSelect as RolePermissions[]
       }).subscribe(res => {
         if (res.code === 200) {
-          this.notifyService.notifySuccess(
-            'Success',
-            'Save Successfully Completed.'
-          );
+          this.notifyService.notifySuccess('Success', 'Save Successfully Completed.');
           this.savedEvent.emit();
         } else {
           this.errorEvent.emit();

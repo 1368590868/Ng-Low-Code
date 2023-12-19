@@ -43,10 +43,7 @@ export class LoginComponent implements OnInit {
         withLatestFrom(this.configDataServce.siteGroup$),
         tap(([res, siteGroup]) => {
           if (this.userService.isLogin) {
-            this.routeService.resetRoutesConfig(
-              res.data?.userMenus || [],
-              siteGroup?.name
-            );
+            this.routeService.resetRoutesConfig(res.data?.userMenus || [], siteGroup?.name);
             this.router.navigateByUrl(returnUrl || '');
           } else {
             this.hasLoginError = true;

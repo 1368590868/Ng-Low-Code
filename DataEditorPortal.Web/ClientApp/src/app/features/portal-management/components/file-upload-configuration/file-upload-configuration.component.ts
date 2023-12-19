@@ -7,18 +7,9 @@ import {
   ViewChildren,
   forwardRef
 } from '@angular/core';
-import {
-  ControlValueAccessor,
-  FormControl,
-  NG_VALUE_ACCESSOR,
-  NgModel
-} from '@angular/forms';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgModel } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
-import {
-  DataSourceConnection,
-  DataSourceTable,
-  DataSourceTableColumn
-} from '../../models/portal-item';
+import { DataSourceConnection, DataSourceTable, DataSourceTableColumn } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
 import { forkJoin } from 'rxjs';
 import { Dropdown } from 'primeng/dropdown';
@@ -40,9 +31,7 @@ import { Dropdown } from 'primeng/dropdown';
     }
   ]
 })
-export class FileUploadConfigurationComponent
-  implements ControlValueAccessor, OnInit
-{
+export class FileUploadConfigurationComponent implements ControlValueAccessor, OnInit {
   @ViewChildren('dropdownList') dropdownList!: NgModel[];
   @Input() foreignKeyOptions!: { label: string; value: string }[];
   visible = false;
@@ -124,9 +113,7 @@ export class FileUploadConfigurationComponent
       this.modifiedDateColumn = newVal.fieldMapping?.MODIFIED_DATE;
       this.modifiedByColumn = newVal.fieldMapping?.MODIFIED_BY;
 
-      this.formControlDbTable.setValue(
-        `${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`
-      );
+      this.formControlDbTable.setValue(`${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`);
 
       this.onStorageTypeChange(this.storageTypeColumn || '');
     }
@@ -193,9 +180,7 @@ export class FileUploadConfigurationComponent
   }
 
   onStorageTypeChange(value: string) {
-    value === 'SqlBinary'
-      ? (this.isStorageTypeBinary = true)
-      : (this.isStorageTypeBinary = false);
+    value === 'SqlBinary' ? (this.isStorageTypeBinary = true) : (this.isStorageTypeBinary = false);
   }
 
   showDialog() {
@@ -304,27 +289,25 @@ export class FileUploadConfigurationComponent
   }
 
   getDbTables() {
-    this.portalItemService
-      .getDataSourceTables(this.formControlConnection.value)
-      .subscribe(res => {
-        const tables: DataSourceTable[] = res;
+    this.portalItemService.getDataSourceTables(this.formControlConnection.value).subscribe(res => {
+      const tables: DataSourceTable[] = res;
 
-        // create label and value for dropdown
-        tables.forEach(x => {
-          x.label = `${x.tableSchema}.${x.tableName}`;
-          x.value = `${x.tableSchema}.${x.tableName}`;
-        });
-        this.dbTables = tables;
-
-        const selectedDbTable = `${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`;
-
-        // check if current selected dbTable exists, if not exist
-        if (tables.find(x => x.value === selectedDbTable)) {
-          this.formControlDbTable.setValue(selectedDbTable);
-        }
-
-        this.getDbTableColumns();
+      // create label and value for dropdown
+      tables.forEach(x => {
+        x.label = `${x.tableSchema}.${x.tableName}`;
+        x.value = `${x.tableSchema}.${x.tableName}`;
       });
+      this.dbTables = tables;
+
+      const selectedDbTable = `${this.dsConfig.tableSchema}.${this.dsConfig.tableName}`;
+
+      // check if current selected dbTable exists, if not exist
+      if (tables.find(x => x.value === selectedDbTable)) {
+        this.formControlDbTable.setValue(selectedDbTable);
+      }
+
+      this.getDbTableColumns();
+    });
   }
 
   onTableNameChange({ value }: { value: string }) {
@@ -344,11 +327,7 @@ export class FileUploadConfigurationComponent
     if (!selectedDbTable) return;
     const [tableSchema, tableName] = selectedDbTable.split('.');
     this.portalItemService
-      .getDataSourceTableColumns(
-        this.formControlConnection.value,
-        tableSchema,
-        tableName
-      )
+      .getDataSourceTableColumns(this.formControlConnection.value, tableSchema, tableName)
       .subscribe(res => this.setColumns(res));
   }
 }
@@ -358,9 +337,7 @@ export class FileUploadConfigurationComponent
   template: ` <app-file-upload-configuration
     [formControl]="formControl"
     [formlyAttributes]="field"
-    [foreignKeyOptions]="
-      props.foreignKeyOptions || []
-    "></app-file-upload-configuration>`,
+    [foreignKeyOptions]="props.foreignKeyOptions || []"></app-file-upload-configuration>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldFileUploadConfigurationComponent extends FieldType<

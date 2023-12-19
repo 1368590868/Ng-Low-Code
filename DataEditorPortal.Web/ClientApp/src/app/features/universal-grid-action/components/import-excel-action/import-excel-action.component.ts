@@ -34,10 +34,7 @@ export class HasErrorPipe implements PipeTransform {
   ],
   providers: [HasErrorPipe, ImportActionService, ImportStatusComponent]
 })
-export class ImportExcelActionComponent
-  extends GridActionDirective
-  implements OnInit
-{
+export class ImportExcelActionComponent extends GridActionDirective implements OnInit {
   isLoading = false;
   uploadedFiles: any[] = [];
   okLabel = 'Next';
@@ -117,57 +114,49 @@ export class ImportExcelActionComponent
 
   onUploadExcelTemplate() {
     this.isLoading = true;
-    this.importExcelService
-      .getUploadTemplate(this.file, this.gridName, this.stepType.toLowerCase())
-      .subscribe(res => {
-        if (res?.data) {
-          if (res?.data?.length > 0) {
-            this.step = 3;
-          } else {
-            this.notifyService.notifyWarning(
-              'Warning',
-              'The uploaded file data is empty.'
-            );
-          }
-          this.infoList = res?.data;
-          this.innerInfoList = res?.data;
-          if (this.infoList && this.infoList.length > 0) {
-            this.columns = Object.keys(this.infoList[0])
-              .map(key => ({
-                key
-              }))
-              .filter(item => item.key !== '__errors__');
-
-            this.columns = this.columns
-              .map(item => {
-                const fieldData = res.fields.find(
-                  (field: any) => field.key === item.key
-                );
-                return {
-                  header: fieldData?.props?.label || fieldData?.key,
-                  key: fieldData?.key,
-                  filterType: fieldData?.filterType
-                };
-              })
-              .filter(item => item.header !== undefined);
-
-            // group by status
-            this.statusList = this.infoList.reduce((acc: any, cur) => {
-              const found: { data: InfoData[] } = acc.find(
-                (item: { __status__: number }) =>
-                  item.__status__ === cur['__status__']
-              );
-              if (found) {
-                found.data.push(cur);
-              } else {
-                acc.push({ __status__: cur['__status__'], data: [cur] });
-              }
-              return acc;
-            }, []);
-          }
+    this.importExcelService.getUploadTemplate(this.file, this.gridName, this.stepType.toLowerCase()).subscribe(res => {
+      if (res?.data) {
+        if (res?.data?.length > 0) {
+          this.step = 3;
+        } else {
+          this.notifyService.notifyWarning('Warning', 'The uploaded file data is empty.');
         }
-        this.isLoading = false;
-      });
+        this.infoList = res?.data;
+        this.innerInfoList = res?.data;
+        if (this.infoList && this.infoList.length > 0) {
+          this.columns = Object.keys(this.infoList[0])
+            .map(key => ({
+              key
+            }))
+            .filter(item => item.key !== '__errors__');
+
+          this.columns = this.columns
+            .map(item => {
+              const fieldData = res.fields.find((field: any) => field.key === item.key);
+              return {
+                header: fieldData?.props?.label || fieldData?.key,
+                key: fieldData?.key,
+                filterType: fieldData?.filterType
+              };
+            })
+            .filter(item => item.header !== undefined);
+
+          // group by status
+          this.statusList = this.infoList.reduce((acc: any, cur) => {
+            const found: { data: InfoData[] } = acc.find(
+              (item: { __status__: number }) => item.__status__ === cur['__status__']
+            );
+            if (found) {
+              found.data.push(cur);
+            } else {
+              acc.push({ __status__: cur['__status__'], data: [cur] });
+            }
+            return acc;
+          }, []);
+        }
+      }
+      this.isLoading = false;
+    });
   }
 
   onShowInfo(type: number) {
@@ -175,9 +164,7 @@ export class ImportExcelActionComponent
     // -1 is all
     if (type !== -1) {
       if (this.innerInfoList) {
-        this.infoList = this.innerInfoList.filter(
-          item => item['__status__'] === type
-        );
+        this.infoList = this.innerInfoList.filter(item => item['__status__'] === type);
       }
     } else {
       this.infoList = this.innerInfoList;
@@ -195,22 +182,20 @@ export class ImportExcelActionComponent
 
   onConfirmImport() {
     this.isLoading = true;
-    this.importExcelService
-      .confirmImport(this.file, this.gridName, this.stepType.toLowerCase())
-      .subscribe(res => {
-        if (res.code === 200) {
-          this.file = null;
-          setTimeout(() => {
-            this.initImportFileList();
-            this.currentStep = 1;
-            this.progress = 0;
-            this.step = this.currentStep;
-            this.isLoading = false;
-          }, 1000);
-        } else {
+    this.importExcelService.confirmImport(this.file, this.gridName, this.stepType.toLowerCase()).subscribe(res => {
+      if (res.code === 200) {
+        this.file = null;
+        setTimeout(() => {
+          this.initImportFileList();
+          this.currentStep = 1;
+          this.progress = 0;
+          this.step = this.currentStep;
           this.isLoading = false;
-        }
-      });
+        }, 1000);
+      } else {
+        this.isLoading = false;
+      }
+    });
   }
 
   validDisabled(currentStep: number) {

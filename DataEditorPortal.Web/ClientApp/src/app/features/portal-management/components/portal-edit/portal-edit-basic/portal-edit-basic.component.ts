@@ -13,10 +13,7 @@ import { PortalEditStepDirective } from '../../../directives/portal-edit-step.di
   templateUrl: './portal-edit-basic.component.html',
   styleUrls: ['./portal-edit-basic.component.scss']
 })
-export class PortalEditBasicComponent
-  extends PortalEditStepDirective
-  implements OnInit
-{
+export class PortalEditBasicComponent extends PortalEditStepDirective implements OnInit {
   @ViewChild('editForm') editForm!: NgForm;
 
   timer: any;
@@ -43,15 +40,13 @@ export class PortalEditBasicComponent
       },
       hooks: {
         onInit: field => {
-          field.formControl?.valueChanges
-            .pipe(skip(this.itemId ? 1 : 0))
-            .subscribe(val => {
-              if (!val) return;
-              if (field && field.parent && field.parent.get) {
-                const control = field.parent?.get('name').formControl;
-                control?.setValue(val);
-              }
-            });
+          field.formControl?.valueChanges.pipe(skip(this.itemId ? 1 : 0)).subscribe(val => {
+            if (!val) return;
+            if (field && field.parent && field.parent.get) {
+              const control = field.parent?.get('name').formControl;
+              control?.setValue(val);
+            }
+          });
         }
       }
     },
@@ -76,13 +71,9 @@ export class PortalEditBasicComponent
                 resolve(true);
               } else {
                 this.timer = setTimeout(() => {
-                  this.portalItemService
-                    .nameExists(currVal, this.itemId)
-                    .subscribe(res => {
-                      res.code === 200
-                        ? resolve(!res.data)
-                        : reject(res.message);
-                    });
+                  this.portalItemService.nameExists(currVal, this.itemId).subscribe(res => {
+                    res.code === 200 ? resolve(!res.data) : reject(res.message);
+                  });
                 }, 100);
               }
             });
@@ -126,9 +117,7 @@ export class PortalEditBasicComponent
                 value: '<root>'
               });
 
-              const findItem = options.find(
-                (x: any) => x.value === this.model['parentId']
-              );
+              const findItem = options.find((x: any) => x.value === this.model['parentId']);
               if (!findItem) {
                 this.model = {
                   ...this.model,
@@ -172,18 +161,16 @@ export class PortalEditBasicComponent
       },
       hooks: {
         onInit: field => {
-          this.siteGroupService
-            .getGroupList({ indexCount: 999 })
-            .subscribe(res => {
-              if (res.code === 200 && res.data?.data && field.props) {
-                const options = res.data.data.map(x => ({
-                  label: x.TITLE,
-                  value: x.ID
-                }));
-                field.props.options = options;
-                this.options.detectChanges?.(field);
-              }
-            });
+          this.siteGroupService.getGroupList({ indexCount: 999 }).subscribe(res => {
+            if (res.code === 200 && res.data?.data && field.props) {
+              const options = res.data.data.map(x => ({
+                label: x.TITLE,
+                value: x.ID
+              }));
+              field.props.options = options;
+              this.options.detectChanges?.(field);
+            }
+          });
         }
       },
       expressions: {
@@ -259,10 +246,7 @@ export class PortalEditBasicComponent
   getFolders(data: PortalItem[], level: number) {
     let folders: any = [];
     data.forEach((x: any) => {
-      if (
-        x.data?.['type'] === 'Folder' &&
-        x.data?.['id'] !== this.model['id']
-      ) {
+      if (x.data?.['type'] === 'Folder' && x.data?.['id'] !== this.model['id']) {
         const arr = {
           label: `${'—'.repeat(level)}  ${x.data?.['label']}`,
           value: x.data?.['id']

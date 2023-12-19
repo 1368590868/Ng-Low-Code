@@ -7,10 +7,7 @@ import { ConfigDataService, SiteMenu } from 'src/app/shared';
   template: ` <router-outlet></router-outlet> `
 })
 export class GroupLayoutComponent implements OnInit {
-  constructor(
-    private route: ActivatedRoute,
-    private configDataService: ConfigDataService
-  ) {}
+  constructor(private route: ActivatedRoute, private configDataService: ConfigDataService) {}
 
   group?: SiteMenu;
 

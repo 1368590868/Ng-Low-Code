@@ -2,13 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { PaginatorState } from 'primeng/paginator';
-import {
-  DataDictionaryService,
-  DictionaryData,
-  GridParam,
-  NotifyService,
-  SortMetaEvent
-} from 'src/app/shared';
+import { DataDictionaryService, DictionaryData, GridParam, NotifyService, SortMetaEvent } from 'src/app/shared';
 import { AddDictionaryDialogComponent } from './add-dictionary-dialog/add-dictionary-dialog.component';
 
 @Component({
@@ -74,15 +68,13 @@ export class DataDictionaryComponent implements OnInit {
     this.loading = true;
     const fetchDataParam = this.getFetchParam();
 
-    this.dataDictionaryService
-      .getDictionaryList(fetchDataParam)
-      .subscribe(res => {
-        if (res.code === 200) {
-          this.data = res.data?.data ?? [];
-          this.totalRecords = res.data?.total ?? 0;
-        }
-        this.loading = false;
-      });
+    this.dataDictionaryService.getDictionaryList(fetchDataParam).subscribe(res => {
+      if (res.code === 200) {
+        this.data = res.data?.data ?? [];
+        this.totalRecords = res.data?.total ?? 0;
+      }
+      this.loading = false;
+    });
   }
 
   onShowMenu(menu: Menu, $event: any, rowData: DictionaryData) {
@@ -127,17 +119,12 @@ export class DataDictionaryComponent implements OnInit {
       icon: 'pi pi-info-circle',
 
       accept: () => {
-        this.dataDictionaryService
-          .deleteDictionary(rowData.ID ?? '')
-          .subscribe(res => {
-            if (res.code === 200) {
-              this.notifyService.notifySuccess(
-                'Success',
-                'Record deleted successfully'
-              );
-              this.fetchData();
-            }
-          });
+        this.dataDictionaryService.deleteDictionary(rowData.ID ?? '').subscribe(res => {
+          if (res.code === 200) {
+            this.notifyService.notifySuccess('Success', 'Record deleted successfully');
+            this.fetchData();
+          }
+        });
       }
     });
   }
@@ -163,10 +150,7 @@ export class DataDictionaryComponent implements OnInit {
         const fieldProp = obj[prop];
         for (let i = 0; i < fieldProp.length; i++) {
           if (fieldProp[i].value != null) {
-            if (
-              Array.isArray(fieldProp[i].value) &&
-              fieldProp[i].value.length === 0
-            ) {
+            if (Array.isArray(fieldProp[i].value) && fieldProp[i].value.length === 0) {
               continue;
             }
             fieldProp[i].field = prop;

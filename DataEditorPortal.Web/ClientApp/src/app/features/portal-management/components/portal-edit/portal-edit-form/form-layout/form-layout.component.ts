@@ -1,10 +1,4 @@
-import {
-  Component,
-  Inject,
-  Input,
-  ViewChild,
-  ViewChildren
-} from '@angular/core';
+import { Component, Inject, Input, ViewChild, ViewChildren } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
@@ -115,9 +109,7 @@ export class FormLayoutComponent {
         return { label: x.label, value: x.name };
       });
 
-    this.formControlQueryText.valueChanges.subscribe(
-      val => (this._formConfig.queryText = val)
-    );
+    this.formControlQueryText.valueChanges.subscribe(val => (this._formConfig.queryText = val));
   }
 
   updateSourceColumns() {
@@ -174,19 +166,14 @@ export class FormLayoutComponent {
       if (!this._formConfig.customFormName) {
         this.notifyService.notifyWarning(
           'Warning',
-          `Please select one Custom Form for ${
-            this._type === 'ADD' ? 'Adding' : 'Updating'
-          }.`
+          `Please select one Custom Form for ${this._type === 'ADD' ? 'Adding' : 'Updating'}.`
         );
         return false;
       }
     } else {
       if (this._type === 'ADD') {
         if (!this.targetColumns || this.targetColumns.length === 0) {
-          this.notifyService.notifyWarning(
-            'Warning',
-            'Please select some fields for Adding Form.'
-          );
+          this.notifyService.notifyWarning('Warning', 'Please select some fields for Adding Form.');
           return false;
         }
         if (this.queryTextRequired && !this._formConfig.queryText) {
@@ -196,36 +183,18 @@ export class FormLayoutComponent {
           );
           return false;
         }
-        if (
-          this.formControlOnValidateConfig.value?.eventType &&
-          !this.formControlOnValidateConfig.value.script
-        ) {
-          this.notifyService.notifyWarning(
-            'Warning',
-            'Please complete On Validate settings for Adding.'
-          );
+        if (this.formControlOnValidateConfig.value?.eventType && !this.formControlOnValidateConfig.value.script) {
+          this.notifyService.notifyWarning('Warning', 'Please complete On Validate settings for Adding.');
           return false;
         }
-        if (
-          this.formControlOnAfterSavedConfig.value?.eventType &&
-          !this.formControlOnAfterSavedConfig.value.script
-        ) {
-          this.notifyService.notifyWarning(
-            'Warning',
-            'Please complete On After Saved settings for Adding.'
-          );
+        if (this.formControlOnAfterSavedConfig.value?.eventType && !this.formControlOnAfterSavedConfig.value.script) {
+          this.notifyService.notifyWarning('Warning', 'Please complete On After Saved settings for Adding.');
           return false;
         }
       }
       if (this._type === 'UPDATE') {
-        if (
-          !this._formConfig.useAddingFormLayout &&
-          (!this.targetColumns || this.targetColumns.length === 0)
-        ) {
-          this.notifyService.notifyWarning(
-            'Warning',
-            'Please select some fields for Updating Form.'
-          );
+        if (!this._formConfig.useAddingFormLayout && (!this.targetColumns || this.targetColumns.length === 0)) {
+          this.notifyService.notifyWarning('Warning', 'Please select some fields for Updating Form.');
           return false;
         }
         if (this.queryTextRequired && !this._formConfig.queryText) {
@@ -235,24 +204,12 @@ export class FormLayoutComponent {
           );
           return false;
         }
-        if (
-          this.formControlOnValidateConfig.value?.eventType &&
-          !this.formControlOnValidateConfig.value.script
-        ) {
-          this.notifyService.notifyWarning(
-            'Warning',
-            'Please complete On Validate settings for Updating.'
-          );
+        if (this.formControlOnValidateConfig.value?.eventType && !this.formControlOnValidateConfig.value.script) {
+          this.notifyService.notifyWarning('Warning', 'Please complete On Validate settings for Updating.');
           return false;
         }
-        if (
-          this.formControlOnAfterSavedConfig.value?.eventType &&
-          !this.formControlOnAfterSavedConfig.value.script
-        ) {
-          this.notifyService.notifyWarning(
-            'Warning',
-            'Please complete On After Saved settings for Updating.'
-          );
+        if (this.formControlOnAfterSavedConfig.value?.eventType && !this.formControlOnAfterSavedConfig.value.script) {
+          this.notifyService.notifyWarning('Warning', 'Please complete On After Saved settings for Updating.');
           return false;
         }
       }
@@ -286,8 +243,7 @@ export class FormLayoutComponent {
   onAddCustomControl(filterType: string) {
     let index = 1;
     for (index = 1; index <= 100; index++) {
-      if (!this.targetColumns.find(x => x.key === `CUSTOM_CONTROL_${index}`))
-        break;
+      if (!this.targetColumns.find(x => x.key === `CUSTOM_CONTROL_${index}`)) break;
     }
     const key = `CUSTOM_CONTROL_${index}`;
     const result = this.controls.filter(c => c.filterType === filterType);

@@ -80,25 +80,21 @@ export class PortalEditComponent implements OnInit, OnDestroy {
           if (params.get('id')) {
             // it is edit, get item details
             this.itemId = params.get('id') || '';
-            this.portalItemService
-              .getPortalDetails(this.itemId)
-              .subscribe(res => {
-                this.configCompleted = res['configCompleted'];
-                this.itemCaption = res['label'];
-                this.dataSourceConnectionName = res['dataSourceConnectionName'];
-                const next = res['currentStep'] || 'basic';
+            this.portalItemService.getPortalDetails(this.itemId).subscribe(res => {
+              this.configCompleted = res['configCompleted'];
+              this.itemCaption = res['label'];
+              this.dataSourceConnectionName = res['dataSourceConnectionName'];
+              const next = res['currentStep'] || 'basic';
 
-                // set activated index
-                this.activatedIndex = this.steps.findIndex(
-                  x => x.routerLink === next
-                );
+              // set activated index
+              this.activatedIndex = this.steps.findIndex(x => x.routerLink === next);
 
-                // navigate to the step that saved last time
-                this.router.navigate([next], {
-                  relativeTo: this.activatedRoute,
-                  replaceUrl: true
-                });
+              // navigate to the step that saved last time
+              this.router.navigate([next], {
+                relativeTo: this.activatedRoute,
+                replaceUrl: true
               });
+            });
           } else {
             // it is add
             this.itemId = undefined;
@@ -181,13 +177,9 @@ export class PortalEditComponent implements OnInit, OnDestroy {
   onActivate(componentRef: any) {
     // set the activated index
     this.activatedIndex = this.steps.findIndex(step => {
-      const routerLink = Array.isArray(step.routerLink)
-        ? step.routerLink
-        : [step.routerLink];
+      const routerLink = Array.isArray(step.routerLink) ? step.routerLink : [step.routerLink];
       return this.router.isActive(
-        this.router
-          .createUrlTree(routerLink, { relativeTo: this.activatedRoute })
-          .toString(),
+        this.router.createUrlTree(routerLink, { relativeTo: this.activatedRoute }).toString(),
         {
           paths: 'subset',
           queryParams: 'subset',
@@ -201,8 +193,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
 
     if (componentRef instanceof PortalEditStepDirective) {
       const child = componentRef as PortalEditStepDirective;
-      child.isLastStep =
-        this.activatedIndex + 1 === this.steps.length && !isLinkedSingle;
+      child.isLastStep = this.activatedIndex + 1 === this.steps.length && !isLinkedSingle;
       // save and next
       child.saveNextEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
         const navigate = () => {
@@ -217,19 +208,14 @@ export class PortalEditComponent implements OnInit, OnDestroy {
         // publish if current is the last step
         if (this.activatedIndex + 1 == this.steps.length) {
           this.portalItemService.saveCurrentStep('basic');
-          this.portalItemService
-            .publish(this.itemId as string)
-            .subscribe(res => {
-              if (res.code === 200) {
-                if (!isLinkedSingle) {
-                  this.notifyService.notifySuccess(
-                    'Success',
-                    'Save & Publish Successfully Completed.'
-                  );
-                }
-                navigate();
+          this.portalItemService.publish(this.itemId as string).subscribe(res => {
+            if (res.code === 200) {
+              if (!isLinkedSingle) {
+                this.notifyService.notifySuccess('Success', 'Save & Publish Successfully Completed.');
               }
-            });
+              navigate();
+            }
+          });
         } else {
           navigate();
         }
@@ -238,10 +224,7 @@ export class PortalEditComponent implements OnInit, OnDestroy {
       // save draft and exit
       child.saveDraftEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
         if (!isLinkedSingle) {
-          this.notifyService.notifySuccess(
-            'Success',
-            'Save Draft Successfully Completed.'
-          );
+          this.notifyService.notifySuccess('Success', 'Save Draft Successfully Completed.');
         }
         const next = this.itemId ? '../../' : '../';
         this.router.navigate([next], {

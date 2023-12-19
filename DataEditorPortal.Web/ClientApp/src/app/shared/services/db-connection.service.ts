@@ -15,24 +15,16 @@ export class DbConnectionService {
 
   getDbConnectionList(): Observable<any> {
     return this.http
-      .get<ApiResponse<any>>(
-        `${this._apiUrl}portal-item/datasource/connections/list`
-      )
+      .get<ApiResponse<any>>(`${this._apiUrl}portal-item/datasource/connections/list`)
       .pipe(map(x => x.data || []));
   }
 
   createConnection(data: DbConnectionData) {
-    return this.http.post<ApiResponse<string>>(
-      `${this._apiUrl}portal-item/datasource/connections/create`,
-      data
-    );
+    return this.http.post<ApiResponse<string>>(`${this._apiUrl}portal-item/datasource/connections/create`, data);
   }
 
   updateConnection(name: string, data: DbConnectionData) {
-    return this.http.put<ApiResponse<string>>(
-      `${this._apiUrl}portal-item/datasource/connections/${name}/update`,
-      data
-    );
+    return this.http.put<ApiResponse<string>>(`${this._apiUrl}portal-item/datasource/connections/${name}/update`, data);
   }
 
   deleteConnection(data: DbConnectionData) {

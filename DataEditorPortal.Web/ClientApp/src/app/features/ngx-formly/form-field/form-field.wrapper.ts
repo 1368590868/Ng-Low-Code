@@ -1,10 +1,6 @@
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Component } from '@angular/core';
-import {
-  FieldWrapper,
-  FormlyFieldConfig,
-  FormlyFieldProps as CoreFormlyFieldProps
-} from '@ngx-formly/core';
+import { FieldWrapper, FormlyFieldConfig, FormlyFieldProps as CoreFormlyFieldProps } from '@ngx-formly/core';
 
 export interface FormlyFieldProps extends CoreFormlyFieldProps {
   hideRequiredMarker?: boolean;
@@ -16,15 +12,9 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
   selector: 'app-formly-wrapper-primeng-form-field',
   template: `
     <div class="p-field">
-      <label
-        *ngIf="props.label && props.hideLabel !== true"
-        [for]="id"
-        class="flex align-items-center">
+      <label *ngIf="props.label && props.hideLabel !== true" [for]="id" class="flex align-items-center">
         {{ props.label }}
-        <span
-          *ngIf="props.required && props.hideRequiredMarker !== true"
-          aria-hidden="true"
-          class="text-red-500"
+        <span *ngIf="props.required && props.hideRequiredMarker !== true" aria-hidden="true" class="text-red-500"
           >*</span
         >
         <i
@@ -37,9 +27,7 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
       <ng-container #fieldComponent></ng-container>
 
       <small *ngIf="showError" class="p-error" @fadeInOut>
-        <formly-validation-message
-          class="ui-message-text"
-          [field]="field"></formly-validation-message>
+        <formly-validation-message class="ui-message-text" [field]="field"></formly-validation-message>
       </small>
 
       <small *ngIf="props?.helperText !== undefined" class="p-always">
@@ -49,10 +37,7 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
   `,
   animations: [
     trigger('fadeInOut', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('200ms', style({ opacity: 1 }))
-      ]),
+      transition(':enter', [style({ opacity: 0 }), animate('200ms', style({ opacity: 1 }))]),
       transition(':leave', [animate('200ms', style({ opacity: 0 }))])
     ])
   ],
@@ -67,6 +52,4 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
     `
   ]
 })
-export class FormlyWrapperFormFieldComponent extends FieldWrapper<
-  FormlyFieldConfig<FormlyFieldProps>
-> {}
+export class FormlyWrapperFormFieldComponent extends FieldWrapper<FormlyFieldConfig<FormlyFieldProps>> {}

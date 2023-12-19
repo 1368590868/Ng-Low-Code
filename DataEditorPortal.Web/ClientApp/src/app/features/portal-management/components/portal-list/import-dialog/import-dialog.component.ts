@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Inject,
-  Input,
-  Output,
-  ViewChild
-} from '@angular/core';
+import { Component, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { NotifyService } from 'src/app/shared';
 import { PortalItemService } from '../../../services/portal-item.service';
@@ -81,10 +74,7 @@ export class ImportDialogComponent {
   }
 
   disableRow(row: any) {
-    return (
-      row.type === 'Portal Item' ||
-      (row.type === 'DataSource Connection' && !row.exist)
-    );
+    return row.type === 'Portal Item' || (row.type === 'DataSource Connection' && !row.exist);
   }
 
   onFileUploadProgress(event: any) {
@@ -148,10 +138,7 @@ export class ImportDialogComponent {
         this.portalItemService
           .importPortalItem({
             attachment: this.file,
-            parentId:
-              this.parentFolderControl.value === '<root>'
-                ? null
-                : this.parentFolderControl.value
+            parentId: this.parentFolderControl.value === '<root>' ? null : this.parentFolderControl.value
           })
           .subscribe(res => {
             if (res.code === 200) {
@@ -177,20 +164,14 @@ export class ImportDialogComponent {
       this.portalItemService
         .confirmPortalItem({
           attachment: this.file,
-          parentId:
-            this.parentFolderControl.value === '<root>'
-              ? null
-              : this.parentFolderControl.value,
+          parentId: this.parentFolderControl.value === '<root>' ? null : this.parentFolderControl.value,
           selectedObjects
         })
         .subscribe(res => {
           if (res.code === 200 && res.data) {
             this.visible = false;
             this.saved.emit();
-            this.notifyService.notifySuccess(
-              'Success',
-              'Imported Successfully'
-            );
+            this.notifyService.notifySuccess('Success', 'Imported Successfully');
           }
           this.isLoading = false;
         });

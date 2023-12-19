@@ -7,23 +7,9 @@ import { Subject, repeat, takeUntil } from 'rxjs';
     <p-tag
       *ngIf="rowData?.status !== 'InProgress'"
       [pTooltip]="rowData?.result ?? ''"
-      [severity]="
-        rowData.status === 'Failed'
-          ? 'danger'
-          : rowData.status === 'Complete'
-          ? 'success'
-          : 'warning'
-      "
-      [tooltipStyleClass]="
-        rowData.status === 'Failed' ? 'tooltip-error' : 'tooltip-success'
-      "
-      >{{
-        rowData.status === 'Failed'
-          ? 'Failed'
-          : rowData.status === 'Complete'
-          ? 'Complete'
-          : 'InProgress'
-      }}</p-tag
+      [severity]="rowData.status === 'Failed' ? 'danger' : rowData.status === 'Complete' ? 'success' : 'warning'"
+      [tooltipStyleClass]="rowData.status === 'Failed' ? 'tooltip-error' : 'tooltip-success'"
+      >{{ rowData.status === 'Failed' ? 'Failed' : rowData.status === 'Complete' ? 'Complete' : 'InProgress' }}</p-tag
     >
     <p-progressBar
       *ngIf="rowData?.progress !== 100"
@@ -40,16 +26,10 @@ export class ImportStatusComponent implements OnInit, OnDestroy {
 
   destroy$ = new Subject<void>();
 
-  constructor(
-    @Inject('API_URL') public apiUrl: string,
-    private importExcelService: ImportActionService
-  ) {}
+  constructor(@Inject('API_URL') public apiUrl: string, private importExcelService: ImportActionService) {}
 
   ngOnInit(): void {
-    if (
-      this.rowData?.progress !== 100 &&
-      this.rowData?.status === 'InProgress'
-    ) {
+    if (this.rowData?.progress !== 100 && this.rowData?.status === 'InProgress') {
       this.destroy$.next();
       this.onStartPolling();
     }

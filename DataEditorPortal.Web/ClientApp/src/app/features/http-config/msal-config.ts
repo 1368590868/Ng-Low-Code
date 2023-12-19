@@ -1,10 +1,5 @@
 import { Injector } from '@angular/core';
-import {
-  BrowserCacheLocation,
-  InteractionType,
-  LogLevel,
-  PublicClientApplication
-} from '@azure/msal-browser';
+import { BrowserCacheLocation, InteractionType, LogLevel, PublicClientApplication } from '@azure/msal-browser';
 
 export const IPublicClientFactory = (injector: Injector) => {
   const clientId = injector.get('MSAL_INSTANCE_CONFIG').clientId;

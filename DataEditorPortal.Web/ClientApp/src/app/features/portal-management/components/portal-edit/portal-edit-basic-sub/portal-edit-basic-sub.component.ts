@@ -13,10 +13,7 @@ import { PortalItemService } from '../../../services/portal-item.service';
   templateUrl: './portal-edit-basic-sub.component.html',
   styleUrls: ['./portal-edit-basic-sub.component.scss']
 })
-export class PortalEditBasicSubComponent
-  extends PortalEditStepDirective
-  implements OnInit
-{
+export class PortalEditBasicSubComponent extends PortalEditStepDirective implements OnInit {
   @ViewChild('editForm') editForm!: NgForm;
 
   timer: any;
@@ -43,15 +40,13 @@ export class PortalEditBasicSubComponent
       },
       hooks: {
         onInit: field => {
-          field.formControl?.valueChanges
-            .pipe(skip(this.itemId ? 1 : 0))
-            .subscribe(val => {
-              if (!val) return;
-              if (field && field.parent && field.parent.get) {
-                const control = field.parent?.get('name').formControl;
-                control?.setValue(val);
-              }
-            });
+          field.formControl?.valueChanges.pipe(skip(this.itemId ? 1 : 0)).subscribe(val => {
+            if (!val) return;
+            if (field && field.parent && field.parent.get) {
+              const control = field.parent?.get('name').formControl;
+              control?.setValue(val);
+            }
+          });
         }
       }
     },
@@ -76,13 +71,9 @@ export class PortalEditBasicSubComponent
                 resolve(true);
               } else {
                 this.timer = setTimeout(() => {
-                  this.portalItemService
-                    .nameExists(currVal, this.itemId)
-                    .subscribe(res => {
-                      res.code === 200
-                        ? resolve(!res.data)
-                        : reject(res.message);
-                    });
+                  this.portalItemService.nameExists(currVal, this.itemId).subscribe(res => {
+                    res.code === 200 ? resolve(!res.data) : reject(res.message);
+                  });
                 }, 100);
               }
             });

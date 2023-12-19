@@ -20,29 +20,18 @@ export class DataDictionaryService {
   }
 
   getDictionaryList(fetchDataParam: any) {
-    return this.http.post<ApiResponse<GridResult<DictionaryData>>>(
-      `${this._apiUrl}dictionary/list`,
-      fetchDataParam
-    );
+    return this.http.post<ApiResponse<GridResult<DictionaryData>>>(`${this._apiUrl}dictionary/list`, fetchDataParam);
   }
 
   createDictionary(data: DictionaryData) {
-    return this.http.post<ApiResponse<string>>(
-      `${this._apiUrl}dictionary/create`,
-      data
-    );
+    return this.http.post<ApiResponse<string>>(`${this._apiUrl}dictionary/create`, data);
   }
 
   updateDictionary(data: DictionaryData, id: string) {
-    return this.http.put<ApiResponse<string>>(
-      `${this._apiUrl}dictionary/${id}/update`,
-      data
-    );
+    return this.http.put<ApiResponse<string>>(`${this._apiUrl}dictionary/${id}/update`, data);
   }
 
   deleteDictionary(id: string) {
-    return this.http.delete<ApiResponse<string>>(
-      `${this._apiUrl}dictionary/${id}/delete`
-    );
+    return this.http.delete<ApiResponse<string>>(`${this._apiUrl}dictionary/${id}/delete`);
   }
 }

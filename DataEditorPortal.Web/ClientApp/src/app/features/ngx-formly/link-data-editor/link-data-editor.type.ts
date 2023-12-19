@@ -43,6 +43,4 @@ interface LinkDataEditorProps extends FormlyFieldProps {
     `
   ]
 })
-export class FormlyFieldLinkDataEditorComponent extends FieldType<
-  FieldTypeConfig<LinkDataEditorProps>
-> {}
+export class FormlyFieldLinkDataEditorComponent extends FieldType<FieldTypeConfig<LinkDataEditorProps>> {}

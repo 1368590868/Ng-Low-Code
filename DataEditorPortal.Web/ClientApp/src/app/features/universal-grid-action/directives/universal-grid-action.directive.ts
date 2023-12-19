@@ -11,18 +11,16 @@ import {
   SimpleChanges,
   ViewContainerRef
 } from '@angular/core';
-import { GridActionConfig, GridActionOption } from '../models/grid-config';
-import { ActionWrapperComponent } from '../components/action-wrapper/action-wrapper.component';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { ActionWrapperComponent } from '../components/action-wrapper/action-wrapper.component';
+import { GridActionConfig, GridActionOption } from '../models/grid-config';
 import { UniversalGridService } from '../services/universal-grid.service';
 
 @Directive({
   selector: '[appUniversalGridAction]'
 })
-export class UniversalGridActionDirective
-  implements DoCheck, OnChanges, OnDestroy
-{
+export class UniversalGridActionDirective implements DoCheck, OnChanges, OnDestroy {
   @Input() actions: GridActionOption[] = [];
   @Input() gridName!: string;
   @Input() selectedRecords: any[] = [];
@@ -68,12 +66,7 @@ export class UniversalGridActionDirective
   }
 
   renderGridActions() {
-    if (
-      !this.actionLoaded &&
-      this.actions &&
-      this.actions.length > 0 &&
-      this.viewContainerRef
-    ) {
+    if (!this.actionLoaded && this.actions && this.actions.length > 0 && this.viewContainerRef) {
       this.viewContainerRef.clear();
       this.actionWrapperRefs = [];
 
@@ -83,15 +76,10 @@ export class UniversalGridActionDirective
         });
 
         if (actionCfg) {
-          const wrapperRef =
-            this.viewContainerRef.createComponent<ActionWrapperComponent>(
-              ActionWrapperComponent
-            );
+          const wrapperRef = this.viewContainerRef.createComponent<ActionWrapperComponent>(ActionWrapperComponent);
 
           // create a copy of actionCfg
-          const config = JSON.parse(
-            JSON.stringify(actionCfg)
-          ) as GridActionConfig;
+          const config = JSON.parse(JSON.stringify(actionCfg)) as GridActionConfig;
           config.component = actionCfg.component;
 
           // assign wrapper config;
@@ -114,11 +102,9 @@ export class UniversalGridActionDirective
           Object.assign(config.props, tableParams);
           wrapperRef.instance.actionConfig = config;
 
-          wrapperRef.instance.savedEvent
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(() => {
-              this.savedEvent.emit();
-            });
+          wrapperRef.instance.savedEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
+            this.savedEvent.emit();
+          });
 
           this.setActionWrapperVisible(wrapperRef);
           this.actionWrapperRefs.push(wrapperRef);
@@ -147,8 +133,7 @@ export class UniversalGridActionDirective
         }
       } else {
         return (
-          (actionCfg.requireGridRowSelected === true &&
-            this.selectedRecords.length > 0) ||
+          (actionCfg.requireGridRowSelected === true && this.selectedRecords.length > 0) ||
           actionCfg.requireGridRowSelected === this.selectedRecords.length ||
           actionCfg.requireGridRowSelected === undefined ||
           actionCfg.requireGridRowSelected === false
@@ -160,7 +145,6 @@ export class UniversalGridActionDirective
   }
 
   syncActionProps(wrapper: ComponentRef<ActionWrapperComponent>, prop: string) {
-    if (wrapper.instance.actionConfig.props)
-      wrapper.instance.actionConfig.props[prop] = (this as any)[prop];
+    if (wrapper.instance.actionConfig.props) wrapper.instance.actionConfig.props[prop] = (this as any)[prop];
   }
 }

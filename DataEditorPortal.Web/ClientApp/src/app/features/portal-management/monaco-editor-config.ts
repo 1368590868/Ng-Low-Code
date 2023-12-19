@@ -73,9 +73,7 @@ export const MonacoEditorConfig: NgxMonacoEditorConfig = {
     monaco.editor.defineTheme('myTheme', {
       base: 'vs',
       inherit: true,
-      rules: [
-        { token: '##MACRO##', foreground: '615a60', fontStyle: 'italic bold' }
-      ],
+      rules: [{ token: '##MACRO##', foreground: '615a60', fontStyle: 'italic bold' }],
       colors: {
         'editor.background': '#EEEEEE'
       }

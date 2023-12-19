@@ -1,14 +1,4 @@
-import {
-  Directive,
-  Host,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Optional,
-  Self,
-  SimpleChanges
-} from '@angular/core';
+import { Directive, Host, Input, OnChanges, OnDestroy, OnInit, Optional, Self, SimpleChanges } from '@angular/core';
 import { Dropdown } from 'primeng/dropdown';
 import { MultiSelect } from 'primeng/multiselect';
 import { Subject, takeUntil } from 'rxjs';
@@ -55,16 +45,14 @@ export class AutoFilterDirective implements OnInit, OnChanges, OnDestroy {
         this.dropdown.filter = enableFilter;
         this.dropdown.resetFilterOnHide = enableFilter;
         this.dropdown.virtualScroll = enableVirtual;
-        this.dropdown.virtualScrollItemSize =
-          this.configDataService.dropdownItemSize || 0;
+        this.dropdown.virtualScrollItemSize = this.configDataService.dropdownItemSize || 0;
       }
       if (this.multiSelect) {
         this.multiSelect.filter = enableFilter;
         this.multiSelect.showHeader = enableFilter;
         this.multiSelect.resetFilterOnHide = enableFilter;
         this.multiSelect.virtualScroll = enableVirtual;
-        this.multiSelect.virtualScrollItemSize =
-          this.configDataService.dropdownItemSize || 0;
+        this.multiSelect.virtualScrollItemSize = this.configDataService.dropdownItemSize || 0;
       }
     }
   }

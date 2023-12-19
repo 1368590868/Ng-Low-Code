@@ -1,9 +1,5 @@
 import { Component, ChangeDetectionStrategy, Type } from '@angular/core';
-import {
-  FieldType,
-  FieldTypeConfig,
-  FormlyFieldConfig
-} from '@ngx-formly/core';
+import { FieldType, FieldTypeConfig, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyFieldProps } from '@ngx-formly/primeng/form-field';
 
 interface MultiSelectProps extends FormlyFieldProps {
@@ -14,8 +10,7 @@ interface MultiSelectProps extends FormlyFieldProps {
   display?: string;
   filter?: boolean;
 }
-export interface FormlyMultiSelectFieldConfig
-  extends FormlyFieldConfig<MultiSelectProps> {
+export interface FormlyMultiSelectFieldConfig extends FormlyFieldConfig<MultiSelectProps> {
   type: 'multiSelect' | Type<FormlyFieldMultiSelectComponent>;
 }
 
@@ -37,6 +32,4 @@ export interface FormlyMultiSelectFieldConfig
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldMultiSelectComponent extends FieldType<
-  FieldTypeConfig<MultiSelectProps>
-> {}
+export class FormlyFieldMultiSelectComponent extends FieldType<FieldTypeConfig<MultiSelectProps>> {}

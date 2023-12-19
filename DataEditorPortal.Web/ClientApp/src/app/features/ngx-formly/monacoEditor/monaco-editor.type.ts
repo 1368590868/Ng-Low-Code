@@ -21,6 +21,4 @@ interface MonacoEditorProps extends FormlyFieldProps {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldMonacoEditorComponent extends FieldType<
-  FieldTypeConfig<MonacoEditorProps>
-> {}
+export class FormlyFieldMonacoEditorComponent extends FieldType<FieldTypeConfig<MonacoEditorProps>> {}

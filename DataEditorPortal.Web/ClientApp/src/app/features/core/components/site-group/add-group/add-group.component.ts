@@ -1,16 +1,5 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild
-} from '@angular/core';
-import {
-  AbstractControl,
-  FormControl,
-  FormGroup,
-  NgForm
-} from '@angular/forms';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AbstractControl, FormControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { Subject, takeUntil } from 'rxjs';
 import { GroupDetail, NotifyService, SiteGroupService } from 'src/app/shared';
@@ -46,10 +35,7 @@ export class AddGroupComponent {
   model: GroupDetail = {};
   fields: FormlyFieldConfig[] = [];
 
-  constructor(
-    private siteGroupService: SiteGroupService,
-    private notifyService: NotifyService
-  ) {}
+  constructor(private siteGroupService: SiteGroupService, private notifyService: NotifyService) {}
   showDialog() {
     this.isLoading = false;
     this.visible = true;
@@ -83,15 +69,13 @@ export class AddGroupComponent {
             },
             hooks: {
               onInit: field => {
-                field.formControl?.valueChanges
-                  .pipe(takeUntil(this.destroy$))
-                  .subscribe(val => {
-                    if (!val) return;
-                    if (field && field.parent && field.parent.get) {
-                      const control = field.parent?.get('name').formControl;
-                      control?.setValue(val);
-                    }
-                  });
+                field.formControl?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
+                  if (!val) return;
+                  if (field && field.parent && field.parent.get) {
+                    const control = field.parent?.get('name').formControl;
+                    control?.setValue(val);
+                  }
+                });
               }
             }
           },
@@ -117,13 +101,9 @@ export class AddGroupComponent {
                       resolve(true);
                     } else {
                       this.timer = setTimeout(() => {
-                        this.siteGroupService
-                          .nameExists(currVal, this.id)
-                          .subscribe(res => {
-                            res.code === 200
-                              ? resolve(!res.data)
-                              : reject(res.message);
-                          });
+                        this.siteGroupService.nameExists(currVal, this.id).subscribe(res => {
+                          res.code === 200 ? resolve(!res.data) : reject(res.message);
+                        });
                       }, 100);
                     }
                   });
@@ -135,19 +115,17 @@ export class AddGroupComponent {
             },
             hooks: {
               onInit: field => {
-                field.formControl?.valueChanges
-                  .pipe(takeUntil(this.destroy$))
-                  .subscribe(val => {
-                    if (val) {
-                      this.siteGroupService.getCodeName(val).subscribe(res => {
-                        field.formControl?.setValue(res.data, {
-                          emitEvent: false
-                        });
-                        this.model['name'] = res.data + '';
-                        field.formControl?.markAsDirty();
+                field.formControl?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
+                  if (val) {
+                    this.siteGroupService.getCodeName(val).subscribe(res => {
+                      field.formControl?.setValue(res.data, {
+                        emitEvent: false
                       });
-                    }
-                  });
+                      this.model['name'] = res.data + '';
+                      field.formControl?.markAsDirty();
+                    });
+                  }
+                });
               }
             }
           }
@@ -171,9 +149,7 @@ export class AddGroupComponent {
       if (res.code === 200 && res.data) {
         this.model = { ...this.model, ...res.data };
         this.formControlAboutEditor.setValue(res.data?.aboutPageContent ?? '');
-        this.formControlContactEditor.setValue(
-          res.data?.contactPageContent ?? ''
-        );
+        this.formControlContactEditor.setValue(res.data?.contactPageContent ?? '');
         this.isLoading = false;
       }
       this.getFields();
@@ -210,10 +186,7 @@ export class AddGroupComponent {
           )
           .subscribe(res => {
             if (res.code === 200 && res.data) {
-              this.notifyService.notifySuccess(
-                'Success',
-                'Save Successfully Completed.'
-              );
+              this.notifyService.notifySuccess('Success', 'Save Successfully Completed.');
               this.visible = false;
               this.saved.emit(res.data);
             } else {
@@ -229,10 +202,7 @@ export class AddGroupComponent {
           })
           .subscribe(res => {
             if (res.code === 200 && res.data) {
-              this.notifyService.notifySuccess(
-                'Success',
-                'Save Successfully Completed.'
-              );
+              this.notifyService.notifySuccess('Success', 'Save Successfully Completed.');
               this.visible = false;
               this.saved.emit(res.data);
             } else {

@@ -4,10 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 import { DropdownModule } from 'primeng/dropdown';
 import { SharedModule } from 'src/app/shared';
-import {
-  FormlySelectModule as FormlyCoreSelectModule,
-  FormlySelectOptionsPipe
-} from '@ngx-formly/core/select';
+import { FormlySelectModule as FormlyCoreSelectModule, FormlySelectOptionsPipe } from '@ngx-formly/core/select';
 import { FormlyFieldSelectComponent } from './select.type';
 
 @NgModule({

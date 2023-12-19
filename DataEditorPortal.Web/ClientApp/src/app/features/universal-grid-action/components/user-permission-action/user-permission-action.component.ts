@@ -10,10 +10,7 @@ import { UserManagerService } from '../../services/user-manager.service';
   templateUrl: './user-permission-action.component.html',
   styleUrls: ['./user-permission-action.component.scss']
 })
-export class UserPermissionActionComponent
-  extends GridActionDirective
-  implements OnInit
-{
+export class UserPermissionActionComponent extends GridActionDirective implements OnInit {
   groupPermissions: any[] = [];
   permissionSelect: UserPemissions[] = [];
   permissions: TreeNode[] = [];
@@ -85,7 +82,7 @@ export class UserPermissionActionComponent
     this.getPermissionsList(this.selectedRecords[0][this.recordKey]);
   }
 
-  selectionChange($event:any) {
+  selectionChange($event: any) {
     this.permissionSelect = $event;
   }
 
@@ -109,16 +106,10 @@ export class UserPermissionActionComponent
       })
     });
     this.userManagerService
-      .saveUserPermissions(
-        permissionSelect,
-        this.selectedRecords[0][this.recordKey]
-      )
+      .saveUserPermissions(permissionSelect, this.selectedRecords[0][this.recordKey])
       .subscribe(res => {
         if (res.code === 200) {
-          this.notifyService.notifySuccess(
-            'Success',
-            'Permissions saved successfully'
-          );
+          this.notifyService.notifySuccess('Success', 'Permissions saved successfully');
           this.savedEvent.emit();
         } else {
           this.errorEvent.emit();

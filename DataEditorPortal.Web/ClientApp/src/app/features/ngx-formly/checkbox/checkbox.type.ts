@@ -1,9 +1,5 @@
 import { Component, ChangeDetectionStrategy, Type } from '@angular/core';
-import {
-  FieldType,
-  FieldTypeConfig,
-  FormlyFieldConfig
-} from '@ngx-formly/core';
+import { FieldType, FieldTypeConfig, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyFieldProps } from '@ngx-formly/primeng/form-field';
 
 interface CheckboxProps extends FormlyFieldProps {
@@ -11,19 +7,14 @@ interface CheckboxProps extends FormlyFieldProps {
   binary?: boolean;
 }
 
-export interface FormlyCheckBoxFieldConfig
-  extends FormlyFieldConfig<CheckboxProps> {
+export interface FormlyCheckBoxFieldConfig extends FormlyFieldConfig<CheckboxProps> {
   type: 'checkboxList' | Type<FormlyFieldCheckBoxComponent>;
 }
 
 @Component({
   selector: 'app-formly-field-primeng-checkbox',
   template: `
-    <div
-      class="p-field-radiobutton"
-      *ngFor="
-        let option of props.options | formlySelectOptions : field | async
-      ">
+    <div class="p-field-radiobutton" *ngFor="let option of props.options | formlySelectOptions : field | async">
       <p-checkbox
         [binary]="props.binary || false"
         [name]="field.name || id"
@@ -38,6 +29,4 @@ export interface FormlyCheckBoxFieldConfig
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldCheckBoxComponent extends FieldType<
-  FieldTypeConfig<CheckboxProps>
-> {}
+export class FormlyFieldCheckBoxComponent extends FieldType<FieldTypeConfig<CheckboxProps>> {}

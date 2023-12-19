@@ -2,12 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { PaginatorState } from 'primeng/paginator';
 import { Table } from 'primeng/table';
 import { tap } from 'rxjs';
-import {
-  GridParam,
-  SortMetaEvent,
-  SystemLogData,
-  SystemLogService
-} from 'src/app/shared';
+import { GridParam, SortMetaEvent, SystemLogData, SystemLogService } from 'src/app/shared';
 import { SystemLogDialogComponent } from './system-log-dialog/system-log-dialog.component';
 
 @Component({
@@ -79,10 +74,7 @@ export class SystemLogComponent implements OnInit {
         const fieldProp = obj[prop];
         for (let i = 0; i < fieldProp.length; i++) {
           if (fieldProp[i].value != null) {
-            if (
-              Array.isArray(fieldProp[i].value) &&
-              fieldProp[i].value.length === 0
-            ) {
+            if (Array.isArray(fieldProp[i].value) && fieldProp[i].value.length === 0) {
               continue;
             }
             fieldProp[i].field = prop;

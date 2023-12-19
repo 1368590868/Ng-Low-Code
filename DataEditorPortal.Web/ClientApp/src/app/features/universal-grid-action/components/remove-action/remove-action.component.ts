@@ -3,10 +3,7 @@ import { tap } from 'rxjs';
 import { NotifyService, SystemLogService } from 'src/app/shared';
 import { GridActionDirective } from '../../directives/grid-action.directive';
 import { FormEventConfig, FormEventMeta } from '../../models/edit';
-import {
-  EventActionHandlerService,
-  AsyncQueryTextActionHandler
-} from '../../services/event-action-handler.service';
+import { EventActionHandlerService, AsyncQueryTextActionHandler } from '../../services/event-action-handler.service';
 import { UniversalGridService } from '../../services/universal-grid.service';
 import * as qs from 'qs';
 
@@ -15,10 +12,7 @@ import * as qs from 'qs';
   templateUrl: './remove-action.component.html',
   styleUrls: ['./remove-action.component.scss']
 })
-export class RemoveActionComponent
-  extends GridActionDirective
-  implements OnInit
-{
+export class RemoveActionComponent extends GridActionDirective implements OnInit {
   eventConfig?: FormEventConfig;
   constructor(
     private gridService: UniversalGridService,
@@ -65,9 +59,7 @@ export class RemoveActionComponent
 
   getEventActionHandler(eventConfig?: FormEventMeta) {
     if (eventConfig && eventConfig.eventType === 'Javascript') {
-      const action = this.EVENT_ACTION_CONFIG.find(
-        x => x.name === eventConfig.script
-      );
+      const action = this.EVENT_ACTION_CONFIG.find(x => x.name === eventConfig.script);
       if (action) return this.injector.get(action?.handler);
     }
     if (
@@ -92,14 +84,9 @@ export class RemoveActionComponent
       )
       .subscribe(res => {
         if (res.code === 200 && res.data) {
-          this.notifyService.notifySuccess(
-            'Success',
-            'Remove Successfully Completed.'
-          );
+          this.notifyService.notifySuccess('Success', 'Remove Successfully Completed.');
           // run after saved event if configured.
-          const handler = this.getEventActionHandler(
-            this.eventConfig?.afterSaved
-          );
+          const handler = this.getEventActionHandler(this.eventConfig?.afterSaved);
           if (handler) handler.excuteAction().subscribe();
           this.savedEvent.emit();
         } else {

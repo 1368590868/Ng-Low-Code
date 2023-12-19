@@ -1,17 +1,5 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
-import {
-  trigger,
-  style,
-  animate,
-  transition,
-  state
-} from '@angular/animations';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { trigger, style, animate, transition, state } from '@angular/animations';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { ConfigDataService } from 'src/app/shared';
@@ -22,10 +10,7 @@ import { ConfigDataService } from 'src/app/shared';
   styleUrls: ['./split-area.component.scss'],
   animations: [
     trigger('fadeInOut', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('200ms 100ms', style({ opacity: 1 }))
-      ]),
+      transition(':enter', [style({ opacity: 0 }), animate('200ms 100ms', style({ opacity: 1 }))]),
       transition(':leave', [animate('100ms', style({ opacity: 0 }))])
     ]),
     trigger('fadeInOutButton', [
@@ -33,15 +18,9 @@ import { ConfigDataService } from 'src/app/shared';
       state('show', style({ opacity: 1 })),
       transition('show => hide', [
         style({ opacity: 0, transform: 'rotate(180deg) translateX(50px)' }),
-        animate(
-          '200ms 300ms',
-          style({ opacity: 1, transform: 'rotate(180deg)' })
-        )
+        animate('200ms 300ms', style({ opacity: 1, transform: 'rotate(180deg)' }))
       ]),
-      transition('hide => show', [
-        style({ opacity: 0 }),
-        animate('200ms 100ms', style({ opacity: 1 }))
-      ])
+      transition('hide => show', [style({ opacity: 0 }), animate('200ms 100ms', style({ opacity: 1 }))])
     ])
   ]
 })
@@ -95,10 +74,7 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
   onToggle() {
     if (!this.configDataService.sidebarCollapsed) {
       this.panelSizesPrev = this.splitterRef._panelSizes;
-      this.getStorage().setItem(
-        `${this.stateKey}-prev`,
-        JSON.stringify(this.panelSizesPrev)
-      );
+      this.getStorage().setItem(`${this.stateKey}-prev`, JSON.stringify(this.panelSizesPrev));
       this.splitterRef._panelSizes = [0, 100];
       this.configDataService.sidebarCollapsed = true;
     } else {
@@ -117,8 +93,7 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
         return window.sessionStorage;
       default:
         throw new Error(
-          this.stateStorage +
-            ' is not a valid value for the state storage, supported values are "local" and "session".'
+          this.stateStorage + ' is not a valid value for the state storage, supported values are "local" and "session".'
         );
     }
   }

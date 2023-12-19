@@ -1,9 +1,5 @@
 import { ChangeDetectionStrategy, Component, Type } from '@angular/core';
-import {
-  FieldType,
-  FieldTypeConfig,
-  FormlyFieldConfig
-} from '@ngx-formly/core';
+import { FieldType, FieldTypeConfig, FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyFieldProps } from '@ngx-formly/primeng/form-field';
 
 interface DatepickerProps extends FormlyFieldProps {
@@ -25,8 +21,7 @@ interface DatepickerProps extends FormlyFieldProps {
   yearRange: string;
 }
 
-export interface FormlyDatepickerFieldConfig
-  extends FormlyFieldConfig<DatepickerProps> {
+export interface FormlyDatepickerFieldConfig extends FormlyFieldConfig<DatepickerProps> {
   type: 'datepicker' | Type<FormlyFieldDatepickerComponent>;
 }
 
@@ -39,12 +34,8 @@ export interface FormlyDatepickerFieldConfig
       [hourFormat]="props.hourFormat"
       [showTime]="props.showTime"
       [showIcon]="isNotSet(props.showIcon) ? true : props.showIcon"
-      [showButtonBar]="
-        isNotSet(props.showButtonBar) ? true : props.showButtonBar
-      "
-      [showOtherMonths]="
-        isNotSet(props.showOtherMonths) ? true : props.showOtherMonths
-      "
+      [showButtonBar]="isNotSet(props.showButtonBar) ? true : props.showButtonBar"
+      [showOtherMonths]="isNotSet(props.showOtherMonths) ? true : props.showOtherMonths"
       [selectOtherMonths]="props.selectOtherMonths"
       [selectionMode]="props.selectionMode || 'single'"
       [numberOfMonths]="props.numberOfMonths || 1"
@@ -62,9 +53,7 @@ export interface FormlyDatepickerFieldConfig
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldDatepickerComponent extends FieldType<
-  FieldTypeConfig<DatepickerProps>
-> {
+export class FormlyFieldDatepickerComponent extends FieldType<FieldTypeConfig<DatepickerProps>> {
   isNotSet(val: unknown) {
     return val === null || val === undefined;
   }

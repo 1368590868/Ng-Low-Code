@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import {
   ControlValueAccessor,
   FormBuilder,
@@ -12,12 +7,7 @@ import {
   NG_VALUE_ACCESSOR,
   Validators
 } from '@angular/forms';
-import {
-  FieldType,
-  FieldTypeConfig,
-  FormlyConfig,
-  FormlyFieldProps
-} from '@ngx-formly/core';
+import { FieldType, FieldTypeConfig, FormlyConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { concat } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 
@@ -49,9 +39,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     '$model.NAME && $model.NAME.length > 5 <br />' +
     '$model.PASSWORD === $model.CONFIRM_PASSOWRD <br />' +
     '/^[0-9]*$/.test($model.PHONE_NUMBER)';
-  libSource = ['/**', '* Current form model', '*/', 'let $model : any;'].join(
-    '\n'
-  );
+  libSource = ['/**', '* Current form model', '*/', 'let $model : any;'].join('\n');
 
   innerValue: any;
 
@@ -61,10 +49,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     this.initForm(val ?? []);
   }
 
-  constructor(
-    private formlyConfig: FormlyConfig,
-    private notifyService: NotifyService
-  ) {
+  constructor(private formlyConfig: FormlyConfig, private notifyService: NotifyService) {
     this.form = this.formBuilder.group({
       validatorFormControl: new FormControl([]),
       expressionFormControl: new FormControl('', {
@@ -146,10 +131,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
       this.hasAdvanceData = true;
       this.onSendData();
     } else {
-      this.notifyService.notifyWarning(
-        '',
-        'Javascript Expression or Error Message is required.'
-      );
+      this.notifyService.notifyWarning('', 'Javascript Expression or Error Message is required.');
       expressionFormControl?.markAsDirty();
       messageFormControl?.markAsDirty();
     }
@@ -160,10 +142,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     if (this.form.get('validatorFormControl')?.value) {
       data = data.concat(this.form.get('validatorFormControl')?.value);
     }
-    if (
-      this.form.get('expressionFormControl')?.value &&
-      this.form.get('messageFormControl')?.value
-    ) {
+    if (this.form.get('expressionFormControl')?.value && this.form.get('messageFormControl')?.value) {
       data.push({
         expression: this.form.get('expressionFormControl')?.value,
         message: this.form.get('messageFormControl')?.value
@@ -192,9 +171,7 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
     <app-validator-editor
       [formControl]="formControl"
       [formlyAttributes]="field"
-      (onChange)="
-        props.change && props.change(field, $event)
-      "></app-validator-editor>
+      (onChange)="props.change && props.change(field, $event)"></app-validator-editor>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

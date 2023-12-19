@@ -25,10 +25,7 @@ import { FormDesignerDirective } from '../../directives/form-designer.directive'
     `
   ]
 })
-export class FormDesignerConfigComponent
-  extends FormDesignerDirective
-  implements OnInit
-{
+export class FormDesignerConfigComponent extends FormDesignerDirective implements OnInit {
   ngOnInit(): void {
     // modify type change logic.
     const type = this.fields.find(x => x.key === 'type');
@@ -42,13 +39,10 @@ export class FormDesignerConfigComponent
               tap(value => {
                 const dField = field.parent?.get?.('defaultValue');
                 if (dField != null) {
-                  if (dField.props)
-                    dField.props['hideLabel'] = value === 'checkbox';
+                  if (dField.props) dField.props['hideLabel'] = value === 'checkbox';
 
                   dField.hide = true; // trigger ngx-formly to reload
-                  if (
-                    'input,checkbox,textarea,inputNumber'.indexOf(value) >= 0
-                  ) {
+                  if ('input,checkbox,textarea,inputNumber'.indexOf(value) >= 0) {
                     dField.type = value;
                     dField.hide = false; // trigger ngx-formly to reload
                   }

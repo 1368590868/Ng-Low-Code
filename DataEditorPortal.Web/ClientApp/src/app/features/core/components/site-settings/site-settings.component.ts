@@ -21,10 +21,7 @@ export class SiteSettingsComponent implements OnInit {
   public formControlContactEditor = new FormControl('');
   public formControlLicense = new FormControl('');
 
-  constructor(
-    public configDataService: ConfigDataService,
-    private notifyService: NotifyService
-  ) {}
+  constructor(public configDataService: ConfigDataService, private notifyService: NotifyService) {}
 
   ngOnInit(): void {
     if (!this.configDataService.licenseExpired) {
@@ -166,15 +163,13 @@ export class SiteSettingsComponent implements OnInit {
     if (!this.formControlLicense.value) {
       return;
     }
-    this.configDataService
-      .saveLicense(this.formControlLicense.value)
-      .subscribe(res => {
-        if (res.code === 200) {
-          this.notifyService.notifySuccess('Success', 'Save Success');
-          this.configDataService.licenseExpiredChange$.next(false);
-          this.onCancel();
-        }
-      });
+    this.configDataService.saveLicense(this.formControlLicense.value).subscribe(res => {
+      if (res.code === 200) {
+        this.notifyService.notifySuccess('Success', 'Save Success');
+        this.configDataService.licenseExpiredChange$.next(false);
+        this.onCancel();
+      }
+    });
   }
 
   onCancel() {

@@ -1,10 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
-import {
-  ManageRoleForm,
-  UpdateRole
-} from 'src/app/features/universal-grid-action/models/user-manager';
+import { ManageRoleForm, UpdateRole } from 'src/app/features/universal-grid-action/models/user-manager';
 import { ApiResponse } from '../models/api-response';
 import { AppUser } from '../models/user';
 import { ConfigDataService } from './config-data.service';
@@ -18,11 +15,7 @@ export class UserService {
   public isLogin = false;
   public durationMs = 5000;
 
-  constructor(
-    private http: HttpClient,
-    @Inject('API_URL') apiUrl: string,
-    private configData: ConfigDataService
-  ) {
+  constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string, private configData: ConfigDataService) {
     this._apiUrl = apiUrl;
   }
 
@@ -52,10 +45,7 @@ export class UserService {
   }
 
   getLoggedInUser(url?: string) {
-    return this.http.get<ApiResponse<AppUser>>(
-      `${this._apiUrl}User/GetLoggedInUser`,
-      { params: { url: url || '' } }
-    );
+    return this.http.get<ApiResponse<AppUser>>(`${this._apiUrl}User/GetLoggedInUser`, { params: { url: url || '' } });
   }
 
   getUserDetail(id: string): Observable<ManageRoleForm> {
@@ -65,31 +55,22 @@ export class UserService {
   }
 
   updateUser(data: ManageRoleForm) {
-    return this.http.put<ApiResponse<UpdateRole[]>>(
-      `${this._apiUrl}user/update/${data.id}`,
-      data
-    );
+    return this.http.put<ApiResponse<UpdateRole[]>>(`${this._apiUrl}user/update/${data.id}`, data);
   }
 
   userNameExists(name: string, id?: string): Observable<ApiResponse<boolean>> {
     let params = new HttpParams().set('username', name);
     if (id) params = params.set('id', id);
-    return this.http.get<ApiResponse<boolean>>(
-      `${this._apiUrl}user/username-exists`,
-      {
-        params
-      }
-    );
+    return this.http.get<ApiResponse<boolean>>(`${this._apiUrl}user/username-exists`, {
+      params
+    });
   }
 
   emailExists(email: string, id?: string): Observable<ApiResponse<boolean>> {
     let params = new HttpParams().set('email', email);
     if (id) params = params.set('id', id);
-    return this.http.get<ApiResponse<boolean>>(
-      `${this._apiUrl}user/email-exists`,
-      {
-        params
-      }
-    );
+    return this.http.get<ApiResponse<boolean>>(`${this._apiUrl}user/email-exists`, {
+      params
+    });
   }
 }

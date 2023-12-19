@@ -16,56 +16,37 @@ export class SiteGroupService {
   }
 
   getGroupList(fetchDataParam: any) {
-    return this.http.post<ApiResponse<GridResult<GroupData>>>(
-      `${this._apiUrl}site-group/list`,
-      fetchDataParam
-    );
+    return this.http.post<ApiResponse<GridResult<GroupData>>>(`${this._apiUrl}site-group/list`, fetchDataParam);
   }
 
   getGroupInfo(id: string) {
-    return this.http.get<ApiResponse<GroupDetail>>(
-      `${this._apiUrl}site-group/${id}`
-    );
+    return this.http.get<ApiResponse<GroupDetail>>(`${this._apiUrl}site-group/${id}`);
   }
 
   createGroup(data: GroupDetail) {
-    return this.http.post<ApiResponse<string>>(
-      `${this._apiUrl}site-group/create`,
-      data
-    );
+    return this.http.post<ApiResponse<string>>(`${this._apiUrl}site-group/create`, data);
   }
 
   updateGroup(data: GroupDetail, id: string) {
-    return this.http.put<ApiResponse<string>>(
-      `${this._apiUrl}site-group/${id}/update`,
-      data
-    );
+    return this.http.put<ApiResponse<string>>(`${this._apiUrl}site-group/${id}/update`, data);
   }
 
   deleteGroup(id: string) {
-    return this.http.delete<ApiResponse<string>>(
-      `${this._apiUrl}site-group/${id}/delete`
-    );
+    return this.http.delete<ApiResponse<string>>(`${this._apiUrl}site-group/${id}/delete`);
   }
 
   nameExists(name: string, id?: string): Observable<ApiResponse<any>> {
     let params = new HttpParams().set('name', name);
     if (id) params = params.set('id', id);
-    return this.http.get<ApiResponse<any>>(
-      `${this._apiUrl}site-group/name-exists`,
-      {
-        params
-      }
-    );
+    return this.http.get<ApiResponse<any>>(`${this._apiUrl}site-group/name-exists`, {
+      params
+    });
   }
 
   getCodeName(name: string): Observable<ApiResponse<string>> {
     const params = new HttpParams().set('name', name);
-    return this.http.get<ApiResponse<string>>(
-      `${this._apiUrl}site-group/get-code-name`,
-      {
-        params
-      }
-    );
+    return this.http.get<ApiResponse<string>>(`${this._apiUrl}site-group/get-code-name`, {
+      params
+    });
   }
 }

@@ -1,10 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { NotifyService, SiteGroupService } from 'src/app/shared';
@@ -64,15 +58,13 @@ export class AddPortalDialogComponent {
         },
         hooks: {
           onInit: field => {
-            field.formControl?.valueChanges
-              .pipe(takeUntil(this.destroy$))
-              .subscribe(val => {
-                if (!val) return;
-                if (field && field.parent && field.parent.get) {
-                  const control = field.parent?.get('name').formControl;
-                  control?.setValue(val);
-                }
-              });
+            field.formControl?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
+              if (!val) return;
+              if (field && field.parent && field.parent.get) {
+                const control = field.parent?.get('name').formControl;
+                control?.setValue(val);
+              }
+            });
           }
         }
       },
@@ -97,13 +89,9 @@ export class AddPortalDialogComponent {
                   resolve(true);
                 } else {
                   this.timer = setTimeout(() => {
-                    this.portalItemService
-                      .nameExists(currVal, this.model['id'])
-                      .subscribe(res => {
-                        res.code === 200
-                          ? resolve(!res.data)
-                          : reject(res.message);
-                      });
+                    this.portalItemService.nameExists(currVal, this.model['id']).subscribe(res => {
+                      res.code === 200 ? resolve(!res.data) : reject(res.message);
+                    });
                   }, 100);
                 }
               });
@@ -115,17 +103,15 @@ export class AddPortalDialogComponent {
         },
         hooks: {
           onInit: field => {
-            field.formControl?.valueChanges
-              .pipe(takeUntil(this.destroy$))
-              .subscribe(val => {
-                if (val) {
-                  this.portalItemService.getCodeName(val).subscribe(res => {
-                    field.formControl?.setValue(res.data, { emitEvent: false });
-                    this.model['name'] = res.data + '';
-                    field.formControl?.markAsDirty();
-                  });
-                }
-              });
+            field.formControl?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
+              if (val) {
+                this.portalItemService.getCodeName(val).subscribe(res => {
+                  field.formControl?.setValue(res.data, { emitEvent: false });
+                  this.model['name'] = res.data + '';
+                  field.formControl?.markAsDirty();
+                });
+              }
+            });
           }
         }
       },
@@ -150,9 +136,7 @@ export class AddPortalDialogComponent {
                   value: '<root>'
                 });
 
-                const findItem = options.find(
-                  (x: any) => x.value === this.model['parentId']
-                );
+                const findItem = options.find((x: any) => x.value === this.model['parentId']);
                 if (!findItem) {
                   this.model = {
                     ...this.model,
@@ -189,18 +173,16 @@ export class AddPortalDialogComponent {
         },
         hooks: {
           onInit: field => {
-            this.siteGroupService
-              .getGroupList({ indexCount: 999 })
-              .subscribe(res => {
-                if (res.code === 200 && res.data?.data && field.props) {
-                  const options = res.data.data.map(x => ({
-                    label: x.TITLE,
-                    value: x.ID
-                  }));
-                  field.props.options = options;
-                  this.options.detectChanges?.(field);
-                }
-              });
+            this.siteGroupService.getGroupList({ indexCount: 999 }).subscribe(res => {
+              if (res.code === 200 && res.data?.data && field.props) {
+                const options = res.data.data.map(x => ({
+                  label: x.TITLE,
+                  value: x.ID
+                }));
+                field.props.options = options;
+                this.options.detectChanges?.(field);
+              }
+            });
           }
         },
         expressions: {
@@ -244,10 +226,7 @@ export class AddPortalDialogComponent {
   getFolders(data: PortalItem[], level: number) {
     let folders: any = [];
     data.forEach(x => {
-      if (
-        x.data?.['type'] === 'Folder' &&
-        x.data?.['id'] !== this.model['id']
-      ) {
+      if (x.data?.['type'] === 'Folder' && x.data?.['id'] !== this.model['id']) {
         const arr = {
           label: `${'—'.repeat(level)}  ${x.data?.['label']}`,
           value: x.data?.['id']
@@ -267,27 +246,19 @@ export class AddPortalDialogComponent {
       if (model['parentId'] === '<root>') model['parentId'] = null;
 
       if (model['id']) {
-        this.portalItemService
-          .updateMenuItem(model['id'] as string, model)
-          .subscribe(res => {
-            if (res.code === 200 && res.data) {
-              this.notifyService.notifySuccess(
-                'Success',
-                'Save Successfully Completed.'
-              );
-              this.visible = false;
-              this.saved.emit(res.data);
-            } else {
-              this.isLoading = false;
-            }
-          });
+        this.portalItemService.updateMenuItem(model['id'] as string, model).subscribe(res => {
+          if (res.code === 200 && res.data) {
+            this.notifyService.notifySuccess('Success', 'Save Successfully Completed.');
+            this.visible = false;
+            this.saved.emit(res.data);
+          } else {
+            this.isLoading = false;
+          }
+        });
       } else {
         this.portalItemService.createMenuItem(model).subscribe(res => {
           if (res.code === 200 && res.data) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Save Successfully Completed.'
-            );
+            this.notifyService.notifySuccess('Success', 'Save Successfully Completed.');
             this.visible = false;
             this.saved.emit(res.data);
           } else {

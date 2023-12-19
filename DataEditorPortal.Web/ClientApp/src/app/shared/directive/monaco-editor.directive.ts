@@ -1,14 +1,4 @@
-import {
-  Directive,
-  Host,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Optional,
-  Self,
-  SimpleChanges
-} from '@angular/core';
+import { Directive, Host, Input, OnChanges, OnDestroy, OnInit, Optional, Self, SimpleChanges } from '@angular/core';
 import { EditorComponent } from 'ngx-monaco-editor-v2';
 import { Subscription } from 'rxjs';
 
@@ -28,9 +18,7 @@ export class MonacoEditorDirective implements OnInit, OnChanges, OnDestroy {
   private subscription!: Subscription;
 
   ngOnInit(): void {
-    this.subscription = this.ngxEditor.onInit.subscribe(editor =>
-      this.onMonacoEditorInit(editor)
-    );
+    this.subscription = this.ngxEditor.onInit.subscribe(editor => this.onMonacoEditorInit(editor));
   }
 
   ngOnDestroy(): void {
@@ -43,17 +31,13 @@ export class MonacoEditorDirective implements OnInit, OnChanges, OnDestroy {
       const libUri = 'ts:filename/lib.d.ts';
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      monaco.languages.typescript.javascriptDefaults.addExtraLib(
-        this.libSource,
-        libUri
-      );
+      monaco.languages.typescript.javascriptDefaults.addExtraLib(this.libSource, libUri);
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('placeholder' in changes) {
-      if (this.widget && this.widget.domNode)
-        this.widget.domNode.innerHTML = this.placeholder || '';
+      if (this.widget && this.widget.domNode) this.widget.domNode.innerHTML = this.placeholder || '';
     }
   }
 }

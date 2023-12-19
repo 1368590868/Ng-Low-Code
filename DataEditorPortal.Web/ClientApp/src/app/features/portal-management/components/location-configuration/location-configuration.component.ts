@@ -1,10 +1,4 @@
-import {
-  CUSTOM_ELEMENTS_SCHEMA,
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  forwardRef
-} from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { DataSourceTableColumn } from '../../models/portal-item';
@@ -32,15 +26,9 @@ export class LocationConfigurationComponent {
   disabled = false;
 
   formControlFrom: FormControl = new FormControl(null, Validators.required);
-  formControlFromMeasure: FormControl = new FormControl(
-    null,
-    Validators.required
-  );
+  formControlFromMeasure: FormControl = new FormControl(null, Validators.required);
   formControlTo: FormControl = new FormControl(null, Validators.required);
-  formControlToMeasure: FormControl = new FormControl(
-    null,
-    Validators.required
-  );
+  formControlToMeasure: FormControl = new FormControl(null, Validators.required);
 
   visible = false;
 
@@ -141,8 +129,7 @@ export class LocationConfigurationComponent {
       return false;
     }
     if (this.locationType === 4) {
-      if (!this.formControlToMeasure.valid || !this.formControlTo.valid)
-        return false;
+      if (!this.formControlToMeasure.valid || !this.formControlTo.valid) return false;
     }
     return true;
   }
@@ -154,9 +141,7 @@ export class LocationConfigurationComponent {
     [formControl]="formControl"
     [formlyAttributes]="field"
     [locationType]="props.locationType || 2"
-    [mappingColumns]="
-      props.mappingColumns || []
-    "></app-location-configuration>`,
+    [mappingColumns]="props.mappingColumns || []"></app-location-configuration>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldLocationConfigurationComponent extends FieldType<

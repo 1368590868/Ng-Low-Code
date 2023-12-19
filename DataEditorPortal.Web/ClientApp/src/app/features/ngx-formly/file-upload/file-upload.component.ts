@@ -106,9 +106,7 @@ export class FileUploadComponent implements ControlValueAccessor {
     if (errorFile.length > 0) {
       this.notifyService.notifyError(
         'Invalid file type',
-        `<ul class="pl-3"><li class="py-1">${errorFile
-          .map(f => f.name)
-          .join('</li><li class="py-1">')}</li></ul>`
+        `<ul class="pl-3"><li class="py-1">${errorFile.map(f => f.name).join('</li><li class="py-1">')}</li></ul>`
       );
       this.fileUpload.clear();
       return;
@@ -125,9 +123,7 @@ export class FileUploadComponent implements ControlValueAccessor {
     if (errorFile.length > 0) {
       this.notifyService.notifyError(
         'Maximum upload size exceeded',
-        `<ul class="pl-3"><li>${errorFile
-          .map(f => f.name)
-          .join('</li><li>')}</li></ul>`
+        `<ul class="pl-3"><li>${errorFile.map(f => f.name).join('</li><li>')}</li></ul>`
       );
       this.fileUpload.clear();
       return;
@@ -176,22 +172,17 @@ export class FileUploadComponent implements ControlValueAccessor {
 
   tempAttachmentDownload(data: any) {
     this.systemLogService.addSiteVisitLog({
-      action:
-        data.status !== 'New'
-          ? 'Download Attachment'
-          : 'Download Temporary Attachment',
+      action: data.status !== 'New' ? 'Download Attachment' : 'Download Temporary Attachment',
       section: this.gridName,
       params: JSON.stringify(data)
     });
 
     const url =
       data.status === 'New'
-        ? `${this.apiUrl}attachment/download-temp-file/${
+        ? `${this.apiUrl}attachment/download-temp-file/${data.fileId}/${encodeURIComponent(data.fileName || '')}`
+        : `${this.apiUrl}attachment/download-file/${this.gridName}/${this.fieldName}/${
             data.fileId
-          }/${encodeURIComponent(data.fileName || '')}`
-        : `${this.apiUrl}attachment/download-file/${this.gridName}/${
-            this.fieldName
-          }/${data.fileId}/${encodeURIComponent(data.fileName || '')}`;
+          }/${encodeURIComponent(data.fileName || '')}`;
     const a = document.createElement('a');
 
     a.href = url;
@@ -204,12 +195,9 @@ export class FileUploadComponent implements ControlValueAccessor {
 
   tempAttachmentDelete(data: any) {
     if (data.status === 'New') {
-      this.newAttachments = this.newAttachments.filter(
-        (x: any) => x.fileId !== data.fileId
-      );
+      this.newAttachments = this.newAttachments.filter((x: any) => x.fileId !== data.fileId);
     } else {
-      this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
-        'Deleted';
+      this.newAttachments.find((x: any) => x.fileId === data.fileId).status = 'Deleted';
     }
 
     if (this.newAttachments.length === 0) {
@@ -221,8 +209,7 @@ export class FileUploadComponent implements ControlValueAccessor {
   }
 
   tempAttachmentRestore(data: any) {
-    this.newAttachments.find((x: any) => x.fileId === data.fileId).status =
-      'Current';
+    this.newAttachments.find((x: any) => x.fileId === data.fileId).status = 'Current';
     this.newAttachments = JSON.parse(JSON.stringify(this.newAttachments));
     this.onChange(JSON.stringify(this.newAttachments));
   }
@@ -263,11 +250,9 @@ export class FormlyFieldFileUploadComponent
   @HostBinding('style.margin-top') marginTop = '0';
 
   ngOnInit(): void {
-    this.formControl.valueChanges
-      .pipe(startWith(this.formControl.value))
-      .subscribe(val => {
-        this.width = val && val !== '[]' ? '100% !important' : '';
-        this.marginTop = val && val !== '[]' ? '0.25rem' : '0';
-      });
+    this.formControl.valueChanges.pipe(startWith(this.formControl.value)).subscribe(val => {
+      this.width = val && val !== '[]' ? '100% !important' : '';
+      this.marginTop = val && val !== '[]' ? '0.25rem' : '0';
+    });
   }
 }

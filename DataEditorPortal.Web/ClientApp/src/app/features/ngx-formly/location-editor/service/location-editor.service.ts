@@ -7,10 +7,7 @@ import { ApiResponse } from 'src/app/shared';
   providedIn: 'root'
 })
 export class LocationEditorService {
-  constructor(
-    private http: HttpClient,
-    @Inject('API_URL') public apiUrl: string
-  ) {}
+  constructor(private http: HttpClient, @Inject('API_URL') public apiUrl: string) {}
 
   getPipeOptions(id: string, data = {}) {
     return this.http

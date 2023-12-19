@@ -1,19 +1,8 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { ConfirmationService } from 'primeng/api';
-import {
-  ConfigDataService,
-  DbConnectionData,
-  DbConnectionService,
-  NotifyService
-} from 'src/app/shared';
+import { ConfigDataService, DbConnectionData, DbConnectionService, NotifyService } from 'src/app/shared';
 
 @Component({
   selector: 'app-add-connection-dialog',
@@ -115,8 +104,7 @@ export class AddConnectionDialogComponent {
       type: 'input',
       props: {
         label: 'Schema Filter',
-        description:
-          'Apply a filter to the query by specifying the schemas here, separated by commas.'
+        description: 'Apply a filter to the query by specifying the schemas here, separated by commas.'
       }
     },
     {
@@ -145,10 +133,7 @@ export class AddConnectionDialogComponent {
     this.fields.forEach(field => {
       if (field.props) {
         if (field.key === 'authentication') {
-          field.defaultValue =
-            type === 'SqlConnection'
-              ? 'Sql Server Authentication'
-              : 'Oracle Database Native';
+          field.defaultValue = type === 'SqlConnection' ? 'Sql Server Authentication' : 'Oracle Database Native';
           field.formControl?.setValue(field.defaultValue);
           field.props.options =
             type === 'SqlConnection'
@@ -177,8 +162,7 @@ export class AddConnectionDialogComponent {
           field.props.label = type === 'SqlConnection' ? 'Server Name' : 'Host';
         }
         if (field.key === 'dbName') {
-          field.props.label =
-            type === 'SqlConnection' ? 'Database Name' : 'Service Name';
+          field.props.label = type === 'SqlConnection' ? 'Database Name' : 'Service Name';
         }
       }
     });
@@ -212,20 +196,15 @@ export class AddConnectionDialogComponent {
         if (model.password === this.backup.password) {
           delete model.password;
         }
-        this.dbConnectionService
-          .updateConnection(model.name, model)
-          .subscribe(res => {
-            this.visible = false;
-            this.saved.emit(res.data);
-            this.isLoading = false;
-          });
+        this.dbConnectionService.updateConnection(model.name, model).subscribe(res => {
+          this.visible = false;
+          this.saved.emit(res.data);
+          this.isLoading = false;
+        });
       } else {
         this.dbConnectionService.createConnection(model).subscribe(res => {
           if (res.code === 200 && res.data) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Save Successfully Completed.'
-            );
+            this.notifyService.notifySuccess('Success', 'Save Successfully Completed.');
             this.visible = false;
             this.saved.emit(res.data);
           } else {

@@ -9,10 +9,7 @@ import { UserManagerService } from '../../services/user-manager.service';
   templateUrl: './user-role-action.component.html',
   styleUrls: ['./user-role-action.component.scss']
 })
-export class UserRoleActionComponent
-  extends GridActionDirective
-  implements OnInit
-{
+export class UserRoleActionComponent extends GridActionDirective implements OnInit {
   rolesArr: RoleItem[] = [];
 
   constructor(
@@ -24,12 +21,10 @@ export class UserRoleActionComponent
   }
 
   ngOnInit(): void {
-    this.userManagerService
-      .getUserRole(this.selectedRecords[0][this.recordKey])
-      .subscribe(res => {
-        this.rolesArr = res;
-        this.loadedEvent.emit();
-      });
+    this.userManagerService.getUserRole(this.selectedRecords[0][this.recordKey]).subscribe(res => {
+      this.rolesArr = res;
+      this.loadedEvent.emit();
+    });
   }
 
   onSave(): void {
@@ -41,18 +36,13 @@ export class UserRoleActionComponent
         userId: this.selectedRecords[0][this.recordKey]
       })
     });
-    this.userManagerService
-      .saveUserRole(this.rolesArr, this.selectedRecords[0][this.recordKey])
-      .subscribe(res => {
-        if (res.code === 200) {
-          this.notifyService.notifySuccess(
-            'Success',
-            'Save Successfully Completed.'
-          );
-          this.savedEvent.emit();
-        } else {
-          this.errorEvent.emit();
-        }
-      });
+    this.userManagerService.saveUserRole(this.rolesArr, this.selectedRecords[0][this.recordKey]).subscribe(res => {
+      if (res.code === 200) {
+        this.notifyService.notifySuccess('Success', 'Save Successfully Completed.');
+        this.savedEvent.emit();
+      } else {
+        this.errorEvent.emit();
+      }
+    });
   }
 }

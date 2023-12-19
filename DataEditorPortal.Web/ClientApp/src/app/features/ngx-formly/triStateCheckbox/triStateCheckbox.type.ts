@@ -19,6 +19,4 @@ interface TriStateCheckboxProps extends FormlyFieldProps {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldTriStateCheckBoxComponent extends FieldType<
-  FieldTypeConfig<TriStateCheckboxProps>
-> {}
+export class FormlyFieldTriStateCheckBoxComponent extends FieldType<FieldTypeConfig<TriStateCheckboxProps>> {}

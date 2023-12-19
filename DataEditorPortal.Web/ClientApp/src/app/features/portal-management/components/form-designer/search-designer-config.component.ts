@@ -29,10 +29,7 @@ import { FormDesignerDirective } from '../../directives/form-designer.directive'
     `
   ]
 })
-export class SearchDesignerConfigComponent
-  extends FormDesignerDirective
-  implements OnInit
-{
+export class SearchDesignerConfigComponent extends FormDesignerDirective implements OnInit {
   @Input() useTwoSearchRule = false;
 
   ngOnInit(): void {
@@ -52,18 +49,14 @@ export class SearchDesignerConfigComponent
                 // update filter match Mode options
                 const searchRuleField = field.parent?.get?.('searchRule');
                 if (searchRuleField && searchRuleField.props) {
-                  searchRuleField.props.options =
-                    this.portalItemService.getFilterMatchModeOptions(
-                      field.parent?.model
-                    );
+                  searchRuleField.props.options = this.portalItemService.getFilterMatchModeOptions(field.parent?.model);
                 }
                 if (this.useTwoSearchRule) {
                   const searchRule1Field = field.parent?.get?.('searchRule1');
                   if (searchRule1Field && searchRule1Field.props) {
-                    searchRule1Field.props.options =
-                      this.portalItemService.getFilterMatchModeOptions(
-                        field.parent?.model
-                      );
+                    searchRule1Field.props.options = this.portalItemService.getFilterMatchModeOptions(
+                      field.parent?.model
+                    );
                   }
                 }
               })

@@ -1,11 +1,4 @@
-import {
-  CUSTOM_ELEMENTS_SCHEMA,
-  ChangeDetectorRef,
-  Component,
-  Input,
-  OnInit,
-  forwardRef
-} from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef, Component, Input, OnInit, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { GridParam, SystemLogService } from 'src/app/shared';
@@ -38,7 +31,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   table2IdColumn = '';
   table2Name = '';
 
-  selectionMode:'single' | 'multiple' | undefined | null = 'multiple';
+  selectionMode: 'single' | 'multiple' | undefined | null = 'multiple';
   selection: any = [];
   onChange?: any;
   onTouch?: any;
@@ -81,9 +74,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
     if (checked) {
       this.dataSource.forEach((item: any) => {
         item.__LINKED__ = true;
-        const repeat = this.innerValue.find(
-          (x: any) => x.table2Id === item[this.table2IdColumn]
-        );
+        const repeat = this.innerValue.find((x: any) => x.table2Id === item[this.table2IdColumn]);
         if (!repeat) {
           this.innerValue.push({ table2Id: item[this.table2IdColumn] });
         }
@@ -115,8 +106,7 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
   onRowSelect(event: any) {
     const { data } = event;
     data.__LINKED__ = true;
-    if (this.selectionMode === 'multiple')
-      this.innerValue.push({ table2Id: data[this.table2IdColumn] });
+    if (this.selectionMode === 'multiple') this.innerValue.push({ table2Id: data[this.table2IdColumn] });
     else this.innerValue = [{ table2Id: data[this.table2IdColumn] }];
     this.onChange(this.innerValue);
   }
@@ -127,14 +117,12 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   fetchData() {
     this.fetchDataParam = this.getFetchParam();
-    this.linkDataTableService
-      .getTableData(this.table1Name, this.fetchDataParam)
-      .subscribe(dataSource => {
-        this.dataSource = dataSource || [];
-        this.setLinkedFlag();
-        this.setSelection();
-        this.cdr.detectChanges();
-      });
+    this.linkDataTableService.getTableData(this.table1Name, this.fetchDataParam).subscribe(dataSource => {
+      this.dataSource = dataSource || [];
+      this.setLinkedFlag();
+      this.setSelection();
+      this.cdr.detectChanges();
+    });
   }
 
   onSort(sortMeta: any) {
@@ -156,20 +144,14 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
       this.fetchDataParam = this.getFetchParam();
       forkJoin([
         this.linkDataTableService.getTableConfig(this.table1Name),
-        this.linkDataTableService.getTableData(
-          this.table1Name,
-          this.fetchDataParam
-        )
+        this.linkDataTableService.getTableData(this.table1Name, this.fetchDataParam)
       ]).subscribe(([tableConfig, dataSource]) => {
         this.columnsConfig = tableConfig.columns;
         this.dataSource = dataSource || [];
         this.table2IdColumn = tableConfig.table2IdColumn;
         this.table2Name = tableConfig.table2Name;
 
-        this.selectionMode =
-          tableConfig.isOneToMany && !tableConfig.table1IsPrimary
-            ? 'single'
-            : 'multiple';
+        this.selectionMode = tableConfig.isOneToMany && !tableConfig.table1IsPrimary ? 'single' : 'multiple';
 
         this.setLinkedFlag();
         this.setSelection();
@@ -210,15 +192,12 @@ export class LinkDataTableComponent implements OnInit, ControlValueAccessor {
 
   setLinkedFlag() {
     this.dataSource.forEach(item => {
-      item.__LINKED__ = !!this.innerValue.find(
-        (x: any) => x.table2Id === item[this.table2IdColumn]
-      );
+      item.__LINKED__ = !!this.innerValue.find((x: any) => x.table2Id === item[this.table2IdColumn]);
     });
   }
 
   setSelection() {
-    if (this.selectionMode === 'multiple')
-      this.selection = this.dataSource.filter(x => x.__LINKED__);
+    if (this.selectionMode === 'multiple') this.selection = this.dataSource.filter(x => x.__LINKED__);
     else this.selection = this.dataSource.find(x => x.__LINKED__);
   }
 

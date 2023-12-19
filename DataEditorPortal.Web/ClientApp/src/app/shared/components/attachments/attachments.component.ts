@@ -41,10 +41,7 @@ export class AttachmentsComponent {
   tooltipList: any = [];
   fileList: AttachmentType[] = [];
 
-  constructor(
-    @Inject('API_URL') public apiUrl: string,
-    private systemLogService: SystemLogService
-  ) {}
+  constructor(@Inject('API_URL') public apiUrl: string, private systemLogService: SystemLogService) {}
 
   onAttachmentClick(file: AttachmentType) {
     this.systemLogService.addSiteVisitLog({

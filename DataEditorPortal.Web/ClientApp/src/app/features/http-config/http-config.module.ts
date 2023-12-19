@@ -1,11 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import {
-  InjectionToken,
-  Injector,
-  ModuleWithProviders,
-  NgModule
-} from '@angular/core';
+import { InjectionToken, Injector, ModuleWithProviders, NgModule } from '@angular/core';
 import {
   MSAL_GUARD_CONFIG,
   MSAL_INSTANCE,
@@ -19,11 +14,7 @@ import {
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
 import { RequestLogInterceptor } from './interceptor/request-log.interceptor';
 import { WinAuthInterceptor } from './interceptor/win-auth.interceptor';
-import {
-  IPublicClientFactory,
-  MsalGuardConfiguration,
-  MsalInterceptorCFactory
-} from './msal-config';
+import { IPublicClientFactory, MsalGuardConfiguration, MsalInterceptorCFactory } from './msal-config';
 
 interface LoginGuard {
   canActivate(): boolean;

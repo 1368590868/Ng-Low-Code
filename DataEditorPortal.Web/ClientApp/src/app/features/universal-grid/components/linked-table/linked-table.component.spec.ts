@@ -8,9 +8,8 @@ describe('LinkedTableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LinkedTableComponent ]
-    })
-    .compileComponents();
+      declarations: [LinkedTableComponent]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LinkedTableComponent);
     component = fixture.componentInstance;

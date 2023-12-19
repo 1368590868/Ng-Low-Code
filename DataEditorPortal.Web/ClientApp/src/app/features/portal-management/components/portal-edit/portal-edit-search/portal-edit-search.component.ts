@@ -1,10 +1,4 @@
-import {
-  Component,
-  Inject,
-  OnInit,
-  ViewChild,
-  ViewChildren
-} from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFormOptions } from '@ngx-formly/core';
 import { cloneDeep, isEqual } from 'lodash-es';
@@ -13,12 +7,7 @@ import { PickList } from 'primeng/picklist';
 import { forkJoin, of, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
-import {
-  DataSourceTableColumn,
-  GridFormField,
-  GridSearchConfig,
-  GridSearchField
-} from '../../../models/portal-item';
+import { DataSourceTableColumn, GridFormField, GridSearchConfig, GridSearchField } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { FormDesignerViewComponent } from '../../form-designer/form-designer-view.component';
 @Component({
@@ -27,10 +16,7 @@ import { FormDesignerViewComponent } from '../../form-designer/form-designer-vie
   styleUrls: ['./portal-edit-search.component.scss'],
   providers: [ConfirmationService]
 })
-export class PortalEditSearchComponent
-  extends PortalEditStepDirective
-  implements OnInit
-{
+export class PortalEditSearchComponent extends PortalEditStepDirective implements OnInit {
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
@@ -120,9 +106,7 @@ export class PortalEditSearchComponent
           .filter(
             c =>
               c.key.startsWith('CUSTOM_SEARCH_') ||
-              !!res[1].find(
-                s => s.columnName === c.key && s.filterType === c.filterType
-              )
+              !!res[1].find(s => s.columnName === c.key && s.filterType === c.filterType)
           )
           .map<GridSearchField>(x => {
             return {
@@ -140,9 +124,7 @@ export class PortalEditSearchComponent
         this.sourceColumns = res[1]
           .filter(s => !this.targetColumns.find(t => t.key === s.columnName))
           .map<GridSearchField>(x => {
-            const result = this.controls.filter(
-              c => c.filterType === x.filterType
-            );
+            const result = this.controls.filter(c => c.filterType === x.filterType);
             return {
               key: x.columnName,
               type: result[0].value,
@@ -196,21 +178,12 @@ export class PortalEditSearchComponent
 
   valid() {
     if (this.useExistingSearch && !this.existingSearchId) {
-      this.notifyService.notifyWarning(
-        'Warning',
-        'Please select existing search.'
-      );
+      this.notifyService.notifyWarning('Warning', 'Please select existing search.');
       return false;
     }
 
-    if (
-      !this.useExistingSearch &&
-      (!this.targetColumns || this.targetColumns.length === 0)
-    ) {
-      this.notifyService.notifyWarning(
-        'Warning',
-        'Please select at least one field.'
-      );
+    if (!this.useExistingSearch && (!this.targetColumns || this.targetColumns.length === 0)) {
+      this.notifyService.notifyWarning('Warning', 'Please select at least one field.');
       return false;
     }
     return true;
@@ -251,10 +224,7 @@ export class PortalEditSearchComponent
 
   dataSourceChanged(): boolean {
     // Add Mode dont need to check
-    if (
-      !this.originalConfig.useExistingSearch &&
-      this.originalConfig.searchFields.length === 0
-    ) {
+    if (!this.originalConfig.useExistingSearch && this.originalConfig.searchFields.length === 0) {
       return false;
     }
 
@@ -307,8 +277,7 @@ export class PortalEditSearchComponent
   onAddCustomColumn(filterType: string) {
     let index = 1;
     for (index = 1; index <= 100; index++) {
-      if (!this.targetColumns.find(x => x.key === `CUSTOM_SEARCH_${index}`))
-        break;
+      if (!this.targetColumns.find(x => x.key === `CUSTOM_SEARCH_${index}`)) break;
     }
     const key = `CUSTOM_SEARCH_${index}`;
     const result = this.controls.filter(c => c.filterType === filterType);

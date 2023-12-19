@@ -28,10 +28,7 @@ export class AdvancedQueryDialogComponent {
     'E.g. <br /><br />' +
     'SELECT * FROM DEMO_TABLE <br />WHERE ##WHERE## AND ##SEARCHES## AND ##FILTERS## <br />ORDER BY ##ORDERBY##';
 
-  constructor(
-    private portalItemService: PortalItemService,
-    private notifyService: NotifyService
-  ) {}
+  constructor(private portalItemService: PortalItemService, private notifyService: NotifyService) {}
 
   showAdvanceDialog() {
     this.advanceDialogVisible = true;
@@ -47,10 +44,7 @@ export class AdvancedQueryDialogComponent {
         // validate if the query can be run against database succesfully
         this.loading = true;
         this.portalItemService
-          .getDataSourceTableColumnsByQuery(
-            this.connectionName,
-            this.formControlQuery.value
-          )
+          .getDataSourceTableColumnsByQuery(this.connectionName, this.formControlQuery.value)
           .subscribe(res => {
             if (res.code === 200) {
               this.queryChange.emit({

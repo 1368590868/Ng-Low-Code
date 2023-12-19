@@ -42,22 +42,18 @@ export class CustomActionsComponent {
   }
 
   showDialog() {
-    if (!this.portalItemId)
-      throw new Error('Portal Item Id can not be undefined. ');
-    this.portalItemService
-      .getCustomActions(this.portalItemId)
-      .subscribe(res => {
-        this.optionArr = res.map(item => {
-          return new FormControl(item.name);
-        });
-
-        this.visible = true;
+    if (!this.portalItemId) throw new Error('Portal Item Id can not be undefined. ');
+    this.portalItemService.getCustomActions(this.portalItemId).subscribe(res => {
+      this.optionArr = res.map(item => {
+        return new FormControl(item.name);
       });
+
+      this.visible = true;
+    });
   }
 
   onOk() {
-    if (!this.portalItemId)
-      throw new Error('Portal Item Id can not be undefined. ');
+    if (!this.portalItemId) throw new Error('Portal Item Id can not be undefined. ');
 
     const isValid = this.optionArr
       .map(item => {
@@ -69,17 +65,12 @@ export class CustomActionsComponent {
       const data = this.optionArr.map(item => {
         return { name: item.value };
       });
-      this.portalItemService
-        .saveCustomActions(this.portalItemId, data)
-        .subscribe(res => {
-          if (res && res.code === 200) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Custom Actions Successfully Saved.'
-            );
-            this.visible = false;
-          }
-        });
+      this.portalItemService.saveCustomActions(this.portalItemId, data).subscribe(res => {
+        if (res && res.code === 200) {
+          this.notifyService.notifySuccess('Success', 'Custom Actions Successfully Saved.');
+          this.visible = false;
+        }
+      });
     }
   }
 

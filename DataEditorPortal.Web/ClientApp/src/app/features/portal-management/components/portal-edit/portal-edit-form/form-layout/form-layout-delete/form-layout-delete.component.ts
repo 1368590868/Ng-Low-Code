@@ -54,19 +54,14 @@ export class FormLayoutDeleteComponent {
         return { label: x.label, value: x.name };
       });
 
-    this.formControlQueryText.valueChanges.subscribe(
-      val => (this._formConfig.queryText = val)
-    );
+    this.formControlQueryText.valueChanges.subscribe(val => (this._formConfig.queryText = val));
   }
 
   validate() {
     if (!this._formConfig.enabled) return true;
     if (this._formConfig.useCustomForm) {
       if (!this._formConfig.customFormName) {
-        this.notifyService.notifyWarning(
-          'Warning',
-          `Please select one Custom Form for Deleting.`
-        );
+        this.notifyService.notifyWarning('Warning', `Please select one Custom Form for Deleting.`);
         return false;
       }
     } else {
@@ -80,24 +75,12 @@ export class FormLayoutDeleteComponent {
         }
       }
     }
-    if (
-      this.formControlOnValidateConfig.value?.eventType &&
-      !this.formControlOnValidateConfig.value.script
-    ) {
-      this.notifyService.notifyWarning(
-        'Warning',
-        'Please complete On Validate settings for Deleting.'
-      );
+    if (this.formControlOnValidateConfig.value?.eventType && !this.formControlOnValidateConfig.value.script) {
+      this.notifyService.notifyWarning('Warning', 'Please complete On Validate settings for Deleting.');
       return false;
     }
-    if (
-      this.formControlOnAfterSavedConfig.value?.eventType &&
-      !this.formControlOnAfterSavedConfig.value.script
-    ) {
-      this.notifyService.notifyWarning(
-        'Warning',
-        'Please complete On After Saved settings for Deleting.'
-      );
+    if (this.formControlOnAfterSavedConfig.value?.eventType && !this.formControlOnAfterSavedConfig.value.script) {
+      this.notifyService.notifyWarning('Warning', 'Please complete On After Saved settings for Deleting.');
       return false;
     }
 

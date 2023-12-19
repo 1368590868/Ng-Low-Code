@@ -1,15 +1,5 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  Input,
-  ViewChild
-} from '@angular/core';
-import {
-  FormControl,
-  ControlValueAccessor,
-  NG_VALUE_ACCESSOR
-} from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewChild } from '@angular/core';
+import { FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FieldType, FieldTypeConfig } from '@ngx-formly/core';
 import { NotifyService } from 'src/app/shared';
 import { DataSourceConnection } from '../../models/portal-item';
@@ -113,16 +103,11 @@ export class OptionDialogComponent implements ControlValueAccessor {
   }
 
   onRemoveFilter(filter: OptionItem) {
-    this.formControlOptions = this.formControlOptions.filter(
-      item => item !== filter
-    );
+    this.formControlOptions = this.formControlOptions.filter(item => item !== filter);
   }
 
   onAdd() {
-    this.formControlOptions = [
-      ...this.formControlOptions,
-      { formControl: new FormControl() }
-    ];
+    this.formControlOptions = [...this.formControlOptions, { formControl: new FormControl() }];
   }
 
   getOptionQueryDetail() {
@@ -152,9 +137,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
   }
 
   showDialog() {
-    this.isAdvanced =
-      ((!this.options || this.options.length === 0) && !!this.optionsLookup) ||
-      this.onlyAdvanced;
+    this.isAdvanced = ((!this.options || this.options.length === 0) && !!this.optionsLookup) || this.onlyAdvanced;
     if (this.isAdvanced) {
       this.getOptionQueryDetail();
       this.visible = true;
@@ -212,9 +195,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
             this.options = [];
             this.optionsLookup = res.data;
 
-            const matches = [
-              ...data.queryText.matchAll(/##([a-zA-Z]{1}[a-zA-Z0-9_]+?)##/g)
-            ];
+            const matches = [...data.queryText.matchAll(/##([a-zA-Z]{1}[a-zA-Z0-9_]+?)##/g)];
             const deps = matches
               .map(match => match[1]) // get the field name
               .filter((value, index, array) => array.indexOf(value) === index); // distinct
@@ -259,6 +240,4 @@ export class OptionDialogComponent implements ControlValueAccessor {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldOptionsEditorComponent extends FieldType<
-  FieldTypeConfig<any>
-> {}
+export class FormlyFieldOptionsEditorComponent extends FieldType<FieldTypeConfig<any>> {}

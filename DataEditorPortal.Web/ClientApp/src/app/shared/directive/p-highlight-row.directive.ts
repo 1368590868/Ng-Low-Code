@@ -9,7 +9,7 @@ export class PTableHighlightRowDirective {
   constructor(public dt: Table) {}
 
   get selected(): boolean | undefined {
-    if(!this.dt.dataKey) return;
+    if (!this.dt.dataKey) return;
     return (this.dt as any).highlightRowId === this.data[this.dt.dataKey];
   }
 

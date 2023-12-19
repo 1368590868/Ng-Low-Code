@@ -1,11 +1,7 @@
 import { trigger, transition, style, animate } from '@angular/animations';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
-import {
-  FieldWrapper,
-  FormlyFieldConfig,
-  FormlyFieldProps as CoreFormlyFieldProps
-} from '@ngx-formly/core';
+import { FieldWrapper, FormlyFieldConfig, FormlyFieldProps as CoreFormlyFieldProps } from '@ngx-formly/core';
 
 export interface FormlyFieldProps extends CoreFormlyFieldProps {
   hideRequiredMarker?: boolean;
@@ -28,17 +24,10 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
       </span>
 
       <div class="p-field  w-full">
-        <label
-          *ngIf="props.label && props.hideLabel !== true"
-          [for]="id"
-          class="flex align-items-center">
+        <label *ngIf="props.label && props.hideLabel !== true" [for]="id" class="flex align-items-center">
           {{ props.label }}
           <span
-            *ngIf="
-              props.isSameValue &&
-              props.required &&
-              props.hideRequiredMarker !== true
-            "
+            *ngIf="props.isSameValue && props.required && props.hideRequiredMarker !== true"
             aria-hidden="true"
             class="text-red-500"
             >*</span
@@ -57,22 +46,15 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
             <i
               class="pi pi-exclamation-circle text-lg text-warning-500"
               style="color: var(--yellow-600);z-index:1;"
-              [pTooltip]="
-                'The field values are different,If the check box is true, all values are the same'
-              "
+              [pTooltip]="'The field values are different,If the check box is true, all values are the same'"
               [hideDelay]="500"
               [escape]="false"></i>
-            <input
-              pInputText
-              [disabled]="true"
-              [ngModel]="'The field values are different'" />
+            <input pInputText [disabled]="true" [ngModel]="'The field values are different'" />
           </span>
         </div>
 
         <small *ngIf="showError" class="p-error" @fadeInOut>
-          <formly-validation-message
-            class="ui-message-text"
-            [field]="field"></formly-validation-message>
+          <formly-validation-message class="ui-message-text" [field]="field"></formly-validation-message>
         </small>
 
         <small *ngIf="props?.helperText !== undefined" class="p-always">
@@ -83,10 +65,7 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
   `,
   animations: [
     trigger('fadeInOut', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('200ms', style({ opacity: 1 }))
-      ]),
+      transition(':enter', [style({ opacity: 0 }), animate('200ms', style({ opacity: 1 }))]),
       transition(':leave', [animate('200ms', style({ opacity: 0 }))])
     ])
   ],

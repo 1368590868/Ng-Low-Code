@@ -5,9 +5,7 @@ import { GridFormField } from '../../models/portal-item';
 
 @Component({
   selector: 'app-form-designer-view',
-  template: `<formly-form
-    [fields]="fields"
-    class="p-fluid {{ layout }}"></formly-form>`,
+  template: `<formly-form [fields]="fields" class="p-fluid {{ layout }}"></formly-form>`,
   styles: [
     `
       :host {

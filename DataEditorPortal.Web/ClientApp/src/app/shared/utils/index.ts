@@ -36,11 +36,7 @@ export function registerNumeral() {
         const integerNum = Math.floor(value / precision);
         const fractionNum = value - integerNum * precision;
 
-        output = `${integerNum}+${numeral._.numberToFormat(
-          fractionNum,
-          fractionFormat,
-          roundingFunction
-        )}`;
+        output = `${integerNum}+${numeral._.numberToFormat(fractionNum, fractionFormat, roundingFunction)}`;
       }
 
       return output;

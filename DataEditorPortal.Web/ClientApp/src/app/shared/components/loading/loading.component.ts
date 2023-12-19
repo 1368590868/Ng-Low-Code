@@ -22,12 +22,8 @@ export class LoadingComponent implements OnDestroy {
   callback: any;
 
   constructor(private requestLogUtility: RequestLogUtility) {
-    this.requestLogUtility.start$
-      .pipe(takeUntil(this.destory$))
-      .subscribe(t => this.add(t));
-    this.requestLogUtility.end$
-      .pipe(takeUntil(this.destory$))
-      .subscribe(t => this.remove(t));
+    this.requestLogUtility.start$.pipe(takeUntil(this.destory$)).subscribe(t => this.add(t));
+    this.requestLogUtility.end$.pipe(takeUntil(this.destory$)).subscribe(t => this.remove(t));
     if (this.autoStart) this.start();
   }
   ngOnDestroy(): void {

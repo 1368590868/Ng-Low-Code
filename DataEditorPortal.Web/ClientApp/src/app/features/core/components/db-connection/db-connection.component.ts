@@ -2,12 +2,7 @@ import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { PaginatorState } from 'primeng/paginator';
-import {
-  DbConnectionData,
-  DbConnectionService,
-  DictionaryData,
-  NotifyService
-} from 'src/app/shared';
+import { DbConnectionData, DbConnectionService, DictionaryData, NotifyService } from 'src/app/shared';
 import { AddConnectionDialogComponent } from './add-connection-dialog/add-connection-dialog.component';
 
 @Component({
@@ -71,11 +66,7 @@ export class DbConnectionComponent {
     });
   }
 
-  onShowMenu(
-    menu: Menu,
-    $event: any,
-    rowData: DbConnectionData & { usedCount: number }
-  ) {
+  onShowMenu(menu: Menu, $event: any, rowData: DbConnectionData & { usedCount: number }) {
     this.getMenuList(rowData);
     menu.toggle($event);
   }
@@ -124,10 +115,7 @@ export class DbConnectionComponent {
       accept: () => {
         this.dbConnectionService.deleteConnection(rowData).subscribe(res => {
           if (res.code === 200) {
-            this.notifyService.notifySuccess(
-              'Success',
-              'Record deleted successfully'
-            );
+            this.notifyService.notifySuccess('Success', 'Record deleted successfully');
             this.fetchData();
           }
         });

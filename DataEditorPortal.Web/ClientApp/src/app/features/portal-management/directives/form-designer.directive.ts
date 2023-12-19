@@ -102,9 +102,7 @@ export class FormDesignerDirective {
                 if (field.parent?.get) {
                   const typeField = field.parent?.get('type');
                   if (typeField && typeField.props) {
-                    const result = this.controls.filter(
-                      x => x.filterType === value
-                    );
+                    const result = this.controls.filter(x => x.filterType === value);
                     typeField.props.options = result;
                     if (!result.find(o => o.value === this.model['type']))
                       typeField.formControl?.setValue(result[0].value);
@@ -285,10 +283,8 @@ export class FormDesignerDirective {
               type: 'input',
               props: {
                 label: 'Accept',
-                description:
-                  'Pattern to restrict the allowed file types such as "image/*".',
-                placeholder:
-                  'Pattern to restrict the allowed file types such as "image/*".'
+                description: 'Pattern to restrict the allowed file types such as "image/*".',
+                placeholder: 'Pattern to restrict the allowed file types such as "image/*".'
               }
             },
             {
@@ -316,10 +312,8 @@ export class FormDesignerDirective {
               type: 'input',
               props: {
                 label: 'Choose Label',
-                description:
-                  'Label of the choose button. Defaults to global value in i18n translation configuration.',
-                placeholder:
-                  'Label of the choose button. Defaults to global value in i18n translation configuration.'
+                description: 'Label of the choose button. Defaults to global value in i18n translation configuration.',
+                placeholder: 'Label of the choose button. Defaults to global value in i18n translation configuration.'
               }
             },
             {
@@ -328,8 +322,7 @@ export class FormDesignerDirective {
               defaultValue: false,
               props: {
                 label: 'Multiple',
-                placeholder:
-                  'Used to select multiple files at once from file dialog.'
+                placeholder: 'Used to select multiple files at once from file dialog.'
               }
             }
           ],

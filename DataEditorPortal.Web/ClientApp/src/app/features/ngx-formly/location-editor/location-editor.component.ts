@@ -7,20 +7,8 @@ import {
   forwardRef,
   OnInit
 } from '@angular/core';
-import {
-  AbstractControl,
-  ControlValueAccessor,
-  FormGroup,
-  NG_VALUE_ACCESSOR,
-  ValidationErrors
-} from '@angular/forms';
-import {
-  FieldType,
-  FieldTypeConfig,
-  FormlyFieldConfig,
-  FormlyFieldProps,
-  FormlyFormOptions
-} from '@ngx-formly/core';
+import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, ValidationErrors } from '@angular/forms';
+import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyFieldProps, FormlyFormOptions } from '@ngx-formly/core';
 import { LocationEditorService } from './service/location-editor.service';
 
 @Component({
@@ -243,15 +231,11 @@ export class LocationEditorComponent implements ControlValueAccessor {
         options: [],
         onShow: () => this.onShow(),
         change: (field, event) => {
-          const record = this.locationOptions.find(
-            x => x.value === event.value
-          );
+          const record = this.locationOptions.find(x => x.value === event.value);
           if (field && field.parent && field.parent.get) {
             const fromMeasureProps = field.parent.get('fromMeasure').props;
             if (fromMeasureProps) {
-              fromMeasureProps[
-                'helperText'
-              ] = `Min: ${record?.value1} Max: ${record?.value2}`;
+              fromMeasureProps['helperText'] = `Min: ${record?.value1} Max: ${record?.value2}`;
               fromMeasureProps['min'] = record?.value1;
               fromMeasureProps['max'] = record?.value2;
             }
@@ -260,9 +244,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
             if (this.locationType === 3) {
               const toMeasureProps = field.parent.get('toMeasure').props;
               if (toMeasureProps) {
-                toMeasureProps[
-                  'helperText'
-                ] = `Min: ${record?.value1} Max: ${record?.value2}`;
+                toMeasureProps['helperText'] = `Min: ${record?.value1} Max: ${record?.value2}`;
                 toMeasureProps['min'] = record?.value1;
                 toMeasureProps['max'] = record?.value2;
               }
@@ -270,12 +252,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
 
             const to = field.parent.get('to').formControl;
             if (to?.value) {
-              const fIndex = this.locationOptions.findIndex(
-                x => x.value === event.value
-              );
-              const tIndex = this.locationOptions.findIndex(
-                x => x.value === to.value
-              );
+              const fIndex = this.locationOptions.findIndex(x => x.value === event.value);
+              const tIndex = this.locationOptions.findIndex(x => x.value === to.value);
               // current index must be less than ToVs index
               if (tIndex <= fIndex) {
                 to.setValue(to.value);
@@ -333,10 +311,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
             }
             return true;
           },
-          message: (
-            error: any,
-            field: { props: { min: number; max: number } }
-          ) => {
+          message: (error: any, field: { props: { min: number; max: number } }) => {
             return `Valid Range: ${field.props.min} to ${field.props.max}`;
           }
         }
@@ -353,15 +328,11 @@ export class LocationEditorComponent implements ControlValueAccessor {
         options: [],
         onShow: () => this.onShow(),
         change: (field, event) => {
-          const record = this.locationOptions.find(
-            x => x.value === event.value
-          );
+          const record = this.locationOptions.find(x => x.value === event.value);
           if (field && field.parent && field.parent.get) {
             const toMeasureProps = field.parent.get('toMeasure').props;
             if (toMeasureProps) {
-              toMeasureProps[
-                'helperText'
-              ] = `Min: ${record?.value1} Max: ${record?.value2}`;
+              toMeasureProps['helperText'] = `Min: ${record?.value1} Max: ${record?.value2}`;
               toMeasureProps['min'] = record?.value1;
               toMeasureProps['max'] = record?.value2;
             }
@@ -373,12 +344,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
           expression: (control: AbstractControl, field: any) => {
             const fromValue = field.parent.get('from').formControl?.value;
             if (fromValue) {
-              const fIndex = this.locationOptions.findIndex(
-                x => x.value === fromValue
-              );
-              const tIndex = this.locationOptions.findIndex(
-                x => x.value === control.value
-              );
+              const fIndex = this.locationOptions.findIndex(x => x.value === fromValue);
+              const tIndex = this.locationOptions.findIndex(x => x.value === control.value);
               // current index must be greater than FromSV
               if (tIndex < fIndex) {
                 return false;
@@ -412,17 +379,13 @@ export class LocationEditorComponent implements ControlValueAccessor {
             }
             return true;
           },
-          message: (
-            error: any,
-            field: { props: { min: number; max: number } }
-          ) => {
+          message: (error: any, field: { props: { min: number; max: number } }) => {
             return `Valid Range: ${field.props.min} to ${field.props.max}`;
           }
         },
         validLocationTypeEq3: {
           expression: (control: AbstractControl, field: any) => {
-            const fromMeasure =
-              field.parent.get('fromMeasure').formControl.value;
+            const fromMeasure = field.parent.get('fromMeasure').formControl.value;
             if (control.value <= fromMeasure) {
               return false;
             }
@@ -447,20 +410,14 @@ export class LocationEditorComponent implements ControlValueAccessor {
         hide: () => !this.lengthLabel,
         calcLength: field => {
           if (this.model?.fromMeasure >= 0 && this.model?.toMeasure >= 0) {
-            if (field && field.formControl)
-              field.formControl.setValue(
-                this.model.toMeasure - this.model.fromMeasure
-              );
+            if (field && field.formControl) field.formControl.setValue(this.model.toMeasure - this.model.fromMeasure);
           }
         }
       }
     }
   ];
 
-  constructor(
-    private locationEditorService: LocationEditorService,
-    private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  constructor(private locationEditorService: LocationEditorService, private changeDetectorRef: ChangeDetectorRef) {}
 
   onShow() {
     const allModel = this.formControl.parent;
@@ -469,44 +426,38 @@ export class LocationEditorComponent implements ControlValueAccessor {
 
     if (this._systemName && this.systemNameChange) {
       if (fromProps && toProps) fromProps['emptyMessage'] = 'Loading...';
-      this.locationEditorService
-        .getPipeOptions(this.system.id, allModel?.value)
-        .subscribe(res => {
-          this.locationOptions = res;
-          // Init fromMeasure and toMeasure helper text
+      this.locationEditorService.getPipeOptions(this.system.id, allModel?.value).subscribe(res => {
+        this.locationOptions = res;
+        // Init fromMeasure and toMeasure helper text
 
-          const fromMeasureProps = this.fields[1].props;
-          const toMeasureProps = this.fields[3].props;
+        const fromMeasureProps = this.fields[1].props;
+        const toMeasureProps = this.fields[3].props;
 
-          // from to have value , set helper text
-          const from = this.fields[0].formControl;
-          const to = this.fields[2].formControl;
+        // from to have value , set helper text
+        const from = this.fields[0].formControl;
+        const to = this.fields[2].formControl;
 
-          if (from && to) {
-            const fromRecord = res.find(x => x.value === from.value);
-            const toRecord = res.find(x => x.value === to.value);
+        if (from && to) {
+          const fromRecord = res.find(x => x.value === from.value);
+          const toRecord = res.find(x => x.value === to.value);
 
-            if (fromMeasureProps && toMeasureProps) {
-              fromMeasureProps['helperText'] = `Min: ${
-                fromRecord?.value1 ?? '--'
-              }  Max: ${fromRecord?.value2 ?? '--'}`;
+          if (fromMeasureProps && toMeasureProps) {
+            fromMeasureProps['helperText'] = `Min: ${fromRecord?.value1 ?? '--'}  Max: ${fromRecord?.value2 ?? '--'}`;
 
-              toMeasureProps['helperText'] = `Min: ${
-                toRecord?.value1 ?? '--'
-              }  Max: ${toRecord?.value2 ?? '--'}`;
+            toMeasureProps['helperText'] = `Min: ${toRecord?.value1 ?? '--'}  Max: ${toRecord?.value2 ?? '--'}`;
 
-              this.options.detectChanges?.(this.fields[1]);
-            }
+            this.options.detectChanges?.(this.fields[1]);
           }
+        }
 
-          if (fromProps && toProps) {
-            fromProps.options = res;
-            toProps.options = res;
+        if (fromProps && toProps) {
+          fromProps.options = res;
+          toProps.options = res;
 
-            fromProps['emptyMessage'] = 'No records found';
-          }
-          this.systemNameChange = false;
-        });
+          fromProps['emptyMessage'] = 'No records found';
+        }
+        this.systemNameChange = false;
+      });
     }
   }
 
@@ -599,14 +550,12 @@ export class FormlyFieldLocationEditorComponent
     this.field.validation = {
       messages: { required: ' ', errorData: ' ' }
     };
-    this.field.formControl.addValidators(
-      (control: AbstractControl): ValidationErrors | null => {
-        if (control.value === 'error') {
-          control.markAsPristine();
-          return { errorData: true };
-        }
-        return null;
+    this.field.formControl.addValidators((control: AbstractControl): ValidationErrors | null => {
+      if (control.value === 'error') {
+        control.markAsPristine();
+        return { errorData: true };
       }
-    );
+      return null;
+    });
   }
 }

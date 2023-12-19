@@ -10,12 +10,7 @@ import {
 } from '@angular/core';
 import { SelectItem } from 'primeng/api';
 import { Dropdown } from 'primeng/dropdown';
-import {
-  ControlValueAccessor,
-  FormControl,
-  NG_VALUE_ACCESSOR,
-  NgControl
-} from '@angular/forms';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 import { NotifyService } from 'src/app/shared';
 import { FileUpload } from 'primeng/fileupload';
 
@@ -389,9 +384,7 @@ export class IconSelectComponent implements ControlValueAccessor {
     if (errorFile.length > 0) {
       this.notifyService.notifyError(
         'Invalid file type',
-        `<ul class="pl-3"><li class="py-1">${errorFile
-          .map(f => f.name)
-          .join('</li><li class="py-1">')}</li></ul>`
+        `<ul class="pl-3"><li class="py-1">${errorFile.map(f => f.name).join('</li><li class="py-1">')}</li></ul>`
       );
       this.fileUpload.clear();
       return;
@@ -408,9 +401,7 @@ export class IconSelectComponent implements ControlValueAccessor {
     if (errorFile.length > 0) {
       this.notifyService.notifyError(
         'Maximum upload size exceeded',
-        `<ul class="pl-3"><li>${errorFile
-          .map(f => f.name)
-          .join('</li><li>')}</li></ul>`
+        `<ul class="pl-3"><li>${errorFile.map(f => f.name).join('</li><li>')}</li></ul>`
       );
       this.fileUpload.clear();
       return;

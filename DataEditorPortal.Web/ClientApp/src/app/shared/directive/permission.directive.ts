@@ -12,10 +12,7 @@ export class PermissionDirective {
   ) {}
   @Input()
   set appNgPermission(value: any) {
-    if (
-      this.userService.USER.permissions &&
-      this.userService.USER.permissions[value]
-    ) {
+    if (this.userService.USER.permissions && this.userService.USER.permissions[value]) {
       this.viewContainerRef.createEmbeddedView(this.templateRef);
     } else {
       this.viewContainerRef.clear();

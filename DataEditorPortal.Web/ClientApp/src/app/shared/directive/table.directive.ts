@@ -1,11 +1,4 @@
-import {
-  AfterViewChecked,
-  ChangeDetectorRef,
-  Directive,
-  Host,
-  Optional,
-  Self
-} from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Directive, Host, Optional, Self } from '@angular/core';
 import { Table } from 'primeng/table';
 
 @Directive({
@@ -15,14 +8,11 @@ import { Table } from 'primeng/table';
 export class TableDirective implements AfterViewChecked {
   private hasClientHeight = false;
 
-  constructor(
-    @Host() @Self() @Optional() private table: Table,
-    private cdr: ChangeDetectorRef
-  ) {}
+  constructor(@Host() @Self() @Optional() private table: Table, private cdr: ChangeDetectorRef) {}
 
   ngAfterViewChecked(): void {
     if (!this.hasClientHeight && this.table.virtualScroll) {
-      if(!this.table.containerViewChild) return;
+      if (!this.table.containerViewChild) return;
       const rows = this.table.containerViewChild.nativeElement.querySelectorAll(
         '.p-datatable .p-datatable-tbody > tr:not(.empty-message)'
       );

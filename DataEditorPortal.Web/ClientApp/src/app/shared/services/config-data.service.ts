@@ -69,11 +69,7 @@ export class ConfigDataService {
 
   public licenseExpiredChange$ = new Subject<boolean>();
 
-  constructor(
-    private http: HttpClient,
-    @Inject('API_URL') apiUrl: string,
-    private router: Router
-  ) {
+  constructor(private http: HttpClient, @Inject('API_URL') apiUrl: string, private router: Router) {
     this._apiUrl = apiUrl;
     this.licenseExpiredChange$.subscribe(val => {
       if (this.router.url !== '/site-settings') {
@@ -110,9 +106,7 @@ export class ConfigDataService {
   }
 
   getHomeMenus(): Observable<SiteMenu[]> {
-    return this.http
-      .post<ApiResponse<SiteMenu[]>>(`${this._apiUrl}site/menus`, null)
-      .pipe(map(res => res.data || []));
+    return this.http.post<ApiResponse<SiteMenu[]>>(`${this._apiUrl}site/menus`, null).pipe(map(res => res.data || []));
   }
 
   public siteSettings: SiteSettings = {
@@ -122,18 +116,16 @@ export class ConfigDataService {
   };
 
   getSiteSettings() {
-    return this.http
-      .get<ApiResponse<SiteSettings>>(`${this._apiUrl}site/settings`)
-      .pipe(
-        tap(res => {
-          if (res.code === 200) {
-            this.siteSettings = res.data ?? {
-              siteName: '',
-              dbProvider: 'SqlConnection'
-            };
-          }
-        })
-      );
+    return this.http.get<ApiResponse<SiteSettings>>(`${this._apiUrl}site/settings`).pipe(
+      tap(res => {
+        if (res.code === 200) {
+          this.siteSettings = res.data ?? {
+            siteName: '',
+            dbProvider: 'SqlConnection'
+          };
+        }
+      })
+    );
   }
 
   getHTMLData(pageName: string, siteGroupId?: string) {
@@ -145,24 +137,18 @@ export class ConfigDataService {
   }
 
   saveData(data: SiteSettings) {
-    return this.http.post<ApiResponse<SiteSettings>>(
-      `${this._apiUrl}site/settings`,
-      data
-    );
+    return this.http.post<ApiResponse<SiteSettings>>(`${this._apiUrl}site/settings`, data);
   }
 
   saveHTMLData(data: SettingsDocument) {
-    return this.http.post<ApiResponse<SettingsDocument>>(
-      `${this._apiUrl}site/content/${data.pageName}`,
-      { content: data.html }
-    );
+    return this.http.post<ApiResponse<SettingsDocument>>(`${this._apiUrl}site/content/${data.pageName}`, {
+      content: data.html
+    });
   }
 
   getLicense() {
     return this.http
-      .get<ApiResponse<{ isExpired: boolean; license: string }>>(
-        `${this._apiUrl}site/license`
-      )
+      .get<ApiResponse<{ isExpired: boolean; license: string }>>(`${this._apiUrl}site/license`)
       .pipe(map(res => res.data ?? { isExpired: false, license: '' }));
   }
 
@@ -180,10 +166,7 @@ export class ConfigDataService {
     divElement.innerHTML = htmlString;
 
     document.body.appendChild(divElement);
-    this.dropdownItemSize =
-      divElement.querySelector<HTMLDivElement>(
-        '.p-dropdown-item'
-      )?.offsetHeight;
+    this.dropdownItemSize = divElement.querySelector<HTMLDivElement>('.p-dropdown-item')?.offsetHeight;
     document.body.removeChild(divElement);
   }
 }

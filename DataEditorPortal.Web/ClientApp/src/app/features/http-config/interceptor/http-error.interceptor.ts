@@ -1,29 +1,17 @@
-import {
-  HttpErrorResponse,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest,
-  HttpResponse
-} from '@angular/common/http';
+import { HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, of, throwError } from 'rxjs';
 import { ConfigDataService, NotifyService } from 'src/app/shared';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
-  constructor(
-    private notifyService: NotifyService,
-    private configDataService: ConfigDataService
-  ) {}
+  constructor(private notifyService: NotifyService, private configDataService: ConfigDataService) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): any {
     return next.handle(request).pipe(
       catchError(error => {
         if (error instanceof HttpErrorResponse && error.status !== 440) {
-          this.notifyService.notifyError(
-            error.statusText || error.name,
-            error.error?.message || error.message
-          );
+          this.notifyService.notifyError(error.statusText || error.name, error.error?.message || error.message);
         }
 
         if (error.status === 401) {

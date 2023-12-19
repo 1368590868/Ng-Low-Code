@@ -7,9 +7,7 @@ export function getBaseUrl() {
   return document.getElementsByTagName('base')[0].href;
 }
 
-const providers: StaticProvider[] = [
-  { provide: 'BASE_URL', useFactory: getBaseUrl, deps: [] }
-];
+const providers: StaticProvider[] = [{ provide: 'BASE_URL', useFactory: getBaseUrl, deps: [] }];
 
 if (environment.production) {
   enableProdMode();

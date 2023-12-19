@@ -19,17 +19,10 @@ export class UrlParamsService {
       ignoreQueryPrefix: true
     });
 
-    if (
-      Object.keys(urlParams).length > 0 &&
-      urlParams['a'] &&
-      urlParams['n'] === name &&
-      dataKey
-    ) {
+    if (Object.keys(urlParams).length > 0 && urlParams['a'] && urlParams['n'] === name && dataKey) {
       if (urlParams['p']) urlParams['p'] = qs.parse(urlParams['p'] as string);
 
-      const actionConfig = this.config.find(
-        (x: any) => x.name === urlParams['a']
-      );
+      const actionConfig = this.config.find((x: any) => x.name === urlParams['a']);
       const payload = urlParams['p'] as string | qs.ParsedQs;
 
       if (actionConfig?.requireGridRowSelected) {
@@ -94,12 +87,7 @@ export class UrlParamsService {
   }
 
   getTableSelection(dataKey: string) {
-    if (
-      this.initParams &&
-      this.initParams.payload &&
-      dataKey &&
-      Array.isArray(this.initParams.payload[dataKey])
-    ) {
+    if (this.initParams && this.initParams.payload && dataKey && Array.isArray(this.initParams.payload[dataKey])) {
       return this.initParams.payload[dataKey].map((item: any) => ({
         [dataKey]: item
       }));

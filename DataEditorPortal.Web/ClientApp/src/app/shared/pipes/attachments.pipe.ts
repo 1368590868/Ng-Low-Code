@@ -11,18 +11,10 @@ type AttachmentType = {
 @Pipe({ name: 'attachments' })
 export class AttachmentsPipe implements PipeTransform {
   private _apiUrl: string;
-  constructor(
-    @Inject('API_URL') apiUrl: string,
-    private sanitizer: DomSanitizer
-  ) {
+  constructor(@Inject('API_URL') apiUrl: string, private sanitizer: DomSanitizer) {
     this._apiUrl = apiUrl;
   }
-  transform(
-    value: string,
-    gridName: string,
-    fieldName: string,
-    isShowAll = false
-  ) {
+  transform(value: string, gridName: string, fieldName: string, isShowAll = false) {
     let parseVal: AttachmentType[] = [];
     if (!value) return '';
     try {
@@ -34,9 +26,7 @@ export class AttachmentsPipe implements PipeTransform {
     const filterArray = parseVal.filter(item => item?.status !== 'Deleted');
     const result = filterArray
       .map(item => {
-        const url = `${
-          this._apiUrl
-        }attachment/download-file/${gridName}/${fieldName}/${
+        const url = `${this._apiUrl}attachment/download-file/${gridName}/${fieldName}/${
           item.fileId
         }/${encodeURIComponent(item.fileName || '')}`;
         const html = ` <a href=${url} target="_blank" title="${item?.comments}"  class="no-underline cursor-pointer text-primary"  > ${item.fileName}</a>`;
@@ -45,10 +35,7 @@ export class AttachmentsPipe implements PipeTransform {
       .join('|');
 
     if (isShowAll) {
-      if (filterArray.length > 0)
-        return this.sanitizer.bypassSecurityTrustHtml(
-          result.split('|').join('')
-        );
+      if (filterArray.length > 0) return this.sanitizer.bypassSecurityTrustHtml(result.split('|').join(''));
       else return '';
     } else {
       if (filterArray.length === 1) return result;

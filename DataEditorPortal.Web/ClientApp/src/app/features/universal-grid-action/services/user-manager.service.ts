@@ -2,12 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiResponse } from 'src/app/shared';
-import {
-  ManageRoleForm,
-  UpdateRole,
-  UserData,
-  UserPemissions
-} from '../models/user-manager';
+import { ManageRoleForm, UpdateRole, UserData, UserPemissions } from '../models/user-manager';
 
 @Injectable({
   providedIn: 'root'
@@ -20,10 +15,7 @@ export class UserManagerService {
   }
 
   createUser(data: ManageRoleForm) {
-    return this.http.post<ApiResponse<UpdateRole[]>>(
-      `${this._apiUrl}user/create`,
-      data
-    );
+    return this.http.post<ApiResponse<UpdateRole[]>>(`${this._apiUrl}user/create`, data);
   }
 
   getUserDetail(id: string): Observable<ManageRoleForm> {
@@ -33,10 +25,7 @@ export class UserManagerService {
   }
 
   updateUser(data: ManageRoleForm) {
-    return this.http.put<ApiResponse<UpdateRole[]>>(
-      `${this._apiUrl}user/update/${data.id}`,
-      data
-    );
+    return this.http.put<ApiResponse<UpdateRole[]>>(`${this._apiUrl}user/update/${data.id}`, data);
   }
 
   getUserPermissions(id: string) {
@@ -45,22 +34,14 @@ export class UserManagerService {
       .pipe(map(res => res.data || []));
   }
   getUserRole(id: string) {
-    return this.http
-      .get<ApiResponse<UserData[]>>(`${this._apiUrl}user/${id}/roles`)
-      .pipe(map(res => res.data || []));
+    return this.http.get<ApiResponse<UserData[]>>(`${this._apiUrl}user/${id}/roles`).pipe(map(res => res.data || []));
   }
 
   saveUserRole(data: UserData[], id: string) {
-    return this.http.post<ApiResponse<string>>(
-      `${this._apiUrl}user/${id}/roles`,
-      { permissions: data }
-    );
+    return this.http.post<ApiResponse<string>>(`${this._apiUrl}user/${id}/roles`, { permissions: data });
   }
 
   saveUserPermissions(data: UserPemissions[], id: string) {
-    return this.http.post<ApiResponse<string>>(
-      `${this._apiUrl}user/${id}/permissions`,
-      { permissions: data }
-    );
+    return this.http.post<ApiResponse<string>>(`${this._apiUrl}user/${id}/permissions`, { permissions: data });
   }
 }

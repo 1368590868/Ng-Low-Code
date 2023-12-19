@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Observable, map, switchMap, tap } from 'rxjs';
+import { Observable, map, switchMap } from 'rxjs';
 import { ConfigDataService } from 'src/app/shared';
 
 @Component({
@@ -10,10 +10,7 @@ import { ConfigDataService } from 'src/app/shared';
 })
 export class ContactComponent implements OnInit {
   public content$!: Observable<SafeHtml>;
-  constructor(
-    private configDataService: ConfigDataService,
-    private domSanitizer: DomSanitizer
-  ) {}
+  constructor(private configDataService: ConfigDataService, private domSanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
     this.content$ = this.configDataService.siteGroup$.pipe(

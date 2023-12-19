@@ -1,12 +1,4 @@
-import {
-  Directive,
-  Host,
-  Input,
-  OnDestroy,
-  OnInit,
-  Optional,
-  Self
-} from '@angular/core';
+import { Directive, Host, Input, OnDestroy, OnInit, Optional, Self } from '@angular/core';
 import { DomHandler } from 'primeng/dom';
 import { Dropdown } from 'primeng/dropdown';
 import { Subject, takeUntil } from 'rxjs';
@@ -33,9 +25,7 @@ export class DropdownFixDirective implements OnInit, OnDestroy {
                 // check if the dropdown scroller doesn't scroll, if first === 0, we need to scroll again
                 const selectedIndex = this.dropdown.selectedOption
                   ? this.dropdown.findOptionIndex(
-                      this.dropdown.getOptionValue(
-                        this.dropdown.selectedOption
-                      ),
+                      this.dropdown.getOptionValue(this.dropdown.selectedOption),
                       this.dropdown.optionsToDisplay || []
                     )
                   : -1;
@@ -46,13 +36,8 @@ export class DropdownFixDirective implements OnInit, OnDestroy {
             } else {
               // Set appendTO to body, Requires a global re-lookup and scroll to the current highlighted option
               if (this.dropdown.appendTo === 'body') {
-                const wrapperDom = document.querySelector(
-                  '.p-dropdown-items-wrapper'
-                );
-                const selectedListItem = DomHandler.findSingle(
-                  wrapperDom,
-                  '.p-dropdown-item.p-highlight'
-                );
+                const wrapperDom = document.querySelector('.p-dropdown-items-wrapper');
+                const selectedListItem = DomHandler.findSingle(wrapperDom, '.p-dropdown-item.p-highlight');
                 if (selectedListItem) {
                   selectedListItem.scrollIntoView({
                     block: 'nearest',

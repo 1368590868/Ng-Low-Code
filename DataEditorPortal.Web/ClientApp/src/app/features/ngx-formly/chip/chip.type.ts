@@ -1,9 +1,5 @@
 import { Component, ViewChild, ViewContainerRef } from '@angular/core';
-import {
-  FieldTypeConfig,
-  FieldWrapper,
-  FormlyFieldProps
-} from '@ngx-formly/core';
+import { FieldTypeConfig, FieldWrapper, FormlyFieldProps } from '@ngx-formly/core';
 interface ChipProps extends FormlyFieldProps {
   styleClass?: string;
   forArray?: any[];
@@ -12,9 +8,7 @@ interface ChipProps extends FormlyFieldProps {
 @Component({
   selector: 'app-formly-wrapper-chip',
   template: `
-    <div
-      class="flex flex-wrap justify-content-start"
-      style="margin-top:'-1.5rem'">
+    <div class="flex flex-wrap justify-content-start" style="margin-top:'-1.5rem'">
       <p-chip
         styleClass="mr-2"
         *ngFor="let item of props.forArray"
@@ -23,9 +17,7 @@ interface ChipProps extends FormlyFieldProps {
     </div>
   `
 })
-export class ChipWrapperComponent extends FieldWrapper<
-  FieldTypeConfig<ChipProps>
-> {
+export class ChipWrapperComponent extends FieldWrapper<FieldTypeConfig<ChipProps>> {
   @ViewChild('fieldComponent', { read: ViewContainerRef })
   override fieldComponent!: ViewContainerRef;
 }
