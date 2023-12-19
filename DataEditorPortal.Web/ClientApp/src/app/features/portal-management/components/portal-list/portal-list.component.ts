@@ -104,19 +104,17 @@ export class PortalListComponent implements OnInit {
     const row = rowNode.data as PortalItemData;
     const items: MenuItem[] = [];
     if (row['type'] === 'Portal Item') {
-      const editLabel =
-        row['itemType'] == 'linked'
-          ? 'Edit Linked Table Page'
-          : 'Edit Table Page';
+      const editLabel = row['itemType'] == 'linked' ? 'Edit Linked Table Page' : 'Edit Table Page';
       items.push({
         label: row['configCompleted'] ? editLabel : 'Continue Editing',
         icon: 'pi pi-fw pi-pencil',
         command: () => {
-          const editRoute =
-            row['itemType'] == 'linked' ? 'edit-linked' : 'edit-single';
-          this.router.navigate([`../${editRoute}/${row['id']}`], {
-            relativeTo: this.activatedRoute
-          });
+          const editRoute = row['itemType'] == 'linked' ? 'edit-linked' : 'edit-single';
+          setTimeout(() => {
+            this.router.navigate([`../${editRoute}/${row['id']}`], {
+              relativeTo: this.activatedRoute
+            });
+          }, 0);
         }
       });
     } else if (row['type'] === 'System' || row['type'] === 'External') {
@@ -229,30 +227,18 @@ export class PortalListComponent implements OnInit {
     }
 
     const maxOrder = (rowNode: TreeNode) => {
-      const nodes = rowNode.parent?.children
-        ? rowNode.parent?.children
-        : this.data;
+      const nodes = rowNode.parent?.children ? rowNode.parent?.children : this.data;
       if (!nodes || nodes.length == 0) return 0;
       return nodes
         .map(x => x.data['order'])
-        .reduce(
-          (result: number, current: number) =>
-            current > result ? current : result,
-          0
-        );
+        .reduce((result: number, current: number) => (current > result ? current : result), 0);
     };
     const minOrder = (rowNode: TreeNode) => {
-      const nodes = rowNode.parent?.children
-        ? rowNode.parent?.children
-        : this.data;
+      const nodes = rowNode.parent?.children ? rowNode.parent?.children : this.data;
       if (!nodes || nodes.length == 0) return 0;
       return nodes
         .map(x => x.data['order'])
-        .reduce(
-          (result: number, current: number) =>
-            current < result ? current : result,
-          9999
-        );
+        .reduce((result: number, current: number) => (current < result ? current : result), 9999);
     };
 
     if (row['order'] > minOrder(rowNode)) {
@@ -298,10 +284,7 @@ export class PortalListComponent implements OnInit {
     }
 
     const hasChildren = rowNode.children && rowNode.children.length > 0;
-    if (
-      row['type'] !== 'System' &&
-      (row['type'] === 'Portal Item' || !hasChildren)
-    ) {
+    if (row['type'] !== 'System' && (row['type'] === 'Portal Item' || !hasChildren)) {
       items.push({
         separator: true
       });
@@ -321,9 +304,7 @@ export class PortalListComponent implements OnInit {
       .pipe(
         tap(res => {
           res.forEach(x => {
-            const exist = this.data.find(
-              m => m.data?.['id'] === x.data?.['id']
-            );
+            const exist = this.data.find(m => m.data?.['id'] === x.data?.['id']);
             if (exist) x.expanded = exist.expanded;
             else x.expanded = false;
           });
@@ -388,10 +369,7 @@ export class PortalListComponent implements OnInit {
   copy(row: PortalItemData) {
     this.portalItemService.copyPortalItem(row['id']).subscribe(res => {
       if (res && res.code === 200) {
-        this.notifyService.notifySuccess(
-          'Success',
-          'Copy Successfully Completed.'
-        );
+        this.notifyService.notifySuccess('Success', 'Copy Successfully Completed.');
         this.getPortalList();
       }
     });
@@ -424,8 +402,7 @@ export class PortalListComponent implements OnInit {
     this.confirmationService.confirm({
       message: 'Are you sure that you want to delete this item?',
       accept: () => {
-        const deleteMethod =
-          row['type'] === 'Portal Item' ? 'deletePortalItem' : 'deleteMenuItem';
+        const deleteMethod = row['type'] === 'Portal Item' ? 'deletePortalItem' : 'deleteMenuItem';
         this.portalItemService[deleteMethod](row['id'])
           .pipe(
             tap(res => {

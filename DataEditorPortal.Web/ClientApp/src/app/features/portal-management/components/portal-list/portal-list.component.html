@@ -21,8 +21,8 @@
               icon="pi pi-file-import"
               [outlined]="true"
               label="Import"
-              (click)="importDialog.showDialog()"></p-button>
-            <p-button icon="pi pi-plus" [outlined]="true" label="New" (click)="addNewMenu.toggle($event)"></p-button>
+              (onClick)="importDialog.showDialog()"></p-button>
+            <p-button icon="pi pi-plus" [outlined]="true" label="New" (onClick)="addNewMenu.toggle($event)"></p-button>
           </div>
         </div>
       </ng-template>
@@ -119,7 +119,7 @@
               icon="pi pi-ellipsis-v"
               [rounded]="true"
               [text]="true"
-              (oncClick)="onShowMenu(menu, $event, rowNode.node)"></p-button>
+              (onClick)="onShowMenu(menu, $event, rowNode.node)"></p-button>
           </td>
         </tr>
       </ng-template>
