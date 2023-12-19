@@ -293,7 +293,7 @@ namespace DataEditorPortal.Web.Services
                     var datas = _dapperService.Query(Conn, queryText, param, Trans);
 
                     DataTable schema;
-                    using (var dr = Conn.ExecuteReader(queryText, param))
+                    using (var dr = Conn.ExecuteReader(queryText, param, Trans))
                     {
                         schema = dr.GetSchemaTable();
                     }
