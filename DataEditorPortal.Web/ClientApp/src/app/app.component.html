@@ -1,9 +1,7 @@
 <p-toast [baseZIndex]="99999">
   <ng-template let-message pTemplate="message">
     <span
-      [class]="
-        'p-toast-message-icon pi' + (message.icon ? ' ' + message.icon : '')
-      "
+      [class]="'p-toast-message-icon pi' + (message.icon ? ' ' + message.icon : '')"
       [ngClass]="{
         'pi-info-circle': message.severity === 'info',
         'pi-exclamation-triangle': message.severity === 'warn',

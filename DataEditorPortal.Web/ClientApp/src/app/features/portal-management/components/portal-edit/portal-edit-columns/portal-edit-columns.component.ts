@@ -1,23 +1,20 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { MenuItem } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
 import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
-import { DataSourceTableColumn, GridColumn } from '../../../models/portal-item';
-import { PortalItemService } from '../../../services/portal-item.service';
 import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
-import { MenuItem } from 'primeng/api';
+import { GridColumn } from '../../../models/portal-item';
+import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
   selector: 'app-portal-edit-columns',
   templateUrl: './portal-edit-columns.component.html',
   styleUrls: ['./portal-edit-columns.component.scss']
 })
-export class PortalEditColumnsComponent
-  extends PortalEditStepDirective
-  implements OnInit
-{
+export class PortalEditColumnsComponent extends PortalEditStepDirective implements OnInit {
   isLoading = true;
   isSaving = false;
   isSavingAndNext = false;
@@ -133,7 +130,9 @@ export class PortalEditColumnsComponent
     '  *',
     '  * @param digitsInfo Decimal representation options, specified by a string',
     '  * in the following format:<br>',
-    '  * <code>{minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}</code>.',
+    '  * ```',
+    '  * {minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}',
+    '  * ```',
     '  *   - `minIntegerDigits`: The minimum number of integer digits before the decimal point.',
     '  * Default is `1`.',
     '  *   - `minFractionDigits`: The minimum number of digits after the decimal point.',
@@ -155,7 +154,9 @@ export class PortalEditColumnsComponent
     '  * @param value The number to be formatted as a percentage.',
     '  * @param digitsInfo Decimal representation options, specified by a string',
     '  * in the following format:<br>',
-    '  * <code>{minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}</code>.',
+    '  * ```',
+    '  * {minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}',
+    '  * ```',
     '  *   - `minIntegerDigits`: The minimum number of integer digits before the decimal point.',
     '  * Default is `1`.',
     '  *   - `minFractionDigits`: The minimum number of digits after the decimal point.',
@@ -167,6 +168,17 @@ export class PortalEditColumnsComponent
     '  * See [Setting your app locale](https://angular.io/guide/i18n-common-locale-id).',
     '  */',
     '       transform(value: number | string, digitsInfo?: string, locale?: string): string | null;',
+    '}',
+    'declare class GuidPipe {',
+    '  /**',
+    '  *',
+    '  * @param value The string to be formatted as a guid.',
+    "  * @param outputFormat The output format of the guid. Default is 's'.",
+    '  *   - `s`: Standard guid format. `{7330F811-F47F-41BC-A4FF-E792D073F41F}`',
+    '  *   - `n`: Standard guid format without braces. `7330F811-F47F-41BC-A4FF-E792D073F41F`',
+    '  *   - `h`: Hex guid format. `11F830737FF4BC41A4FFE792D073F41F`',
+    '  */',
+    "       transform(value: string | null, outputFormat: 's' | 'n' | 'h' = 's'): string | null;",
     '}',
     '/**',
     '* Angular All Pipes. [See more](https://angular.io/api/common#pipes)',
@@ -188,6 +200,10 @@ export class PortalEditColumnsComponent
     '     * Transforms a number to a percentage string, formatted according to locale rules that determine group sizing and separator, decimal-point character, and other locale-specific configurations. [See more](https://angular.io/api/common/PercentPipe)',
     '     */',
     '    static percent:PercentPipe',
+    '    /**',
+    '     * Transforms a guid string to a standard guid, it will detected the input format automatically, and formatted according to the output foramt.',
+    '     */',
+    '    static guid:GuidPipe',
     '}'
   ].join('\n');
 
@@ -375,10 +391,7 @@ export class PortalEditColumnsComponent
     }
   ];
 
-  constructor(
-    private portalItemService: PortalItemService,
-    private notifyService: NotifyService
-  ) {
+  constructor(private portalItemService: PortalItemService, private notifyService: NotifyService) {
     super();
   }
 
@@ -391,11 +404,7 @@ export class PortalEditColumnsComponent
         this.isLoading = false;
         this.targetColumns = res[0]
           .filter(c =>
-            res[1].find(
-              s =>
-                c.type !== 'DataBaseField' ||
-                (s.columnName === c.field && s.filterType === c.filterType)
-            )
+            res[1].find(s => c.type !== 'DataBaseField' || (s.columnName === c.field && s.filterType === c.filterType))
           )
           .map<GridColumn>(x => {
             return {
@@ -453,10 +462,7 @@ export class PortalEditColumnsComponent
 
   valid() {
     if (!this.targetColumns || this.targetColumns.length === 0) {
-      this.notifyService.notifyWarning(
-        'Warning',
-        'Please select at least one field as column.'
-      );
+      this.notifyService.notifyWarning('Warning', 'Please select at least one field as column.');
       return false;
     }
     return true;
@@ -531,8 +537,7 @@ export class PortalEditColumnsComponent
   onAddAttachmentsColumn() {
     let index = 1;
     for (index = 1; index <= 100; index++) {
-      if (!this.targetColumns.find(x => x.field === `ATTACHMENT_${index}`))
-        break;
+      if (!this.targetColumns.find(x => x.field === `ATTACHMENT_${index}`)) break;
     }
     this.targetColumns = [
       {

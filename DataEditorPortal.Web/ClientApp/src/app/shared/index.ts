@@ -24,6 +24,7 @@ import { AttachmentsComponent } from './components/attachments/attachments.compo
 import { LoadingComponent } from './components/loading/loading.component';
 import { DialogFocusDirective } from './directive/dialog-focus.directive';
 import { PTableHighlightRowDirective } from './directive/p-highlight-row.directive';
+import { GuidPipe } from './pipes/guid.pipe';
 import { ConfigDataService, DataFormatService } from './services';
 import { registerNumeral, registerQuill } from './utils';
 
@@ -47,6 +48,7 @@ registerQuill();
     AttachmentsPipe,
     TemplatePipe,
     NumeralPipe,
+    GuidPipe,
     AttachmentsComponent,
     LoadingComponent
   ],
@@ -62,11 +64,12 @@ registerQuill();
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
+    GuidPipe,
     NumeralPipe,
     AttachmentsComponent,
     LoadingComponent
   ],
-  providers: [MessageService, DataFormatService]
+  providers: [MessageService, DataFormatService, GuidPipe]
 })
 export class SharedModule {
   constructor(private configDataService: ConfigDataService) {

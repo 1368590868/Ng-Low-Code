@@ -1,10 +1,6 @@
-import {
-  DatePipe,
-  DecimalPipe,
-  CurrencyPipe,
-  PercentPipe
-} from '@angular/common';
+import { CurrencyPipe, DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
+import { GuidPipe } from '../pipes/guid.pipe';
 
 @Injectable()
 export class DataFormatService {
@@ -13,7 +9,8 @@ export class DataFormatService {
     private datePipe: DatePipe,
     private decimalPipe: DecimalPipe,
     private currencyPipe: CurrencyPipe,
-    private percentPipe: PercentPipe
+    private percentPipe: PercentPipe,
+    private guidPipe: GuidPipe
   ) {}
 
   getFormatters() {
@@ -22,7 +19,8 @@ export class DataFormatService {
       date: this.datePipe,
       number: this.decimalPipe,
       currency: this.currencyPipe,
-      percent: this.percentPipe
+      percent: this.percentPipe,
+      guid: this.guidPipe
     };
   }
 }
