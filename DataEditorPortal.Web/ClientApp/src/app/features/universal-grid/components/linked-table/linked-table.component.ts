@@ -2,6 +2,9 @@ import { AfterViewChecked, Component, Input, OnDestroy, ViewChild } from '@angul
 import { Subscription } from 'rxjs';
 import { GridTableService } from '../../services/grid-table.service';
 import { TableComponent } from '../table/table.component';
+export interface SelectionsType {
+  [key: string]: { [key: string]: any }[];
+}
 
 @Component({
   selector: 'app-linked-table',
@@ -14,7 +17,7 @@ export class LinkedTableComponent implements AfterViewChecked, OnDestroy {
   @Input() primaryTableName!: string;
   @Input() secondaryTableName!: string;
   useAsMasterDetailView = false;
-  convertTableLinkSelect: any = {};
+  selections: SelectionsType = {};
 
   subPrimarySelectionChange: Subscription | undefined;
   subSecondarySelectionChange: Subscription | undefined;
@@ -45,24 +48,24 @@ export class LinkedTableComponent implements AfterViewChecked, OnDestroy {
     }
   }
 
-  onPrimaryRowSelect(event: any) {
-    const kevs = event.map((item: any) => {
+  onPrimaryRowSelect(event = []) {
+    const kevs = event.map(item => {
       return {
         key: item[this.primaryTable.tableConfig.dataKey]
       };
     });
 
-    this.convertTableLinkSelect[this.secondaryTableName] = kevs;
+    this.selections[this.secondaryTableName] = kevs;
   }
 
-  onSecondaryRowSelect(event: any) {
-    const kevs = event.map((item: any) => {
+  onSecondaryRowSelect(event = []) {
+    const kevs = event.map(item => {
       return {
         key: item[this.secondaryTable.tableConfig.dataKey]
       };
     });
 
-    this.convertTableLinkSelect[this.primaryTableName] = kevs;
+    this.selections[this.primaryTableName] = kevs;
   }
 
   selectedPrimaryRow: any;
