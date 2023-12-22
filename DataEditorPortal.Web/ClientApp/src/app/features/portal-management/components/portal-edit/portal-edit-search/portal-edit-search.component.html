@@ -4,7 +4,7 @@
 
   <p-divider styleClass="mt-0 sticky top-0 z-5"></p-divider>
   <div class="scrollable-content">
-    <div class="flex align-items-center">
+    <div class="flex align-items-center" *ngIf="!isLinkedItem">
       <div class="flex align-items-center py-2 mr-4">
         <p-inputSwitch class="mr-2" [(ngModel)]="useExistingSearch"></p-inputSwitch>
         Use Existing Search
@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <div class="w-full pt-2 flex" *ngIf="!useExistingSearch">
+    <div class="w-full pt-2 flex" *ngIf="isLinkedItem || !useExistingSearch">
       <p-pickList
         #pickList
         class="flex-grow-1 mr-3"
