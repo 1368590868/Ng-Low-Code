@@ -22,12 +22,22 @@
   header="Locator Data"
   [(visible)]="visible"
   [style]="{ width: '55rem' }"
+  [modal]="true"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0"
   appendTo="body">
   <div #container class="dialog-content">
-    <p-table [value]="dialogData" [columns]="columns">
+    <p-table
+      [value]="dialogData"
+      [columns]="columns"
+      [rowHover]="true"
+      [selectionMode]="'single'"
+      [(selection)]="selection"
+      (onRowSelect)="onRowSelect($event)"
+      (onRowUnselect)="onRowUnselect($event)"
+      [tableStyle]="{ tableLayout: 'fixed' }">
       <ng-template pTemplate="header" let-columns>
         <tr>
+          <th style="width: 4.6rem; max-width: 4.6rem" pSortableColumn="linked" pFrozenColumn></th>
           <th style="width: 200px" *ngFor="let col of columns">
             <span>{{ col }} </span>
           </th>
@@ -35,6 +45,9 @@
       </ng-template>
       <ng-template pTemplate="body" let-data let-columns="columns">
         <tr>
+          <td pFrozenColumn>
+            <p-tableRadioButton [value]="data" (click)="onRowCheckBoxClick($event)"></p-tableRadioButton>
+          </td>
           <td style="width: 200px" *ngFor="let col of columns">
             <span>{{ data[col] }}</span>
           </td>

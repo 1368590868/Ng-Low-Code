@@ -10,6 +10,8 @@ import {
 } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, ValidationErrors } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyFieldProps, FormlyFormOptions } from '@ngx-formly/core';
+import { map } from 'rxjs';
+import { NotifyService } from 'src/app/shared';
 
 @Component({
   selector: 'app-gps-locator',
@@ -78,6 +80,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     { name: 'test2', value: 'test 1', age: 3 },
     { name: 'test3', value: 'test 1', age: 3 }
   ];
+  selection: any = null;
 
   fields: FormlyFieldConfig[] = [
     {
@@ -116,7 +119,11 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     }
   ];
 
-  constructor(private changeDetectorRef: ChangeDetectorRef, private http: HttpClient) {}
+  constructor(
+    private changeDetectorRef: ChangeDetectorRef,
+    private http: HttpClient,
+    private notifyService: NotifyService
+  ) {}
 
   writeValue(value: any): void {
     this.value = value;
@@ -142,10 +149,10 @@ export class GPSLocatorComponent implements ControlValueAccessor {
       });
       if (method === 'get') {
         // pipe is mock data
-        return this.http.get(api, { params: httpParams });
+        return this.http.get(api, { params: httpParams }).pipe(map((res: any) => res.data));
       } else {
         // pipe is mock data
-        return this.http.post(api, httpParams);
+        return this.http.post(api, httpParams).pipe(map((res: any) => res.data));
       }
     } catch {
       throw new Error('Invalid service config');
@@ -163,18 +170,17 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     this.resultMapping = resultMapping;
     if (this.form.valid) {
       this.onCustomService(apiAddress, method.toLowerCase(), paramMapping).subscribe((res: any) => {
-        console.log(res.data);
-        if (Array.isArray(res.data)) {
-          if (res.data.length > 1) {
+        if (Array.isArray(res)) {
+          if (res.length > 1) {
             this.openDialog();
-            this.dialogData = res.data;
-            this.columns = Object.keys(res.data[0]);
+            this.dialogData = res;
+            this.columns = resultMapping.map((x: any) => x.name);
             this.changeDetectorRef.detectChanges();
           } else {
-            this.changeOutFieldData(res.data);
+            this.changeOutFieldData(res);
           }
         } else {
-          this.changeOutFieldData(res.data);
+          this.changeOutFieldData(res);
         }
       });
     } else {
@@ -184,11 +190,31 @@ export class GPSLocatorComponent implements ControlValueAccessor {
 
   // Change the external filed value by mapping
   changeOutFieldData(val: any) {
-    console.log(val);
+    const { resultMapping } = this.serviceConfig;
+    const data: any = {};
+    resultMapping.forEach((x: any) => {
+      data[x.value] = val[x.name];
+    });
+
+    (this.formControl.parent as FormGroup<any>)?.patchValue(data);
+    this.visible = false;
+  }
+
+  onRowSelect(event: any) {
+    this.selection = event.data;
+  }
+
+  onRowUnselect(event: any) {
+    this.selection = null;
+  }
+
+  onRowCheckBoxClick(event: MouseEvent) {
+    event.stopPropagation();
   }
 
   onOk() {
-    this.changeOutFieldData('table selected data');
+    if (!this.selection) this.notifyService.notifyWarning('Warning', 'Please select a row');
+    else this.changeOutFieldData(this.selection);
   }
 
   openDialog() {
