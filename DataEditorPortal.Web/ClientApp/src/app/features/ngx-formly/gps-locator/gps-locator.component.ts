@@ -127,7 +127,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  onCustomService(api: string, method: 'get' | 'post', params: any[]): any {
+  onCustomService(api: string, method: 'get' | 'post', params: any[] = []): any {
     try {
       const newParams = params.map(x => {
         return { name: x.name, value: this.model[x.value] };
@@ -160,10 +160,10 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   }
 
   onLookupLines() {
-    const { apiAddress, method, params, resultMapping } = this.serviceConfig;
+    const { apiAddress, method, parameterMapping, resultMapping } = this.serviceConfig;
     this.resultMapping = resultMapping;
     if (this.form.valid) {
-      this.onCustomService(apiAddress, method, params).subscribe((res: any) => {
+      this.onCustomService(apiAddress, method, parameterMapping).subscribe((res: any) => {
         if (Array.isArray(res)) {
           if (res.length > 1) {
             this.openDialog();
@@ -206,7 +206,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
 interface ServiceConfig {
   apiAddress: string;
   method: 'get' | 'post';
-  params: { [key: string]: any }[];
+  parameterMapping: { [key: string]: any }[];
   resultMapping: { [key: string]: any }[];
 }
 
