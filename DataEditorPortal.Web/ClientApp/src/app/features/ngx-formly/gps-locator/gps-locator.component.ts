@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, ValidationErrors } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyFieldProps, FormlyFormOptions } from '@ngx-formly/core';
-import { map } from 'rxjs';
 
 @Component({
   selector: 'app-gps-locator',
@@ -71,9 +70,14 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   disabled = false;
   model: any = {};
   resultMapping!: any;
+  columns: any[] = ['name', 'value', 'age'];
 
   visible = false;
-  dialogData: any[] = [];
+  dialogData: any[] = [
+    { name: 'test', value: 'test 1', age: 3 },
+    { name: 'test2', value: 'test 1', age: 3 },
+    { name: 'test3', value: 'test 1', age: 3 }
+  ];
 
   fields: FormlyFieldConfig[] = [
     {
@@ -127,7 +131,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  onCustomService(api: string, method: 'get' | 'post', params: any[] = []): any {
+  onCustomService(api: string, method: string, params: any[] = []): any {
     try {
       const newParams = params.map(x => {
         return { name: x.name, value: this.model[x.value] };
@@ -138,15 +142,10 @@ export class GPSLocatorComponent implements ControlValueAccessor {
       });
       if (method === 'get') {
         // pipe is mock data
-        return this.http.get(api, { params: httpParams }).pipe(
-          map(() => [
-            { name1: 3, name2: 4 },
-            { name1: 6, name2: 8 }
-          ])
-        );
+        return this.http.get(api, { params: httpParams });
       } else {
         // pipe is mock data
-        return this.http.post(api, httpParams).pipe(map(() => ({ name1: 3, name2: 4 })));
+        return this.http.post(api, httpParams);
       }
     } catch {
       throw new Error('Invalid service config');
@@ -160,20 +159,22 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   }
 
   onLookupLines() {
-    const { apiAddress, method, parameterMapping, resultMapping } = this.serviceConfig;
+    const { apiAddress, method, paramMapping, resultMapping } = this.serviceConfig;
     this.resultMapping = resultMapping;
     if (this.form.valid) {
-      this.onCustomService(apiAddress, method, parameterMapping).subscribe((res: any) => {
-        if (Array.isArray(res)) {
-          if (res.length > 1) {
+      this.onCustomService(apiAddress, method.toLowerCase(), paramMapping).subscribe((res: any) => {
+        console.log(res.data);
+        if (Array.isArray(res.data)) {
+          if (res.data.length > 1) {
             this.openDialog();
-            this.dialogData = res;
+            this.dialogData = res.data;
+            this.columns = Object.keys(res.data[0]);
             this.changeDetectorRef.detectChanges();
           } else {
-            this.changeOutFieldData(res);
+            this.changeOutFieldData(res.data);
           }
         } else {
-          this.changeOutFieldData(res);
+          this.changeOutFieldData(res.data);
         }
       });
     } else {
@@ -205,8 +206,8 @@ export class GPSLocatorComponent implements ControlValueAccessor {
 
 interface ServiceConfig {
   apiAddress: string;
-  method: 'get' | 'post';
-  parameterMapping: { [key: string]: any }[];
+  method: 'GET' | 'POST';
+  paramMapping: { [key: string]: any }[];
   resultMapping: { [key: string]: any }[];
 }
 
@@ -235,6 +236,7 @@ export class FormlyFieldGPSLocatorComponent
       FormlyFieldProps & {
         dirty: boolean;
         serviceConfig: ServiceConfig;
+        mappingColumns: { [key: string]: any }[];
       }
     >
   >

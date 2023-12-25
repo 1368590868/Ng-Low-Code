@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { TableModule } from 'primeng/table';
 import { FormlyFieldGPSLocatorComponent, GPSLocatorComponent } from './gps-locator.component';
 @NgModule({
   declarations: [GPSLocatorComponent, FormlyFieldGPSLocatorComponent],
@@ -17,6 +18,7 @@ import { FormlyFieldGPSLocatorComponent, GPSLocatorComponent } from './gps-locat
     InputNumberModule,
     ButtonModule,
     DialogModule,
+    TableModule,
     FormlyModule.forChild({
       types: [
         {
