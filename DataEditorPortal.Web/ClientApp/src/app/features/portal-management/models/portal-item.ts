@@ -164,3 +164,13 @@ export interface ImportPortal {
   type: string;
   exist: boolean;
 }
+
+export interface FieldControlType {
+  label: string;
+  value: string;
+  filterType: string;
+  isCustom?: boolean;
+  initialConfig?: {
+    [key: string]: any;
+  };
+}

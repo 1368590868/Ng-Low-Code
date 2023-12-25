@@ -2,14 +2,10 @@ import { Directive, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { distinctUntilChanged, startWith, tap } from 'rxjs';
-import { DataSourceTableColumn, GridFormField } from '../models/portal-item';
+import { DataSourceTableColumn, FieldControlType, GridFormField } from '../models/portal-item';
 import { PortalItemService } from '../services/portal-item.service';
 
-export const FROM_DESIGNER_CONTROLS: {
-  label: string;
-  value: string;
-  filterType: string;
-}[] = [
+export const FROM_DESIGNER_CONTROLS: FieldControlType[] = [
   {
     label: 'Checkbox',
     value: 'checkbox',
@@ -63,17 +59,27 @@ export const FROM_DESIGNER_CONTROLS: {
   {
     label: 'Link Data Editor',
     value: 'linkDataEditor',
-    filterType: 'linkDataField'
+    filterType: 'linkDataField',
+    isCustom: true
   },
   {
     label: 'Location Editor',
     value: 'locationEditor',
-    filterType: 'locationField'
+    filterType: 'locationField',
+    isCustom: true,
+    initialConfig: {
+      fromLabel: 'From',
+      fromMeasureLabel: 'From Measure',
+      toLabel: 'To',
+      toMeasureLabel: 'To Measure',
+      locationType: 2
+    }
   },
   {
     label: 'GPS Locator',
     value: 'gpsLocator',
-    filterType: 'gpsLocatorField'
+    filterType: 'gpsLocatorField',
+    isCustom: true
   }
 ];
 
@@ -557,8 +563,7 @@ export class FormDesignerDirective {
   ];
 
   constructor(
-    @Inject('FROM_DESIGNER_CONTROLS')
-    public controls: any[],
+    @Inject('FROM_DESIGNER_CONTROLS') public controls: FieldControlType[],
     public portalItemService: PortalItemService
   ) {}
 
