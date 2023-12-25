@@ -251,21 +251,5 @@ export class FormlyFieldGPSLocatorComponent
       }
       return null;
     });
-
-    // mock service config data
-    this.props.serviceConfig = {
-      apiAddress: 'https://localhost:5001/api/PortalManagement/GetLines',
-      method: 'post',
-      params: [
-        { name: 'fromX', value: 'beginX' },
-        { name: 'fromY', value: 'beginY' },
-        { name: 'toX', value: 'endX' },
-        { name: 'toY', value: 'endY' }
-      ],
-      resultMapping: [
-        { name: 'name1', value: 'FIRST_NAME' },
-        { name: 'name2', value: 'NAME' }
-      ]
-    };
   }
 }
