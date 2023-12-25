@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { GridTableService } from '../services/grid-table.service';
 
 @Component({
@@ -20,13 +20,14 @@ export class LinkedOrMasterComponent implements OnInit {
   secondaryTableName!: string;
   useAsMasterDetailView = false;
 
-  constructor(private gridTableService: GridTableService) {}
+  constructor(private gridTableService: GridTableService, private cdf: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.gridTableService.getLinkedTableConfig(this.gridName).subscribe(res => {
       this.primaryTableName = res.primaryTableName;
       this.secondaryTableName = res.secondaryTableName;
       this.useAsMasterDetailView = res.useAsMasterDetailView;
+      this.cdf.detectChanges();
     });
   }
 }

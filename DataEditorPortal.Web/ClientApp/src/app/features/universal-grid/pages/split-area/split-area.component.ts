@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { trigger, style, animate, transition, state } from '@angular/animations';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 import { ConfigDataService } from 'src/app/shared';
 
 @Component({
@@ -34,11 +34,10 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
   itemType = '';
   gridName = '';
 
-  constructor(
-    private route: ActivatedRoute,
-    private changeDetectorRef: ChangeDetectorRef,
-    public configDataService: ConfigDataService
-  ) {}
+  constructor(private route: ActivatedRoute, public configDataService: ConfigDataService) {
+    this.itemType = this.route.snapshot.data['type'];
+    this.gridName = this.route.snapshot.data['name'];
+  }
 
   ngOnInit() {
     const storage = this.getStorage();
@@ -54,16 +53,6 @@ export class SplitAreaComponent implements OnInit, OnDestroy {
         this.configDataService.sidebarCollapsed = true;
       }
     }
-
-    // get item type from route
-    this.route.data.pipe(takeUntil(this.destroy$)).subscribe(data => {
-      this.itemType = data['type'];
-
-      this.gridName = '';
-      this.changeDetectorRef.detectChanges();
-      this.gridName = data['name'];
-      this.changeDetectorRef.detectChanges();
-    });
   }
 
   ngOnDestroy() {
