@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GpsLocatorServiceConfigComponent } from './gps-locator-service-config.component';
+import { GPSLocatorServiceConfigComponent } from './gps-locator-service-config.component';
 
-describe('GpsLocatorConfigurationComponent', () => {
-  let component: GpsLocatorServiceConfigComponent;
-  let fixture: ComponentFixture<GpsLocatorServiceConfigComponent>;
+describe('GPSLocatorConfigurationComponent', () => {
+  let component: GPSLocatorServiceConfigComponent;
+  let fixture: ComponentFixture<GPSLocatorServiceConfigComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [GpsLocatorServiceConfigComponent]
+      declarations: [GPSLocatorServiceConfigComponent]
     });
-    fixture = TestBed.createComponent(GpsLocatorServiceConfigComponent);
+    fixture = TestBed.createComponent(GPSLocatorServiceConfigComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

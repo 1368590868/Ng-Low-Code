@@ -5,9 +5,9 @@ import { FormlyModule } from '@ngx-formly/core';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { FormlyFieldGpsLocatorComponent, GpsLocatorComponent } from './gps-locator.component';
+import { FormlyFieldGPSLocatorComponent, GPSLocatorComponent } from './gps-locator.component';
 @NgModule({
-  declarations: [GpsLocatorComponent, FormlyFieldGpsLocatorComponent],
+  declarations: [GPSLocatorComponent, FormlyFieldGPSLocatorComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -19,11 +19,11 @@ import { FormlyFieldGpsLocatorComponent, GpsLocatorComponent } from './gps-locat
       types: [
         {
           name: 'gpsLocator',
-          component: FormlyFieldGpsLocatorComponent,
+          component: FormlyFieldGPSLocatorComponent,
           wrappers: ['form-field']
         }
       ]
     })
   ]
 })
-export class FormlyGpsLocatorModule {}
+export class FormlyGPSLocatorModule {}

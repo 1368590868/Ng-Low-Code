@@ -19,17 +19,17 @@ type ValueModel = {
   providers: [
     {
       provide: CUSTOM_ELEMENTS_SCHEMA,
-      useExisting: GpsLocatorServiceConfigComponent,
+      useExisting: GPSLocatorServiceConfigComponent,
       multi: true
     },
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => GpsLocatorServiceConfigComponent),
+      useExisting: forwardRef(() => GPSLocatorServiceConfigComponent),
       multi: true
     }
   ]
 })
-export class GpsLocatorServiceConfigComponent {
+export class GPSLocatorServiceConfigComponent {
   @Input()
   set value(val: ValueModel) {
     if (!val) {

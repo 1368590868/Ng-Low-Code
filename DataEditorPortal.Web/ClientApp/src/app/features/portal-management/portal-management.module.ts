@@ -62,8 +62,8 @@ import {
   FormlyFieldOptionsEditorComponent,
   FormlyFieldSearchRuleEditorComponent,
   FormlyFieldValidatorEditorComponent,
-  GpsLocatorFieldsConfigComponent,
-  GpsLocatorServiceConfigComponent,
+  GPSLocatorFieldsConfigComponent,
+  GPSLocatorServiceConfigComponent,
   LocationConfigurationComponent,
   OptionDialogComponent,
   PortalEditBasicComponent,
@@ -123,8 +123,8 @@ import { PortalManagementRoutingModule } from './portal-management-routing.modul
     FileUploadConfigurationComponent,
     LocationConfigurationComponent,
     ImportDialogComponent,
-    GpsLocatorServiceConfigComponent,
-    GpsLocatorFieldsConfigComponent
+    GPSLocatorServiceConfigComponent,
+    GPSLocatorFieldsConfigComponent
   ],
   imports: [
     CoreModule,

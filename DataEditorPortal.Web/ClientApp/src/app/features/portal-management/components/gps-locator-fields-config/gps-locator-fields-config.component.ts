@@ -10,17 +10,17 @@ import { DataSourceTableColumn } from '../../models/portal-item';
   providers: [
     {
       provide: CUSTOM_ELEMENTS_SCHEMA,
-      useExisting: GpsLocatorFieldsConfigComponent,
+      useExisting: GPSLocatorFieldsConfigComponent,
       multi: true
     },
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => GpsLocatorFieldsConfigComponent),
+      useExisting: forwardRef(() => GPSLocatorFieldsConfigComponent),
       multi: true
     }
   ]
 })
-export class GpsLocatorFieldsConfigComponent {
+export class GPSLocatorFieldsConfigComponent {
   @Input()
   set value(val: any) {
     if (!val) {

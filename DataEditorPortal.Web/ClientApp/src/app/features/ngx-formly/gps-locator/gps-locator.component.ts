@@ -17,18 +17,18 @@ import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyFieldProps, Formly
   providers: [
     {
       provide: CUSTOM_ELEMENTS_SCHEMA,
-      useExisting: GpsLocatorComponent,
+      useExisting: GPSLocatorComponent,
       multi: true
     },
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => GpsLocatorComponent),
+      useExisting: forwardRef(() => GPSLocatorComponent),
       multi: true
     }
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GpsLocatorComponent implements ControlValueAccessor {
+export class GPSLocatorComponent implements ControlValueAccessor {
   @Input()
   set dirty(val: boolean) {
     if (val) this.fields.forEach(x => x.formControl?.markAsDirty());
@@ -153,7 +153,7 @@ export class GpsLocatorComponent implements ControlValueAccessor {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldGpsLocatorComponent
+export class FormlyFieldGPSLocatorComponent
   extends FieldType<
     FieldTypeConfig<
       FormlyFieldProps & {

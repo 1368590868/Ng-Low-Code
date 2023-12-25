@@ -8,7 +8,7 @@ import { FormlyDividerWrapperModule } from './divider';
 import { FormlyFileUploadModule } from './file-upload/file-upload.modules';
 import { FormlyFormFieldMultipleModule } from './form-field-multiple/form-field-multiple.module';
 import { FormlyFormFieldModule } from './form-field/form-field.module';
-import { FormlyGpsLocatorModule } from './gps-locator/gps-locator.modules';
+import { FormlyGPSLocatorModule } from './gps-locator/gps-locator.modules';
 import { FormlyIconSelectModule } from './iconselect';
 import { FormlyInputMaskModule } from './inputMask';
 import { FormlyInputNumberModule } from './inputnumber';
@@ -41,7 +41,7 @@ import { UniversalRegexpModule } from './universalregexp';
     FormlyFormFieldMultipleModule,
     FormlyLinkDataEditorModule,
     FormlyLocationEditorModule,
-    FormlyGpsLocatorModule
+    FormlyGPSLocatorModule
   ],
   declarations: []
 })
