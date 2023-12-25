@@ -1,7 +1,16 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { DataSourceTableColumn } from '../../models/portal-item';
+
+type FieldMapping = { name: string | null; value: string | null };
+type FC<T> = { [P in keyof T]: FormControl<T[P]> };
+type ValueModel = {
+  apiAddress: string | null;
+  method: string;
+  paramMapping: FieldMapping[];
+  resultMapping: FieldMapping[];
+};
 
 @Component({
   selector: 'app-gps-locator-service-config',
@@ -22,21 +31,35 @@ import { DataSourceTableColumn } from '../../models/portal-item';
 })
 export class GpsLocatorServiceConfigComponent {
   @Input()
-  set value(val: any) {
+  set value(val: ValueModel) {
     if (!val) {
       this.innerValue = null;
       return;
     }
     this.innerValue = val;
 
-    const newVal = JSON.parse(JSON.stringify(val || null));
-    if (newVal) {
-      // this.formControlFrom.setValue(val?.from);
-      // this.formControlFromMeasure.setValue(val?.fromMeasure);
-      // this.formControlTo.setValue(val?.to);
-      // this.formControlToMeasure.setValue(val?.toMeasure);
-    }
+    const newVal = JSON.parse(JSON.stringify(val || null)) as ValueModel;
+    this.createFormGroup(newVal);
   }
+  @Input()
+  set mappingColumns(val: DataSourceTableColumn[]) {
+    this.filedMapping = val.map(x => {
+      return {
+        label: x.columnName,
+        value: x.columnName
+      };
+    });
+  }
+  filedMapping!: { label: string; value: string }[];
+
+  constructor(private formBuilder: FormBuilder) {}
+
+  formGroup!: FormGroup<{
+    apiAddress: FormControl<string | null>;
+    method: FormControl<string>;
+    paramMapping: FormArray<FormGroup<FC<FieldMapping>>>;
+    resultMapping: FormArray<FormGroup<FC<FieldMapping>>>;
+  }>;
 
   visible = false;
   onChange?: any;
@@ -81,41 +104,64 @@ export class GpsLocatorServiceConfigComponent {
     if (!this.onValid()) {
       return;
     }
-    const data = {
-      // from: this.formControlFrom.value,
-      // fromMeasure: this.formControlFromMeasure.value,
-      // to: this.formControlTo.value,
-      // toMeasure: this.formControlToMeasure.value
-    };
-
-    // switch (this.locationType) {
-    //   case 2: {
-    //     data.to = null;
-    //     data.toMeasure = null;
-    //     break;
-    //   }
-    // }
-
+    const data = this.formGroup.getRawValue();
     this.onChange?.(data);
     this.innerValue = data;
     this.visible = false;
   }
 
   onValid() {
-    // this.formControlFromMeasure.markAsDirty();
-    // this.formControlFrom.markAsDirty();
-    // this.formControlToMeasure.markAsDirty();
-    // this.formControlTo.markAsDirty();
-    // if (!this.formControlFromMeasure.valid || !this.formControlFrom.valid) {
-    //   return false;
-    // }
-    // if (this.locationType === 3 && !this.formControlToMeasure.valid) {
-    //   return false;
-    // }
-    // if (this.locationType === 4) {
-    //   if (!this.formControlToMeasure.valid || !this.formControlTo.valid) return false;
-    // }
-    return true;
+    this.formGroup.markAllAsTouched();
+    return this.formGroup.valid;
+  }
+
+  createFormGroup(data?: ValueModel) {
+    const paramMapping = data?.paramMapping || [];
+    const resultMapping = data?.resultMapping || [];
+
+    const formGroup = this.formBuilder.group({
+      apiAddress: this.formBuilder.control(data?.apiAddress || null, Validators.required),
+      method: this.formBuilder.control(data?.method || 'GET', { nonNullable: true, validators: Validators.required }),
+      paramMapping: this.formBuilder.array(paramMapping.map(x => this.createMappingFormGroup(x))),
+      resultMapping: this.formBuilder.array(resultMapping.map(x => this.createMappingFormGroup(x)))
+    });
+
+    this.formGroup = formGroup;
+  }
+
+  createMappingFormGroup(data?: FieldMapping) {
+    return this.formBuilder.group({
+      name: this.formBuilder.control(data?.name || null, { validators: Validators.required }),
+      value: this.formBuilder.control(data?.value || null, { validators: Validators.required })
+    });
+  }
+
+  // param mapping
+  get params() {
+    return this.formGroup.controls.paramMapping;
+  }
+
+  addParam() {
+    const param = this.createMappingFormGroup();
+    this.params.push(param);
+  }
+
+  deleteParam(index: number) {
+    this.params.removeAt(index);
+  }
+
+  // result mapping
+  get resultMappings() {
+    return this.formGroup.controls.resultMapping;
+  }
+
+  addResultMapping() {
+    const mapping = this.createMappingFormGroup();
+    this.resultMappings.push(mapping);
+  }
+
+  deleteResultMapping(index: number) {
+    this.resultMappings.removeAt(index);
   }
 }
 
@@ -123,7 +169,8 @@ export class GpsLocatorServiceConfigComponent {
   selector: 'app-formly-gps-locator-service-config',
   template: ` <app-gps-locator-service-config
     [formControl]="formControl"
-    [formlyAttributes]="field"></app-gps-locator-service-config>`,
+    [formlyAttributes]="field"
+    [mappingColumns]="props.mappingColumns || []"></app-gps-locator-service-config>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldGPSLocatorServiceConfigComponent extends FieldType<

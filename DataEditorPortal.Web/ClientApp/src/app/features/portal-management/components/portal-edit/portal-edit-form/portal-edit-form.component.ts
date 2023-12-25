@@ -2,10 +2,10 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 import { FormLayoutDeleteComponent } from '../..';
-import { GridFormConfig, DataSourceTableColumn, GirdDetailConfig } from '../../../models/portal-item';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
+import { DataSourceTableColumn, GirdDetailConfig, GridFormConfig } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
 import { FormLayoutComponent } from './form-layout/form-layout.component';
-import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 
 @Component({
   selector: 'app-portal-edit-form',
@@ -83,7 +83,7 @@ export class PortalEditFormComponent extends PortalEditStepDirective implements 
     if (config && config.formFields) {
       config.formFields = config.formFields.filter(
         c =>
-          ['locationField', 'linkDataField'].indexOf(c.filterType) >= 0 ||
+          ['locationField', 'linkDataField', 'gpsLocatorField'].indexOf(c.filterType) >= 0 ||
           dbCols.find(s => s.columnName === c.key && s.filterType === c.filterType)
       );
     }

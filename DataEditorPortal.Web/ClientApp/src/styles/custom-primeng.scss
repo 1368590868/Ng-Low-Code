@@ -241,6 +241,49 @@ formly-form {
   }
 }
 
-p-dropdown.ng-dirty.ng-invalid > .p-dropdown {
-  @include invalid-input();
+/* primeNg validation error style */
+p-autocomplete.ng-touched.ng-invalid > .p-autocomplete > .p-inputtext {
+  border-color: var(--invalid-color);
+}
+p-calendar.ng-touched.ng-invalid > .p-calendar > .p-inputtext {
+  border-color: var(--invalid-color);
+}
+p-cascadeselect.ng-touched.ng-invalid > .p-cascadeselect {
+  border-color: var(--invalid-color);
+}
+p-checkbox.ng-touched.ng-invalid > .p-checkbox > .p-checkbox-box {
+  border-color: var(--invalid-color);
+}
+p-chips.ng-touched.ng-invalid > .p-chips > .p-inputtext {
+  border-color: var(--invalid-color);
+}
+p-inputmask.ng-touched.ng-invalid > .p-inputtext {
+  border-color: var(--invalid-color);
+}
+p-inputnumber.ng-touched.ng-invalid > .p-inputnumber > .p-inputtext {
+  border-color: var(--invalid-color);
+}
+p-inputswitch.ng-touched.ng-invalid > .p-inputswitch {
+  border-color: var(--invalid-color);
+}
+.p-inputtext.ng-touched.ng-invalid {
+  border-color: var(--invalid-color);
+}
+p-listbox.ng-touched.ng-invalid > .p-listbox {
+  border-color: var(--invalid-color);
+}
+p-multiselect.ng-touched.ng-invalid > .p-multiselect {
+  border-color: var(--invalid-color);
+}
+p-radiobutton.ng-touched.ng-invalid > .p-radiobutton > .p-radiobutton-box {
+  border-color: var(--invalid-color);
+}
+p-selectbutton.ng-touched.ng-invalid > .p-selectbutton > .p-button {
+  border-color: var(--invalid-color);
+}
+p-togglebutton.ng-touched.ng-invalid > .p-togglebutton.p-button {
+  border-color: var(--invalid-color);
+}
+p-dropdown.ng-touched.ng-invalid > .p-dropdown.p-component {
+  border-color: var(--invalid-color);
 }

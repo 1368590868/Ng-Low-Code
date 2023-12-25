@@ -10,7 +10,7 @@
 
     <p-button
       *ngIf="innerValue"
-      [outlined]="true"
+      [text]="true"
       [rounded]="true"
       styleClass="remove-btn"
       icon="pi pi-times-circle"
@@ -20,13 +20,103 @@
   <p-button *ngIf="!innerValue" [outlined]="true" (onClick)="showDialog()">Configure</p-button>
 </div>
 <p-dialog
+  *ngIf="formGroup"
   [(visible)]="visible"
   [style]="{ minWidth: '50rem' }"
   [modal]="true"
-  header="Fields Mapping"
+  header="Service confguraiton"
   appendTo="body"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0">
-  <div #container class="dialog-content"></div>
+  <div #container class="dialog-content">
+    <div [formGroup]="formGroup">
+      <div class="flex align-items-center mb-3 -mx-2">
+        <div class="flex flex-column px-2 w-9">
+          <label for="" class="mb-1">Service Address</label>
+          <input type="text" pInputText placeholder="https://api.example.com/service" formControlName="apiAddress" />
+        </div>
+        <div class="flex flex-column px-2 w-3">
+          <label for="tableName" class="mb-1">Method</label>
+          <p-dropdown
+            formControlName="method"
+            class="mr-1 flex-grow-1"
+            styleClass="w-full"
+            appendTo="body"
+            placeholder="Please Select"
+            [options]="['GET', 'POST']">
+          </p-dropdown>
+        </div>
+      </div>
+      <p-divider styleClass="font-medium mt-4">Parameter Mapping</p-divider>
+      <ng-container formArrayName="paramMapping">
+        <div
+          class="flex align-items-center mb-3 -mx-2"
+          *ngFor="let param of formGroup.controls.paramMapping.controls; let i = index">
+          <ng-container [formGroup]="param">
+            <div class="flex flex-column px-2 w-5">
+              <label *ngIf="i === 0" class="mb-1">Name</label>
+              <input type="text" pInputText placeholder="Parameter name" formControlName="name" />
+            </div>
+            <div class="flex flex-column px-2 w-5">
+              <label *ngIf="i === 0" class="mb-1">Value from</label>
+              <p-dropdown
+                formControlName="value"
+                class="mr-1 flex-grow-1"
+                styleClass="w-full"
+                appendTo="body"
+                placeholder="Please Select"
+                [options]="filedMapping">
+              </p-dropdown>
+            </div>
+            <div class="flex flex-column px-2 w-2">
+              <label *ngIf="i === 0" class="mb-1">&nbsp;</label>
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                [rounded]="true"
+                [text]="true"
+                (onClick)="deleteParam(i)"></p-button>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+      <p-button label="Add" icon="pi pi-plus" styleClass="mb-2" [outlined]="true" (onClick)="addParam()"></p-button>
+
+      <p-divider styleClass="font-medium">Result Mapping</p-divider>
+      <ng-container formArrayName="resultMapping">
+        <div
+          class="flex align-items-center mb-3 -mx-2"
+          *ngFor="let result of formGroup.controls.resultMapping.controls; let i = index">
+          <ng-container [formGroup]="result">
+            <div class="flex flex-column px-2 w-5">
+              <label *ngIf="i === 0" class="mb-1">Name</label>
+              <input type="text" pInputText placeholder="Property name" formControlName="name" />
+            </div>
+            <div class="flex flex-column px-2 w-5">
+              <label *ngIf="i === 0" class="mb-1">Value to update</label>
+              <p-dropdown
+                formControlName="value"
+                class="mr-1 flex-grow-1"
+                styleClass="w-full"
+                appendTo="body"
+                placeholder="Please Select"
+                [options]="filedMapping">
+              </p-dropdown>
+            </div>
+            <div class="flex flex-column px-2 w-2">
+              <label *ngIf="i === 0" class="mb-1">&nbsp;</label>
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                [rounded]="true"
+                [text]="true"
+                (onClick)="deleteResultMapping(i)"></p-button>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+      <p-button label="Add" icon="pi pi-plus" [outlined]="true" (onClick)="addResultMapping()"></p-button>
+    </div>
+  </div>
   <ng-template pTemplate="footer">
     <p-button icon="pi pi-times" label="Cancel" [text]="true" (onClick)="visible = false"></p-button>
     <p-button icon="pi pi-check" label="Ok" (onClick)="onSave()"></p-button>
