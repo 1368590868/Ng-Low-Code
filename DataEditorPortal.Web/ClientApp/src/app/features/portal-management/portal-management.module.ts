@@ -56,10 +56,14 @@ import {
   FormLayoutDeleteComponent,
   FormlyFieldComputedValueEditorComponent,
   FormlyFieldFileUploadConfigurationComponent,
+  FormlyFieldGPSLocatorFieldsConfigComponent,
+  FormlyFieldGPSLocatorServiceConfigComponent,
   FormlyFieldLocationConfigurationComponent,
   FormlyFieldOptionsEditorComponent,
   FormlyFieldSearchRuleEditorComponent,
   FormlyFieldValidatorEditorComponent,
+  GpsLocatorFieldsConfigComponent,
+  GpsLocatorServiceConfigComponent,
   LocationConfigurationComponent,
   OptionDialogComponent,
   PortalEditBasicComponent,
@@ -100,23 +104,27 @@ import { PortalManagementRoutingModule } from './portal-management-routing.modul
     FormlyFieldOptionsEditorComponent,
     FormlyFieldSearchRuleEditorComponent,
     FormlyFieldValidatorEditorComponent,
+    FormlyFieldGPSLocatorFieldsConfigComponent,
+    FormlyFieldGPSLocatorServiceConfigComponent,
+    FormlyFieldLocationConfigurationComponent,
+    FormlyFieldFileUploadConfigurationComponent,
+    FormlyFieldComputedValueEditorComponent,
     FormDesignerViewComponent,
     FormDesignerConfigComponent,
     SearchDesignerConfigComponent,
     ValidatorEditorComponent,
     FormLayoutComponent,
     ComputedValueEditorComponent,
-    FormlyFieldComputedValueEditorComponent,
     AdvancedQueryDialogComponent,
     FormLayoutDeleteComponent,
     EventConfigComponent,
     PortalEditLinkComponent,
     PortalEditBasicSubComponent,
     FileUploadConfigurationComponent,
-    FormlyFieldFileUploadConfigurationComponent,
     LocationConfigurationComponent,
-    FormlyFieldLocationConfigurationComponent,
-    ImportDialogComponent
+    ImportDialogComponent,
+    GpsLocatorServiceConfigComponent,
+    GpsLocatorFieldsConfigComponent
   ],
   imports: [
     CoreModule,
@@ -157,6 +165,21 @@ import { PortalManagementRoutingModule } from './portal-management-routing.modul
         {
           name: 'locationConfig',
           component: FormlyFieldLocationConfigurationComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'gpsLocator',
+          component: FormlyFieldOptionsEditorComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'gpsLocatorFieldsConfig',
+          component: FormlyFieldGPSLocatorFieldsConfigComponent,
+          wrappers: ['form-field']
+        },
+        {
+          name: 'gpsLocatorServiceConfig',
+          component: FormlyFieldGPSLocatorServiceConfigComponent,
           wrappers: ['form-field']
         }
       ]

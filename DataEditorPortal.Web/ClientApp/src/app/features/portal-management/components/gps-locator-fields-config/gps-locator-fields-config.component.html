@@ -1,0 +1,34 @@
+<div class="flex align-items-center justify-content-between">
+  <div class="flex">
+    <p-message *ngIf="!innerValue" class="cursor-pointer" severity="warn" text="Not Configured"></p-message>
+    <p-message
+      *ngIf="innerValue"
+      class="cursor-pointer"
+      severity="success"
+      text="Configured"
+      (click)="showDialog()"></p-message>
+
+    <p-button
+      *ngIf="innerValue"
+      [outlined]="true"
+      [rounded]="true"
+      styleClass="remove-btn"
+      icon="pi pi-times-circle"
+      (onClick)="removeConfig()"></p-button>
+  </div>
+
+  <p-button *ngIf="!innerValue" [outlined]="true" (onClick)="showDialog()">Configure</p-button>
+</div>
+<p-dialog
+  [(visible)]="visible"
+  [style]="{ minWidth: '50rem' }"
+  [modal]="true"
+  header="Fields Mapping"
+  appendTo="body"
+  contentStyleClass="border-top-1 surface-border pt-4 pb-0">
+  <div #container class="dialog-content"></div>
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-times" label="Cancel" [text]="true" (onClick)="visible = false"></p-button>
+    <p-button icon="pi pi-check" label="Ok" (onClick)="onSave()"></p-button>
+  </ng-template>
+</p-dialog>

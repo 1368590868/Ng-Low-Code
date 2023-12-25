@@ -1,7 +1,7 @@
 import { Directive, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
-import { startWith, distinctUntilChanged, tap } from 'rxjs';
+import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { distinctUntilChanged, startWith, tap } from 'rxjs';
 import { DataSourceTableColumn, GridFormField } from '../models/portal-item';
 import { PortalItemService } from '../services/portal-item.service';
 
@@ -69,6 +69,11 @@ export const FROM_DESIGNER_CONTROLS: {
     label: 'Location Editor',
     value: 'locationEditor',
     filterType: 'locationField'
+  },
+  {
+    label: 'GPS Locator',
+    value: 'gpsLocator',
+    filterType: 'gpsLocatorField'
   }
 ];
 
@@ -473,6 +478,67 @@ export class FormDesignerDirective {
           ],
           expressions: {
             hide: `'locationEditor' !== field.parent.parent.model.type`
+          }
+        },
+        // props for gps locator
+        {
+          fieldGroup: [
+            {
+              key: 'mappingColumns',
+              type: 'gpsLocatorFieldsConfig',
+              props: {
+                label: 'Fields Mapping',
+                description: 'Set GPS fields mapping'
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dbColumns) {
+                    field.props.mappingColumns = this.dbColumns;
+                  }
+                }
+              }
+            },
+            {
+              key: 'serviceConfig',
+              type: 'gpsLocatorServiceConfig',
+              props: {
+                label: 'GPS Service Config',
+                description: 'Set gps service and fields mapping'
+              },
+              hooks: {
+                onInit: (field: any) => {
+                  if (this.dbColumns) {
+                    field.props.mappingColumns = this.dbColumns;
+                  }
+                }
+              }
+            }
+            // {
+            //   wrappers: ['divider']
+            // },
+            // {
+            //   key: 'apiAddress',
+            //   type: 'input',
+            //   props: {
+            //     label: 'Service Address'
+            //   }
+            // },
+            // {
+            //   key: 'apiMethod',
+            //   type: 'select',
+            //   defaultValue: 'GET',
+            //   props: {
+            //     label: 'Method',
+            //     required: true,
+            //     options: [
+            //       { label: 'GET', value: 'GET' },
+            //       { label: 'POST', value: 'POST' }
+            //     ]
+            //   }
+            // }
+          ],
+          expressions: {
+            hide: `'gpsLocator' !== field.parent.parent.model.type`
           }
         },
         {

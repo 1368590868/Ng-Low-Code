@@ -3,8 +3,8 @@ import { FormControl } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
 import {
-  GridFormConfig,
   DataSourceTableColumn,
+  GridFormConfig,
   GridFormField
 } from 'src/app/features/portal-management/models/portal-item';
 import { GridActionConfig } from 'src/app/features/universal-grid-action';
@@ -93,6 +93,13 @@ export class FormLayoutComponent {
       icon: 'pi pi-fw pi-bars',
       command: () => {
         this.onAddCustomControl('locationField');
+      }
+    },
+    {
+      label: 'GPS Locator',
+      icon: 'pi pi-fw pi-bars',
+      command: () => {
+        this.onAddCustomControl('gpsLocatorField');
       }
     }
   ];
