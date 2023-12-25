@@ -17,3 +17,21 @@
     (onClick)="onLookupLines()"></p-button>
   <p-button icon="pi pi-link" [outlined]="true" label="Show Lines" (onClick)="onShowLines()"></p-button>
 </div>
+
+<p-dialog
+  header="Locator Data"
+  [(visible)]="visible"
+  [modal]="true"
+  contentStyleClass="border-top-1 surface-border pt-4 pb-0"
+  appendTo="body">
+  <div #container class="dialog-content">
+    <!-- replace Table UI -->
+    <div *ngFor="let data of dialogData" class="mt-3">
+      {{ data | json }}
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-times" (onClick)="onCancel()" [label]="'Cancel'" [text]="true"></p-button>
+    <p-button icon="pi pi-check" (onClick)="onOk()" [label]="'Ok'"></p-button>
+  </ng-template>
+</p-dialog>
