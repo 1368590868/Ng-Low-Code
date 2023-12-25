@@ -1,0 +1,52 @@
+:host {
+  form > formly-form {
+    &.gps-wrapper {
+      ::ng-deep {
+        & > formly-field > formly-group > formly-field {
+          .p-field {
+            margin-bottom: 1rem !important;
+          }
+        }
+
+        formly-validation-message {
+          display: none;
+        }
+
+        & > formly-field > formly-group {
+          display: flex;
+          flex-flow: row wrap;
+          justify-self: flex-end;
+          .left-columns {
+            width: 70%;
+            app-formly-field-primeng-input-number {
+              width: 42%;
+              margin-left: 17%;
+            }
+          }
+
+          .right-columns {
+            width: 30%;
+            app-formly-field-primeng-input-number {
+              padding-left: 5%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  form > formly-form.label-padding {
+    ::ng-deep {
+      label {
+        padding-left: 1.5rem;
+      }
+    }
+  }
+
+  form {
+    margin-bottom: -1rem;
+    display: flex;
+    flex-flow: row wrap;
+    width: 100%;
+  }
+}

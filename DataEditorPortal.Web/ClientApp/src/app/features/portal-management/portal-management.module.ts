@@ -168,11 +168,6 @@ import { PortalManagementRoutingModule } from './portal-management-routing.modul
           wrappers: ['form-field']
         },
         {
-          name: 'gpsLocator',
-          component: FormlyFieldOptionsEditorComponent,
-          wrappers: ['form-field']
-        },
-        {
           name: 'gpsLocatorFieldsConfig',
           component: FormlyFieldGPSLocatorFieldsConfigComponent,
           wrappers: ['form-field']

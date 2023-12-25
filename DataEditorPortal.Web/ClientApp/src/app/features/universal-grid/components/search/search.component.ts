@@ -77,18 +77,10 @@ export class SearchComponent implements OnInit, OnDestroy {
 
       this.fields = this.configFields(result as FormlyFieldConfig[]);
 
-      const searchParams = this.urlParamsService.getSearchInitParams();
-      this.initExistingSearch();
-      if (searchParams && searchParams.action === 'search') {
-        if (searchParams?.payload) {
-          this.model = { ...this.model, ...searchParams?.payload };
-        }
-
-        // wait table listening Search
-        setTimeout(() => {
-          this.onSubmit(this.model);
-        });
-      }
+      // Delay setting default value
+      setTimeout(() => {
+        this.updateSearchModel();
+      }, 0);
     });
 
     // get search history
@@ -129,6 +121,25 @@ export class SearchComponent implements OnInit, OnDestroy {
     });
 
     this.setDefaultSearchOn();
+  }
+
+  updateSearchModel() {
+    this.initExistingSearch();
+    this.setSearchUrl();
+  }
+
+  setSearchUrl() {
+    const searchParams = this.urlParamsService.getSearchInitParams();
+    if (searchParams && searchParams.action === 'search') {
+      if (searchParams?.payload) {
+        this.model = { ...this.model, ...searchParams?.payload };
+      }
+
+      // wait table listening Search
+      setTimeout(() => {
+        this.onSubmit(this.model);
+      });
+    }
   }
 
   configFields(fields: FormlyFieldConfig[] | undefined) {

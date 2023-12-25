@@ -513,29 +513,6 @@ export class FormDesignerDirective {
                 }
               }
             }
-            // {
-            //   wrappers: ['divider']
-            // },
-            // {
-            //   key: 'apiAddress',
-            //   type: 'input',
-            //   props: {
-            //     label: 'Service Address'
-            //   }
-            // },
-            // {
-            //   key: 'apiMethod',
-            //   type: 'select',
-            //   defaultValue: 'GET',
-            //   props: {
-            //     label: 'Method',
-            //     required: true,
-            //     options: [
-            //       { label: 'GET', value: 'GET' },
-            //       { label: 'POST', value: 'POST' }
-            //     ]
-            //   }
-            // }
           ],
           expressions: {
             hide: `'gpsLocator' !== field.parent.parent.model.type`
