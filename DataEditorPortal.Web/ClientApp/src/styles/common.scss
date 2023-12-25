@@ -13,6 +13,7 @@ html {
 :root {
   --transition-duration: 0.2s;
   --primary-light-color: #{$primaryLightColor};
+  --invalid-color: #{$errorColor};
 }
 
 body {
