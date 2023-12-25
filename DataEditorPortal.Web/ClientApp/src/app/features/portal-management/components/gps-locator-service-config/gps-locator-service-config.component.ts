@@ -34,12 +34,12 @@ export class GPSLocatorServiceConfigComponent {
   set value(val: ValueModel) {
     if (!val) {
       this.innerValue = null;
-      return;
+      this.createFormGroup();
+    } else {
+      this.innerValue = val;
+      const newVal = JSON.parse(JSON.stringify(val || null)) as ValueModel;
+      this.createFormGroup(newVal);
     }
-    this.innerValue = val;
-
-    const newVal = JSON.parse(JSON.stringify(val || null)) as ValueModel;
-    this.createFormGroup(newVal);
   }
   @Input()
   set mappingColumns(val: DataSourceTableColumn[]) {
@@ -51,6 +51,24 @@ export class GPSLocatorServiceConfigComponent {
     });
   }
   filedMapping!: { label: string; value: string }[];
+  paramMappingOptions = [
+    {
+      label: 'Begin X',
+      value: 'beginX'
+    },
+    {
+      label: 'Begin Y',
+      value: 'beginY'
+    },
+    {
+      label: 'End X',
+      value: 'endX'
+    },
+    {
+      label: 'End Y',
+      value: 'endY'
+    }
+  ];
 
   constructor(private formBuilder: FormBuilder) {}
 
