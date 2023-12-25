@@ -1,0 +1,18 @@
+<form #editForm="ngForm">
+  <formly-form
+    [form]="form"
+    [fields]="fields"
+    [model]="model"
+    [options]="options"
+    class="gps-wrapper"
+    [ngClass]="{ 'label-padding': '1.5rem' }"></formly-form>
+</form>
+<div class="flex mt-3" style="padding-left: 40%">
+  <p-button
+    icon="pi pi-plus"
+    class="mr-3"
+    [outlined]="true"
+    label="Lookup Lines"
+    (onClick)="onLookupLines()"></p-button>
+  <p-button icon="pi pi-link" [outlined]="true" label="Show Lines" (onClick)="onShowLines()"></p-button>
+</div>
