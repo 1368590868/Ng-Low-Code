@@ -4,6 +4,7 @@
     [fields]="fields"
     [model]="model"
     [options]="options"
+    (modelChange)="modelChange($event)"
     class="gps-wrapper"
     [ngClass]="{ 'label-padding': '1.5rem' }"></formly-form>
 </form>

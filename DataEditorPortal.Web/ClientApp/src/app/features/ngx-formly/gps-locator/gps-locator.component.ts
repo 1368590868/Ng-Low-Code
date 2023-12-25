@@ -1,5 +1,13 @@
-import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  CUSTOM_ELEMENTS_SCHEMA,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+  forwardRef
+} from '@angular/core';
+import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, ValidationErrors } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyFieldProps, FormlyFormOptions } from '@ngx-formly/core';
 
 @Component({
@@ -27,11 +35,27 @@ export class GpsLocatorComponent implements ControlValueAccessor {
     else this.fields.forEach(x => x.formControl?.markAsPristine());
   }
 
+  _required = false;
+  @Input()
+  get required() {
+    return this._required;
+  }
+  set required(val: boolean) {
+    this._required = val;
+    this.fields.forEach(x => {
+      if (x.props) x.props.required = val;
+    });
+  }
+
   @Input() label!: string;
 
   _value: any;
   @Input()
   set value(val: any) {
+    if (val && val !== 'error') {
+      this.model = { ...this.model, ...val };
+      this.changeDetectorRef.markForCheck();
+    }
     this._value = val;
   }
   @Input() formControl!: AbstractControl;
@@ -46,32 +70,42 @@ export class GpsLocatorComponent implements ControlValueAccessor {
 
   fields: FormlyFieldConfig[] = [
     {
-      key: 'beginGpsLat',
+      key: 'beginX',
       type: 'inputNumber',
       className: 'left-columns',
       props: {
-        label: 'Begin GPS'
+        label: 'Begin GPS',
+        required: this.required
       }
     },
     {
-      key: 'beginGpsLong',
+      key: 'beginY',
       className: 'right-columns',
-      type: 'inputNumber'
-    },
-    {
-      key: 'endGpsLat',
       type: 'inputNumber',
-      className: 'left-columns',
       props: {
-        label: 'End GPS'
+        required: this.required
       }
     },
     {
-      key: 'endGpsLong',
+      key: 'endX',
       type: 'inputNumber',
-      className: 'right-columns'
+      className: 'left-columns',
+      props: {
+        label: 'End GPS',
+        required: this.required
+      }
+    },
+    {
+      key: 'endY',
+      type: 'inputNumber',
+      className: 'right-columns',
+      props: {
+        required: this.required
+      }
     }
   ];
+
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   writeValue(value: any): void {
     this.value = value;
@@ -86,6 +120,12 @@ export class GpsLocatorComponent implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
+  modelChange(val: any) {
+    if (val?.beginX && val?.beginY && val?.endX && val?.endY) {
+      this.onChange?.(val);
+    }
+  }
+
   onLookupLines() {
     console.log('onLookupLines');
   }
@@ -97,7 +137,13 @@ export class GpsLocatorComponent implements ControlValueAccessor {
 
 @Component({
   selector: 'app-formly-gps-locator',
-  template: ` <app-gps-locator></app-gps-locator> `,
+  template: `
+    <app-gps-locator
+      [formControl]="formControl"
+      [formlyAttributes]="field"
+      [dirty]="formControl.dirty"
+      [required]="props.required || false"></app-gps-locator>
+  `,
   styles: [
     `
       :host {
@@ -107,4 +153,26 @@ export class GpsLocatorComponent implements ControlValueAccessor {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldGpsLocatorComponent extends FieldType<FieldTypeConfig<FormlyFieldProps>> {}
+export class FormlyFieldGpsLocatorComponent
+  extends FieldType<
+    FieldTypeConfig<
+      FormlyFieldProps & {
+        dirty: boolean;
+      }
+    >
+  >
+  implements OnInit
+{
+  ngOnInit(): void {
+    this.field.validation = {
+      messages: { required: ' ', errorData: ' ' }
+    };
+    this.field.formControl.addValidators((control: AbstractControl): ValidationErrors | null => {
+      if (control.value === 'error') {
+        control.markAsPristine();
+        return { errorData: true };
+      }
+      return null;
+    });
+  }
+}
