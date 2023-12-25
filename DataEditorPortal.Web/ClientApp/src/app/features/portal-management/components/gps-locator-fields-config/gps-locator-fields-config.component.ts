@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormControl, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { DataSourceTableColumn } from '../../models/portal-item';
 
@@ -31,12 +31,27 @@ export class GpsLocatorFieldsConfigComponent {
 
     const newVal = JSON.parse(JSON.stringify(val || null));
     if (newVal) {
-      // this.formControlFrom.setValue(val?.from);
-      // this.formControlFromMeasure.setValue(val?.fromMeasure);
-      // this.formControlTo.setValue(val?.to);
-      // this.formControlToMeasure.setValue(val?.toMeasure);
+      this.formControlBeginX.setValue(val?.beginX);
+      this.formControlBeginY.setValue(val?.beginY);
+      this.formControlEndX.setValue(val?.endX);
+      this.formControlEndY.setValue(val?.endY);
     }
   }
+  @Input()
+  set mappingColumns(val: DataSourceTableColumn[]) {
+    this.filedMapping = val.map(x => {
+      return {
+        label: x.columnName,
+        value: x.columnName
+      };
+    });
+  }
+  filedMapping!: { label: string; value: string }[];
+
+  formControlBeginX: FormControl = new FormControl(null, Validators.required);
+  formControlBeginY: FormControl = new FormControl(null, Validators.required);
+  formControlEndX: FormControl = new FormControl(null, Validators.required);
+  formControlEndY: FormControl = new FormControl(null, Validators.required);
 
   visible = false;
   onChange?: any;
@@ -82,19 +97,11 @@ export class GpsLocatorFieldsConfigComponent {
       return;
     }
     const data = {
-      // from: this.formControlFrom.value,
-      // fromMeasure: this.formControlFromMeasure.value,
-      // to: this.formControlTo.value,
-      // toMeasure: this.formControlToMeasure.value
+      beginX: this.formControlBeginX.value,
+      beginY: this.formControlBeginY.value,
+      endX: this.formControlEndX.value,
+      endY: this.formControlEndY.value
     };
-
-    // switch (this.locationType) {
-    //   case 2: {
-    //     data.to = null;
-    //     data.toMeasure = null;
-    //     break;
-    //   }
-    // }
 
     this.onChange?.(data);
     this.innerValue = data;
@@ -102,19 +109,13 @@ export class GpsLocatorFieldsConfigComponent {
   }
 
   onValid() {
-    // this.formControlFromMeasure.markAsDirty();
-    // this.formControlFrom.markAsDirty();
-    // this.formControlToMeasure.markAsDirty();
-    // this.formControlTo.markAsDirty();
-    // if (!this.formControlFromMeasure.valid || !this.formControlFrom.valid) {
-    //   return false;
-    // }
-    // if (this.locationType === 3 && !this.formControlToMeasure.valid) {
-    //   return false;
-    // }
-    // if (this.locationType === 4) {
-    //   if (!this.formControlToMeasure.valid || !this.formControlTo.valid) return false;
-    // }
+    this.formControlBeginX.markAsDirty();
+    this.formControlBeginY.markAsDirty();
+    this.formControlEndX.markAsDirty();
+    this.formControlEndY.markAsDirty();
+    if (!this.formControlBeginX.valid || !this.formControlBeginY.valid) return false;
+    if (!this.formControlEndX.valid || !this.formControlEndY.valid) return false;
+
     return true;
   }
 }
@@ -123,7 +124,8 @@ export class GpsLocatorFieldsConfigComponent {
   selector: 'app-formly-gps-locator-fields-config',
   template: ` <app-gps-locator-fields-config
     [formControl]="formControl"
-    [formlyAttributes]="field"></app-gps-locator-fields-config>`,
+    [formlyAttributes]="field"
+    [mappingColumns]="props.mappingColumns || []"></app-gps-locator-fields-config>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldGPSLocatorFieldsConfigComponent extends FieldType<
