@@ -169,6 +169,10 @@ export interface FieldControlType {
   label: string;
   value: string;
   filterType: string;
+  hideValidatorConfig?: boolean;
+  hideExpressionConfig?: boolean;
+  hideComputedConfig?: boolean;
+  hidePlaceholderConfig?: boolean;
   isCustom?: boolean;
   initialConfig?: {
     [key: string]: any;

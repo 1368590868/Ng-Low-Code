@@ -9,7 +9,8 @@ export const FROM_DESIGNER_CONTROLS: FieldControlType[] = [
   {
     label: 'Checkbox',
     value: 'checkbox',
-    filterType: 'boolean'
+    filterType: 'boolean',
+    hidePlaceholderConfig: true
   },
   {
     label: 'Date',
@@ -39,12 +40,14 @@ export const FROM_DESIGNER_CONTROLS: FieldControlType[] = [
   {
     label: 'Checkbox List',
     value: 'checkboxList',
-    filterType: 'text'
+    filterType: 'text',
+    hidePlaceholderConfig: true
   },
   {
     label: 'Radio List',
     value: 'radio',
-    filterType: 'text'
+    filterType: 'text',
+    hidePlaceholderConfig: true
   },
   {
     label: 'Input Number',
@@ -54,18 +57,27 @@ export const FROM_DESIGNER_CONTROLS: FieldControlType[] = [
   {
     label: 'File Upload',
     value: 'fileUpload',
-    filterType: 'attachmentField'
+    filterType: 'attachmentField',
+    hideComputedConfig: true,
+    hidePlaceholderConfig: true,
+    hideValidatorConfig: true
   },
   {
     label: 'Link Data Editor',
     value: 'linkDataEditor',
     filterType: 'linkDataField',
+    hideComputedConfig: true,
+    hidePlaceholderConfig: true,
+    hideValidatorConfig: true,
     isCustom: true
   },
   {
     label: 'Location Editor',
     value: 'locationEditor',
     filterType: 'locationField',
+    hideComputedConfig: true,
+    hidePlaceholderConfig: true,
+    hideValidatorConfig: true,
     isCustom: true,
     initialConfig: {
       fromLabel: 'From',
@@ -79,6 +91,9 @@ export const FROM_DESIGNER_CONTROLS: FieldControlType[] = [
     label: 'GPS Locator',
     value: 'gpsLocator',
     filterType: 'gpsLocatorField',
+    hideComputedConfig: true,
+    hidePlaceholderConfig: true,
+    hideValidatorConfig: true,
     isCustom: true
   }
 ];
@@ -176,7 +191,10 @@ export class FormDesignerDirective {
         }
       ],
       expressions: {
-        hide: `formState.hideComputedValue  || 'fileUpload' === field.parent.model.type || 'locationEditor'=== field.parent.model.type `
+        hide: `formState.hideComputedValue${this.controls
+          .filter(c => c.hideComputedConfig)
+          .map(c => ` || '${c.value}' === field.parent.model.type`)
+          .join('')}`
       }
     },
     {
@@ -216,7 +234,10 @@ export class FormDesignerDirective {
             placeholder: 'Enter placeholder'
           },
           expressions: {
-            hide: `['checkbox', 'radio', 'checkboxList' , 'fileUpload', 'locationEditor'].indexOf(field.parent.parent.model.type) >= 0`
+            hide: `${this.controls
+              .filter(c => c.hidePlaceholderConfig)
+              .map(c => `'${c.value}' === field.parent.parent.model.type`)
+              .join('||')}`
           }
         },
         // props for select, mutiSelect, checkboxList, radio
@@ -557,7 +578,10 @@ export class FormDesignerDirective {
         }
       ],
       expressions: {
-        hide: `formState.hideValidation  || 'fileUpload' === field.parent.model.type || 'locationEditor' === field.parent.model.type || field.parent.model.computedConfig`
+        hide: `formState.hideValidation || field.parent.model.computedConfig${this.controls
+          .filter(c => c.hideValidatorConfig)
+          .map(c => ` || '${c.value}' === field.parent.model.type`)
+          .join('')}`
       }
     }
   ];
