@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import {
   CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectionStrategy,
@@ -9,6 +10,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, ValidationErrors } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyFieldProps, FormlyFormOptions } from '@ngx-formly/core';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-gps-locator',
@@ -46,6 +48,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
       if (x.props) x.props.required = val;
     });
   }
+  @Input() serviceConfig!: ServiceConfig;
 
   @Input() label!: string;
 
@@ -67,6 +70,10 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   onTouch?: any;
   disabled = false;
   model: any = {};
+  resultMapping!: any;
+
+  visible = false;
+  dialogData: any[] = [];
 
   fields: FormlyFieldConfig[] = [
     {
@@ -105,7 +112,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     }
   ];
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+  constructor(private changeDetectorRef: ChangeDetectorRef, private http: HttpClient) {}
 
   writeValue(value: any): void {
     this.value = value;
@@ -120,6 +127,32 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
+  onCustomService(api: string, method: 'get' | 'post', params: any[]): any {
+    try {
+      const newParams = params.map(x => {
+        return { name: x.name, value: this.model[x.value] };
+      });
+      const httpParams: any = {};
+      newParams.forEach(x => {
+        httpParams[x.name] = x.value;
+      });
+      if (method === 'get') {
+        // pipe is mock data
+        return this.http.get(api, { params: httpParams }).pipe(
+          map(() => [
+            { name1: 3, name2: 4 },
+            { name1: 6, name2: 8 }
+          ])
+        );
+      } else {
+        // pipe is mock data
+        return this.http.post(api, httpParams).pipe(map(() => ({ name1: 3, name2: 4 })));
+      }
+    } catch {
+      throw new Error('Invalid service config');
+    }
+  }
+
   modelChange(val: any) {
     if (val?.beginX && val?.beginY && val?.endX && val?.endY) {
       this.onChange?.(val);
@@ -127,12 +160,54 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   }
 
   onLookupLines() {
-    console.log('onLookupLines');
+    const { apiAddress, method, params, resultMapping } = this.serviceConfig;
+    this.resultMapping = resultMapping;
+    if (this.form.valid) {
+      this.onCustomService(apiAddress, method, params).subscribe((res: any) => {
+        if (Array.isArray(res)) {
+          if (res.length > 1) {
+            this.openDialog();
+            this.dialogData = res;
+            this.changeDetectorRef.detectChanges();
+          } else {
+            this.changeOutFieldData(res);
+          }
+        } else {
+          this.changeOutFieldData(res);
+        }
+      });
+    } else {
+      this.fields.forEach(x => x.formControl?.markAsDirty());
+    }
+  }
+
+  // Change the external filed value by mapping
+  changeOutFieldData(val: any) {
+    console.log(val);
+  }
+
+  onOk() {
+    this.changeOutFieldData('table selected data');
+  }
+
+  openDialog() {
+    this.visible = true;
+  }
+
+  onCancel() {
+    this.visible = false;
   }
 
   onShowLines() {
     console.log('onShowLines');
   }
+}
+
+interface ServiceConfig {
+  apiAddress: string;
+  method: 'get' | 'post';
+  params: { [key: string]: any }[];
+  resultMapping: { [key: string]: any }[];
 }
 
 @Component({
@@ -142,7 +217,8 @@ export class GPSLocatorComponent implements ControlValueAccessor {
       [formControl]="formControl"
       [formlyAttributes]="field"
       [dirty]="formControl.dirty"
-      [required]="props.required || false"></app-gps-locator>
+      [required]="props.required || false"
+      [serviceConfig]="props.serviceConfig"></app-gps-locator>
   `,
   styles: [
     `
@@ -158,6 +234,7 @@ export class FormlyFieldGPSLocatorComponent
     FieldTypeConfig<
       FormlyFieldProps & {
         dirty: boolean;
+        serviceConfig: ServiceConfig;
       }
     >
   >
@@ -174,5 +251,21 @@ export class FormlyFieldGPSLocatorComponent
       }
       return null;
     });
+
+    // mock service config data
+    this.props.serviceConfig = {
+      apiAddress: 'https://localhost:5001/api/PortalManagement/GetLines',
+      method: 'post',
+      params: [
+        { name: 'fromX', value: 'beginX' },
+        { name: 'fromY', value: 'beginY' },
+        { name: 'toX', value: 'endX' },
+        { name: 'toY', value: 'endY' }
+      ],
+      resultMapping: [
+        { name: 'name1', value: 'FIRST_NAME' },
+        { name: 'name2', value: 'NAME' }
+      ]
+    };
   }
 }
