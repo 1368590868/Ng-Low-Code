@@ -74,14 +74,10 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   disabled = false;
   model: any = {};
   resultMapping!: any;
-  columns: any[] = ['name', 'value', 'age'];
+  columns: any[] = [];
 
   visible = false;
-  dialogData: any[] = [
-    { name: 'test', value: 'test 1', age: 3 },
-    { name: 'test2', value: 'test 1', age: 3 },
-    { name: 'test3', value: 'test 1', age: 3 }
-  ];
+  dialogData: any[] = [];
   selection: any = null;
 
   fields: FormlyFieldConfig[] = [
