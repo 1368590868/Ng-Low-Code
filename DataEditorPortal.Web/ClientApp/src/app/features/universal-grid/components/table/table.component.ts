@@ -301,6 +301,8 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   fetchData() {
+    (this.table as any).highlightRowId = undefined;
+
     this.loading = true;
     this.fetchDataParam = this.getFetchParam();
     this.gridTableService
