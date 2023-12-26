@@ -1,7 +1,7 @@
-import { trigger, transition, style, animate } from '@angular/animations';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
-import { FieldWrapper, FormlyFieldConfig, FormlyFieldProps as CoreFormlyFieldProps } from '@ngx-formly/core';
+import { FormlyFieldProps as CoreFormlyFieldProps, FieldWrapper, FormlyFieldConfig } from '@ngx-formly/core';
 
 export interface FormlyFieldProps extends CoreFormlyFieldProps {
   hideRequiredMarker?: boolean;
@@ -24,21 +24,38 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
       </span>
 
       <div class="p-field  w-full">
-        <label *ngIf="props.label && props.hideLabel !== true" [for]="id" class="flex align-items-center">
-          {{ props.label }}
-          <span
-            *ngIf="props.isSameValue && props.required && props.hideRequiredMarker !== true"
-            aria-hidden="true"
-            class="text-red-500"
-            >*</span
-          >
-          <i
-            *ngIf="props.description"
-            class="pi pi-question-circle ml-2"
-            [pTooltip]="props.description"
-            [hideDelay]="500"
-            [escape]="false"></i>
-        </label>
+        <ng-container *ngIf="props.isSameValue">
+          <label *ngIf="props.label && props.hideLabel !== true" [for]="id" class="flex align-items-center">
+            {{ props.label }}
+            <span
+              *ngIf="props.isSameValue && props.required && props.hideRequiredMarker !== true"
+              aria-hidden="true"
+              class="text-red-500"
+              >*</span
+            >
+            <i
+              *ngIf="props.description"
+              class="pi pi-question-circle ml-2"
+              [pTooltip]="props.description"
+              [hideDelay]="500"
+              [escape]="false"></i>
+          </label>
+        </ng-container>
+
+        <ng-container *ngIf="!props.isSameValue">
+          <label [for]="id" class="flex align-items-center">
+            {{ props.label || '-' }}
+            <span *ngIf="props.required && props.hideRequiredMarker !== true" aria-hidden="true" class="text-red-500"
+              >*</span
+            >
+            <i
+              *ngIf="props.description && props.label"
+              class="pi pi-question-circle ml-2"
+              [pTooltip]="props.description"
+              [hideDelay]="500"
+              [escape]="false"></i>
+          </label>
+        </ng-container>
 
         <ng-container *ngIf="props?.isSameValue" #fieldComponent></ng-container>
         <div *ngIf="!props?.isSameValue">
