@@ -103,13 +103,8 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     this.formControlSearchHistory.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
       if (value && Object.keys(value).length > 0) {
-        const temp = this.configFields(JSON.parse(JSON.stringify(this.fieldsCopy)));
-        this.fields = undefined;
         this.model = { ...this.model, ...value };
-        setTimeout(() => {
-          this.fields = temp;
-          this.onSubmit(this.model);
-        }, 0);
+        this.onSubmit(this.model);
       }
     });
 
