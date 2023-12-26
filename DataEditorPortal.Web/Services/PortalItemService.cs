@@ -386,8 +386,10 @@ namespace DataEditorPortal.Web.Services
 
                 _depDbContext.Lookups.Add(lookupCopy);
 
-                configCopy.SearchConfig = configCopy.SearchConfig.Replace(lookup.Id.ToString(), lookupCopy.Id.ToString());
-                configCopy.DetailConfig = configCopy.DetailConfig.Replace(lookup.Id.ToString(), lookupCopy.Id.ToString());
+                if (configCopy.SearchConfig != null)
+                    configCopy.SearchConfig = configCopy.SearchConfig.Replace(lookup.Id.ToString(), lookupCopy.Id.ToString());
+                if (configCopy.DetailConfig != null)
+                    configCopy.DetailConfig = configCopy.DetailConfig.Replace(lookup.Id.ToString(), lookupCopy.Id.ToString());
             }
 
             #endregion
