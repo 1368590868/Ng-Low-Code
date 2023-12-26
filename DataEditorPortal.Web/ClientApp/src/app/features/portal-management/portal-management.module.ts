@@ -86,6 +86,8 @@ import { PortalEditStepDirective } from './directives/portal-edit-step.directive
 import { MonacoEditorConfig } from './monaco-editor-config';
 import { PortalManagementRoutingModule } from './portal-management-routing.module';
 
+export * from './models/portal-item';
+
 @NgModule({
   declarations: [
     PortalListComponent,

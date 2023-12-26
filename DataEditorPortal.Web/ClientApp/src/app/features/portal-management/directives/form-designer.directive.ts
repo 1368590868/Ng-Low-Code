@@ -2,18 +2,15 @@ import { Directive, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { distinctUntilChanged, startWith, tap } from 'rxjs';
-import { DataSourceTableColumn, GridFormField } from '../models/portal-item';
+import { DataSourceTableColumn, FieldControlType, GridFormField } from '../models/portal-item';
 import { PortalItemService } from '../services/portal-item.service';
 
-export const FROM_DESIGNER_CONTROLS: {
-  label: string;
-  value: string;
-  filterType: string;
-}[] = [
+export const FROM_DESIGNER_CONTROLS: FieldControlType[] = [
   {
     label: 'Checkbox',
     value: 'checkbox',
-    filterType: 'boolean'
+    filterType: 'boolean',
+    hidePlaceholderConfig: true
   },
   {
     label: 'Date',
@@ -43,12 +40,14 @@ export const FROM_DESIGNER_CONTROLS: {
   {
     label: 'Checkbox List',
     value: 'checkboxList',
-    filterType: 'text'
+    filterType: 'text',
+    hidePlaceholderConfig: true
   },
   {
     label: 'Radio List',
     value: 'radio',
-    filterType: 'text'
+    filterType: 'text',
+    hidePlaceholderConfig: true
   },
   {
     label: 'Input Number',
@@ -58,22 +57,44 @@ export const FROM_DESIGNER_CONTROLS: {
   {
     label: 'File Upload',
     value: 'fileUpload',
-    filterType: 'attachmentField'
+    filterType: 'attachmentField',
+    hideComputedConfig: true,
+    hidePlaceholderConfig: true,
+    hideValidatorConfig: true
   },
   {
     label: 'Link Data Editor',
     value: 'linkDataEditor',
-    filterType: 'linkDataField'
+    filterType: 'linkDataField',
+    hideComputedConfig: true,
+    hidePlaceholderConfig: true,
+    hideValidatorConfig: true,
+    isCustom: true
   },
   {
     label: 'Location Editor',
     value: 'locationEditor',
-    filterType: 'locationField'
+    filterType: 'locationField',
+    hideComputedConfig: true,
+    hidePlaceholderConfig: true,
+    hideValidatorConfig: true,
+    isCustom: true,
+    initialConfig: {
+      fromLabel: 'From',
+      fromMeasureLabel: 'From Measure',
+      toLabel: 'To',
+      toMeasureLabel: 'To Measure',
+      locationType: 2
+    }
   },
   {
     label: 'GPS Locator',
     value: 'gpsLocator',
-    filterType: 'gpsLocatorField'
+    filterType: 'gpsLocatorField',
+    hideComputedConfig: true,
+    hidePlaceholderConfig: true,
+    hideValidatorConfig: true,
+    isCustom: true
   }
 ];
 
@@ -170,7 +191,10 @@ export class FormDesignerDirective {
         }
       ],
       expressions: {
-        hide: `formState.hideComputedValue  || 'fileUpload' === field.parent.model.type || 'locationEditor'=== field.parent.model.type `
+        hide: `formState.hideComputedValue${this.controls
+          .filter(c => c.hideComputedConfig)
+          .map(c => ` || '${c.value}' === field.parent.model.type`)
+          .join('')}`
       }
     },
     {
@@ -210,7 +234,10 @@ export class FormDesignerDirective {
             placeholder: 'Enter placeholder'
           },
           expressions: {
-            hide: `['checkbox', 'radio', 'checkboxList' , 'fileUpload', 'locationEditor'].indexOf(field.parent.parent.model.type) >= 0`
+            hide: `${this.controls
+              .filter(c => c.hidePlaceholderConfig)
+              .map(c => `'${c.value}' === field.parent.parent.model.type`)
+              .join('||')}`
           }
         },
         // props for select, mutiSelect, checkboxList, radio
@@ -551,14 +578,16 @@ export class FormDesignerDirective {
         }
       ],
       expressions: {
-        hide: `formState.hideValidation  || 'fileUpload' === field.parent.model.type || 'locationEditor' === field.parent.model.type || field.parent.model.computedConfig`
+        hide: `formState.hideValidation || field.parent.model.computedConfig${this.controls
+          .filter(c => c.hideValidatorConfig)
+          .map(c => ` || '${c.value}' === field.parent.model.type`)
+          .join('')}`
       }
     }
   ];
 
   constructor(
-    @Inject('FROM_DESIGNER_CONTROLS')
-    public controls: any[],
+    @Inject('FROM_DESIGNER_CONTROLS') public controls: FieldControlType[],
     public portalItemService: PortalItemService
   ) {}
 

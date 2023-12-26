@@ -2,13 +2,9 @@ import { Component, Inject, Input, ViewChild, ViewChildren } from '@angular/core
 import { FormControl } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
 import { PickList } from 'primeng/picklist';
-import {
-  DataSourceTableColumn,
-  GridFormConfig,
-  GridFormField
-} from 'src/app/features/portal-management/models/portal-item';
 import { GridActionConfig } from 'src/app/features/universal-grid-action';
 import { NotifyService } from 'src/app/shared';
+import { DataSourceTableColumn, FieldControlType, GridFormConfig, GridFormField } from '../../../../models/portal-item';
 import { FormDesignerViewComponent } from '../../../form-designer/form-designer-view.component';
 
 @Component({
@@ -108,7 +104,7 @@ export class FormLayoutComponent {
     private notifyService: NotifyService,
     @Inject('GRID_ACTION_CONFIG')
     public customActionsConfig: GridActionConfig[],
-    @Inject('FROM_DESIGNER_CONTROLS') private controls: any[]
+    @Inject('FROM_DESIGNER_CONTROLS') private controls: FieldControlType[]
   ) {
     this.customActions = customActionsConfig
       .filter(x => x.isCustom)
@@ -264,13 +260,8 @@ export class FormLayoutComponent {
       selected: true
     };
 
-    if (filterType === 'locationField') {
-      model.props['fromLabel'] = 'From';
-      model.props['fromMeasureLabel'] = 'From Measure';
-      model.props['toLabel'] = 'To';
-      model.props['toMeasureLabel'] = 'To Measure';
-      model.props['locationType'] = 2;
-    }
+    // set initial config
+    if (result[0].initialConfig) model.props = { ...model.props, ...result[0].initialConfig };
 
     this.targetColumns = [model, ...this.targetColumns];
   }

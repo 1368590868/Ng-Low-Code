@@ -835,6 +835,8 @@ namespace DataEditorPortal.Web.Services
                     else
                         item.ExistingSearchName = $"{newSearchName}{item.ExistingSearchName}";
                     item.SearchConfig = searchItem.SearchConfig;
+
+                    RemoveGridCache(item.Name);
                 });
 
                 config.SearchConfig = searchItem.SearchConfig;
@@ -855,6 +857,8 @@ namespace DataEditorPortal.Web.Services
                         item.ExistingSearchName = item.ExistingSearchName.Replace(config.ExistingSearchName, "");
 
                     item.SearchConfig = searchFieldsStr;
+
+                    RemoveGridCache(item.Name);
                 });
 
                 config.SearchConfig = searchFieldsStr;
