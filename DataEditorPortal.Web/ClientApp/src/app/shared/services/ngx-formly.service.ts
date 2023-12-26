@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { distinctUntilChanged, map, Observable, tap, debounceTime, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, debounceTime, distinctUntilChanged, map, takeUntil, tap } from 'rxjs';
 import { ApiResponse } from '../models/api-response';
 import { evalExpression, evalStringExpression } from '../utils';
 
@@ -22,17 +22,15 @@ export class NgxFormlyService {
 
   initFieldOptions(field: any, data?: any) {
     if (field.props && field.props.optionsLookup) {
-      // clear options, show empty message
-      field.props.options = [];
-      field.props.emptyMessage = 'Loading...';
+      field.props.loading = true;
+      field.options.detectChanges(field);
 
       // get lookups from server
       this.getLookup(field.props.optionsLookup.id, data)
         .pipe(
           tap(result => {
             if (field.props) {
-              // restore empty message
-              field.props.emptyMessage = 'No records found';
+              field.props.loading = false;
 
               // set new options
               field.props.options = result;
