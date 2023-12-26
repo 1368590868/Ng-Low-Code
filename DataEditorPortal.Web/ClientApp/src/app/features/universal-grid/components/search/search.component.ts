@@ -157,7 +157,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       )
       .forEach(f => {
         if (f.props) {
-          f.props.placeholder = 'Please Select';
           if (!f.props.options) f.props.options = [];
 
           if (Array.isArray(f.props['optionsLookup'])) {
