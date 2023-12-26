@@ -50,8 +50,10 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     });
   }
   @Input() serviceConfig!: ServiceConfig;
-
   @Input() label!: string;
+  @Input() showLinesLabel!: string;
+  @Input() showLinesUrl!: string;
+  @Input() lookupLinesLabel!: string;
 
   _value: any;
   @Input()
@@ -89,7 +91,8 @@ export class GPSLocatorComponent implements ControlValueAccessor {
       className: 'left-columns',
       props: {
         label: 'Begin GPS',
-        required: this.required
+        required: this.required,
+        maxFractionDigits: 20
       }
     },
     {
@@ -97,7 +100,8 @@ export class GPSLocatorComponent implements ControlValueAccessor {
       className: 'right-columns',
       type: 'inputNumber',
       props: {
-        required: this.required
+        required: this.required,
+        maxFractionDigits: 20
       }
     },
     {
@@ -106,7 +110,8 @@ export class GPSLocatorComponent implements ControlValueAccessor {
       className: 'left-columns',
       props: {
         label: 'End GPS',
-        required: this.required
+        required: this.required,
+        maxFractionDigits: 20
       }
     },
     {
@@ -114,7 +119,8 @@ export class GPSLocatorComponent implements ControlValueAccessor {
       type: 'inputNumber',
       className: 'right-columns',
       props: {
-        required: this.required
+        required: this.required,
+        maxFractionDigits: 20
       }
     }
   ];
@@ -226,7 +232,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   }
 
   onShowLines() {
-    console.log('onShowLines');
+    if (this.showLinesUrl) window.open(this.showLinesUrl, '_blank');
   }
 }
 
@@ -244,8 +250,12 @@ interface ServiceConfig {
       [formControl]="formControl"
       [formlyAttributes]="field"
       [dirty]="formControl.dirty"
+      [label]="props.label || ''"
       [required]="props.required || false"
-      [serviceConfig]="props.serviceConfig"></app-gps-locator>
+      [serviceConfig]="props.serviceConfig"
+      [showLinesLabel]="props.showLinesLabel || 'Show Lines'"
+      [showLinesUrl]="props.showLinesUrl || ''"
+      [lookupLinesLabel]="props.lookupLinesLabel || 'Lookup Lines'"></app-gps-locator>
   `,
   styles: [
     `
@@ -261,8 +271,12 @@ export class FormlyFieldGPSLocatorComponent
     FieldTypeConfig<
       FormlyFieldProps & {
         dirty: boolean;
+        label: string;
         serviceConfig: ServiceConfig;
         mappingColumns: { [key: string]: any }[];
+        showLinesLabel: string;
+        showLinesUrl: string;
+        lookupLinesLabel: string;
       }
     >
   >
