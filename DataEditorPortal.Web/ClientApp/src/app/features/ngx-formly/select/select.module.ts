@@ -1,10 +1,11 @@
-import { NgModule } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
-import { DropdownModule } from 'primeng/dropdown';
-import { SharedModule } from 'src/app/shared';
 import { FormlySelectModule as FormlyCoreSelectModule, FormlySelectOptionsPipe } from '@ngx-formly/core/select';
+import { DropdownModule } from 'primeng/dropdown';
+import { SkeletonModule } from 'primeng/skeleton';
+import { SharedModule } from 'src/app/shared';
 import { FormlyFieldSelectComponent } from './select.type';
 
 @NgModule({
@@ -13,6 +14,7 @@ import { FormlyFieldSelectComponent } from './select.type';
     CommonModule,
     ReactiveFormsModule,
     DropdownModule,
+    SkeletonModule,
     FormlyCoreSelectModule,
     FormlyModule.forChild({
       types: [
