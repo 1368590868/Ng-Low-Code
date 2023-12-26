@@ -6,16 +6,11 @@
     [options]="options"
     (modelChange)="modelChange($event)"
     class="gps-wrapper"
-    [ngClass]="{ 'label-padding': '1.5rem' }"></formly-form>
+    [ngClass]="{ 'label-padding': label }"></formly-form>
 </form>
-<div class="flex mt-3" style="padding-left: 40%">
-  <p-button
-    icon="pi pi-plus"
-    class="mr-3"
-    [outlined]="true"
-    label="Lookup Lines"
-    (onClick)="onLookupLines()"></p-button>
-  <p-button icon="pi pi-link" [outlined]="true" label="Show Lines" (onClick)="onShowLines()"></p-button>
+<div class="flex justify-content-end mt-3" style="padding-left: 40%">
+  <p-button class="mr-2" [text]="true" [label]="showLinesLabel" (onClick)="onShowLines()"></p-button>
+  <p-button [outlined]="true" [label]="lookupLinesLabel" (onClick)="onLookupLines()"></p-button>
 </div>
 
 <p-dialog

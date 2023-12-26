@@ -99,7 +99,9 @@ export class ViewRecordActionComponent extends GridActionDirective implements On
                 filterType: h.fieldConfig.filterType
               };
             })
-            .filter(x => !['attachmentField', 'linkDataField', 'locationField'].includes(x.filterType));
+            .filter(
+              x => !['attachmentField', 'linkDataField', 'locationField', 'gpsLocatorField'].includes(x.filterType)
+            );
         })
       )
       .subscribe();

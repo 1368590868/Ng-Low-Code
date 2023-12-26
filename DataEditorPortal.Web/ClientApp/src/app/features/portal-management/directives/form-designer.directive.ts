@@ -94,7 +94,11 @@ export const FROM_DESIGNER_CONTROLS: FieldControlType[] = [
     hideComputedConfig: true,
     hidePlaceholderConfig: true,
     hideValidatorConfig: true,
-    isCustom: true
+    isCustom: true,
+    initialConfig: {
+      lookupLinesLabel: 'Lookup Lines',
+      showLinesLabel: 'Show Lines'
+    }
   }
 ];
 
@@ -538,6 +542,31 @@ export class FormDesignerDirective {
                     field.props.mappingColumns = this.dbColumns;
                   }
                 }
+              }
+            },
+
+            {
+              key: 'lookupLinesLabel',
+              type: 'input',
+              props: {
+                label: 'Lookup Lines Label',
+                placeholder: 'Enter lookup lines label'
+              }
+            },
+            {
+              key: 'showLinesLabel',
+              type: 'input',
+              props: {
+                label: 'Show Lines Label',
+                placeholder: 'Enter show lines label'
+              }
+            },
+            {
+              key: 'showLinesUrl',
+              type: 'input',
+              props: {
+                label: 'Show Lines Url',
+                placeholder: 'Enter show lines url'
               }
             }
           ],

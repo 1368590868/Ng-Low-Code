@@ -34,11 +34,8 @@ export class GPSLocatorServiceConfigComponent {
   set value(val: ValueModel) {
     if (!val) {
       this.innerValue = null;
-      this.createFormGroup();
     } else {
       this.innerValue = val;
-      const newVal = JSON.parse(JSON.stringify(val || null)) as ValueModel;
-      this.createFormGroup(newVal);
     }
   }
   @Input()
@@ -106,15 +103,10 @@ export class GPSLocatorServiceConfigComponent {
   showDialog() {
     this.visible = true;
     if (this.innerValue) {
-      // this.formControlFrom.setValue(this.innerValue?.from);
-      // this.formControlFromMeasure.setValue(this.innerValue?.fromMeasure);
-      // this.formControlTo.setValue(this.innerValue?.to);
-      // this.formControlToMeasure.setValue(this.innerValue?.toMeasure);
+      const newVal = JSON.parse(JSON.stringify(this.innerValue || null)) as ValueModel;
+      this.createFormGroup(newVal);
     } else {
-      // this.formControlFrom.reset();
-      // this.formControlFromMeasure.reset();
-      // this.formControlTo.reset();
-      // this.formControlToMeasure.reset();
+      this.createFormGroup();
     }
   }
 
