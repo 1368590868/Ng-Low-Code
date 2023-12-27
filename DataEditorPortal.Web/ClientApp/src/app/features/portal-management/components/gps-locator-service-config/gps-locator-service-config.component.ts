@@ -62,16 +62,7 @@ export class GPSLocatorServiceConfigComponent {
     }
   ];
 
-  get dbColumns(): { label: string; value: string }[] {
-    return (
-      this.formLayout?._dbColumns?.map(x => {
-        return {
-          label: x.columnName,
-          value: x.columnName
-        };
-      }) || []
-    );
-  }
+  formItems: { label: string; value: string }[] = [];
 
   formGroup!: FormGroup<{
     apiAddress: FormControl<string | null>;
@@ -113,6 +104,17 @@ export class GPSLocatorServiceConfigComponent {
     } else {
       this.createFormGroup();
     }
+
+    // generate form items
+    const _items: { label: string; value: string }[] = [];
+    this.formLayout?.targetColumns?.forEach(x => {
+      if (x.props?.['mappingColumns']) {
+        Object.keys(x.props?.['mappingColumns']).forEach(f =>
+          _items.push({ label: `${x.key}.${f}`, value: `${x.key}.${f}` })
+        );
+      } else _items.push({ label: x.key, value: x.key });
+    });
+    this.formItems = _items;
   }
 
   onSave() {

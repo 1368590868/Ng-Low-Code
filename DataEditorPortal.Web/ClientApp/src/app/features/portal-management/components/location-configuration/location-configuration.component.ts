@@ -42,16 +42,7 @@ export class LocationConfigurationComponent {
 
   constructor(private formLayout: FormLayoutComponent) {}
 
-  get dbColumns(): { label: string; value: string }[] {
-    return (
-      this.formLayout?._dbColumns?.map(x => {
-        return {
-          label: x.columnName,
-          value: x.columnName
-        };
-      }) || []
-    );
-  }
+  dbColumns: { label: string; value: string }[] = [];
 
   onChange?: any;
   onTouch?: any;
@@ -95,6 +86,9 @@ export class LocationConfigurationComponent {
       this.formControlTo.reset();
       this.formControlToMeasure.reset();
     }
+
+    // generate dbColumns
+    this.dbColumns = this.formLayout?._dbColumns?.map(x => ({ label: x.columnName, value: x.columnName })) || [];
   }
   onSave() {
     if (!this.onValid()) {

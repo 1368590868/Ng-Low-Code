@@ -32,16 +32,7 @@ export class GPSLocatorFieldsConfigComponent {
 
   constructor(private formLayout: FormLayoutComponent) {}
 
-  get dbColumns(): { label: string; value: string }[] {
-    return (
-      this.formLayout?._dbColumns?.map(x => {
-        return {
-          label: x.columnName,
-          value: x.columnName
-        };
-      }) || []
-    );
-  }
+  dbColumns: { label: string; value: string }[] = [];
 
   formGroup = new FormGroup({
     beginLat: new FormControl(null, Validators.required),
@@ -81,6 +72,9 @@ export class GPSLocatorFieldsConfigComponent {
     } else {
       this.formGroup.reset();
     }
+
+    // generate dbColumns
+    this.dbColumns = this.formLayout?._dbColumns?.map(x => ({ label: x.columnName, value: x.columnName })) || [];
   }
 
   onSave() {
