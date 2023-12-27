@@ -27,81 +27,83 @@
   appendTo="body"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0">
   <div #container class="dialog-content">
-    <div class="flex align-items-center mb-3 -mx-3">
-      <div class="flex flex-column flex-1 px-3 w-6">
-        <label for="" class="mb-1">Field Name</label>
-        <input type="text" pInputText [ngModel]="'Begin X'" [disabled]="true" />
+    <form [formGroup]="formGroup">
+      <div class="flex align-items-center mb-3 -mx-3">
+        <div class="flex flex-column flex-1 px-3 w-6">
+          <label for="" class="mb-1">Field Name</label>
+          <input type="text" pInputText value="Begin Latitude" [disabled]="true" />
+        </div>
+        <div class="flex flex-column flex-1 px-3 w-6">
+          <label for="tableName" class="mb-1">Map To</label>
+          <p-dropdown
+            formControlName="beginLat"
+            class="mr-1 flex-grow-1"
+            styleClass="w-full"
+            appendTo="body"
+            placeholder="Please Select"
+            [showClear]="true"
+            [options]="filedMapping">
+          </p-dropdown>
+        </div>
       </div>
-      <div class="flex flex-column flex-1 px-3 w-6">
-        <label for="tableName" class="mb-1">Map To</label>
-        <p-dropdown
-          [formControl]="formControlBeginX"
-          class="mr-1 flex-grow-1"
-          styleClass="w-full"
-          appendTo="body"
-          placeholder="Please Select"
-          [showClear]="true"
-          [options]="filedMapping">
-        </p-dropdown>
-      </div>
-    </div>
 
-    <div class="flex align-items-center mb-3 -mx-3">
-      <div class="flex flex-column px-3 w-6 flex-1">
-        <label for="" class="mb-1"></label>
-        <input type="text" pInputText [ngModel]="'Begin Y'" [disabled]="true" />
+      <div class="flex align-items-center mb-3 -mx-3">
+        <div class="flex flex-column px-3 w-6 flex-1">
+          <label for="" class="mb-1"></label>
+          <input type="text" pInputText value="Begin Longitude" [disabled]="true" />
+        </div>
+        <div class="flex flex-column flex-1 px-3 w-6">
+          <label for="tableName" class="mb-1"></label>
+          <p-dropdown
+            formControlName="beginLon"
+            class="mr-1 flex-grow-1"
+            styleClass="w-full"
+            appendTo="body"
+            placeholder="Please Select"
+            [showClear]="true"
+            [options]="filedMapping">
+          </p-dropdown>
+        </div>
       </div>
-      <div class="flex flex-column flex-1 px-3 w-6">
-        <label for="tableName" class="mb-1"></label>
-        <p-dropdown
-          [formControl]="formControlBeginY"
-          class="mr-1 flex-grow-1"
-          styleClass="w-full"
-          appendTo="body"
-          placeholder="Please Select"
-          [showClear]="true"
-          [options]="filedMapping">
-        </p-dropdown>
-      </div>
-    </div>
 
-    <div class="flex align-items-center mb-3 -mx-3">
-      <div class="flex flex-column px-3 w-6 flex-1">
-        <label for="" class="mb-1"></label>
-        <input type="text" pInputText [ngModel]="'End X'" [disabled]="true" />
+      <div class="flex align-items-center mb-3 -mx-3">
+        <div class="flex flex-column px-3 w-6 flex-1">
+          <label for="" class="mb-1"></label>
+          <input type="text" pInputText value="End Latitude" [disabled]="true" />
+        </div>
+        <div class="flex flex-column flex-1 px-3 w-6">
+          <label for="tableName" class="mb-1"></label>
+          <p-dropdown
+            formControlName="endLat"
+            class="mr-1 flex-grow-1"
+            styleClass="w-full"
+            appendTo="body"
+            placeholder="Please Select"
+            [showClear]="true"
+            [options]="filedMapping">
+          </p-dropdown>
+        </div>
       </div>
-      <div class="flex flex-column flex-1 px-3 w-6">
-        <label for="tableName" class="mb-1"></label>
-        <p-dropdown
-          [formControl]="formControlEndX"
-          class="mr-1 flex-grow-1"
-          styleClass="w-full"
-          appendTo="body"
-          placeholder="Please Select"
-          [showClear]="true"
-          [options]="filedMapping">
-        </p-dropdown>
-      </div>
-    </div>
 
-    <div class="flex align-items-center mb-3 -mx-3">
-      <div class="flex flex-column flex-1 px-3 w-6">
-        <label for="" class="mb-1"></label>
-        <input type="text" pInputText [ngModel]="'End Y'" [disabled]="true" />
+      <div class="flex align-items-center mb-3 -mx-3">
+        <div class="flex flex-column flex-1 px-3 w-6">
+          <label for="" class="mb-1"></label>
+          <input type="text" pInputText value="End Longitude" [disabled]="true" />
+        </div>
+        <div class="flex flex-column flex-1 px-3 w-6">
+          <label for="tableName" class="mb-1"></label>
+          <p-dropdown
+            formControlName="endLon"
+            class="mr-1 flex-grow-1"
+            styleClass="w-full"
+            appendTo="body"
+            placeholder="Please Select"
+            [showClear]="true"
+            [options]="filedMapping">
+          </p-dropdown>
+        </div>
       </div>
-      <div class="flex flex-column flex-1 px-3 w-6">
-        <label for="tableName" class="mb-1"></label>
-        <p-dropdown
-          [formControl]="formControlEndY"
-          class="mr-1 flex-grow-1"
-          styleClass="w-full"
-          appendTo="body"
-          placeholder="Please Select"
-          [showClear]="true"
-          [options]="filedMapping">
-        </p-dropdown>
-      </div>
-    </div>
+    </form>
   </div>
   <ng-template pTemplate="footer">
     <p-button icon="pi pi-times" label="Cancel" [text]="true" (onClick)="visible = false"></p-button>

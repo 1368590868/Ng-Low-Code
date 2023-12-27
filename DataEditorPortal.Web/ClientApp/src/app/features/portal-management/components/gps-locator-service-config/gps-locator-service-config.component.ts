@@ -50,20 +50,20 @@ export class GPSLocatorServiceConfigComponent {
   filedMapping!: { label: string; value: string }[];
   paramMappingOptions = [
     {
-      label: 'Begin X',
-      value: 'beginX'
+      label: 'Begin Latitude',
+      value: 'beginLat'
     },
     {
-      label: 'Begin Y',
-      value: 'beginY'
+      label: 'Begin Longitude',
+      value: 'beginLon'
     },
     {
-      label: 'End X',
-      value: 'endX'
+      label: 'End Latitude',
+      value: 'endLat'
     },
     {
-      label: 'End Y',
-      value: 'endY'
+      label: 'End Longitude',
+      value: 'endLon'
     }
   ];
 

@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { DataSourceTableColumn } from '../../models/portal-item';
 
@@ -31,10 +31,7 @@ export class GPSLocatorFieldsConfigComponent {
 
     const newVal = JSON.parse(JSON.stringify(val || null));
     if (newVal) {
-      this.formControlBeginX.setValue(val?.beginX);
-      this.formControlBeginY.setValue(val?.beginY);
-      this.formControlEndX.setValue(val?.endX);
-      this.formControlEndY.setValue(val?.endY);
+      this.formGroup.setValue(newVal);
     }
   }
   @Input()
@@ -48,10 +45,12 @@ export class GPSLocatorFieldsConfigComponent {
   }
   filedMapping!: { label: string; value: string }[];
 
-  formControlBeginX: FormControl = new FormControl(null, Validators.required);
-  formControlBeginY: FormControl = new FormControl(null, Validators.required);
-  formControlEndX: FormControl = new FormControl(null, Validators.required);
-  formControlEndY: FormControl = new FormControl(null, Validators.required);
+  formGroup = new FormGroup({
+    beginLat: new FormControl(null, Validators.required),
+    beginLon: new FormControl(null, Validators.required),
+    endLat: new FormControl(null, Validators.required),
+    endLon: new FormControl(null, Validators.required)
+  });
 
   visible = false;
   onChange?: any;
@@ -96,12 +95,7 @@ export class GPSLocatorFieldsConfigComponent {
     if (!this.onValid()) {
       return;
     }
-    const data = {
-      beginX: this.formControlBeginX.value,
-      beginY: this.formControlBeginY.value,
-      endX: this.formControlEndX.value,
-      endY: this.formControlEndY.value
-    };
+    const data = this.formGroup.getRawValue();
 
     this.onChange?.(data);
     this.innerValue = data;
@@ -109,12 +103,8 @@ export class GPSLocatorFieldsConfigComponent {
   }
 
   onValid() {
-    this.formControlBeginX.markAsDirty();
-    this.formControlBeginY.markAsDirty();
-    this.formControlEndX.markAsDirty();
-    this.formControlEndY.markAsDirty();
-    if (!this.formControlBeginX.valid || !this.formControlBeginY.valid) return false;
-    if (!this.formControlEndX.valid || !this.formControlEndY.valid) return false;
+    this.formGroup.markAllAsTouched();
+    return this.formGroup.valid;
 
     return true;
   }
