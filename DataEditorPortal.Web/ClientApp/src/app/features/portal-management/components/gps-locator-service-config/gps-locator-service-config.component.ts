@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
-import { DataSourceTableColumn } from '../../models/portal-item';
+import { FormLayoutComponent } from '..';
 
 type ParamMapping = { name: string | null; value: string | null };
 type FieldMapping = { name: string | null; value: string | null; label: string | null };
@@ -40,16 +40,9 @@ export class GPSLocatorServiceConfigComponent {
       this.innerValue = val;
     }
   }
-  @Input()
-  set mappingColumns(val: DataSourceTableColumn[]) {
-    this.filedMapping = val.map(x => {
-      return {
-        label: x.columnName,
-        value: x.columnName
-      };
-    });
-  }
-  filedMapping!: { label: string; value: string }[];
+
+  constructor(private formBuilder: FormBuilder, private formLayout: FormLayoutComponent) {}
+
   paramMappingOptions = [
     {
       label: 'beginLat',
@@ -69,7 +62,16 @@ export class GPSLocatorServiceConfigComponent {
     }
   ];
 
-  constructor(private formBuilder: FormBuilder) {}
+  get dbColumns(): { label: string; value: string }[] {
+    return (
+      this.formLayout?._dbColumns?.map(x => {
+        return {
+          label: x.columnName,
+          value: x.columnName
+        };
+      }) || []
+    );
+  }
 
   formGroup!: FormGroup<{
     apiAddress: FormControl<string | null>;
@@ -191,15 +193,8 @@ export class GPSLocatorServiceConfigComponent {
   selector: 'app-formly-gps-locator-service-config',
   template: ` <app-gps-locator-service-config
     [formControl]="formControl"
-    [formlyAttributes]="field"
-    [mappingColumns]="props.mappingColumns || []"></app-gps-locator-service-config>`,
+    [formlyAttributes]="field"></app-gps-locator-service-config>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldGPSLocatorServiceConfigComponent extends FieldType<
-  FieldTypeConfig<
-    FormlyFieldProps & {
-      mappingColumns: DataSourceTableColumn[];
-    }
-  >
-> {}
+export class FormlyFieldGPSLocatorServiceConfigComponent extends FieldType<FieldTypeConfig<FormlyFieldProps>> {}
 FormlyFieldGPSLocatorServiceConfigComponent;

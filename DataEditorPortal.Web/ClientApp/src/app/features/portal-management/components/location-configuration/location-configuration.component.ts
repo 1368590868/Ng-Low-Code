@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
-import { DataSourceTableColumn } from '../../models/portal-item';
+import { FormLayoutComponent } from '..';
 
 @Component({
   selector: 'app-location-configuration',
@@ -21,27 +21,8 @@ import { DataSourceTableColumn } from '../../models/portal-item';
   ]
 })
 export class LocationConfigurationComponent {
-  onChange?: any;
-  onTouch?: any;
-  disabled = false;
-
-  formControlFrom: FormControl = new FormControl(null, Validators.required);
-  formControlFromMeasure: FormControl = new FormControl(null, Validators.required);
-  formControlTo: FormControl = new FormControl(null, Validators.required);
-  formControlToMeasure: FormControl = new FormControl(null, Validators.required);
-
-  visible = false;
-
   @Input() locationType!: number;
-  @Input()
-  set mappingColumns(val: DataSourceTableColumn[]) {
-    this.filedMapping = val.map(x => {
-      return {
-        label: x.columnName,
-        value: x.columnName
-      };
-    });
-  }
+
   @Input()
   set value(val: any) {
     if (!val) {
@@ -58,8 +39,30 @@ export class LocationConfigurationComponent {
       this.formControlToMeasure.setValue(val?.toMeasure);
     }
   }
-  filedMapping!: { label: string; value: string }[];
 
+  constructor(private formLayout: FormLayoutComponent) {}
+
+  get dbColumns(): { label: string; value: string }[] {
+    return (
+      this.formLayout?._dbColumns?.map(x => {
+        return {
+          label: x.columnName,
+          value: x.columnName
+        };
+      }) || []
+    );
+  }
+
+  onChange?: any;
+  onTouch?: any;
+  disabled = false;
+
+  formControlFrom: FormControl = new FormControl(null, Validators.required);
+  formControlFromMeasure: FormControl = new FormControl(null, Validators.required);
+  formControlTo: FormControl = new FormControl(null, Validators.required);
+  formControlToMeasure: FormControl = new FormControl(null, Validators.required);
+
+  visible = false;
   innerValue: any = null;
   writeValue(value: any): void {
     this.value = value;
@@ -140,15 +143,9 @@ export class LocationConfigurationComponent {
   template: ` <app-location-configuration
     [formControl]="formControl"
     [formlyAttributes]="field"
-    [locationType]="props.locationType || 2"
-    [mappingColumns]="props.mappingColumns || []"></app-location-configuration>`,
+    [locationType]="props.locationType || 2"></app-location-configuration>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormlyFieldLocationConfigurationComponent extends FieldType<
-  FieldTypeConfig<
-    FormlyFieldProps & {
-      locationType: number;
-      mappingColumns: DataSourceTableColumn[];
-    }
-  >
+  FieldTypeConfig<FormlyFieldProps & { locationType: number }>
 > {}
