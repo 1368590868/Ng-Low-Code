@@ -76,6 +76,10 @@ namespace DataEditorPortal.Web.Controllers
             using (var con = _depDbContext.Database.GetDbConnection())
             {
                 output = _universalGridService.QueryGridData(con, queryText, queryParams, "site-groups", false);
+                foreach (var item in output.Data)
+                {
+                    item["ID"] = new Guid(Convert.FromHexString(item["ID"].ToString()));
+                }
             }
 
             return output;
