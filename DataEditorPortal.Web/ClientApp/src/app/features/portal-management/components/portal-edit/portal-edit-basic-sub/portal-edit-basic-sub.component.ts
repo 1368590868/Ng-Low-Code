@@ -90,7 +90,7 @@ export class PortalEditBasicSubComponent extends PortalEditStepDirective impleme
               this.portalItemService.getCodeName(val).subscribe(res => {
                 field.formControl?.setValue(res.data, { emitEvent: false });
                 this.model['name'] = res.data + '';
-                field.formControl?.markAsDirty();
+                field.formControl?.markAsTouched();
               });
             }
           });

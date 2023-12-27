@@ -122,7 +122,7 @@ export class AddGroupComponent {
                         emitEvent: false
                       });
                       this.model['name'] = res.data + '';
-                      field.formControl?.markAsDirty();
+                      field.formControl?.markAsTouched();
                     });
                   }
                 });
