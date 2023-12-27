@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { tap } from 'rxjs';
-import { NotifyService, ConfigDataService } from 'src/app/shared';
+import { ConfigDataService, NotifyService } from 'src/app/shared';
 
 @Component({
   selector: 'app-site-settings',
@@ -91,7 +91,7 @@ export class SiteSettingsComponent implements OnInit {
     this.siteLogo = '';
   }
   onSave() {
-    this.formControlSiteName.markAsDirty();
+    this.formControlSiteName.markAsTouched();
     if (!this.siteLogo) {
       this.picTips = true;
       return;
@@ -157,7 +157,7 @@ export class SiteSettingsComponent implements OnInit {
 
   onSaveLicense() {
     if (!this.formControlLicense.valid) {
-      this.formControlLicense.markAsDirty();
+      this.formControlLicense.markAsTouched();
       return;
     }
     if (!this.formControlLicense.value) {

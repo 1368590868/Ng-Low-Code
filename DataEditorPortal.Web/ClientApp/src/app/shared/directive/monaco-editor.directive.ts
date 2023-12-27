@@ -62,7 +62,7 @@ class PlaceholderContentWidget implements monaco.editor.IContentWidget {
     // register a listener for editor code changes
     editor.onDidChangeModelContent(() => this.onDidChangeModelContent());
     // ensure that on initial load the placeholder is shown
-    // this.onDidChangeModelContent();
+    this.onDidChangeModelContent();
   }
 
   private onDidChangeModelContent(): void {

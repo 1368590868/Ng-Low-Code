@@ -1,7 +1,7 @@
 import { Component, Inject, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { NotifyService } from 'src/app/shared';
 import { GridActionConfig } from 'src/app/features/universal-grid-action';
+import { NotifyService } from 'src/app/shared';
 import { PortalItemService } from '../../services/portal-item.service';
 
 @Component({
@@ -57,7 +57,7 @@ export class CustomActionsComponent {
 
     const isValid = this.optionArr
       .map(item => {
-        item.markAsDirty();
+        item.markAsTouched();
         return item.valid;
       })
       .find(item => item === false);

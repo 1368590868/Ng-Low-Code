@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { Subject, takeUntil } from 'rxjs';
 import { NotifyService, SiteGroupService } from 'src/app/shared';
-import { PortalItemService } from '../../../services/portal-item.service';
 import { PortalItem } from '../../../models/portal-item';
-import { Subject, skip, takeUntil } from 'rxjs';
+import { PortalItemService } from '../../../services/portal-item.service';
 
 @Component({
   selector: 'app-add-portal-dialog',
@@ -269,7 +269,7 @@ export class AddPortalDialogComponent {
     } else {
       this.fields.forEach(x => {
         if (x.formControl?.invalid) {
-          x.formControl.markAsDirty();
+          x.formControl.markAsTouched();
           x.formControl.updateValueAndValidity();
         }
       });

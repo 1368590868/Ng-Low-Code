@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormlyFormOptions, FormlyFieldConfig } from '@ngx-formly/core';
+import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { skip, tap } from 'rxjs';
 import { NotifyService, SiteGroupService } from 'src/app/shared';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import { PortalItem, PortalItemData } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 
 @Component({
   selector: 'app-portal-edit-basic',
@@ -304,7 +304,7 @@ export class PortalEditBasicComponent extends PortalEditStepDirective implements
     } else {
       this.fields.forEach(x => {
         if (x.formControl?.invalid) {
-          x.formControl.markAsDirty();
+          x.formControl.markAsTouched();
           x.formControl.updateValueAndValidity();
         }
       });

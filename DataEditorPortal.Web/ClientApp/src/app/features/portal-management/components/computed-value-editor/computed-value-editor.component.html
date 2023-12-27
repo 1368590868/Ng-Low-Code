@@ -37,6 +37,7 @@
     [(visible)]="visible"
     [style]="{ minWidth: '50rem' }"
     [modal]="true"
+    (onHide)="onHide()"
     appendTo="body"
     contentStyleClass="border-top-1 surface-border pt-4 pb-0">
     <div #container class="dialog-content">

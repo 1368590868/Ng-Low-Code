@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { NotifyService } from 'src/app/shared';
-import { PortalItemService } from '../../../services/portal-item.service';
-import { ImportPortal, PortalItem } from '../../../models/portal-item';
 import { Dialog } from 'primeng/dialog';
+import { NotifyService } from 'src/app/shared';
+import { ImportPortal, PortalItem } from '../../../models/portal-item';
+import { PortalItemService } from '../../../services/portal-item.service';
 @Component({
   selector: 'app-import-dialog',
   templateUrl: './import-dialog.component.html',
@@ -128,7 +128,7 @@ export class ImportDialogComponent {
 
   onOk() {
     if (this.step === 1) {
-      this.parentFolderControl.markAsDirty();
+      this.parentFolderControl.markAsTouched();
       if (this.parentFolderControl.valid) {
         if (!this.file) {
           return;

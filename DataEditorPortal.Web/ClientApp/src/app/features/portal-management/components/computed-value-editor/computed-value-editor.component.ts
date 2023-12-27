@@ -112,10 +112,11 @@ export class ComputedValueEditorComponent implements ControlValueAccessor, OnIni
 
   showDialog() {
     this.initForm(this.innerValue);
-    setTimeout(() => {
-      this.form.markAsPristine();
-    }, 100);
     this.visible = true;
+  }
+
+  onHide() {
+    this.form.markAsUntouched();
   }
 
   onOk() {
@@ -127,8 +128,8 @@ export class ComputedValueEditorComponent implements ControlValueAccessor, OnIni
       this.onSendData();
     } else {
       this.notifyService.notifyWarning('', 'Query Type or Query Text is required.');
-      queryTextFormControl?.markAsDirty();
-      typeFormControl?.markAsDirty();
+      queryTextFormControl?.markAsTouched();
+      typeFormControl?.markAsTouched();
     }
   }
 

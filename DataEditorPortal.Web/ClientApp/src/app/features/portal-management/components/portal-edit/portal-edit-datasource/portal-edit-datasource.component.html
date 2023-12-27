@@ -63,7 +63,7 @@
         <ng-container *ngIf="datasourceConfig.queryText">
           <label class="line-height-3">Database Query</label>
           <div class="flex align-items-center">
-            <div (click)="advancedQueryDialog.showAdvanceDialog()">
+            <div class="flex-grow-1" (click)="advancedQueryDialog.showAdvanceDialog()">
               <ngx-monaco-editor
                 [ngModel]="datasourceConfig.queryText"
                 [style]="{ minWidth: '41.5rem' }"

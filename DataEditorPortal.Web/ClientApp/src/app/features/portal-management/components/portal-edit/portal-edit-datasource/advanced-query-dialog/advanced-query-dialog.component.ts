@@ -33,9 +33,10 @@ export class AdvancedQueryDialogComponent {
   showAdvanceDialog() {
     this.advanceDialogVisible = true;
     this.formControlQuery.setValue(this.queryText);
-    setTimeout(() => {
-      this.formControlQuery.markAsPristine();
-    }, 100);
+  }
+
+  onHide() {
+    this.formControlQuery.markAsUntouched();
   }
 
   onAdvanceDialogOk() {
@@ -60,7 +61,7 @@ export class AdvancedQueryDialogComponent {
       }
     } else {
       this.notifyService.notifyWarning('', 'Query text is required.');
-      this.formControlQuery.markAsDirty();
+      this.formControlQuery.markAsTouched();
     }
   }
 

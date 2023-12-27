@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
-import { distinctUntilChanged, startWith } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 
 export interface SaveData {
@@ -119,9 +119,10 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
   showDialog() {
     this.visible = true;
     this.formControlQuery.setValue(this.whereClause);
-    setTimeout(() => {
-      this.formControlQuery.markAsPristine();
-    }, 100);
+  }
+
+  onHide() {
+    this.formControlQuery.markAsUntouched();
   }
 
   onOk() {
@@ -130,7 +131,7 @@ export class SearchRuleComponent implements ControlValueAccessor, OnInit {
       this.visible = false;
     } else {
       this.notifyService.notifyWarning('', 'Query text is required.');
-      this.formControlQuery.markAsDirty();
+      this.formControlQuery.markAsTouched();
     }
   }
 

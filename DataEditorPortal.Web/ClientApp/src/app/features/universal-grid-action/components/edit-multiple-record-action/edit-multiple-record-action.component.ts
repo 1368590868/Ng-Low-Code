@@ -286,7 +286,7 @@ export class EditMultipleRecordActionComponent extends GridActionDirective imple
       this.submitSave(model);
     } else {
       setTimeout(() => {
-        this.fields.forEach(x => x.formControl?.markAsDirty());
+        this.form.markAllAsTouched();
       });
       this.errorEvent.emit();
     }

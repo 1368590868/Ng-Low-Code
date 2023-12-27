@@ -8,7 +8,6 @@ import {
   Validators
 } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyConfig, FormlyFieldProps } from '@ngx-formly/core';
-import { concat } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 
 @Component({
@@ -118,9 +117,10 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
   showDialog() {
     this.visible = true;
     this.initForm(this.innerValue);
-    setTimeout(() => {
-      this.form.markAsPristine();
-    }, 100);
+  }
+
+  onHide() {
+    this.form.markAsUntouched();
   }
 
   onOk() {
@@ -132,8 +132,8 @@ export class ValidatorEditorComponent implements ControlValueAccessor, OnInit {
       this.onSendData();
     } else {
       this.notifyService.notifyWarning('', 'Javascript Expression or Error Message is required.');
-      expressionFormControl?.markAsDirty();
-      messageFormControl?.markAsDirty();
+      expressionFormControl?.markAsTouched();
+      messageFormControl?.markAsTouched();
     }
   }
 

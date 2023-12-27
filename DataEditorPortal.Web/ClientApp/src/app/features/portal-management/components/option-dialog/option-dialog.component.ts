@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, ViewChild } from '@angular/core';
-import { FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FieldType, FieldTypeConfig } from '@ngx-formly/core';
+import { Dialog } from 'primeng/dialog';
 import { NotifyService } from 'src/app/shared';
+import { Lookup } from '../../models/lookup';
 import { DataSourceConnection } from '../../models/portal-item';
 import { LookupService } from '../../services/lookup.service';
 import { PortalItemService } from '../../services/portal-item.service';
-import { Lookup } from '../../models/lookup';
-import { Dialog } from 'primeng/dialog';
 
 interface OptionItem {
   formControl: FormControl;
@@ -131,7 +131,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
         });
       }
 
-      this.formControlQuery.markAsPristine();
+      this.formControlQuery.markAsUntouched();
       this.cdr.markForCheck();
     });
   }
@@ -156,10 +156,10 @@ export class OptionDialogComponent implements ControlValueAccessor {
   validate() {
     if (this.isAdvanced) {
       if (!this.formControlName.valid) {
-        this.formControlName.markAsDirty();
+        this.formControlName.markAsTouched();
       }
       if (!this.formControlQuery.valid) {
-        this.formControlQuery.markAsDirty();
+        this.formControlQuery.markAsTouched();
       }
       if (!this.formControlQuery.value) {
         this.notifyService.notifyWarning('', 'Query  Text is required.');
@@ -168,7 +168,7 @@ export class OptionDialogComponent implements ControlValueAccessor {
     } else {
       const valid = this.formControlOptions.reduce((r, x) => {
         if (!x.formControl.valid) {
-          x.formControl.markAsDirty();
+          x.formControl.markAsTouched();
           x.formControl.updateValueAndValidity();
         }
         return r && x.formControl.valid;

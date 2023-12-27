@@ -134,7 +134,7 @@ formly-form {
     }
   }
 
-  &.ng-dirty.ng-invalid {
+  &.ng-touched.ng-invalid {
     border-color: $errorColor;
   }
   &:focus-within {

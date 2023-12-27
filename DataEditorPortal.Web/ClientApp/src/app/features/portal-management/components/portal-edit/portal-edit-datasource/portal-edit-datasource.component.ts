@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { ConfirmationService, PrimeNGConfig } from 'primeng/api';
 import { forkJoin, tap } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import {
   DataSourceConfig,
   DataSourceConnection,
@@ -12,7 +13,6 @@ import {
   DataSourceTableColumn
 } from '../../../models/portal-item';
 import { PortalItemService } from '../../../services/portal-item.service';
-import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import { AdvancedQueryModel } from './advanced-query-dialog/advanced-query-dialog.component';
 
 interface DataSourceFilterControls {
@@ -267,25 +267,25 @@ export class PortalEditDatasourceComponent extends PortalEditStepDirective imple
 
   validate() {
     if (!this.formControlConnection.valid) {
-      this.formControlConnection.markAsDirty();
+      this.formControlConnection.markAsTouched();
       this.formControlConnection.updateValueAndValidity();
     }
 
     if (!this.datasourceConfig.queryText) {
       if (!this.formControlDbTable.valid) {
-        this.formControlDbTable.markAsDirty();
+        this.formControlDbTable.markAsTouched();
         this.formControlDbTable.updateValueAndValidity();
       }
     }
 
     if (!this.formControlIdColumn.valid) {
-      this.formControlIdColumn.markAsDirty();
+      this.formControlIdColumn.markAsTouched();
       this.formControlIdColumn.updateValueAndValidity();
     }
 
     const filterValid = this.filters.reduce((r, x) => {
       if (!x.formControlValue.valid) {
-        x.formControlValue.markAsDirty();
+        x.formControlValue.markAsTouched();
         x.formControlValue.updateValueAndValidity();
       }
       return r && x.formControlValue.valid;

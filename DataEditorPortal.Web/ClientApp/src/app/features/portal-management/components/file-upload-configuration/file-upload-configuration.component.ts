@@ -9,10 +9,9 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgModel } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
+import { forkJoin } from 'rxjs';
 import { DataSourceConnection, DataSourceTable, DataSourceTableColumn } from '../../models/portal-item';
 import { PortalItemService } from '../../services/portal-item.service';
-import { forkJoin } from 'rxjs';
-import { Dropdown } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-file-upload-configuration',
@@ -221,9 +220,9 @@ export class FileUploadConfigurationComponent implements ControlValueAccessor, O
 
   onOk() {
     this.dropdownList.forEach(x => {
-      x.control.markAsDirty();
+      x.control.markAsTouched();
     });
-    this.formControlDbTable.markAsDirty();
+    this.formControlDbTable.markAsTouched();
     if (this.valid()) {
       if (this.storageTypeColumn === 'SqlBinary') {
         if (this.fileBytesColumn == null) {
@@ -257,9 +256,9 @@ export class FileUploadConfigurationComponent implements ControlValueAccessor, O
     if (!this.innerValue) {
       this.onReset();
     }
-    this.formControlDbTable.markAsPristine();
+    this.formControlDbTable.markAsUntouched();
     this.dropdownList.forEach(x => {
-      x.control.markAsPristine();
+      x.control.markAsUntouched();
     });
   }
 

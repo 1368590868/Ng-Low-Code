@@ -269,8 +269,8 @@ export class SearchComponent implements OnInit, OnDestroy {
           });
       }
     } else {
-      this.formControlDialogName.markAsDirty();
-      this.formControlDialogSearchHistory.markAsDirty();
+      this.formControlDialogName.markAsTouched();
+      this.formControlDialogSearchHistory.markAsTouched();
     }
   }
 

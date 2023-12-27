@@ -118,10 +118,10 @@ export class LocationConfigurationComponent {
   }
 
   onValid() {
-    this.formControlFromMeasure.markAsDirty();
-    this.formControlFrom.markAsDirty();
-    this.formControlToMeasure.markAsDirty();
-    this.formControlTo.markAsDirty();
+    this.formControlFromMeasure.markAsTouched();
+    this.formControlFrom.markAsTouched();
+    this.formControlToMeasure.markAsTouched();
+    this.formControlTo.markAsTouched();
     if (!this.formControlFromMeasure.valid || !this.formControlFrom.valid) {
       return false;
     }
