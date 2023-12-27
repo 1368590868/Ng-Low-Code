@@ -197,7 +197,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
             if (data.length > 1) {
               this.openDialog();
               this.dialogData = data;
-              this.columns = resultMapping.map((x: any) => x.name);
+              this.columns = resultMapping.filter(x => x['label']).map(x => x);
               this.changeDetectorRef.detectChanges();
             } else if (data.length === 1) {
               this.changeOutFieldData(data[0]);
@@ -217,8 +217,22 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   changeOutFieldData(val: any) {
     const { resultMapping } = this.serviceConfig;
     const data: any = {};
+    const model = this.formControl.parent?.getRawValue();
     resultMapping.forEach((x: any) => {
-      data[x.value] = val[x.name];
+      if (x.value) {
+        if (x.value.indexOf('.') > 0) {
+          const keys = x.value.split('.');
+          const value = val[x.name];
+          if (!data[keys[0]]) {
+            const fieldValue = model ? model[keys[0]] || {} : {};
+            data[keys[0]] = fieldValue;
+          }
+          data[keys[0]][keys[1]] = value;
+        } else {
+          // one level field
+          data[x.value] = val[x.name];
+        }
+      }
     });
 
     (this.formControl.parent as FormGroup<any>)?.patchValue(data);

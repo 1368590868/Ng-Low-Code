@@ -3,12 +3,13 @@ import { FormArray, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Vali
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { DataSourceTableColumn } from '../../models/portal-item';
 
-type FieldMapping = { name: string | null; value: string | null };
+type ParamMapping = { name: string | null; value: string | null };
+type FieldMapping = { name: string | null; value: string | null; label: string | null };
 type FC<T> = { [P in keyof T]: FormControl<T[P]> };
 type ValueModel = {
   apiAddress: string | null;
   method: string;
-  paramMapping: FieldMapping[];
+  paramMapping: ParamMapping[];
   dataField: string | null;
   resultMapping: FieldMapping[];
 };
@@ -73,7 +74,7 @@ export class GPSLocatorServiceConfigComponent {
   formGroup!: FormGroup<{
     apiAddress: FormControl<string | null>;
     method: FormControl<string>;
-    paramMapping: FormArray<FormGroup<FC<FieldMapping>>>;
+    paramMapping: FormArray<FormGroup<FC<ParamMapping>>>;
     dataField: FormControl<string | null>;
     resultMapping: FormArray<FormGroup<FC<FieldMapping>>>;
   }>;
@@ -134,18 +135,26 @@ export class GPSLocatorServiceConfigComponent {
     const formGroup = this.formBuilder.group({
       apiAddress: this.formBuilder.control(data?.apiAddress || null, Validators.required),
       method: this.formBuilder.control(data?.method || 'GET', { nonNullable: true, validators: Validators.required }),
-      paramMapping: this.formBuilder.array(paramMapping.map(x => this.createMappingFormGroup(x))),
+      paramMapping: this.formBuilder.array(paramMapping.map(x => this.createParamMappingFormGroup(x))),
       dataField: this.formBuilder.control(data?.dataField || null),
-      resultMapping: this.formBuilder.array(resultMapping.map(x => this.createMappingFormGroup(x)))
+      resultMapping: this.formBuilder.array(resultMapping.map(x => this.createFieldMappingFormGroup(x)))
     });
 
     this.formGroup = formGroup;
   }
 
-  createMappingFormGroup(data?: FieldMapping) {
+  createParamMappingFormGroup(data?: ParamMapping) {
     return this.formBuilder.group({
       name: this.formBuilder.control(data?.name || null, { validators: Validators.required }),
       value: this.formBuilder.control(data?.value || null, { validators: Validators.required })
+    });
+  }
+
+  createFieldMappingFormGroup(data?: FieldMapping) {
+    return this.formBuilder.group({
+      name: this.formBuilder.control(data?.name || null, { validators: Validators.required }),
+      value: this.formBuilder.control(data?.value || null),
+      label: this.formBuilder.control(data?.label || null)
     });
   }
 
@@ -155,7 +164,7 @@ export class GPSLocatorServiceConfigComponent {
   }
 
   addParam() {
-    const param = this.createMappingFormGroup();
+    const param = this.createParamMappingFormGroup();
     this.params.push(param);
   }
 
@@ -169,7 +178,7 @@ export class GPSLocatorServiceConfigComponent {
   }
 
   addResultMapping() {
-    const mapping = this.createMappingFormGroup();
+    const mapping = this.createFieldMappingFormGroup();
     this.resultMappings.push(mapping);
   }
 

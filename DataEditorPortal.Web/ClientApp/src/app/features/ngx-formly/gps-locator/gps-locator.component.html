@@ -22,7 +22,7 @@
 </div>
 
 <p-dialog
-  header="Locator Data"
+  header="Location Matche(s) Found"
   [(visible)]="visible"
   [style]="{ width: '55rem' }"
   (onHide)="onHide()"
@@ -43,7 +43,7 @@
         <tr>
           <th style="width: 4.6rem; max-width: 4.6rem" pSortableColumn="linked" pFrozenColumn></th>
           <th style="width: 200px" *ngFor="let col of columns">
-            <span>{{ col }} </span>
+            <span>{{ col.label || col.name }} </span>
           </th>
         </tr>
       </ng-template>
@@ -53,7 +53,7 @@
             <p-tableRadioButton [value]="data" (click)="onRowCheckBoxClick($event)"></p-tableRadioButton>
           </td>
           <td style="width: 200px" *ngFor="let col of columns">
-            <span>{{ data[col] }}</span>
+            <span>{{ data[col.name] }}</span>
           </td>
         </tr>
       </ng-template>
