@@ -5,8 +5,8 @@
       [style]="{ '--icon-padding': !formControl.value ? '0.5rem' : '3rem' }"
       [class]="{
         'ng-invalid': formNgControl.invalid,
-        'ng-dirty': formNgControl.dirty
       }"
+      (onBlur)="onTouch()"
       [style.display]="iconLogo ? 'none' : 'block'"
       [options]="iconList"
       [filter]="true"

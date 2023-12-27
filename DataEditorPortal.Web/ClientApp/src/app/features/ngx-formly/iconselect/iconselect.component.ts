@@ -1,18 +1,21 @@
 import {
-  Component,
-  ViewChild,
+  AfterViewChecked,
   CUSTOM_ELEMENTS_SCHEMA,
-  forwardRef,
   ChangeDetectorRef,
-  Input,
+  Component,
   Inject,
-  Injector
+  Injector,
+  Input,
+  ViewChild,
+  forwardRef
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 import { SelectItem } from 'primeng/api';
 import { Dropdown } from 'primeng/dropdown';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
-import { NotifyService } from 'src/app/shared';
 import { FileUpload } from 'primeng/fileupload';
+import { Subject, distinctUntilChanged } from 'rxjs';
+import { NotifyService } from 'src/app/shared';
 
 @Component({
   selector: 'app-icon-select',
@@ -31,7 +34,7 @@ import { FileUpload } from 'primeng/fileupload';
     }
   ]
 })
-export class IconSelectComponent implements ControlValueAccessor {
+export class IconSelectComponent implements ControlValueAccessor, AfterViewChecked {
   @Input() accept = 'image/*';
   @Input() maxFileSize = 1000 * 1000 * 2;
   @Input() chooseLabel = 'Browse';
@@ -305,6 +308,8 @@ export class IconSelectComponent implements ControlValueAccessor {
   @ViewChild('dropdown') dropdown!: Dropdown;
   @ViewChild(FileUpload) fileUpload!: FileUpload;
 
+  touched: boolean | null = false;
+
   public onChange!: (value: any) => void;
   public onTouch!: () => void;
   public disabled!: boolean;
@@ -324,6 +329,10 @@ export class IconSelectComponent implements ControlValueAccessor {
   formControl = new FormControl();
 
   public iconLogo = '';
+  touched$ = new Subject();
+  ngAfterViewChecked(): void {
+    this.touched$.next(this.formNgControl.touched);
+  }
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -336,6 +345,15 @@ export class IconSelectComponent implements ControlValueAccessor {
       label: icon.replace('pi ', ''),
       value: icon
     }));
+
+    this.touched$.pipe(distinctUntilChanged(), takeUntilDestroyed()).subscribe(res => {
+      if (res) {
+        this.formControl.markAsTouched();
+      } else {
+        this.formControl.markAsUntouched();
+      }
+      this.cdr.detectChanges();
+    });
   }
 
   ngOnInit(): void {
@@ -345,6 +363,7 @@ export class IconSelectComponent implements ControlValueAccessor {
   private setComponentControl(): void {
     const injectedControl = this.injector.get(NgControl);
     this.formNgControl = injectedControl;
+    this.formNgControl.touched;
   }
 
   writeValue(value: any): void {
