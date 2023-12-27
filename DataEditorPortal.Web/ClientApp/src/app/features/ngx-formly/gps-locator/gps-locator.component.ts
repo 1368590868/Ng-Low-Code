@@ -52,8 +52,9 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   @Input() serviceConfig!: ServiceConfig;
   @Input() label!: string;
   @Input() showLinesLabel!: string;
-  @Input() showLinesUrl!: string;
   @Input() lookupLinesLabel!: string;
+
+  @Input() showLinesUrlConfig!: string;
 
   _value: any;
   @Input()
@@ -79,6 +80,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   visible = false;
   dialogData: any[] = [];
   selection: any = null;
+  showLinesUrl = '';
 
   fields: FormlyFieldConfig[] = [
     {
@@ -167,6 +169,12 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     if (val?.beginLon && val?.beginLat && val?.endLon && val?.endLat) {
       this.onChange?.(val);
     }
+
+    const matches = [...this.showLinesUrlConfig.matchAll(/##([a-zA-Z]{1}[a-zA-Z0-9_]+)##/g)];
+    this.showLinesUrl = this.showLinesUrlConfig;
+    matches.forEach(x => {
+      this.showLinesUrl = this.showLinesUrl.replace(x[0], val[x[1]] || '');
+    });
   }
 
   onLookupLines() {
@@ -234,10 +242,6 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   onCancel() {
     this.visible = false;
   }
-
-  onShowLines() {
-    if (this.showLinesUrl) window.open(this.showLinesUrl, '_blank');
-  }
 }
 
 interface ServiceConfig {
@@ -258,7 +262,7 @@ interface ServiceConfig {
       [required]="props.required || false"
       [serviceConfig]="props.serviceConfig"
       [showLinesLabel]="props.showLinesLabel"
-      [showLinesUrl]="props.showLinesUrl || ''"
+      [showLinesUrlConfig]="props.showLinesUrl || ''"
       [lookupLinesLabel]="props.lookupLinesLabel"></app-gps-locator>
   `,
   styles: [
