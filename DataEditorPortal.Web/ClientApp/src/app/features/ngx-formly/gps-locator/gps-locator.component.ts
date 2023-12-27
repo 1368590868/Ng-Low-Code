@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, ValidationErrors } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyFieldProps, FormlyFormOptions } from '@ngx-formly/core';
+import { finalize } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 
 @Component({
@@ -80,6 +81,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   dialogData: any[] = [];
   selection: any = null;
   showLinesUrl = '';
+  loading = false;
 
   fields: FormlyFieldConfig[] = [
     {
@@ -160,6 +162,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
         return this.http.post(api, httpParams);
       }
     } catch {
+      this.loading = false;
       this.notifyService.notifyWarning('Warning', 'Invalid service config');
     }
   }
@@ -180,28 +183,31 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     const { apiAddress, method, paramMapping, resultMapping, dataField } = this.serviceConfig;
     this.resultMapping = resultMapping;
     if (this.form.valid) {
-      this.onCustomService(apiAddress, method.toLowerCase(), paramMapping).subscribe((res: any) => {
-        const data = dataField ? res[dataField] : res;
+      this.loading = true;
+      this.onCustomService(apiAddress, method.toLowerCase(), paramMapping)
+        .pipe(finalize(() => (this.loading = false)))
+        .subscribe((res: any) => {
+          const data = dataField ? res[dataField] : res;
 
-        if (!data) {
-          return this.notifyService.notifyWarning('Warning', this.noDataMessage || 'No data found');
-        }
-
-        if (Array.isArray(data)) {
-          if (data.length > 1) {
-            this.openDialog();
-            this.dialogData = data;
-            this.columns = resultMapping.map((x: any) => x.name);
-            this.changeDetectorRef.detectChanges();
-          } else if (data.length === 1) {
-            this.changeOutFieldData(data[0]);
-          } else {
-            this.notifyService.notifyWarning('Warning', this.noDataMessage || 'No data found');
+          if (!data) {
+            return this.notifyService.notifyWarning('Warning', this.noDataMessage || 'No data found');
           }
-        } else {
-          this.changeOutFieldData(data);
-        }
-      });
+
+          if (Array.isArray(data)) {
+            if (data.length > 1) {
+              this.openDialog();
+              this.dialogData = data;
+              this.columns = resultMapping.map((x: any) => x.name);
+              this.changeDetectorRef.detectChanges();
+            } else if (data.length === 1) {
+              this.changeOutFieldData(data[0]);
+            } else {
+              this.notifyService.notifyWarning('Warning', this.noDataMessage || 'No data found');
+            }
+          } else {
+            this.changeOutFieldData(data);
+          }
+        });
     } else {
       this.fields.forEach(x => x.formControl?.markAsDirty());
     }
@@ -234,6 +240,10 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   onOk() {
     if (!this.selection) this.notifyService.notifyWarning('Warning', 'Please select a row');
     else this.changeOutFieldData(this.selection);
+  }
+
+  onHide() {
+    this.selection = null;
   }
 
   openDialog() {

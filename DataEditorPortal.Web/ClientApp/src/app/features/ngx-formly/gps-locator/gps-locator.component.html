@@ -16,6 +16,8 @@
     *ngIf="lookupLinesLabel"
     [outlined]="true"
     [label]="lookupLinesLabel"
+    [loading]="loading"
+    [disabled]="loading"
     (onClick)="onLookupLines()"></p-button>
 </div>
 
@@ -23,6 +25,7 @@
   header="Locator Data"
   [(visible)]="visible"
   [style]="{ width: '55rem' }"
+  (onHide)="onHide()"
   [modal]="true"
   contentStyleClass="border-top-1 surface-border pt-4 pb-0"
   appendTo="body">
