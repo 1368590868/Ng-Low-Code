@@ -9,8 +9,17 @@
     [ngClass]="{ 'label-padding': label }"></formly-form>
 </form>
 <div class="flex justify-content-end mt-3" style="padding-left: 40%">
-  <p-button class="mr-2" [text]="true" [label]="showLinesLabel" (onClick)="onShowLines()"></p-button>
-  <p-button [outlined]="true" [label]="lookupLinesLabel" (onClick)="onLookupLines()"></p-button>
+  <p-button
+    *ngIf="showLinesLabel"
+    class="mr-2"
+    [text]="true"
+    [label]="showLinesLabel"
+    (onClick)="onShowLines()"></p-button>
+  <p-button
+    *ngIf="lookupLinesLabel"
+    [outlined]="true"
+    [label]="lookupLinesLabel"
+    (onClick)="onLookupLines()"></p-button>
 </div>
 
 <p-dialog

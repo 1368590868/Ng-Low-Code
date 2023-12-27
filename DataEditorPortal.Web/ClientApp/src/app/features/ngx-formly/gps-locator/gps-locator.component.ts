@@ -251,9 +251,9 @@ interface ServiceConfig {
       [label]="props.label || ''"
       [required]="props.required || false"
       [serviceConfig]="props.serviceConfig"
-      [showLinesLabel]="props.showLinesLabel || 'Show Lines'"
+      [showLinesLabel]="props.showLinesLabel"
       [showLinesUrl]="props.showLinesUrl || ''"
-      [lookupLinesLabel]="props.lookupLinesLabel || 'Lookup Lines'"></app-gps-locator>
+      [lookupLinesLabel]="props.lookupLinesLabel"></app-gps-locator>
   `,
   styles: [
     `
