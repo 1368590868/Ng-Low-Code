@@ -354,7 +354,7 @@ namespace DataEditorPortal.Web.Services
             if (val == null)
                 return 0;
 
-            var obj = ((IEnumerable<object>)val).Cast<IDictionary<string, object>>();
+            var obj = (IEnumerable<object>)val;
 
             int hashCode = 17;
             foreach (var v in obj)
