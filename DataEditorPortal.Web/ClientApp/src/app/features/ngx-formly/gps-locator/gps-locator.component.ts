@@ -82,41 +82,45 @@ export class GPSLocatorComponent implements ControlValueAccessor {
 
   fields: FormlyFieldConfig[] = [
     {
-      key: 'beginX',
+      key: 'beginLon',
       type: 'inputNumber',
       className: 'left-columns',
       props: {
         label: 'Begin GPS',
         required: this.required,
-        maxFractionDigits: 20
+        maxFractionDigits: 20,
+        placeholder: 'Please input begin Longitude'
       }
     },
     {
-      key: 'beginY',
+      key: 'beginLat',
       className: 'right-columns',
       type: 'inputNumber',
       props: {
         required: this.required,
-        maxFractionDigits: 20
+        maxFractionDigits: 20,
+        placeholder: 'Please input begin Latitude'
       }
     },
     {
-      key: 'endX',
+      key: 'endLon',
       type: 'inputNumber',
       className: 'left-columns',
       props: {
         label: 'End GPS',
         required: this.required,
-        maxFractionDigits: 20
+        maxFractionDigits: 20,
+        placeholder: 'Please input end Longitude'
       }
     },
     {
-      key: 'endY',
+      key: 'endLat',
       type: 'inputNumber',
       className: 'right-columns',
       props: {
         required: this.required,
-        maxFractionDigits: 20
+        maxFractionDigits: 20,
+        placeholder: 'Please input end Latitude'
       }
     }
   ];
@@ -150,10 +154,8 @@ export class GPSLocatorComponent implements ControlValueAccessor {
         httpParams[x.name] = x.value;
       });
       if (method === 'get') {
-        // pipe is mock data
         return this.http.get(api, { params: httpParams }).pipe(map((res: any) => res.data));
       } else {
-        // pipe is mock data
         return this.http.post(api, httpParams).pipe(map((res: any) => res.data));
       }
     } catch {
@@ -162,7 +164,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   }
 
   modelChange(val: any) {
-    if (val?.beginX && val?.beginY && val?.endX && val?.endY) {
+    if (val?.beginLon && val?.beginLat && val?.endLon && val?.endLat) {
       this.onChange?.(val);
     }
   }
