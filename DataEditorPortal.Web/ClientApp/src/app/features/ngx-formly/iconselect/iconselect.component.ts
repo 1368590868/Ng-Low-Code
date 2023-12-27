@@ -363,7 +363,6 @@ export class IconSelectComponent implements ControlValueAccessor, AfterViewCheck
   private setComponentControl(): void {
     const injectedControl = this.injector.get(NgControl);
     this.formNgControl = injectedControl;
-    this.formNgControl.touched;
   }
 
   writeValue(value: any): void {
