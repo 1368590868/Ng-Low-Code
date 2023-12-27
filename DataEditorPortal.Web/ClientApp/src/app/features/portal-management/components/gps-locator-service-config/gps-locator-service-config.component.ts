@@ -9,6 +9,7 @@ type ValueModel = {
   apiAddress: string | null;
   method: string;
   paramMapping: FieldMapping[];
+  dataField: string | null;
   resultMapping: FieldMapping[];
 };
 
@@ -73,6 +74,7 @@ export class GPSLocatorServiceConfigComponent {
     apiAddress: FormControl<string | null>;
     method: FormControl<string>;
     paramMapping: FormArray<FormGroup<FC<FieldMapping>>>;
+    dataField: FormControl<string | null>;
     resultMapping: FormArray<FormGroup<FC<FieldMapping>>>;
   }>;
 
@@ -133,6 +135,7 @@ export class GPSLocatorServiceConfigComponent {
       apiAddress: this.formBuilder.control(data?.apiAddress || null, Validators.required),
       method: this.formBuilder.control(data?.method || 'GET', { nonNullable: true, validators: Validators.required }),
       paramMapping: this.formBuilder.array(paramMapping.map(x => this.createMappingFormGroup(x))),
+      dataField: this.formBuilder.control(data?.dataField || null),
       resultMapping: this.formBuilder.array(resultMapping.map(x => this.createMappingFormGroup(x)))
     });
 
