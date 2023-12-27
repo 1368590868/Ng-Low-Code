@@ -180,8 +180,8 @@ export class GPSLocatorComponent implements ControlValueAccessor {
             this.dialogData = res;
             this.columns = resultMapping.map((x: any) => x.name);
             this.changeDetectorRef.detectChanges();
-          } else {
-            this.changeOutFieldData(res);
+          } else if (res.length === 1) {
+            this.changeOutFieldData(res[0]);
           }
         } else {
           this.changeOutFieldData(res);
