@@ -4,10 +4,10 @@ import {
   ChangeDetectorRef,
   Component,
   Input,
-  forwardRef,
-  OnInit
+  OnInit,
+  forwardRef
 } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, ValidationErrors } from '@angular/forms';
+import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyFieldProps, FormlyFormOptions } from '@ngx-formly/core';
 import { LocationEditorService } from './service/location-editor.service';
 
@@ -31,17 +31,19 @@ import { LocationEditorService } from './service/location-editor.service';
 })
 export class LocationEditorComponent implements ControlValueAccessor {
   @Input()
-  set dirty(val: boolean) {
-    if (val) this.fields.forEach(x => x.formControl?.markAsDirty());
-    else this.fields.forEach(x => x.formControl?.markAsPristine());
+  set touched(val: boolean) {
+    if (val) this.fields.forEach(x => x.formControl?.markAsTouched());
+    else this.fields.forEach(x => x.formControl?.markAsUntouched());
   }
 
-  _value: any;
+  _value: any = null;
   @Input()
   set value(val: any) {
-    if (val && val !== 'error') {
-      this.model = { ...this.model, ...val };
-      this.changeDetectorRef.markForCheck();
+    if (val) {
+      setTimeout(() => {
+        this.model = { ...this.model, ...val };
+        this.changeDetectorRef.markForCheck();
+      }, 0);
     }
     this._value = val;
   }
@@ -185,6 +187,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
       toMeasure: null,
       lengthFeet: null
     });
+    this.formControl.markAsUntouched();
     this.fields.forEach(x => {
       // min max reset
       if (x && x.parent && x.parent.get) {
@@ -202,7 +205,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
         }
       }
     });
-    this.dirty = false;
+    this.touched = false;
+    this.onShow();
   }
 
   form = new FormGroup({});
@@ -229,7 +233,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
         required: this.required,
         appendTo: 'body',
         options: [],
-        onShow: () => this.onShow(),
         change: (field, event) => {
           const record = this.locationOptions.find(x => x.value === event.value);
           if (field && field.parent && field.parent.get) {
@@ -274,9 +277,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
               toMeasureProps['helperText'] = `Min: --  Max: --`;
 
               this.options.detectChanges?.(field);
-            }
-            if (this._systemName) {
-              this.onShow();
             }
           }
         }
@@ -326,7 +326,6 @@ export class LocationEditorComponent implements ControlValueAccessor {
         required: this.required,
         appendTo: 'body',
         options: [],
-        onShow: () => this.onShow(),
         change: (field, event) => {
           const record = this.locationOptions.find(x => x.value === event.value);
           if (field && field.parent && field.parent.get) {
@@ -425,7 +424,10 @@ export class LocationEditorComponent implements ControlValueAccessor {
     const toProps = this.fields[2].props;
 
     if (this._systemName && this.systemNameChange) {
-      if (fromProps && toProps) fromProps['emptyMessage'] = 'Loading...';
+      if (fromProps && toProps) {
+        fromProps['loading'] = true;
+        toProps['loading'] = true;
+      }
       this.locationEditorService.getPipeOptions(this.system.id, allModel?.value).subscribe(res => {
         this.locationOptions = res;
         // Init fromMeasure and toMeasure helper text
@@ -454,7 +456,8 @@ export class LocationEditorComponent implements ControlValueAccessor {
           fromProps.options = res;
           toProps.options = res;
 
-          fromProps['emptyMessage'] = 'No records found';
+          fromProps['loading'] = false;
+          toProps['loading'] = false;
         }
         this.systemNameChange = false;
       });
@@ -470,7 +473,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
         val = { ...$event };
       }
     } else {
-      val = 'error';
+      val = null;
     }
     if (this._value !== val) {
       this._value = val;
@@ -497,7 +500,7 @@ export class LocationEditorComponent implements ControlValueAccessor {
   template: `<app-location-editor
     [formControl]="formControl"
     [formlyAttributes]="field"
-    [dirty]="formControl.dirty"
+    [touched]="formControl.touched"
     [required]="props.required || false"
     [label]="props.label || ''"
     [locationType]="props.locationType || 2"
@@ -526,7 +529,6 @@ export class FormlyFieldLocationEditorComponent
   extends FieldType<
     FieldTypeConfig<
       FormlyFieldProps & {
-        dirty: boolean;
         label: string;
         locationType: number;
         system: { id: string };
@@ -548,14 +550,7 @@ export class FormlyFieldLocationEditorComponent
 {
   ngOnInit(): void {
     this.field.validation = {
-      messages: { required: ' ', errorData: ' ' }
+      messages: { required: ' ' }
     };
-    this.field.formControl.addValidators((control: AbstractControl): ValidationErrors | null => {
-      if (control.value === 'error') {
-        control.markAsPristine();
-        return { errorData: true };
-      }
-      return null;
-    });
   }
 }
