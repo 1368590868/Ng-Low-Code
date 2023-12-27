@@ -445,9 +445,11 @@ export class LocationEditorComponent implements ControlValueAccessor {
 
           if (fromMeasureProps && toMeasureProps) {
             fromMeasureProps['helperText'] = `Min: ${fromRecord?.value1 ?? '--'}  Max: ${fromRecord?.value2 ?? '--'}`;
-
+            fromMeasureProps['min'] = fromRecord?.value1;
+            fromMeasureProps['max'] = fromRecord?.value2;
             toMeasureProps['helperText'] = `Min: ${toRecord?.value1 ?? '--'}  Max: ${toRecord?.value2 ?? '--'}`;
-
+            toMeasureProps['min'] = toRecord?.value1;
+            toMeasureProps['max'] = toRecord?.value2;
             this.options.detectChanges?.(this.fields[1]);
           }
         }
