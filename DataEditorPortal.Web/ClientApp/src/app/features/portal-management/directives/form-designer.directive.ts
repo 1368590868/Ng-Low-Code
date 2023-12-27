@@ -544,7 +544,6 @@ export class FormDesignerDirective {
                 }
               }
             },
-
             {
               key: 'lookupLinesLabel',
               type: 'input',
@@ -567,6 +566,14 @@ export class FormDesignerDirective {
               props: {
                 label: 'Show Lines Url',
                 placeholder: 'Enter show lines url'
+              }
+            },
+            {
+              key: 'noDataMessage',
+              type: 'input',
+              props: {
+                label: 'No Data Message',
+                placeholder: 'Enter no data message'
               }
             }
           ],

@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, ValidationErrors } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyFieldProps, FormlyFormOptions } from '@ngx-formly/core';
-import { map } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
 
 @Component({
@@ -53,8 +52,8 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   @Input() label!: string;
   @Input() showLinesLabel!: string;
   @Input() lookupLinesLabel!: string;
-
   @Input() showLinesUrlConfig!: string;
+  @Input() noDataMessage!: string;
 
   _value: any;
   @Input()
@@ -156,9 +155,9 @@ export class GPSLocatorComponent implements ControlValueAccessor {
         httpParams[x.name] = x.value;
       });
       if (method === 'get') {
-        return this.http.get(api, { params: httpParams }).pipe(map((res: any) => res?.data || res));
+        return this.http.get(api, { params: httpParams });
       } else {
-        return this.http.post(api, httpParams).pipe(map((res: any) => res?.data || res));
+        return this.http.post(api, httpParams);
       }
     } catch {
       this.notifyService.notifyWarning('Warning', 'Invalid service config');
@@ -178,27 +177,29 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   }
 
   onLookupLines() {
-    const { apiAddress, method, paramMapping, resultMapping } = this.serviceConfig;
+    const { apiAddress, method, paramMapping, resultMapping, dataField } = this.serviceConfig;
     this.resultMapping = resultMapping;
     if (this.form.valid) {
       this.onCustomService(apiAddress, method.toLowerCase(), paramMapping).subscribe((res: any) => {
-        if (!res) {
-          return this.notifyService.notifyWarning('Warning', 'No data found');
+        const data = dataField ? res[dataField] : res;
+
+        if (!data) {
+          return this.notifyService.notifyWarning('Warning', this.noDataMessage || 'No data found');
         }
 
-        if (Array.isArray(res)) {
-          if (res.length > 1) {
+        if (Array.isArray(data)) {
+          if (data.length > 1) {
             this.openDialog();
-            this.dialogData = res;
+            this.dialogData = data;
             this.columns = resultMapping.map((x: any) => x.name);
             this.changeDetectorRef.detectChanges();
-          } else if (res.length === 1) {
-            this.changeOutFieldData(res[0]);
+          } else if (data.length === 1) {
+            this.changeOutFieldData(data[0]);
           } else {
-            this.notifyService.notifyWarning('Warning', 'No data found');
+            this.notifyService.notifyWarning('Warning', this.noDataMessage || 'No data found');
           }
         } else {
-          this.changeOutFieldData(res);
+          this.changeOutFieldData(data);
         }
       });
     } else {
@@ -248,6 +249,7 @@ interface ServiceConfig {
   apiAddress: string;
   method: 'GET' | 'POST';
   paramMapping: { [key: string]: any }[];
+  dataField?: string;
   resultMapping: { [key: string]: any }[];
 }
 
@@ -263,6 +265,7 @@ interface ServiceConfig {
       [serviceConfig]="props.serviceConfig"
       [showLinesLabel]="props.showLinesLabel"
       [showLinesUrlConfig]="props.showLinesUrl || ''"
+      [noDataMessage]="props.noDataMessage || ''"
       [lookupLinesLabel]="props.lookupLinesLabel"></app-gps-locator>
   `,
   styles: [
@@ -285,6 +288,7 @@ export class FormlyFieldGPSLocatorComponent
         showLinesLabel: string;
         showLinesUrl: string;
         lookupLinesLabel: string;
+        noDataMessage: string;
       }
     >
   >
