@@ -8,7 +8,7 @@ import {
   OnInit,
   forwardRef
 } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, ValidationErrors } from '@angular/forms';
+import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyFieldProps, FormlyFormOptions } from '@ngx-formly/core';
 import { finalize } from 'rxjs';
 import { NotifyService } from 'src/app/shared';
@@ -33,9 +33,9 @@ import { NotifyService } from 'src/app/shared';
 })
 export class GPSLocatorComponent implements ControlValueAccessor {
   @Input()
-  set dirty(val: boolean) {
-    if (val) this.fields.forEach(x => x.formControl?.markAsDirty());
-    else this.fields.forEach(x => x.formControl?.markAsPristine());
+  set touched(val: boolean) {
+    if (val) this.fields.forEach(x => x.formControl?.markAsTouched());
+    else this.fields.forEach(x => x.formControl?.markAsUntouched());
   }
 
   _required = false;
@@ -59,9 +59,11 @@ export class GPSLocatorComponent implements ControlValueAccessor {
   _value: any;
   @Input()
   set value(val: any) {
-    if (val && val !== 'error') {
-      this.model = { ...this.model, ...val };
-      this.changeDetectorRef.markForCheck();
+    if (val) {
+      setTimeout(() => {
+        this.model = { ...this.model, ...val };
+        this.changeDetectorRef.markForCheck();
+      }, 0);
     }
     this._value = val;
   }
@@ -209,7 +211,7 @@ export class GPSLocatorComponent implements ControlValueAccessor {
           }
         });
     } else {
-      this.fields.forEach(x => x.formControl?.markAsDirty());
+      this.fields.forEach(x => x.formControl?.markAsTouched());
     }
   }
 
@@ -283,7 +285,7 @@ interface ServiceConfig {
     <app-gps-locator
       [formControl]="formControl"
       [formlyAttributes]="field"
-      [dirty]="formControl.dirty"
+      [touched]="formControl.touched"
       [label]="props.label || ''"
       [required]="props.required || false"
       [serviceConfig]="props.serviceConfig"
@@ -305,7 +307,6 @@ export class FormlyFieldGPSLocatorComponent
   extends FieldType<
     FieldTypeConfig<
       FormlyFieldProps & {
-        dirty: boolean;
         label: string;
         serviceConfig: ServiceConfig;
         mappingColumns: { [key: string]: any }[];
@@ -320,14 +321,7 @@ export class FormlyFieldGPSLocatorComponent
 {
   ngOnInit(): void {
     this.field.validation = {
-      messages: { required: ' ', errorData: ' ' }
+      messages: { required: ' ' }
     };
-    this.field.formControl.addValidators((control: AbstractControl): ValidationErrors | null => {
-      if (control.value === 'error') {
-        control.markAsPristine();
-        return { errorData: true };
-      }
-      return null;
-    });
   }
 }

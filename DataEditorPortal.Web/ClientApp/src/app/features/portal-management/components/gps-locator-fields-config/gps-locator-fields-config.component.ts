@@ -28,11 +28,6 @@ export class GPSLocatorFieldsConfigComponent {
       return;
     }
     this.innerValue = val;
-
-    const newVal = JSON.parse(JSON.stringify(val || null));
-    if (newVal) {
-      this.formGroup.setValue(newVal);
-    }
   }
   @Input()
   set mappingColumns(val: DataSourceTableColumn[]) {
@@ -79,15 +74,9 @@ export class GPSLocatorFieldsConfigComponent {
   showDialog() {
     this.visible = true;
     if (this.innerValue) {
-      // this.formControlFrom.setValue(this.innerValue?.from);
-      // this.formControlFromMeasure.setValue(this.innerValue?.fromMeasure);
-      // this.formControlTo.setValue(this.innerValue?.to);
-      // this.formControlToMeasure.setValue(this.innerValue?.toMeasure);
+      this.formGroup.setValue(this.innerValue);
     } else {
-      // this.formControlFrom.reset();
-      // this.formControlFromMeasure.reset();
-      // this.formControlTo.reset();
-      // this.formControlToMeasure.reset();
+      this.formGroup.reset();
     }
   }
 

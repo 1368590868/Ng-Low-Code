@@ -352,7 +352,7 @@ export class EditRecordActionComponent extends GridActionDirective implements On
       }
     } else {
       setTimeout(() => {
-        this.fields.forEach(x => x.formControl?.markAsDirty());
+        this.form.markAllAsTouched();
       }, 0);
       this.errorEvent.emit();
     }
