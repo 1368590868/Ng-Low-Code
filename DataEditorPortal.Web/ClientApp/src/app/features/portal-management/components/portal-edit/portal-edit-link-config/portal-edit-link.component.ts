@@ -1,9 +1,11 @@
 import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
-import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
-import { PortalItemService } from '../../../services/portal-item.service';
+import { FormControl, NgModel } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
 import { NotifyService } from 'src/app/shared';
-import { Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
+import { AdvancedQueryModel } from '..';
+import { CustomActionsComponent } from '../..';
+import { PortalEditStepDirective } from '../../../directives/portal-edit-step.directive';
 import {
   DataSourceConfig,
   DataSourceConnection,
@@ -12,10 +14,7 @@ import {
   LinkedDataSourceConfig,
   LinkedSingleConfig
 } from '../../../models/portal-item';
-import { FormControl, NgModel } from '@angular/forms';
-import { AdvancedQueryModel } from '..';
-import { CustomActionsComponent } from '../..';
-import { ConfirmationService } from 'primeng/api';
+import { PortalItemService } from '../../../services/portal-item.service';
 @Component({
   selector: 'app-portal-edit-link',
   templateUrl: './portal-edit-link.component.html',
@@ -236,8 +235,8 @@ export class PortalEditLinkComponent extends PortalEditStepDirective implements 
   valid() {
     if (this.isOneToMany) {
       if (!this.formControlPrimaryOneToMany.value || !this.formControlSecondaryOneToMany.value) {
-        this.formControlPrimaryOneToMany.markAsDirty();
-        this.formControlSecondaryOneToMany.markAsDirty();
+        this.formControlPrimaryOneToMany.markAsTouched();
+        this.formControlSecondaryOneToMany.markAsTouched();
         return false;
       }
       return true;
@@ -253,12 +252,12 @@ export class PortalEditLinkComponent extends PortalEditStepDirective implements 
       !this.formControlPrimaryReference.value ||
       !this.formControlSecondaryReference.value
     ) {
-      this.formControlSecondaryMap.markAsDirty();
-      this.formControlPrimaryMap.markAsDirty();
-      this.formControlPrimaryReference.markAsDirty();
-      this.formControlSecondaryReference.markAsDirty();
+      this.formControlSecondaryMap.markAsTouched();
+      this.formControlPrimaryMap.markAsTouched();
+      this.formControlPrimaryReference.markAsTouched();
+      this.formControlSecondaryReference.markAsTouched();
       this.validationRef.forEach(x => {
-        x.control.markAsDirty();
+        x.control.markAsTouched();
       });
       if (
         !this.primaryTableConfig?.details ||
@@ -446,17 +445,17 @@ export class PortalEditLinkComponent extends PortalEditStepDirective implements 
 
   validate() {
     if (!this.formControlConnection.valid) {
-      this.formControlConnection.markAsDirty();
+      this.formControlConnection.markAsTouched();
       this.formControlConnection.updateValueAndValidity();
     }
 
     if (!this.formControlDbTable.valid) {
-      this.formControlDbTable.markAsDirty();
+      this.formControlDbTable.markAsTouched();
       this.formControlDbTable.updateValueAndValidity();
     }
 
     if (!this.formControlIdColumn.valid) {
-      this.formControlIdColumn.markAsDirty();
+      this.formControlIdColumn.markAsTouched();
       this.formControlIdColumn.updateValueAndValidity();
     }
 
