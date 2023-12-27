@@ -154,12 +154,12 @@ export class GPSLocatorComponent implements ControlValueAccessor {
         httpParams[x.name] = x.value;
       });
       if (method === 'get') {
-        return this.http.get(api, { params: httpParams }).pipe(map((res: any) => res.data));
+        return this.http.get(api, { params: httpParams }).pipe(map((res: any) => res?.data || res));
       } else {
-        return this.http.post(api, httpParams).pipe(map((res: any) => res.data));
+        return this.http.post(api, httpParams).pipe(map((res: any) => res?.data || res));
       }
     } catch {
-      throw new Error('Invalid service config');
+      this.notifyService.notifyWarning('Warning', 'Invalid service config');
     }
   }
 
@@ -174,6 +174,10 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     this.resultMapping = resultMapping;
     if (this.form.valid) {
       this.onCustomService(apiAddress, method.toLowerCase(), paramMapping).subscribe((res: any) => {
+        if (!res) {
+          return this.notifyService.notifyWarning('Warning', 'No data found');
+        }
+
         if (Array.isArray(res)) {
           if (res.length > 1) {
             this.openDialog();
@@ -182,6 +186,8 @@ export class GPSLocatorComponent implements ControlValueAccessor {
             this.changeDetectorRef.detectChanges();
           } else if (res.length === 1) {
             this.changeOutFieldData(res[0]);
+          } else {
+            this.notifyService.notifyWarning('Warning', 'No data found');
           }
         } else {
           this.changeOutFieldData(res);
