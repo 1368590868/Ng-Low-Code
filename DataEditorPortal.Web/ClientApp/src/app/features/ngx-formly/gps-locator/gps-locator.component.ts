@@ -82,45 +82,45 @@ export class GPSLocatorComponent implements ControlValueAccessor {
 
   fields: FormlyFieldConfig[] = [
     {
-      key: 'beginLon',
+      key: 'beginLat',
       type: 'inputNumber',
       className: 'left-columns',
       props: {
         label: 'Begin GPS',
         required: this.required,
         maxFractionDigits: 20,
-        placeholder: 'Please input begin Longitude'
+        placeholder: 'Latitude'
       }
     },
     {
-      key: 'beginLat',
+      key: 'beginLon',
       className: 'right-columns',
       type: 'inputNumber',
       props: {
         required: this.required,
         maxFractionDigits: 20,
-        placeholder: 'Please input begin Latitude'
+        placeholder: 'Longitude'
       }
     },
     {
-      key: 'endLon',
+      key: 'endLat',
       type: 'inputNumber',
       className: 'left-columns',
       props: {
         label: 'End GPS',
         required: this.required,
         maxFractionDigits: 20,
-        placeholder: 'Please input end Longitude'
+        placeholder: 'Latitude'
       }
     },
     {
-      key: 'endLat',
+      key: 'endLon',
       type: 'inputNumber',
       className: 'right-columns',
       props: {
         required: this.required,
         maxFractionDigits: 20,
-        placeholder: 'Please input end Latitude'
+        placeholder: 'Longitude'
       }
     }
   ];
