@@ -106,7 +106,6 @@
           <div class="p-picklist-list flex-grow-1">
             <div *ngIf="this.model && this.model.key; else emptyMessage">
               <app-form-designer-config
-                [dbColumns]="_dbColumns"
                 [config]="model"
                 (configChange)="configChange($event)"></app-form-designer-config>
             </div>

@@ -39,7 +39,7 @@ export class AutoFilterDirective implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     if ('options' in changes) {
       const enableFilter = this.options.length > 5;
-      const enableVirtual = this.options.length > 10;
+      const enableVirtual = this.options.length > 50;
 
       if (this.dropdown) {
         this.dropdown.filter = enableFilter;

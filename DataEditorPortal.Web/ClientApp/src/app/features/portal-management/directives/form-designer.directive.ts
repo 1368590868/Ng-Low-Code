@@ -2,7 +2,7 @@ import { Directive, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
 import { distinctUntilChanged, startWith, tap } from 'rxjs';
-import { DataSourceTableColumn, FieldControlType, GridFormField } from '../models/portal-item';
+import { FieldControlType, GridFormField } from '../models/portal-item';
 import { PortalItemService } from '../services/portal-item.service';
 
 export const FROM_DESIGNER_CONTROLS: FieldControlType[] = [
@@ -405,13 +405,6 @@ export class FormDesignerDirective {
               },
               expressions: {
                 'props.locationType': `field.parent.model.locationType`
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dbColumns) {
-                    field.props.mappingColumns = this.dbColumns;
-                  }
-                }
               }
             },
 
@@ -520,13 +513,6 @@ export class FormDesignerDirective {
               props: {
                 label: 'Fields Mapping',
                 description: 'Set GPS fields mapping'
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dbColumns) {
-                    field.props.mappingColumns = this.dbColumns;
-                  }
-                }
               }
             },
             {
@@ -535,13 +521,6 @@ export class FormDesignerDirective {
               props: {
                 label: 'GPS Service Config',
                 description: 'Set gps service and fields mapping'
-              },
-              hooks: {
-                onInit: (field: any) => {
-                  if (this.dbColumns) {
-                    field.props.mappingColumns = this.dbColumns;
-                  }
-                }
               }
             },
             {
@@ -633,7 +612,6 @@ export class FormDesignerDirective {
       this.model = val;
     }
   }
-  @Input() dbColumns: DataSourceTableColumn[] = [];
 
   @Output() configChange = new EventEmitter<GridFormField>();
 

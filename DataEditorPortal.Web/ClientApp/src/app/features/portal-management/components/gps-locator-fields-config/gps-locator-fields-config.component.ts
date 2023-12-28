@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
 import { FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
-import { DataSourceTableColumn } from '../../models/portal-item';
+import { FormLayoutComponent } from '..';
 
 @Component({
   selector: 'app-gps-locator-fields-config',
@@ -29,16 +29,10 @@ export class GPSLocatorFieldsConfigComponent {
     }
     this.innerValue = val;
   }
-  @Input()
-  set mappingColumns(val: DataSourceTableColumn[]) {
-    this.filedMapping = val.map(x => {
-      return {
-        label: x.columnName,
-        value: x.columnName
-      };
-    });
-  }
-  filedMapping!: { label: string; value: string }[];
+
+  constructor(private formLayout: FormLayoutComponent) {}
+
+  dbColumns: { label: string; value: string }[] = [];
 
   formGroup = new FormGroup({
     beginLat: new FormControl(null, Validators.required),
@@ -78,6 +72,9 @@ export class GPSLocatorFieldsConfigComponent {
     } else {
       this.formGroup.reset();
     }
+
+    // generate dbColumns
+    this.dbColumns = this.formLayout?._dbColumns?.map(x => ({ label: x.columnName, value: x.columnName })) || [];
   }
 
   onSave() {
@@ -103,15 +100,7 @@ export class GPSLocatorFieldsConfigComponent {
   selector: 'app-formly-gps-locator-fields-config',
   template: ` <app-gps-locator-fields-config
     [formControl]="formControl"
-    [formlyAttributes]="field"
-    [mappingColumns]="props.mappingColumns || []"></app-gps-locator-fields-config>`,
+    [formlyAttributes]="field"></app-gps-locator-fields-config>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormlyFieldGPSLocatorFieldsConfigComponent extends FieldType<
-  FieldTypeConfig<
-    FormlyFieldProps & {
-      mappingColumns: DataSourceTableColumn[];
-    }
-  >
-> {}
-FormlyFieldGPSLocatorFieldsConfigComponent;
+export class FormlyFieldGPSLocatorFieldsConfigComponent extends FieldType<FieldTypeConfig<FormlyFieldProps>> {}

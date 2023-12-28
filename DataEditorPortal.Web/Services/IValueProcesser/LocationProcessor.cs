@@ -150,7 +150,7 @@ namespace DataEditorPortal.Web.Services
                 if (valueX == null || valueY == null)
                     return false;
 
-                if (key == "fromMeasure" || key == "toMeasure")
+                if (key == "fromMeasure" || key == "toMeasure" || key == "measure")
                 {
                     if (!decimal.Equals(Convert.ToDecimal(valueX), Convert.ToDecimal(valueY))) return false;
                 }
@@ -183,7 +183,7 @@ namespace DataEditorPortal.Web.Services
                     var valueCode = 0;
                     if (obj.ContainsKey(key) && obj[key] != null)
                     {
-                        if (key == "fromMeasure" || key == "toMeasure")
+                        if (key == "fromMeasure" || key == "toMeasure" || key == "measure")
                         {
                             valueCode = Convert.ToDecimal(obj[key]).GetHashCode();
                         }

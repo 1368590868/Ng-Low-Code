@@ -187,9 +187,18 @@ export class GPSLocatorComponent implements ControlValueAccessor {
     if (this.form.valid) {
       this.loading = true;
       this.onCustomService(apiAddress, method.toLowerCase(), paramMapping)
-        .pipe(finalize(() => (this.loading = false)))
+        .pipe(
+          finalize(() => {
+            this.loading = false;
+            this.changeDetectorRef.markForCheck();
+          })
+        )
         .subscribe((res: any) => {
-          const data = dataField ? res[dataField] : res;
+          let data = res;
+          if (dataField) {
+            const arr = dataField.split('.');
+            data = arr.reduce((p, c) => (p[c] ? p[c] : undefined), res);
+          }
 
           if (!data) {
             return this.notifyService.notifyWarning('Warning', this.noDataMessage || 'No data found');
