@@ -74,7 +74,7 @@ export class SystemLogDialogComponent {
   removeExtraIndentation(inputString?: string) {
     if (!inputString) return;
     // Split the string into lines
-    const lines = inputString.split(/[\r|\n]+/g);
+    const lines = inputString.split(/[\r\n]+/g);
     if (lines.length <= 1) return inputString;
 
     // Find the indentation of first non-empty lines
