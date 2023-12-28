@@ -277,6 +277,7 @@ export class UserManagerActionComponent extends GridActionDirective implements O
   }
 
   onFormSubmit(model: ManageRoleForm) {
+    this.form.markAllAsTouched();
     if (this.form.valid) {
       const apiName = this.isAddForm ? 'createUser' : 'updateUser';
       this.systemLogService.addSiteVisitLog({

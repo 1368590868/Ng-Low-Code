@@ -172,6 +172,7 @@ export class AddGroupComponent {
   }
 
   onFormSubmit(model: GroupDetail) {
+    this.form.markAllAsTouched();
     if (this.form.valid) {
       this.isLoading = true;
       if (this.id) {
