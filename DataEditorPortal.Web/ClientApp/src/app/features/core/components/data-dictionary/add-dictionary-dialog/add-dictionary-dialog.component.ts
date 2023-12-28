@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, NgForm } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
-import { DictionaryData, NotifyService, DataDictionaryService } from 'src/app/shared';
+import { DataDictionaryService, DictionaryData, NotifyService } from 'src/app/shared';
 
 @Component({
   selector: 'app-add-dictionary-dialog',
@@ -108,6 +108,7 @@ export class AddDictionaryDialogComponent {
   }
 
   onFormSubmit(model: DictionaryData) {
+    this.form.markAllAsTouched();
     if (this.form.valid) {
       this.isLoading = true;
       if (model['ID']) {

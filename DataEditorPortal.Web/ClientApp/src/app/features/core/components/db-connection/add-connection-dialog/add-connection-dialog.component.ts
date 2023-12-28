@@ -190,6 +190,7 @@ export class AddConnectionDialogComponent {
   }
 
   onFormSubmit(model: DbConnectionData) {
+    this.form.markAllAsTouched();
     if (this.form.valid) {
       this.isLoading = true;
       if (this.isEdit) {
