@@ -1,9 +1,10 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormlyModule } from '@ngx-formly/core';
+import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { FormlyWrapperFormFieldComponent } from './form-field.wrapper';
+import { FormlyModule } from '@ngx-formly/core';
 import { TooltipModule } from 'primeng/tooltip';
+import { SharedModule } from 'src/app/shared';
+import { FormlyWrapperFormFieldComponent } from './form-field.wrapper';
 
 @NgModule({
   declarations: [FormlyWrapperFormFieldComponent],
@@ -11,6 +12,7 @@ import { TooltipModule } from 'primeng/tooltip';
     CommonModule,
     ReactiveFormsModule,
     TooltipModule,
+    SharedModule,
     FormlyModule.forChild({
       wrappers: [
         {

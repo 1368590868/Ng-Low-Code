@@ -18,6 +18,7 @@ import { DropdownFixDirective } from './directive/dropdown-fix.directive';
 import { MonacoEditorDirective } from './directive/monaco-editor.directive';
 import { PermissionDirective } from './directive/permission.directive';
 import { TableDirective } from './directive/table.directive';
+import { PTooltipFixDirective } from './directive/tooltip-fix.directive';
 
 // public components
 import { AttachmentsComponent } from './components/attachments/attachments.component';
@@ -44,6 +45,7 @@ registerQuill();
     DialogFocusDirective,
     PTableHighlightRowDirective,
     TableDirective,
+    PTooltipFixDirective,
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,
@@ -61,6 +63,7 @@ registerQuill();
     DialogFocusDirective,
     PTableHighlightRowDirective,
     TableDirective,
+    PTooltipFixDirective,
     BooleanTextPipe,
     AttachmentsPipe,
     TemplatePipe,

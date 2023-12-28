@@ -37,7 +37,7 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
               *ngIf="props.description"
               class="pi pi-question-circle ml-2"
               [pTooltip]="props.description"
-              [hideDelay]="500"
+              [autoHide]="false"
               [escape]="false"></i>
           </label>
         </ng-container>

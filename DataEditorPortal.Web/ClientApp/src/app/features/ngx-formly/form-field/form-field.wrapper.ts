@@ -1,6 +1,6 @@
-import { trigger, transition, style, animate } from '@angular/animations';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Component } from '@angular/core';
-import { FieldWrapper, FormlyFieldConfig, FormlyFieldProps as CoreFormlyFieldProps } from '@ngx-formly/core';
+import { FormlyFieldProps as CoreFormlyFieldProps, FieldWrapper, FormlyFieldConfig } from '@ngx-formly/core';
 
 export interface FormlyFieldProps extends CoreFormlyFieldProps {
   hideRequiredMarker?: boolean;
@@ -21,7 +21,7 @@ export interface FormlyFieldProps extends CoreFormlyFieldProps {
           *ngIf="props.description"
           class="pi pi-question-circle ml-2"
           [pTooltip]="props.description"
-          [hideDelay]="500"
+          [autoHide]="false"
           [escape]="false"></i>
       </label>
       <ng-container #fieldComponent></ng-container>

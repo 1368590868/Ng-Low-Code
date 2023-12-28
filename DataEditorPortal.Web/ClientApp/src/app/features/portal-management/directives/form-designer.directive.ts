@@ -96,8 +96,8 @@ export const FROM_DESIGNER_CONTROLS: FieldControlType[] = [
     hideValidatorConfig: true,
     isCustom: true,
     initialConfig: {
-      lookupLinesLabel: 'Lookup Lines',
-      showLinesLabel: 'Show Lines'
+      lookupLinesLabel: 'See Matched Lines',
+      showLinesLabel: 'Show on Map'
     }
   }
 ];
@@ -544,6 +544,8 @@ export class FormDesignerDirective {
               type: 'input',
               props: {
                 label: 'Show Lines Url',
+                description:
+                  'Avaliable macros: <br><br><code>##beginLat##</code> <br><code>##beginLon##</code> <br><code>##endLat##</code> <br><code>##endLon##</code>',
                 placeholder: 'Enter show lines url'
               }
             },
