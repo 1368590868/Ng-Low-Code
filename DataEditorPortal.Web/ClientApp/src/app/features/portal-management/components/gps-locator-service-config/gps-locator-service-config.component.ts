@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, Optional, forwardRef } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { FormLayoutComponent } from '..';
@@ -41,7 +41,7 @@ export class GPSLocatorServiceConfigComponent {
     }
   }
 
-  constructor(private formBuilder: FormBuilder, private formLayout: FormLayoutComponent) {}
+  constructor(private formBuilder: FormBuilder, @Optional() private formLayout: FormLayoutComponent) {}
 
   paramMappingOptions = [
     {

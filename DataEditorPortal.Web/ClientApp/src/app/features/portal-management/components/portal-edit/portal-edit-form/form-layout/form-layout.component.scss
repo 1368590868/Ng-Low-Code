@@ -27,8 +27,8 @@
     }
     .p-picklist-target-wrapper {
       .p-picklist-item {
-        padding-top: 0.5;
-        padding-bottom: 0.5;
+        padding-left: 2rem;
+        padding-right: 2rem;
         position: relative;
         max-width: 50rem;
         margin: 0 auto;
@@ -37,8 +37,8 @@
           opacity: 0;
           transition: opacity var(--transition-duration);
           position: absolute;
-          top: 0.875rem;
-          right: 0.5rem;
+          top: 0.25rem;
+          right: 0.25rem;
           z-index: 99;
           .p-button.p-button-icon-only {
             width: 1.5rem;

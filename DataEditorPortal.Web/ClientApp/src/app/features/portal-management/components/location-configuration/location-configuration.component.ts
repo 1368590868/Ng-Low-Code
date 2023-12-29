@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, Input, Optional, forwardRef } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { FieldType, FieldTypeConfig, FormlyFieldProps } from '@ngx-formly/core';
 import { FormLayoutComponent } from '..';
@@ -40,7 +40,7 @@ export class LocationConfigurationComponent {
     }
   }
 
-  constructor(private formLayout: FormLayoutComponent) {}
+  constructor(@Optional() private formLayout: FormLayoutComponent) {}
 
   dbColumns: { label: string; value: string }[] = [];
 
