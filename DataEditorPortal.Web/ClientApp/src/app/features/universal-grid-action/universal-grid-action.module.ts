@@ -108,6 +108,7 @@ const GRID_ACTION_CONFIG: GridActionConfig[] = [
   },
   {
     name: 'export-excel',
+    requireGridSearch: true,
     component: ExportExcelActionComponent,
     wrapper: {
       label: 'Export To Excel',

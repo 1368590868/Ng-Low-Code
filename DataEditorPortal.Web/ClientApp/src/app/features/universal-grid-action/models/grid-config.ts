@@ -28,6 +28,7 @@ export interface GridActionConfig {
   label?: string;
   isCustom?: boolean;
   requireGridRowSelected?: boolean | number | string;
+  requireGridSearch?: boolean;
   component: Type<GridActionDirective>;
   wrapper?: GridActionWrapperOption;
   props?: {

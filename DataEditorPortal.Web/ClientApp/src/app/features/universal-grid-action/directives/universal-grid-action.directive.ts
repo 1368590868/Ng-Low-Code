@@ -55,6 +55,7 @@ export class UniversalGridActionDirective implements DoCheck, OnChanges, OnDestr
     if ('fetchDataParam' in changes) {
       this.actionWrapperRefs.forEach(wrapper => {
         this.syncActionProps(wrapper, 'fetchDataParam');
+        this.setActionWrapperVisible(wrapper);
       });
     }
   }
@@ -118,7 +119,7 @@ export class UniversalGridActionDirective implements DoCheck, OnChanges, OnDestr
   setActionWrapperVisible(wrapper: ComponentRef<ActionWrapperComponent>) {
     const actionCfg = wrapper.instance.actionConfig;
 
-    const isActionVisible = (): boolean => {
+    const isRequireSelectedRocords = (): boolean => {
       if (typeof actionCfg.requireGridRowSelected === 'string') {
         const operator = actionCfg.requireGridRowSelected.split(' ')[0];
         const value = actionCfg.requireGridRowSelected.split(' ')[1];
@@ -141,7 +142,13 @@ export class UniversalGridActionDirective implements DoCheck, OnChanges, OnDestr
       }
     };
 
-    wrapper.instance.visible = isActionVisible();
+    const isRequireSearch = (): boolean => {
+      if (actionCfg.requireGridSearch) {
+        return this.fetchDataParam != null;
+      } else return true;
+    };
+
+    wrapper.instance.visible = isRequireSelectedRocords() && isRequireSearch();
   }
 
   syncActionProps(wrapper: ComponentRef<ActionWrapperComponent>, prop: string) {
