@@ -1,9 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { GridResult } from '../models';
 import { ApiResponse } from '../models/api-response';
 import { GroupData, GroupDetail } from '../models/site-group';
-import { Observable } from 'rxjs';
-import { GridResult } from '../models/universal.type';
+
+interface DropdownOptions {
+  label: string;
+  value: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +22,10 @@ export class SiteGroupService {
 
   getGroupList(fetchDataParam: any) {
     return this.http.post<ApiResponse<GridResult<GroupData>>>(`${this._apiUrl}site-group/list`, fetchDataParam);
+  }
+
+  getGroupOptions() {
+    return this.http.get<ApiResponse<DropdownOptions[]>>(`${this._apiUrl}site-group/options`);
   }
 
   getGroupInfo(id: string) {

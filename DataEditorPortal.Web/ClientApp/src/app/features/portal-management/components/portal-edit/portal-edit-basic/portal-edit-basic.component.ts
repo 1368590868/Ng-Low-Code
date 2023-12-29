@@ -161,12 +161,9 @@ export class PortalEditBasicComponent extends PortalEditStepDirective implements
       },
       hooks: {
         onInit: field => {
-          this.siteGroupService.getGroupList({ indexCount: 999 }).subscribe(res => {
-            if (res.code === 200 && res.data?.data && field.props) {
-              const options = res.data.data.map(x => ({
-                label: x.TITLE,
-                value: x.ID
-              }));
+          this.siteGroupService.getGroupOptions().subscribe(res => {
+            if (res.code === 200 && res.data && field.props) {
+              const options = res.data;
               field.props.options = options;
               this.options.detectChanges?.(field);
             }
