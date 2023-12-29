@@ -262,6 +262,14 @@ export class PortalEditComponent implements OnInit, OnDestroy {
           relativeTo: this.activatedRoute
         });
       });
+
+      // cancel
+      child.cancelEvent.pipe(takeUntil(this.destroy$)).subscribe(() => {
+        const next = this.itemId ? '../../' : '../';
+        this.router.navigate([next], {
+          relativeTo: this.activatedRoute
+        });
+      });
     }
   }
 

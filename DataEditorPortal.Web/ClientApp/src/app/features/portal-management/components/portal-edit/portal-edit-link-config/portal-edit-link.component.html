@@ -393,15 +393,22 @@
   <ng-template pTemplate="footer">
     <div class="flex align-items-center">
       <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        [disabled]="isLoading || isSaving"
+        [text]="true"
+        (onClick)="cancelEvent.emit()"></p-button>
+      <p-button
         label="Back"
         icon="pi pi-angle-left"
+        class="ml-auto"
         [disabled]="isLoading || isSaving"
         [outlined]="true"
         (onClick)="onBack()"></p-button>
       <p-button
         label="Save Draft & Exit"
         icon="pi pi-save"
-        class="ml-auto"
+        class="ml-2"
         [disabled]="isLoading || isSaving"
         [outlined]="true"
         (onClick)="onSaveAndExit()"
@@ -410,7 +417,7 @@
         label="Save & Next"
         icon="pi pi-angle-right"
         iconPos="right"
-        [style]="{ 'margin-left': '.5em' }"
+        class="ml-2"
         [disabled]="isLoading || isSaving"
         (onClick)="onSaveAndNext()"
         [loading]="isSaving && isSavingAndNext"></p-button>
