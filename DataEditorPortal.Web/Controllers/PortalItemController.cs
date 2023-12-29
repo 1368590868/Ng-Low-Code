@@ -126,7 +126,7 @@ namespace DataEditorPortal.Web.Controllers
 
         private string SetRouterLink(PortalItemData data, string parentPath = "")
         {
-            var path = $"{parentPath}/{data.Name}";
+            var path = string.IsNullOrEmpty(parentPath) ? data.Name : $"{parentPath}/{data.Name}";
             if (data.Type == "Portal Item" || data.Type == "System")
                 data.RouterLink = path;
 
