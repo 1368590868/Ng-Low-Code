@@ -76,10 +76,6 @@ namespace DataEditorPortal.Web.Controllers
             using (var con = _depDbContext.Database.GetDbConnection())
             {
                 output = _universalGridService.QueryGridData(con, queryText, queryParams, "site-groups", false);
-                foreach (var item in output.Data)
-                {
-                    item["ID"] = new Guid(Convert.FromHexString(item["ID"].ToString()));
-                }
             }
 
             return output;
@@ -119,7 +115,6 @@ namespace DataEditorPortal.Web.Controllers
 
             return _portalItemService.ExistName(name, id);
         }
-
 
         [HttpGet]
         [Route("get-code-name")]
@@ -211,6 +206,17 @@ namespace DataEditorPortal.Web.Controllers
             _depDbContext.SaveChanges();
 
             return true;
+        }
+
+        [HttpGet]
+        [Route("options")]
+        public IEnumerable<DropdownOptionsItem> GetSiteGroupOptions()
+        {
+            return _depDbContext.SiteGroups.Select(x => new DropdownOptionsItem
+            {
+                Label = x.Title,
+                Value = x.Id
+            }).ToList();
         }
     }
 }
