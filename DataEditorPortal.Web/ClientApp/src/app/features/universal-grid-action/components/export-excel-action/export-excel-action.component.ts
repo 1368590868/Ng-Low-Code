@@ -96,7 +96,7 @@ export class ExportExcelActionComponent extends GridActionDirective implements O
             a.download = fileName;
             a.click();
             a.remove();
-            // this.savedEvent.emit();
+            this.cancelEvent.emit();
           })
         )
         .subscribe();
