@@ -138,6 +138,7 @@ namespace DataEditorPortal.Web.Services
 
             foreach (var key in _keys)
             {
+                if (!x.ContainsKey(key) && !y.ContainsKey(key)) continue;
                 if (!x.ContainsKey(key) || !y.ContainsKey(key))
                     return false;
 
